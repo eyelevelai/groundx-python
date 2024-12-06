@@ -3,5 +3,5 @@
 import enum
 
 
-class EyeLevelEnvironment(enum.Enum):
+class GroundXEnvironment(enum.Enum):
     DEFAULT = "https://api.groundx.ai/api"

@@ -43,14 +43,14 @@ from .types import (
 )
 from .errors import BadRequestError, UnauthorizedError
 from . import buckets, customer, documents, groups, health, search
-from .client import AsyncEyeLevel, EyeLevel
+from .client import AsyncGroundX, GroundX
 from .documents import DocumentRemoteIngestRequestDocumentsItem, WebsiteCrawlRequestWebsitesItem
-from .environment import EyeLevelEnvironment
+from .environment import GroundXEnvironment
 from .search import SearchContentRequestId
 from .version import __version__
 
 __all__ = [
-    "AsyncEyeLevel",
+    "AsyncGroundX",
     "BadRequestError",
     "BoundingBoxDetail",
     "BucketDetail",
@@ -66,8 +66,8 @@ __all__ = [
     "DocumentRemoteIngestRequestDocumentsItem",
     "DocumentResponse",
     "DocumentType",
-    "EyeLevel",
-    "EyeLevelEnvironment",
+    "GroundX",
+    "GroundXEnvironment",
     "GroupDetail",
     "GroupListResponse",
     "GroupResponse",

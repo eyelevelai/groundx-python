@@ -69,9 +69,9 @@ class SearchClient:
 
         Examples
         --------
-        from eyelevel import EyeLevel
+        from eyelevel import GroundX
 
-        client = EyeLevel(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.search.content(
@@ -177,9 +177,9 @@ class SearchClient:
 
         Examples
         --------
-        from eyelevel import EyeLevel
+        from eyelevel import GroundX
 
-        client = EyeLevel(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.search.documents(
@@ -293,9 +293,9 @@ class AsyncSearchClient:
         --------
         import asyncio
 
-        from eyelevel import AsyncEyeLevel
+        from eyelevel import AsyncGroundX
 
-        client = AsyncEyeLevel(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -409,9 +409,9 @@ class AsyncSearchClient:
         --------
         import asyncio
 
-        from eyelevel import AsyncEyeLevel
+        from eyelevel import AsyncGroundX
 
-        client = AsyncEyeLevel(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 

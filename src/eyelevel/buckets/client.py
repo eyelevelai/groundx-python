@@ -53,9 +53,9 @@ class BucketsClient:
 
         Examples
         --------
-        from eyelevel import EyeLevel
+        from eyelevel import GroundX
 
-        client = EyeLevel(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.buckets.list()
@@ -103,9 +103,9 @@ class BucketsClient:
 
         Examples
         --------
-        from eyelevel import EyeLevel
+        from eyelevel import GroundX
 
-        client = EyeLevel(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.buckets.create(
@@ -166,9 +166,9 @@ class BucketsClient:
 
         Examples
         --------
-        from eyelevel import EyeLevel
+        from eyelevel import GroundX
 
-        client = EyeLevel(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.buckets.get(
@@ -240,9 +240,9 @@ class BucketsClient:
 
         Examples
         --------
-        from eyelevel import EyeLevel
+        from eyelevel import GroundX
 
-        client = EyeLevel(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.buckets.update(
@@ -314,9 +314,9 @@ class BucketsClient:
 
         Examples
         --------
-        from eyelevel import EyeLevel
+        from eyelevel import GroundX
 
-        client = EyeLevel(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.buckets.delete(
@@ -399,9 +399,9 @@ class AsyncBucketsClient:
         --------
         import asyncio
 
-        from eyelevel import AsyncEyeLevel
+        from eyelevel import AsyncGroundX
 
-        client = AsyncEyeLevel(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -457,9 +457,9 @@ class AsyncBucketsClient:
         --------
         import asyncio
 
-        from eyelevel import AsyncEyeLevel
+        from eyelevel import AsyncGroundX
 
-        client = AsyncEyeLevel(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -528,9 +528,9 @@ class AsyncBucketsClient:
         --------
         import asyncio
 
-        from eyelevel import AsyncEyeLevel
+        from eyelevel import AsyncGroundX
 
-        client = AsyncEyeLevel(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -610,9 +610,9 @@ class AsyncBucketsClient:
         --------
         import asyncio
 
-        from eyelevel import AsyncEyeLevel
+        from eyelevel import AsyncGroundX
 
-        client = AsyncEyeLevel(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -694,9 +694,9 @@ class AsyncBucketsClient:
         --------
         import asyncio
 
-        from eyelevel import AsyncEyeLevel
+        from eyelevel import AsyncGroundX
 
-        client = AsyncEyeLevel(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 

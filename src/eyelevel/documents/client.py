@@ -55,10 +55,10 @@ class DocumentsClient:
 
         Examples
         --------
-        from eyelevel import EyeLevel
+        from eyelevel import GroundX
         from eyelevel.documents import DocumentRemoteIngestRequestDocumentsItem
 
-        client = EyeLevel(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.ingest_remote(
@@ -135,9 +135,9 @@ class DocumentsClient:
 
         Examples
         --------
-        from eyelevel import EyeLevel
+        from eyelevel import GroundX
 
-        client = EyeLevel(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.ingest_local()
@@ -209,10 +209,10 @@ class DocumentsClient:
 
         Examples
         --------
-        from eyelevel import EyeLevel
+        from eyelevel import GroundX
         from eyelevel.documents import WebsiteCrawlRequestWebsitesItem
 
-        client = EyeLevel(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.crawl_website(
@@ -292,9 +292,9 @@ class DocumentsClient:
 
         Examples
         --------
-        from eyelevel import EyeLevel
+        from eyelevel import GroundX
 
-        client = EyeLevel(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.get_processing_status_by_id(
@@ -390,9 +390,9 @@ class DocumentsClient:
 
         Examples
         --------
-        from eyelevel import EyeLevel
+        from eyelevel import GroundX
 
-        client = EyeLevel(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.lookup(
@@ -492,9 +492,9 @@ class DocumentsClient:
 
         Examples
         --------
-        from eyelevel import EyeLevel
+        from eyelevel import GroundX
 
-        client = EyeLevel(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.list()
@@ -552,9 +552,9 @@ class DocumentsClient:
 
         Examples
         --------
-        from eyelevel import EyeLevel
+        from eyelevel import GroundX
 
-        client = EyeLevel(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.delete()
@@ -622,9 +622,9 @@ class DocumentsClient:
 
         Examples
         --------
-        from eyelevel import EyeLevel
+        from eyelevel import GroundX
 
-        client = EyeLevel(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.get(
@@ -693,9 +693,9 @@ class DocumentsClient:
 
         Examples
         --------
-        from eyelevel import EyeLevel
+        from eyelevel import GroundX
 
-        client = EyeLevel(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.delete_by_id(
@@ -773,10 +773,10 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from eyelevel import AsyncEyeLevel
+        from eyelevel import AsyncGroundX
         from eyelevel.documents import DocumentRemoteIngestRequestDocumentsItem
 
-        client = AsyncEyeLevel(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -861,9 +861,9 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from eyelevel import AsyncEyeLevel
+        from eyelevel import AsyncGroundX
 
-        client = AsyncEyeLevel(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -943,10 +943,10 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from eyelevel import AsyncEyeLevel
+        from eyelevel import AsyncGroundX
         from eyelevel.documents import WebsiteCrawlRequestWebsitesItem
 
-        client = AsyncEyeLevel(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -1034,9 +1034,9 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from eyelevel import AsyncEyeLevel
+        from eyelevel import AsyncGroundX
 
-        client = AsyncEyeLevel(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -1140,9 +1140,9 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from eyelevel import AsyncEyeLevel
+        from eyelevel import AsyncGroundX
 
-        client = AsyncEyeLevel(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -1250,9 +1250,9 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from eyelevel import AsyncEyeLevel
+        from eyelevel import AsyncGroundX
 
-        client = AsyncEyeLevel(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -1318,9 +1318,9 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from eyelevel import AsyncEyeLevel
+        from eyelevel import AsyncGroundX
 
-        client = AsyncEyeLevel(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -1398,9 +1398,9 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from eyelevel import AsyncEyeLevel
+        from eyelevel import AsyncGroundX
 
-        client = AsyncEyeLevel(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -1477,9 +1477,9 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from eyelevel import AsyncEyeLevel
+        from eyelevel import AsyncGroundX
 
-        client = AsyncEyeLevel(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
