@@ -128,9 +128,6 @@ class GroupsClient:
                 "name": name,
                 "bucketName": bucket_name,
             },
-            headers={
-                "content-type": "application/json",
-            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -268,9 +265,6 @@ class GroupsClient:
             method="PUT",
             json={
                 "newName": new_name,
-            },
-            headers={
-                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -655,9 +649,6 @@ class AsyncGroupsClient:
                 "name": name,
                 "bucketName": bucket_name,
             },
-            headers={
-                "content-type": "application/json",
-            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -811,9 +802,6 @@ class AsyncGroupsClient:
             method="PUT",
             json={
                 "newName": new_name,
-            },
-            headers={
-                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,

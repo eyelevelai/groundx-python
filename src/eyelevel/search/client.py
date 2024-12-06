@@ -92,9 +92,6 @@ class SearchClient:
                 "query": query,
                 "relevance": relevance,
             },
-            headers={
-                "content-type": "application/json",
-            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -203,9 +200,6 @@ class SearchClient:
                 "query": query,
                 "documentIds": document_ids,
                 "relevance": relevance,
-            },
-            headers={
-                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -328,9 +322,6 @@ class AsyncSearchClient:
                 "query": query,
                 "relevance": relevance,
             },
-            headers={
-                "content-type": "application/json",
-            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -447,9 +438,6 @@ class AsyncSearchClient:
                 "query": query,
                 "documentIds": document_ids,
                 "relevance": relevance,
-            },
-            headers={
-                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,

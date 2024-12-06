@@ -80,9 +80,6 @@ class DocumentsClient:
                     direction="write",
                 ),
             },
-            headers={
-                "content-type": "application/json",
-            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -234,9 +231,6 @@ class DocumentsClient:
                 "websites": convert_and_respect_annotation_metadata(
                     object_=websites, annotation=typing.Sequence[WebsiteCrawlRequestWebsitesItem], direction="write"
                 ),
-            },
-            headers={
-                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -810,9 +804,6 @@ class AsyncDocumentsClient:
                     direction="write",
                 ),
             },
-            headers={
-                "content-type": "application/json",
-            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -980,9 +971,6 @@ class AsyncDocumentsClient:
                 "websites": convert_and_respect_annotation_metadata(
                     object_=websites, annotation=typing.Sequence[WebsiteCrawlRequestWebsitesItem], direction="write"
                 ),
-            },
-            headers={
-                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
