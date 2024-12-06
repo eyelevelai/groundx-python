@@ -1,4 +1,4 @@
-# Eyelevel Python Library
+# GroundX Python Library
 
 [![fern shield](https://img.shields.io/badge/%F0%9F%8C%BF-Built%20with%20Fern-brightgreen)](https://buildwithfern.com?utm_source=github&utm_medium=github&utm_campaign=readme&utm_source=https%3A%2F%2Fgithub.com%2Ffern-demo%2Fgroundx-python)
 [![pypi](https://img.shields.io/pypi/v/groundx-python-sdk)](https://pypi.python.org/pypi/groundx-python-sdk)
@@ -98,9 +98,9 @@ Use the `max_retries` request option to configure this behavior.
 
 ```python
 client.documents.ingest_remote(..., request_options={
-        "max_retries": 1
-    })
-    ```
+    "max_retries": 1
+})
+```
 
 ### Timeouts
 
@@ -116,11 +116,11 @@ client = GroundX(
 )
 
 
-    # Override timeout for a specific method
-    client.documents.ingest_remote(..., request_options={
-        "timeout_in_seconds": 1
-    })
-    ```
+# Override timeout for a specific method
+client.documents.ingest_remote(..., request_options={
+    "timeout_in_seconds": 1
+})
+```
 
 ### Custom Client
 
