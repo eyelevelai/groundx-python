@@ -118,9 +118,6 @@ class BucketsClient:
             json={
                 "name": name,
             },
-            headers={
-                "content-type": "application/json",
-            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -258,9 +255,6 @@ class BucketsClient:
             method="PUT",
             json={
                 "newName": new_name,
-            },
-            headers={
-                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -484,9 +478,6 @@ class AsyncBucketsClient:
             json={
                 "name": name,
             },
-            headers={
-                "content-type": "application/json",
-            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -640,9 +631,6 @@ class AsyncBucketsClient:
             method="PUT",
             json={
                 "newName": new_name,
-            },
-            headers={
-                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
