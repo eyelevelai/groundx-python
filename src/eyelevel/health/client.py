@@ -32,9 +32,9 @@ class HealthClient:
 
         Examples
         --------
-        from eyelevel import EyeLevel
+        from eyelevel import GroundX
 
-        client = EyeLevel(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.health.list()
@@ -77,9 +77,9 @@ class HealthClient:
 
         Examples
         --------
-        from eyelevel import EyeLevel
+        from eyelevel import GroundX
 
-        client = EyeLevel(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.health.get(
@@ -138,9 +138,9 @@ class AsyncHealthClient:
         --------
         import asyncio
 
-        from eyelevel import AsyncEyeLevel
+        from eyelevel import AsyncGroundX
 
-        client = AsyncEyeLevel(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -191,9 +191,9 @@ class AsyncHealthClient:
         --------
         import asyncio
 
-        from eyelevel import AsyncEyeLevel
+        from eyelevel import AsyncGroundX
 
-        client = AsyncEyeLevel(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 

@@ -1,14 +1,14 @@
 # Eyelevel Python Library
 
 [![fern shield](https://img.shields.io/badge/%F0%9F%8C%BF-Built%20with%20Fern-brightgreen)](https://buildwithfern.com?utm_source=github&utm_medium=github&utm_campaign=readme&utm_source=https%3A%2F%2Fgithub.com%2Ffern-demo%2Fgroundx-python)
-[![pypi](https://img.shields.io/pypi/v/eyelevel)](https://pypi.python.org/pypi/eyelevel)
+[![pypi](https://img.shields.io/pypi/v/groundx-python-sdk)](https://pypi.python.org/pypi/groundx-python-sdk)
 
 The Eyelevel Python library provides convenient access to the Eyelevel API from Python.
 
 ## Installation
 
 ```sh
-pip install eyelevel
+pip install groundx-python-sdk
 ```
 
 ## Reference
@@ -20,10 +20,10 @@ A full reference for this library is available [here](./reference.md).
 Instantiate and use the client with the following:
 
 ```python
-from eyelevel import EyeLevel
+from eyelevel import GroundX
 from eyelevel.documents import DocumentRemoteIngestRequestDocumentsItem
 
-client = EyeLevel(
+client = GroundX(
     api_key="YOUR_API_KEY",
 )
 client.documents.ingest_remote(
@@ -43,10 +43,10 @@ The SDK also exports an `async` client so that you can make non-blocking calls t
 ```python
 import asyncio
 
-from eyelevel import AsyncEyeLevel
+from eyelevel import AsyncGroundX
 from eyelevel.documents import DocumentRemoteIngestRequestDocumentsItem
 
-client = AsyncEyeLevel(
+client = AsyncGroundX(
     api_key="YOUR_API_KEY",
 )
 
@@ -108,9 +108,9 @@ The SDK defaults to a 60 second timeout. You can configure this with a timeout o
 
 ```python
 
-    from eyelevel import EyeLevel
+    from eyelevel import GroundX
 
-client = EyeLevel(
+client = GroundX(
     ...,
     timeout=20.0,
 )
@@ -128,9 +128,9 @@ You can override the `httpx` client to customize it for your use-case. Some comm
 and transports.
 ```python
 import httpx
-from eyelevel import EyeLevel
+from eyelevel import GroundX
 
-client = EyeLevel(
+client = GroundX(
     ...,
     httpx_client=httpx.Client(
         proxies="http://my.test.proxy.example.com",

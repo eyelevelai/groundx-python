@@ -1,3 +1,3 @@
 from importlib import metadata
 
-__version__ = metadata.version("eyelevel")
+__version__ = metadata.version("groundx-python-sdk")
