@@ -2,7 +2,7 @@
 
 import typing
 from ..core.client_wrapper import SyncClientWrapper
-from .types.search_content_request_id import SearchContentRequestId
+from .requests.search_content_request_id import SearchContentRequestIdParams
 from ..core.request_options import RequestOptions
 from ..types.search_response import SearchResponse
 from ..core.jsonable_encoder import jsonable_encoder
@@ -23,7 +23,7 @@ class SearchClient:
 
     def content(
         self,
-        id: SearchContentRequestId,
+        id: SearchContentRequestIdParams,
         *,
         query: str,
         n: typing.Optional[int] = None,
@@ -41,7 +41,7 @@ class SearchClient:
 
         Parameters
         ----------
-        id : SearchContentRequestId
+        id : SearchContentRequestIdParams
             The bucketId, groupId, projectId, or documentId to be searched. The document or documents within the specified container will be compared to the query, and relevant information will be extracted.
 
         query : str
@@ -91,6 +91,9 @@ class SearchClient:
             json={
                 "query": query,
                 "relevance": relevance,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -201,6 +204,9 @@ class SearchClient:
                 "documentIds": document_ids,
                 "relevance": relevance,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -245,7 +251,7 @@ class AsyncSearchClient:
 
     async def content(
         self,
-        id: SearchContentRequestId,
+        id: SearchContentRequestIdParams,
         *,
         query: str,
         n: typing.Optional[int] = None,
@@ -263,7 +269,7 @@ class AsyncSearchClient:
 
         Parameters
         ----------
-        id : SearchContentRequestId
+        id : SearchContentRequestIdParams
             The bucketId, groupId, projectId, or documentId to be searched. The document or documents within the specified container will be compared to the query, and relevant information will be extracted.
 
         query : str
@@ -321,6 +327,9 @@ class AsyncSearchClient:
             json={
                 "query": query,
                 "relevance": relevance,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -438,6 +447,9 @@ class AsyncSearchClient:
                 "query": query,
                 "documentIds": document_ids,
                 "relevance": relevance,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
