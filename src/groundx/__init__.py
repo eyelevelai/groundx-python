@@ -43,7 +43,7 @@ from .types import (
 )
 from .errors import BadRequestError, UnauthorizedError
 from . import buckets, customer, documents, groups, health, search
-from .compatibility import AsyncGroundx, Groundx
+from .client2 import AsyncGroundx, Groundx
 from .documents import (
     DocumentRemoteIngestRequestDocumentsItem,
     DocumentRemoteIngestRequestDocumentsItemParams,
