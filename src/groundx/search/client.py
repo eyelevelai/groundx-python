@@ -69,9 +69,9 @@ class SearchClient:
 
         Examples
         --------
-        from groundx import GroundX
+        from groundx import Groundx
 
-        client = GroundX(
+        client = Groundx(
             api_key="YOUR_API_KEY",
         )
         client.search.content(
@@ -180,9 +180,9 @@ class SearchClient:
 
         Examples
         --------
-        from groundx import GroundX
+        from groundx import Groundx
 
-        client = GroundX(
+        client = Groundx(
             api_key="YOUR_API_KEY",
         )
         client.search.documents(
@@ -299,9 +299,9 @@ class AsyncSearchClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundX
+        from groundx import AsyncGroundx
 
-        client = AsyncGroundX(
+        client = AsyncGroundx(
             api_key="YOUR_API_KEY",
         )
 
@@ -418,9 +418,9 @@ class AsyncSearchClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundX
+        from groundx import AsyncGroundx
 
-        client = AsyncGroundX(
+        client = AsyncGroundx(
             api_key="YOUR_API_KEY",
         )
 

@@ -29,9 +29,9 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from groundx import GroundX
+from groundx import Groundx
 
-client = GroundX(
+client = Groundx(
     api_key="YOUR_API_KEY",
 )
 client.documents.ingest_remote(
@@ -103,9 +103,9 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from groundx import GroundX
+from groundx import Groundx
 
-client = GroundX(
+client = Groundx(
     api_key="YOUR_API_KEY",
 )
 client.documents.ingest_local()
@@ -165,9 +165,9 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from groundx import GroundX
+from groundx import Groundx
 
-client = GroundX(
+client = Groundx(
     api_key="YOUR_API_KEY",
 )
 client.documents.crawl_website(
@@ -237,9 +237,9 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from groundx import GroundX
+from groundx import Groundx
 
-client = GroundX(
+client = Groundx(
     api_key="YOUR_API_KEY",
 )
 client.documents.get_processing_status_by_id(
@@ -309,9 +309,9 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from groundx import GroundX
+from groundx import Groundx
 
-client = GroundX(
+client = Groundx(
     api_key="YOUR_API_KEY",
 )
 client.documents.lookup(
@@ -429,9 +429,9 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from groundx import GroundX
+from groundx import Groundx
 
-client = GroundX(
+client = Groundx(
     api_key="YOUR_API_KEY",
 )
 client.documents.list()
@@ -539,9 +539,9 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from groundx import GroundX
+from groundx import Groundx
 
-client = GroundX(
+client = Groundx(
     api_key="YOUR_API_KEY",
 )
 client.documents.delete()
@@ -609,9 +609,9 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from groundx import GroundX
+from groundx import Groundx
 
-client = GroundX(
+client = Groundx(
     api_key="YOUR_API_KEY",
 )
 client.documents.get(
@@ -681,9 +681,9 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from groundx import GroundX
+from groundx import Groundx
 
-client = GroundX(
+client = Groundx(
     api_key="YOUR_API_KEY",
 )
 client.documents.delete_by_id(
@@ -756,9 +756,9 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from groundx import GroundX
+from groundx import Groundx
 
-client = GroundX(
+client = Groundx(
     api_key="YOUR_API_KEY",
 )
 client.search.content(
@@ -872,9 +872,9 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from groundx import GroundX
+from groundx import Groundx
 
-client = GroundX(
+client = Groundx(
     api_key="YOUR_API_KEY",
 )
 client.search.documents(
@@ -987,9 +987,9 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from groundx import GroundX
+from groundx import Groundx
 
-client = GroundX(
+client = Groundx(
     api_key="YOUR_API_KEY",
 )
 client.buckets.list()
@@ -1065,9 +1065,9 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from groundx import GroundX
+from groundx import Groundx
 
-client = GroundX(
+client = Groundx(
     api_key="YOUR_API_KEY",
 )
 client.buckets.create(
@@ -1137,9 +1137,9 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from groundx import GroundX
+from groundx import Groundx
 
-client = GroundX(
+client = Groundx(
     api_key="YOUR_API_KEY",
 )
 client.buckets.get(
@@ -1209,9 +1209,9 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from groundx import GroundX
+from groundx import Groundx
 
-client = GroundX(
+client = Groundx(
     api_key="YOUR_API_KEY",
 )
 client.buckets.update(
@@ -1290,9 +1290,9 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from groundx import GroundX
+from groundx import Groundx
 
-client = GroundX(
+client = Groundx(
     api_key="YOUR_API_KEY",
 )
 client.buckets.delete(
@@ -1363,9 +1363,9 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from groundx import GroundX
+from groundx import Groundx
 
-client = GroundX(
+client = Groundx(
     api_key="YOUR_API_KEY",
 )
 client.groups.list()
@@ -1441,9 +1441,9 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from groundx import GroundX
+from groundx import Groundx
 
-client = GroundX(
+client = Groundx(
     api_key="YOUR_API_KEY",
 )
 client.groups.create(
@@ -1521,9 +1521,9 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from groundx import GroundX
+from groundx import Groundx
 
-client = GroundX(
+client = Groundx(
     api_key="YOUR_API_KEY",
 )
 client.groups.get(
@@ -1593,9 +1593,9 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from groundx import GroundX
+from groundx import Groundx
 
-client = GroundX(
+client = Groundx(
     api_key="YOUR_API_KEY",
 )
 client.groups.update(
@@ -1674,9 +1674,9 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from groundx import GroundX
+from groundx import Groundx
 
-client = GroundX(
+client = Groundx(
     api_key="YOUR_API_KEY",
 )
 client.groups.delete(
@@ -1746,9 +1746,9 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from groundx import GroundX
+from groundx import Groundx
 
-client = GroundX(
+client = Groundx(
     api_key="YOUR_API_KEY",
 )
 client.groups.add_bucket(
@@ -1827,9 +1827,9 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from groundx import GroundX
+from groundx import Groundx
 
-client = GroundX(
+client = Groundx(
     api_key="YOUR_API_KEY",
 )
 client.groups.remove_bucket(
@@ -1907,9 +1907,9 @@ Get the account information associated with the API key.
 <dd>
 
 ```python
-from groundx import GroundX
+from groundx import Groundx
 
-client = GroundX(
+client = Groundx(
     api_key="YOUR_API_KEY",
 )
 client.customer.get()
@@ -1968,9 +1968,9 @@ List the current health status of all services. Statuses update every 5 minutes.
 <dd>
 
 ```python
-from groundx import GroundX
+from groundx import Groundx
 
-client = GroundX(
+client = Groundx(
     api_key="YOUR_API_KEY",
 )
 client.health.list()
@@ -2028,9 +2028,9 @@ Look up the current health status of a specific service. Statuses update every 5
 <dd>
 
 ```python
-from groundx import GroundX
+from groundx import Groundx
 
-client = GroundX(
+client = Groundx(
     api_key="YOUR_API_KEY",
 )
 client.health.get(

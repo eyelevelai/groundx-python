@@ -43,14 +43,14 @@ from .types import (
 )
 from .errors import BadRequestError, UnauthorizedError
 from . import buckets, customer, documents, groups, health, search
-from .client import AsyncGroundX, GroundX
+from .compatibility import AsyncGroundx, Groundx
 from .documents import (
     DocumentRemoteIngestRequestDocumentsItem,
     DocumentRemoteIngestRequestDocumentsItemParams,
     WebsiteCrawlRequestWebsitesItem,
     WebsiteCrawlRequestWebsitesItemParams,
 )
-from .environment import GroundXEnvironment
+from .environment import GroundxEnvironment
 from .requests import (
     BoundingBoxDetailParams,
     BucketDetailParams,
@@ -91,7 +91,7 @@ from .search import SearchContentRequestId, SearchContentRequestIdParams
 from .version import __version__
 
 __all__ = [
-    "AsyncGroundX",
+    "AsyncGroundx",
     "BadRequestError",
     "BoundingBoxDetail",
     "BoundingBoxDetailParams",
@@ -120,8 +120,8 @@ __all__ = [
     "DocumentResponse",
     "DocumentResponseParams",
     "DocumentType",
-    "GroundX",
-    "GroundXEnvironment",
+    "Groundx",
+    "GroundxEnvironment",
     "GroupDetail",
     "GroupDetailParams",
     "GroupListResponse",
