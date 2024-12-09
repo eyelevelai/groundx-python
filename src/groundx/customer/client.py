@@ -30,7 +30,7 @@ class CustomerClient:
 
         Examples
         --------
-        from eyelevel import GroundX
+        from groundx import GroundX
 
         client = GroundX(
             api_key="YOUR_API_KEY",
@@ -79,7 +79,7 @@ class AsyncCustomerClient:
         --------
         import asyncio
 
-        from eyelevel import AsyncGroundX
+        from groundx import AsyncGroundX
 
         client = AsyncGroundX(
             api_key="YOUR_API_KEY",

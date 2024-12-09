@@ -1,6 +1,6 @@
 # Reference
 ## Documents
-<details><summary><code>client.documents.<a href="src/eyelevel/documents/client.py">ingest_remote</a>(...)</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">ingest_remote</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -29,7 +29,7 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from eyelevel import GroundX
+from groundx import GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
@@ -74,7 +74,7 @@ client.documents.ingest_remote(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/eyelevel/documents/client.py">ingest_local</a>()</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">ingest_local</a>()</code></summary>
 <dl>
 <dd>
 
@@ -103,7 +103,7 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from eyelevel import GroundX
+from groundx import GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
@@ -136,7 +136,7 @@ client.documents.ingest_local()
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/eyelevel/documents/client.py">crawl_website</a>(...)</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">crawl_website</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -165,7 +165,7 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from eyelevel import GroundX
+from groundx import GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
@@ -208,7 +208,7 @@ client.documents.crawl_website(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/eyelevel/documents/client.py">get_processing_status_by_id</a>(...)</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">get_processing_status_by_id</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -237,7 +237,7 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from eyelevel import GroundX
+from groundx import GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
@@ -280,7 +280,7 @@ client.documents.get_processing_status_by_id(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/eyelevel/documents/client.py">lookup</a>(...)</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">lookup</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -309,7 +309,7 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from eyelevel import GroundX
+from groundx import GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
@@ -400,7 +400,7 @@ client.documents.lookup(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/eyelevel/documents/client.py">list</a>(...)</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">list</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -429,7 +429,7 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from eyelevel import GroundX
+from groundx import GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
@@ -510,7 +510,7 @@ client.documents.list()
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/eyelevel/documents/client.py">delete</a>(...)</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">delete</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -539,7 +539,7 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from eyelevel import GroundX
+from groundx import GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
@@ -580,7 +580,7 @@ client.documents.delete()
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/eyelevel/documents/client.py">get</a>(...)</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">get</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -609,7 +609,7 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from eyelevel import GroundX
+from groundx import GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
@@ -652,7 +652,7 @@ client.documents.get(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/eyelevel/documents/client.py">delete_by_id</a>(...)</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">delete_by_id</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -681,7 +681,7 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from eyelevel import GroundX
+from groundx import GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
@@ -725,7 +725,7 @@ client.documents.delete_by_id(
 </details>
 
 ## Search
-<details><summary><code>client.search.<a href="src/eyelevel/search/client.py">content</a>(...)</code></summary>
+<details><summary><code>client.search.<a href="src/groundx/search/client.py">content</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -756,7 +756,7 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from eyelevel import GroundX
+from groundx import GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
@@ -841,7 +841,7 @@ client.search.content(
 </dl>
 </details>
 
-<details><summary><code>client.search.<a href="src/eyelevel/search/client.py">documents</a>(...)</code></summary>
+<details><summary><code>client.search.<a href="src/groundx/search/client.py">documents</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -872,7 +872,7 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from eyelevel import GroundX
+from groundx import GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
@@ -958,7 +958,7 @@ client.search.documents(
 </details>
 
 ## Buckets
-<details><summary><code>client.buckets.<a href="src/eyelevel/buckets/client.py">list</a>(...)</code></summary>
+<details><summary><code>client.buckets.<a href="src/groundx/buckets/client.py">list</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -987,7 +987,7 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from eyelevel import GroundX
+from groundx import GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
@@ -1036,7 +1036,7 @@ client.buckets.list()
 </dl>
 </details>
 
-<details><summary><code>client.buckets.<a href="src/eyelevel/buckets/client.py">create</a>(...)</code></summary>
+<details><summary><code>client.buckets.<a href="src/groundx/buckets/client.py">create</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -1065,7 +1065,7 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from eyelevel import GroundX
+from groundx import GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
@@ -1108,7 +1108,7 @@ client.buckets.create(
 </dl>
 </details>
 
-<details><summary><code>client.buckets.<a href="src/eyelevel/buckets/client.py">get</a>(...)</code></summary>
+<details><summary><code>client.buckets.<a href="src/groundx/buckets/client.py">get</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -1137,7 +1137,7 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from eyelevel import GroundX
+from groundx import GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
@@ -1180,7 +1180,7 @@ client.buckets.get(
 </dl>
 </details>
 
-<details><summary><code>client.buckets.<a href="src/eyelevel/buckets/client.py">update</a>(...)</code></summary>
+<details><summary><code>client.buckets.<a href="src/groundx/buckets/client.py">update</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -1209,7 +1209,7 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from eyelevel import GroundX
+from groundx import GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
@@ -1261,7 +1261,7 @@ client.buckets.update(
 </dl>
 </details>
 
-<details><summary><code>client.buckets.<a href="src/eyelevel/buckets/client.py">delete</a>(...)</code></summary>
+<details><summary><code>client.buckets.<a href="src/groundx/buckets/client.py">delete</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -1290,7 +1290,7 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from eyelevel import GroundX
+from groundx import GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
@@ -1334,7 +1334,7 @@ client.buckets.delete(
 </details>
 
 ## Groups
-<details><summary><code>client.groups.<a href="src/eyelevel/groups/client.py">list</a>(...)</code></summary>
+<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">list</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -1363,7 +1363,7 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from eyelevel import GroundX
+from groundx import GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
@@ -1412,7 +1412,7 @@ client.groups.list()
 </dl>
 </details>
 
-<details><summary><code>client.groups.<a href="src/eyelevel/groups/client.py">create</a>(...)</code></summary>
+<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">create</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -1441,7 +1441,7 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from eyelevel import GroundX
+from groundx import GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
@@ -1492,7 +1492,7 @@ client.groups.create(
 </dl>
 </details>
 
-<details><summary><code>client.groups.<a href="src/eyelevel/groups/client.py">get</a>(...)</code></summary>
+<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">get</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -1521,7 +1521,7 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from eyelevel import GroundX
+from groundx import GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
@@ -1564,7 +1564,7 @@ client.groups.get(
 </dl>
 </details>
 
-<details><summary><code>client.groups.<a href="src/eyelevel/groups/client.py">update</a>(...)</code></summary>
+<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">update</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -1593,7 +1593,7 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from eyelevel import GroundX
+from groundx import GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
@@ -1645,7 +1645,7 @@ client.groups.update(
 </dl>
 </details>
 
-<details><summary><code>client.groups.<a href="src/eyelevel/groups/client.py">delete</a>(...)</code></summary>
+<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">delete</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -1674,7 +1674,7 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from eyelevel import GroundX
+from groundx import GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
@@ -1717,7 +1717,7 @@ client.groups.delete(
 </dl>
 </details>
 
-<details><summary><code>client.groups.<a href="src/eyelevel/groups/client.py">add_bucket</a>(...)</code></summary>
+<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">add_bucket</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -1746,7 +1746,7 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from eyelevel import GroundX
+from groundx import GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
@@ -1798,7 +1798,7 @@ client.groups.add_bucket(
 </dl>
 </details>
 
-<details><summary><code>client.groups.<a href="src/eyelevel/groups/client.py">remove_bucket</a>(...)</code></summary>
+<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">remove_bucket</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -1827,7 +1827,7 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from eyelevel import GroundX
+from groundx import GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
@@ -1880,7 +1880,7 @@ client.groups.remove_bucket(
 </details>
 
 ## Customer
-<details><summary><code>client.customer.<a href="src/eyelevel/customer/client.py">get</a>()</code></summary>
+<details><summary><code>client.customer.<a href="src/groundx/customer/client.py">get</a>()</code></summary>
 <dl>
 <dd>
 
@@ -1907,7 +1907,7 @@ Get the account information associated with the API key.
 <dd>
 
 ```python
-from eyelevel import GroundX
+from groundx import GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
@@ -1941,7 +1941,7 @@ client.customer.get()
 </details>
 
 ## Health
-<details><summary><code>client.health.<a href="src/eyelevel/health/client.py">list</a>()</code></summary>
+<details><summary><code>client.health.<a href="src/groundx/health/client.py">list</a>()</code></summary>
 <dl>
 <dd>
 
@@ -1968,7 +1968,7 @@ List the current health status of all services. Statuses update every 5 minutes.
 <dd>
 
 ```python
-from eyelevel import GroundX
+from groundx import GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
@@ -2001,7 +2001,7 @@ client.health.list()
 </dl>
 </details>
 
-<details><summary><code>client.health.<a href="src/eyelevel/health/client.py">get</a>(...)</code></summary>
+<details><summary><code>client.health.<a href="src/groundx/health/client.py">get</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -2028,7 +2028,7 @@ Look up the current health status of a specific service. Statuses update every 5
 <dd>
 
 ```python
-from eyelevel import GroundX
+from groundx import GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",

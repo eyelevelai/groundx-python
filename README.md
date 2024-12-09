@@ -20,7 +20,7 @@ A full reference for this library is available [here](./reference.md).
 Instantiate and use the client with the following:
 
 ```python
-from eyelevel import GroundX
+from groundx import GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
@@ -39,7 +39,7 @@ The SDK also exports an `async` client so that you can make non-blocking calls t
 ```python
 import asyncio
 
-from eyelevel import AsyncGroundX
+from groundx import AsyncGroundX
 
 client = AsyncGroundX(
     api_key="YOUR_API_KEY",
@@ -66,7 +66,7 @@ When the API returns a non-success status code (4xx or 5xx response), a subclass
 will be thrown.
 
 ```python
-from eyelevel.core.api_error import ApiError
+from groundx.core.api_error import ApiError
 
 try:
     client.documents.ingest_remote(...)
@@ -103,7 +103,7 @@ The SDK defaults to a 60 second timeout. You can configure this with a timeout o
 
 ```python
 
-from eyelevel import GroundX
+from groundx import GroundX
 
 client = GroundX(
     ...,
@@ -123,7 +123,7 @@ You can override the `httpx` client to customize it for your use-case. Some comm
 and transports.
 ```python
 import httpx
-from eyelevel import GroundX
+from groundx import GroundX
 
 client = GroundX(
     ...,

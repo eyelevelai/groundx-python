@@ -3,15 +3,14 @@
 import typing
 from ..core.client_wrapper import SyncClientWrapper
 from ..core.request_options import RequestOptions
-from ..types.bucket_list_response import BucketListResponse
+from ..types.group_list_response import GroupListResponse
 from ..core.pydantic_utilities import parse_obj_as
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
-from ..types.bucket_response import BucketResponse
+from ..types.group_response import GroupResponse
 from ..errors.bad_request_error import BadRequestError
 from ..core.jsonable_encoder import jsonable_encoder
 from ..errors.unauthorized_error import UnauthorizedError
-from ..types.bucket_update_response import BucketUpdateResponse
 from ..types.message_response import MessageResponse
 from ..core.client_wrapper import AsyncClientWrapper
 
@@ -19,7 +18,7 @@ from ..core.client_wrapper import AsyncClientWrapper
 OMIT = typing.cast(typing.Any, ...)
 
 
-class BucketsClient:
+class GroupsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
@@ -29,39 +28,39 @@ class BucketsClient:
         n: typing.Optional[int] = None,
         next_token: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> BucketListResponse:
+    ) -> GroupListResponse:
         """
-        List all buckets within your GroundX account
+        list all groups within your GroundX account.
 
         Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
         n : typing.Optional[int]
-            The maximum number of returned buckets. Accepts 1-100 with a default of 20.
+            The maximum number of returned groups. Accepts 1-100 with a default of 20.
 
         next_token : typing.Optional[str]
-            A token for pagination. If the number of buckets for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n buckets.
+            A token for pagination. If the number of groups for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n groups.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        BucketListResponse
-            Look up success
+        GroupListResponse
+            Successful retrieval of groups
 
         Examples
         --------
-        from eyelevel import GroundX
+        from groundx import GroundX
 
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
-        client.buckets.list()
+        client.groups.list()
         """
         _response = self._client_wrapper.httpx_client.request(
-            "v1/bucket",
+            "v1/group",
             method="GET",
             params={
                 "n": n,
@@ -72,9 +71,9 @@ class BucketsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    BucketListResponse,
+                    GroupListResponse,
                     parse_obj_as(
-                        type_=BucketListResponse,  # type: ignore
+                        type_=GroupListResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -83,40 +82,51 @@ class BucketsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def create(self, *, name: str, request_options: typing.Optional[RequestOptions] = None) -> BucketResponse:
+    def create(
+        self,
+        *,
+        name: str,
+        bucket_name: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GroupResponse:
         """
-        Create a new bucket.
+        create a new group, a group being a collection of buckets which can be searched.
 
         Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
         name : str
+            The name of the group being created.
+
+        bucket_name : typing.Optional[str]
+            Specify bucketName to automatically create a bucket, by the name specified, and add it to the created group.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        BucketResponse
-            Bucket successfully created
+        GroupResponse
+            Group successfully created
 
         Examples
         --------
-        from eyelevel import GroundX
+        from groundx import GroundX
 
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
-        client.buckets.create(
-            name="your_bucket_name",
+        client.groups.create(
+            name="your_group_name",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            "v1/bucket",
+            "v1/group",
             method="POST",
             json={
                 "name": name,
+                "bucketName": bucket_name,
             },
             headers={
                 "content-type": "application/json",
@@ -127,9 +137,9 @@ class BucketsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    BucketResponse,
+                    GroupResponse,
                     parse_obj_as(
-                        type_=BucketResponse,  # type: ignore
+                        type_=GroupResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -148,47 +158,47 @@ class BucketsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def get(self, bucket_id: int, *, request_options: typing.Optional[RequestOptions] = None) -> BucketResponse:
+    def get(self, group_id: int, *, request_options: typing.Optional[RequestOptions] = None) -> GroupResponse:
         """
-        Look up a specific bucket by its bucketId.
+        look up a specific group by its groupId.
 
         Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
-        bucket_id : int
-            The bucketId of the bucket to look up.
+        group_id : int
+            The groupId of the group to look up.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        BucketResponse
-            Look up success
+        GroupResponse
+            Successful retrieval of group
 
         Examples
         --------
-        from eyelevel import GroundX
+        from groundx import GroundX
 
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
-        client.buckets.get(
-            bucket_id=1,
+        client.groups.get(
+            group_id=1,
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"v1/bucket/{jsonable_encoder(bucket_id)}",
+            f"v1/group/{jsonable_encoder(group_id)}",
             method="GET",
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    BucketResponse,
+                    GroupResponse,
                     parse_obj_as(
-                        type_=BucketResponse,  # type: ignore
+                        type_=GroupResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -218,43 +228,43 @@ class BucketsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def update(
-        self, bucket_id: int, *, new_name: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> BucketUpdateResponse:
+        self, group_id: int, *, new_name: str, request_options: typing.Optional[RequestOptions] = None
+    ) -> GroupResponse:
         """
-        Rename a bucket.
+        Rename a group
 
         Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
-        bucket_id : int
-            The bucketId of the bucket being updated.
+        group_id : int
+            The groupId of the group to update.
 
         new_name : str
-            The new name of the bucket being renamed.
+            The new name of the group being renamed.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        BucketUpdateResponse
-            Bucket successfully updated
+        GroupResponse
+            Successful update of group
 
         Examples
         --------
-        from eyelevel import GroundX
+        from groundx import GroundX
 
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
-        client.buckets.update(
-            bucket_id=1,
-            new_name="your_bucket_name",
+        client.groups.update(
+            group_id=1,
+            new_name="your_group_name",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"v1/bucket/{jsonable_encoder(bucket_id)}",
+            f"v1/group/{jsonable_encoder(group_id)}",
             method="PUT",
             json={
                 "newName": new_name,
@@ -268,9 +278,9 @@ class BucketsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    BucketUpdateResponse,
+                    GroupResponse,
                     parse_obj_as(
-                        type_=BucketUpdateResponse,  # type: ignore
+                        type_=GroupResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -299,16 +309,16 @@ class BucketsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def delete(self, bucket_id: int, *, request_options: typing.Optional[RequestOptions] = None) -> MessageResponse:
+    def delete(self, group_id: int, *, request_options: typing.Optional[RequestOptions] = None) -> MessageResponse:
         """
-        Delete a bucket.
+        Delete a group.
 
         Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
-        bucket_id : int
-            The bucketId of the bucket being deleted.
+        group_id : int
+            The groupId of the group to be deleted.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -316,21 +326,171 @@ class BucketsClient:
         Returns
         -------
         MessageResponse
-            Bucket successfully deleted
+            Group successfully deleted
 
         Examples
         --------
-        from eyelevel import GroundX
+        from groundx import GroundX
 
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
-        client.buckets.delete(
+        client.groups.delete(
+            group_id=1,
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"v1/group/{jsonable_encoder(group_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    MessageResponse,
+                    parse_obj_as(
+                        type_=MessageResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def add_bucket(
+        self, group_id: int, bucket_id: int, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> MessageResponse:
+        """
+        Add an existing bucket to an existing group. Buckets and groups can be associated many to many.
+
+        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
+
+        Parameters
+        ----------
+        group_id : int
+            The groupId of the group which the bucket will be added to.
+
+        bucket_id : int
+            The bucketId of the bucket being added to the group.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        MessageResponse
+            Successful update of group
+
+        Examples
+        --------
+        from groundx import GroundX
+
+        client = GroundX(
+            api_key="YOUR_API_KEY",
+        )
+        client.groups.add_bucket(
+            group_id=1,
             bucket_id=1,
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"v1/bucket/{jsonable_encoder(bucket_id)}",
+            f"v1/group/{jsonable_encoder(group_id)}/bucket/{jsonable_encoder(bucket_id)}",
+            method="POST",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    MessageResponse,
+                    parse_obj_as(
+                        type_=MessageResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def remove_bucket(
+        self, group_id: int, bucket_id: int, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> MessageResponse:
+        """
+        remove a bucket from a group. Buckets and groups can be associated many to many, this removes one bucket to group association without disturbing others.
+
+        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
+
+        Parameters
+        ----------
+        group_id : int
+            The groupId of the group which the bucket will be removed from.
+
+        bucket_id : int
+            The bucketId of the bucket which will be removed from the group.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        MessageResponse
+            Successful update of group
+
+        Examples
+        --------
+        from groundx import GroundX
+
+        client = GroundX(
+            api_key="YOUR_API_KEY",
+        )
+        client.groups.remove_bucket(
+            group_id=1,
+            bucket_id=1,
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"v1/group/{jsonable_encoder(group_id)}/bucket/{jsonable_encoder(bucket_id)}",
             method="DELETE",
             request_options=request_options,
         )
@@ -369,7 +529,7 @@ class BucketsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
 
-class AsyncBucketsClient:
+class AsyncGroupsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
@@ -379,33 +539,33 @@ class AsyncBucketsClient:
         n: typing.Optional[int] = None,
         next_token: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> BucketListResponse:
+    ) -> GroupListResponse:
         """
-        List all buckets within your GroundX account
+        list all groups within your GroundX account.
 
         Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
         n : typing.Optional[int]
-            The maximum number of returned buckets. Accepts 1-100 with a default of 20.
+            The maximum number of returned groups. Accepts 1-100 with a default of 20.
 
         next_token : typing.Optional[str]
-            A token for pagination. If the number of buckets for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n buckets.
+            A token for pagination. If the number of groups for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n groups.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        BucketListResponse
-            Look up success
+        GroupListResponse
+            Successful retrieval of groups
 
         Examples
         --------
         import asyncio
 
-        from eyelevel import AsyncGroundX
+        from groundx import AsyncGroundX
 
         client = AsyncGroundX(
             api_key="YOUR_API_KEY",
@@ -413,13 +573,13 @@ class AsyncBucketsClient:
 
 
         async def main() -> None:
-            await client.buckets.list()
+            await client.groups.list()
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            "v1/bucket",
+            "v1/group",
             method="GET",
             params={
                 "n": n,
@@ -430,9 +590,9 @@ class AsyncBucketsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    BucketListResponse,
+                    GroupListResponse,
                     parse_obj_as(
-                        type_=BucketListResponse,  # type: ignore
+                        type_=GroupListResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -441,29 +601,39 @@ class AsyncBucketsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def create(self, *, name: str, request_options: typing.Optional[RequestOptions] = None) -> BucketResponse:
+    async def create(
+        self,
+        *,
+        name: str,
+        bucket_name: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GroupResponse:
         """
-        Create a new bucket.
+        create a new group, a group being a collection of buckets which can be searched.
 
         Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
         name : str
+            The name of the group being created.
+
+        bucket_name : typing.Optional[str]
+            Specify bucketName to automatically create a bucket, by the name specified, and add it to the created group.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        BucketResponse
-            Bucket successfully created
+        GroupResponse
+            Group successfully created
 
         Examples
         --------
         import asyncio
 
-        from eyelevel import AsyncGroundX
+        from groundx import AsyncGroundX
 
         client = AsyncGroundX(
             api_key="YOUR_API_KEY",
@@ -471,18 +641,19 @@ class AsyncBucketsClient:
 
 
         async def main() -> None:
-            await client.buckets.create(
-                name="your_bucket_name",
+            await client.groups.create(
+                name="your_group_name",
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            "v1/bucket",
+            "v1/group",
             method="POST",
             json={
                 "name": name,
+                "bucketName": bucket_name,
             },
             headers={
                 "content-type": "application/json",
@@ -493,9 +664,9 @@ class AsyncBucketsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    BucketResponse,
+                    GroupResponse,
                     parse_obj_as(
-                        type_=BucketResponse,  # type: ignore
+                        type_=GroupResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -514,30 +685,30 @@ class AsyncBucketsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def get(self, bucket_id: int, *, request_options: typing.Optional[RequestOptions] = None) -> BucketResponse:
+    async def get(self, group_id: int, *, request_options: typing.Optional[RequestOptions] = None) -> GroupResponse:
         """
-        Look up a specific bucket by its bucketId.
+        look up a specific group by its groupId.
 
         Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
-        bucket_id : int
-            The bucketId of the bucket to look up.
+        group_id : int
+            The groupId of the group to look up.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        BucketResponse
-            Look up success
+        GroupResponse
+            Successful retrieval of group
 
         Examples
         --------
         import asyncio
 
-        from eyelevel import AsyncGroundX
+        from groundx import AsyncGroundX
 
         client = AsyncGroundX(
             api_key="YOUR_API_KEY",
@@ -545,24 +716,24 @@ class AsyncBucketsClient:
 
 
         async def main() -> None:
-            await client.buckets.get(
-                bucket_id=1,
+            await client.groups.get(
+                group_id=1,
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"v1/bucket/{jsonable_encoder(bucket_id)}",
+            f"v1/group/{jsonable_encoder(group_id)}",
             method="GET",
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    BucketResponse,
+                    GroupResponse,
                     parse_obj_as(
-                        type_=BucketResponse,  # type: ignore
+                        type_=GroupResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -592,34 +763,34 @@ class AsyncBucketsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def update(
-        self, bucket_id: int, *, new_name: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> BucketUpdateResponse:
+        self, group_id: int, *, new_name: str, request_options: typing.Optional[RequestOptions] = None
+    ) -> GroupResponse:
         """
-        Rename a bucket.
+        Rename a group
 
         Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
-        bucket_id : int
-            The bucketId of the bucket being updated.
+        group_id : int
+            The groupId of the group to update.
 
         new_name : str
-            The new name of the bucket being renamed.
+            The new name of the group being renamed.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        BucketUpdateResponse
-            Bucket successfully updated
+        GroupResponse
+            Successful update of group
 
         Examples
         --------
         import asyncio
 
-        from eyelevel import AsyncGroundX
+        from groundx import AsyncGroundX
 
         client = AsyncGroundX(
             api_key="YOUR_API_KEY",
@@ -627,16 +798,16 @@ class AsyncBucketsClient:
 
 
         async def main() -> None:
-            await client.buckets.update(
-                bucket_id=1,
-                new_name="your_bucket_name",
+            await client.groups.update(
+                group_id=1,
+                new_name="your_group_name",
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"v1/bucket/{jsonable_encoder(bucket_id)}",
+            f"v1/group/{jsonable_encoder(group_id)}",
             method="PUT",
             json={
                 "newName": new_name,
@@ -650,9 +821,9 @@ class AsyncBucketsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    BucketUpdateResponse,
+                    GroupResponse,
                     parse_obj_as(
-                        type_=BucketUpdateResponse,  # type: ignore
+                        type_=GroupResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -682,17 +853,17 @@ class AsyncBucketsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def delete(
-        self, bucket_id: int, *, request_options: typing.Optional[RequestOptions] = None
+        self, group_id: int, *, request_options: typing.Optional[RequestOptions] = None
     ) -> MessageResponse:
         """
-        Delete a bucket.
+        Delete a group.
 
         Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
-        bucket_id : int
-            The bucketId of the bucket being deleted.
+        group_id : int
+            The groupId of the group to be deleted.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -700,13 +871,13 @@ class AsyncBucketsClient:
         Returns
         -------
         MessageResponse
-            Bucket successfully deleted
+            Group successfully deleted
 
         Examples
         --------
         import asyncio
 
-        from eyelevel import AsyncGroundX
+        from groundx import AsyncGroundX
 
         client = AsyncGroundX(
             api_key="YOUR_API_KEY",
@@ -714,7 +885,90 @@ class AsyncBucketsClient:
 
 
         async def main() -> None:
-            await client.buckets.delete(
+            await client.groups.delete(
+                group_id=1,
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"v1/group/{jsonable_encoder(group_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    MessageResponse,
+                    parse_obj_as(
+                        type_=MessageResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def add_bucket(
+        self, group_id: int, bucket_id: int, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> MessageResponse:
+        """
+        Add an existing bucket to an existing group. Buckets and groups can be associated many to many.
+
+        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
+
+        Parameters
+        ----------
+        group_id : int
+            The groupId of the group which the bucket will be added to.
+
+        bucket_id : int
+            The bucketId of the bucket being added to the group.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        MessageResponse
+            Successful update of group
+
+        Examples
+        --------
+        import asyncio
+
+        from groundx import AsyncGroundX
+
+        client = AsyncGroundX(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.groups.add_bucket(
+                group_id=1,
                 bucket_id=1,
             )
 
@@ -722,7 +976,90 @@ class AsyncBucketsClient:
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"v1/bucket/{jsonable_encoder(bucket_id)}",
+            f"v1/group/{jsonable_encoder(group_id)}/bucket/{jsonable_encoder(bucket_id)}",
+            method="POST",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    MessageResponse,
+                    parse_obj_as(
+                        type_=MessageResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def remove_bucket(
+        self, group_id: int, bucket_id: int, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> MessageResponse:
+        """
+        remove a bucket from a group. Buckets and groups can be associated many to many, this removes one bucket to group association without disturbing others.
+
+        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
+
+        Parameters
+        ----------
+        group_id : int
+            The groupId of the group which the bucket will be removed from.
+
+        bucket_id : int
+            The bucketId of the bucket which will be removed from the group.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        MessageResponse
+            Successful update of group
+
+        Examples
+        --------
+        import asyncio
+
+        from groundx import AsyncGroundX
+
+        client = AsyncGroundX(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.groups.remove_bucket(
+                group_id=1,
+                bucket_id=1,
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"v1/group/{jsonable_encoder(group_id)}/bucket/{jsonable_encoder(bucket_id)}",
             method="DELETE",
             request_options=request_options,
         )

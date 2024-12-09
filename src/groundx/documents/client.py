@@ -55,7 +55,7 @@ class DocumentsClient:
 
         Examples
         --------
-        from eyelevel import GroundX
+        from groundx import GroundX
 
         client = GroundX(
             api_key="YOUR_API_KEY",
@@ -134,7 +134,7 @@ class DocumentsClient:
 
         Examples
         --------
-        from eyelevel import GroundX
+        from groundx import GroundX
 
         client = GroundX(
             api_key="YOUR_API_KEY",
@@ -208,7 +208,7 @@ class DocumentsClient:
 
         Examples
         --------
-        from eyelevel import GroundX
+        from groundx import GroundX
 
         client = GroundX(
             api_key="YOUR_API_KEY",
@@ -290,7 +290,7 @@ class DocumentsClient:
 
         Examples
         --------
-        from eyelevel import GroundX
+        from groundx import GroundX
 
         client = GroundX(
             api_key="YOUR_API_KEY",
@@ -388,7 +388,7 @@ class DocumentsClient:
 
         Examples
         --------
-        from eyelevel import GroundX
+        from groundx import GroundX
 
         client = GroundX(
             api_key="YOUR_API_KEY",
@@ -490,7 +490,7 @@ class DocumentsClient:
 
         Examples
         --------
-        from eyelevel import GroundX
+        from groundx import GroundX
 
         client = GroundX(
             api_key="YOUR_API_KEY",
@@ -550,7 +550,7 @@ class DocumentsClient:
 
         Examples
         --------
-        from eyelevel import GroundX
+        from groundx import GroundX
 
         client = GroundX(
             api_key="YOUR_API_KEY",
@@ -620,7 +620,7 @@ class DocumentsClient:
 
         Examples
         --------
-        from eyelevel import GroundX
+        from groundx import GroundX
 
         client = GroundX(
             api_key="YOUR_API_KEY",
@@ -691,7 +691,7 @@ class DocumentsClient:
 
         Examples
         --------
-        from eyelevel import GroundX
+        from groundx import GroundX
 
         client = GroundX(
             api_key="YOUR_API_KEY",
@@ -771,7 +771,7 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from eyelevel import AsyncGroundX
+        from groundx import AsyncGroundX
 
         client = AsyncGroundX(
             api_key="YOUR_API_KEY",
@@ -861,7 +861,7 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from eyelevel import AsyncGroundX
+        from groundx import AsyncGroundX
 
         client = AsyncGroundX(
             api_key="YOUR_API_KEY",
@@ -943,7 +943,7 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from eyelevel import AsyncGroundX
+        from groundx import AsyncGroundX
 
         client = AsyncGroundX(
             api_key="YOUR_API_KEY",
@@ -1033,7 +1033,7 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from eyelevel import AsyncGroundX
+        from groundx import AsyncGroundX
 
         client = AsyncGroundX(
             api_key="YOUR_API_KEY",
@@ -1139,7 +1139,7 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from eyelevel import AsyncGroundX
+        from groundx import AsyncGroundX
 
         client = AsyncGroundX(
             api_key="YOUR_API_KEY",
@@ -1249,7 +1249,7 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from eyelevel import AsyncGroundX
+        from groundx import AsyncGroundX
 
         client = AsyncGroundX(
             api_key="YOUR_API_KEY",
@@ -1317,7 +1317,7 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from eyelevel import AsyncGroundX
+        from groundx import AsyncGroundX
 
         client = AsyncGroundX(
             api_key="YOUR_API_KEY",
@@ -1397,7 +1397,7 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from eyelevel import AsyncGroundX
+        from groundx import AsyncGroundX
 
         client = AsyncGroundX(
             api_key="YOUR_API_KEY",
@@ -1476,7 +1476,7 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from eyelevel import AsyncGroundX
+        from groundx import AsyncGroundX
 
         client = AsyncGroundX(
             api_key="YOUR_API_KEY",
