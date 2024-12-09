@@ -5,7 +5,7 @@
 import typing_extensions
 import typing
 import typing_extensions
-from eyelevel.core.serialization import FieldMetadata
+from groundx.core.serialization import FieldMetadata
 import datetime as dt
 import uuid
 from .color import Color

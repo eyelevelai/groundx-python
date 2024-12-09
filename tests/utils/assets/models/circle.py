@@ -4,7 +4,7 @@
 
 import typing_extensions
 import typing_extensions
-from eyelevel.core.serialization import FieldMetadata
+from groundx.core.serialization import FieldMetadata
 
 
 class CircleParams(typing_extensions.TypedDict):

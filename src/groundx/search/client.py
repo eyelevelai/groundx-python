@@ -69,7 +69,7 @@ class SearchClient:
 
         Examples
         --------
-        from eyelevel import GroundX
+        from groundx import GroundX
 
         client = GroundX(
             api_key="YOUR_API_KEY",
@@ -180,7 +180,7 @@ class SearchClient:
 
         Examples
         --------
-        from eyelevel import GroundX
+        from groundx import GroundX
 
         client = GroundX(
             api_key="YOUR_API_KEY",
@@ -299,7 +299,7 @@ class AsyncSearchClient:
         --------
         import asyncio
 
-        from eyelevel import AsyncGroundX
+        from groundx import AsyncGroundX
 
         client = AsyncGroundX(
             api_key="YOUR_API_KEY",
@@ -418,7 +418,7 @@ class AsyncSearchClient:
         --------
         import asyncio
 
-        from eyelevel import AsyncGroundX
+        from groundx import AsyncGroundX
 
         client = AsyncGroundX(
             api_key="YOUR_API_KEY",
