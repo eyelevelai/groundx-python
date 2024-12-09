@@ -30,9 +30,9 @@ class CustomerClient:
 
         Examples
         --------
-        from groundx import Groundx
+        from groundx import GroundX
 
-        client = Groundx(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.customer.get()
@@ -79,9 +79,9 @@ class AsyncCustomerClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundx
+        from groundx import AsyncGroundX
 
-        client = AsyncGroundx(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 

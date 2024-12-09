@@ -2,7 +2,7 @@
 
 import typing
 from ..core.client_wrapper import SyncClientWrapper
-from .requests.document_remote_ingest_request_documents_item import DocumentRemoteIngestRequestDocumentsItemParams
+from .types.document_remote_ingest_request_documents_item import DocumentRemoteIngestRequestDocumentsItem
 from ..core.request_options import RequestOptions
 from ..types.ingest_response import IngestResponse
 from ..core.serialization import convert_and_respect_annotation_metadata
@@ -11,7 +11,7 @@ from ..errors.bad_request_error import BadRequestError
 from ..errors.unauthorized_error import UnauthorizedError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
-from .requests.website_crawl_request_websites_item import WebsiteCrawlRequestWebsitesItemParams
+from .types.website_crawl_request_websites_item import WebsiteCrawlRequestWebsitesItem
 from ..types.process_status_response import ProcessStatusResponse
 from ..core.jsonable_encoder import jsonable_encoder
 from ..types.sort import Sort
@@ -33,7 +33,7 @@ class DocumentsClient:
     def ingest_remote(
         self,
         *,
-        documents: typing.Sequence[DocumentRemoteIngestRequestDocumentsItemParams],
+        documents: typing.Sequence[DocumentRemoteIngestRequestDocumentsItem],
         request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
         """
@@ -43,7 +43,7 @@ class DocumentsClient:
 
         Parameters
         ----------
-        documents : typing.Sequence[DocumentRemoteIngestRequestDocumentsItemParams]
+        documents : typing.Sequence[DocumentRemoteIngestRequestDocumentsItem]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -55,14 +55,18 @@ class DocumentsClient:
 
         Examples
         --------
-        from groundx import Groundx
+        from groundx import GroundX
+        from groundx.documents import DocumentRemoteIngestRequestDocumentsItem
 
-        client = Groundx(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.ingest_remote(
             documents=[
-                {"bucket_id": 1234, "source_url": "https://my.source.url.com/file.txt"}
+                DocumentRemoteIngestRequestDocumentsItem(
+                    bucket_id=1234,
+                    source_url="https://my.source.url.com/file.txt",
+                )
             ],
         )
         """
@@ -72,7 +76,7 @@ class DocumentsClient:
             json={
                 "documents": convert_and_respect_annotation_metadata(
                     object_=documents,
-                    annotation=typing.Sequence[DocumentRemoteIngestRequestDocumentsItemParams],
+                    annotation=typing.Sequence[DocumentRemoteIngestRequestDocumentsItem],
                     direction="write",
                 ),
             },
@@ -134,9 +138,9 @@ class DocumentsClient:
 
         Examples
         --------
-        from groundx import Groundx
+        from groundx import GroundX
 
-        client = Groundx(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.ingest_local()
@@ -186,7 +190,7 @@ class DocumentsClient:
     def crawl_website(
         self,
         *,
-        websites: typing.Sequence[WebsiteCrawlRequestWebsitesItemParams],
+        websites: typing.Sequence[WebsiteCrawlRequestWebsitesItem],
         request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
         """
@@ -196,7 +200,7 @@ class DocumentsClient:
 
         Parameters
         ----------
-        websites : typing.Sequence[WebsiteCrawlRequestWebsitesItemParams]
+        websites : typing.Sequence[WebsiteCrawlRequestWebsitesItem]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -208,13 +212,19 @@ class DocumentsClient:
 
         Examples
         --------
-        from groundx import Groundx
+        from groundx import GroundX
+        from groundx.documents import WebsiteCrawlRequestWebsitesItem
 
-        client = Groundx(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.crawl_website(
-            websites=[{"bucket_id": 123, "source_url": "https://my.website.com"}],
+            websites=[
+                WebsiteCrawlRequestWebsitesItem(
+                    bucket_id=123,
+                    source_url="https://my.website.com",
+                )
+            ],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -222,9 +232,7 @@ class DocumentsClient:
             method="POST",
             json={
                 "websites": convert_and_respect_annotation_metadata(
-                    object_=websites,
-                    annotation=typing.Sequence[WebsiteCrawlRequestWebsitesItemParams],
-                    direction="write",
+                    object_=websites, annotation=typing.Sequence[WebsiteCrawlRequestWebsitesItem], direction="write"
                 ),
             },
             headers={
@@ -290,9 +298,9 @@ class DocumentsClient:
 
         Examples
         --------
-        from groundx import Groundx
+        from groundx import GroundX
 
-        client = Groundx(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.get_processing_status_by_id(
@@ -388,9 +396,9 @@ class DocumentsClient:
 
         Examples
         --------
-        from groundx import Groundx
+        from groundx import GroundX
 
-        client = Groundx(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.lookup(
@@ -490,9 +498,9 @@ class DocumentsClient:
 
         Examples
         --------
-        from groundx import Groundx
+        from groundx import GroundX
 
-        client = Groundx(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.list()
@@ -550,9 +558,9 @@ class DocumentsClient:
 
         Examples
         --------
-        from groundx import Groundx
+        from groundx import GroundX
 
-        client = Groundx(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.delete()
@@ -620,9 +628,9 @@ class DocumentsClient:
 
         Examples
         --------
-        from groundx import Groundx
+        from groundx import GroundX
 
-        client = Groundx(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.get(
@@ -691,9 +699,9 @@ class DocumentsClient:
 
         Examples
         --------
-        from groundx import Groundx
+        from groundx import GroundX
 
-        client = Groundx(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.delete_by_id(
@@ -747,7 +755,7 @@ class AsyncDocumentsClient:
     async def ingest_remote(
         self,
         *,
-        documents: typing.Sequence[DocumentRemoteIngestRequestDocumentsItemParams],
+        documents: typing.Sequence[DocumentRemoteIngestRequestDocumentsItem],
         request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
         """
@@ -757,7 +765,7 @@ class AsyncDocumentsClient:
 
         Parameters
         ----------
-        documents : typing.Sequence[DocumentRemoteIngestRequestDocumentsItemParams]
+        documents : typing.Sequence[DocumentRemoteIngestRequestDocumentsItem]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -771,9 +779,10 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundx
+        from groundx import AsyncGroundX
+        from groundx.documents import DocumentRemoteIngestRequestDocumentsItem
 
-        client = AsyncGroundx(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -781,10 +790,10 @@ class AsyncDocumentsClient:
         async def main() -> None:
             await client.documents.ingest_remote(
                 documents=[
-                    {
-                        "bucket_id": 1234,
-                        "source_url": "https://my.source.url.com/file.txt",
-                    }
+                    DocumentRemoteIngestRequestDocumentsItem(
+                        bucket_id=1234,
+                        source_url="https://my.source.url.com/file.txt",
+                    )
                 ],
             )
 
@@ -797,7 +806,7 @@ class AsyncDocumentsClient:
             json={
                 "documents": convert_and_respect_annotation_metadata(
                     object_=documents,
-                    annotation=typing.Sequence[DocumentRemoteIngestRequestDocumentsItemParams],
+                    annotation=typing.Sequence[DocumentRemoteIngestRequestDocumentsItem],
                     direction="write",
                 ),
             },
@@ -861,9 +870,9 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundx
+        from groundx import AsyncGroundX
 
-        client = AsyncGroundx(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -919,7 +928,7 @@ class AsyncDocumentsClient:
     async def crawl_website(
         self,
         *,
-        websites: typing.Sequence[WebsiteCrawlRequestWebsitesItemParams],
+        websites: typing.Sequence[WebsiteCrawlRequestWebsitesItem],
         request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
         """
@@ -929,7 +938,7 @@ class AsyncDocumentsClient:
 
         Parameters
         ----------
-        websites : typing.Sequence[WebsiteCrawlRequestWebsitesItemParams]
+        websites : typing.Sequence[WebsiteCrawlRequestWebsitesItem]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -943,16 +952,22 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundx
+        from groundx import AsyncGroundX
+        from groundx.documents import WebsiteCrawlRequestWebsitesItem
 
-        client = AsyncGroundx(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
 
         async def main() -> None:
             await client.documents.crawl_website(
-                websites=[{"bucket_id": 123, "source_url": "https://my.website.com"}],
+                websites=[
+                    WebsiteCrawlRequestWebsitesItem(
+                        bucket_id=123,
+                        source_url="https://my.website.com",
+                    )
+                ],
             )
 
 
@@ -963,9 +978,7 @@ class AsyncDocumentsClient:
             method="POST",
             json={
                 "websites": convert_and_respect_annotation_metadata(
-                    object_=websites,
-                    annotation=typing.Sequence[WebsiteCrawlRequestWebsitesItemParams],
-                    direction="write",
+                    object_=websites, annotation=typing.Sequence[WebsiteCrawlRequestWebsitesItem], direction="write"
                 ),
             },
             headers={
@@ -1033,9 +1046,9 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundx
+        from groundx import AsyncGroundX
 
-        client = AsyncGroundx(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -1139,9 +1152,9 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundx
+        from groundx import AsyncGroundX
 
-        client = AsyncGroundx(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -1249,9 +1262,9 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundx
+        from groundx import AsyncGroundX
 
-        client = AsyncGroundx(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -1317,9 +1330,9 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundx
+        from groundx import AsyncGroundX
 
-        client = AsyncGroundx(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -1397,9 +1410,9 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundx
+        from groundx import AsyncGroundX
 
-        client = AsyncGroundx(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -1476,9 +1489,9 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundx
+        from groundx import AsyncGroundX
 
-        client = AsyncGroundx(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
