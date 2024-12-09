@@ -30,17 +30,13 @@ Interact with the "Request Body" below to explore the arguments of this function
 
 ```python
 from eyelevel import GroundX
-from eyelevel.documents import DocumentRemoteIngestRequestDocumentsItem
 
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
 client.documents.ingest_remote(
     documents=[
-        DocumentRemoteIngestRequestDocumentsItem(
-            bucket_id=1234,
-            source_url="https://my.source.url.com/file.txt",
-        )
+        {"bucket_id": 1234, "source_url": "https://my.source.url.com/file.txt"}
     ],
 )
 
@@ -58,7 +54,7 @@ client.documents.ingest_remote(
 <dl>
 <dd>
 
-**documents:** `typing.Sequence[DocumentRemoteIngestRequestDocumentsItem]` 
+**documents:** `typing.Sequence[DocumentRemoteIngestRequestDocumentsItemParams]` 
     
 </dd>
 </dl>
@@ -170,18 +166,12 @@ Interact with the "Request Body" below to explore the arguments of this function
 
 ```python
 from eyelevel import GroundX
-from eyelevel.documents import WebsiteCrawlRequestWebsitesItem
 
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
 client.documents.crawl_website(
-    websites=[
-        WebsiteCrawlRequestWebsitesItem(
-            bucket_id=123,
-            source_url="https://my.website.com",
-        )
-    ],
+    websites=[{"bucket_id": 123, "source_url": "https://my.website.com"}],
 )
 
 ```
@@ -198,7 +188,7 @@ client.documents.crawl_website(
 <dl>
 <dd>
 
-**websites:** `typing.Sequence[WebsiteCrawlRequestWebsitesItem]` 
+**websites:** `typing.Sequence[WebsiteCrawlRequestWebsitesItemParams]` 
     
 </dd>
 </dl>
@@ -791,7 +781,7 @@ client.search.content(
 <dl>
 <dd>
 
-**id:** `SearchContentRequestId` — The bucketId, groupId, projectId, or documentId to be searched. The document or documents within the specified container will be compared to the query, and relevant information will be extracted.
+**id:** `SearchContentRequestIdParams` — The bucketId, groupId, projectId, or documentId to be searched. The document or documents within the specified container will be compared to the query, and relevant information will be extracted.
     
 </dd>
 </dl>

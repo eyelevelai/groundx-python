@@ -2,7 +2,7 @@
 
 import typing
 from ..core.client_wrapper import SyncClientWrapper
-from .types.document_remote_ingest_request_documents_item import DocumentRemoteIngestRequestDocumentsItem
+from .requests.document_remote_ingest_request_documents_item import DocumentRemoteIngestRequestDocumentsItemParams
 from ..core.request_options import RequestOptions
 from ..types.ingest_response import IngestResponse
 from ..core.serialization import convert_and_respect_annotation_metadata
@@ -11,7 +11,7 @@ from ..errors.bad_request_error import BadRequestError
 from ..errors.unauthorized_error import UnauthorizedError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
-from .types.website_crawl_request_websites_item import WebsiteCrawlRequestWebsitesItem
+from .requests.website_crawl_request_websites_item import WebsiteCrawlRequestWebsitesItemParams
 from ..types.process_status_response import ProcessStatusResponse
 from ..core.jsonable_encoder import jsonable_encoder
 from ..types.sort import Sort
@@ -33,7 +33,7 @@ class DocumentsClient:
     def ingest_remote(
         self,
         *,
-        documents: typing.Sequence[DocumentRemoteIngestRequestDocumentsItem],
+        documents: typing.Sequence[DocumentRemoteIngestRequestDocumentsItemParams],
         request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
         """
@@ -43,7 +43,7 @@ class DocumentsClient:
 
         Parameters
         ----------
-        documents : typing.Sequence[DocumentRemoteIngestRequestDocumentsItem]
+        documents : typing.Sequence[DocumentRemoteIngestRequestDocumentsItemParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -56,17 +56,13 @@ class DocumentsClient:
         Examples
         --------
         from eyelevel import GroundX
-        from eyelevel.documents import DocumentRemoteIngestRequestDocumentsItem
 
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.ingest_remote(
             documents=[
-                DocumentRemoteIngestRequestDocumentsItem(
-                    bucket_id=1234,
-                    source_url="https://my.source.url.com/file.txt",
-                )
+                {"bucket_id": 1234, "source_url": "https://my.source.url.com/file.txt"}
             ],
         )
         """
@@ -76,9 +72,12 @@ class DocumentsClient:
             json={
                 "documents": convert_and_respect_annotation_metadata(
                     object_=documents,
-                    annotation=typing.Sequence[DocumentRemoteIngestRequestDocumentsItem],
+                    annotation=typing.Sequence[DocumentRemoteIngestRequestDocumentsItemParams],
                     direction="write",
                 ),
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -187,7 +186,7 @@ class DocumentsClient:
     def crawl_website(
         self,
         *,
-        websites: typing.Sequence[WebsiteCrawlRequestWebsitesItem],
+        websites: typing.Sequence[WebsiteCrawlRequestWebsitesItemParams],
         request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
         """
@@ -197,7 +196,7 @@ class DocumentsClient:
 
         Parameters
         ----------
-        websites : typing.Sequence[WebsiteCrawlRequestWebsitesItem]
+        websites : typing.Sequence[WebsiteCrawlRequestWebsitesItemParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -210,18 +209,12 @@ class DocumentsClient:
         Examples
         --------
         from eyelevel import GroundX
-        from eyelevel.documents import WebsiteCrawlRequestWebsitesItem
 
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.crawl_website(
-            websites=[
-                WebsiteCrawlRequestWebsitesItem(
-                    bucket_id=123,
-                    source_url="https://my.website.com",
-                )
-            ],
+            websites=[{"bucket_id": 123, "source_url": "https://my.website.com"}],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -229,8 +222,13 @@ class DocumentsClient:
             method="POST",
             json={
                 "websites": convert_and_respect_annotation_metadata(
-                    object_=websites, annotation=typing.Sequence[WebsiteCrawlRequestWebsitesItem], direction="write"
+                    object_=websites,
+                    annotation=typing.Sequence[WebsiteCrawlRequestWebsitesItemParams],
+                    direction="write",
                 ),
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -749,7 +747,7 @@ class AsyncDocumentsClient:
     async def ingest_remote(
         self,
         *,
-        documents: typing.Sequence[DocumentRemoteIngestRequestDocumentsItem],
+        documents: typing.Sequence[DocumentRemoteIngestRequestDocumentsItemParams],
         request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
         """
@@ -759,7 +757,7 @@ class AsyncDocumentsClient:
 
         Parameters
         ----------
-        documents : typing.Sequence[DocumentRemoteIngestRequestDocumentsItem]
+        documents : typing.Sequence[DocumentRemoteIngestRequestDocumentsItemParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -774,7 +772,6 @@ class AsyncDocumentsClient:
         import asyncio
 
         from eyelevel import AsyncGroundX
-        from eyelevel.documents import DocumentRemoteIngestRequestDocumentsItem
 
         client = AsyncGroundX(
             api_key="YOUR_API_KEY",
@@ -784,10 +781,10 @@ class AsyncDocumentsClient:
         async def main() -> None:
             await client.documents.ingest_remote(
                 documents=[
-                    DocumentRemoteIngestRequestDocumentsItem(
-                        bucket_id=1234,
-                        source_url="https://my.source.url.com/file.txt",
-                    )
+                    {
+                        "bucket_id": 1234,
+                        "source_url": "https://my.source.url.com/file.txt",
+                    }
                 ],
             )
 
@@ -800,9 +797,12 @@ class AsyncDocumentsClient:
             json={
                 "documents": convert_and_respect_annotation_metadata(
                     object_=documents,
-                    annotation=typing.Sequence[DocumentRemoteIngestRequestDocumentsItem],
+                    annotation=typing.Sequence[DocumentRemoteIngestRequestDocumentsItemParams],
                     direction="write",
                 ),
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -919,7 +919,7 @@ class AsyncDocumentsClient:
     async def crawl_website(
         self,
         *,
-        websites: typing.Sequence[WebsiteCrawlRequestWebsitesItem],
+        websites: typing.Sequence[WebsiteCrawlRequestWebsitesItemParams],
         request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
         """
@@ -929,7 +929,7 @@ class AsyncDocumentsClient:
 
         Parameters
         ----------
-        websites : typing.Sequence[WebsiteCrawlRequestWebsitesItem]
+        websites : typing.Sequence[WebsiteCrawlRequestWebsitesItemParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -944,7 +944,6 @@ class AsyncDocumentsClient:
         import asyncio
 
         from eyelevel import AsyncGroundX
-        from eyelevel.documents import WebsiteCrawlRequestWebsitesItem
 
         client = AsyncGroundX(
             api_key="YOUR_API_KEY",
@@ -953,12 +952,7 @@ class AsyncDocumentsClient:
 
         async def main() -> None:
             await client.documents.crawl_website(
-                websites=[
-                    WebsiteCrawlRequestWebsitesItem(
-                        bucket_id=123,
-                        source_url="https://my.website.com",
-                    )
-                ],
+                websites=[{"bucket_id": 123, "source_url": "https://my.website.com"}],
             )
 
 
@@ -969,8 +963,13 @@ class AsyncDocumentsClient:
             method="POST",
             json={
                 "websites": convert_and_respect_annotation_metadata(
-                    object_=websites, annotation=typing.Sequence[WebsiteCrawlRequestWebsitesItem], direction="write"
+                    object_=websites,
+                    annotation=typing.Sequence[WebsiteCrawlRequestWebsitesItemParams],
+                    direction="write",
                 ),
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,

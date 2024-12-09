@@ -1,4 +1,4 @@
-# GroundX Python Library
+# Eyelevel Python Library
 
 [![fern shield](https://img.shields.io/badge/%F0%9F%8C%BF-Built%20with%20Fern-brightgreen)](https://buildwithfern.com?utm_source=github&utm_medium=github&utm_campaign=readme&utm_source=https%3A%2F%2Fgithub.com%2Ffern-demo%2Fgroundx-python)
 [![pypi](https://img.shields.io/pypi/v/groundx-python-sdk)](https://pypi.python.org/pypi/groundx-python-sdk)
@@ -21,17 +21,13 @@ Instantiate and use the client with the following:
 
 ```python
 from eyelevel import GroundX
-from eyelevel.documents import DocumentRemoteIngestRequestDocumentsItem
 
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
 client.documents.ingest_remote(
     documents=[
-        DocumentRemoteIngestRequestDocumentsItem(
-            bucket_id=1234,
-            source_url="https://my.source.url.com/file.txt",
-        )
+        {"bucket_id": 1234, "source_url": "https://my.source.url.com/file.txt"}
     ],
 )
 ```
@@ -44,7 +40,6 @@ The SDK also exports an `async` client so that you can make non-blocking calls t
 import asyncio
 
 from eyelevel import AsyncGroundX
-from eyelevel.documents import DocumentRemoteIngestRequestDocumentsItem
 
 client = AsyncGroundX(
     api_key="YOUR_API_KEY",
@@ -54,10 +49,10 @@ client = AsyncGroundX(
 async def main() -> None:
     await client.documents.ingest_remote(
         documents=[
-            DocumentRemoteIngestRequestDocumentsItem(
-                bucket_id=1234,
-                source_url="https://my.source.url.com/file.txt",
-            )
+            {
+                "bucket_id": 1234,
+                "source_url": "https://my.source.url.com/file.txt",
+            }
         ],
     )
 
@@ -108,7 +103,7 @@ The SDK defaults to a 60 second timeout. You can configure this with a timeout o
 
 ```python
 
-    from eyelevel import GroundX
+from eyelevel import GroundX
 
 client = GroundX(
     ...,
