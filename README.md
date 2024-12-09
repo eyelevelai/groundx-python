@@ -20,14 +20,18 @@ A full reference for this library is available [here](./reference.md).
 Instantiate and use the client with the following:
 
 ```python
-from groundx import Groundx
+from groundx import GroundX
+from groundx.documents import DocumentRemoteIngestRequestDocumentsItem
 
-client = Groundx(
+client = GroundX(
     api_key="YOUR_API_KEY",
 )
 client.documents.ingest_remote(
     documents=[
-        {"bucket_id": 1234, "source_url": "https://my.source.url.com/file.txt"}
+        DocumentRemoteIngestRequestDocumentsItem(
+            bucket_id=1234,
+            source_url="https://my.source.url.com/file.txt",
+        )
     ],
 )
 ```
@@ -39,9 +43,10 @@ The SDK also exports an `async` client so that you can make non-blocking calls t
 ```python
 import asyncio
 
-from groundx import AsyncGroundx
+from groundx import AsyncGroundX
+from groundx.documents import DocumentRemoteIngestRequestDocumentsItem
 
-client = AsyncGroundx(
+client = AsyncGroundX(
     api_key="YOUR_API_KEY",
 )
 
@@ -49,10 +54,10 @@ client = AsyncGroundx(
 async def main() -> None:
     await client.documents.ingest_remote(
         documents=[
-            {
-                "bucket_id": 1234,
-                "source_url": "https://my.source.url.com/file.txt",
-            }
+            DocumentRemoteIngestRequestDocumentsItem(
+                bucket_id=1234,
+                source_url="https://my.source.url.com/file.txt",
+            )
         ],
     )
 
@@ -103,9 +108,9 @@ The SDK defaults to a 60 second timeout. You can configure this with a timeout o
 
 ```python
 
-from groundx import Groundx
+from groundx import GroundX
 
-client = Groundx(
+client = GroundX(
     ...,
     timeout=20.0,
 )
@@ -123,9 +128,9 @@ You can override the `httpx` client to customize it for your use-case. Some comm
 and transports.
 ```python
 import httpx
-from groundx import Groundx
+from groundx import GroundX
 
-client = Groundx(
+client = GroundX(
     ...,
     httpx_client=httpx.Client(
         proxies="http://my.test.proxy.example.com",

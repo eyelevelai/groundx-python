@@ -2,7 +2,7 @@
 
 import typing
 from ..core.client_wrapper import SyncClientWrapper
-from .requests.search_content_request_id import SearchContentRequestIdParams
+from .types.search_content_request_id import SearchContentRequestId
 from ..core.request_options import RequestOptions
 from ..types.search_response import SearchResponse
 from ..core.jsonable_encoder import jsonable_encoder
@@ -23,7 +23,7 @@ class SearchClient:
 
     def content(
         self,
-        id: SearchContentRequestIdParams,
+        id: SearchContentRequestId,
         *,
         query: str,
         n: typing.Optional[int] = None,
@@ -41,7 +41,7 @@ class SearchClient:
 
         Parameters
         ----------
-        id : SearchContentRequestIdParams
+        id : SearchContentRequestId
             The bucketId, groupId, projectId, or documentId to be searched. The document or documents within the specified container will be compared to the query, and relevant information will be extracted.
 
         query : str
@@ -69,9 +69,9 @@ class SearchClient:
 
         Examples
         --------
-        from groundx import Groundx
+        from groundx import GroundX
 
-        client = Groundx(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.search.content(
@@ -180,9 +180,9 @@ class SearchClient:
 
         Examples
         --------
-        from groundx import Groundx
+        from groundx import GroundX
 
-        client = Groundx(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.search.documents(
@@ -251,7 +251,7 @@ class AsyncSearchClient:
 
     async def content(
         self,
-        id: SearchContentRequestIdParams,
+        id: SearchContentRequestId,
         *,
         query: str,
         n: typing.Optional[int] = None,
@@ -269,7 +269,7 @@ class AsyncSearchClient:
 
         Parameters
         ----------
-        id : SearchContentRequestIdParams
+        id : SearchContentRequestId
             The bucketId, groupId, projectId, or documentId to be searched. The document or documents within the specified container will be compared to the query, and relevant information will be extracted.
 
         query : str
@@ -299,9 +299,9 @@ class AsyncSearchClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundx
+        from groundx import AsyncGroundX
 
-        client = AsyncGroundx(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -418,9 +418,9 @@ class AsyncSearchClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundx
+        from groundx import AsyncGroundX
 
-        client = AsyncGroundx(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
