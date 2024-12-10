@@ -115,12 +115,13 @@ client = GroundX(
     api_key="YOUR_API_KEY",
 )
 client.documents.ingest_local(
-    files=[
+    documents=[
         IngestLocalDocument(
             bucket_id=1234,
-            file_data="binary data here",
+            file_data="binary data",
             file_name="my_file.txt",
             file_type="txt",
+            search_data={"key": "value"},
         )
     ],
 )
@@ -139,7 +140,7 @@ client.documents.ingest_local(
 <dl>
 <dd>
 
-**files:** `typing.List[IngestLocalDocument]` 
+**documents:** `typing.Optional[typing.List[IngestLocalDocument]]` 
     
 </dd>
 </dl>
@@ -196,7 +197,10 @@ client = GroundX(
 client.documents.crawl_website(
     websites=[
         CrawlWebsiteSource(
-            bucket_id=123,
+            bucket_id=1234,
+            cap=100,
+            depth=3,
+            search_data={"key": "value"},
             source_url="https://my.website.com",
         )
     ],

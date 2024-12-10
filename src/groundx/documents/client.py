@@ -122,7 +122,10 @@ class DocumentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def ingest_local(
-        self, *, files: typing.List[IngestLocalDocument], request_options: typing.Optional[RequestOptions] = None
+        self,
+        *,
+        documents: typing.Optional[typing.List[IngestLocalDocument]] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
         """
         Upload documents hosted on a local file system for ingestion into a GroundX bucket.
@@ -131,7 +134,7 @@ class DocumentsClient:
 
         Parameters
         ----------
-        files : typing.List[IngestLocalDocument]
+        documents : typing.Optional[typing.List[IngestLocalDocument]]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -149,12 +152,13 @@ class DocumentsClient:
             api_key="YOUR_API_KEY",
         )
         client.documents.ingest_local(
-            files=[
+            documents=[
                 IngestLocalDocument(
                     bucket_id=1234,
-                    file_data="binary data here",
+                    file_data="binary data",
                     file_name="my_file.txt",
                     file_type="txt",
+                    search_data={"key": "value"},
                 )
             ],
         )
@@ -163,7 +167,7 @@ class DocumentsClient:
             "v1/ingest/documents/local",
             method="POST",
             data={
-                "files": files,
+                "documents": documents,
             },
             files={},
             request_options=request_options,
@@ -233,7 +237,10 @@ class DocumentsClient:
         client.documents.crawl_website(
             websites=[
                 CrawlWebsiteSource(
-                    bucket_id=123,
+                    bucket_id=1234,
+                    cap=100,
+                    depth=3,
+                    search_data={"key": "value"},
                     source_url="https://my.website.com",
                 )
             ],
@@ -863,7 +870,10 @@ class AsyncDocumentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def ingest_local(
-        self, *, files: typing.List[IngestLocalDocument], request_options: typing.Optional[RequestOptions] = None
+        self,
+        *,
+        documents: typing.Optional[typing.List[IngestLocalDocument]] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
         """
         Upload documents hosted on a local file system for ingestion into a GroundX bucket.
@@ -872,7 +882,7 @@ class AsyncDocumentsClient:
 
         Parameters
         ----------
-        files : typing.List[IngestLocalDocument]
+        documents : typing.Optional[typing.List[IngestLocalDocument]]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -895,12 +905,13 @@ class AsyncDocumentsClient:
 
         async def main() -> None:
             await client.documents.ingest_local(
-                files=[
+                documents=[
                     IngestLocalDocument(
                         bucket_id=1234,
-                        file_data="binary data here",
+                        file_data="binary data",
                         file_name="my_file.txt",
                         file_type="txt",
+                        search_data={"key": "value"},
                     )
                 ],
             )
@@ -912,7 +923,7 @@ class AsyncDocumentsClient:
             "v1/ingest/documents/local",
             method="POST",
             data={
-                "files": files,
+                "documents": documents,
             },
             files={},
             request_options=request_options,
@@ -987,7 +998,10 @@ class AsyncDocumentsClient:
             await client.documents.crawl_website(
                 websites=[
                     CrawlWebsiteSource(
-                        bucket_id=123,
+                        bucket_id=1234,
+                        cap=100,
+                        depth=3,
+                        search_data={"key": "value"},
                         source_url="https://my.website.com",
                     )
                 ],
