@@ -29,7 +29,7 @@ from groundx import GroundX, IngestDocument
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
-client.documents.document_ingest(
+client.documents.ingest(
     documents=[
         IngestDocument(
             bucket_id=1234,
@@ -57,7 +57,7 @@ client = AsyncGroundX(
 
 
 async def main() -> None:
-    await client.documents.document_ingest(
+    await client.documents.ingest(
         documents=[
             IngestDocument(
                 bucket_id=1234,
@@ -82,7 +82,7 @@ will be thrown.
 from groundx.core.api_error import ApiError
 
 try:
-    client.documents.document_ingest(...)
+    client.documents.ingest(...)
 except ApiError as e:
     print(e.status_code)
     print(e.body)
@@ -105,7 +105,7 @@ A request is deemed retriable when any of the following HTTP status codes is ret
 Use the `max_retries` request option to configure this behavior.
 
 ```python
-client.documents.document_ingest(..., request_options={
+client.documents.ingest(..., request_options={
     "max_retries": 1
 })
 ```
@@ -125,7 +125,7 @@ client = GroundX(
 
 
 # Override timeout for a specific method
-client.documents.document_ingest(..., request_options={
+client.documents.ingest(..., request_options={
     "timeout_in_seconds": 1
 })
 ```
