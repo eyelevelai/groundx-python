@@ -24,19 +24,19 @@ A full reference for this library is available [here](./reference.md).
 Instantiate and use the client with the following:
 
 ```python
-from groundx import GroundX, IngestRemoteDocument
+from groundx import GroundX, IngestDocument
 
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
-client.documents.ingest_remote(
+client.documents.document_ingest(
     documents=[
-        IngestRemoteDocument(
+        IngestDocument(
             bucket_id=1234,
             file_name="my_file.txt",
+            file_path="https://my.source.url.com/file.txt",
             file_type="txt",
             search_data={"key": "value"},
-            source_url="https://my.source.url.com/file.txt",
         )
     ],
 )
@@ -49,7 +49,7 @@ The SDK also exports an `async` client so that you can make non-blocking calls t
 ```python
 import asyncio
 
-from groundx import AsyncGroundX, IngestRemoteDocument
+from groundx import AsyncGroundX, IngestDocument
 
 client = AsyncGroundX(
     api_key="YOUR_API_KEY",
@@ -57,14 +57,14 @@ client = AsyncGroundX(
 
 
 async def main() -> None:
-    await client.documents.ingest_remote(
+    await client.documents.document_ingest(
         documents=[
-            IngestRemoteDocument(
+            IngestDocument(
                 bucket_id=1234,
                 file_name="my_file.txt",
+                file_path="https://my.source.url.com/file.txt",
                 file_type="txt",
                 search_data={"key": "value"},
-                source_url="https://my.source.url.com/file.txt",
             )
         ],
     )
@@ -82,7 +82,7 @@ will be thrown.
 from groundx.core.api_error import ApiError
 
 try:
-    client.documents.ingest_remote(...)
+    client.documents.document_ingest(...)
 except ApiError as e:
     print(e.status_code)
     print(e.body)
@@ -105,7 +105,7 @@ A request is deemed retriable when any of the following HTTP status codes is ret
 Use the `max_retries` request option to configure this behavior.
 
 ```python
-client.documents.ingest_remote(..., request_options={
+client.documents.document_ingest(..., request_options={
     "max_retries": 1
 })
 ```
@@ -125,7 +125,7 @@ client = GroundX(
 
 
 # Override timeout for a specific method
-client.documents.ingest_remote(..., request_options={
+client.documents.document_ingest(..., request_options={
     "timeout_in_seconds": 1
 })
 ```
