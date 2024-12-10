@@ -11,8 +11,8 @@ from ..errors.bad_request_error import BadRequestError
 from ..errors.unauthorized_error import UnauthorizedError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
-from .types.documents_ingest_local_request_files_item import DocumentsIngestLocalRequestFilesItem
-from .types.website_crawl_request_websites_item import WebsiteCrawlRequestWebsitesItem
+from ..types.ingest_local_document import IngestLocalDocument
+from ..types.crawl_website_source import CrawlWebsiteSource
 from ..types.process_status_response import ProcessStatusResponse
 from ..core.jsonable_encoder import jsonable_encoder
 from ..types.sort import Sort
@@ -122,10 +122,7 @@ class DocumentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def ingest_local(
-        self,
-        *,
-        files: typing.List[DocumentsIngestLocalRequestFilesItem],
-        request_options: typing.Optional[RequestOptions] = None,
+        self, *, files: typing.List[IngestLocalDocument], request_options: typing.Optional[RequestOptions] = None
     ) -> IngestResponse:
         """
         Upload documents hosted on a local file system for ingestion into a GroundX bucket.
@@ -134,7 +131,7 @@ class DocumentsClient:
 
         Parameters
         ----------
-        files : typing.List[DocumentsIngestLocalRequestFilesItem]
+        files : typing.List[IngestLocalDocument]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -146,18 +143,17 @@ class DocumentsClient:
 
         Examples
         --------
-        from groundx import GroundX
-        from groundx.documents import DocumentsIngestLocalRequestFilesItem
+        from groundx import GroundX, IngestLocalDocument
 
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.ingest_local(
             files=[
-                DocumentsIngestLocalRequestFilesItem(
-                    bucket_id=1,
-                    file_data="fileData",
-                    file_name="fileName",
+                IngestLocalDocument(
+                    bucket_id=1234,
+                    file_data="binary data here",
+                    file_name="my_file.txt",
                     file_type="txt",
                 )
             ],
@@ -208,10 +204,7 @@ class DocumentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def crawl_website(
-        self,
-        *,
-        websites: typing.Sequence[WebsiteCrawlRequestWebsitesItem],
-        request_options: typing.Optional[RequestOptions] = None,
+        self, *, websites: typing.Sequence[CrawlWebsiteSource], request_options: typing.Optional[RequestOptions] = None
     ) -> IngestResponse:
         """
         Upload the content of a publicly accessible website for ingestion into a GroundX bucket. This is done by following links within a specified URL, recursively, up to a specified depth or number of pages.
@@ -220,7 +213,7 @@ class DocumentsClient:
 
         Parameters
         ----------
-        websites : typing.Sequence[WebsiteCrawlRequestWebsitesItem]
+        websites : typing.Sequence[CrawlWebsiteSource]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -232,15 +225,14 @@ class DocumentsClient:
 
         Examples
         --------
-        from groundx import GroundX
-        from groundx.documents import WebsiteCrawlRequestWebsitesItem
+        from groundx import CrawlWebsiteSource, GroundX
 
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.crawl_website(
             websites=[
-                WebsiteCrawlRequestWebsitesItem(
+                CrawlWebsiteSource(
                     bucket_id=123,
                     source_url="https://my.website.com",
                 )
@@ -252,7 +244,7 @@ class DocumentsClient:
             method="POST",
             json={
                 "websites": convert_and_respect_annotation_metadata(
-                    object_=websites, annotation=typing.Sequence[WebsiteCrawlRequestWebsitesItem], direction="write"
+                    object_=websites, annotation=typing.Sequence[CrawlWebsiteSource], direction="write"
                 ),
             },
             headers={
@@ -871,10 +863,7 @@ class AsyncDocumentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def ingest_local(
-        self,
-        *,
-        files: typing.List[DocumentsIngestLocalRequestFilesItem],
-        request_options: typing.Optional[RequestOptions] = None,
+        self, *, files: typing.List[IngestLocalDocument], request_options: typing.Optional[RequestOptions] = None
     ) -> IngestResponse:
         """
         Upload documents hosted on a local file system for ingestion into a GroundX bucket.
@@ -883,7 +872,7 @@ class AsyncDocumentsClient:
 
         Parameters
         ----------
-        files : typing.List[DocumentsIngestLocalRequestFilesItem]
+        files : typing.List[IngestLocalDocument]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -897,8 +886,7 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundX
-        from groundx.documents import DocumentsIngestLocalRequestFilesItem
+        from groundx import AsyncGroundX, IngestLocalDocument
 
         client = AsyncGroundX(
             api_key="YOUR_API_KEY",
@@ -908,10 +896,10 @@ class AsyncDocumentsClient:
         async def main() -> None:
             await client.documents.ingest_local(
                 files=[
-                    DocumentsIngestLocalRequestFilesItem(
-                        bucket_id=1,
-                        file_data="fileData",
-                        file_name="fileName",
+                    IngestLocalDocument(
+                        bucket_id=1234,
+                        file_data="binary data here",
+                        file_name="my_file.txt",
                         file_type="txt",
                     )
                 ],
@@ -965,10 +953,7 @@ class AsyncDocumentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def crawl_website(
-        self,
-        *,
-        websites: typing.Sequence[WebsiteCrawlRequestWebsitesItem],
-        request_options: typing.Optional[RequestOptions] = None,
+        self, *, websites: typing.Sequence[CrawlWebsiteSource], request_options: typing.Optional[RequestOptions] = None
     ) -> IngestResponse:
         """
         Upload the content of a publicly accessible website for ingestion into a GroundX bucket. This is done by following links within a specified URL, recursively, up to a specified depth or number of pages.
@@ -977,7 +962,7 @@ class AsyncDocumentsClient:
 
         Parameters
         ----------
-        websites : typing.Sequence[WebsiteCrawlRequestWebsitesItem]
+        websites : typing.Sequence[CrawlWebsiteSource]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -991,8 +976,7 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundX
-        from groundx.documents import WebsiteCrawlRequestWebsitesItem
+        from groundx import AsyncGroundX, CrawlWebsiteSource
 
         client = AsyncGroundX(
             api_key="YOUR_API_KEY",
@@ -1002,7 +986,7 @@ class AsyncDocumentsClient:
         async def main() -> None:
             await client.documents.crawl_website(
                 websites=[
-                    WebsiteCrawlRequestWebsitesItem(
+                    CrawlWebsiteSource(
                         bucket_id=123,
                         source_url="https://my.website.com",
                     )
@@ -1017,7 +1001,7 @@ class AsyncDocumentsClient:
             method="POST",
             json={
                 "websites": convert_and_respect_annotation_metadata(
-                    object_=websites, annotation=typing.Sequence[WebsiteCrawlRequestWebsitesItem], direction="write"
+                    object_=websites, annotation=typing.Sequence[CrawlWebsiteSource], direction="write"
                 ),
             },
             headers={

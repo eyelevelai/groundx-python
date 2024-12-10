@@ -7,6 +7,7 @@ from .types import (
     BucketResponse,
     BucketUpdateDetail,
     BucketUpdateResponse,
+    CrawlWebsiteSource,
     CustomerDetail,
     CustomerResponse,
     DocumentDetail,
@@ -21,6 +22,7 @@ from .types import (
     HealthResponseHealth,
     HealthService,
     HealthServiceStatus,
+    IngestLocalDocument,
     IngestRemoteDocument,
     IngestResponse,
     IngestResponseIngest,
@@ -45,7 +47,6 @@ from .types import (
 from .errors import BadRequestError, UnauthorizedError
 from . import buckets, customer, documents, groups, health, search
 from .client import AsyncGroundX, GroundX
-from .documents import DocumentsIngestLocalRequestFilesItem, WebsiteCrawlRequestWebsitesItem
 from .environment import GroundXEnvironment
 from .search import SearchContentRequestId
 from .version import __version__
@@ -59,6 +60,7 @@ __all__ = [
     "BucketResponse",
     "BucketUpdateDetail",
     "BucketUpdateResponse",
+    "CrawlWebsiteSource",
     "CustomerDetail",
     "CustomerResponse",
     "DocumentDetail",
@@ -66,7 +68,6 @@ __all__ = [
     "DocumentLookupResponse",
     "DocumentResponse",
     "DocumentType",
-    "DocumentsIngestLocalRequestFilesItem",
     "GroundX",
     "GroundXEnvironment",
     "GroupDetail",
@@ -76,6 +77,7 @@ __all__ = [
     "HealthResponseHealth",
     "HealthService",
     "HealthServiceStatus",
+    "IngestLocalDocument",
     "IngestRemoteDocument",
     "IngestResponse",
     "IngestResponseIngest",
@@ -98,7 +100,6 @@ __all__ = [
     "SubscriptionDetail",
     "SubscriptionDetailMeters",
     "UnauthorizedError",
-    "WebsiteCrawlRequestWebsitesItem",
     "__version__",
     "buckets",
     "customer",

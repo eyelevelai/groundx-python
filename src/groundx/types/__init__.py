@@ -6,6 +6,7 @@ from .bucket_list_response import BucketListResponse
 from .bucket_response import BucketResponse
 from .bucket_update_detail import BucketUpdateDetail
 from .bucket_update_response import BucketUpdateResponse
+from .crawl_website_source import CrawlWebsiteSource
 from .customer_detail import CustomerDetail
 from .customer_response import CustomerResponse
 from .document_detail import DocumentDetail
@@ -20,6 +21,7 @@ from .health_response import HealthResponse
 from .health_response_health import HealthResponseHealth
 from .health_service import HealthService
 from .health_service_status import HealthServiceStatus
+from .ingest_local_document import IngestLocalDocument
 from .ingest_remote_document import IngestRemoteDocument
 from .ingest_response import IngestResponse
 from .ingest_response_ingest import IngestResponseIngest
@@ -48,6 +50,7 @@ __all__ = [
     "BucketResponse",
     "BucketUpdateDetail",
     "BucketUpdateResponse",
+    "CrawlWebsiteSource",
     "CustomerDetail",
     "CustomerResponse",
     "DocumentDetail",
@@ -62,6 +65,7 @@ __all__ = [
     "HealthResponseHealth",
     "HealthService",
     "HealthServiceStatus",
+    "IngestLocalDocument",
     "IngestRemoteDocument",
     "IngestResponse",
     "IngestResponseIngest",

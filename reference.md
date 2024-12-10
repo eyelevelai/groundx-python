@@ -109,18 +109,17 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from groundx import GroundX
-from groundx.documents import DocumentsIngestLocalRequestFilesItem
+from groundx import GroundX, IngestLocalDocument
 
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
 client.documents.ingest_local(
     files=[
-        DocumentsIngestLocalRequestFilesItem(
-            bucket_id=1,
-            file_data="fileData",
-            file_name="fileName",
+        IngestLocalDocument(
+            bucket_id=1234,
+            file_data="binary data here",
+            file_name="my_file.txt",
             file_type="txt",
         )
     ],
@@ -140,7 +139,7 @@ client.documents.ingest_local(
 <dl>
 <dd>
 
-**files:** `typing.List[DocumentsIngestLocalRequestFilesItem]` 
+**files:** `typing.List[IngestLocalDocument]` 
     
 </dd>
 </dl>
@@ -189,15 +188,14 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from groundx import GroundX
-from groundx.documents import WebsiteCrawlRequestWebsitesItem
+from groundx import CrawlWebsiteSource, GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
 client.documents.crawl_website(
     websites=[
-        WebsiteCrawlRequestWebsitesItem(
+        CrawlWebsiteSource(
             bucket_id=123,
             source_url="https://my.website.com",
         )
@@ -218,7 +216,7 @@ client.documents.crawl_website(
 <dl>
 <dd>
 
-**websites:** `typing.Sequence[WebsiteCrawlRequestWebsitesItem]` 
+**websites:** `typing.Sequence[CrawlWebsiteSource]` 
     
 </dd>
 </dl>
