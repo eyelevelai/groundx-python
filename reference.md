@@ -29,15 +29,14 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from groundx import GroundX
-from groundx.documents import DocumentRemoteIngestRequestDocumentsItem
+from groundx import GroundX, IngestRemoteDocument
 
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
 client.documents.ingest_remote(
     documents=[
-        DocumentRemoteIngestRequestDocumentsItem(
+        IngestRemoteDocument(
             bucket_id=1234,
             file_name="my_file.txt",
             file_type="txt",
@@ -61,7 +60,7 @@ client.documents.ingest_remote(
 <dl>
 <dd>
 
-**documents:** `typing.Sequence[DocumentRemoteIngestRequestDocumentsItem]` 
+**documents:** `typing.Sequence[IngestRemoteDocument]` 
     
 </dd>
 </dl>

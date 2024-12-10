@@ -24,15 +24,14 @@ A full reference for this library is available [here](./reference.md).
 Instantiate and use the client with the following:
 
 ```python
-from groundx import GroundX
-from groundx.documents import DocumentRemoteIngestRequestDocumentsItem
+from groundx import GroundX, IngestRemoteDocument
 
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
 client.documents.ingest_remote(
     documents=[
-        DocumentRemoteIngestRequestDocumentsItem(
+        IngestRemoteDocument(
             bucket_id=1234,
             file_name="my_file.txt",
             file_type="txt",
@@ -50,8 +49,7 @@ The SDK also exports an `async` client so that you can make non-blocking calls t
 ```python
 import asyncio
 
-from groundx import AsyncGroundX
-from groundx.documents import DocumentRemoteIngestRequestDocumentsItem
+from groundx import AsyncGroundX, IngestRemoteDocument
 
 client = AsyncGroundX(
     api_key="YOUR_API_KEY",
@@ -61,7 +59,7 @@ client = AsyncGroundX(
 async def main() -> None:
     await client.documents.ingest_remote(
         documents=[
-            DocumentRemoteIngestRequestDocumentsItem(
+            IngestRemoteDocument(
                 bucket_id=1234,
                 file_name="my_file.txt",
                 file_type="txt",
