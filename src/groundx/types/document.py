@@ -5,35 +5,34 @@ import typing_extensions
 from ..core.serialization import FieldMetadata
 import pydantic
 import typing
+from .document_type import DocumentType
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class CrawlWebsiteSource(UniversalBaseModel):
+class Document(UniversalBaseModel):
     bucket_id: typing_extensions.Annotated[int, FieldMetadata(alias="bucketId")] = pydantic.Field()
     """
-    the bucketId of the bucket which this website will be ingested to.
+    the bucketId of the bucket which this remote file will be ingested to.
     """
 
-    cap: typing.Optional[int] = pydantic.Field(default=None)
+    file_name: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="fileName")] = pydantic.Field(
+        default=None
+    )
     """
-    The maximum number of pages to crawl
-    """
-
-    depth: typing.Optional[int] = pydantic.Field(default=None)
-    """
-    The maximum depth of linked pages to follow from the sourceUrl
+    The name of the file being ingested
     """
 
+    file_path: typing_extensions.Annotated[str, FieldMetadata(alias="filePath")] = pydantic.Field()
+    """
+    The local file path or remote URL of the document being ingested by GroundX.
+    """
+
+    file_type: typing_extensions.Annotated[typing.Optional[DocumentType], FieldMetadata(alias="fileType")] = None
     search_data: typing_extensions.Annotated[
         typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]], FieldMetadata(alias="searchData")
     ] = pydantic.Field(default=None)
     """
     Custom metadata which can be used to influence GroundX's search functionality. This data can be used to further hone GroundX search.
-    """
-
-    source_url: typing_extensions.Annotated[str, FieldMetadata(alias="sourceUrl")] = pydantic.Field()
-    """
-    The URL from which the crawl is initiated.
     """
 
     if IS_PYDANTIC_V2:

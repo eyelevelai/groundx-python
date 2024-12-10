@@ -24,20 +24,26 @@ A full reference for this library is available [here](./reference.md).
 Instantiate and use the client with the following:
 
 ```python
-from groundx import GroundX, IngestDocument
+from groundx import Document, GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
 client.documents.ingest(
     documents=[
-        IngestDocument(
+        Document(
             bucket_id=1234,
-            file_name="my_file.txt",
-            file_path="https://my.source.url.com/file.txt",
+            file_name="my_file1.txt",
+            file_path="https://my.source.url.com/file1.txt",
             file_type="txt",
             search_data={"key": "value"},
-        )
+        ),
+        Document(
+            bucket_id=1234,
+            file_name="my_file2.pdf",
+            file_path="/local/path/file2.pdf",
+            file_type="pdf",
+        ),
     ],
 )
 ```
@@ -49,7 +55,7 @@ The SDK also exports an `async` client so that you can make non-blocking calls t
 ```python
 import asyncio
 
-from groundx import AsyncGroundX, IngestDocument
+from groundx import AsyncGroundX, Document
 
 client = AsyncGroundX(
     api_key="YOUR_API_KEY",
@@ -59,13 +65,19 @@ client = AsyncGroundX(
 async def main() -> None:
     await client.documents.ingest(
         documents=[
-            IngestDocument(
+            Document(
                 bucket_id=1234,
-                file_name="my_file.txt",
-                file_path="https://my.source.url.com/file.txt",
+                file_name="my_file1.txt",
+                file_path="https://my.source.url.com/file1.txt",
                 file_type="txt",
                 search_data={"key": "value"},
-            )
+            ),
+            Document(
+                bucket_id=1234,
+                file_name="my_file2.pdf",
+                file_path="/local/path/file2.pdf",
+                file_type="pdf",
+            ),
         ],
     )
 
