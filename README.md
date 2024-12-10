@@ -5,6 +5,10 @@
 
 The Eyelevel Python library provides convenient access to the Eyelevel API from Python.
 
+## Documentation
+
+API reference documentation is available [here](https://docs.groundx.ai/reference).
+
 ## Installation
 
 ```sh
