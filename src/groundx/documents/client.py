@@ -2,24 +2,25 @@
 
 import typing
 from ..core.client_wrapper import SyncClientWrapper
-from ..types.ingest_remote_document import IngestRemoteDocument
+from ..types.sort import Sort
+from ..types.sort_order import SortOrder
+from ..types.processing_status import ProcessingStatus
 from ..core.request_options import RequestOptions
-from ..types.ingest_response import IngestResponse
-from ..core.serialization import convert_and_respect_annotation_metadata
+from ..types.document_list_response import DocumentListResponse
 from ..core.pydantic_utilities import parse_obj_as
-from ..errors.bad_request_error import BadRequestError
-from ..errors.unauthorized_error import UnauthorizedError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
+from ..types.ingest_document import IngestDocument
+from ..types.ingest_response import IngestResponse
+from ..core.serialization import convert_and_respect_annotation_metadata
+from ..errors.bad_request_error import BadRequestError
+from ..errors.unauthorized_error import UnauthorizedError
+from ..types.ingest_remote_document import IngestRemoteDocument
 from ..types.ingest_local_document import IngestLocalDocument
 from ..types.crawl_website_source import CrawlWebsiteSource
 from ..types.process_status_response import ProcessStatusResponse
 from ..core.jsonable_encoder import jsonable_encoder
-from ..types.sort import Sort
-from ..types.sort_order import SortOrder
-from ..types.processing_status import ProcessingStatus
 from ..types.document_lookup_response import DocumentLookupResponse
-from ..types.document_list_response import DocumentListResponse
 from ..types.document_response import DocumentResponse
 from ..core.client_wrapper import AsyncClientWrapper
 
@@ -30,6 +31,248 @@ OMIT = typing.cast(typing.Any, ...)
 class DocumentsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
+
+    def list(
+        self,
+        *,
+        n: typing.Optional[int] = None,
+        filter: typing.Optional[str] = None,
+        sort: typing.Optional[Sort] = None,
+        sort_order: typing.Optional[SortOrder] = None,
+        status: typing.Optional[ProcessingStatus] = None,
+        next_token: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> DocumentListResponse:
+        """
+        lookup all documents across all resources which are currently on GroundX
+
+        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
+
+        Parameters
+        ----------
+        n : typing.Optional[int]
+            The maximum number of returned documents. Accepts 1-100 with a default of 20.
+
+        filter : typing.Optional[str]
+            Only documents with names that contain the filter string will be returned in the results.
+
+        sort : typing.Optional[Sort]
+            The document attribute that will be used to sort the results.
+
+        sort_order : typing.Optional[SortOrder]
+            The order in which to sort the results. A value for sort must also be set.
+
+        status : typing.Optional[ProcessingStatus]
+            A status filter on the get documents query. If this value is set, then only documents with this status will be returned in the results.
+
+        next_token : typing.Optional[str]
+            A token for pagination. If the number of documents for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n documents.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        DocumentListResponse
+            Look up success
+
+        Examples
+        --------
+        from groundx import GroundX
+
+        client = GroundX(
+            api_key="YOUR_API_KEY",
+        )
+        client.documents.list()
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "v1/ingest/documents",
+            method="GET",
+            params={
+                "n": n,
+                "filter": filter,
+                "sort": sort,
+                "sortOrder": sort_order,
+                "status": status,
+                "nextToken": next_token,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    DocumentListResponse,
+                    parse_obj_as(
+                        type_=DocumentListResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def document_ingest(
+        self, *, documents: typing.Sequence[IngestDocument], request_options: typing.Optional[RequestOptions] = None
+    ) -> IngestResponse:
+        """
+        Ingest documents hosted on public URLs or a local file system for ingestion into a GroundX bucket.
+
+        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
+
+        Parameters
+        ----------
+        documents : typing.Sequence[IngestDocument]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        IngestResponse
+            Documents successfully uploaded
+
+        Examples
+        --------
+        from groundx import GroundX, IngestDocument
+
+        client = GroundX(
+            api_key="YOUR_API_KEY",
+        )
+        client.documents.document_ingest(
+            documents=[
+                IngestDocument(
+                    bucket_id=1234,
+                    file_name="my_file.txt",
+                    file_path="https://my.source.url.com/file.txt",
+                    file_type="txt",
+                    search_data={"key": "value"},
+                )
+            ],
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "v1/ingest/documents",
+            method="POST",
+            json={
+                "documents": convert_and_respect_annotation_metadata(
+                    object_=documents, annotation=typing.Sequence[IngestDocument], direction="write"
+                ),
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    IngestResponse,
+                    parse_obj_as(
+                        type_=IngestResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def delete(
+        self,
+        *,
+        document_ids: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> IngestResponse:
+        """
+        Delete multiple documents hosted on GroundX
+
+        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
+
+        Parameters
+        ----------
+        document_ids : typing.Optional[typing.Union[str, typing.Sequence[str]]]
+            A list of documentIds which correspond to documents ingested by GroundX
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        IngestResponse
+            Documents are queued to be deleted
+
+        Examples
+        --------
+        from groundx import GroundX
+
+        client = GroundX(
+            api_key="YOUR_API_KEY",
+        )
+        client.documents.delete()
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "v1/ingest/documents",
+            method="DELETE",
+            params={
+                "documentIds": document_ids,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    IngestResponse,
+                    parse_obj_as(
+                        type_=IngestResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def ingest_remote(
         self,
@@ -471,161 +714,6 @@ class DocumentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def list(
-        self,
-        *,
-        n: typing.Optional[int] = None,
-        filter: typing.Optional[str] = None,
-        sort: typing.Optional[Sort] = None,
-        sort_order: typing.Optional[SortOrder] = None,
-        status: typing.Optional[ProcessingStatus] = None,
-        next_token: typing.Optional[str] = None,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> DocumentListResponse:
-        """
-        lookup all documents across all resources which are currently on GroundX
-
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
-
-        Parameters
-        ----------
-        n : typing.Optional[int]
-            The maximum number of returned documents. Accepts 1-100 with a default of 20.
-
-        filter : typing.Optional[str]
-            Only documents with names that contain the filter string will be returned in the results.
-
-        sort : typing.Optional[Sort]
-            The document attribute that will be used to sort the results.
-
-        sort_order : typing.Optional[SortOrder]
-            The order in which to sort the results. A value for sort must also be set.
-
-        status : typing.Optional[ProcessingStatus]
-            A status filter on the get documents query. If this value is set, then only documents with this status will be returned in the results.
-
-        next_token : typing.Optional[str]
-            A token for pagination. If the number of documents for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n documents.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        DocumentListResponse
-            Look up success
-
-        Examples
-        --------
-        from groundx import GroundX
-
-        client = GroundX(
-            api_key="YOUR_API_KEY",
-        )
-        client.documents.list()
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            "v1/ingest/documents",
-            method="GET",
-            params={
-                "n": n,
-                "filter": filter,
-                "sort": sort,
-                "sortOrder": sort_order,
-                "status": status,
-                "nextToken": next_token,
-            },
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DocumentListResponse,
-                    parse_obj_as(
-                        type_=DocumentListResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    def delete(
-        self,
-        *,
-        document_ids: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> IngestResponse:
-        """
-        Delete multiple documents hosted on GroundX
-
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
-
-        Parameters
-        ----------
-        document_ids : typing.Optional[typing.Union[str, typing.Sequence[str]]]
-            A list of documentIds which correspond to documents ingested by GroundX
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        IngestResponse
-            Documents are queued to be deleted
-
-        Examples
-        --------
-        from groundx import GroundX
-
-        client = GroundX(
-            api_key="YOUR_API_KEY",
-        )
-        client.documents.delete()
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            "v1/ingest/documents",
-            method="DELETE",
-            params={
-                "documentIds": document_ids,
-            },
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    IngestResponse,
-                    parse_obj_as(
-                        type_=IngestResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 401:
-                raise UnauthorizedError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
     def get(self, document_id: str, *, request_options: typing.Optional[RequestOptions] = None) -> DocumentResponse:
         """
         Look up an existing document by documentId.
@@ -770,6 +858,272 @@ class DocumentsClient:
 class AsyncDocumentsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
+
+    async def list(
+        self,
+        *,
+        n: typing.Optional[int] = None,
+        filter: typing.Optional[str] = None,
+        sort: typing.Optional[Sort] = None,
+        sort_order: typing.Optional[SortOrder] = None,
+        status: typing.Optional[ProcessingStatus] = None,
+        next_token: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> DocumentListResponse:
+        """
+        lookup all documents across all resources which are currently on GroundX
+
+        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
+
+        Parameters
+        ----------
+        n : typing.Optional[int]
+            The maximum number of returned documents. Accepts 1-100 with a default of 20.
+
+        filter : typing.Optional[str]
+            Only documents with names that contain the filter string will be returned in the results.
+
+        sort : typing.Optional[Sort]
+            The document attribute that will be used to sort the results.
+
+        sort_order : typing.Optional[SortOrder]
+            The order in which to sort the results. A value for sort must also be set.
+
+        status : typing.Optional[ProcessingStatus]
+            A status filter on the get documents query. If this value is set, then only documents with this status will be returned in the results.
+
+        next_token : typing.Optional[str]
+            A token for pagination. If the number of documents for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n documents.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        DocumentListResponse
+            Look up success
+
+        Examples
+        --------
+        import asyncio
+
+        from groundx import AsyncGroundX
+
+        client = AsyncGroundX(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.documents.list()
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "v1/ingest/documents",
+            method="GET",
+            params={
+                "n": n,
+                "filter": filter,
+                "sort": sort,
+                "sortOrder": sort_order,
+                "status": status,
+                "nextToken": next_token,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    DocumentListResponse,
+                    parse_obj_as(
+                        type_=DocumentListResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def document_ingest(
+        self, *, documents: typing.Sequence[IngestDocument], request_options: typing.Optional[RequestOptions] = None
+    ) -> IngestResponse:
+        """
+        Ingest documents hosted on public URLs or a local file system for ingestion into a GroundX bucket.
+
+        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
+
+        Parameters
+        ----------
+        documents : typing.Sequence[IngestDocument]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        IngestResponse
+            Documents successfully uploaded
+
+        Examples
+        --------
+        import asyncio
+
+        from groundx import AsyncGroundX, IngestDocument
+
+        client = AsyncGroundX(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.documents.document_ingest(
+                documents=[
+                    IngestDocument(
+                        bucket_id=1234,
+                        file_name="my_file.txt",
+                        file_path="https://my.source.url.com/file.txt",
+                        file_type="txt",
+                        search_data={"key": "value"},
+                    )
+                ],
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "v1/ingest/documents",
+            method="POST",
+            json={
+                "documents": convert_and_respect_annotation_metadata(
+                    object_=documents, annotation=typing.Sequence[IngestDocument], direction="write"
+                ),
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    IngestResponse,
+                    parse_obj_as(
+                        type_=IngestResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def delete(
+        self,
+        *,
+        document_ids: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> IngestResponse:
+        """
+        Delete multiple documents hosted on GroundX
+
+        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
+
+        Parameters
+        ----------
+        document_ids : typing.Optional[typing.Union[str, typing.Sequence[str]]]
+            A list of documentIds which correspond to documents ingested by GroundX
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        IngestResponse
+            Documents are queued to be deleted
+
+        Examples
+        --------
+        import asyncio
+
+        from groundx import AsyncGroundX
+
+        client = AsyncGroundX(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.documents.delete()
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "v1/ingest/documents",
+            method="DELETE",
+            params={
+                "documentIds": document_ids,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    IngestResponse,
+                    parse_obj_as(
+                        type_=IngestResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def ingest_remote(
         self,
@@ -1223,177 +1577,6 @@ class AsyncDocumentsClient:
                     DocumentLookupResponse,
                     parse_obj_as(
                         type_=DocumentLookupResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 401:
-                raise UnauthorizedError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def list(
-        self,
-        *,
-        n: typing.Optional[int] = None,
-        filter: typing.Optional[str] = None,
-        sort: typing.Optional[Sort] = None,
-        sort_order: typing.Optional[SortOrder] = None,
-        status: typing.Optional[ProcessingStatus] = None,
-        next_token: typing.Optional[str] = None,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> DocumentListResponse:
-        """
-        lookup all documents across all resources which are currently on GroundX
-
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
-
-        Parameters
-        ----------
-        n : typing.Optional[int]
-            The maximum number of returned documents. Accepts 1-100 with a default of 20.
-
-        filter : typing.Optional[str]
-            Only documents with names that contain the filter string will be returned in the results.
-
-        sort : typing.Optional[Sort]
-            The document attribute that will be used to sort the results.
-
-        sort_order : typing.Optional[SortOrder]
-            The order in which to sort the results. A value for sort must also be set.
-
-        status : typing.Optional[ProcessingStatus]
-            A status filter on the get documents query. If this value is set, then only documents with this status will be returned in the results.
-
-        next_token : typing.Optional[str]
-            A token for pagination. If the number of documents for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n documents.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        DocumentListResponse
-            Look up success
-
-        Examples
-        --------
-        import asyncio
-
-        from groundx import AsyncGroundX
-
-        client = AsyncGroundX(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.documents.list()
-
-
-        asyncio.run(main())
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            "v1/ingest/documents",
-            method="GET",
-            params={
-                "n": n,
-                "filter": filter,
-                "sort": sort,
-                "sortOrder": sort_order,
-                "status": status,
-                "nextToken": next_token,
-            },
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DocumentListResponse,
-                    parse_obj_as(
-                        type_=DocumentListResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def delete(
-        self,
-        *,
-        document_ids: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> IngestResponse:
-        """
-        Delete multiple documents hosted on GroundX
-
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
-
-        Parameters
-        ----------
-        document_ids : typing.Optional[typing.Union[str, typing.Sequence[str]]]
-            A list of documentIds which correspond to documents ingested by GroundX
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        IngestResponse
-            Documents are queued to be deleted
-
-        Examples
-        --------
-        import asyncio
-
-        from groundx import AsyncGroundX
-
-        client = AsyncGroundX(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.documents.delete()
-
-
-        asyncio.run(main())
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            "v1/ingest/documents",
-            method="DELETE",
-            params={
-                "documentIds": document_ids,
-            },
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    IngestResponse,
-                    parse_obj_as(
-                        type_=IngestResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

@@ -21,6 +21,7 @@ from .health_response import HealthResponse
 from .health_response_health import HealthResponseHealth
 from .health_service import HealthService
 from .health_service_status import HealthServiceStatus
+from .ingest_document import IngestDocument
 from .ingest_local_document import IngestLocalDocument
 from .ingest_remote_document import IngestRemoteDocument
 from .ingest_response import IngestResponse
@@ -65,6 +66,7 @@ __all__ = [
     "HealthResponseHealth",
     "HealthService",
     "HealthServiceStatus",
+    "IngestDocument",
     "IngestLocalDocument",
     "IngestRemoteDocument",
     "IngestResponse",
