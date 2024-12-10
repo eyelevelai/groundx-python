@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "groundx-python-sdk"
+name = "groundx"
 version = "2.0.9"
 description = ""
 readme = "README.md"
