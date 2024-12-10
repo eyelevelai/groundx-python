@@ -112,7 +112,7 @@ class DocumentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def document_ingest(
+    def ingest(
         self, *, documents: typing.Sequence[IngestDocument], request_options: typing.Optional[RequestOptions] = None
     ) -> IngestResponse:
         """
@@ -139,7 +139,7 @@ class DocumentsClient:
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
-        client.documents.document_ingest(
+        client.documents.ingest(
             documents=[
                 IngestDocument(
                     bucket_id=1234,
@@ -947,7 +947,7 @@ class AsyncDocumentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def document_ingest(
+    async def ingest(
         self, *, documents: typing.Sequence[IngestDocument], request_options: typing.Optional[RequestOptions] = None
     ) -> IngestResponse:
         """
@@ -979,7 +979,7 @@ class AsyncDocumentsClient:
 
 
         async def main() -> None:
-            await client.documents.document_ingest(
+            await client.documents.ingest(
                 documents=[
                     IngestDocument(
                         bucket_id=1234,

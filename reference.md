@@ -110,7 +110,7 @@ client.documents.list()
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">document_ingest</a>(...)</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">ingest</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -144,7 +144,7 @@ from groundx import GroundX, IngestDocument
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
-client.documents.document_ingest(
+client.documents.ingest(
     documents=[
         IngestDocument(
             bucket_id=1234,
