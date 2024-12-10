@@ -34,6 +34,9 @@ client.documents.ingest_remote(
     documents=[
         DocumentRemoteIngestRequestDocumentsItem(
             bucket_id=1234,
+            file_name="my_file.txt",
+            file_type="txt",
+            search_data={"key": "value"},
             source_url="https://my.source.url.com/file.txt",
         )
     ],
@@ -60,6 +63,9 @@ async def main() -> None:
         documents=[
             DocumentRemoteIngestRequestDocumentsItem(
                 bucket_id=1234,
+                file_name="my_file.txt",
+                file_type="txt",
+                search_data={"key": "value"},
                 source_url="https://my.source.url.com/file.txt",
             )
         ],
