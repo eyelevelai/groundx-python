@@ -17,7 +17,7 @@ class DocumentsIngestLocalRequestFilesItem(UniversalBaseModel):
 
     file_data: typing_extensions.Annotated[str, FieldMetadata(alias="fileData")] = pydantic.Field()
     """
-    The actual file being ingested.
+    Binary data for the file being ingested.
     """
 
     file_name: typing_extensions.Annotated[str, FieldMetadata(alias="fileName")] = pydantic.Field()
