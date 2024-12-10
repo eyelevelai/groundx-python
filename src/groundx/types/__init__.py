@@ -6,9 +6,9 @@ from .bucket_list_response import BucketListResponse
 from .bucket_response import BucketResponse
 from .bucket_update_detail import BucketUpdateDetail
 from .bucket_update_response import BucketUpdateResponse
-from .crawl_website_source import CrawlWebsiteSource
 from .customer_detail import CustomerDetail
 from .customer_response import CustomerResponse
+from .document import Document
 from .document_detail import DocumentDetail
 from .document_list_response import DocumentListResponse
 from .document_lookup_response import DocumentLookupResponse
@@ -21,7 +21,6 @@ from .health_response import HealthResponse
 from .health_response_health import HealthResponseHealth
 from .health_service import HealthService
 from .health_service_status import HealthServiceStatus
-from .ingest_document import IngestDocument
 from .ingest_local_document import IngestLocalDocument
 from .ingest_remote_document import IngestRemoteDocument
 from .ingest_response import IngestResponse
@@ -43,6 +42,7 @@ from .sort import Sort
 from .sort_order import SortOrder
 from .subscription_detail import SubscriptionDetail
 from .subscription_detail_meters import SubscriptionDetailMeters
+from .website_source import WebsiteSource
 
 __all__ = [
     "BoundingBoxDetail",
@@ -51,9 +51,9 @@ __all__ = [
     "BucketResponse",
     "BucketUpdateDetail",
     "BucketUpdateResponse",
-    "CrawlWebsiteSource",
     "CustomerDetail",
     "CustomerResponse",
+    "Document",
     "DocumentDetail",
     "DocumentListResponse",
     "DocumentLookupResponse",
@@ -66,7 +66,6 @@ __all__ = [
     "HealthResponseHealth",
     "HealthService",
     "HealthServiceStatus",
-    "IngestDocument",
     "IngestLocalDocument",
     "IngestRemoteDocument",
     "IngestResponse",
@@ -88,4 +87,5 @@ __all__ = [
     "SortOrder",
     "SubscriptionDetail",
     "SubscriptionDetailMeters",
+    "WebsiteSource",
 ]

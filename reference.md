@@ -139,20 +139,26 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from groundx import GroundX, IngestDocument
+from groundx import Document, GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
 client.documents.ingest(
     documents=[
-        IngestDocument(
+        Document(
             bucket_id=1234,
-            file_name="my_file.txt",
-            file_path="https://my.source.url.com/file.txt",
+            file_name="my_file1.txt",
+            file_path="https://my.source.url.com/file1.txt",
             file_type="txt",
             search_data={"key": "value"},
-        )
+        ),
+        Document(
+            bucket_id=1234,
+            file_name="my_file2.pdf",
+            file_path="/local/path/file2.pdf",
+            file_type="pdf",
+        ),
     ],
 )
 
@@ -170,7 +176,7 @@ client.documents.ingest(
 <dl>
 <dd>
 
-**documents:** `typing.Sequence[IngestDocument]` 
+**documents:** `typing.Sequence[Document]` 
     
 </dd>
 </dl>
@@ -298,9 +304,6 @@ client.documents.ingest_remote(
     documents=[
         IngestRemoteDocument(
             bucket_id=1234,
-            file_name="my_file.txt",
-            file_type="txt",
-            search_data={"key": "value"},
             source_url="https://my.source.url.com/file.txt",
         )
     ],
@@ -369,22 +372,12 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from groundx import GroundX, IngestLocalDocument
+from groundx import GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
-client.documents.ingest_local(
-    documents=[
-        IngestLocalDocument(
-            bucket_id=1234,
-            file_data="binary data",
-            file_name="my_file.txt",
-            file_type="txt",
-            search_data={"key": "value"},
-        )
-    ],
-)
+client.documents.ingest_local()
 
 ```
 </dd>
@@ -449,14 +442,14 @@ Interact with the "Request Body" below to explore the arguments of this function
 <dd>
 
 ```python
-from groundx import CrawlWebsiteSource, GroundX
+from groundx import GroundX, WebsiteSource
 
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
 client.documents.crawl_website(
     websites=[
-        CrawlWebsiteSource(
+        WebsiteSource(
             bucket_id=1234,
             cap=100,
             depth=3,
@@ -480,7 +473,7 @@ client.documents.crawl_website(
 <dl>
 <dd>
 
-**websites:** `typing.Sequence[CrawlWebsiteSource]` 
+**websites:** `typing.Sequence[WebsiteSource]` 
     
 </dd>
 </dl>
