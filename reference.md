@@ -78,7 +78,7 @@ client.documents.ingest_remote(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">ingest_local</a>()</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">ingest_local</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -108,11 +108,21 @@ Interact with the "Request Body" below to explore the arguments of this function
 
 ```python
 from groundx import GroundX
+from groundx.documents import DocumentsIngestLocalRequestFilesItem
 
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
-client.documents.ingest_local()
+client.documents.ingest_local(
+    files=[
+        DocumentsIngestLocalRequestFilesItem(
+            bucket_id=1,
+            file_data="fileData",
+            file_name="fileName",
+            file_type="txt",
+        )
+    ],
+)
 
 ```
 </dd>
@@ -124,6 +134,14 @@ client.documents.ingest_local()
 
 <dl>
 <dd>
+
+<dl>
+<dd>
+
+**files:** `typing.List[DocumentsIngestLocalRequestFilesItem]` 
+    
+</dd>
+</dl>
 
 <dl>
 <dd>

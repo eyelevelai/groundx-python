@@ -44,7 +44,11 @@ from .types import (
 from .errors import BadRequestError, UnauthorizedError
 from . import buckets, customer, documents, groups, health, search
 from .client import AsyncGroundX, GroundX
-from .documents import DocumentRemoteIngestRequestDocumentsItem, WebsiteCrawlRequestWebsitesItem
+from .documents import (
+    DocumentRemoteIngestRequestDocumentsItem,
+    DocumentsIngestLocalRequestFilesItem,
+    WebsiteCrawlRequestWebsitesItem,
+)
 from .environment import GroundXEnvironment
 from .search import SearchContentRequestId
 from .version import __version__
@@ -66,6 +70,7 @@ __all__ = [
     "DocumentRemoteIngestRequestDocumentsItem",
     "DocumentResponse",
     "DocumentType",
+    "DocumentsIngestLocalRequestFilesItem",
     "GroundX",
     "GroundXEnvironment",
     "GroupDetail",

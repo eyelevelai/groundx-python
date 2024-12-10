@@ -11,6 +11,7 @@ from ..errors.bad_request_error import BadRequestError
 from ..errors.unauthorized_error import UnauthorizedError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
+from .types.documents_ingest_local_request_files_item import DocumentsIngestLocalRequestFilesItem
 from .types.website_crawl_request_websites_item import WebsiteCrawlRequestWebsitesItem
 from ..types.process_status_response import ProcessStatusResponse
 from ..core.jsonable_encoder import jsonable_encoder
@@ -120,7 +121,12 @@ class DocumentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def ingest_local(self, *, request_options: typing.Optional[RequestOptions] = None) -> IngestResponse:
+    def ingest_local(
+        self,
+        *,
+        files: typing.List[DocumentsIngestLocalRequestFilesItem],
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> IngestResponse:
         """
         Upload documents hosted on a local file system for ingestion into a GroundX bucket.
 
@@ -128,6 +134,8 @@ class DocumentsClient:
 
         Parameters
         ----------
+        files : typing.List[DocumentsIngestLocalRequestFilesItem]
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -139,16 +147,28 @@ class DocumentsClient:
         Examples
         --------
         from groundx import GroundX
+        from groundx.documents import DocumentsIngestLocalRequestFilesItem
 
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
-        client.documents.ingest_local()
+        client.documents.ingest_local(
+            files=[
+                DocumentsIngestLocalRequestFilesItem(
+                    bucket_id=1,
+                    file_data="fileData",
+                    file_name="fileName",
+                    file_type="txt",
+                )
+            ],
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/ingest/documents/local",
             method="POST",
-            data={},
+            data={
+                "files": files,
+            },
             files={},
             request_options=request_options,
             omit=OMIT,
@@ -850,7 +870,12 @@ class AsyncDocumentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def ingest_local(self, *, request_options: typing.Optional[RequestOptions] = None) -> IngestResponse:
+    async def ingest_local(
+        self,
+        *,
+        files: typing.List[DocumentsIngestLocalRequestFilesItem],
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> IngestResponse:
         """
         Upload documents hosted on a local file system for ingestion into a GroundX bucket.
 
@@ -858,6 +883,8 @@ class AsyncDocumentsClient:
 
         Parameters
         ----------
+        files : typing.List[DocumentsIngestLocalRequestFilesItem]
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -871,6 +898,7 @@ class AsyncDocumentsClient:
         import asyncio
 
         from groundx import AsyncGroundX
+        from groundx.documents import DocumentsIngestLocalRequestFilesItem
 
         client = AsyncGroundX(
             api_key="YOUR_API_KEY",
@@ -878,7 +906,16 @@ class AsyncDocumentsClient:
 
 
         async def main() -> None:
-            await client.documents.ingest_local()
+            await client.documents.ingest_local(
+                files=[
+                    DocumentsIngestLocalRequestFilesItem(
+                        bucket_id=1,
+                        file_data="fileData",
+                        file_name="fileName",
+                        file_type="txt",
+                    )
+                ],
+            )
 
 
         asyncio.run(main())
@@ -886,7 +923,9 @@ class AsyncDocumentsClient:
         _response = await self._client_wrapper.httpx_client.request(
             "v1/ingest/documents/local",
             method="POST",
-            data={},
+            data={
+                "files": files,
+            },
             files={},
             request_options=request_options,
             omit=OMIT,
