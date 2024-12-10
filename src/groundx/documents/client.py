@@ -2,7 +2,7 @@
 
 import typing
 from ..core.client_wrapper import SyncClientWrapper
-from .types.document_remote_ingest_request_documents_item import DocumentRemoteIngestRequestDocumentsItem
+from ..types.ingest_remote_document import IngestRemoteDocument
 from ..core.request_options import RequestOptions
 from ..types.ingest_response import IngestResponse
 from ..core.serialization import convert_and_respect_annotation_metadata
@@ -34,7 +34,7 @@ class DocumentsClient:
     def ingest_remote(
         self,
         *,
-        documents: typing.Sequence[DocumentRemoteIngestRequestDocumentsItem],
+        documents: typing.Sequence[IngestRemoteDocument],
         request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
         """
@@ -44,7 +44,7 @@ class DocumentsClient:
 
         Parameters
         ----------
-        documents : typing.Sequence[DocumentRemoteIngestRequestDocumentsItem]
+        documents : typing.Sequence[IngestRemoteDocument]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -56,15 +56,14 @@ class DocumentsClient:
 
         Examples
         --------
-        from groundx import GroundX
-        from groundx.documents import DocumentRemoteIngestRequestDocumentsItem
+        from groundx import GroundX, IngestRemoteDocument
 
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.ingest_remote(
             documents=[
-                DocumentRemoteIngestRequestDocumentsItem(
+                IngestRemoteDocument(
                     bucket_id=1234,
                     file_name="my_file.txt",
                     file_type="txt",
@@ -79,9 +78,7 @@ class DocumentsClient:
             method="POST",
             json={
                 "documents": convert_and_respect_annotation_metadata(
-                    object_=documents,
-                    annotation=typing.Sequence[DocumentRemoteIngestRequestDocumentsItem],
-                    direction="write",
+                    object_=documents, annotation=typing.Sequence[IngestRemoteDocument], direction="write"
                 ),
             },
             headers={
@@ -778,7 +775,7 @@ class AsyncDocumentsClient:
     async def ingest_remote(
         self,
         *,
-        documents: typing.Sequence[DocumentRemoteIngestRequestDocumentsItem],
+        documents: typing.Sequence[IngestRemoteDocument],
         request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
         """
@@ -788,7 +785,7 @@ class AsyncDocumentsClient:
 
         Parameters
         ----------
-        documents : typing.Sequence[DocumentRemoteIngestRequestDocumentsItem]
+        documents : typing.Sequence[IngestRemoteDocument]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -802,8 +799,7 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundX
-        from groundx.documents import DocumentRemoteIngestRequestDocumentsItem
+        from groundx import AsyncGroundX, IngestRemoteDocument
 
         client = AsyncGroundX(
             api_key="YOUR_API_KEY",
@@ -813,7 +809,7 @@ class AsyncDocumentsClient:
         async def main() -> None:
             await client.documents.ingest_remote(
                 documents=[
-                    DocumentRemoteIngestRequestDocumentsItem(
+                    IngestRemoteDocument(
                         bucket_id=1234,
                         file_name="my_file.txt",
                         file_type="txt",
@@ -831,9 +827,7 @@ class AsyncDocumentsClient:
             method="POST",
             json={
                 "documents": convert_and_respect_annotation_metadata(
-                    object_=documents,
-                    annotation=typing.Sequence[DocumentRemoteIngestRequestDocumentsItem],
-                    direction="write",
+                    object_=documents, annotation=typing.Sequence[IngestRemoteDocument], direction="write"
                 ),
             },
             headers={

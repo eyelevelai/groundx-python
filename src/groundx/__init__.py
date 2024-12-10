@@ -21,6 +21,7 @@ from .types import (
     HealthResponseHealth,
     HealthService,
     HealthServiceStatus,
+    IngestRemoteDocument,
     IngestResponse,
     IngestResponseIngest,
     MessageResponse,
@@ -44,11 +45,7 @@ from .types import (
 from .errors import BadRequestError, UnauthorizedError
 from . import buckets, customer, documents, groups, health, search
 from .client import AsyncGroundX, GroundX
-from .documents import (
-    DocumentRemoteIngestRequestDocumentsItem,
-    DocumentsIngestLocalRequestFilesItem,
-    WebsiteCrawlRequestWebsitesItem,
-)
+from .documents import DocumentsIngestLocalRequestFilesItem, WebsiteCrawlRequestWebsitesItem
 from .environment import GroundXEnvironment
 from .search import SearchContentRequestId
 from .version import __version__
@@ -67,7 +64,6 @@ __all__ = [
     "DocumentDetail",
     "DocumentListResponse",
     "DocumentLookupResponse",
-    "DocumentRemoteIngestRequestDocumentsItem",
     "DocumentResponse",
     "DocumentType",
     "DocumentsIngestLocalRequestFilesItem",
@@ -80,6 +76,7 @@ __all__ = [
     "HealthResponseHealth",
     "HealthService",
     "HealthServiceStatus",
+    "IngestRemoteDocument",
     "IngestResponse",
     "IngestResponseIngest",
     "MessageResponse",
