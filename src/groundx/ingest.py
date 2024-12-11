@@ -1,4 +1,4 @@
-import json, mimetypes, requests, typing, os
+import io, json, mimetypes, requests, typing, os
 from urllib.parse import urlparse
 
 from json.decoder import JSONDecodeError
@@ -115,7 +115,7 @@ class GroundX(GroundXBase):
                         "metadata",
                         (
                             f"data.json",
-                            json.dumps(metadata),
+                            io.BytesIO(json.dumps(metadata).encode("utf-8")),
                             "application/json",
                         ),
                     )
