@@ -1,9 +1,9 @@
-# Eyelevel Python Library
+# GroundX Python Library
 
 [![fern shield](https://img.shields.io/badge/%F0%9F%8C%BF-Built%20with%20Fern-brightgreen)](https://buildwithfern.com?utm_source=github&utm_medium=github&utm_campaign=readme&utm_source=https%3A%2F%2Fgithub.com%2Feyelevelai%2Fgroundx-python)
 [![pypi](https://img.shields.io/pypi/v/groundx)](https://pypi.python.org/pypi/groundx)
 
-The Eyelevel Python library provides convenient access to the Eyelevel API from Python.
+The GroundX Python library provides convenient access to the GroundX API from Python.
 
 ## Documentation
 
@@ -24,14 +24,15 @@ A full reference for this library is available [here](./reference.md).
 Instantiate and use the client with the following:
 
 ```python
-from groundx import GroundX, IngestRemoteDocument
+from groundx import Document, GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
-client.documents.ingest_remote(
+
+client.ingest(
     documents=[
-        IngestRemoteDocument(
+        Document(
             bucket_id=1234,
             file_name="my_file1.txt",
             file_type="txt",
@@ -48,17 +49,16 @@ The SDK also exports an `async` client so that you can make non-blocking calls t
 ```python
 import asyncio
 
-from groundx import AsyncGroundX, IngestRemoteDocument
+from groundx import AsyncGroundX, Document
 
 client = AsyncGroundX(
     api_key="YOUR_API_KEY",
 )
 
-
 async def main() -> None:
-    await client.documents.ingest_remote(
+    await client.ingest(
         documents=[
-            IngestRemoteDocument(
+            Document(
                 bucket_id=1234,
                 file_name="my_file1.txt",
                 file_type="txt",
@@ -66,7 +66,6 @@ async def main() -> None:
             )
         ],
     )
-
 
 asyncio.run(main())
 ```
@@ -80,7 +79,7 @@ will be thrown.
 from groundx.core.api_error import ApiError
 
 try:
-    client.documents.ingest_remote(...)
+    client.ingest(...)
 except ApiError as e:
     print(e.status_code)
     print(e.body)
@@ -103,7 +102,7 @@ A request is deemed retriable when any of the following HTTP status codes is ret
 Use the `max_retries` request option to configure this behavior.
 
 ```python
-client.documents.ingest_remote(..., request_options={
+client.ingest(..., request_options={
     "max_retries": 1
 })
 ```
@@ -123,7 +122,7 @@ client = GroundX(
 
 
 # Override timeout for a specific method
-client.documents.ingest_remote(..., request_options={
+client.ingest(..., request_options={
     "timeout_in_seconds": 1
 })
 ```
