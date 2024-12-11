@@ -11,7 +11,7 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2
 class WebsiteSource(UniversalBaseModel):
     bucket_id: typing_extensions.Annotated[int, FieldMetadata(alias="bucketId")] = pydantic.Field()
     """
-    the bucketId of the bucket which this website will be ingested to.
+    The bucketId of the bucket which this website will be ingested into.
     """
 
     cap: typing.Optional[int] = pydantic.Field(default=None)

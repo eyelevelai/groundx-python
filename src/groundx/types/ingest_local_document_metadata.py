@@ -14,7 +14,7 @@ class IngestLocalDocumentMetadata(UniversalBaseModel):
         default=None
     )
     """
-    The bucketId of the bucket which this local file will be ingested to.
+    The bucketId of the bucket which this local file will be ingested into.
     """
 
     file_name: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="fileName")] = pydantic.Field(
