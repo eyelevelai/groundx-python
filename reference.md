@@ -1,5 +1,245 @@
 # Reference
 ## Documents
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">ingest_remote</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Ingest documents hosted on public URLs into a GroundX bucket.
+
+Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from groundx import GroundX, IngestRemoteDocument
+
+client = GroundX(
+    api_key="YOUR_API_KEY",
+)
+client.documents.ingest_remote(
+    documents=[
+        IngestRemoteDocument(
+            bucket_id=1234,
+            file_name="my_file1.txt",
+            file_type="txt",
+            source_url="https://my.source.url.com/file1.txt",
+        )
+    ],
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**documents:** `typing.Sequence[IngestRemoteDocument]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">ingest_local</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Upload documents hosted on a local file system into a GroundX bucket.
+
+Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from groundx import GroundX, IngestLocalDocument, IngestLocalDocumentMetadata
+
+client = GroundX(
+    api_key="YOUR_API_KEY",
+)
+client.documents.ingest_local(
+    request=[
+        IngestLocalDocument(
+            blob="blob",
+            metadata=IngestLocalDocumentMetadata(
+                bucket_id=1234,
+                file_name="my_file1.txt",
+                file_type="txt",
+            ),
+        )
+    ],
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**request:** `DocumentLocalIngestRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">crawl_website</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Upload the content of a publicly accessible website for ingestion into a GroundX bucket. This is done by following links within a specified URL, recursively, up to a specified depth or number of pages.
+
+Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from groundx import GroundX, WebsiteSource
+
+client = GroundX(
+    api_key="YOUR_API_KEY",
+)
+client.documents.crawl_website(
+    websites=[
+        WebsiteSource(
+            bucket_id=1234,
+            cap=100,
+            depth=3,
+            search_data={"key": "value"},
+            source_url="https://my.website.com",
+        )
+    ],
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**websites:** `typing.Sequence[WebsiteSource]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.documents.<a href="src/groundx/documents/client.py">list</a>(...)</code></summary>
 <dl>
 <dd>
@@ -110,92 +350,6 @@ client.documents.list()
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">ingest</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Ingest documents hosted on public URLs or a local file system for ingestion into a GroundX bucket.
-
-Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from groundx import Document, GroundX
-
-client = GroundX(
-    api_key="YOUR_API_KEY",
-)
-client.documents.ingest(
-    documents=[
-        Document(
-            bucket_id=1234,
-            file_name="my_file1.txt",
-            file_path="https://my.source.url.com/file1.txt",
-            file_type="txt",
-            search_data={"key": "value"},
-        ),
-        Document(
-            bucket_id=1234,
-            file_name="my_file2.pdf",
-            file_path="/local/path/file2.pdf",
-            file_type="pdf",
-        ),
-    ],
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**documents:** `typing.Sequence[Document]` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
 <details><summary><code>client.documents.<a href="src/groundx/documents/client.py">delete</a>(...)</code></summary>
 <dl>
 <dd>
@@ -247,233 +401,6 @@ client.documents.delete()
 <dd>
 
 **document_ids:** `typing.Optional[typing.Union[str, typing.Sequence[str]]]` — A list of documentIds which correspond to documents ingested by GroundX
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">ingest_remote</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Ingest documents hosted on public URLs to a GroundX bucket.
-
-Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from groundx import GroundX, IngestRemoteDocument
-
-client = GroundX(
-    api_key="YOUR_API_KEY",
-)
-client.documents.ingest_remote(
-    documents=[
-        IngestRemoteDocument(
-            bucket_id=1234,
-            source_url="https://my.source.url.com/file.txt",
-        )
-    ],
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**documents:** `typing.Sequence[IngestRemoteDocument]` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">ingest_local</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Upload documents hosted on a local file system for ingestion into a GroundX bucket.
-
-Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from groundx import GroundX
-
-client = GroundX(
-    api_key="YOUR_API_KEY",
-)
-client.documents.ingest_local()
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**documents:** `typing.Optional[typing.List[IngestLocalDocument]]` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">crawl_website</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Upload the content of a publicly accessible website for ingestion into a GroundX bucket. This is done by following links within a specified URL, recursively, up to a specified depth or number of pages.
-
-Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from groundx import GroundX, WebsiteSource
-
-client = GroundX(
-    api_key="YOUR_API_KEY",
-)
-client.documents.crawl_website(
-    websites=[
-        WebsiteSource(
-            bucket_id=1234,
-            cap=100,
-            depth=3,
-            search_data={"key": "value"},
-            source_url="https://my.website.com",
-        )
-    ],
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**websites:** `typing.Sequence[WebsiteSource]` 
     
 </dd>
 </dl>
