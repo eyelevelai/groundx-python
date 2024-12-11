@@ -53,9 +53,9 @@ class BucketsClient:
 
         Examples
         --------
-        from groundx import GroundXIngest
+        from groundx import GroundX
 
-        client = GroundXIngest(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.buckets.list()
@@ -103,9 +103,9 @@ class BucketsClient:
 
         Examples
         --------
-        from groundx import GroundXIngest
+        from groundx import GroundX
 
-        client = GroundXIngest(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.buckets.create(
@@ -169,9 +169,9 @@ class BucketsClient:
 
         Examples
         --------
-        from groundx import GroundXIngest
+        from groundx import GroundX
 
-        client = GroundXIngest(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.buckets.get(
@@ -243,9 +243,9 @@ class BucketsClient:
 
         Examples
         --------
-        from groundx import GroundXIngest
+        from groundx import GroundX
 
-        client = GroundXIngest(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.buckets.update(
@@ -320,9 +320,9 @@ class BucketsClient:
 
         Examples
         --------
-        from groundx import GroundXIngest
+        from groundx import GroundX
 
-        client = GroundXIngest(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.buckets.delete(
@@ -405,9 +405,9 @@ class AsyncBucketsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundXIngest
+        from groundx import AsyncGroundX
 
-        client = AsyncGroundXIngest(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -463,9 +463,9 @@ class AsyncBucketsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundXIngest
+        from groundx import AsyncGroundX
 
-        client = AsyncGroundXIngest(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -537,9 +537,9 @@ class AsyncBucketsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundXIngest
+        from groundx import AsyncGroundX
 
-        client = AsyncGroundXIngest(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -619,9 +619,9 @@ class AsyncBucketsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundXIngest
+        from groundx import AsyncGroundX
 
-        client = AsyncGroundXIngest(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -706,9 +706,9 @@ class AsyncBucketsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundXIngest
+        from groundx import AsyncGroundX
 
-        client = AsyncGroundXIngest(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 

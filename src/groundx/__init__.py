@@ -48,13 +48,13 @@ from .types import (
 )
 from .errors import BadRequestError, UnauthorizedError
 from . import buckets, customer, documents, groups, health, search
-from .environment import GroundXIngestEnvironment
-from .ingest import AsyncGroundXIngest, GroundXIngest
+from .environment import GroundXEnvironment
+from .ingest import AsyncGroundX, GroundX
 from .search import SearchContentRequestId
 from .version import __version__
 
 __all__ = [
-    "AsyncGroundXIngest",
+    "AsyncGroundX",
     "BadRequestError",
     "BoundingBoxDetail",
     "BucketDetail",
@@ -70,8 +70,8 @@ __all__ = [
     "DocumentLookupResponse",
     "DocumentResponse",
     "DocumentType",
-    "GroundXIngest",
-    "GroundXIngestEnvironment",
+    "GroundX",
+    "GroundXEnvironment",
     "GroupDetail",
     "GroupListResponse",
     "GroupResponse",

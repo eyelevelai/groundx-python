@@ -56,9 +56,9 @@ class DocumentsClient:
 
         Examples
         --------
-        from groundx import GroundXIngest, IngestRemoteDocument
+        from groundx import GroundX, IngestRemoteDocument
 
-        client = GroundXIngest(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.ingest_remote(
@@ -142,13 +142,9 @@ class DocumentsClient:
 
         Examples
         --------
-        from groundx import (
-            GroundXIngest,
-            IngestLocalDocument,
-            IngestLocalDocumentMetadata,
-        )
+        from groundx import GroundX, IngestLocalDocument, IngestLocalDocumentMetadata
 
-        client = GroundXIngest(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.ingest_local(
@@ -229,9 +225,9 @@ class DocumentsClient:
 
         Examples
         --------
-        from groundx import GroundXIngest, WebsiteSource
+        from groundx import GroundX, WebsiteSource
 
-        client = GroundXIngest(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.crawl_website(
@@ -340,9 +336,9 @@ class DocumentsClient:
 
         Examples
         --------
-        from groundx import GroundXIngest
+        from groundx import GroundX
 
-        client = GroundXIngest(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.list()
@@ -400,9 +396,9 @@ class DocumentsClient:
 
         Examples
         --------
-        from groundx import GroundXIngest
+        from groundx import GroundX
 
-        client = GroundXIngest(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.delete()
@@ -472,9 +468,9 @@ class DocumentsClient:
 
         Examples
         --------
-        from groundx import GroundXIngest
+        from groundx import GroundX
 
-        client = GroundXIngest(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.get_processing_status_by_id(
@@ -570,9 +566,9 @@ class DocumentsClient:
 
         Examples
         --------
-        from groundx import GroundXIngest
+        from groundx import GroundX
 
-        client = GroundXIngest(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.lookup(
@@ -647,9 +643,9 @@ class DocumentsClient:
 
         Examples
         --------
-        from groundx import GroundXIngest
+        from groundx import GroundX
 
-        client = GroundXIngest(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.get(
@@ -718,9 +714,9 @@ class DocumentsClient:
 
         Examples
         --------
-        from groundx import GroundXIngest
+        from groundx import GroundX
 
-        client = GroundXIngest(
+        client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.delete_by_id(
@@ -798,9 +794,9 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundXIngest, IngestRemoteDocument
+        from groundx import AsyncGroundX, IngestRemoteDocument
 
-        client = AsyncGroundXIngest(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -893,12 +889,12 @@ class AsyncDocumentsClient:
         import asyncio
 
         from groundx import (
-            AsyncGroundXIngest,
+            AsyncGroundX,
             IngestLocalDocument,
             IngestLocalDocumentMetadata,
         )
 
-        client = AsyncGroundXIngest(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -987,9 +983,9 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundXIngest, WebsiteSource
+        from groundx import AsyncGroundX, WebsiteSource
 
-        client = AsyncGroundXIngest(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -1106,9 +1102,9 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundXIngest
+        from groundx import AsyncGroundX
 
-        client = AsyncGroundXIngest(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -1174,9 +1170,9 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundXIngest
+        from groundx import AsyncGroundX
 
-        client = AsyncGroundXIngest(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -1254,9 +1250,9 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundXIngest
+        from groundx import AsyncGroundX
 
-        client = AsyncGroundXIngest(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -1360,9 +1356,9 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundXIngest
+        from groundx import AsyncGroundX
 
-        client = AsyncGroundXIngest(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -1447,9 +1443,9 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundXIngest
+        from groundx import AsyncGroundX
 
-        client = AsyncGroundXIngest(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
@@ -1526,9 +1522,9 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundXIngest
+        from groundx import AsyncGroundX
 
-        client = AsyncGroundXIngest(
+        client = AsyncGroundX(
             api_key="YOUR_API_KEY",
         )
 
