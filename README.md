@@ -24,9 +24,9 @@ A full reference for this library is available [here](./reference.md).
 Instantiate and use the client with the following:
 
 ```python
-from groundx import GroundXIngest, IngestRemoteDocument
+from groundx import GroundX, IngestRemoteDocument
 
-client = GroundXIngest(
+client = GroundX(
     api_key="YOUR_API_KEY",
 )
 client.documents.ingest_remote(
@@ -48,9 +48,9 @@ The SDK also exports an `async` client so that you can make non-blocking calls t
 ```python
 import asyncio
 
-from groundx import AsyncGroundXIngest, IngestRemoteDocument
+from groundx import AsyncGroundX, IngestRemoteDocument
 
-client = AsyncGroundXIngest(
+client = AsyncGroundX(
     api_key="YOUR_API_KEY",
 )
 
@@ -114,9 +114,9 @@ The SDK defaults to a 60 second timeout. You can configure this with a timeout o
 
 ```python
 
-from groundx import GroundXIngest
+from groundx import GroundX
 
-client = GroundXIngest(
+client = GroundX(
     ...,
     timeout=20.0,
 )
@@ -134,9 +134,9 @@ You can override the `httpx` client to customize it for your use-case. Some comm
 and transports.
 ```python
 import httpx
-from groundx import GroundXIngest
+from groundx import GroundX
 
-client = GroundXIngest(
+client = GroundX(
     ...,
     httpx_client=httpx.Client(
         proxies="http://my.test.proxy.example.com",
