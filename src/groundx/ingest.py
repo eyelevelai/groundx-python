@@ -251,6 +251,7 @@ class AsyncGroundX(AsyncGroundXBase):
                         raise BadRequestError(await response.json())
                     if response.status == 401:
                         raise UnauthorizedError(await response.json())
+
                     raise ApiError(
                         status_code=response.status, body=await response.text()
                     )
@@ -258,5 +259,3 @@ class AsyncGroundX(AsyncGroundXBase):
             raise ApiError(status_code=408, body="Request timed out")
         except aiohttp.ClientError as e:
             raise ApiError(status_code=500, body=str(e))
-
-        raise ApiError(status_code=_response.status_code, body="unknown error")
