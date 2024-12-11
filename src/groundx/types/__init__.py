@@ -8,6 +8,7 @@ from .bucket_update_detail import BucketUpdateDetail
 from .bucket_update_response import BucketUpdateResponse
 from .customer_detail import CustomerDetail
 from .customer_response import CustomerResponse
+from .document import Document
 from .document_detail import DocumentDetail
 from .document_list_response import DocumentListResponse
 from .document_local_ingest_request import DocumentLocalIngestRequest
@@ -54,6 +55,7 @@ __all__ = [
     "BucketUpdateResponse",
     "CustomerDetail",
     "CustomerResponse",
+    "Document",
     "DocumentDetail",
     "DocumentListResponse",
     "DocumentLocalIngestRequest",

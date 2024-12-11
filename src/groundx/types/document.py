@@ -9,17 +9,22 @@ from .document_type import DocumentType
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class IngestRemoteDocument(UniversalBaseModel):
+class Document(UniversalBaseModel):
     bucket_id: typing_extensions.Annotated[int, FieldMetadata(alias="bucketId")] = pydantic.Field()
     """
-    The bucketId of the bucket which this remote file will be ingested into.
+    The bucketId of the bucket which this file will be ingested into.
     """
 
     file_name: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="fileName")] = pydantic.Field(
         default=None
     )
     """
-    The name of the file being ingested
+    The name of the file being ingested.
+    """
+
+    file_path: typing_extensions.Annotated[str, FieldMetadata(alias="filePath")] = pydantic.Field()
+    """
+    The local file path or remote URL of the document being ingested by GroundX.
     """
 
     file_type: typing_extensions.Annotated[typing.Optional[DocumentType], FieldMetadata(alias="fileType")] = None
@@ -28,11 +33,6 @@ class IngestRemoteDocument(UniversalBaseModel):
     ] = pydantic.Field(default=None)
     """
     Custom metadata which can be used to influence GroundX's search functionality. This data can be used to further hone GroundX search.
-    """
-
-    source_url: typing_extensions.Annotated[str, FieldMetadata(alias="sourceUrl")] = pydantic.Field()
-    """
-    The URL of the document being ingested by GroundX.
     """
 
     if IS_PYDANTIC_V2:
