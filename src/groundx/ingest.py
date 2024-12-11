@@ -137,6 +137,40 @@ class GroundX(GroundXBase):
         documents: typing.Sequence[Document],
         request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
+        """
+        Ingest local or hosted documents into a GroundX bucket.
+
+        Parameters
+        ----------
+        documents : typing.Sequence[Document]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        IngestResponse
+            Documents successfully uploaded
+
+        Examples
+        --------
+        from groundx import Document, GroundX
+
+        client = GroundX(
+            api_key="YOUR_API_KEY",
+        )
+
+        client.ingest(
+            documents=[
+                Document(
+                    bucket_id=1234,
+                    file_name="my_file1.txt",
+                    file_path="https://my.source.url.com/file1.txt",
+                    file_type="txt",
+                )
+            ],
+        )
+        """
         remote_documents, local_documents = prep_documents(documents)
 
         if local_documents and remote_documents:
@@ -207,6 +241,45 @@ class AsyncGroundX(AsyncGroundXBase):
         documents: typing.Sequence[Document],
         request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
+        """
+        Ingest local or hosted documents into a GroundX bucket.
+
+        Parameters
+        ----------
+        documents : typing.Sequence[Document]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        IngestResponse
+            Documents successfully uploaded
+
+        Examples
+        --------
+        import asyncio
+
+        from groundx import AsyncGroundX, Document
+
+        client = AsyncGroundX(
+            api_key="YOUR_API_KEY",
+        )
+
+        async def main() -> None:
+            await client.ingest(
+                documents=[
+                    Document(
+                        bucket_id=1234,
+                        file_name="my_file1.txt",
+                        file_path="https://my.source.url.com/file1.txt",
+                        file_type="txt",
+                    )
+                ],
+            )
+
+        asyncio.run(main())
+        """
         remote_documents, local_documents = prep_documents(documents)
 
         if local_documents and remote_documents:
