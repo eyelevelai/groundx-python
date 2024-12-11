@@ -54,7 +54,9 @@ class GroundX(GroundXBase):
                 return False
 
         idx = 0
-        local_documents = []
+        local_documents: typing.List[
+            typing.Tuple[str, typing.Tuple[typing.Optional[str], typing.BinaryIO, str]]
+        ] = []
         remote_documents: typing.List[IngestRemoteDocument] = []
 
         for document in documents:
@@ -91,7 +93,7 @@ class GroundX(GroundXBase):
                         (
                             "blob",
                             (
-                                document.file_name,
+                                file_name,
                                 open(expanded_path, "rb"),
                                 mime_type,
                             ),
