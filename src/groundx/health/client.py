@@ -32,9 +32,9 @@ class HealthClient:
 
         Examples
         --------
-        from groundx import GroundX
+        from groundx import GroundXIngest
 
-        client = GroundX(
+        client = GroundXIngest(
             api_key="YOUR_API_KEY",
         )
         client.health.list()
@@ -77,9 +77,9 @@ class HealthClient:
 
         Examples
         --------
-        from groundx import GroundX
+        from groundx import GroundXIngest
 
-        client = GroundX(
+        client = GroundXIngest(
             api_key="YOUR_API_KEY",
         )
         client.health.get(
@@ -138,9 +138,9 @@ class AsyncHealthClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundX
+        from groundx import AsyncGroundXIngest
 
-        client = AsyncGroundX(
+        client = AsyncGroundXIngest(
             api_key="YOUR_API_KEY",
         )
 
@@ -191,9 +191,9 @@ class AsyncHealthClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundX
+        from groundx import AsyncGroundXIngest
 
-        client = AsyncGroundX(
+        client = AsyncGroundXIngest(
             api_key="YOUR_API_KEY",
         )
 

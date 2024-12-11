@@ -52,9 +52,9 @@ class GroupsClient:
 
         Examples
         --------
-        from groundx import GroundX
+        from groundx import GroundXIngest
 
-        client = GroundX(
+        client = GroundXIngest(
             api_key="YOUR_API_KEY",
         )
         client.groups.list()
@@ -112,9 +112,9 @@ class GroupsClient:
 
         Examples
         --------
-        from groundx import GroundX
+        from groundx import GroundXIngest
 
-        client = GroundX(
+        client = GroundXIngest(
             api_key="YOUR_API_KEY",
         )
         client.groups.create(
@@ -179,9 +179,9 @@ class GroupsClient:
 
         Examples
         --------
-        from groundx import GroundX
+        from groundx import GroundXIngest
 
-        client = GroundX(
+        client = GroundXIngest(
             api_key="YOUR_API_KEY",
         )
         client.groups.get(
@@ -253,9 +253,9 @@ class GroupsClient:
 
         Examples
         --------
-        from groundx import GroundX
+        from groundx import GroundXIngest
 
-        client = GroundX(
+        client = GroundXIngest(
             api_key="YOUR_API_KEY",
         )
         client.groups.update(
@@ -330,9 +330,9 @@ class GroupsClient:
 
         Examples
         --------
-        from groundx import GroundX
+        from groundx import GroundXIngest
 
-        client = GroundX(
+        client = GroundXIngest(
             api_key="YOUR_API_KEY",
         )
         client.groups.delete(
@@ -404,9 +404,9 @@ class GroupsClient:
 
         Examples
         --------
-        from groundx import GroundX
+        from groundx import GroundXIngest
 
-        client = GroundX(
+        client = GroundXIngest(
             api_key="YOUR_API_KEY",
         )
         client.groups.add_bucket(
@@ -479,9 +479,9 @@ class GroupsClient:
 
         Examples
         --------
-        from groundx import GroundX
+        from groundx import GroundXIngest
 
-        client = GroundX(
+        client = GroundXIngest(
             api_key="YOUR_API_KEY",
         )
         client.groups.remove_bucket(
@@ -565,9 +565,9 @@ class AsyncGroupsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundX
+        from groundx import AsyncGroundXIngest
 
-        client = AsyncGroundX(
+        client = AsyncGroundXIngest(
             api_key="YOUR_API_KEY",
         )
 
@@ -633,9 +633,9 @@ class AsyncGroupsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundX
+        from groundx import AsyncGroundXIngest
 
-        client = AsyncGroundX(
+        client = AsyncGroundXIngest(
             api_key="YOUR_API_KEY",
         )
 
@@ -708,9 +708,9 @@ class AsyncGroupsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundX
+        from groundx import AsyncGroundXIngest
 
-        client = AsyncGroundX(
+        client = AsyncGroundXIngest(
             api_key="YOUR_API_KEY",
         )
 
@@ -790,9 +790,9 @@ class AsyncGroupsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundX
+        from groundx import AsyncGroundXIngest
 
-        client = AsyncGroundX(
+        client = AsyncGroundXIngest(
             api_key="YOUR_API_KEY",
         )
 
@@ -877,9 +877,9 @@ class AsyncGroupsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundX
+        from groundx import AsyncGroundXIngest
 
-        client = AsyncGroundX(
+        client = AsyncGroundXIngest(
             api_key="YOUR_API_KEY",
         )
 
@@ -959,9 +959,9 @@ class AsyncGroupsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundX
+        from groundx import AsyncGroundXIngest
 
-        client = AsyncGroundX(
+        client = AsyncGroundXIngest(
             api_key="YOUR_API_KEY",
         )
 
@@ -1042,9 +1042,9 @@ class AsyncGroupsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundX
+        from groundx import AsyncGroundXIngest
 
-        client = AsyncGroundX(
+        client = AsyncGroundXIngest(
             api_key="YOUR_API_KEY",
         )
 
