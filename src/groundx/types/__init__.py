@@ -8,9 +8,9 @@ from .bucket_update_detail import BucketUpdateDetail
 from .bucket_update_response import BucketUpdateResponse
 from .customer_detail import CustomerDetail
 from .customer_response import CustomerResponse
-from .document import Document
 from .document_detail import DocumentDetail
 from .document_list_response import DocumentListResponse
+from .document_local_ingest_request import DocumentLocalIngestRequest
 from .document_lookup_response import DocumentLookupResponse
 from .document_response import DocumentResponse
 from .document_type import DocumentType
@@ -22,6 +22,7 @@ from .health_response_health import HealthResponseHealth
 from .health_service import HealthService
 from .health_service_status import HealthServiceStatus
 from .ingest_local_document import IngestLocalDocument
+from .ingest_local_document_metadata import IngestLocalDocumentMetadata
 from .ingest_remote_document import IngestRemoteDocument
 from .ingest_response import IngestResponse
 from .ingest_response_ingest import IngestResponseIngest
@@ -53,9 +54,9 @@ __all__ = [
     "BucketUpdateResponse",
     "CustomerDetail",
     "CustomerResponse",
-    "Document",
     "DocumentDetail",
     "DocumentListResponse",
+    "DocumentLocalIngestRequest",
     "DocumentLookupResponse",
     "DocumentResponse",
     "DocumentType",
@@ -67,6 +68,7 @@ __all__ = [
     "HealthService",
     "HealthServiceStatus",
     "IngestLocalDocument",
+    "IngestLocalDocumentMetadata",
     "IngestRemoteDocument",
     "IngestResponse",
     "IngestResponseIngest",

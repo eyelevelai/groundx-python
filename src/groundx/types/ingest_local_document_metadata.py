@@ -2,17 +2,19 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing_extensions
+import typing
 from ..core.serialization import FieldMetadata
 import pydantic
-import typing
 from .document_type import DocumentType
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class Document(UniversalBaseModel):
-    bucket_id: typing_extensions.Annotated[int, FieldMetadata(alias="bucketId")] = pydantic.Field()
+class IngestLocalDocumentMetadata(UniversalBaseModel):
+    bucket_id: typing_extensions.Annotated[typing.Optional[int], FieldMetadata(alias="bucketId")] = pydantic.Field(
+        default=None
+    )
     """
-    the bucketId of the bucket which this remote file will be ingested to.
+    The bucketId of the bucket which this local file will be ingested to.
     """
 
     file_name: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="fileName")] = pydantic.Field(
@@ -20,11 +22,6 @@ class Document(UniversalBaseModel):
     )
     """
     The name of the file being ingested
-    """
-
-    file_path: typing_extensions.Annotated[str, FieldMetadata(alias="filePath")] = pydantic.Field()
-    """
-    The local file path or remote URL of the document being ingested by GroundX.
     """
 
     file_type: typing_extensions.Annotated[typing.Optional[DocumentType], FieldMetadata(alias="fileType")] = None

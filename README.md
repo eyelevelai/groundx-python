@@ -24,26 +24,19 @@ A full reference for this library is available [here](./reference.md).
 Instantiate and use the client with the following:
 
 ```python
-from groundx import Document, GroundX
+from groundx import GroundX, IngestRemoteDocument
 
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
-client.documents.ingest(
+client.documents.ingest_remote(
     documents=[
-        Document(
+        IngestRemoteDocument(
             bucket_id=1234,
             file_name="my_file1.txt",
-            file_path="https://my.source.url.com/file1.txt",
             file_type="txt",
-            search_data={"key": "value"},
-        ),
-        Document(
-            bucket_id=1234,
-            file_name="my_file2.pdf",
-            file_path="/local/path/file2.pdf",
-            file_type="pdf",
-        ),
+            source_url="https://my.source.url.com/file1.txt",
+        )
     ],
 )
 ```
@@ -55,7 +48,7 @@ The SDK also exports an `async` client so that you can make non-blocking calls t
 ```python
 import asyncio
 
-from groundx import AsyncGroundX, Document
+from groundx import AsyncGroundX, IngestRemoteDocument
 
 client = AsyncGroundX(
     api_key="YOUR_API_KEY",
@@ -63,21 +56,14 @@ client = AsyncGroundX(
 
 
 async def main() -> None:
-    await client.documents.ingest(
+    await client.documents.ingest_remote(
         documents=[
-            Document(
+            IngestRemoteDocument(
                 bucket_id=1234,
                 file_name="my_file1.txt",
-                file_path="https://my.source.url.com/file1.txt",
                 file_type="txt",
-                search_data={"key": "value"},
-            ),
-            Document(
-                bucket_id=1234,
-                file_name="my_file2.pdf",
-                file_path="/local/path/file2.pdf",
-                file_type="pdf",
-            ),
+                source_url="https://my.source.url.com/file1.txt",
+            )
         ],
     )
 
@@ -94,7 +80,7 @@ will be thrown.
 from groundx.core.api_error import ApiError
 
 try:
-    client.documents.ingest(...)
+    client.documents.ingest_remote(...)
 except ApiError as e:
     print(e.status_code)
     print(e.body)
@@ -117,7 +103,7 @@ A request is deemed retriable when any of the following HTTP status codes is ret
 Use the `max_retries` request option to configure this behavior.
 
 ```python
-client.documents.ingest(..., request_options={
+client.documents.ingest_remote(..., request_options={
     "max_retries": 1
 })
 ```
@@ -137,7 +123,7 @@ client = GroundX(
 
 
 # Override timeout for a specific method
-client.documents.ingest(..., request_options={
+client.documents.ingest_remote(..., request_options={
     "timeout_in_seconds": 1
 })
 ```
