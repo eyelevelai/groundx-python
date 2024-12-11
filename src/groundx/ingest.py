@@ -55,7 +55,7 @@ class GroundX(GroundXBase):
 
         idx = 0
         local_documents = []
-        remote_documents: typing.Sequence[IngestRemoteDocument] = []
+        remote_documents: typing.List[IngestRemoteDocument] = []
 
         for document in documents:
             if not hasattr(document, "file_path"):
