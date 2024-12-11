@@ -213,7 +213,7 @@ class AsyncGroundX(AsyncGroundXBase):
             raise ValueError("Documents must all be either local or remote, not a mix.")
 
         if len(remote_documents) > 0:
-            return self.documents.ingest_remote(
+            return await self.documents.ingest_remote(
                 documents=remote_documents,
                 request_options=request_options,
             )
