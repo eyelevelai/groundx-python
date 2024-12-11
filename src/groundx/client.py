@@ -19,7 +19,7 @@ from .customer.client import AsyncCustomerClient
 from .health.client import AsyncHealthClient
 
 
-class GroundX:
+class GroundXBase:
     """
     Use this class to access the different functions within the SDK. You can instantiate any number of clients with different configuration that will propagate to these functions.
 
@@ -85,7 +85,7 @@ class GroundX:
         self.health = HealthClient(client_wrapper=self._client_wrapper)
 
 
-class AsyncGroundX:
+class AsyncGroundXBase:
     """
     Use this class to access the different functions within the SDK. You can instantiate any number of clients with different configuration that will propagate to these functions.
 
