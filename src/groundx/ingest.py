@@ -127,7 +127,7 @@ def prep_documents(
         else:
             raise ValueError(f"Invalid file path: {document.file_path}")
 
-    return remote_document, local_documents
+    return remote_documents, local_documents
 
 
 class GroundX(GroundXBase):
