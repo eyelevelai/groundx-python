@@ -58,11 +58,10 @@ def prep_documents(
         except ValueError:
             return False
 
-    idx = 0
-    remote_documents: typing.List[IngestRemoteDocument] = []
     local_documents: typing.List[
         typing.Tuple[str, typing.Tuple[typing.Union[str, None], typing.BinaryIO, str]]
     ] = []
+    remote_documents: typing.List[IngestRemoteDocument] = []
 
     for document in documents:
         if not hasattr(document, "file_path"):
@@ -123,7 +122,6 @@ def prep_documents(
                     ),
                 )
             )
-            idx += 1
         else:
             raise ValueError(f"Invalid file path: {document.file_path}")
 
