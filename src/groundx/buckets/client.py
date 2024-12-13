@@ -33,8 +33,6 @@ class BucketsClient:
         """
         List all buckets within your GroundX account
 
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
-
         Parameters
         ----------
         n : typing.Optional[int]
@@ -86,8 +84,6 @@ class BucketsClient:
     def create(self, *, name: str, request_options: typing.Optional[RequestOptions] = None) -> BucketResponse:
         """
         Create a new bucket.
-
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
@@ -151,8 +147,6 @@ class BucketsClient:
     def get(self, bucket_id: int, *, request_options: typing.Optional[RequestOptions] = None) -> BucketResponse:
         """
         Look up a specific bucket by its bucketId.
-
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
@@ -222,8 +216,6 @@ class BucketsClient:
     ) -> BucketUpdateResponse:
         """
         Rename a bucket.
-
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
@@ -303,8 +295,6 @@ class BucketsClient:
         """
         Delete a bucket.
 
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
-
         Parameters
         ----------
         bucket_id : int
@@ -383,8 +373,6 @@ class AsyncBucketsClient:
         """
         List all buckets within your GroundX account
 
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
-
         Parameters
         ----------
         n : typing.Optional[int]
@@ -444,8 +432,6 @@ class AsyncBucketsClient:
     async def create(self, *, name: str, request_options: typing.Optional[RequestOptions] = None) -> BucketResponse:
         """
         Create a new bucket.
-
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
@@ -517,8 +503,6 @@ class AsyncBucketsClient:
     async def get(self, bucket_id: int, *, request_options: typing.Optional[RequestOptions] = None) -> BucketResponse:
         """
         Look up a specific bucket by its bucketId.
-
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
@@ -596,8 +580,6 @@ class AsyncBucketsClient:
     ) -> BucketUpdateResponse:
         """
         Rename a bucket.
-
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
@@ -686,8 +668,6 @@ class AsyncBucketsClient:
     ) -> MessageResponse:
         """
         Delete a bucket.
-
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------

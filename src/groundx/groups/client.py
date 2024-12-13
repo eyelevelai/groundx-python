@@ -32,8 +32,6 @@ class GroupsClient:
         """
         list all groups within your GroundX account.
 
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
-
         Parameters
         ----------
         n : typing.Optional[int]
@@ -91,8 +89,6 @@ class GroupsClient:
     ) -> GroupResponse:
         """
         create a new group, a group being a collection of buckets which can be searched.
-
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
@@ -162,8 +158,6 @@ class GroupsClient:
         """
         look up a specific group by its groupId.
 
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
-
         Parameters
         ----------
         group_id : int
@@ -232,8 +226,6 @@ class GroupsClient:
     ) -> GroupResponse:
         """
         Rename a group
-
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
@@ -313,8 +305,6 @@ class GroupsClient:
         """
         Delete a group.
 
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
-
         Parameters
         ----------
         group_id : int
@@ -383,8 +373,6 @@ class GroupsClient:
     ) -> MessageResponse:
         """
         Add an existing bucket to an existing group. Buckets and groups can be associated many to many.
-
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
@@ -458,8 +446,6 @@ class GroupsClient:
     ) -> MessageResponse:
         """
         remove a bucket from a group. Buckets and groups can be associated many to many, this removes one bucket to group association without disturbing others.
-
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
@@ -543,8 +529,6 @@ class AsyncGroupsClient:
         """
         list all groups within your GroundX account.
 
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
-
         Parameters
         ----------
         n : typing.Optional[int]
@@ -610,8 +594,6 @@ class AsyncGroupsClient:
     ) -> GroupResponse:
         """
         create a new group, a group being a collection of buckets which can be searched.
-
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
@@ -689,8 +671,6 @@ class AsyncGroupsClient:
         """
         look up a specific group by its groupId.
 
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
-
         Parameters
         ----------
         group_id : int
@@ -767,8 +747,6 @@ class AsyncGroupsClient:
     ) -> GroupResponse:
         """
         Rename a group
-
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
@@ -858,8 +836,6 @@ class AsyncGroupsClient:
         """
         Delete a group.
 
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
-
         Parameters
         ----------
         group_id : int
@@ -936,8 +912,6 @@ class AsyncGroupsClient:
     ) -> MessageResponse:
         """
         Add an existing bucket to an existing group. Buckets and groups can be associated many to many.
-
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
@@ -1019,8 +993,6 @@ class AsyncGroupsClient:
     ) -> MessageResponse:
         """
         remove a bucket from a group. Buckets and groups can be associated many to many, this removes one bucket to group association without disturbing others.
-
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
