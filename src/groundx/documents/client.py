@@ -40,8 +40,6 @@ class DocumentsClient:
         """
         Ingest documents hosted on public URLs into a GroundX bucket.
 
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
-
         Parameters
         ----------
         documents : typing.Sequence[IngestRemoteDocument]
@@ -126,8 +124,6 @@ class DocumentsClient:
         """
         Upload documents hosted on a local file system into a GroundX bucket.
 
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
-
         Parameters
         ----------
         request : DocumentLocalIngestRequest
@@ -209,8 +205,6 @@ class DocumentsClient:
         """
         Upload the content of a publicly accessible website for ingestion into a GroundX bucket. This is done by following links within a specified URL, recursively, up to a specified depth or number of pages.
 
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
-
         Parameters
         ----------
         websites : typing.Sequence[WebsiteSource]
@@ -234,8 +228,8 @@ class DocumentsClient:
             websites=[
                 WebsiteSource(
                     bucket_id=1234,
-                    cap=100,
-                    depth=3,
+                    cap=10,
+                    depth=2,
                     search_data={"key": "value"},
                     source_url="https://my.website.com",
                 )
@@ -303,8 +297,6 @@ class DocumentsClient:
     ) -> DocumentListResponse:
         """
         lookup all documents across all resources which are currently on GroundX
-
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
@@ -379,8 +371,6 @@ class DocumentsClient:
         """
         Delete multiple documents hosted on GroundX
 
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
-
         Parameters
         ----------
         document_ids : typing.Optional[typing.Union[str, typing.Sequence[str]]]
@@ -401,7 +391,9 @@ class DocumentsClient:
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
-        client.documents.delete()
+        client.documents.delete(
+            document_ids="123e4567-e89b-12d3-a456-426614174000,9f7c11a6-24b8-4d52-a9f3-90a7e70a9e49",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/ingest/documents",
@@ -450,8 +442,6 @@ class DocumentsClient:
     ) -> ProcessStatusResponse:
         """
         Get the current status of an ingest, initiated with documents.ingest_remote, documents.ingest_local, or documents.crawl_website, by specifying the processId (the processId is included in the response of the documents.ingest functions).
-
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
@@ -530,8 +520,6 @@ class DocumentsClient:
     ) -> DocumentLookupResponse:
         """
         lookup the document(s) associated with a processId, bucketId, groupId, or projectId.
-
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
@@ -626,8 +614,6 @@ class DocumentsClient:
         """
         Look up an existing document by documentId.
 
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
-
         Parameters
         ----------
         document_id : str
@@ -696,8 +682,6 @@ class DocumentsClient:
     ) -> IngestResponse:
         """
         Delete a single document hosted on GroundX
-
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
@@ -775,8 +759,6 @@ class AsyncDocumentsClient:
     ) -> IngestResponse:
         """
         Ingest documents hosted on public URLs into a GroundX bucket.
-
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
@@ -869,8 +851,6 @@ class AsyncDocumentsClient:
     ) -> IngestResponse:
         """
         Upload documents hosted on a local file system into a GroundX bucket.
-
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
@@ -965,8 +945,6 @@ class AsyncDocumentsClient:
         """
         Upload the content of a publicly accessible website for ingestion into a GroundX bucket. This is done by following links within a specified URL, recursively, up to a specified depth or number of pages.
 
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
-
         Parameters
         ----------
         websites : typing.Sequence[WebsiteSource]
@@ -995,8 +973,8 @@ class AsyncDocumentsClient:
                 websites=[
                     WebsiteSource(
                         bucket_id=1234,
-                        cap=100,
-                        depth=3,
+                        cap=10,
+                        depth=2,
                         search_data={"key": "value"},
                         source_url="https://my.website.com",
                     )
@@ -1067,8 +1045,6 @@ class AsyncDocumentsClient:
     ) -> DocumentListResponse:
         """
         lookup all documents across all resources which are currently on GroundX
-
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
@@ -1151,8 +1127,6 @@ class AsyncDocumentsClient:
         """
         Delete multiple documents hosted on GroundX
 
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
-
         Parameters
         ----------
         document_ids : typing.Optional[typing.Union[str, typing.Sequence[str]]]
@@ -1178,7 +1152,9 @@ class AsyncDocumentsClient:
 
 
         async def main() -> None:
-            await client.documents.delete()
+            await client.documents.delete(
+                document_ids="123e4567-e89b-12d3-a456-426614174000,9f7c11a6-24b8-4d52-a9f3-90a7e70a9e49",
+            )
 
 
         asyncio.run(main())
@@ -1230,8 +1206,6 @@ class AsyncDocumentsClient:
     ) -> ProcessStatusResponse:
         """
         Get the current status of an ingest, initiated with documents.ingest_remote, documents.ingest_local, or documents.crawl_website, by specifying the processId (the processId is included in the response of the documents.ingest functions).
-
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
@@ -1318,8 +1292,6 @@ class AsyncDocumentsClient:
     ) -> DocumentLookupResponse:
         """
         lookup the document(s) associated with a processId, bucketId, groupId, or projectId.
-
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
@@ -1424,8 +1396,6 @@ class AsyncDocumentsClient:
         """
         Look up an existing document by documentId.
 
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
-
         Parameters
         ----------
         document_id : str
@@ -1502,8 +1472,6 @@ class AsyncDocumentsClient:
     ) -> IngestResponse:
         """
         Delete a single document hosted on GroundX
-
-        Interact with the "Request Body" below to explore the arguments of this function. Enter your GroundX API key to send a request directly from this web page. Select your language of choice to structure a code snippet based on your specified arguments.
 
         Parameters
         ----------
