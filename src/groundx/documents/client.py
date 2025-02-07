@@ -204,6 +204,8 @@ class DocumentsClient:
     ) -> IngestResponse:
         """
         Upload the content of a publicly accessible website for ingestion into a GroundX bucket. This is done by following links within a specified URL, recursively, up to a specified depth or number of pages.
+        Note1: This endpoint is currently not supported for on-prem deployments.
+        Note2: The `source_url` must include the protocol, http:// or https://.
 
         Parameters
         ----------
@@ -944,6 +946,8 @@ class AsyncDocumentsClient:
     ) -> IngestResponse:
         """
         Upload the content of a publicly accessible website for ingestion into a GroundX bucket. This is done by following links within a specified URL, recursively, up to a specified depth or number of pages.
+        Note1: This endpoint is currently not supported for on-prem deployments.
+        Note2: The `source_url` must include the protocol, http:// or https://.
 
         Parameters
         ----------

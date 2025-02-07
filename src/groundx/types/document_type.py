@@ -3,5 +3,25 @@
 import typing
 
 DocumentType = typing.Union[
-    typing.Literal["txt", "docx", "pptx", "xlsx", "pdf", "png", "jpg", "csv", "tsv", "json"], typing.Any
+    typing.Literal[
+        "bmp",
+        "csv",
+        "docx",
+        "gif",
+        "heif",
+        "hwp",
+        "ico",
+        "jpg",
+        "json",
+        "pdf",
+        "png",
+        "pptx",
+        "svg",
+        "tiff",
+        "tsv",
+        "txt",
+        "xlsx",
+        "webp",
+    ],
+    typing.Any,
 ]
