@@ -1,3 +1,6 @@
+[project]
+name = "groundx"
+
 [tool.poetry]
 name = "groundx"
 version = "2.1.0"
