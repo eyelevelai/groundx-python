@@ -742,6 +742,82 @@ client.documents.delete_by_id(
 </dl>
 </details>
 
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">document_get_processing_status</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Get the current status of ingest processes, sorted from most recent to least.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from groundx import GroundX
+
+client = GroundX(
+    api_key="YOUR_API_KEY",
+)
+client.documents.document_get_processing_status()
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**n:** `typing.Optional[int]` — The maximum number of returned processes. Accepts 1-100 with a default of 20.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**status:** `typing.Optional[ProcessingStatus]` — A status filter on the processing status. If this value is set, then only processes with this status will be returned in the results.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## Search
 <details><summary><code>client.search.<a href="src/groundx/search/client.py">content</a>(...)</code></summary>
 <dl>

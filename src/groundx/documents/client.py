@@ -748,6 +748,84 @@ class DocumentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    def document_get_processing_status(
+        self,
+        *,
+        n: typing.Optional[int] = None,
+        status: typing.Optional[ProcessingStatus] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> DocumentResponse:
+        """
+        Get the current status of ingest processes, sorted from most recent to least.
+
+        Parameters
+        ----------
+        n : typing.Optional[int]
+            The maximum number of returned processes. Accepts 1-100 with a default of 20.
+
+        status : typing.Optional[ProcessingStatus]
+            A status filter on the processing status. If this value is set, then only processes with this status will be returned in the results.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        DocumentResponse
+            Look up success
+
+        Examples
+        --------
+        from groundx import GroundX
+
+        client = GroundX(
+            api_key="YOUR_API_KEY",
+        )
+        client.documents.document_get_processing_status()
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "v1/ingest",
+            method="GET",
+            params={
+                "n": n,
+                "status": status,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    DocumentResponse,
+                    parse_obj_as(
+                        type_=DocumentResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
 
 class AsyncDocumentsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
@@ -1520,6 +1598,92 @@ class AsyncDocumentsClient:
                     IngestResponse,
                     parse_obj_as(
                         type_=IngestResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def document_get_processing_status(
+        self,
+        *,
+        n: typing.Optional[int] = None,
+        status: typing.Optional[ProcessingStatus] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> DocumentResponse:
+        """
+        Get the current status of ingest processes, sorted from most recent to least.
+
+        Parameters
+        ----------
+        n : typing.Optional[int]
+            The maximum number of returned processes. Accepts 1-100 with a default of 20.
+
+        status : typing.Optional[ProcessingStatus]
+            A status filter on the processing status. If this value is set, then only processes with this status will be returned in the results.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        DocumentResponse
+            Look up success
+
+        Examples
+        --------
+        import asyncio
+
+        from groundx import AsyncGroundX
+
+        client = AsyncGroundX(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.documents.document_get_processing_status()
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "v1/ingest",
+            method="GET",
+            params={
+                "n": n,
+                "status": status,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    DocumentResponse,
+                    parse_obj_as(
+                        type_=DocumentResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
