@@ -36,6 +36,7 @@ from .process_status_response_ingest_progress_cancelled import ProcessStatusResp
 from .process_status_response_ingest_progress_complete import ProcessStatusResponseIngestProgressComplete
 from .process_status_response_ingest_progress_errors import ProcessStatusResponseIngestProgressErrors
 from .process_status_response_ingest_progress_processing import ProcessStatusResponseIngestProgressProcessing
+from .processes_status_response import ProcessesStatusResponse
 from .processing_status import ProcessingStatus
 from .search_response import SearchResponse
 from .search_response_search import SearchResponseSearch
@@ -83,6 +84,7 @@ __all__ = [
     "ProcessStatusResponseIngestProgressComplete",
     "ProcessStatusResponseIngestProgressErrors",
     "ProcessStatusResponseIngestProgressProcessing",
+    "ProcessesStatusResponse",
     "ProcessingStatus",
     "SearchResponse",
     "SearchResponseSearch",

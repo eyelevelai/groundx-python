@@ -21,6 +21,7 @@ from ..types.process_status_response import ProcessStatusResponse
 from ..core.jsonable_encoder import jsonable_encoder
 from ..types.document_lookup_response import DocumentLookupResponse
 from ..types.document_response import DocumentResponse
+from ..types.processes_status_response import ProcessesStatusResponse
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
@@ -748,15 +749,15 @@ class DocumentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def document_get_processing_status(
+    def document_get_processes(
         self,
         *,
         n: typing.Optional[int] = None,
         status: typing.Optional[ProcessingStatus] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> DocumentResponse:
+    ) -> ProcessesStatusResponse:
         """
-        Get the current status of ingest processes, sorted from most recent to least.
+        Get a list of ingest process requests, sorted from most recent to least.
 
         Parameters
         ----------
@@ -771,7 +772,7 @@ class DocumentsClient:
 
         Returns
         -------
-        DocumentResponse
+        ProcessesStatusResponse
             Look up success
 
         Examples
@@ -781,7 +782,7 @@ class DocumentsClient:
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
-        client.documents.document_get_processing_status()
+        client.documents.document_get_processes()
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/ingest",
@@ -795,31 +796,11 @@ class DocumentsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    DocumentResponse,
+                    ProcessesStatusResponse,
                     parse_obj_as(
-                        type_=DocumentResponse,  # type: ignore
+                        type_=ProcessesStatusResponse,  # type: ignore
                         object_=_response.json(),
                     ),
-                )
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 401:
-                raise UnauthorizedError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
                 )
             _response_json = _response.json()
         except JSONDecodeError:
@@ -1626,15 +1607,15 @@ class AsyncDocumentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def document_get_processing_status(
+    async def document_get_processes(
         self,
         *,
         n: typing.Optional[int] = None,
         status: typing.Optional[ProcessingStatus] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> DocumentResponse:
+    ) -> ProcessesStatusResponse:
         """
-        Get the current status of ingest processes, sorted from most recent to least.
+        Get a list of ingest process requests, sorted from most recent to least.
 
         Parameters
         ----------
@@ -1649,7 +1630,7 @@ class AsyncDocumentsClient:
 
         Returns
         -------
-        DocumentResponse
+        ProcessesStatusResponse
             Look up success
 
         Examples
@@ -1664,7 +1645,7 @@ class AsyncDocumentsClient:
 
 
         async def main() -> None:
-            await client.documents.document_get_processing_status()
+            await client.documents.document_get_processes()
 
 
         asyncio.run(main())
@@ -1681,31 +1662,11 @@ class AsyncDocumentsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    DocumentResponse,
+                    ProcessesStatusResponse,
                     parse_obj_as(
-                        type_=DocumentResponse,  # type: ignore
+                        type_=ProcessesStatusResponse,  # type: ignore
                         object_=_response.json(),
                     ),
-                )
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 401:
-                raise UnauthorizedError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
                 )
             _response_json = _response.json()
         except JSONDecodeError:

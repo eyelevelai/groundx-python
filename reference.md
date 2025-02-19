@@ -742,7 +742,7 @@ client.documents.delete_by_id(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">document_get_processing_status</a>(...)</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">document_get_processes</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -754,7 +754,7 @@ client.documents.delete_by_id(
 <dl>
 <dd>
 
-Get the current status of ingest processes, sorted from most recent to least.
+Get a list of ingest process requests, sorted from most recent to least.
 </dd>
 </dl>
 </dd>
@@ -774,7 +774,7 @@ from groundx import GroundX
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
-client.documents.document_get_processing_status()
+client.documents.document_get_processes()
 
 ```
 </dd>
