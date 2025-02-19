@@ -2,4 +2,6 @@
 
 import typing
 
-ProcessingStatus = typing.Union[typing.Literal["queued", "processing", "error", "complete", "cancelled"], typing.Any]
+ProcessingStatus = typing.Union[
+    typing.Literal["queued", "processing", "error", "complete", "cancelled", "active", "inactive"], typing.Any
+]
