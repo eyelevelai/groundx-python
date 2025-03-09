@@ -6,6 +6,7 @@ import typing
 from ..core.serialization import FieldMetadata
 import pydantic
 from .document_type import DocumentType
+from .process_level import ProcessLevel
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
@@ -25,6 +26,9 @@ class IngestLocalDocumentMetadata(UniversalBaseModel):
     """
 
     file_type: typing_extensions.Annotated[typing.Optional[DocumentType], FieldMetadata(alias="fileType")] = None
+    process_level: typing_extensions.Annotated[typing.Optional[ProcessLevel], FieldMetadata(alias="processLevel")] = (
+        None
+    )
     search_data: typing_extensions.Annotated[
         typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]], FieldMetadata(alias="searchData")
     ] = pydantic.Field(default=None)
