@@ -17,7 +17,7 @@ pip install groundx
 
 ## Reference
 
-A full reference for this library is available [here](./reference.md).
+A full reference for this library is available [here](https://github.com/eyelevelai/groundx-python/blob/main/reference.md).
 
 ## Usage
 
