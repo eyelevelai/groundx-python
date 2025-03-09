@@ -742,7 +742,7 @@ client.documents.delete_by_id(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">document_get_processes</a>(...)</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">get_processes</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -774,7 +774,7 @@ from groundx import GroundX
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
-client.documents.document_get_processes()
+client.documents.get_processes()
 
 ```
 </dd>

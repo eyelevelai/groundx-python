@@ -29,6 +29,7 @@ from .ingest_response import IngestResponse
 from .ingest_response_ingest import IngestResponseIngest
 from .message_response import MessageResponse
 from .meter_detail import MeterDetail
+from .process_level import ProcessLevel
 from .process_status_response import ProcessStatusResponse
 from .process_status_response_ingest import ProcessStatusResponseIngest
 from .process_status_response_ingest_progress import ProcessStatusResponseIngestProgress
@@ -77,6 +78,7 @@ __all__ = [
     "IngestResponseIngest",
     "MessageResponse",
     "MeterDetail",
+    "ProcessLevel",
     "ProcessStatusResponse",
     "ProcessStatusResponseIngest",
     "ProcessStatusResponseIngestProgress",
