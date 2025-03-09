@@ -72,6 +72,7 @@ def prep_documents(
                 bucket_id=document.bucket_id,
                 file_name=document.file_name,
                 file_type=document.file_type,
+                process_level=document.process_level,
                 search_data=document.search_data,
                 source_url=document.file_path,
             )
@@ -109,6 +110,8 @@ def prep_documents(
                 "fileName": file_name,
                 "fileType": file_type,
             }
+            if document.process_level:
+                metadata["processLevel"] = document.process_level
             if document.search_data:
                 metadata["searchData"] = document.search_data
 
