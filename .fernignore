@@ -3,3 +3,4 @@ README.md
 src/groundx/ingest.py
 src/groundx/test.py
 src/test.py
+.gitignore
