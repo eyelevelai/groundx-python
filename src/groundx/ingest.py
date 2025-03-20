@@ -300,7 +300,7 @@ class GroundX(GroundXBase):
         )
         """
 
-        def get_presigned_url(endpoint, file_name, file_extension):
+        def get_presigned_url(endpoint, file_name, file_extension) -> dict[str, typing.Any]:
             params = {"name": file_name, "type": file_extension}
             response = requests.get(endpoint, params=params)
             response.raise_for_status()
@@ -311,7 +311,7 @@ class GroundX(GroundXBase):
             expanded_path = os.path.expanduser(path)
             return os.path.isdir(expanded_path)
 
-        def load_directory_files(directory):
+        def load_directory_files(directory: str) -> list[Path]:
             dir_path = Path(directory)
 
             matched_files = [
@@ -325,7 +325,7 @@ class GroundX(GroundXBase):
 
             return matched_files
 
-        def strip_query_params(url):
+        def strip_query_params(url: str) -> str:
             parsed = urlparse(url)
             clean_url = urlunparse((parsed.scheme, parsed.netloc, parsed.path, "", "", ""))
             return clean_url
@@ -369,7 +369,7 @@ class GroundX(GroundXBase):
                 if progress > 0:
                     pbar.update(progress)
 
-        def upload_file(endpoint, file_path):
+        def upload_file(endpoint, file_path) -> str:
             file_name = os.path.basename(file_path)
             file_extension = os.path.splitext(file_name)[1][1:].lower()
 
@@ -409,8 +409,8 @@ class GroundX(GroundXBase):
         if len(files) < 1:
             raise ValueError(f"No supported files found in directory: {path}")
 
-        current_batch = []
-        current_batch_size = 0
+        current_batch: list[Path] = []
+        current_batch_size: int = 0
 
         n = max(MIN_BATCH_SIZE, min(batch_size or MIN_BATCH_SIZE, MAX_BATCH_SIZE))
 
