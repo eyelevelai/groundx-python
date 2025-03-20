@@ -300,7 +300,7 @@ class GroundX(GroundXBase):
         )
         """
 
-        def get_presigned_url(endpoint, file_name, file_extension) -> dict[str, typing.Any]:
+        def get_presigned_url(endpoint, file_name, file_extension) -> typing.Dict[str, typing.Any]:
             params = {"name": file_name, "type": file_extension}
             response = requests.get(endpoint, params=params)
             response.raise_for_status()
@@ -311,7 +311,7 @@ class GroundX(GroundXBase):
             expanded_path = os.path.expanduser(path)
             return os.path.isdir(expanded_path)
 
-        def load_directory_files(directory: str) -> list[Path]:
+        def load_directory_files(directory: str) -> typing.List[Path]:
             dir_path = Path(directory)
 
             matched_files = [
@@ -409,7 +409,7 @@ class GroundX(GroundXBase):
         if len(files) < 1:
             raise ValueError(f"No supported files found in directory: {path}")
 
-        current_batch: list[Path] = []
+        current_batch: typing.List[Path] = []
         current_batch_size: int = 0
 
         n = max(MIN_BATCH_SIZE, min(batch_size or MIN_BATCH_SIZE, MAX_BATCH_SIZE))
