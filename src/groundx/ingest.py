@@ -1,6 +1,8 @@
-import aiohttp, io, json, mimetypes, requests, typing, os
+import aiohttp, io, json, mimetypes, requests, time, typing, os
 from asyncio import TimeoutError
-from urllib.parse import urlparse
+from pathlib import Path
+from tqdm import tqdm
+from urllib.parse import urlparse, urlunparse
 
 from json.decoder import JSONDecodeError
 
@@ -11,6 +13,7 @@ from .core.request_options import RequestOptions
 from .errors.bad_request_error import BadRequestError
 from .errors.unauthorized_error import UnauthorizedError
 from .types.document import Document
+from .types.document_type import DocumentType
 from .types.ingest_remote_document import IngestRemoteDocument
 from .types.ingest_response import IngestResponse
 
@@ -19,6 +22,14 @@ OMIT = typing.cast(typing.Any, ...)
 
 
 DOCUMENT_TYPE_TO_MIME = {
+    "bmp": "image/bmp",
+    "gif": "image/gif",
+    "heif": "image/heif",
+    "hwp": "application/x-hwp",
+    "ico": "image/vnd.microsoft.icon",
+    "svg": "image/svg",
+    "tiff": "image/tiff",
+    "webp": "image/webp",
     "txt": "text/plain",
     "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     "pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
@@ -32,6 +43,17 @@ DOCUMENT_TYPE_TO_MIME = {
 }
 MIME_TO_DOCUMENT_TYPE = {v: k for k, v in DOCUMENT_TYPE_TO_MIME.items()}
 
+ALLOWED_SUFFIXES = {f".{k}": v for k, v in DOCUMENT_TYPE_TO_MIME.items()}
+
+SUFFIX_ALIASES = {
+    ".jpeg": ".jpg",
+    ".heic": ".heif",
+    ".tif": ".tiff",
+}
+
+MAX_BATCH_SIZE = 50
+MIN_BATCH_SIZE = 1
+MAX_BATCH_SIZE_BYTES = 50 * 1024 * 1024
 
 def prep_documents(
     documents: typing.Sequence[Document],
@@ -233,6 +255,180 @@ class GroundX(GroundXBase):
             raise ApiError(status_code=_response.status_code, body=_response.text)
 
         raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def ingest_directory(
+        self,
+        *,
+        bucket_id: int,
+        path: str,
+        batch_size: typing.Optional[int] = 10,
+        upload_api: typing.Optional[str] = "https://api.eyelevel.ai/upload/file",
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> IngestResponse:
+        """
+        Ingest documents from a local directory into a GroundX bucket.
+
+        Parameters
+        ----------
+        bucket_id : int
+        path : str
+        batch_size : type.Optional[int]
+
+        # an endpoint that accepts 'name' and 'type' query params
+        # and returns a presigned URL
+        upload_api : typing.Optional[str]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        IngestResponse
+            Documents successfully uploaded
+
+        Examples
+        --------
+        from groundx import Document, GroundX
+
+        client = GroundX(
+            api_key="YOUR_API_KEY",
+        )
+
+        client.ingest_directory(
+            bucket_id=0,
+            path="/path/to/directory"
+        )
+        """
+
+        def get_presigned_url(endpoint, file_name, file_extension):
+            params = {"name": file_name, "type": file_extension}
+            response = requests.get(endpoint, params=params)
+            response.raise_for_status()
+
+            return response.json()
+
+        def is_valid_local_directory(path: str) -> bool:
+            expanded_path = os.path.expanduser(path)
+            return os.path.isdir(expanded_path)
+
+        def load_directory_files(directory):
+            dir_path = Path(directory)
+
+            matched_files = [
+                file
+                for file in dir_path.rglob("*")
+                if file.is_file() and (
+                    file.suffix.lower() in ALLOWED_SUFFIXES
+                    or file.suffix.lower() in SUFFIX_ALIASES
+                )
+            ]
+
+            return matched_files
+
+        def strip_query_params(url):
+            parsed = urlparse(url)
+            clean_url = urlunparse((parsed.scheme, parsed.netloc, parsed.path, "", "", ""))
+            return clean_url
+
+        def _upload_file_batch(bucket_id, batch, upload_api, request_options, pbar):
+            docs = []
+
+            progress = len(batch)
+            for file in batch:
+                url = upload_file(upload_api, file)
+                docs.append(
+                    Document(
+                        bucket_id=bucket_id,
+                        file_path=url,
+                    ),
+                )
+                pbar.update(0.25)
+                progress -= 0.25
+
+            if docs:
+                ingest = self.ingest(documents=docs, request_options=request_options)
+
+                completed_files = set()
+
+                while (
+                    ingest is not None
+                    and ingest.ingest.status not in ["complete", "error", "cancelled"]
+                ):
+                    time.sleep(3)
+                    ingest = self.documents.get_processing_status_by_id(ingest.ingest.process_id)
+
+                    if ingest.ingest.progress and ingest.ingest.progress.processing:
+                        for doc in ingest.ingest.progress.processing.documents:
+                            if doc.status == "complete" and doc.document_id not in completed_files:
+                                pbar.update(0.75)
+                                progress -= 0.75
+
+                if ingest.ingest.status in ["error", "cancelled"]:
+                    raise ValueError(f"Ingest failed with status: {ingest.ingest.status}")
+
+                if progress > 0:
+                    pbar.update(progress)
+
+        def upload_file(endpoint, file_path):
+            file_name = os.path.basename(file_path)
+            file_extension = os.path.splitext(file_name)[1][1:].lower()
+
+            presigned_info = get_presigned_url(endpoint, file_name, file_extension)
+
+            upload_url = presigned_info["URL"]
+            headers = presigned_info.get("Header", {})
+            method = presigned_info.get("Method", "PUT").upper()
+
+            for key, value in headers.items():
+                if isinstance(value, list):
+                    headers[key] = value[0]
+
+            with open(file_path, "rb") as f:
+                file_data = f.read()
+
+            if method == "PUT":
+                upload_response = requests.put(upload_url, data=file_data, headers=headers)
+            else:
+                raise ValueError(f"Unsupported HTTP method: {method}")
+
+            if upload_response.status_code not in (200, 201):
+                raise Exception(
+                    f"Upload failed: {upload_response.status_code} - {upload_response.text}"
+                )
+
+            return strip_query_params(upload_url)
+
+        if bucket_id < 1:
+            raise ValueError(f"Invalid bucket_id: {bucket_id}")
+
+        if is_valid_local_directory(path) is not True:
+            raise ValueError(f"Invalid directory path: {path}")
+
+        files = load_directory_files(path)
+
+        if len(files) < 1:
+            raise ValueError(f"No supported files found in directory: {path}")
+
+        current_batch = []
+        current_batch_size = 0
+
+        n = max(MIN_BATCH_SIZE, min(batch_size or MIN_BATCH_SIZE, MAX_BATCH_SIZE))
+
+        with tqdm(total=len(files), desc="Ingesting Files", unit="file") as pbar:
+            for file in files:
+                file_size = file.stat().st_size
+
+                if (current_batch_size + file_size > MAX_BATCH_SIZE_BYTES) or (len(current_batch) >= n):
+                    _upload_file_batch(bucket_id, current_batch, upload_api, request_options, pbar)
+                    current_batch = []
+                    current_batch_size = 0
+
+                current_batch.append(file)
+                current_batch_size += file_size
+
+            if current_batch:
+                _upload_file_batch(bucket_id, current_batch, upload_api, request_options, pbar)
+
 
 
 class AsyncGroundX(AsyncGroundXBase):
