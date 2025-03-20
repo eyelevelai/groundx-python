@@ -264,7 +264,7 @@ class GroundX(GroundXBase):
         batch_size: typing.Optional[int] = 10,
         upload_api: typing.Optional[str] = "https://api.eyelevel.ai/upload/file",
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> IngestResponse:
+    ):
         """
         Ingest documents from a local directory into a GroundX bucket.
 
