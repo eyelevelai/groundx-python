@@ -1,17 +1,10 @@
-import aiohttp, io, json, mimetypes, requests, time, typing, os
-from asyncio import TimeoutError
+import requests, time, typing, os
 from pathlib import Path
 from tqdm import tqdm
 from urllib.parse import urlparse, urlunparse
 
-from json.decoder import JSONDecodeError
-
 from .client import GroundXBase, AsyncGroundXBase
-from .core.api_error import ApiError
-from .core.pydantic_utilities import parse_obj_as
 from .core.request_options import RequestOptions
-from .errors.bad_request_error import BadRequestError
-from .errors.unauthorized_error import UnauthorizedError
 from .types.document import Document
 from .types.document_type import DocumentType
 from .types.ingest_remote_document import IngestRemoteDocument
@@ -55,13 +48,30 @@ MAX_BATCH_SIZE = 50
 MIN_BATCH_SIZE = 1
 MAX_BATCH_SIZE_BYTES = 50 * 1024 * 1024
 
+def get_presigned_url(
+    endpoint: str,
+    file_name: str,
+    file_extension: str,
+) -> typing.Dict[str, typing.Any]:
+    params = {"name": file_name, "type": file_extension}
+    response = requests.get(endpoint, params=params)
+    response.raise_for_status()
+
+    return response.json()
+
+def strip_query_params(
+    url: str,
+) -> str:
+    parsed = urlparse(url)
+    clean_url = urlunparse((parsed.scheme, parsed.netloc, parsed.path, "", "", ""))
+
+    return clean_url
+
 def prep_documents(
     documents: typing.Sequence[Document],
 ) -> typing.Tuple[
     typing.List[IngestRemoteDocument],
-    typing.List[
-        typing.Tuple[str, typing.Tuple[typing.Union[str, None], typing.BinaryIO, str]]
-    ],
+    typing.List[Document],
 ]:
     """
     Process documents and separate them into remote and local documents.
@@ -80,9 +90,7 @@ def prep_documents(
         except ValueError:
             return False
 
-    local_documents: typing.List[
-        typing.Tuple[str, typing.Tuple[typing.Union[str, None], typing.BinaryIO, str]]
-    ] = []
+    local_documents: typing.List[Document] = []
     remote_documents: typing.List[IngestRemoteDocument] = []
 
     for document in documents:
@@ -100,53 +108,7 @@ def prep_documents(
             )
             remote_documents.append(remote_document)
         elif is_valid_local_path(document.file_path):
-            expanded_path = os.path.expanduser(document.file_path)
-            file_name = os.path.basename(expanded_path)
-            mime_type = mimetypes.guess_type(file_name)[0] or "application/octet-stream"
-            file_type = MIME_TO_DOCUMENT_TYPE.get(mime_type, None)
-            if document.file_type:
-                file_type = document.file_type
-                mime_type = DOCUMENT_TYPE_TO_MIME.get(
-                    document.file_type, "application/octet-stream"
-                )
-
-            if document.file_name:
-                file_name = document.file_name
-
-            try:
-                local_documents.append(
-                    (
-                        "blob",
-                        (
-                            file_name,
-                            open(expanded_path, "rb"),
-                            mime_type,
-                        ),
-                    )
-                )
-            except Exception as e:
-                raise ValueError(f"Error reading file {expanded_path}: {e}")
-
-            metadata = {
-                "bucketId": document.bucket_id,
-                "fileName": file_name,
-                "fileType": file_type,
-            }
-            if document.process_level:
-                metadata["processLevel"] = document.process_level
-            if document.search_data:
-                metadata["searchData"] = document.search_data
-
-            local_documents.append(
-                (
-                    "metadata",
-                    (
-                        f"data.json",
-                        io.BytesIO(json.dumps(metadata).encode("utf-8")),
-                        "application/json",
-                    ),
-                )
-            )
+            local_documents.append(document)
         else:
             raise ValueError(f"Invalid file path: {document.file_path}")
 
@@ -158,6 +120,7 @@ class GroundX(GroundXBase):
         self,
         *,
         documents: typing.Sequence[Document],
+        upload_api: typing.Optional[str] = "https://api.eyelevel.ai/upload/file",
         request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
         """
@@ -166,6 +129,10 @@ class GroundX(GroundXBase):
         Parameters
         ----------
         documents : typing.Sequence[Document]
+
+        # an endpoint that accepts 'name' and 'type' query params
+        # and returns a presigned URL in a JSON dictionary with key 'URL'
+        upload_api : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -200,61 +167,39 @@ class GroundX(GroundXBase):
             raise ValueError("Documents must all be either local or remote, not a mix.")
 
         if len(remote_documents) > 0:
+            if len(remote_documents) > MAX_BATCH_SIZE:
+                raise ValueError("You have sent too many documents in this request")
+
             return self.documents.ingest_remote(
                 documents=remote_documents,
                 request_options=request_options,
             )
 
-        timeout = self._client_wrapper.get_timeout()
-        headers = self._client_wrapper.get_headers()
-        base_url = self._client_wrapper.get_base_url().rstrip("/")
-        follow_redirects = getattr(
-            self._client_wrapper.httpx_client, "follow_redirects", True
+        if len(local_documents) > MAX_BATCH_SIZE:
+            raise ValueError("You have sent too many documents in this request")
+
+        if len(local_documents) == 0:
+            raise ValueError("No valid documents were provided")
+
+        docs: typing.List[IngestRemoteDocument] = []
+        for d in local_documents:
+            url = self._upload_file(upload_api, Path(os.path.expanduser(d.file_path)))
+
+            docs.append(
+                IngestRemoteDocument(
+                    bucket_id=d.bucket_id,
+                    file_name=d.file_name,
+                    file_type=d.file_type,
+                    process_level=d.process_level,
+                    search_data=d.search_data,
+                    source_url=url,
+                )
+            )
+
+        return self.documents.ingest_remote(
+            documents=docs,
+            request_options=request_options,
         )
-
-        url = f"{base_url}/v1/ingest/documents/local"
-        _response = requests.post(
-            url,
-            files=local_documents,
-            headers=headers,
-            timeout=timeout,
-            allow_redirects=follow_redirects,
-        )
-
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    IngestResponse,
-                    parse_obj_as(
-                        type_=IngestResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 400:
-                raise BadRequestError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 401:
-                raise UnauthorizedError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-
-        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def ingest_directory(
         self,
@@ -275,7 +220,7 @@ class GroundX(GroundXBase):
         batch_size : type.Optional[int]
 
         # an endpoint that accepts 'name' and 'type' query params
-        # and returns a presigned URL
+        # and returns a presigned URL in a JSON dictionary with key 'URL'
         upload_api : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
@@ -300,13 +245,6 @@ class GroundX(GroundXBase):
         )
         """
 
-        def get_presigned_url(endpoint, file_name, file_extension) -> typing.Dict[str, typing.Any]:
-            params = {"name": file_name, "type": file_extension}
-            response = requests.get(endpoint, params=params)
-            response.raise_for_status()
-
-            return response.json()
-
         def is_valid_local_directory(path: str) -> bool:
             expanded_path = os.path.expanduser(path)
             return os.path.isdir(expanded_path)
@@ -323,80 +261,7 @@ class GroundX(GroundXBase):
                 )
             ]
 
-            return matched_files
-
-        def strip_query_params(url: str) -> str:
-            parsed = urlparse(url)
-            clean_url = urlunparse((parsed.scheme, parsed.netloc, parsed.path, "", "", ""))
-            return clean_url
-
-        def _upload_file_batch(bucket_id, batch, upload_api, request_options, pbar):
-            docs = []
-
-            progress = len(batch)
-            for file in batch:
-                url = upload_file(upload_api, file)
-                docs.append(
-                    Document(
-                        bucket_id=bucket_id,
-                        file_path=url,
-                    ),
-                )
-                pbar.update(0.25)
-                progress -= 0.25
-
-            if docs:
-                ingest = self.ingest(documents=docs, request_options=request_options)
-
-                completed_files = set()
-
-                while (
-                    ingest is not None
-                    and ingest.ingest.status not in ["complete", "error", "cancelled"]
-                ):
-                    time.sleep(3)
-                    ingest = self.documents.get_processing_status_by_id(ingest.ingest.process_id)
-
-                    if ingest.ingest.progress and ingest.ingest.progress.processing:
-                        for doc in ingest.ingest.progress.processing.documents:
-                            if doc.status == "complete" and doc.document_id not in completed_files:
-                                pbar.update(0.75)
-                                progress -= 0.75
-
-                if ingest.ingest.status in ["error", "cancelled"]:
-                    raise ValueError(f"Ingest failed with status: {ingest.ingest.status}")
-
-                if progress > 0:
-                    pbar.update(progress)
-
-        def upload_file(endpoint, file_path) -> str:
-            file_name = os.path.basename(file_path)
-            file_extension = os.path.splitext(file_name)[1][1:].lower()
-
-            presigned_info = get_presigned_url(endpoint, file_name, file_extension)
-
-            upload_url = presigned_info["URL"]
-            headers = presigned_info.get("Header", {})
-            method = presigned_info.get("Method", "PUT").upper()
-
-            for key, value in headers.items():
-                if isinstance(value, list):
-                    headers[key] = value[0]
-
-            with open(file_path, "rb") as f:
-                file_data = f.read()
-
-            if method == "PUT":
-                upload_response = requests.put(upload_url, data=file_data, headers=headers)
-            else:
-                raise ValueError(f"Unsupported HTTP method: {method}")
-
-            if upload_response.status_code not in (200, 201):
-                raise Exception(
-                    f"Upload failed: {upload_response.status_code} - {upload_response.text}"
-                )
-
-            return strip_query_params(upload_url)
+            return matched_files      
 
         if bucket_id < 1:
             raise ValueError(f"Invalid bucket_id: {bucket_id}")
@@ -419,7 +284,7 @@ class GroundX(GroundXBase):
                 file_size = file.stat().st_size
 
                 if (current_batch_size + file_size > MAX_BATCH_SIZE_BYTES) or (len(current_batch) >= n):
-                    _upload_file_batch(bucket_id, current_batch, upload_api, request_options, pbar)
+                    self._upload_file_batch(bucket_id, current_batch, upload_api, request_options, pbar)
                     current_batch = []
                     current_batch_size = 0
 
@@ -427,7 +292,89 @@ class GroundX(GroundXBase):
                 current_batch_size += file_size
 
             if current_batch:
-                _upload_file_batch(bucket_id, current_batch, upload_api, request_options, pbar)
+                self._upload_file_batch(bucket_id, current_batch, upload_api, request_options, pbar)
+
+    def _upload_file(
+        self,
+        endpoint: str,
+        file_path: Path,
+    ) -> str:
+        file_name = os.path.basename(file_path)
+        file_extension = os.path.splitext(file_name)[1][1:].lower()
+
+        presigned_info = get_presigned_url(endpoint, file_name, file_extension)
+
+        upload_url = presigned_info["URL"]
+        headers = presigned_info.get("Header", {})
+        method = presigned_info.get("Method", "PUT").upper()
+
+        for key, value in headers.items():
+            if isinstance(value, list):
+                headers[key] = value[0]
+
+        try:
+            with open(file_path, "rb") as f:
+                file_data = f.read()
+        except Exception as e:
+            raise ValueError(f"Error reading file {file_path}: {e}")
+
+        if method == "PUT":
+            upload_response = requests.put(upload_url, data=file_data, headers=headers)
+        else:
+            raise ValueError(f"Unsupported HTTP method: {method}")
+
+        if upload_response.status_code not in (200, 201):
+            raise Exception(
+                f"Upload failed: {upload_response.status_code} - {upload_response.text}"
+            )
+
+        return strip_query_params(upload_url)
+
+    def _upload_file_batch(
+        self,
+        bucket_id,
+        batch,
+        upload_api,
+        request_options,
+        pbar,
+    ):
+        docs = []
+
+        progress = len(batch)
+        for file in batch:
+            url = self._upload_file(upload_api, file)
+            docs.append(
+                Document(
+                    bucket_id=bucket_id,
+                    file_path=url,
+                ),
+            )
+            pbar.update(0.25)
+            progress -= 0.25
+
+        if docs:
+            ingest = self.ingest(documents=docs, request_options=request_options)
+
+            completed_files = set()
+
+            while (
+                ingest is not None
+                and ingest.ingest.status not in ["complete", "error", "cancelled"]
+            ):
+                time.sleep(3)
+                ingest = self.documents.get_processing_status_by_id(ingest.ingest.process_id)
+
+                if ingest.ingest.progress and ingest.ingest.progress.processing:
+                    for doc in ingest.ingest.progress.processing.documents:
+                        if doc.status == "complete" and doc.document_id not in completed_files:
+                            pbar.update(0.75)
+                            progress -= 0.75
+
+            if ingest.ingest.status in ["error", "cancelled"]:
+                raise ValueError(f"Ingest failed with status: {ingest.ingest.status}")
+
+            if progress > 0:
+                pbar.update(progress)
 
 
 
@@ -436,6 +383,7 @@ class AsyncGroundX(AsyncGroundXBase):
         self,
         *,
         documents: typing.Sequence[Document],
+        upload_api: typing.Optional[str] = "https://api.eyelevel.ai/upload/file",
         request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
         """
@@ -444,6 +392,10 @@ class AsyncGroundX(AsyncGroundXBase):
         Parameters
         ----------
         documents : typing.Sequence[Document]
+
+        # an endpoint that accepts 'name' and 'type' query params
+        # and returns a presigned URL in a JSON dictionary with key 'URL'
+        upload_api : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -483,49 +435,36 @@ class AsyncGroundX(AsyncGroundXBase):
             raise ValueError("Documents must all be either local or remote, not a mix.")
 
         if len(remote_documents) > 0:
+            if len(remote_documents) > MAX_BATCH_SIZE:
+                raise ValueError("You have sent too many documents in this request")
+
             return await self.documents.ingest_remote(
                 documents=remote_documents,
                 request_options=request_options,
             )
 
-        timeout = self._client_wrapper.get_timeout()
-        headers = self._client_wrapper.get_headers()
-        base_url = self._client_wrapper.get_base_url().rstrip("/")
+        if len(local_documents) > MAX_BATCH_SIZE:
+            raise ValueError("You have sent too many documents in this request")
 
-        url = f"{base_url}/v1/ingest/documents/local"
+        if len(local_documents) == 0:
+            raise ValueError("No valid documents were provided")
 
-        try:
-            async with aiohttp.ClientSession() as session:
-                data = aiohttp.FormData()
-                for field_name, (file_name, file_obj, content_type) in local_documents:
-                    data.add_field(
-                        name=field_name,
-                        value=file_obj,
-                        filename=file_name,
-                        content_type=content_type,
-                    )
+        docs: typing.List[IngestRemoteDocument] = []
+        for d in local_documents:
+            url = self._upload_file(upload_api, Path(os.path.expanduser(d.file_path)))
 
-                async with session.post(
-                    url, data=data, headers=headers, timeout=timeout
-                ) as response:
-                    if 200 <= response.status < 300:
-                        response_data = await response.json()
-                        return typing.cast(
-                            IngestResponse,
-                            parse_obj_as(
-                                type_=IngestResponse,  # type: ignore
-                                object_=response_data,
-                            ),
-                        )
-                    if response.status == 400:
-                        raise BadRequestError(await response.json())
-                    if response.status == 401:
-                        raise UnauthorizedError(await response.json())
+            docs.append(
+                IngestRemoteDocument(
+                    bucket_id=d.bucket_id,
+                    file_name=d.file_name,
+                    file_type=d.file_type,
+                    process_level=d.process_level,
+                    search_data=d.search_data,
+                    source_url=url,
+                )
+            )
 
-                    raise ApiError(
-                        status_code=response.status, body=await response.text()
-                    )
-        except TimeoutError:
-            raise ApiError(status_code=408, body="Request timed out")
-        except aiohttp.ClientError as e:
-            raise ApiError(status_code=500, body=str(e))
+        return await self.documents.ingest_remote(
+            documents=docs,
+            request_options=request_options,
+        )
