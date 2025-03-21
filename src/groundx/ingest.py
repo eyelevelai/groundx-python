@@ -296,9 +296,9 @@ class GroundX(GroundXBase):
 
     def _upload_file(
         self,
-        endpoint: typing.Optional[str],
-        file_path: Path,
-    ) -> str:
+        endpoint,
+        file_path,
+    ):
         file_name = os.path.basename(file_path)
         file_extension = os.path.splitext(file_name)[1][1:].lower()
 
@@ -383,7 +383,7 @@ class AsyncGroundX(AsyncGroundXBase):
         self,
         *,
         documents: typing.Sequence[Document],
-        upload_api: typing.Optional[str] = "https://api.eyelevel.ai/upload/file",
+        upload_api: str = "https://api.eyelevel.ai/upload/file",
         request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
         """
@@ -468,3 +468,39 @@ class AsyncGroundX(AsyncGroundXBase):
             documents=docs,
             request_options=request_options,
         )
+
+    def _upload_file(
+        self,
+        endpoint,
+        file_path,
+    ):
+        file_name = os.path.basename(file_path)
+        file_extension = os.path.splitext(file_name)[1][1:].lower()
+
+        presigned_info = get_presigned_url(endpoint, file_name, file_extension)
+
+        upload_url = presigned_info["URL"]
+        headers = presigned_info.get("Header", {})
+        method = presigned_info.get("Method", "PUT").upper()
+
+        for key, value in headers.items():
+            if isinstance(value, list):
+                headers[key] = value[0]
+
+        try:
+            with open(file_path, "rb") as f:
+                file_data = f.read()
+        except Exception as e:
+            raise ValueError(f"Error reading file {file_path}: {e}")
+
+        if method == "PUT":
+            upload_response = requests.put(upload_url, data=file_data, headers=headers)
+        else:
+            raise ValueError(f"Unsupported HTTP method: {method}")
+
+        if upload_response.status_code not in (200, 201):
+            raise Exception(
+                f"Upload failed: {upload_response.status_code} - {upload_response.text}"
+            )
+
+        return strip_query_params(upload_url)
