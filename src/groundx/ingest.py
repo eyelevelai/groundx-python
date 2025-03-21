@@ -296,7 +296,7 @@ class GroundX(GroundXBase):
 
     def _upload_file(
         self,
-        endpoint: str,
+        endpoint: typing.Optional[str],
         file_path: Path,
     ) -> str:
         file_name = os.path.basename(file_path)
