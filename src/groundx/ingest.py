@@ -5,8 +5,8 @@ from urllib.parse import urlparse, urlunparse
 
 from .client import GroundXBase, AsyncGroundXBase
 from .core.request_options import RequestOptions
+from .csv_splitter import CSVSplitter
 from .types.document import Document
-from .types.document_type import DocumentType
 from .types.ingest_remote_document import IngestRemoteDocument
 from .types.ingest_response import IngestResponse
 
@@ -38,10 +38,18 @@ MIME_TO_DOCUMENT_TYPE = {v: k for k, v in DOCUMENT_TYPE_TO_MIME.items()}
 
 ALLOWED_SUFFIXES = {f".{k}": v for k, v in DOCUMENT_TYPE_TO_MIME.items()}
 
+CSV_SPLITS = {
+    ".csv": True,
+}
+TSV_SPLITS = {
+    ".tsv": True,
+}
+
 SUFFIX_ALIASES = {
-    ".jpeg": ".jpg",
-    ".heic": ".heif",
-    ".tif": ".tiff",
+    ".jpeg": "jpg",
+    ".heic": "heif",
+    ".tif": "tiff",
+    ".md": "txt",
 }
 
 MAX_BATCH_SIZE = 50
@@ -115,6 +123,18 @@ def prep_documents(
     return remote_documents, local_documents
 
 
+def split_doc(file):
+    if file.is_file() and (
+        file.suffix.lower() in ALLOWED_SUFFIXES
+        or file.suffix.lower() in SUFFIX_ALIASES
+    ):
+        if file.suffix.lower() in CSV_SPLITS:
+            return CSVSplitter(filepath=file).split()
+        elif file.suffix.lower() in TSV_SPLITS:
+            return CSVSplitter(filepath=file, delimiter='\t').split()
+        return [file]
+    return []
+
 class GroundX(GroundXBase):
     def ingest(
         self,
@@ -163,41 +183,39 @@ class GroundX(GroundXBase):
         """
         remote_documents, local_documents = prep_documents(documents)
 
-        if local_documents and remote_documents:
-            raise ValueError("Documents must all be either local or remote, not a mix.")
-
-        if len(remote_documents) > 0:
-            if len(remote_documents) > MAX_BATCH_SIZE:
-                raise ValueError("You have sent too many documents in this request")
-
-            return self.documents.ingest_remote(
-                documents=remote_documents,
-                request_options=request_options,
-            )
-
-        if len(local_documents) > MAX_BATCH_SIZE:
+        if len(remote_documents) + len(local_documents) > MAX_BATCH_SIZE:
             raise ValueError("You have sent too many documents in this request")
 
-        if len(local_documents) == 0:
+        if len(remote_documents) + len(local_documents) == 0:
             raise ValueError("No valid documents were provided")
 
-        docs: typing.List[IngestRemoteDocument] = []
         for d in local_documents:
-            url = self._upload_file(upload_api, Path(os.path.expanduser(d.file_path)))
+            splits = split_doc(Path(os.path.expanduser(d.file_path)))
 
-            docs.append(
-                IngestRemoteDocument(
-                    bucket_id=d.bucket_id,
-                    file_name=d.file_name,
-                    file_type=d.file_type,
-                    process_level=d.process_level,
-                    search_data=d.search_data,
-                    source_url=url,
+            for sd in splits:
+                url = self._upload_file(upload_api, sd)
+
+                ft = d.file_type
+                if sd.suffix.lower() in SUFFIX_ALIASES:
+                    ft = SUFFIX_ALIASES[sd.suffix.lower()]
+
+                fn = sd.name
+                if len(splits) == 1 and d.file_name:
+                    fn = d.file_name
+
+                remote_documents.append(
+                    IngestRemoteDocument(
+                        bucket_id=d.bucket_id,
+                        file_name=fn,
+                        file_type=ft,
+                        process_level=d.process_level,
+                        search_data=d.search_data,
+                        source_url=url,
+                    )
                 )
-            )
 
         return self.documents.ingest_remote(
-            documents=docs,
+            documents=remote_documents,
             request_options=request_options,
         )
 
@@ -252,14 +270,10 @@ class GroundX(GroundXBase):
         def load_directory_files(directory: str) -> typing.List[Path]:
             dir_path = Path(directory)
 
-            matched_files = [
-                file
-                for file in dir_path.rglob("*")
-                if file.is_file() and (
-                    file.suffix.lower() in ALLOWED_SUFFIXES
-                    or file.suffix.lower() in SUFFIX_ALIASES
-                )
-            ]
+            matched_files: typing.List[Path] = []
+            for file in dir_path.rglob("*"):
+                for sd in split_doc(file):
+                    matched_files.append(sd)    
 
             return matched_files      
 
@@ -301,6 +315,8 @@ class GroundX(GroundXBase):
     ):
         file_name = os.path.basename(file_path)
         file_extension = os.path.splitext(file_name)[1][1:].lower()
+        if f".{file_extension}" in SUFFIX_ALIASES:
+            file_extension = SUFFIX_ALIASES[f".{file_extension}"]
 
         presigned_info = get_presigned_url(endpoint, file_name, file_extension)
 
@@ -343,12 +359,23 @@ class GroundX(GroundXBase):
         progress = len(batch)
         for file in batch:
             url = self._upload_file(upload_api, file)
-            docs.append(
-                Document(
-                    bucket_id=bucket_id,
-                    file_path=url,
-                ),
-            )
+            if file.suffix.lower() in SUFFIX_ALIASES:
+                docs.append(
+                    Document(
+                        bucket_id=bucket_id,
+                        file_name=file.name,
+                        file_path=url,
+                        file_type=SUFFIX_ALIASES[file.suffix.lower()],
+                    ),
+                )
+            else:
+                docs.append(
+                    Document(
+                        bucket_id=bucket_id,
+                        file_name=file.name,
+                        file_path=url,
+                    ),
+                )
             pbar.update(0.25)
             progress -= 0.25
 
@@ -364,11 +391,28 @@ class GroundX(GroundXBase):
                 time.sleep(3)
                 ingest = self.documents.get_processing_status_by_id(ingest.ingest.process_id)
 
-                if ingest.ingest.progress and ingest.ingest.progress.processing:
-                    for doc in ingest.ingest.progress.processing.documents:
-                        if doc.status == "complete" and doc.document_id not in completed_files:
-                            pbar.update(0.75)
-                            progress -= 0.75
+                if ingest.ingest.progress:
+                    if ingest.ingest.progress.processing and ingest.ingest.progress.processing.documents:
+                        for doc in ingest.ingest.progress.processing.documents:
+                            if doc.status in ["complete", "error", "cancelled"] and doc.document_id not in completed_files:
+                                pbar.update(0.75)
+                                progress -= 0.75
+                    if ingest.ingest.progress.complete and ingest.ingest.progress.complete.documents:
+                        for doc in ingest.ingest.progress.complete.documents:
+                            if doc.status in ["complete", "error", "cancelled"] and doc.document_id not in completed_files:
+                                pbar.update(0.75)
+                                progress -= 0.75
+                    if ingest.ingest.progress.cancelled and ingest.ingest.progress.cancelled.documents:
+                        for doc in ingest.ingest.progress.cancelled.documents:
+                            if doc.status in ["complete", "error", "cancelled"] and doc.document_id not in completed_files:
+                                pbar.update(0.75)
+                                progress -= 0.75
+                    if ingest.ingest.progress.errors and ingest.ingest.progress.errors.documents:
+                        for doc in ingest.ingest.progress.errors.documents:
+                            if doc.status in ["complete", "error", "cancelled"] and doc.document_id not in completed_files:
+                                pbar.update(0.75)
+                                progress -= 0.75
+
 
             if ingest.ingest.status in ["error", "cancelled"]:
                 raise ValueError(f"Ingest failed with status: {ingest.ingest.status}")
@@ -431,41 +475,39 @@ class AsyncGroundX(AsyncGroundXBase):
         """
         remote_documents, local_documents = prep_documents(documents)
 
-        if local_documents and remote_documents:
-            raise ValueError("Documents must all be either local or remote, not a mix.")
-
-        if len(remote_documents) > 0:
-            if len(remote_documents) > MAX_BATCH_SIZE:
-                raise ValueError("You have sent too many documents in this request")
-
-            return await self.documents.ingest_remote(
-                documents=remote_documents,
-                request_options=request_options,
-            )
-
-        if len(local_documents) > MAX_BATCH_SIZE:
+        if len(remote_documents) + len(local_documents) > MAX_BATCH_SIZE:
             raise ValueError("You have sent too many documents in this request")
 
-        if len(local_documents) == 0:
+        if len(remote_documents) + len(local_documents) == 0:
             raise ValueError("No valid documents were provided")
 
-        docs: typing.List[IngestRemoteDocument] = []
         for d in local_documents:
-            url = self._upload_file(upload_api, Path(os.path.expanduser(d.file_path)))
+            splits = split_doc(Path(os.path.expanduser(d.file_path)))
 
-            docs.append(
-                IngestRemoteDocument(
-                    bucket_id=d.bucket_id,
-                    file_name=d.file_name,
-                    file_type=d.file_type,
-                    process_level=d.process_level,
-                    search_data=d.search_data,
-                    source_url=url,
+            for sd in splits:
+                url = self._upload_file(upload_api, sd)
+
+                ft = d.file_type
+                if sd.suffix.lower() in SUFFIX_ALIASES:
+                    ft = SUFFIX_ALIASES[sd.suffix.lower()]
+
+                fn = sd.name
+                if len(splits) == 1 and d.file_name:
+                    fn = d.file_name
+
+                remote_documents.append(
+                    IngestRemoteDocument(
+                        bucket_id=d.bucket_id,
+                        file_name=fn,
+                        file_type=ft,
+                        process_level=d.process_level,
+                        search_data=d.search_data,
+                        source_url=url,
+                    )
                 )
-            )
 
         return await self.documents.ingest_remote(
-            documents=docs,
+            documents=remote_documents,
             request_options=request_options,
         )
 
@@ -476,6 +518,8 @@ class AsyncGroundX(AsyncGroundXBase):
     ):
         file_name = os.path.basename(file_path)
         file_extension = os.path.splitext(file_name)[1][1:].lower()
+        if f".{file_extension}" in SUFFIX_ALIASES:
+            file_extension = SUFFIX_ALIASES[f".{file_extension}"]
 
         presigned_info = get_presigned_url(endpoint, file_name, file_extension)
 
