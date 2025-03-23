@@ -9,6 +9,7 @@ from .csv_splitter import CSVSplitter
 from .types.document import Document
 from .types.ingest_remote_document import IngestRemoteDocument
 from .types.ingest_response import IngestResponse
+from .types.ingest_response_ingest import IngestResponseIngest
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -140,6 +141,8 @@ class GroundX(GroundXBase):
         self,
         *,
         documents: typing.Sequence[Document],
+        batch_size: typing.Optional[int] = 10,
+        wait_for_complete: typing.Optional[bool] = False,
         upload_api: typing.Optional[str] = "https://api.eyelevel.ai/upload/file",
         request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
@@ -149,6 +152,13 @@ class GroundX(GroundXBase):
         Parameters
         ----------
         documents : typing.Sequence[Document]
+
+        # defines how many files to send per batch
+        # ignored unless wait_for_complete is True
+        batch_size : typing.Optional[int]
+
+        # will turn on progress bar and wait for ingestion to complete
+        wait_for_complete : typing.Optional[bool]
 
         # an endpoint that accepts 'name' and 'type' query params
         # and returns a presigned URL in a JSON dictionary with key 'URL'
@@ -183,36 +193,83 @@ class GroundX(GroundXBase):
         """
         remote_documents, local_documents = prep_documents(documents)
 
-        if len(remote_documents) + len(local_documents) > MAX_BATCH_SIZE:
-            raise ValueError("You have sent too many documents in this request")
-
         if len(remote_documents) + len(local_documents) == 0:
             raise ValueError("No valid documents were provided")
 
-        for d in local_documents:
-            splits = split_doc(Path(os.path.expanduser(d.file_path)))
+        if wait_for_complete:
+            with tqdm(total=len(remote_documents) + len(local_documents), desc="Ingesting Files", unit="file") as pbar:
+                n = max(MIN_BATCH_SIZE, min(batch_size or MIN_BATCH_SIZE, MAX_BATCH_SIZE))
 
-            for sd in splits:
-                url = self._upload_file(upload_api, sd)
+                current_batch = []
+                ingest = IngestResponse(ingest=IngestResponseIngest(process_id="",status="queued"))
 
-                ft = d.file_type
-                if sd.suffix.lower() in SUFFIX_ALIASES:
-                    ft = SUFFIX_ALIASES[sd.suffix.lower()]
+                progress = len(remote_documents)
+                for rd in remote_documents:
+                    if len(current_batch) >= n:
+                        ingest = self.documents.ingest_remote(
+                            documents=current_batch,
+                            request_options=request_options,
+                        )
+                        ingest, progress = self._monitor_batch(ingest, progress, pbar)
 
-                fn = sd.name
-                if len(splits) == 1 and d.file_name:
-                    fn = d.file_name
+                        current_batch = []
 
-                remote_documents.append(
-                    IngestRemoteDocument(
-                        bucket_id=d.bucket_id,
-                        file_name=fn,
-                        file_type=ft,
-                        process_level=d.process_level,
-                        search_data=d.search_data,
-                        source_url=url,
+                    current_batch.append(rd)
+                    pbar.update(0.25)
+                    progress -= 0.25
+
+                if current_batch:
+                    ingest = self.documents.ingest_remote(
+                        documents=current_batch,
+                        request_options=request_options,
                     )
-                )
+                    ingest, progress = self._monitor_batch(ingest, progress, pbar)
+
+                    current_batch = []
+
+                if progress > 0:
+                    pbar.update(progress)
+
+                current_batch_size = 0
+                progress = len(local_documents)
+                for ld in local_documents:
+                    fp = Path(os.path.expanduser(ld.file_path))
+                    file_size = fp.stat().st_size
+
+                    if (current_batch_size + file_size > MAX_BATCH_SIZE_BYTES) or (len(current_batch) >= n):
+                        up_docs, progress = self._process_local(current_batch, upload_api, progress, pbar)
+
+                        ingest = self.documents.ingest_remote(
+                            documents=up_docs,
+                            request_options=request_options,
+                        )
+                        ingest, progress = self._monitor_batch(ingest, progress, pbar)
+
+                        current_batch = []
+                        current_batch_size = 0
+
+                    current_batch.append(ld)
+                    current_batch_size += file_size
+
+                if current_batch:
+                    up_docs, progress = self._process_local(current_batch, upload_api, progress, pbar)
+
+                    ingest = self.documents.ingest_remote(
+                        documents=up_docs,
+                        request_options=request_options,
+                    )
+                    ingest, progress = self._monitor_batch(ingest, progress, pbar)
+
+                if progress > 0:
+                    pbar.update(progress)
+
+                return ingest
+        elif len(remote_documents) + len(local_documents) > MAX_BATCH_SIZE:
+            raise ValueError("You have sent too many documents in this request")
+
+
+        up_docs, _ = self._process_local(local_documents, upload_api)
+        remote_documents.extend(up_docs)
 
         return self.documents.ingest_remote(
             documents=remote_documents,
@@ -346,6 +403,92 @@ class GroundX(GroundXBase):
 
         return strip_query_params(upload_url)
 
+    def _process_local(
+        self,
+        local_docs,
+        upload_api,
+        progress = None,
+        pbar = None,
+    ):
+        remote_docs = []
+        for d in local_docs:
+            splits = split_doc(Path(os.path.expanduser(d.file_path)))
+
+            for sd in splits:
+                url = self._upload_file(upload_api, sd)
+
+                ft = d.file_type
+                if sd.suffix.lower() in SUFFIX_ALIASES:
+                    ft = SUFFIX_ALIASES[sd.suffix.lower()]
+
+                fn = sd.name
+                if len(splits) == 1 and d.file_name:
+                    fn = d.file_name
+
+                remote_docs.append(
+                    IngestRemoteDocument(
+                        bucket_id=d.bucket_id,
+                        file_name=fn,
+                        file_type=ft,
+                        process_level=d.process_level,
+                        search_data=d.search_data,
+                        source_url=url,
+                    )
+                )
+
+                if progress is not None and pbar is not None and pbar.update is not None:
+                    pbar.update(0.25)
+                    progress -= 0.25
+
+        return remote_docs, progress
+
+    def _monitor_batch(
+        self,
+        ingest,
+        progress,
+        pbar,
+    ):
+        completed_files = set()
+
+        while (
+            ingest is not None
+            and ingest.ingest.status not in ["complete", "error", "cancelled"]
+        ):
+            time.sleep(3)
+            ingest = self.documents.get_processing_status_by_id(ingest.ingest.process_id)
+
+            if ingest.ingest.progress:
+                if ingest.ingest.progress.processing and ingest.ingest.progress.processing.documents:
+                    for doc in ingest.ingest.progress.processing.documents:
+                        if doc.status in ["complete", "error", "cancelled"] and doc.document_id not in completed_files:
+                            pbar.update(0.75)
+                            progress -= 0.75
+                            completed_files.add(doc.document_id)
+                if ingest.ingest.progress.complete and ingest.ingest.progress.complete.documents:
+                    for doc in ingest.ingest.progress.complete.documents:
+                        if doc.status in ["complete", "error", "cancelled"] and doc.document_id not in completed_files:
+                            pbar.update(0.75)
+                            progress -= 0.75
+                            completed_files.add(doc.document_id)
+                if ingest.ingest.progress.cancelled and ingest.ingest.progress.cancelled.documents:
+                    for doc in ingest.ingest.progress.cancelled.documents:
+                        if doc.status in ["complete", "error", "cancelled"] and doc.document_id not in completed_files:
+                            pbar.update(0.75)
+                            progress -= 0.75
+                            completed_files.add(doc.document_id)
+                if ingest.ingest.progress.errors and ingest.ingest.progress.errors.documents:
+                    for doc in ingest.ingest.progress.errors.documents:
+                        if doc.status in ["complete", "error", "cancelled"] and doc.document_id not in completed_files:
+                            pbar.update(0.75)
+                            progress -= 0.75
+                            completed_files.add(doc.document_id)
+
+
+        if ingest.ingest.status in ["error", "cancelled"]:
+            raise ValueError(f"Ingest failed with status: {ingest.ingest.status}")
+
+        return ingest, progress
+
     def _upload_file_batch(
         self,
         bucket_id,
@@ -381,44 +524,10 @@ class GroundX(GroundXBase):
 
         if docs:
             ingest = self.ingest(documents=docs, request_options=request_options)
+            ingest, progress = self._monitor_batch(ingest, progress, pbar)
 
-            completed_files = set()
-
-            while (
-                ingest is not None
-                and ingest.ingest.status not in ["complete", "error", "cancelled"]
-            ):
-                time.sleep(3)
-                ingest = self.documents.get_processing_status_by_id(ingest.ingest.process_id)
-
-                if ingest.ingest.progress:
-                    if ingest.ingest.progress.processing and ingest.ingest.progress.processing.documents:
-                        for doc in ingest.ingest.progress.processing.documents:
-                            if doc.status in ["complete", "error", "cancelled"] and doc.document_id not in completed_files:
-                                pbar.update(0.75)
-                                progress -= 0.75
-                    if ingest.ingest.progress.complete and ingest.ingest.progress.complete.documents:
-                        for doc in ingest.ingest.progress.complete.documents:
-                            if doc.status in ["complete", "error", "cancelled"] and doc.document_id not in completed_files:
-                                pbar.update(0.75)
-                                progress -= 0.75
-                    if ingest.ingest.progress.cancelled and ingest.ingest.progress.cancelled.documents:
-                        for doc in ingest.ingest.progress.cancelled.documents:
-                            if doc.status in ["complete", "error", "cancelled"] and doc.document_id not in completed_files:
-                                pbar.update(0.75)
-                                progress -= 0.75
-                    if ingest.ingest.progress.errors and ingest.ingest.progress.errors.documents:
-                        for doc in ingest.ingest.progress.errors.documents:
-                            if doc.status in ["complete", "error", "cancelled"] and doc.document_id not in completed_files:
-                                pbar.update(0.75)
-                                progress -= 0.75
-
-
-            if ingest.ingest.status in ["error", "cancelled"]:
-                raise ValueError(f"Ingest failed with status: {ingest.ingest.status}")
-
-            if progress > 0:
-                pbar.update(progress)
+        if progress > 0:
+            progress = 0
 
 
 
