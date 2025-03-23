@@ -200,44 +200,45 @@ class GroundX(GroundXBase):
             with tqdm(total=len(remote_documents) + len(local_documents), desc="Ingesting Files", unit="file") as pbar:
                 n = max(MIN_BATCH_SIZE, min(batch_size or MIN_BATCH_SIZE, MAX_BATCH_SIZE))
 
-                current_batch = []
+                remote_batch: typing.List[IngestRemoteDocument] = []
                 ingest = IngestResponse(ingest=IngestResponseIngest(process_id="",status="queued"))
 
-                progress = len(remote_documents)
+                progress = float(len(remote_documents))
                 for rd in remote_documents:
-                    if len(current_batch) >= n:
+                    if len(remote_batch) >= n:
                         ingest = self.documents.ingest_remote(
-                            documents=current_batch,
+                            documents=remote_batch,
                             request_options=request_options,
                         )
                         ingest, progress = self._monitor_batch(ingest, progress, pbar)
 
-                        current_batch = []
+                        remote_batch = []
 
-                    current_batch.append(rd)
+                    remote_batch.append(rd)
                     pbar.update(0.25)
                     progress -= 0.25
 
-                if current_batch:
+                if remote_batch:
                     ingest = self.documents.ingest_remote(
-                        documents=current_batch,
+                        documents=remote_batch,
                         request_options=request_options,
                     )
                     ingest, progress = self._monitor_batch(ingest, progress, pbar)
 
-                    current_batch = []
 
                 if progress > 0:
                     pbar.update(progress)
 
                 current_batch_size = 0
-                progress = len(local_documents)
+                local_batch: typing.List[Document] = []
+
+                progress = float(len(local_documents))
                 for ld in local_documents:
                     fp = Path(os.path.expanduser(ld.file_path))
                     file_size = fp.stat().st_size
 
-                    if (current_batch_size + file_size > MAX_BATCH_SIZE_BYTES) or (len(current_batch) >= n):
-                        up_docs, progress = self._process_local(current_batch, upload_api, progress, pbar)
+                    if (current_batch_size + file_size > MAX_BATCH_SIZE_BYTES) or (len(local_batch) >= n):
+                        up_docs, progress = self._process_local(local_batch, upload_api, progress, pbar)
 
                         ingest = self.documents.ingest_remote(
                             documents=up_docs,
@@ -245,14 +246,14 @@ class GroundX(GroundXBase):
                         )
                         ingest, progress = self._monitor_batch(ingest, progress, pbar)
 
-                        current_batch = []
+                        local_batch = []
                         current_batch_size = 0
 
-                    current_batch.append(ld)
+                    local_batch.append(ld)
                     current_batch_size += file_size
 
-                if current_batch:
-                    up_docs, progress = self._process_local(current_batch, upload_api, progress, pbar)
+                if local_batch:
+                    up_docs, progress = self._process_local(local_batch, upload_api, progress, pbar)
 
                     ingest = self.documents.ingest_remote(
                         documents=up_docs,
@@ -499,7 +500,7 @@ class GroundX(GroundXBase):
     ):
         docs = []
 
-        progress = len(batch)
+        progress =  float(len(batch))
         for file in batch:
             url = self._upload_file(upload_api, file)
             if file.suffix.lower() in SUFFIX_ALIASES:
@@ -527,7 +528,7 @@ class GroundX(GroundXBase):
             ingest, progress = self._monitor_batch(ingest, progress, pbar)
 
         if progress > 0:
-            progress = 0
+            pbar.update(progress)
 
 
 
