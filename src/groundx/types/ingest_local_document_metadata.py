@@ -26,6 +26,11 @@ class IngestLocalDocumentMetadata(UniversalBaseModel):
     """
 
     file_type: typing_extensions.Annotated[typing.Optional[DocumentType], FieldMetadata(alias="fileType")] = None
+    filter: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(default=None)
+    """
+    A dictionary of key-value pairs that can be used to pre-filter documents prior to a search.
+    """
+
     process_level: typing_extensions.Annotated[typing.Optional[ProcessLevel], FieldMetadata(alias="processLevel")] = (
         None
     )

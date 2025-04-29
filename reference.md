@@ -13,6 +13,8 @@
 <dd>
 
 Ingest documents hosted on public URLs into a GroundX bucket.
+
+[Supported Document Types and Ingest Capacities](https://docs.eyelevel.ai/documentation/fundamentals/document-types-and-ingest-capacities)
 </dd>
 </dl>
 </dd>
@@ -90,6 +92,8 @@ client.documents.ingest_remote(
 <dd>
 
 Upload documents hosted on a local file system into a GroundX bucket.
+
+[Supported Document Types and Ingest Capacities](https://docs.eyelevel.ai/documentation/fundamentals/document-types-and-ingest-capacities)
 </dd>
 </dl>
 </dd>
@@ -169,8 +173,11 @@ client.documents.ingest_local(
 <dd>
 
 Upload the content of a publicly accessible website for ingestion into a GroundX bucket. This is done by following links within a specified URL, recursively, up to a specified depth or number of pages.
-Note1: This endpoint is currently not supported for on-prem deployments.
+
+Note1: This endpoint is currently not supported for on-prem deployments. 
 Note2: The `source_url` must include the protocol, http:// or https://.
+
+[Supported Document Types and Ingest Capacities](https://docs.eyelevel.ai/documentation/fundamentals/document-types-and-ingest-capacities)
 </dd>
 </dl>
 </dd>
@@ -496,7 +503,7 @@ client.documents.get_processing_status_by_id(
 <dl>
 <dd>
 
-lookup the document(s) associated with a processId, bucketId, groupId, or projectId.
+lookup the document(s) associated with a processId, bucketId, or groupId.
 </dd>
 </dl>
 </dd>
@@ -534,7 +541,7 @@ client.documents.lookup(
 <dl>
 <dd>
 
-**id:** `int` — a processId, bucketId, groupId, or projectId
+**id:** `int` — a processId, bucketId, or groupId
     
 </dd>
 </dl>
@@ -872,7 +879,7 @@ client.search.content(
 <dl>
 <dd>
 
-**id:** `SearchContentRequestId` — The bucketId, groupId, projectId, or documentId to be searched. The document or documents within the specified container will be compared to the query, and relevant information will be extracted.
+**id:** `SearchContentRequestId` — The bucketId, groupId, or documentId to be searched. The document or documents within the specified container will be compared to the query, and relevant information will be extracted.
     
 </dd>
 </dl>
@@ -905,6 +912,14 @@ client.search.content(
 <dd>
 
 **verbosity:** `typing.Optional[int]` — The amount of data returned with each search result. 0 == no search results, only the recommended context. 1 == search results but no searchData. 2 == search results and searchData.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**filter:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — A dictionary of key-value pairs that can be used to pre-filter documents prior to a search.
     
 </dd>
 </dl>
@@ -1018,6 +1033,14 @@ client.search.documents(
 <dd>
 
 **verbosity:** `typing.Optional[int]` — The amount of data returned with each search result. 0 == no search results, only the recommended context. 1 == search results but no searchData. 2 == search results and searchData.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**filter:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — A dictionary of key-value pairs that can be used to pre-filter documents prior to a search.
     
 </dd>
 </dl>
