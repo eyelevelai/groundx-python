@@ -29,6 +29,7 @@ class SearchClient:
         n: typing.Optional[int] = None,
         next_token: typing.Optional[str] = None,
         verbosity: typing.Optional[int] = None,
+        filter: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         relevance: typing.Optional[float] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> SearchResponse:
@@ -39,7 +40,7 @@ class SearchClient:
         Parameters
         ----------
         id : SearchContentRequestId
-            The bucketId, groupId, projectId, or documentId to be searched. The document or documents within the specified container will be compared to the query, and relevant information will be extracted.
+            The bucketId, groupId, or documentId to be searched. The document or documents within the specified container will be compared to the query, and relevant information will be extracted.
 
         query : str
             The search query to be used to find relevant documentation.
@@ -52,6 +53,9 @@ class SearchClient:
 
         verbosity : typing.Optional[int]
             The amount of data returned with each search result. 0 == no search results, only the recommended context. 1 == search results but no searchData. 2 == search results and searchData.
+
+        filter : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            A dictionary of key-value pairs that can be used to pre-filter documents prior to a search.
 
         relevance : typing.Optional[float]
             The minimum search relevance score required to include the result. By default, this is 10.0.
@@ -87,6 +91,7 @@ class SearchClient:
             },
             json={
                 "query": query,
+                "filter": filter,
                 "relevance": relevance,
             },
             headers={
@@ -137,6 +142,7 @@ class SearchClient:
         n: typing.Optional[int] = None,
         next_token: typing.Optional[str] = None,
         verbosity: typing.Optional[int] = None,
+        filter: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         relevance: typing.Optional[float] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> SearchResponse:
@@ -160,6 +166,9 @@ class SearchClient:
 
         verbosity : typing.Optional[int]
             The amount of data returned with each search result. 0 == no search results, only the recommended context. 1 == search results but no searchData. 2 == search results and searchData.
+
+        filter : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            A dictionary of key-value pairs that can be used to pre-filter documents prior to a search.
 
         relevance : typing.Optional[float]
             The minimum search relevance score required to include the result. By default, this is 10.0.
@@ -196,6 +205,7 @@ class SearchClient:
             json={
                 "query": query,
                 "documentIds": document_ids,
+                "filter": filter,
                 "relevance": relevance,
             },
             headers={
@@ -251,6 +261,7 @@ class AsyncSearchClient:
         n: typing.Optional[int] = None,
         next_token: typing.Optional[str] = None,
         verbosity: typing.Optional[int] = None,
+        filter: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         relevance: typing.Optional[float] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> SearchResponse:
@@ -261,7 +272,7 @@ class AsyncSearchClient:
         Parameters
         ----------
         id : SearchContentRequestId
-            The bucketId, groupId, projectId, or documentId to be searched. The document or documents within the specified container will be compared to the query, and relevant information will be extracted.
+            The bucketId, groupId, or documentId to be searched. The document or documents within the specified container will be compared to the query, and relevant information will be extracted.
 
         query : str
             The search query to be used to find relevant documentation.
@@ -274,6 +285,9 @@ class AsyncSearchClient:
 
         verbosity : typing.Optional[int]
             The amount of data returned with each search result. 0 == no search results, only the recommended context. 1 == search results but no searchData. 2 == search results and searchData.
+
+        filter : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            A dictionary of key-value pairs that can be used to pre-filter documents prior to a search.
 
         relevance : typing.Optional[float]
             The minimum search relevance score required to include the result. By default, this is 10.0.
@@ -317,6 +331,7 @@ class AsyncSearchClient:
             },
             json={
                 "query": query,
+                "filter": filter,
                 "relevance": relevance,
             },
             headers={
@@ -367,6 +382,7 @@ class AsyncSearchClient:
         n: typing.Optional[int] = None,
         next_token: typing.Optional[str] = None,
         verbosity: typing.Optional[int] = None,
+        filter: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         relevance: typing.Optional[float] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> SearchResponse:
@@ -390,6 +406,9 @@ class AsyncSearchClient:
 
         verbosity : typing.Optional[int]
             The amount of data returned with each search result. 0 == no search results, only the recommended context. 1 == search results but no searchData. 2 == search results and searchData.
+
+        filter : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            A dictionary of key-value pairs that can be used to pre-filter documents prior to a search.
 
         relevance : typing.Optional[float]
             The minimum search relevance score required to include the result. By default, this is 10.0.
@@ -434,6 +453,7 @@ class AsyncSearchClient:
             json={
                 "query": query,
                 "documentIds": document_ids,
+                "filter": filter,
                 "relevance": relevance,
             },
             headers={

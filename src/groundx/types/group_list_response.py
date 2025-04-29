@@ -3,12 +3,26 @@
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
 from .group_detail import GroupDetail
-from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
+from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
 class GroupListResponse(UniversalBaseModel):
     groups: typing.Optional[typing.List[GroupDetail]] = None
+    count: typing.Optional[int] = pydantic.Field(default=None)
+    """
+    The number of groups returned in the current response
+    """
+
+    remaining: typing.Optional[int] = pydantic.Field(default=None)
+    """
+    The number of groups that have not been returned yet, will be null if there are no remaining groups
+    """
+
+    total: typing.Optional[int] = pydantic.Field(default=None)
+    """
+    The total number of groups found
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

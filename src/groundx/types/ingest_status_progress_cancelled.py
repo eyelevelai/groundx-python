@@ -7,7 +7,7 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
 
 
-class ProcessStatusResponseIngestProgressComplete(UniversalBaseModel):
+class IngestStatusProgressCancelled(UniversalBaseModel):
     documents: typing.Optional[typing.List[DocumentDetail]] = None
     total: typing.Optional[int] = None
 

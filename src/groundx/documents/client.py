@@ -17,7 +17,6 @@ from ..types.sort import Sort
 from ..types.sort_order import SortOrder
 from ..types.processing_status import ProcessingStatus
 from ..types.document_list_response import DocumentListResponse
-from ..types.process_status_response import ProcessStatusResponse
 from ..core.jsonable_encoder import jsonable_encoder
 from ..types.document_lookup_response import DocumentLookupResponse
 from ..types.document_response import DocumentResponse
@@ -40,6 +39,8 @@ class DocumentsClient:
     ) -> IngestResponse:
         """
         Ingest documents hosted on public URLs into a GroundX bucket.
+
+        [Supported Document Types and Ingest Capacities](https://docs.eyelevel.ai/documentation/fundamentals/document-types-and-ingest-capacities)
 
         Parameters
         ----------
@@ -125,6 +126,8 @@ class DocumentsClient:
         """
         Upload documents hosted on a local file system into a GroundX bucket.
 
+        [Supported Document Types and Ingest Capacities](https://docs.eyelevel.ai/documentation/fundamentals/document-types-and-ingest-capacities)
+
         Parameters
         ----------
         request : DocumentLocalIngestRequest
@@ -205,8 +208,11 @@ class DocumentsClient:
     ) -> IngestResponse:
         """
         Upload the content of a publicly accessible website for ingestion into a GroundX bucket. This is done by following links within a specified URL, recursively, up to a specified depth or number of pages.
+
         Note1: This endpoint is currently not supported for on-prem deployments.
         Note2: The `source_url` must include the protocol, http:// or https://.
+
+        [Supported Document Types and Ingest Capacities](https://docs.eyelevel.ai/documentation/fundamentals/document-types-and-ingest-capacities)
 
         Parameters
         ----------
@@ -442,7 +448,7 @@ class DocumentsClient:
 
     def get_processing_status_by_id(
         self, process_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> ProcessStatusResponse:
+    ) -> IngestResponse:
         """
         Get the current status of an ingest, initiated with documents.ingest_remote, documents.ingest_local, or documents.crawl_website, by specifying the processId (the processId is included in the response of the documents.ingest functions).
 
@@ -456,7 +462,7 @@ class DocumentsClient:
 
         Returns
         -------
-        ProcessStatusResponse
+        IngestResponse
             Look up success
 
         Examples
@@ -478,9 +484,9 @@ class DocumentsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ProcessStatusResponse,
+                    IngestResponse,
                     parse_obj_as(
-                        type_=ProcessStatusResponse,  # type: ignore
+                        type_=IngestResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -522,12 +528,12 @@ class DocumentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> DocumentLookupResponse:
         """
-        lookup the document(s) associated with a processId, bucketId, groupId, or projectId.
+        lookup the document(s) associated with a processId, bucketId, or groupId.
 
         Parameters
         ----------
         id : int
-            a processId, bucketId, groupId, or projectId
+            a processId, bucketId, or groupId
 
         n : typing.Optional[int]
             The maximum number of returned documents. Accepts 1-100 with a default of 20.
@@ -821,6 +827,8 @@ class AsyncDocumentsClient:
         """
         Ingest documents hosted on public URLs into a GroundX bucket.
 
+        [Supported Document Types and Ingest Capacities](https://docs.eyelevel.ai/documentation/fundamentals/document-types-and-ingest-capacities)
+
         Parameters
         ----------
         documents : typing.Sequence[IngestRemoteDocument]
@@ -912,6 +920,8 @@ class AsyncDocumentsClient:
     ) -> IngestResponse:
         """
         Upload documents hosted on a local file system into a GroundX bucket.
+
+        [Supported Document Types and Ingest Capacities](https://docs.eyelevel.ai/documentation/fundamentals/document-types-and-ingest-capacities)
 
         Parameters
         ----------
@@ -1005,8 +1015,11 @@ class AsyncDocumentsClient:
     ) -> IngestResponse:
         """
         Upload the content of a publicly accessible website for ingestion into a GroundX bucket. This is done by following links within a specified URL, recursively, up to a specified depth or number of pages.
+
         Note1: This endpoint is currently not supported for on-prem deployments.
         Note2: The `source_url` must include the protocol, http:// or https://.
+
+        [Supported Document Types and Ingest Capacities](https://docs.eyelevel.ai/documentation/fundamentals/document-types-and-ingest-capacities)
 
         Parameters
         ----------
@@ -1266,7 +1279,7 @@ class AsyncDocumentsClient:
 
     async def get_processing_status_by_id(
         self, process_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> ProcessStatusResponse:
+    ) -> IngestResponse:
         """
         Get the current status of an ingest, initiated with documents.ingest_remote, documents.ingest_local, or documents.crawl_website, by specifying the processId (the processId is included in the response of the documents.ingest functions).
 
@@ -1280,7 +1293,7 @@ class AsyncDocumentsClient:
 
         Returns
         -------
-        ProcessStatusResponse
+        IngestResponse
             Look up success
 
         Examples
@@ -1310,9 +1323,9 @@ class AsyncDocumentsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ProcessStatusResponse,
+                    IngestResponse,
                     parse_obj_as(
-                        type_=ProcessStatusResponse,  # type: ignore
+                        type_=IngestResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -1354,12 +1367,12 @@ class AsyncDocumentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> DocumentLookupResponse:
         """
-        lookup the document(s) associated with a processId, bucketId, groupId, or projectId.
+        lookup the document(s) associated with a processId, bucketId, or groupId.
 
         Parameters
         ----------
         id : int
-            a processId, bucketId, groupId, or projectId
+            a processId, bucketId, or groupId
 
         n : typing.Optional[int]
             The maximum number of returned documents. Accepts 1-100 with a default of 20.

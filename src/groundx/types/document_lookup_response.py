@@ -17,6 +17,11 @@ class DocumentLookupResponse(UniversalBaseModel):
 
     documents: typing.Optional[typing.List[DocumentDetail]] = None
     next_token: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="nextToken")] = None
+    remaining: typing.Optional[int] = pydantic.Field(default=None)
+    """
+    The number of results that have not been returned yet. Will be null if there are no remaining results.
+    """
+
     total: typing.Optional[int] = pydantic.Field(default=None)
     """
     The total number of results found

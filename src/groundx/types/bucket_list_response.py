@@ -3,12 +3,26 @@
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
 from .bucket_detail import BucketDetail
-from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
+from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
 class BucketListResponse(UniversalBaseModel):
     buckets: typing.Optional[typing.List[BucketDetail]] = None
+    count: typing.Optional[int] = pydantic.Field(default=None)
+    """
+    The number of buckets returned in the current response
+    """
+
+    remaining: typing.Optional[int] = pydantic.Field(default=None)
+    """
+    The number of buckets that have not been returned yet, will be null if there are no remaining buckets
+    """
+
+    total: typing.Optional[int] = pydantic.Field(default=None)
+    """
+    The total number of buckets found
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

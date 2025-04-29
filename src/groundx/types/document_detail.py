@@ -26,6 +26,11 @@ class DocumentDetail(UniversalBaseModel):
     """
 
     file_type: typing_extensions.Annotated[typing.Optional[DocumentType], FieldMetadata(alias="fileType")] = None
+    filter: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(default=None)
+    """
+    A dictionary of key-value pairs that can be used to pre-filter documents prior to a search.
+    """
+
     process_id: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="processId")] = pydantic.Field(
         default=None
     )

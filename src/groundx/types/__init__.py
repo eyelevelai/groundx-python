@@ -26,17 +26,16 @@ from .ingest_local_document import IngestLocalDocument
 from .ingest_local_document_metadata import IngestLocalDocumentMetadata
 from .ingest_remote_document import IngestRemoteDocument
 from .ingest_response import IngestResponse
-from .ingest_response_ingest import IngestResponseIngest
+from .ingest_status import IngestStatus
+from .ingest_status_light import IngestStatusLight
+from .ingest_status_progress import IngestStatusProgress
+from .ingest_status_progress_cancelled import IngestStatusProgressCancelled
+from .ingest_status_progress_complete import IngestStatusProgressComplete
+from .ingest_status_progress_errors import IngestStatusProgressErrors
+from .ingest_status_progress_processing import IngestStatusProgressProcessing
 from .message_response import MessageResponse
 from .meter_detail import MeterDetail
 from .process_level import ProcessLevel
-from .process_status_response import ProcessStatusResponse
-from .process_status_response_ingest import ProcessStatusResponseIngest
-from .process_status_response_ingest_progress import ProcessStatusResponseIngestProgress
-from .process_status_response_ingest_progress_cancelled import ProcessStatusResponseIngestProgressCancelled
-from .process_status_response_ingest_progress_complete import ProcessStatusResponseIngestProgressComplete
-from .process_status_response_ingest_progress_errors import ProcessStatusResponseIngestProgressErrors
-from .process_status_response_ingest_progress_processing import ProcessStatusResponseIngestProgressProcessing
 from .processes_status_response import ProcessesStatusResponse
 from .processing_status import ProcessingStatus
 from .search_response import SearchResponse
@@ -75,17 +74,16 @@ __all__ = [
     "IngestLocalDocumentMetadata",
     "IngestRemoteDocument",
     "IngestResponse",
-    "IngestResponseIngest",
+    "IngestStatus",
+    "IngestStatusLight",
+    "IngestStatusProgress",
+    "IngestStatusProgressCancelled",
+    "IngestStatusProgressComplete",
+    "IngestStatusProgressErrors",
+    "IngestStatusProgressProcessing",
     "MessageResponse",
     "MeterDetail",
     "ProcessLevel",
-    "ProcessStatusResponse",
-    "ProcessStatusResponseIngest",
-    "ProcessStatusResponseIngestProgress",
-    "ProcessStatusResponseIngestProgressCancelled",
-    "ProcessStatusResponseIngestProgressComplete",
-    "ProcessStatusResponseIngestProgressErrors",
-    "ProcessStatusResponseIngestProgressProcessing",
     "ProcessesStatusResponse",
     "ProcessingStatus",
     "SearchResponse",
