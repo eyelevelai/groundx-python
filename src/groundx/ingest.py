@@ -9,7 +9,7 @@ from .csv_splitter import CSVSplitter
 from .types.document import Document
 from .types.ingest_remote_document import IngestRemoteDocument
 from .types.ingest_response import IngestResponse
-from .types.ingest_response_ingest import IngestResponseIngest
+from .types.ingest_status import IngestStatus
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -201,7 +201,7 @@ class GroundX(GroundXBase):
                 n = max(MIN_BATCH_SIZE, min(batch_size or MIN_BATCH_SIZE, MAX_BATCH_SIZE))
 
                 remote_batch: typing.List[IngestRemoteDocument] = []
-                ingest = IngestResponse(ingest=IngestResponseIngest(process_id="",status="queued"))
+                ingest = IngestResponse(ingest=IngestStatus(process_id="",status="queued"))
 
                 progress = float(len(remote_documents))
                 for rd in remote_documents:
