@@ -7,6 +7,7 @@ import typing_extensions
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 from ..core.serialization import FieldMetadata
 from .bounding_box_detail import BoundingBoxDetail
+from .search_result_item_pages_item import SearchResultItemPagesItem
 
 
 class SearchResultItem(UniversalBaseModel):
@@ -55,6 +56,7 @@ class SearchResultItem(UniversalBaseModel):
     page_images: typing_extensions.Annotated[typing.Optional[typing.List[str]], FieldMetadata(alias="pageImages")] = (
         None
     )
+    pages: typing.Optional[typing.List[SearchResultItemPagesItem]] = None
     score: typing.Optional[float] = pydantic.Field(default=None)
     """
     Confidence score in the search result

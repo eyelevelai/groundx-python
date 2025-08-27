@@ -43,6 +43,7 @@ from .processing_status import ProcessingStatus
 from .search_response import SearchResponse
 from .search_response_search import SearchResponseSearch
 from .search_result_item import SearchResultItem
+from .search_result_item_pages_item import SearchResultItemPagesItem
 from .sort import Sort
 from .sort_order import SortOrder
 from .subscription_detail import SubscriptionDetail
@@ -91,6 +92,7 @@ __all__ = [
     "SearchResponse",
     "SearchResponseSearch",
     "SearchResultItem",
+    "SearchResultItemPagesItem",
     "Sort",
     "SortOrder",
     "SubscriptionDetail",
