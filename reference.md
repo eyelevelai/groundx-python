@@ -1,6 +1,8 @@
 # Reference
-## Documents
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">ingest_remote</a>(...)</code></summary>
+
+## Ingest
+
+<details><summary><code>client.<a href="https://docs.eyelevel.ai/reference/api-reference/documents/ingest-documents">ingest</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -12,7 +14,7 @@
 <dl>
 <dd>
 
-Ingest documents hosted on public URLs into a GroundX bucket.
+Ingest local and hosted documents into a GroundX bucket.
 
 [Supported Document Types and Ingest Capacities](https://docs.eyelevel.ai/documentation/fundamentals/document-types-and-ingest-capacities)
 </dd>
@@ -29,18 +31,18 @@ Ingest documents hosted on public URLs into a GroundX bucket.
 <dd>
 
 ```python
-from groundx import GroundX, IngestRemoteDocument
+from groundx import Document, GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
-client.documents.ingest_remote(
+client.ingest(
     documents=[
-        IngestRemoteDocument(
+        Document(
             bucket_id=1234,
             file_name="my_file1.txt",
+            file_path="https://my.source.url.com/file1.txt",
             file_type="txt",
-            source_url="https://my.source.url.com/file1.txt",
         )
     ],
 )
@@ -59,7 +61,7 @@ client.documents.ingest_remote(
 <dl>
 <dd>
 
-**documents:** `typing.Sequence[IngestRemoteDocument]` 
+**documents:** `typing.Sequence[Document]`
     
 </dd>
 </dl>
@@ -79,86 +81,7 @@ client.documents.ingest_remote(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">ingest_local</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Upload documents hosted on a local file system into a GroundX bucket.
-
-[Supported Document Types and Ingest Capacities](https://docs.eyelevel.ai/documentation/fundamentals/document-types-and-ingest-capacities)
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from groundx import GroundX, IngestLocalDocument, IngestLocalDocumentMetadata
-
-client = GroundX(
-    api_key="YOUR_API_KEY",
-)
-client.documents.ingest_local(
-    request=[
-        IngestLocalDocument(
-            blob="blob",
-            metadata=IngestLocalDocumentMetadata(
-                bucket_id=1234,
-                file_name="my_file1.txt",
-                file_type="txt",
-            ),
-        )
-    ],
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**request:** `DocumentLocalIngestRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
+## Documents
 
 <details><summary><code>client.documents.<a href="src/groundx/documents/client.py">crawl_website</a>(...)</code></summary>
 <dl>
