@@ -36,6 +36,8 @@ class RawDocumentsClient:
         self,
         *,
         documents: typing.Sequence[IngestRemoteDocument],
+        callback_url: typing.Optional[str] = OMIT,
+        callback_data: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[IngestResponse]:
         """
@@ -46,6 +48,12 @@ class RawDocumentsClient:
         Parameters
         ----------
         documents : typing.Sequence[IngestRemoteDocument]
+
+        callback_url : typing.Optional[str]
+            An endpoint that will receive processing event updates as POST.
+
+        callback_data : typing.Optional[str]
+            A string that is returned, along with processing event updates, to the callback URL.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -62,6 +70,8 @@ class RawDocumentsClient:
                 "documents": convert_and_respect_annotation_metadata(
                     object_=documents, annotation=typing.Sequence[IngestRemoteDocument], direction="write"
                 ),
+                "callbackUrl": callback_url,
+                "callbackData": callback_data,
             },
             headers={
                 "content-type": "application/json",
@@ -176,7 +186,12 @@ class RawDocumentsClient:
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
     def crawl_website(
-        self, *, websites: typing.Sequence[WebsiteSource], request_options: typing.Optional[RequestOptions] = None
+        self,
+        *,
+        websites: typing.Sequence[WebsiteSource],
+        callback_url: typing.Optional[str] = OMIT,
+        callback_data: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[IngestResponse]:
         """
         Upload the content of a publicly accessible website for ingestion into a GroundX bucket. This is done by following links within a specified URL, recursively, up to a specified depth or number of pages.
@@ -189,6 +204,12 @@ class RawDocumentsClient:
         Parameters
         ----------
         websites : typing.Sequence[WebsiteSource]
+
+        callback_url : typing.Optional[str]
+            The URL that will receive processing event updates.
+
+        callback_data : typing.Optional[str]
+            A string that is returned, along with processing event updates, to the callback URL.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -205,6 +226,8 @@ class RawDocumentsClient:
                 "websites": convert_and_respect_annotation_metadata(
                     object_=websites, annotation=typing.Sequence[WebsiteSource], direction="write"
                 ),
+                "callbackUrl": callback_url,
+                "callbackData": callback_data,
             },
             headers={
                 "content-type": "application/json",
@@ -724,6 +747,8 @@ class AsyncRawDocumentsClient:
         self,
         *,
         documents: typing.Sequence[IngestRemoteDocument],
+        callback_url: typing.Optional[str] = OMIT,
+        callback_data: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[IngestResponse]:
         """
@@ -734,6 +759,12 @@ class AsyncRawDocumentsClient:
         Parameters
         ----------
         documents : typing.Sequence[IngestRemoteDocument]
+
+        callback_url : typing.Optional[str]
+            An endpoint that will receive processing event updates as POST.
+
+        callback_data : typing.Optional[str]
+            A string that is returned, along with processing event updates, to the callback URL.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -750,6 +781,8 @@ class AsyncRawDocumentsClient:
                 "documents": convert_and_respect_annotation_metadata(
                     object_=documents, annotation=typing.Sequence[IngestRemoteDocument], direction="write"
                 ),
+                "callbackUrl": callback_url,
+                "callbackData": callback_data,
             },
             headers={
                 "content-type": "application/json",
@@ -864,7 +897,12 @@ class AsyncRawDocumentsClient:
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
     async def crawl_website(
-        self, *, websites: typing.Sequence[WebsiteSource], request_options: typing.Optional[RequestOptions] = None
+        self,
+        *,
+        websites: typing.Sequence[WebsiteSource],
+        callback_url: typing.Optional[str] = OMIT,
+        callback_data: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[IngestResponse]:
         """
         Upload the content of a publicly accessible website for ingestion into a GroundX bucket. This is done by following links within a specified URL, recursively, up to a specified depth or number of pages.
@@ -877,6 +915,12 @@ class AsyncRawDocumentsClient:
         Parameters
         ----------
         websites : typing.Sequence[WebsiteSource]
+
+        callback_url : typing.Optional[str]
+            The URL that will receive processing event updates.
+
+        callback_data : typing.Optional[str]
+            A string that is returned, along with processing event updates, to the callback URL.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -893,6 +937,8 @@ class AsyncRawDocumentsClient:
                 "websites": convert_and_respect_annotation_metadata(
                     object_=websites, annotation=typing.Sequence[WebsiteSource], direction="write"
                 ),
+                "callbackUrl": callback_url,
+                "callbackData": callback_data,
             },
             headers={
                 "content-type": "application/json",

@@ -1,8 +1,6 @@
 # Reference
-
-## Ingest
-
-<details><summary><code>client.<a href="https://docs.eyelevel.ai/reference/api-reference/documents/ingest-documents">ingest</a>(...)</code></summary>
+## Documents
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">ingest_remote</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -14,7 +12,7 @@
 <dl>
 <dd>
 
-Ingest local and hosted documents into a GroundX bucket.
+Ingest documents hosted on public URLs into a GroundX bucket.
 
 [Supported Document Types and Ingest Capacities](https://docs.eyelevel.ai/documentation/fundamentals/document-types-and-ingest-capacities)
 </dd>
@@ -31,18 +29,18 @@ Ingest local and hosted documents into a GroundX bucket.
 <dd>
 
 ```python
-from groundx import Document, GroundX
+from groundx import GroundX, IngestRemoteDocument
 
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
-client.ingest(
+client.documents.ingest_remote(
     documents=[
-        Document(
+        IngestRemoteDocument(
             bucket_id=1234,
             file_name="my_file1.txt",
-            file_path="https://my.source.url.com/file1.txt",
             file_type="txt",
+            source_url="https://my.source.url.com/file1.txt",
         )
     ],
 )
@@ -61,7 +59,23 @@ client.ingest(
 <dl>
 <dd>
 
-**documents:** `typing.Sequence[Document]`
+**documents:** `typing.Sequence[IngestRemoteDocument]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**callback_url:** `typing.Optional[str]` — An endpoint that will receive processing event updates as POST.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**callback_data:** `typing.Optional[str]` — A string that is returned, along with processing event updates, to the callback URL.
     
 </dd>
 </dl>
@@ -81,7 +95,86 @@ client.ingest(
 </dl>
 </details>
 
-## Documents
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">ingest_local</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Upload documents hosted on a local file system into a GroundX bucket.
+
+[Supported Document Types and Ingest Capacities](https://docs.eyelevel.ai/documentation/fundamentals/document-types-and-ingest-capacities)
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from groundx import GroundX, IngestLocalDocument, IngestLocalDocumentMetadata
+
+client = GroundX(
+    api_key="YOUR_API_KEY",
+)
+client.documents.ingest_local(
+    request=[
+        IngestLocalDocument(
+            blob="blob",
+            metadata=IngestLocalDocumentMetadata(
+                bucket_id=1234,
+                file_name="my_file1.txt",
+                file_type="txt",
+            ),
+        )
+    ],
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**request:** `DocumentLocalIngestRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
 
 <details><summary><code>client.documents.<a href="src/groundx/documents/client.py">crawl_website</a>(...)</code></summary>
 <dl>
@@ -147,6 +240,22 @@ client.documents.crawl_website(
 <dd>
 
 **websites:** `typing.Sequence[WebsiteSource]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**callback_url:** `typing.Optional[str]` — The URL that will receive processing event updates.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**callback_data:** `typing.Optional[str]` — A string that is returned, along with processing event updates, to the callback URL.
     
 </dd>
 </dl>
