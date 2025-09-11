@@ -40,6 +40,8 @@ class DocumentsClient:
         self,
         *,
         documents: typing.Sequence[IngestRemoteDocument],
+        callback_url: typing.Optional[str] = OMIT,
+        callback_data: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
         """
@@ -50,6 +52,12 @@ class DocumentsClient:
         Parameters
         ----------
         documents : typing.Sequence[IngestRemoteDocument]
+
+        callback_url : typing.Optional[str]
+            An endpoint that will receive processing event updates as POST.
+
+        callback_data : typing.Optional[str]
+            A string that is returned, along with processing event updates, to the callback URL.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -77,7 +85,9 @@ class DocumentsClient:
             ],
         )
         """
-        _response = self._raw_client.ingest_remote(documents=documents, request_options=request_options)
+        _response = self._raw_client.ingest_remote(
+            documents=documents, callback_url=callback_url, callback_data=callback_data, request_options=request_options
+        )
         return _response.data
 
     def ingest_local(
@@ -124,7 +134,12 @@ class DocumentsClient:
         return _response.data
 
     def crawl_website(
-        self, *, websites: typing.Sequence[WebsiteSource], request_options: typing.Optional[RequestOptions] = None
+        self,
+        *,
+        websites: typing.Sequence[WebsiteSource],
+        callback_url: typing.Optional[str] = OMIT,
+        callback_data: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
         """
         Upload the content of a publicly accessible website for ingestion into a GroundX bucket. This is done by following links within a specified URL, recursively, up to a specified depth or number of pages.
@@ -137,6 +152,12 @@ class DocumentsClient:
         Parameters
         ----------
         websites : typing.Sequence[WebsiteSource]
+
+        callback_url : typing.Optional[str]
+            The URL that will receive processing event updates.
+
+        callback_data : typing.Optional[str]
+            A string that is returned, along with processing event updates, to the callback URL.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -165,7 +186,9 @@ class DocumentsClient:
             ],
         )
         """
-        _response = self._raw_client.crawl_website(websites=websites, request_options=request_options)
+        _response = self._raw_client.crawl_website(
+            websites=websites, callback_url=callback_url, callback_data=callback_data, request_options=request_options
+        )
         return _response.data
 
     def list(
@@ -490,6 +513,8 @@ class AsyncDocumentsClient:
         self,
         *,
         documents: typing.Sequence[IngestRemoteDocument],
+        callback_url: typing.Optional[str] = OMIT,
+        callback_data: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
         """
@@ -500,6 +525,12 @@ class AsyncDocumentsClient:
         Parameters
         ----------
         documents : typing.Sequence[IngestRemoteDocument]
+
+        callback_url : typing.Optional[str]
+            An endpoint that will receive processing event updates as POST.
+
+        callback_data : typing.Optional[str]
+            A string that is returned, along with processing event updates, to the callback URL.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -535,7 +566,9 @@ class AsyncDocumentsClient:
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.ingest_remote(documents=documents, request_options=request_options)
+        _response = await self._raw_client.ingest_remote(
+            documents=documents, callback_url=callback_url, callback_data=callback_data, request_options=request_options
+        )
         return _response.data
 
     async def ingest_local(
@@ -594,7 +627,12 @@ class AsyncDocumentsClient:
         return _response.data
 
     async def crawl_website(
-        self, *, websites: typing.Sequence[WebsiteSource], request_options: typing.Optional[RequestOptions] = None
+        self,
+        *,
+        websites: typing.Sequence[WebsiteSource],
+        callback_url: typing.Optional[str] = OMIT,
+        callback_data: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
         """
         Upload the content of a publicly accessible website for ingestion into a GroundX bucket. This is done by following links within a specified URL, recursively, up to a specified depth or number of pages.
@@ -607,6 +645,12 @@ class AsyncDocumentsClient:
         Parameters
         ----------
         websites : typing.Sequence[WebsiteSource]
+
+        callback_url : typing.Optional[str]
+            The URL that will receive processing event updates.
+
+        callback_data : typing.Optional[str]
+            A string that is returned, along with processing event updates, to the callback URL.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -643,7 +687,9 @@ class AsyncDocumentsClient:
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.crawl_website(websites=websites, request_options=request_options)
+        _response = await self._raw_client.crawl_website(
+            websites=websites, callback_url=callback_url, callback_data=callback_data, request_options=request_options
+        )
         return _response.data
 
     async def list(
