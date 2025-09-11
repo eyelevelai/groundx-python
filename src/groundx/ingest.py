@@ -125,7 +125,7 @@ def prep_documents(
     return remote_documents, local_documents
 
 
-def split_doc(file):
+def split_doc(file: Path) -> typing.List[Path]:
     if file.is_file() and (
         file.suffix.lower() in ALLOWED_SUFFIXES
         or file.suffix.lower() in SUFFIX_ALIASES
@@ -142,9 +142,11 @@ class GroundX(GroundXBase):
         self,
         *,
         documents: typing.Sequence[Document],
-        batch_size: typing.Optional[int] = 10,
-        wait_for_complete: typing.Optional[bool] = False,
-        upload_api: typing.Optional[str] = "https://api.eyelevel.ai/upload/file",
+        batch_size: int = 10,
+        wait_for_complete: bool = False,
+        upload_api: str = "https://api.eyelevel.ai/upload/file",
+        callback_url: typing.Optional[str] = None,
+        callback_data: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
         """
@@ -164,6 +166,13 @@ class GroundX(GroundXBase):
         # an endpoint that accepts 'name' and 'type' query params
         # and returns a presigned URL in a JSON dictionary with key 'URL'
         upload_api : typing.Optional[str]
+
+        # an endpoint that will receive processing event updates as POST
+        callback_url : typing.Optional[str]
+
+        # a string that is returned, along with processing event updates,
+        # to the callback URL.
+        callback_data : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -209,6 +218,8 @@ class GroundX(GroundXBase):
                     if len(remote_batch) >= n:
                         ingest = self.documents.ingest_remote(
                             documents=remote_batch,
+                            callback_url=callback_url,
+                            callback_data=callback_data,
                             request_options=request_options,
                         )
                         ingest, progress = self._monitor_batch(ingest, progress, pbar)
@@ -222,6 +233,8 @@ class GroundX(GroundXBase):
                 if remote_batch:
                     ingest = self.documents.ingest_remote(
                         documents=remote_batch,
+                        callback_data=callback_data,
+                        callback_url=callback_url,
                         request_options=request_options,
                     )
                     ingest, progress = self._monitor_batch(ingest, progress, pbar)
@@ -243,6 +256,8 @@ class GroundX(GroundXBase):
 
                         ingest = self.documents.ingest_remote(
                             documents=up_docs,
+                            callback_url=callback_url,
+                            callback_data=callback_data,
                             request_options=request_options,
                         )
                         ingest, progress = self._monitor_batch(ingest, progress, pbar)
@@ -258,6 +273,8 @@ class GroundX(GroundXBase):
 
                     ingest = self.documents.ingest_remote(
                         documents=up_docs,
+                        callback_data=callback_data,
+                        callback_url=callback_url,
                         request_options=request_options,
                     )
                     ingest, progress = self._monitor_batch(ingest, progress, pbar)
@@ -270,11 +287,13 @@ class GroundX(GroundXBase):
             raise ValueError("You have sent too many documents in this request")
 
 
-        up_docs, _ = self._process_local(local_documents, upload_api)
+        up_docs, _ = self._process_local(local_documents, upload_api, 0, None)
         remote_documents.extend(up_docs)
 
         return self.documents.ingest_remote(
             documents=remote_documents,
+            callback_url=callback_url,
+            callback_data=callback_data,
             request_options=request_options,
         )
 
@@ -283,8 +302,10 @@ class GroundX(GroundXBase):
         *,
         bucket_id: int,
         path: str,
-        batch_size: typing.Optional[int] = 10,
-        upload_api: typing.Optional[str] = "https://api.eyelevel.ai/upload/file",
+        batch_size: int = 10,
+        upload_api: str = "https://api.eyelevel.ai/upload/file",
+        callback_url: typing.Optional[str] = None,
+        callback_data: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ):
         """
@@ -299,6 +320,13 @@ class GroundX(GroundXBase):
         # an endpoint that accepts 'name' and 'type' query params
         # and returns a presigned URL in a JSON dictionary with key 'URL'
         upload_api : typing.Optional[str]
+
+        # an endpoint that will receive processing event updates as POST
+        callback_url : typing.Optional[str]
+
+        # a string that is returned, along with processing event updates,
+        # to the callback URL.
+        callback_data : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -357,7 +385,7 @@ class GroundX(GroundXBase):
                 file_size = file.stat().st_size
 
                 if (current_batch_size + file_size > MAX_BATCH_SIZE_BYTES) or (len(current_batch) >= n):
-                    self._upload_file_batch(bucket_id, current_batch, upload_api, request_options, pbar)
+                    self._upload_file_batch(bucket_id, current_batch, upload_api, callback_url, callback_data, request_options, pbar)
                     current_batch = []
                     current_batch_size = 0
 
@@ -365,13 +393,13 @@ class GroundX(GroundXBase):
                 current_batch_size += file_size
 
             if current_batch:
-                self._upload_file_batch(bucket_id, current_batch, upload_api, request_options, pbar)
+                self._upload_file_batch(bucket_id, current_batch, upload_api, callback_url, callback_data, request_options, pbar)
 
     def _upload_file(
         self,
-        endpoint,
-        file_path,
-    ):
+        endpoint: str,
+        file_path: Path,
+    ) -> str:
         file_name = os.path.basename(file_path)
         file_extension = os.path.splitext(file_name)[1][1:].lower()
         if f".{file_extension}" in SUFFIX_ALIASES:
@@ -407,12 +435,12 @@ class GroundX(GroundXBase):
 
     def _process_local(
         self,
-        local_docs,
-        upload_api,
-        progress = None,
-        pbar = None,
-    ):
-        remote_docs = []
+        local_docs: typing.List[Document],
+        upload_api: str,
+        progress: float,
+        pbar: typing.Optional[tqdm[typing.Any]] = None,
+    ) -> typing.Tuple[typing.List[IngestRemoteDocument], float]:
+        remote_docs: typing.List[IngestRemoteDocument] = []
         for d in local_docs:
             splits = split_doc(Path(os.path.expanduser(d.file_path)))
 
@@ -439,23 +467,22 @@ class GroundX(GroundXBase):
                     )
                 )
 
-                if progress is not None and pbar is not None and pbar.update is not None:
+                progress -= 0.25
+                if pbar is not None and pbar.update is not None:
                     pbar.update(0.25)
-                    progress -= 0.25
 
         return remote_docs, progress
 
     def _monitor_batch(
         self,
-        ingest,
-        progress,
-        pbar,
-    ):
-        completed_files = set()
+        ingest: IngestResponse,
+        progress: float,
+        pbar: tqdm[typing.Any],
+    ) -> typing.Tuple[IngestResponse, float]:
+        completed_files: typing.Set[str] = set()
 
         while (
-            ingest is not None
-            and ingest.ingest.status not in ["complete", "error", "cancelled"]
+            ingest.ingest.status not in ["complete", "error", "cancelled"]
         ):
             time.sleep(3)
             ingest = self.documents.get_processing_status_by_id(ingest.ingest.process_id)
@@ -494,13 +521,15 @@ class GroundX(GroundXBase):
 
     def _upload_file_batch(
         self,
-        bucket_id,
-        batch,
-        upload_api,
-        request_options,
-        pbar,
-    ):
-        docs = []
+        bucket_id: int,
+        batch: typing.List[Path],
+        upload_api: str,
+        callback_url: typing.Optional[str],
+        callback_data: typing.Optional[str],
+        request_options: typing.Optional[RequestOptions],
+        pbar: tqdm[typing.Any],
+    ) -> None:
+        docs: typing.List[Document] = []
 
         progress =  float(len(batch))
         for file in batch:
@@ -526,7 +555,12 @@ class GroundX(GroundXBase):
             progress -= 0.25
 
         if docs:
-            ingest = self.ingest(documents=docs, request_options=request_options)
+            ingest = self.ingest(
+                documents=docs,
+                callback_data=callback_data,
+                callback_url=callback_url,
+                request_options=request_options,
+            )
             ingest, progress = self._monitor_batch(ingest, progress, pbar)
 
         if progress > 0:
@@ -540,6 +574,8 @@ class AsyncGroundX(AsyncGroundXBase):
         *,
         documents: typing.Sequence[Document],
         upload_api: str = "https://api.eyelevel.ai/upload/file",
+        callback_url: typing.Optional[str] = None,
+        callback_data: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
         """
@@ -552,6 +588,13 @@ class AsyncGroundX(AsyncGroundXBase):
         # an endpoint that accepts 'name' and 'type' query params
         # and returns a presigned URL in a JSON dictionary with key 'URL'
         upload_api : typing.Optional[str]
+
+        # an endpoint that will receive processing event updates as POST
+        callback_url : typing.Optional[str]
+
+        # a string that is returned, along with processing event updates,
+        # to the callback URL.
+        callback_data : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -621,14 +664,16 @@ class AsyncGroundX(AsyncGroundXBase):
 
         return await self.documents.ingest_remote(
             documents=remote_documents,
+            callback_url=callback_url,
+            callback_data=callback_data,
             request_options=request_options,
         )
 
     def _upload_file(
         self,
-        endpoint,
-        file_path,
-    ):
+        endpoint: str,
+        file_path: Path,
+    ) -> str:
         file_name = os.path.basename(file_path)
         file_extension = os.path.splitext(file_name)[1][1:].lower()
         if f".{file_extension}" in SUFFIX_ALIASES:
