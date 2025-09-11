@@ -438,7 +438,7 @@ class GroundX(GroundXBase):
         local_docs: typing.List[Document],
         upload_api: str,
         progress: float,
-        pbar: typing.Optional[tqdm[typing.Any]] = None,
+        pbar: typing.Optional[typing.Any] = None,
     ) -> typing.Tuple[typing.List[IngestRemoteDocument], float]:
         remote_docs: typing.List[IngestRemoteDocument] = []
         for d in local_docs:
@@ -477,7 +477,7 @@ class GroundX(GroundXBase):
         self,
         ingest: IngestResponse,
         progress: float,
-        pbar: tqdm[typing.Any],
+        pbar: typing.Any,
     ) -> typing.Tuple[IngestResponse, float]:
         completed_files: typing.Set[str] = set()
 
@@ -527,7 +527,7 @@ class GroundX(GroundXBase):
         callback_url: typing.Optional[str],
         callback_data: typing.Optional[str],
         request_options: typing.Optional[RequestOptions],
-        pbar: tqdm[typing.Any],
+        pbar: typing.Any,
     ) -> None:
         docs: typing.List[Document] = []
 
