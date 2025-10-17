@@ -62,7 +62,10 @@ class BucketsClient:
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
-        client.buckets.list()
+        client.buckets.list(
+            n=1,
+            next_token="nextToken",
+        )
         """
         _response = self._raw_client.list(n=n, next_token=next_token, request_options=request_options)
         return _response.data
@@ -250,7 +253,10 @@ class AsyncBucketsClient:
 
 
         async def main() -> None:
-            await client.buckets.list()
+            await client.buckets.list(
+                n=1,
+                next_token="nextToken",
+            )
 
 
         asyncio.run(main())

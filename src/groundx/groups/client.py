@@ -61,7 +61,10 @@ class GroupsClient:
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
-        client.groups.list()
+        client.groups.list(
+            n=1,
+            next_token="nextToken",
+        )
         """
         _response = self._raw_client.list(n=n, next_token=next_token, request_options=request_options)
         return _response.data
@@ -333,7 +336,10 @@ class AsyncGroupsClient:
 
 
         async def main() -> None:
-            await client.groups.list()
+            await client.groups.list(
+                n=1,
+                next_token="nextToken",
+            )
 
 
         asyncio.run(main())

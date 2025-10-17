@@ -240,7 +240,14 @@ class DocumentsClient:
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
-        client.documents.list()
+        client.documents.list(
+            n=1,
+            filter="filter",
+            sort="name",
+            sort_order="asc",
+            status="queued",
+            next_token="nextToken",
+        )
         """
         _response = self._raw_client.list(
             n=n,
@@ -377,6 +384,12 @@ class DocumentsClient:
         )
         client.documents.lookup(
             id=1,
+            n=1,
+            filter="filter",
+            sort="name",
+            sort_order="asc",
+            status="queued",
+            next_token="nextToken",
         )
         """
         _response = self._raw_client.lookup(
@@ -488,7 +501,10 @@ class DocumentsClient:
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
-        client.documents.get_processes()
+        client.documents.get_processes(
+            n=1,
+            status="queued",
+        )
         """
         _response = self._raw_client.get_processes(n=n, status=status, request_options=request_options)
         return _response.data
@@ -746,7 +762,14 @@ class AsyncDocumentsClient:
 
 
         async def main() -> None:
-            await client.documents.list()
+            await client.documents.list(
+                n=1,
+                filter="filter",
+                sort="name",
+                sort_order="asc",
+                status="queued",
+                next_token="nextToken",
+            )
 
 
         asyncio.run(main())
@@ -907,6 +930,12 @@ class AsyncDocumentsClient:
         async def main() -> None:
             await client.documents.lookup(
                 id=1,
+                n=1,
+                filter="filter",
+                sort="name",
+                sort_order="asc",
+                status="queued",
+                next_token="nextToken",
             )
 
 
@@ -1044,7 +1073,10 @@ class AsyncDocumentsClient:
 
 
         async def main() -> None:
-            await client.documents.get_processes()
+            await client.documents.get_processes(
+                n=1,
+                status="queued",
+            )
 
 
         asyncio.run(main())

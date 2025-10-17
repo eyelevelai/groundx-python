@@ -307,7 +307,14 @@ from groundx import GroundX
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
-client.documents.list()
+client.documents.list(
+    n=1,
+    filter="filter",
+    sort="name",
+    sort_order="asc",
+    status="queued",
+    next_token="nextToken",
+)
 
 ```
 </dd>
@@ -557,6 +564,12 @@ client = GroundX(
 )
 client.documents.lookup(
     id=1,
+    n=1,
+    filter="filter",
+    sort="name",
+    sort_order="asc",
+    status="queued",
+    next_token="nextToken",
 )
 
 ```
@@ -813,7 +826,10 @@ from groundx import GroundX
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
-client.documents.get_processes()
+client.documents.get_processes(
+    n=1,
+    status="queued",
+)
 
 ```
 </dd>
@@ -893,7 +909,9 @@ client = GroundX(
 )
 client.search.content(
     id=1,
+    n=1,
     next_token="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9",
+    verbosity=1,
     query="my search query",
 )
 
@@ -1013,7 +1031,9 @@ client = GroundX(
     api_key="YOUR_API_KEY",
 )
 client.search.documents(
+    n=1,
     next_token="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9",
+    verbosity=1,
     query="my search query",
     document_ids=["docUUID1", "docUUID2"],
 )
@@ -1133,7 +1153,10 @@ from groundx import GroundX
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
-client.buckets.list()
+client.buckets.list(
+    n=1,
+    next_token="nextToken",
+)
 
 ```
 </dd>
@@ -1499,7 +1522,10 @@ from groundx import GroundX
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
-client.groups.list()
+client.groups.list(
+    n=1,
+    next_token="nextToken",
+)
 
 ```
 </dd>
