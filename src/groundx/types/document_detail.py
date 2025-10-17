@@ -50,6 +50,13 @@ class DocumentDetail(UniversalBaseModel):
 
     status: typing.Optional[ProcessingStatus] = None
     status_message: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="statusMessage")] = None
+    text_url: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="textUrl")] = pydantic.Field(
+        default=None
+    )
+    """
+    Extracted text URL, if using the extract agent
+    """
+
     xray_url: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="xrayUrl")] = pydantic.Field(
         default=None
     )

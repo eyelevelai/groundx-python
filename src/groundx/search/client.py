@@ -83,7 +83,9 @@ class SearchClient:
         )
         client.search.content(
             id=1,
+            n=1,
             next_token="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9",
+            verbosity=1,
             query="my search query",
         )
         """
@@ -154,7 +156,9 @@ class SearchClient:
             api_key="YOUR_API_KEY",
         )
         client.search.documents(
+            n=1,
             next_token="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9",
+            verbosity=1,
             query="my search query",
             document_ids=["docUUID1", "docUUID2"],
         )
@@ -248,7 +252,9 @@ class AsyncSearchClient:
         async def main() -> None:
             await client.search.content(
                 id=1,
+                n=1,
                 next_token="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9",
+                verbosity=1,
                 query="my search query",
             )
 
@@ -327,7 +333,9 @@ class AsyncSearchClient:
 
         async def main() -> None:
             await client.search.documents(
+                n=1,
                 next_token="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9",
+                verbosity=1,
                 query="my search query",
                 document_ids=["docUUID1", "docUUID2"],
             )
