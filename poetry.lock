@@ -1355,9 +1355,9 @@ multidict = ">=4.0"
 propcache = ">=0.2.0"
 
 [extras]
-extract = ["pydantic"]
+extract = []
 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "38e53bab8a898cee1047ee305957cc37d5fc0b243ab21c2c23aa620b88c429c6"
+content-hash = "7736e07d9b6a77dcb849aab5b982372a08035f2a420b66e68363b58113080a55"
