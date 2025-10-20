@@ -3,7 +3,7 @@ name = "groundx"
 
 [tool.poetry]
 name = "groundx"
-version = "2.4.1"
+version = "2.4.2"
 description = ""
 readme = "README.md"
 authors = []
@@ -88,3 +88,6 @@ section-order = ["future", "standard-library", "third-party", "first-party"]
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.extras]
+extract=["celery", "celery-types", "fastapi", "google-api-python-client", "google-api-python-client-stubs", "google-auth-stubs", "gspread", "boto3", "types-boto3", "dateparser", "minio", "pandas", "pandas-stubs", "pydantic", "redis", "smolagents", "pillow"]

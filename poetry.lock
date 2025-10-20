@@ -1354,7 +1354,10 @@ idna = ">=2.0"
 multidict = ">=4.0"
 propcache = ">=0.2.0"
 
+[extras]
+extract = ["pydantic"]
+
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "c8375aeb4aae213751ddb283f02e827d98c71330c644556ec9623d1ebe51e67a"
+content-hash = "38e53bab8a898cee1047ee305957cc37d5fc0b243ab21c2c23aa620b88c429c6"
