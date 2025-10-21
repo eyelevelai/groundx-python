@@ -3,7 +3,7 @@ name = "groundx"
 
 [tool.poetry]
 name = "groundx"
-version = "2.4.4"
+version = "2.4.5"
 description = ""
 readme = "README.md"
 authors = []
@@ -89,22 +89,22 @@ section-order = ["future", "standard-library", "third-party", "first-party"]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-tool.poetry.dependencies.celery = { optional = true, extras = ["redis"] }
-tool.poetry.dependencies.celery-types = { optional = true }
-tool.poetry.dependencies.fastapi = { optional = true }
-tool.poetry.dependencies.google-api-python-client = { optional = true }
-tool.poetry.dependencies.google-api-python-client-stubs = { optional = true }
-tool.poetry.dependencies.google-auth-stubs = { optional = true }
-tool.poetry.dependencies.gspread = { optional = true }
-tool.poetry.dependencies.boto3 = { optional = true }
-tool.poetry.dependencies.types-boto3 = { optional = true }
-tool.poetry.dependencies.dateparser = { optional = true }
-tool.poetry.dependencies.minio = { optional = true }
-tool.poetry.dependencies.pandas = { optional = true }
-tool.poetry.dependencies.pandas-stubs = { optional = true }
-tool.poetry.dependencies.redis = { optional = true }
+tool.poetry.dependencies.celery = { version = "*", optional = true, extras = ["redis"] }
+tool.poetry.dependencies.celery-types = { version = "*", optional = true }
+tool.poetry.dependencies.fastapi = { version = "*", optional = true }
+tool.poetry.dependencies.google-api-python-client = { version = "*", optional = true }
+tool.poetry.dependencies.google-api-python-client-stubs = { version = "*", optional = true }
+tool.poetry.dependencies.google-auth-stubs = { version = "*", optional = true }
+tool.poetry.dependencies.gspread = { version = "*", optional = true }
+tool.poetry.dependencies.boto3 = { version = "*", optional = true }
+tool.poetry.dependencies.types-boto3 = { version = "*", optional = true }
+tool.poetry.dependencies.dateparser = { version = "*", optional = true }
+tool.poetry.dependencies.minio = { version = "*", optional = true }
+tool.poetry.dependencies.pandas = { version = "*", optional = true }
+tool.poetry.dependencies.pandas-stubs = { version = "*", optional = true }
+tool.poetry.dependencies.redis = { version = "*", optional = true }
 tool.poetry.dependencies.smolagents = { version = ">=1.19.0", optional = true, extras = ["openai"] }
-tool.poetry.dependencies.pillow = { optional = true }
+tool.poetry.dependencies.pillow = { version = "*", optional = true }
 
 [tool.poetry.extras]
 extract=["celery", "celery-types", "fastapi", "google-api-python-client", "google-api-python-client-stubs", "google-auth-stubs", "gspread", "boto3", "types-boto3", "dateparser", "minio", "pandas", "pandas-stubs", "redis", "smolagents", "pillow"]
