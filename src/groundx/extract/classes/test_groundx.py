@@ -79,7 +79,7 @@ class TestGroundX(unittest.TestCase):
             self.assertIn("Invalid JSON returned", str(cm.exception))
 
     def test_validation_error_on_missing_required_fields(self) -> None:
-        payload: dict[str, typing.Any] = {
+        payload: typing.Dict[str, typing.Any] = {
             "documentPages": [],
             "sourceUrl": "https://example.com/foo.pdf",
         }
@@ -99,7 +99,7 @@ class TestGroundX(unittest.TestCase):
             self.assertIs(result, sentinel)
 
     def test_chunk_json_alias(self) -> None:
-        raw: dict[str, typing.Any] = {
+        raw: typing.Dict[str, typing.Any] = {
             "boundingBoxes": [],
             "chunk": "id123",
             "contentType": [],

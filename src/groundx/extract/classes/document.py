@@ -39,7 +39,7 @@ class Document(BaseModel):
 
     @classmethod
     def from_request(
-        cls: type[DocT],
+        cls: typing.Type[DocT],
         base_url: str,
         req: "DocumentRequest",
         **data: typing.Any,
@@ -131,10 +131,10 @@ class DocumentRequest(BaseModel):
     _clear_cache: bool = PrivateAttr(default_factory=bool)
     _debug_path: typing.Optional[str] = PrivateAttr(default=None)
     _page_image_dict: typing.Dict[str, int] = PrivateAttr(
-        default_factory=dict[str, int]
+        default_factory=typing.Dict[str, int]
     )
     _page_images: typing.List[Image.Image] = PrivateAttr(
-        default_factory=list[Image.Image]
+        default_factory=typing.List[Image.Image]
     )
     _start: int = PrivateAttr(
         default_factory=lambda: int(datetime.now(timezone.utc).timestamp())

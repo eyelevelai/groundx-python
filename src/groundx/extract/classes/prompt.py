@@ -16,7 +16,7 @@ class Prompt(BaseModel):
     def valid_value(self, value: typing.Any) -> bool:
         ty = self.type
 
-        types: list[typing.Type[typing.Any]] = []
+        types: typing.List[typing.Type[typing.Any]] = []
         if isinstance(ty, list):
             for t in ty:
                 if t == "int" or t == "float":

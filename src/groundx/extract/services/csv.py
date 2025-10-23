@@ -4,8 +4,8 @@ from pathlib import Path
 
 def append_row(
     csv_path: Path,
-    headers: list[str],
-    row: dict[str, str],
+    headers: typing.List[str],
+    row: typing.Dict[str, str],
 ) -> None:
     with csv_path.open("a", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=headers)
@@ -42,8 +42,8 @@ def load_row(
     key: str,
     match: typing.List[str],
     csv_path: typing.Optional[Path] = None,
-    rows: typing.Optional[list[dict[str, str]]] = None,
-) -> typing.Optional[dict[str, str]]:
+    rows: typing.Optional[typing.List[typing.Dict[str, str]]] = None,
+) -> typing.Optional[typing.Dict[str, str]]:
     if csv_path is None and rows is None:
         raise Exception("csv_path and rows are None")
 
@@ -56,8 +56,8 @@ def load_row(
     return next((r for r in rows if r.get(key) in match), None)
 
 
-def load_rows(csv_path: Path) -> list[dict[str, str]]:
-    rows: list[dict[str, str]] = []
+def load_rows(csv_path: Path) -> typing.List[typing.Dict[str, str]]:
+    rows: typing.List[typing.Dict[str, str]] = []
     with csv_path.open("r", newline="") as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
@@ -66,7 +66,9 @@ def load_rows(csv_path: Path) -> list[dict[str, str]]:
     return rows
 
 
-def save_rows(csv_path: Path, headers: list[str], rows: list[dict[str, str]]) -> None:
+def save_rows(
+    csv_path: Path, headers: typing.List[str], rows: typing.List[typing.Dict[str, str]]
+) -> None:
     with csv_path.open("w", newline="") as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=headers)
         writer.writeheader()

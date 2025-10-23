@@ -50,19 +50,19 @@ class TestDocument(unittest.TestCase):
         self.mock_xray.return_value = DummyXRay("http://test.co", [])
 
     def test_init_name(self) -> None:
-        st1 = Document.from_request(
+        st1: Document = Document.from_request(
             base_url="",
             req=test_request(),
         )
         self.assertEqual(st1.file_name, "F")
-        st2 = Document.from_request(
+        st2: Document = Document.from_request(
             base_url="",
             req=DR(
                 documentID="D", fileName="F.pdf", modelID=1, processorID=1, taskID="T"
             ),
         )
         self.assertEqual(st2.file_name, "F.pdf")
-        st3 = Document.from_request(
+        st3: Document = Document.from_request(
             base_url="",
             req=DR(documentID="D", fileName="F.", modelID=1, processorID=1, taskID="T"),
         )
