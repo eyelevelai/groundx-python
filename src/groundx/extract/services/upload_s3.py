@@ -25,7 +25,7 @@ class S3Client:
 
     def get_object(self, url: str) -> typing.Optional[bytes]:
         if not self.client:
-            return
+            return None
 
         try:
             s3_uri_parts = url.replace("s3://", "").split("/")
@@ -39,7 +39,13 @@ class S3Client:
             self.logger.error_msg(f"[{url}] exception: {e}")
             raise
 
-    def put_object(self, bucket: str, key: str, data: bytes, content_type: str) -> None:
+    def put_object(
+        self,
+        bucket: str,
+        key: str,
+        data: bytes,
+        content_type: str = "application/octet-stream",
+    ) -> None:
         if not self.client:
             return
 
@@ -51,7 +57,11 @@ class S3Client:
         )
 
     def put_json_stream(
-        self, bucket: str, key: str, data: bytes, content_type: str
+        self,
+        bucket: str,
+        key: str,
+        data: bytes,
+        content_type: str = "application/octet-stream",
     ) -> None:
         if not self.client:
             return

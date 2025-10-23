@@ -5,13 +5,13 @@ if typing.TYPE_CHECKING:
 
 
 def class_fields(cls: typing.Any) -> typing.Set[str]:
-    # Pydantic v1/v2 compatibility: class fields
+    fields: typing.Set[str] = set()
     if hasattr(cls, "model_fields"):
-        fields: typing.Set[str] = set(cls.model_fields.keys())
+        fields = set(cls.model_fields.keys())
     elif hasattr(cls, "__fields__"):
-        fields: typing.Set[str] = set(cls.__fields__.keys())  # type: ignore[reportDeprecated]
+        fields = set(cls.__fields__.keys())  # type: ignore[reportDeprecated]
     else:
-        fields: typing.Set[str] = set()
+        fields = set()
 
     return fields
 
@@ -31,9 +31,6 @@ def coerce_numeric_string(
     et: typing.Union[str, typing.List[str]],
 ) -> typing.Union[typing.Any, typing.List[typing.Any]]:
     expected_types = str_to_type_sequence(et)
-
-    if not isinstance(expected_types, list):
-        expected_types = [expected_types]
 
     if any(t in (int, float) for t in expected_types):
         if isinstance(value, str):
@@ -68,9 +65,9 @@ def from_key(
     prompts: typing.Sequence[typing.Mapping[str, "Prompt"]],
 ) -> typing.Tuple[typing.Optional[str], typing.Optional[typing.Any]]:
     for pmps in prompts:
-        for key, prompt in pmps.items():
-            if key == name:
-                return key, prompt
+        for k, prompt in pmps.items():
+            if k == name:
+                return k, prompt
 
     key, pmp = from_attr_name(name, prompts)
     if pmp:
@@ -81,41 +78,30 @@ def from_key(
 
 def str_to_type_sequence(
     ty: typing.Union[str, typing.List[str]],
-) -> typing.Union[typing.Type[typing.Any], typing.Sequence[typing.Type[typing.Any]]]:
+) -> typing.Sequence[typing.Type[typing.Any]]:
     if isinstance(ty, list):
         tys: typing.List[typing.Any] = []
         for t in ty:
-            tys.append(str_to_type_sequence(t))
+            tys.append(str_to_type(t))
 
         return tys
 
-    exp = str
-    if ty == "int":
-        exp = int
-    elif ty == "float":
-        exp = float
-    elif ty == "list":
-        exp = list
-    elif ty == "dict":
-        exp = dict
-
-    return exp
+    return [str_to_type(ty)]
 
 
 def str_to_type(
-    ty: typing.Union[str, typing.List[str]],
+    ty: str,
 ) -> typing.Type[typing.Any]:
-    exp = str
     if ty == "int":
-        exp = int
+        return int
     elif ty == "float":
-        exp = float
+        return float
     elif ty == "list":
-        exp = list
+        return list
     elif ty == "dict":
-        exp = dict
+        return dict
 
-    return exp
+    return str
 
 
 def type_to_str(

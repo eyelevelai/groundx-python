@@ -9,7 +9,7 @@ class MinIOClient:
         self,
         settings: ContainerSettings,
         logger: Logger,
-    ):
+    ) -> None:
         self.settings = settings
         self.client = None
         self.logger = logger
@@ -59,7 +59,7 @@ class MinIOClient:
 
     def get_object(self, url: str) -> typing.Optional[bytes]:
         if not self.client:
-            return
+            return None
 
         from minio.error import S3Error
 
@@ -80,8 +80,8 @@ class MinIOClient:
         bucket: str,
         key: str,
         data: bytes,
-        content_type: str,
-    ):
+        content_type: str = "application/octet-stream",
+    ) -> None:
         if not self.client:
             return
 
@@ -109,7 +109,7 @@ class MinIOClient:
         bucket: str,
         key: str,
         data: bytes,
-        content_type: str,
+        content_type: str = "application/octet-stream",
     ) -> None:
         if not self.client:
             return

@@ -11,7 +11,7 @@ def check_map(
     if sty not in mp:
         sty = ""
     if sty not in mp:
-        return
+        return None
 
     vl = val.lower().strip()
 
@@ -19,7 +19,7 @@ def check_map(
     if vl not in nmp:
         if should_warn:
             print(f"[arcadia-v1] {fty} not found [{sty}] [{vl}]")
-        return
+        return None
 
     return nmp[vl]
 

@@ -27,6 +27,8 @@ class Document(BaseModel):
         if self._logger:
             return self._logger
 
+        return None
+
     @logger.setter
     def logger(self, value: Logger) -> None:
         self._logger = value
@@ -92,6 +94,8 @@ class Document(BaseModel):
 
     def add(self, k: str, value: typing.Any) -> typing.Union[str, None]:
         self.print("WARNING", "add is not implemented")
+
+        return None
 
     def finalize_init(self) -> None:
         self.print("WARNING", "finalize_init is not implemented")
@@ -177,6 +181,8 @@ class DocumentRequest(BaseModel):
     def logger(self) -> typing.Optional[Logger]:
         if self._logger:
             return self._logger
+
+        return None
 
     @logger.setter
     def logger(self, value: Logger) -> None:

@@ -135,5 +135,9 @@ module = ["smolagents.*"]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
+module = ["dateparser.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
 module = ["groundx.extract.classes.document"]
 disable_error_code = ["call-arg"]

@@ -6,10 +6,12 @@ from unittest.mock import patch
 from .document import Document, DocumentRequest
 
 
+def DR(**data: typing.Any) -> DocumentRequest:
+    return DocumentRequest.model_validate(data)
+
+
 def test_request() -> DocumentRequest:
-    return DocumentRequest(
-        documentID="D", fileName="F", modelID=1, processorID=1, taskID="T"
-    )
+    return DR(documentID="D", fileName="F", modelID=1, processorID=1, taskID="T")
 
 
 class DummyChunk:
@@ -40,7 +42,9 @@ class DummyXRay:
 
 class TestDocument(unittest.TestCase):
     def setUp(self) -> None:
-        patcher = patch("extract.classes.document.GroundXDocument.xray", autospec=True)
+        patcher = patch(
+            "groundx.extract.classes.document.GroundXDocument.xray", autospec=True
+        )
         self.mock_xray = patcher.start()
         self.addCleanup(patcher.stop)
         self.mock_xray.return_value = DummyXRay("http://test.co", [])
@@ -53,16 +57,14 @@ class TestDocument(unittest.TestCase):
         self.assertEqual(st1.file_name, "F")
         st2 = Document.from_request(
             base_url="",
-            req=DocumentRequest(
+            req=DR(
                 documentID="D", fileName="F.pdf", modelID=1, processorID=1, taskID="T"
             ),
         )
         self.assertEqual(st2.file_name, "F.pdf")
         st3 = Document.from_request(
             base_url="",
-            req=DocumentRequest(
-                documentID="D", fileName="F.", modelID=1, processorID=1, taskID="T"
-            ),
+            req=DR(documentID="D", fileName="F.", modelID=1, processorID=1, taskID="T"),
         )
         self.assertEqual(st3.file_name, "F.")
 
