@@ -1,4 +1,7 @@
-import json, traceback, typing
+import json, pytest, traceback, typing
+
+pytest.importorskip("PIL")
+
 from PIL.Image import Image
 
 from smolagents import (  # pyright: ignore[reportMissingTypeStubs]
