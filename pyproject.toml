@@ -3,7 +3,7 @@ name = "groundx"
 
 [tool.poetry]
 name = "groundx"
-version = "2.4.9"
+version = "2.4.10"
 description = ""
 readme = "README.md"
 authors = []
@@ -37,11 +37,27 @@ Repository = 'https://github.com/eyelevelai/groundx-python'
 [tool.poetry.dependencies]
 python = "^3.8"
 aiohttp = ">=3.8.0"
+boto3 = { version = "*", optional = true}
+celery = { version = "*", optional = true}
+celery-types = { version = "*", optional = true}
+dateparser = { version = "*", optional = true}
+fastapi = { version = "*", optional = true}
+google-api-python-client = { version = "*", optional = true}
+google-api-python-client-stubs = { version = "*", optional = true}
+google-auth-stubs = { version = "*", optional = true}
+gspread = { version = "*", optional = true}
 httpx = ">=0.21.2"
+minio = { version = "*", optional = true}
+pandas = { version = "*", optional = true}
+pandas-stubs = { version = "*", optional = true}
+pillow = { version = "*", optional = true}
 pydantic = ">= 1.9.2"
 pydantic-core = "^2.18.2"
+redis = { version = "*", optional = true}
 requests = ">=2.4.0"
 tqdm = ">=4.60.0"
+types-boto3 = { version = "*", optional = true}
+types-dateparser = { version = "*", optional = true}
 types-tqdm = ">=4.60.0"
 typing_extensions = ">= 4.0.0"
 
@@ -89,26 +105,8 @@ section-order = ["future", "standard-library", "third-party", "first-party"]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-tool.poetry.dependencies.celery = { version = "*", optional = true, extras = ["redis"] }
-tool.poetry.dependencies.celery-types = { version = "*", optional = true }
-tool.poetry.dependencies.fastapi = { version = "*", optional = true }
-tool.poetry.dependencies.google-api-python-client = { version = "*", optional = true }
-tool.poetry.dependencies.google-api-python-client-stubs = { version = "*", optional = true }
-tool.poetry.dependencies.google-auth-stubs = { version = "*", optional = true }
-tool.poetry.dependencies.gspread = { version = "*", optional = true }
-tool.poetry.dependencies.boto3 = { version = "*", optional = true }
-tool.poetry.dependencies.types-boto3 = { version = "*", optional = true }
-tool.poetry.dependencies.dateparser = { version = "*", optional = true }
-tool.poetry.dependencies.types-dateparser = { version = "*", optional = true }
-tool.poetry.dependencies.minio = { version = "*", optional = true }
-tool.poetry.dependencies.pandas = { version = "*", optional = true }
-tool.poetry.dependencies.pandas-stubs = { version = "*", optional = true }
-tool.poetry.dependencies.redis = { version = "*", optional = true }
-tool.poetry.dependencies.smolagents = { version = ">=1.19.0", optional = true, extras = ["openai"] }
-tool.poetry.dependencies.pillow = { version = "*", optional = true }
-
 [tool.poetry.extras]
-extract=["celery", "celery-types", "fastapi", "google-api-python-client", "google-api-python-client-stubs", "google-auth-stubs", "gspread", "boto3", "types-boto3", "dateparser", "types-dateparser", "minio", "pandas", "pandas-stubs", "redis", "smolagents", "pillow"]
+extract=["celery", "celery-types", "fastapi", "google-api-python-client", "google-api-python-client-stubs", "google-auth-stubs", "gspread", "boto3", "types-boto3", "dateparser", "types-dateparser", "minio", "pandas", "pandas-stubs", "redis", "pillow"]
 
 [[tool.mypy.overrides]]
 module = ["PIL.*"]
