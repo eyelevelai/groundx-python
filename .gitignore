@@ -5,3 +5,4 @@ poetry.toml
 .ruff_cache/
 test.py
 .DS_Store
+src/groundx/extract/cache
