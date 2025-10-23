@@ -3,19 +3,17 @@
 import typing
 
 import pydantic
-import typing_extensions
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
-from ..core.serialization import FieldMetadata
 from .ingest_status_progress import IngestStatusProgress
 from .processing_status import ProcessingStatus
 
 
 class IngestStatus(UniversalBaseModel):
     id: typing.Optional[int] = None
-    process_id: typing_extensions.Annotated[str, FieldMetadata(alias="processId")]
+    process_id: str = pydantic.Field(alias="processId")
     progress: typing.Optional[IngestStatusProgress] = None
     status: ProcessingStatus
-    status_message: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="statusMessage")] = None
+    status_message: typing.Optional[str] = pydantic.Field(alias="statusMessage", default=None)
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

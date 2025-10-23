@@ -3,9 +3,7 @@
 import typing
 
 import pydantic
-import typing_extensions
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
-from ..core.serialization import FieldMetadata
 
 
 class SearchResultItemPagesItem(UniversalBaseModel):
@@ -14,9 +12,7 @@ class SearchResultItemPagesItem(UniversalBaseModel):
     The height of the page image
     """
 
-    image_url: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="imageUrl")] = pydantic.Field(
-        default=None
-    )
+    image_url: typing.Optional[str] = pydantic.Field(alias="imageUrl", default=None)
     """
     A jpg of the page the chunk appears on
     """

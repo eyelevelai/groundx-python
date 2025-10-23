@@ -3,63 +3,51 @@
 import typing
 
 import pydantic
-import typing_extensions
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
-from ..core.serialization import FieldMetadata
 from .document_type import DocumentType
 from .processing_status import ProcessingStatus
 
 
 class DocumentDetail(UniversalBaseModel):
-    bucket_id: typing_extensions.Annotated[typing.Optional[int], FieldMetadata(alias="bucketId")] = None
-    document_id: typing_extensions.Annotated[str, FieldMetadata(alias="documentId")] = pydantic.Field()
+    bucket_id: typing.Optional[int] = pydantic.Field(alias="bucketId", default=None)
+    document_id: str = pydantic.Field(alias="documentId")
     """
     Unique system generated ID for the document
     """
 
-    file_name: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="fileName")] = None
-    file_size: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="fileSize")] = pydantic.Field(
-        default=None
-    )
+    file_name: typing.Optional[str] = pydantic.Field(alias="fileName", default=None)
+    file_size: typing.Optional[str] = pydantic.Field(alias="fileSize", default=None)
     """
     The file size of the file stored in GroundX
     """
 
-    file_type: typing_extensions.Annotated[typing.Optional[DocumentType], FieldMetadata(alias="fileType")] = None
+    file_type: typing.Optional[DocumentType] = pydantic.Field(alias="fileType", default=None)
     filter: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(default=None)
     """
     A dictionary of key-value pairs that can be used to pre-filter documents prior to a search.
     """
 
-    process_id: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="processId")] = pydantic.Field(
-        default=None
-    )
+    process_id: typing.Optional[str] = pydantic.Field(alias="processId", default=None)
     """
     Unique system generated ID for the ingest request
     """
 
-    search_data: typing_extensions.Annotated[
-        typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]], FieldMetadata(alias="searchData")
-    ] = None
-    source_url: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="sourceUrl")] = pydantic.Field(
-        default=None
+    search_data: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(
+        alias="searchData", default=None
     )
+    source_url: typing.Optional[str] = pydantic.Field(alias="sourceUrl", default=None)
     """
     Source document URL
     """
 
     status: typing.Optional[ProcessingStatus] = None
-    status_message: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="statusMessage")] = None
-    text_url: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="textUrl")] = pydantic.Field(
-        default=None
-    )
+    status_message: typing.Optional[str] = pydantic.Field(alias="statusMessage", default=None)
+    text_url: typing.Optional[str] = pydantic.Field(alias="textUrl", default=None)
     """
     Extracted text URL, if using the extract agent
     """
 
-    xray_url: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="xrayUrl")] = pydantic.Field(
-        default=None
-    )
+    xray_url: typing.Optional[str] = pydantic.Field(alias="xrayUrl", default=None)
     """
     Document X-Ray results
     """

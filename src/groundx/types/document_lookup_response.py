@@ -3,9 +3,7 @@
 import typing
 
 import pydantic
-import typing_extensions
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
-from ..core.serialization import FieldMetadata
 from .document_detail import DocumentDetail
 
 
@@ -16,7 +14,7 @@ class DocumentLookupResponse(UniversalBaseModel):
     """
 
     documents: typing.Optional[typing.List[DocumentDetail]] = None
-    next_token: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="nextToken")] = None
+    next_token: typing.Optional[str] = pydantic.Field(alias="nextToken", default=None)
     remaining: typing.Optional[int] = pydantic.Field(default=None)
     """
     The number of results that have not been returned yet. Will be null if there are no remaining results.

@@ -4,9 +4,7 @@ import datetime as dt
 import typing
 
 import pydantic
-import typing_extensions
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
-from ..core.serialization import FieldMetadata
 from .bucket_detail import BucketDetail
 
 
@@ -21,21 +19,17 @@ class GroupDetail(UniversalBaseModel):
     The data time when the group was created, in RFC3339 format
     """
 
-    file_count: typing_extensions.Annotated[typing.Optional[int], FieldMetadata(alias="fileCount")] = pydantic.Field(
-        default=None
-    )
+    file_count: typing.Optional[int] = pydantic.Field(alias="fileCount", default=None)
     """
     The number of files contained in the content buckets associated with the group
     """
 
-    file_size: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="fileSize")] = pydantic.Field(
-        default=None
-    )
+    file_size: typing.Optional[str] = pydantic.Field(alias="fileSize", default=None)
     """
     The total file size of files contained in the content buckets associated with the group
     """
 
-    group_id: typing_extensions.Annotated[int, FieldMetadata(alias="groupId")]
+    group_id: int = pydantic.Field(alias="groupId")
     name: typing.Optional[str] = None
     updated: typing.Optional[dt.datetime] = pydantic.Field(default=None)
     """
