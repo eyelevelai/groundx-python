@@ -3,37 +3,43 @@
 import typing
 
 import pydantic
+import typing_extensions
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
+from ..core.serialization import FieldMetadata
 from .document_type import DocumentType
 from .process_level import ProcessLevel
 
 
 class Document(UniversalBaseModel):
-    bucket_id: int = pydantic.Field(alias="bucketId")
+    bucket_id: typing_extensions.Annotated[int, FieldMetadata(alias="bucketId")] = pydantic.Field()
     """
     The bucketId of the bucket which this file will be ingested into.
     """
 
-    file_name: typing.Optional[str] = pydantic.Field(alias="fileName", default=None)
+    file_name: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="fileName")] = pydantic.Field(
+        default=None
+    )
     """
     The name of the file being ingested.
     """
 
-    file_path: str = pydantic.Field(alias="filePath")
+    file_path: typing_extensions.Annotated[str, FieldMetadata(alias="filePath")] = pydantic.Field()
     """
     The local file path or remote URL of the document being ingested by GroundX.
     """
 
-    file_type: typing.Optional[DocumentType] = pydantic.Field(alias="fileType", default=None)
+    file_type: typing_extensions.Annotated[typing.Optional[DocumentType], FieldMetadata(alias="fileType")] = None
     filter: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(default=None)
     """
     A dictionary of key-value pairs that can be used to pre-filter documents prior to a search.
     """
 
-    process_level: typing.Optional[ProcessLevel] = pydantic.Field(alias="processLevel", default=None)
-    search_data: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(
-        alias="searchData", default=None
+    process_level: typing_extensions.Annotated[typing.Optional[ProcessLevel], FieldMetadata(alias="processLevel")] = (
+        None
     )
+    search_data: typing_extensions.Annotated[
+        typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]], FieldMetadata(alias="searchData")
+    ] = pydantic.Field(default=None)
     """
     Custom metadata which can be used to influence GroundX's search functionality. This data can be used to further hone GroundX search.
     """

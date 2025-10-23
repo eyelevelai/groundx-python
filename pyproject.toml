@@ -99,6 +99,7 @@ tool.poetry.dependencies.gspread = { version = "*", optional = true }
 tool.poetry.dependencies.boto3 = { version = "*", optional = true }
 tool.poetry.dependencies.types-boto3 = { version = "*", optional = true }
 tool.poetry.dependencies.dateparser = { version = "*", optional = true }
+tool.poetry.dependencies.types-dateparser = { version = "*", optional = true }
 tool.poetry.dependencies.minio = { version = "*", optional = true }
 tool.poetry.dependencies.pandas = { version = "*", optional = true }
 tool.poetry.dependencies.pandas-stubs = { version = "*", optional = true }
@@ -107,4 +108,32 @@ tool.poetry.dependencies.smolagents = { version = ">=1.19.0", optional = true, e
 tool.poetry.dependencies.pillow = { version = "*", optional = true }
 
 [tool.poetry.extras]
-extract=["celery", "celery-types", "fastapi", "google-api-python-client", "google-api-python-client-stubs", "google-auth-stubs", "gspread", "boto3", "types-boto3", "dateparser", "minio", "pandas", "pandas-stubs", "redis", "smolagents", "pillow"]
+extract=["celery", "celery-types", "fastapi", "google-api-python-client", "google-api-python-client-stubs", "google-auth-stubs", "gspread", "boto3", "types-boto3", "dateparser", "types-dateparser", "minio", "pandas", "pandas-stubs", "redis", "smolagents", "pillow"]
+
+[[tool.mypy.overrides]]
+module = ["PIL.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["boto3.*", "botocore.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["minio.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["google.*", "googleapiclient.*", "gspread.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["fastapi.*", "starlette.*", "redis.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["smolagents.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["groundx.extract.classes.document"]
+disable_error_code = ["call-arg"]

@@ -3,7 +3,7 @@
 # nopycln: file
 import datetime as dt
 from collections import defaultdict
-from typing import Any, Callable, Dict, List, Mapping, Tuple, Type, TypeVar, Union, cast
+from typing import Any, Callable, ClassVar, Dict, List, Mapping, Optional, Set, Tuple, Type, TypeVar, Union, cast
 
 import pydantic
 
@@ -29,6 +29,7 @@ else:
     from pydantic.typing import is_union as is_union  # type: ignore[no-redef]
 
 from .datetime_utils import serialize_datetime
+from .serialization import convert_and_respect_annotation_metadata
 from typing_extensions import TypeAlias
 
 T = TypeVar("T")
@@ -36,10 +37,11 @@ Model = TypeVar("Model", bound=pydantic.BaseModel)
 
 
 def parse_obj_as(type_: Type[T], object_: Any) -> T:
+    dealiased_object = convert_and_respect_annotation_metadata(object_=object_, annotation=type_, direction="read")
     if IS_PYDANTIC_V2:
         adapter = pydantic.TypeAdapter(type_)  # type: ignore[attr-defined]
-        return adapter.validate_python(object_)
-    return pydantic.parse_obj_as(type_, object_)
+        return adapter.validate_python(dealiased_object)
+    return pydantic.parse_obj_as(type_, dealiased_object)
 
 
 def to_jsonable_with_fallback(obj: Any, fallback_serializer: Callable[[Any], Any]) -> Any:
@@ -51,13 +53,35 @@ def to_jsonable_with_fallback(obj: Any, fallback_serializer: Callable[[Any], Any
 
 
 class UniversalBaseModel(pydantic.BaseModel):
-    class Config:
-        populate_by_name = True
-        smart_union = True
-        allow_population_by_field_name = True
-        json_encoders = {dt.datetime: serialize_datetime}
-        # Allow fields beginning with `model_` to be used in the model
-        protected_namespaces = ()
+    if IS_PYDANTIC_V2:
+        model_config: ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(  # type: ignore[typeddict-unknown-key]
+            # Allow fields beginning with `model_` to be used in the model
+            protected_namespaces=(),
+        )
+
+        @pydantic.model_serializer(mode="wrap", when_used="json")  # type: ignore[attr-defined]
+        def serialize_model(self, handler: pydantic.SerializerFunctionWrapHandler) -> Any:  # type: ignore[name-defined]
+            serialized = handler(self)
+            data = {k: serialize_datetime(v) if isinstance(v, dt.datetime) else v for k, v in serialized.items()}
+            return data
+
+    else:
+
+        class Config:
+            smart_union = True
+            json_encoders = {dt.datetime: serialize_datetime}
+
+    @classmethod
+    def model_construct(cls: Type["Model"], _fields_set: Optional[Set[str]] = None, **values: Any) -> "Model":
+        dealiased_object = convert_and_respect_annotation_metadata(object_=values, annotation=cls, direction="read")
+        return cls.construct(_fields_set, **dealiased_object)
+
+    @classmethod
+    def construct(cls: Type["Model"], _fields_set: Optional[Set[str]] = None, **values: Any) -> "Model":
+        dealiased_object = convert_and_respect_annotation_metadata(object_=values, annotation=cls, direction="read")
+        if IS_PYDANTIC_V2:
+            return super().model_construct(_fields_set, **dealiased_object)  # type: ignore[misc]
+        return super().construct(_fields_set, **dealiased_object)
 
     def json(self, **kwargs: Any) -> str:
         kwargs_with_defaults = {
@@ -92,35 +116,38 @@ class UniversalBaseModel(pydantic.BaseModel):
                 "exclude_none": True,
                 "exclude_unset": False,
             }
-            return deep_union_pydantic_dicts(
+            dict_dump = deep_union_pydantic_dicts(
                 super().model_dump(**kwargs_with_defaults_exclude_unset),  # type: ignore[misc]
                 super().model_dump(**kwargs_with_defaults_exclude_none),  # type: ignore[misc]
             )
 
-        _fields_set = self.__fields_set__.copy()
+        else:
+            _fields_set = self.__fields_set__.copy()
 
-        fields = _get_model_fields(self.__class__)
-        for name, field in fields.items():
-            if name not in _fields_set:
-                default = _get_field_default(field)
+            fields = _get_model_fields(self.__class__)
+            for name, field in fields.items():
+                if name not in _fields_set:
+                    default = _get_field_default(field)
 
-                # If the default values are non-null act like they've been set
-                # This effectively allows exclude_unset to work like exclude_none where
-                # the latter passes through intentionally set none values.
-                if default is not None or ("exclude_unset" in kwargs and not kwargs["exclude_unset"]):
-                    _fields_set.add(name)
+                    # If the default values are non-null act like they've been set
+                    # This effectively allows exclude_unset to work like exclude_none where
+                    # the latter passes through intentionally set none values.
+                    if default is not None or ("exclude_unset" in kwargs and not kwargs["exclude_unset"]):
+                        _fields_set.add(name)
 
-                    if default is not None:
-                        self.__fields_set__.add(name)
+                        if default is not None:
+                            self.__fields_set__.add(name)
 
-        kwargs_with_defaults_exclude_unset_include_fields = {
-            "by_alias": True,
-            "exclude_unset": True,
-            "include": _fields_set,
-            **kwargs,
-        }
+            kwargs_with_defaults_exclude_unset_include_fields = {
+                "by_alias": True,
+                "exclude_unset": True,
+                "include": _fields_set,
+                **kwargs,
+            }
 
-        return super().dict(**kwargs_with_defaults_exclude_unset_include_fields)
+            dict_dump = super().dict(**kwargs_with_defaults_exclude_unset_include_fields)
+
+        return convert_and_respect_annotation_metadata(object_=dict_dump, annotation=self.__class__, direction="write")
 
 
 def _union_list_of_pydantic_dicts(source: List[Any], destination: List[Any]) -> List[Any]:
@@ -154,10 +181,10 @@ def deep_union_pydantic_dicts(source: Dict[str, Any], destination: Dict[str, Any
 
 if IS_PYDANTIC_V2:
 
-    class V2RootModel(UniversalBaseModel, pydantic.RootModel):  # type: ignore[name-defined, type-arg]
+    class V2RootModel(UniversalBaseModel, pydantic.RootModel):  # type: ignore[misc, name-defined, type-arg]
         pass
 
-    UniversalRootModel: TypeAlias = V2RootModel
+    UniversalRootModel: TypeAlias = V2RootModel  # type: ignore[misc]
 else:
     UniversalRootModel: TypeAlias = UniversalBaseModel  # type: ignore[misc, no-redef]
 
@@ -185,7 +212,9 @@ def update_forward_refs(model: Type["Model"], **localns: Any) -> None:
 AnyCallable = Callable[..., Any]
 
 
-def universal_root_validator(pre: bool = False) -> Callable[[AnyCallable], AnyCallable]:
+def universal_root_validator(
+    pre: bool = False,
+) -> Callable[[AnyCallable], AnyCallable]:
     def decorator(func: AnyCallable) -> AnyCallable:
         if IS_PYDANTIC_V2:
             return cast(AnyCallable, pydantic.model_validator(mode="before" if pre else "after")(func))  # type: ignore[attr-defined]
