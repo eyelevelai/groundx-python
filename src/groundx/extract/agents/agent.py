@@ -13,9 +13,9 @@ from smolagents.models import (  # pyright: ignore[reportMissingTypeStubs]
     OpenAIServerModel,
 )
 
-from ..classes.settings import AgentSettings
-from ..classes.utility import clean_json
 from ..services.logger import Logger
+from ..settings.settings import AgentSettings
+from ..utility.classes import clean_json
 
 
 prompt_suffix = """

@@ -12,6 +12,32 @@ from .groundx import (
 )
 
 
+class TestChunk:
+    def __init__(self, json_str: str):
+        self.sectionSummary = None
+        self.suggestedText = json_str
+
+
+class TestDocumentPage:
+    def __init__(self, page_url: str):
+        self.pageUrl = page_url
+
+
+class TestXRay:
+    def __init__(
+        self,
+        source_url: str,
+        chunks: typing.Optional[typing.List[TestChunk]] = [],
+        document_pages: typing.Optional[typing.List[str]] = [],
+    ):
+        self.chunks = chunks
+        self.documentPages: typing.List[TestDocumentPage] = []
+        if document_pages is not None:
+            for p in document_pages:
+                self.documentPages.append(TestDocumentPage(p))
+        self.sourceUrl = source_url
+
+
 def GD(**data: typing.Any) -> GroundXDocument:
     return GroundXDocument.model_validate(data)
 

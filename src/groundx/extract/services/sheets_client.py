@@ -7,7 +7,7 @@ from googleapiclient.discovery import (
 )
 import gspread
 
-from ..classes.settings import ContainerSettings, GCP_CREDENTIALS
+from ..settings.settings import ContainerSettings, GCP_CREDENTIALS
 
 SPREADSHEET_MIME = "application/vnd.google-apps.spreadsheet"
 

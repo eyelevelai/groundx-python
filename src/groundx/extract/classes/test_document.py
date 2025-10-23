@@ -7,6 +7,7 @@ from PIL import Image
 from unittest.mock import patch
 
 from .document import Document, DocumentRequest
+from .test_groundx import TestXRay
 
 
 def DR(**data: typing.Any) -> DocumentRequest:
@@ -17,32 +18,6 @@ def test_request() -> DocumentRequest:
     return DR(documentID="D", fileName="F", modelID=1, processorID=1, taskID="T")
 
 
-class DummyChunk:
-    def __init__(self, json_str: str):
-        self.sectionSummary = None
-        self.suggestedText = json_str
-
-
-class DummyDocumentPage:
-    def __init__(self, page_url: str):
-        self.pageUrl = page_url
-
-
-class DummyXRay:
-    def __init__(
-        self,
-        source_url: str,
-        chunks: typing.Optional[typing.List[DummyChunk]] = [],
-        document_pages: typing.Optional[typing.List[str]] = [],
-    ):
-        self.chunks = chunks
-        self.documentPages: typing.List[DummyDocumentPage] = []
-        if document_pages is not None:
-            for p in document_pages:
-                self.documentPages.append(DummyDocumentPage(p))
-        self.sourceUrl = source_url
-
-
 class TestDocument(unittest.TestCase):
     def setUp(self) -> None:
         patcher = patch(
@@ -50,7 +25,7 @@ class TestDocument(unittest.TestCase):
         )
         self.mock_xray = patcher.start()
         self.addCleanup(patcher.stop)
-        self.mock_xray.return_value = DummyXRay("http://test.co", [])
+        self.mock_xray.return_value = TestXRay("http://test.co", [])
 
     def test_init_name(self) -> None:
         st1: Document = Document.from_request(
@@ -101,13 +76,13 @@ class TestDocumentRequest(unittest.TestCase):
         red_img.save(buf, format="PNG")
         img_bytes = buf.getvalue()
 
-        class DummyResp:
+        class TestResp:
             content = img_bytes
 
             def raise_for_status(self) -> None:
                 pass
 
-        with patch("requests.get", return_value=DummyResp()):
+        with patch("requests.get", return_value=TestResp()):
             st = test_request()
             st.load_images(urls)
 

@@ -2,8 +2,8 @@ import typing
 
 from fastapi import Response
 
-from ..classes.settings import ContainerSettings
 from .logger import Logger
+from ..settings.settings import ContainerSettings
 
 
 class Status:

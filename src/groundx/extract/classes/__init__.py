@@ -4,24 +4,21 @@ from .document import Document, DocumentRequest
 from .field import ExtractedField
 from .groundx import GroundXDocument, XRayDocument
 from .prompt import Prompt
-from .settings import (
-    AgentSettings,
-    ContainerSettings,
-    ContainerUploadSettings,
-    GroundXSettings,
-)
+from .test_field import TestField
+from .test_groundx import TestChunk, TestDocumentPage, TestXRay
+
 
 __all__ = [
     "AgentRequest",
-    "AgentSettings",
-    "ContainerSettings",
-    "ContainerUploadSettings",
     "Document",
     "DocumentRequest",
     "ExtractedField",
     "GroundXDocument",
-    "GroundXSettings",
     "ProcessResponse",
     "Prompt",
+    "TestChunk",
+    "TestDocumentPage",
+    "TestField",
+    "TestXRay",
     "XRayDocument",
 ]

@@ -1,7 +1,7 @@
 import typing
 
 if typing.TYPE_CHECKING:
-    from .prompt import Prompt
+    from ..classes.prompt import Prompt
 
 
 def class_fields(cls: typing.Any) -> typing.Set[str]:

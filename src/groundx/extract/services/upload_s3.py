@@ -1,7 +1,7 @@
 import typing
 
-from ..classes.settings import ContainerSettings
 from .logger import Logger
+from ..settings.settings import ContainerSettings
 
 
 class S3Client:
