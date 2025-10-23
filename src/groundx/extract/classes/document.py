@@ -6,7 +6,7 @@ from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
 from .groundx import GroundXDocument
 from ..services.logger import Logger
-from .utility import clean_json
+from ..utility.classes import clean_json
 
 
 DocT = typing.TypeVar("DocT", bound="Document")
@@ -116,6 +116,14 @@ class Document(BaseModel):
             self.logger.debug_msg(msg, self.file_name, self.document_id, self.task_id)
 
 
+def _new_page_image_dict() -> dict[str, int]:
+    return {}
+
+
+def _new_page_images() -> list[Image.Image]:
+    return []
+
+
 class DocumentRequest(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
     callback_url: str = Field(alias="callbackURL", default="")
@@ -131,10 +139,10 @@ class DocumentRequest(BaseModel):
     _clear_cache: bool = PrivateAttr(default_factory=bool)
     _debug_path: typing.Optional[str] = PrivateAttr(default=None)
     _page_image_dict: typing.Dict[str, int] = PrivateAttr(
-        default_factory=typing.Dict[str, int]
+        default_factory=_new_page_image_dict
     )
     _page_images: typing.List[Image.Image] = PrivateAttr(
-        default_factory=typing.List[Image.Image]
+        default_factory=_new_page_images
     )
     _start: int = PrivateAttr(
         default_factory=lambda: int(datetime.now(timezone.utc).timestamp())

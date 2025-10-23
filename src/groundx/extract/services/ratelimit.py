@@ -7,9 +7,9 @@ from starlette.responses import JSONResponse, Response
 from starlette.types import ASGIApp
 
 from ..classes.api import ProcessResponse
-from ..classes.settings import ContainerSettings
 from .logger import Logger
 from .status import Status
+from ..settings.settings import ContainerSettings
 from .utility import get_gunicorn_threads, get_thread_id, get_worker_id
 
 
