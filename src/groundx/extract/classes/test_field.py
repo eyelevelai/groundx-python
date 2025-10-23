@@ -1,4 +1,6 @@
-import typing, unittest
+import pytest, typing, unittest
+
+pytest.importorskip("dateparser")
 
 from .field import ExtractedField
 
