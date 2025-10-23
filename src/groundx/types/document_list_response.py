@@ -3,13 +3,15 @@
 import typing
 
 import pydantic
+import typing_extensions
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
+from ..core.serialization import FieldMetadata
 from .document_detail import DocumentDetail
 
 
 class DocumentListResponse(UniversalBaseModel):
     documents: typing.Optional[typing.List[DocumentDetail]] = None
-    next_token: typing.Optional[str] = pydantic.Field(alias="nextToken", default=None)
+    next_token: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="nextToken")] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

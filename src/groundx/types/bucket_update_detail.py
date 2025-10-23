@@ -3,11 +3,13 @@
 import typing
 
 import pydantic
+import typing_extensions
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
+from ..core.serialization import FieldMetadata
 
 
 class BucketUpdateDetail(UniversalBaseModel):
-    bucket_id: int = pydantic.Field(alias="bucketId")
+    bucket_id: typing_extensions.Annotated[int, FieldMetadata(alias="bucketId")]
     name: typing.Optional[str] = None
 
     if IS_PYDANTIC_V2:

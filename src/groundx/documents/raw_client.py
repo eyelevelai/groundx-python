@@ -9,6 +9,7 @@ from ..core.http_response import AsyncHttpResponse, HttpResponse
 from ..core.jsonable_encoder import jsonable_encoder
 from ..core.pydantic_utilities import parse_obj_as
 from ..core.request_options import RequestOptions
+from ..core.serialization import convert_and_respect_annotation_metadata
 from ..errors.bad_request_error import BadRequestError
 from ..errors.unauthorized_error import UnauthorizedError
 from ..types.document_list_response import DocumentListResponse
@@ -66,7 +67,9 @@ class RawDocumentsClient:
             "v1/ingest/documents/remote",
             method="POST",
             json={
-                "documents": documents,
+                "documents": convert_and_respect_annotation_metadata(
+                    object_=documents, annotation=typing.Sequence[IngestRemoteDocument], direction="write"
+                ),
                 "callbackUrl": callback_url,
                 "callbackData": callback_data,
             },
@@ -136,7 +139,9 @@ class RawDocumentsClient:
         _response = self._client_wrapper.httpx_client.request(
             "v1/ingest/documents/local",
             method="POST",
-            json=request,
+            json=convert_and_respect_annotation_metadata(
+                object_=request, annotation=DocumentLocalIngestRequest, direction="write"
+            ),
             headers={
                 "content-type": "application/json",
             },
@@ -218,7 +223,9 @@ class RawDocumentsClient:
             "v1/ingest/documents/website",
             method="POST",
             json={
-                "websites": websites,
+                "websites": convert_and_respect_annotation_metadata(
+                    object_=websites, annotation=typing.Sequence[WebsiteSource], direction="write"
+                ),
                 "callbackUrl": callback_url,
                 "callbackData": callback_data,
             },
@@ -771,7 +778,9 @@ class AsyncRawDocumentsClient:
             "v1/ingest/documents/remote",
             method="POST",
             json={
-                "documents": documents,
+                "documents": convert_and_respect_annotation_metadata(
+                    object_=documents, annotation=typing.Sequence[IngestRemoteDocument], direction="write"
+                ),
                 "callbackUrl": callback_url,
                 "callbackData": callback_data,
             },
@@ -841,7 +850,9 @@ class AsyncRawDocumentsClient:
         _response = await self._client_wrapper.httpx_client.request(
             "v1/ingest/documents/local",
             method="POST",
-            json=request,
+            json=convert_and_respect_annotation_metadata(
+                object_=request, annotation=DocumentLocalIngestRequest, direction="write"
+            ),
             headers={
                 "content-type": "application/json",
             },
@@ -923,7 +934,9 @@ class AsyncRawDocumentsClient:
             "v1/ingest/documents/website",
             method="POST",
             json={
-                "websites": websites,
+                "websites": convert_and_respect_annotation_metadata(
+                    object_=websites, annotation=typing.Sequence[WebsiteSource], direction="write"
+                ),
                 "callbackUrl": callback_url,
                 "callbackData": callback_data,
             },

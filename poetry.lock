@@ -1360,4 +1360,4 @@ extract = []
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "7736e07d9b6a77dcb849aab5b982372a08035f2a420b66e68363b58113080a55"
+content-hash = "8fd8ce457c009193ce9c781c5f33313ad5f74f9f85f39db7d59a21a78b635b75"
