@@ -1,7 +1,4 @@
-try:
-    from .agent import AgentCode, AgentTool
-except Exception:
-    AgentCode = AgentTool = None
+from .agent import AgentCode, AgentTool
 
 
 __all__ = [
