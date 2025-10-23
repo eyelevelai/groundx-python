@@ -1,11 +1,8 @@
-try:
-    from .logger import Logger
-    from .sheets_client import SheetsClient
-    from .ratelimit import RateLimit
-    from .status import Status
-    from .upload import Upload
-except Exception:
-    Logger = SheetsClient = RateLimit = Status = Upload = None
+from .logger import Logger
+from .sheets_client import SheetsClient
+from .ratelimit import RateLimit
+from .status import Status
+from .upload import Upload
 
 
 __all__ = [
