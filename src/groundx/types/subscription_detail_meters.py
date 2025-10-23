@@ -3,14 +3,12 @@
 import typing
 
 import pydantic
-import typing_extensions
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
-from ..core.serialization import FieldMetadata
 from .meter_detail import MeterDetail
 
 
 class SubscriptionDetailMeters(UniversalBaseModel):
-    file_tokens: typing_extensions.Annotated[typing.Optional[MeterDetail], FieldMetadata(alias="fileTokens")] = None
+    file_tokens: typing.Optional[MeterDetail] = pydantic.Field(alias="fileTokens", default=None)
     searches: typing.Optional[MeterDetail] = None
 
     if IS_PYDANTIC_V2:

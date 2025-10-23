@@ -3,9 +3,7 @@
 import typing
 
 import pydantic
-import typing_extensions
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
-from ..core.serialization import FieldMetadata
 
 
 class MeterDetail(UniversalBaseModel):
@@ -18,9 +16,7 @@ class MeterDetail(UniversalBaseModel):
     Maximum limit for the current billing period
     """
 
-    meter_id: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="meterId")] = pydantic.Field(
-        default=None
-    )
+    meter_id: typing.Optional[str] = pydantic.Field(alias="meterId", default=None)
     """
     Unique system generated ID for the meteric
     """

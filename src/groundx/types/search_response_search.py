@@ -3,9 +3,7 @@
 import typing
 
 import pydantic
-import typing_extensions
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
-from ..core.serialization import FieldMetadata
 from .search_result_item import SearchResultItem
 
 
@@ -30,9 +28,7 @@ class SearchResponseSearch(UniversalBaseModel):
     Confidence score in the search results
     """
 
-    search_query: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="searchQuery")] = (
-        pydantic.Field(default=None)
-    )
+    search_query: typing.Optional[str] = pydantic.Field(alias="searchQuery", default=None)
     """
     The actual search query, if the search request query was re-written
     """
@@ -42,9 +38,7 @@ class SearchResponseSearch(UniversalBaseModel):
     Suggested context for LLM completion
     """
 
-    next_token: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="nextToken")] = pydantic.Field(
-        default=None
-    )
+    next_token: typing.Optional[str] = pydantic.Field(alias="nextToken", default=None)
     """
     For paginated results
     """

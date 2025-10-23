@@ -4,14 +4,12 @@ import datetime as dt
 import typing
 
 import pydantic
-import typing_extensions
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
-from ..core.serialization import FieldMetadata
 from .health_service_status import HealthServiceStatus
 
 
 class HealthService(UniversalBaseModel):
-    last_update: typing_extensions.Annotated[dt.datetime, FieldMetadata(alias="lastUpdate")] = pydantic.Field()
+    last_update: dt.datetime = pydantic.Field(alias="lastUpdate")
     """
     The data time when the service status was last updated, in RFC3339 format
     """

@@ -3,82 +3,64 @@
 import typing
 
 import pydantic
-import typing_extensions
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
-from ..core.serialization import FieldMetadata
 from .bounding_box_detail import BoundingBoxDetail
 from .search_result_item_pages_item import SearchResultItemPagesItem
 
 
 class SearchResultItem(UniversalBaseModel):
-    bounding_boxes: typing_extensions.Annotated[
-        typing.Optional[typing.List[BoundingBoxDetail]], FieldMetadata(alias="boundingBoxes")
-    ] = pydantic.Field(default=None)
+    bounding_boxes: typing.Optional[typing.List[BoundingBoxDetail]] = pydantic.Field(
+        alias="boundingBoxes", default=None
+    )
     """
     Coordinates corresponding to the areas of the document where the chunk appears
     """
 
-    bucket_id: typing_extensions.Annotated[typing.Optional[int], FieldMetadata(alias="bucketId")] = pydantic.Field(
-        default=None
-    )
+    bucket_id: typing.Optional[int] = pydantic.Field(alias="bucketId", default=None)
     """
     Content bucket the search result belongs to
     """
 
-    chunk_id: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="chunkId")] = pydantic.Field(
-        default=None
-    )
+    chunk_id: typing.Optional[str] = pydantic.Field(alias="chunkId", default=None)
     """
     Unique system generated ID for the chunk
     """
 
-    document_id: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="documentId")] = pydantic.Field(
-        default=None
-    )
+    document_id: typing.Optional[str] = pydantic.Field(alias="documentId", default=None)
     """
     Unique system generated ID for the document
     """
 
-    file_name: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="fileName")] = pydantic.Field(
-        default=None
-    )
+    file_name: typing.Optional[str] = pydantic.Field(alias="fileName", default=None)
     """
     Name of ingested file
     """
 
-    multimodal_url: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="multimodalUrl")] = (
-        pydantic.Field(default=None)
-    )
+    multimodal_url: typing.Optional[str] = pydantic.Field(alias="multimodalUrl", default=None)
     """
     An image clipping of the table or figure object from the document
     """
 
-    page_images: typing_extensions.Annotated[typing.Optional[typing.List[str]], FieldMetadata(alias="pageImages")] = (
-        None
-    )
+    page_images: typing.Optional[typing.List[str]] = pydantic.Field(alias="pageImages", default=None)
     pages: typing.Optional[typing.List[SearchResultItemPagesItem]] = None
     score: typing.Optional[float] = pydantic.Field(default=None)
     """
     Confidence score in the search result
     """
 
-    search_data: typing_extensions.Annotated[
-        typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]], FieldMetadata(alias="searchData")
-    ] = pydantic.Field(default=None)
+    search_data: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(
+        alias="searchData", default=None
+    )
     """
     Document, section, and chunk search data, both custom and system-generated
     """
 
-    source_url: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="sourceUrl")] = pydantic.Field(
-        default=None
-    )
+    source_url: typing.Optional[str] = pydantic.Field(alias="sourceUrl", default=None)
     """
     Source document URL
     """
 
-    suggested_text: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="suggestedText")] = (
-        pydantic.Field(default=None)
-    )
+    suggested_text: typing.Optional[str] = pydantic.Field(alias="suggestedText", default=None)
     """
     System-generated text, re-written for LLM completions
     """
