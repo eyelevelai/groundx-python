@@ -9,6 +9,8 @@ def get_config_path() -> typing.Optional[str]:
         if config_index < len(sys.argv):
             return sys.argv[config_index]
 
+    return None
+
 
 def get_gunicorn_threads() -> int:
     import importlib.util

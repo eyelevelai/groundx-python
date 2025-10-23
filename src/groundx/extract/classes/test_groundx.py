@@ -12,6 +12,10 @@ from .groundx import (
 )
 
 
+def GD(**data: typing.Any) -> GroundXDocument:
+    return GroundXDocument.model_validate(data)
+
+
 class TestGroundX(unittest.TestCase):
     def make_dummy_response(
         self,
@@ -32,19 +36,19 @@ class TestGroundX(unittest.TestCase):
         return DummyResponse()
 
     def test_xray_url(self):
-        gx = GroundXDocument(base_url="", documentID="doc123", taskID="taskABC")
+        gx = GD(base_url="", documentID="doc123", taskID="taskABC")
         expected = "https://upload.test/layout/processed/taskABC/doc123-xray.json"
         self.assertEqual(gx.xray_url(base="https://upload.test"), expected)
 
     def test_download_success(self):
-        payload: dict[str, typing.Any] = {
+        payload: typing.Dict[str, typing.Any] = {
             "chunks": [],
             "documentPages": [],
             "sourceUrl": "https://example.com/foo.pdf",
         }
         dummy = self.make_dummy_response(payload=payload, status_ok=True)
         with patch("requests.get", return_value=dummy):
-            gx = GroundXDocument(base_url="", documentID="D", taskID="T")
+            gx = GD(base_url="", documentID="D", taskID="T")
             xdoc = XRayDocument.download(gx, base="https://upload.test", is_test=True)
             self.assertIsInstance(xdoc, XRayDocument)
             self.assertEqual(xdoc.chunks, [])
@@ -53,7 +57,7 @@ class TestGroundX(unittest.TestCase):
 
     def test_download_request_exception(self):
         with patch("requests.get", side_effect=requests.RequestException("no network")):
-            gx = GroundXDocument(base_url="", documentID="D", taskID="T")
+            gx = GD(base_url="", documentID="D", taskID="T")
             with self.assertRaises(RuntimeError) as cm:
                 XRayDocument.download(gx, base="https://upload.test", is_test=True)
             self.assertIn("Error fetching X-ray JSON", str(cm.exception))
@@ -61,7 +65,7 @@ class TestGroundX(unittest.TestCase):
     def test_download_http_error(self):
         dummy = self.make_dummy_response(payload={}, status_ok=False)
         with patch("requests.get", return_value=dummy):
-            gx = GroundXDocument(base_url="", documentID="D", taskID="T")
+            gx = GD(base_url="", documentID="D", taskID="T")
             with self.assertRaises(RuntimeError) as cm:
                 XRayDocument.download(gx, base="https://upload.test", is_test=True)
             self.assertIn("HTTP error!", str(cm.exception))
@@ -69,7 +73,7 @@ class TestGroundX(unittest.TestCase):
     def test_download_json_error(self):
         dummy = self.make_dummy_response(payload=None, status_ok=True, json_error=True)
         with patch("requests.get", return_value=dummy):
-            gx = GroundXDocument(base_url="", documentID="D", taskID="T")
+            gx = GD(base_url="", documentID="D", taskID="T")
             with self.assertRaises(RuntimeError) as cm:
                 XRayDocument.download(gx, base="https://upload.test", is_test=True)
             self.assertIn("Invalid JSON returned", str(cm.exception))
@@ -81,13 +85,13 @@ class TestGroundX(unittest.TestCase):
         }
         dummy = self.make_dummy_response(payload=payload, status_ok=True)
         with patch("requests.get", return_value=dummy):
-            gx = GroundXDocument(base_url="", documentID="D", taskID="T")
+            gx = GD(base_url="", documentID="D", taskID="T")
             with self.assertRaises(ValidationError) as cm:
                 XRayDocument.download(gx, base="https://upload.test", is_test=True)
             self.assertIn("Field required", str(cm.exception))
 
     def test_xray_method_delegates_to_download(self) -> None:
-        gx = GroundXDocument(base_url="", documentID="X", taskID="Y")
+        gx = GD(base_url="", documentID="X", taskID="Y")
 
         sentinel = object()
         with patch.object(XRayDocument, "download", return_value=sentinel):
@@ -155,7 +159,7 @@ class TestGroundX(unittest.TestCase):
         }
         dummy = self.make_dummy_response(payload=payload, status_ok=True)
         with patch("requests.get", return_value=dummy):
-            gx = GroundXDocument(base_url="", documentID="D", taskID="T")
+            gx = GD(base_url="", documentID="D", taskID="T")
             xdoc = XRayDocument.download(gx, base="https://upload.test", is_test=True)
 
             self.assertEqual(xdoc.fileType, "pdf")
