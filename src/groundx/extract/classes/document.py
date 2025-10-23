@@ -116,11 +116,11 @@ class Document(BaseModel):
             self.logger.debug_msg(msg, self.file_name, self.document_id, self.task_id)
 
 
-def _new_page_image_dict() -> dict[str, int]:
+def _new_page_image_dict() -> typing.Dict[str, int]:
     return {}
 
 
-def _new_page_images() -> list[Image.Image]:
+def _new_page_images() -> typing.List[Image.Image]:
     return []
 
 
