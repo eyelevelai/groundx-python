@@ -3,5 +3,6 @@ README.md
 src/groundx/ingest.py
 src/groundx/csv_splitter.py
 src/groundx/test.py
+src/groundx/extract
 src/test.py
 .gitignore
