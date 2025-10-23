@@ -17,13 +17,12 @@ def class_fields(cls: typing.Any) -> typing.Set[str]:
 
 
 def clean_json(txt: str) -> str:
-    return (
-        txt.removeprefix("json```\n")
-        .removeprefix("```json\n")
-        .removeprefix("json\n")
-        .removesuffix("```")
-        .strip()
-    )
+    for p in ("json```\n", "```json\n", "json\n"):
+        if txt.startswith(p):
+            txt = txt[len(p) :]
+    if txt.endswith("```"):
+        txt = txt[:-3]
+    return txt.strip()
 
 
 def coerce_numeric_string(

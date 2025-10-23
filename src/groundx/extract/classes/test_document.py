@@ -1,4 +1,7 @@
-import typing, unittest
+import pytest, typing, unittest
+
+pytest.importorskip("PIL")
+
 from io import BytesIO
 from PIL import Image
 from unittest.mock import patch
