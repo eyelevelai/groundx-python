@@ -19,12 +19,17 @@ class GroundXDocument(BaseModel):
 
     def xray(
         self,
+        cache_dir: Path,
         clear_cache: bool = False,
         is_test: bool = False,
         base: typing.Optional[str] = None,
     ) -> "XRayDocument":
         return XRayDocument.download(
-            self, base=base, clear_cache=clear_cache, is_test=is_test
+            self,
+            cache_dir=cache_dir,
+            base=base,
+            clear_cache=clear_cache,
+            is_test=is_test,
         )
 
 
@@ -81,11 +86,11 @@ class XRayDocument(BaseModel):
     def download(
         cls,
         gx_doc: GroundXDocument,
+        cache_dir: Path,
         clear_cache: bool = False,
         is_test: bool = False,
         base: typing.Optional[str] = None,
     ) -> "XRayDocument":
-        cache_dir = Path(__file__).resolve().parent.parent / "cache"
         cache_dir.mkdir(parents=True, exist_ok=True)
         cache_file = cache_dir / f"{gx_doc.document_id}-xray.json"
 

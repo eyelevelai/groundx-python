@@ -1,6 +1,7 @@
 import json, os, shutil, requests, time, typing
 from datetime import datetime, timezone
 from io import BytesIO
+from pathlib import Path
 from PIL import Image
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
@@ -41,6 +42,7 @@ class Document(BaseModel):
     def from_request(
         cls: typing.Type[DocT],
         base_url: str,
+        cache_dir: Path,
         req: "DocumentRequest",
         **data: typing.Any,
     ) -> DocT:
@@ -54,7 +56,7 @@ class Document(BaseModel):
             base_url=base_url,
             documentID=req.document_id,
             taskID=req.task_id,
-        ).xray(clear_cache=req.clear_cache)
+        ).xray(cache_dir=cache_dir, clear_cache=req.clear_cache)
 
         for page in xray_doc.documentPages:
             st.page_images.append(page.pageUrl)
