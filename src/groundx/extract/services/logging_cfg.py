@@ -14,7 +14,7 @@ def logging_config(name: str, level: str) -> typing.Dict[str, typing.Any]:
         },
         "handlers": {
             "default": {
-                "level": level,
+                "level": level.upper(),
                 "formatter": "default",
                 "class": "logging.StreamHandler",
                 "stream": "ext://sys.stdout",
@@ -27,7 +27,7 @@ def logging_config(name: str, level: str) -> typing.Dict[str, typing.Any]:
             },
             name: {
                 "handlers": ["default"],
-                "level": level,
+                "level": level.upper(),
                 "propagate": False,
             },
             "gunicorn.error": {
