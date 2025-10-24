@@ -84,7 +84,7 @@ class AgentCode(CodeAgent):
     def __init__(
         self,
         settings: AgentSettings,
-        logger: Logger,
+        log: Logger,
         name: typing.Optional[str] = None,
         description: typing.Optional[str] = None,
         tools: typing.Optional[typing.List[Tool]] = None,
@@ -114,7 +114,7 @@ class AgentCode(CodeAgent):
 
         self.python_executor.static_tools.update({"open": open})  # type: ignore
 
-        self.logger = logger
+        self.log = log
 
     def process(
         self,
@@ -137,7 +137,7 @@ class AgentCode(CodeAgent):
                     f"agent process result is not of expected type(s) {expected_types!r}: [{e}]\n\n{res}"
                 )
 
-            self.logger.debug_msg(
+            self.log.debug_msg(
                 f"agent process result is not of expected type(s) {expected_types!r}: [{e}], attempting again [{attempt+1}]\n\n{res}"
             )
 
@@ -148,7 +148,7 @@ class AgentTool(ToolCallingAgent):
     def __init__(
         self,
         settings: AgentSettings,
-        logger: Logger,
+        log: Logger,
         name: typing.Optional[str] = None,
         description: typing.Optional[str] = None,
         tools: typing.Optional[typing.List[Tool]] = None,
@@ -172,7 +172,7 @@ class AgentTool(ToolCallingAgent):
             verbosity_level=verbosity,
         )
 
-        self.logger = logger
+        self.log = log
 
     def process(
         self,
