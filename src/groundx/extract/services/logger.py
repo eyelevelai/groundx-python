@@ -64,7 +64,6 @@ class Logger:
         self,
         api_key: str,
         callback_url: str,
-        result_url: str,
         req: typing.Dict[str, typing.Any],
     ):
         import requests
