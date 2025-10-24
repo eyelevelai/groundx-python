@@ -153,13 +153,13 @@ vine = ">=5.0.0,<6.0.0"
 
 [[package]]
 name = "annotated-doc"
-version = "0.0.2"
+version = "0.0.3"
 description = "Document parameters, class attributes, return types, and variables inline, with Annotated."
 optional = true
 python-versions = ">=3.8"
 files = [
-    {file = "annotated_doc-0.0.2-py3-none-any.whl", hash = "sha256:2188cb99e353fcb5c20f23b8bc6f5fa7c924b213fac733d4b44883f9edffa090"},
-    {file = "annotated_doc-0.0.2.tar.gz", hash = "sha256:f25664061aee278227abfaec5aeb398298be579b934758c16205d48e896e149c"},
+    {file = "annotated_doc-0.0.3-py3-none-any.whl", hash = "sha256:348ec6664a76f1fd3be81f43dffbee4c7e8ce931ba71ec67cc7f4ade7fbbb580"},
+    {file = "annotated_doc-0.0.3.tar.gz", hash = "sha256:e18370014c70187422c33e945053ff4c286f453a984eba84d0dbfa0c935adeda"},
 ]
 
 [[package]]
@@ -3076,9 +3076,9 @@ multidict = ">=4.0"
 propcache = ">=0.2.0"
 
 [extras]
-extract = ["boto3", "celery", "celery-types", "dateparser", "fastapi", "google-api-python-client", "google-api-python-client-stubs", "google-auth-stubs", "gspread", "minio", "redis", "types-boto3", "types-dateparser"]
+extract = ["boto3", "celery", "celery-types", "dateparser", "fastapi", "google-api-python-client", "google-api-python-client-stubs", "google-auth-stubs", "gspread", "minio", "pytest", "redis", "types-boto3", "types-dateparser"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "75b917cd070e35708a8943ef43ae60339becde883ed92c26249841f3e86aa18d"
+content-hash = "741903a01d67f4d32548d144b62fbcd044eb8df52651203179c43b2a27e35e0c"
