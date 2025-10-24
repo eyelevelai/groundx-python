@@ -8,12 +8,13 @@ DocT = typing.TypeVar("DocT", bound=Document)
 
 
 class AgentRequest(BaseModel, typing.Generic[ReqT, DocT]):
-    allowed_request_types: typing.List[str] = []
+    allowed_request_types: typing.ClassVar[typing.List[str]] = []
     request: ReqT
     request_type: str
     statement: DocT
 
     @field_validator("request_type")
+    @classmethod
     def validate_request_type(cls, value: str):
         if value not in cls.allowed_request_types:
             raise ValueError(
