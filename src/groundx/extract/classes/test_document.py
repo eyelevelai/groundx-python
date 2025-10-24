@@ -3,6 +3,7 @@ import pytest, typing, unittest
 pytest.importorskip("PIL")
 
 from io import BytesIO
+from pathlib import Path
 from PIL import Image
 from unittest.mock import patch
 
@@ -12,6 +13,14 @@ from .test_groundx import TestXRay
 
 def DR(**data: typing.Any) -> DocumentRequest:
     return DocumentRequest.model_validate(data)
+
+
+def test_doc() -> Document:
+    return Document.from_request(
+        cache_dir=Path("./cache"),
+        base_url="",
+        req=test_request(),
+    )
 
 
 def test_request() -> DocumentRequest:
@@ -28,12 +37,10 @@ class TestDocument(unittest.TestCase):
         self.mock_xray.return_value = TestXRay("http://test.co", [])
 
     def test_init_name(self) -> None:
-        st1: Document = Document.from_request(
-            base_url="",
-            req=test_request(),
-        )
+        st1: Document = test_doc()
         self.assertEqual(st1.file_name, "F")
         st2: Document = Document.from_request(
+            cache_dir=Path("./cache"),
             base_url="",
             req=DR(
                 documentID="D", fileName="F.pdf", modelID=1, processorID=1, taskID="T"
@@ -41,6 +48,7 @@ class TestDocument(unittest.TestCase):
         )
         self.assertEqual(st2.file_name, "F.pdf")
         st3: Document = Document.from_request(
+            cache_dir=Path("./cache"),
             base_url="",
             req=DR(documentID="D", fileName="F.", modelID=1, processorID=1, taskID="T"),
         )
