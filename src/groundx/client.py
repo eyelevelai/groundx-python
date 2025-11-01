@@ -11,6 +11,7 @@ from .environment import GroundXEnvironment
 from .groups.client import AsyncGroupsClient, GroupsClient
 from .health.client import AsyncHealthClient, HealthClient
 from .search.client import AsyncSearchClient, SearchClient
+from .workflow.client import AsyncWorkflowClient, WorkflowClient
 
 
 class GroundXBase:
@@ -77,6 +78,7 @@ class GroundXBase:
         self.search = SearchClient(client_wrapper=self._client_wrapper)
         self.buckets = BucketsClient(client_wrapper=self._client_wrapper)
         self.groups = GroupsClient(client_wrapper=self._client_wrapper)
+        self.workflow = WorkflowClient(client_wrapper=self._client_wrapper)
         self.customer = CustomerClient(client_wrapper=self._client_wrapper)
         self.health = HealthClient(client_wrapper=self._client_wrapper)
 
@@ -145,6 +147,7 @@ class AsyncGroundXBase:
         self.search = AsyncSearchClient(client_wrapper=self._client_wrapper)
         self.buckets = AsyncBucketsClient(client_wrapper=self._client_wrapper)
         self.groups = AsyncGroupsClient(client_wrapper=self._client_wrapper)
+        self.workflow = AsyncWorkflowClient(client_wrapper=self._client_wrapper)
         self.customer = AsyncCustomerClient(client_wrapper=self._client_wrapper)
         self.health = AsyncHealthClient(client_wrapper=self._client_wrapper)
 
