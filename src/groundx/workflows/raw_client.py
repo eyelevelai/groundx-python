@@ -11,6 +11,7 @@ from ..core.pydantic_utilities import parse_obj_as
 from ..core.request_options import RequestOptions
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..types.message_response import MessageResponse
+from ..types.workflow_request_chunk_strategy import WorkflowRequestChunkStrategy
 from ..types.workflow_response import WorkflowResponse
 from ..types.workflow_steps import WorkflowSteps
 from ..types.workflows_response import WorkflowsResponse
@@ -61,6 +62,7 @@ class RawWorkflowsClient:
     def create(
         self,
         *,
+        chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -70,6 +72,8 @@ class RawWorkflowsClient:
 
         Parameters
         ----------
+        chunk_strategy : typing.Optional[WorkflowRequestChunkStrategy]
+
         name : typing.Optional[str]
             The name of the workflow being created.
 
@@ -87,6 +91,7 @@ class RawWorkflowsClient:
             "v1/workflow",
             method="POST",
             json={
+                "chunkStrategy": chunk_strategy,
                 "name": name,
                 "steps": convert_and_respect_annotation_metadata(
                     object_=steps, annotation=WorkflowSteps, direction="write"
@@ -326,6 +331,7 @@ class RawWorkflowsClient:
         self,
         id: str,
         *,
+        chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -337,6 +343,8 @@ class RawWorkflowsClient:
         ----------
         id : str
             The workflowId of the workflow being updated.
+
+        chunk_strategy : typing.Optional[WorkflowRequestChunkStrategy]
 
         name : typing.Optional[str]
             The name of the workflow being created.
@@ -355,6 +363,7 @@ class RawWorkflowsClient:
             f"v1/workflow/{jsonable_encoder(id)}",
             method="PUT",
             json={
+                "chunkStrategy": chunk_strategy,
                 "name": name,
                 "steps": convert_and_respect_annotation_metadata(
                     object_=steps, annotation=WorkflowSteps, direction="write"
@@ -464,6 +473,7 @@ class AsyncRawWorkflowsClient:
     async def create(
         self,
         *,
+        chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -473,6 +483,8 @@ class AsyncRawWorkflowsClient:
 
         Parameters
         ----------
+        chunk_strategy : typing.Optional[WorkflowRequestChunkStrategy]
+
         name : typing.Optional[str]
             The name of the workflow being created.
 
@@ -490,6 +502,7 @@ class AsyncRawWorkflowsClient:
             "v1/workflow",
             method="POST",
             json={
+                "chunkStrategy": chunk_strategy,
                 "name": name,
                 "steps": convert_and_respect_annotation_metadata(
                     object_=steps, annotation=WorkflowSteps, direction="write"
@@ -729,6 +742,7 @@ class AsyncRawWorkflowsClient:
         self,
         id: str,
         *,
+        chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -740,6 +754,8 @@ class AsyncRawWorkflowsClient:
         ----------
         id : str
             The workflowId of the workflow being updated.
+
+        chunk_strategy : typing.Optional[WorkflowRequestChunkStrategy]
 
         name : typing.Optional[str]
             The name of the workflow being created.
@@ -758,6 +774,7 @@ class AsyncRawWorkflowsClient:
             f"v1/workflow/{jsonable_encoder(id)}",
             method="PUT",
             json={
+                "chunkStrategy": chunk_strategy,
                 "name": name,
                 "steps": convert_and_respect_annotation_metadata(
                     object_=steps, annotation=WorkflowSteps, direction="write"

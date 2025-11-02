@@ -51,6 +51,7 @@ from .subscription_detail_meters import SubscriptionDetailMeters
 from .website_source import WebsiteSource
 from .workflow_apply_request import WorkflowApplyRequest
 from .workflow_detail import WorkflowDetail
+from .workflow_detail_chunk_strategy import WorkflowDetailChunkStrategy
 from .workflow_detail_relationships import WorkflowDetailRelationships
 from .workflow_engine import WorkflowEngine
 from .workflow_engine_reasoning_effort import WorkflowEngineReasoningEffort
@@ -59,9 +60,11 @@ from .workflow_prompt import WorkflowPrompt
 from .workflow_prompt_group import WorkflowPromptGroup
 from .workflow_prompt_role import WorkflowPromptRole
 from .workflow_request import WorkflowRequest
+from .workflow_request_chunk_strategy import WorkflowRequestChunkStrategy
 from .workflow_response import WorkflowResponse
 from .workflow_step import WorkflowStep
 from .workflow_step_config import WorkflowStepConfig
+from .workflow_step_config_field import WorkflowStepConfigField
 from .workflow_steps import WorkflowSteps
 from .workflows_response import WorkflowsResponse
 
@@ -115,6 +118,7 @@ __all__ = [
     "WebsiteSource",
     "WorkflowApplyRequest",
     "WorkflowDetail",
+    "WorkflowDetailChunkStrategy",
     "WorkflowDetailRelationships",
     "WorkflowEngine",
     "WorkflowEngineReasoningEffort",
@@ -123,9 +127,11 @@ __all__ = [
     "WorkflowPromptGroup",
     "WorkflowPromptRole",
     "WorkflowRequest",
+    "WorkflowRequestChunkStrategy",
     "WorkflowResponse",
     "WorkflowStep",
     "WorkflowStepConfig",
+    "WorkflowStepConfigField",
     "WorkflowSteps",
     "WorkflowsResponse",
 ]
