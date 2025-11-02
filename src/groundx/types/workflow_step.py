@@ -3,9 +3,10 @@
 import typing
 
 import pydantic
+import typing_extensions
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
-from .workflow_engine import WorkflowEngine
-from .workflow_prompt_group import WorkflowPromptGroup
+from ..core.serialization import FieldMetadata
+from .workflow_step_config import WorkflowStepConfig
 
 
 class WorkflowStep(UniversalBaseModel):
@@ -13,8 +14,14 @@ class WorkflowStep(UniversalBaseModel):
     Configurations for an agent, including LLM information and prompts
     """
 
-    engine: typing.Optional[WorkflowEngine] = None
-    prompt: typing.Optional[WorkflowPromptGroup] = None
+    all_: typing_extensions.Annotated[typing.Optional[WorkflowStepConfig], FieldMetadata(alias="all")] = None
+    figure: typing.Optional[WorkflowStepConfig] = None
+    json_: typing_extensions.Annotated[typing.Optional[WorkflowStepConfig], FieldMetadata(alias="json")] = None
+    paragraph: typing.Optional[WorkflowStepConfig] = None
+    table: typing.Optional[WorkflowStepConfig] = None
+    table_figure: typing_extensions.Annotated[
+        typing.Optional[WorkflowStepConfig], FieldMetadata(alias="table-figure")
+    ] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

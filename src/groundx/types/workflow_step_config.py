@@ -4,11 +4,17 @@ import typing
 
 import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
-from .workflow_step import WorkflowStep
+from .workflow_engine import WorkflowEngine
+from .workflow_prompt_group import WorkflowPromptGroup
 
 
-class WorkflowStepsSectInstruct(UniversalBaseModel):
-    table: typing.Optional[WorkflowStep] = None
+class WorkflowStepConfig(UniversalBaseModel):
+    """
+    Configurations for an agent, including LLM information and prompts
+    """
+
+    engine: typing.Optional[WorkflowEngine] = None
+    prompt: typing.Optional[WorkflowPromptGroup] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
