@@ -58,6 +58,7 @@ from .workflow_engine_service import WorkflowEngineService
 from .workflow_prompt import WorkflowPrompt
 from .workflow_prompt_group import WorkflowPromptGroup
 from .workflow_prompt_role import WorkflowPromptRole
+from .workflow_request import WorkflowRequest
 from .workflow_response import WorkflowResponse
 from .workflow_step import WorkflowStep
 from .workflow_step_config import WorkflowStepConfig
@@ -121,6 +122,7 @@ __all__ = [
     "WorkflowPrompt",
     "WorkflowPromptGroup",
     "WorkflowPromptRole",
+    "WorkflowRequest",
     "WorkflowResponse",
     "WorkflowStep",
     "WorkflowStepConfig",

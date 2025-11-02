@@ -326,7 +326,6 @@ class RawWorkflowsClient:
         self,
         id: str,
         *,
-        workflow_id: str,
         name: typing.Optional[str] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -338,9 +337,6 @@ class RawWorkflowsClient:
         ----------
         id : str
             The workflowId of the workflow being updated.
-
-        workflow_id : str
-            The id of the workflow that is being updated.
 
         name : typing.Optional[str]
             The name of the workflow being created.
@@ -363,7 +359,6 @@ class RawWorkflowsClient:
                 "steps": convert_and_respect_annotation_metadata(
                     object_=steps, annotation=WorkflowSteps, direction="write"
                 ),
-                "workflowId": workflow_id,
             },
             headers={
                 "content-type": "application/json",
@@ -734,7 +729,6 @@ class AsyncRawWorkflowsClient:
         self,
         id: str,
         *,
-        workflow_id: str,
         name: typing.Optional[str] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -746,9 +740,6 @@ class AsyncRawWorkflowsClient:
         ----------
         id : str
             The workflowId of the workflow being updated.
-
-        workflow_id : str
-            The id of the workflow that is being updated.
 
         name : typing.Optional[str]
             The name of the workflow being created.
@@ -771,7 +762,6 @@ class AsyncRawWorkflowsClient:
                 "steps": convert_and_respect_annotation_metadata(
                     object_=steps, annotation=WorkflowSteps, direction="write"
                 ),
-                "workflowId": workflow_id,
             },
             headers={
                 "content-type": "application/json",
