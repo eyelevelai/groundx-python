@@ -60,14 +60,8 @@ from .workflow_prompt_group import WorkflowPromptGroup
 from .workflow_prompt_role import WorkflowPromptRole
 from .workflow_response import WorkflowResponse
 from .workflow_step import WorkflowStep
+from .workflow_step_config import WorkflowStepConfig
 from .workflow_steps import WorkflowSteps
-from .workflow_steps_chunk_instruct import WorkflowStepsChunkInstruct
-from .workflow_steps_chunk_summary import WorkflowStepsChunkSummary
-from .workflow_steps_doc_keys import WorkflowStepsDocKeys
-from .workflow_steps_doc_summary import WorkflowStepsDocSummary
-from .workflow_steps_search_query import WorkflowStepsSearchQuery
-from .workflow_steps_sect_instruct import WorkflowStepsSectInstruct
-from .workflow_steps_sect_summary import WorkflowStepsSectSummary
 from .workflows_response import WorkflowsResponse
 
 __all__ = [
@@ -129,13 +123,7 @@ __all__ = [
     "WorkflowPromptRole",
     "WorkflowResponse",
     "WorkflowStep",
+    "WorkflowStepConfig",
     "WorkflowSteps",
-    "WorkflowStepsChunkInstruct",
-    "WorkflowStepsChunkSummary",
-    "WorkflowStepsDocKeys",
-    "WorkflowStepsDocSummary",
-    "WorkflowStepsSearchQuery",
-    "WorkflowStepsSectInstruct",
-    "WorkflowStepsSectSummary",
     "WorkflowsResponse",
 ]
