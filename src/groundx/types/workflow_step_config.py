@@ -6,6 +6,7 @@ import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 from .workflow_engine import WorkflowEngine
 from .workflow_prompt_group import WorkflowPromptGroup
+from .workflow_step_config_field import WorkflowStepConfigField
 
 
 class WorkflowStepConfig(UniversalBaseModel):
@@ -14,6 +15,12 @@ class WorkflowStepConfig(UniversalBaseModel):
     """
 
     engine: typing.Optional[WorkflowEngine] = None
+    field: typing.Optional[WorkflowStepConfigField] = pydantic.Field(default=None)
+    """
+    The field where agent output will be saved
+    """
+
+    includes: typing.Optional[typing.Dict[str, bool]] = None
     prompt: typing.Optional[WorkflowPromptGroup] = None
 
     if IS_PYDANTIC_V2:

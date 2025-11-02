@@ -2133,6 +2133,14 @@ client.workflows.create()
 <dl>
 <dd>
 
+**chunk_strategy:** `typing.Optional[WorkflowRequestChunkStrategy]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **name:** `typing.Optional[str]` — The name of the workflow being created.
     
 </dd>
@@ -2561,6 +2569,14 @@ client.workflows.update(
 <dd>
 
 **id:** `str` — The workflowId of the workflow being updated.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**chunk_strategy:** `typing.Optional[WorkflowRequestChunkStrategy]` 
     
 </dd>
 </dl>

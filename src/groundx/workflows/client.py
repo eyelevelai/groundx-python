@@ -5,6 +5,7 @@ import typing
 from ..core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ..core.request_options import RequestOptions
 from ..types.message_response import MessageResponse
+from ..types.workflow_request_chunk_strategy import WorkflowRequestChunkStrategy
 from ..types.workflow_response import WorkflowResponse
 from ..types.workflow_steps import WorkflowSteps
 from ..types.workflows_response import WorkflowsResponse
@@ -59,6 +60,7 @@ class WorkflowsClient:
     def create(
         self,
         *,
+        chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -68,6 +70,8 @@ class WorkflowsClient:
 
         Parameters
         ----------
+        chunk_strategy : typing.Optional[WorkflowRequestChunkStrategy]
+
         name : typing.Optional[str]
             The name of the workflow being created.
 
@@ -90,7 +94,9 @@ class WorkflowsClient:
         )
         client.workflows.create()
         """
-        _response = self._raw_client.create(name=name, steps=steps, request_options=request_options)
+        _response = self._raw_client.create(
+            chunk_strategy=chunk_strategy, name=name, steps=steps, request_options=request_options
+        )
         return _response.data
 
     def add_to_account(
@@ -257,6 +263,7 @@ class WorkflowsClient:
         self,
         id: str,
         *,
+        chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -268,6 +275,8 @@ class WorkflowsClient:
         ----------
         id : str
             The workflowId of the workflow being updated.
+
+        chunk_strategy : typing.Optional[WorkflowRequestChunkStrategy]
 
         name : typing.Optional[str]
             The name of the workflow being created.
@@ -293,7 +302,9 @@ class WorkflowsClient:
             id="id",
         )
         """
-        _response = self._raw_client.update(id, name=name, steps=steps, request_options=request_options)
+        _response = self._raw_client.update(
+            id, chunk_strategy=chunk_strategy, name=name, steps=steps, request_options=request_options
+        )
         return _response.data
 
     def delete(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> MessageResponse:
@@ -380,6 +391,7 @@ class AsyncWorkflowsClient:
     async def create(
         self,
         *,
+        chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -389,6 +401,8 @@ class AsyncWorkflowsClient:
 
         Parameters
         ----------
+        chunk_strategy : typing.Optional[WorkflowRequestChunkStrategy]
+
         name : typing.Optional[str]
             The name of the workflow being created.
 
@@ -419,7 +433,9 @@ class AsyncWorkflowsClient:
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.create(name=name, steps=steps, request_options=request_options)
+        _response = await self._raw_client.create(
+            chunk_strategy=chunk_strategy, name=name, steps=steps, request_options=request_options
+        )
         return _response.data
 
     async def add_to_account(
@@ -628,6 +644,7 @@ class AsyncWorkflowsClient:
         self,
         id: str,
         *,
+        chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -639,6 +656,8 @@ class AsyncWorkflowsClient:
         ----------
         id : str
             The workflowId of the workflow being updated.
+
+        chunk_strategy : typing.Optional[WorkflowRequestChunkStrategy]
 
         name : typing.Optional[str]
             The name of the workflow being created.
@@ -672,7 +691,9 @@ class AsyncWorkflowsClient:
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.update(id, name=name, steps=steps, request_options=request_options)
+        _response = await self._raw_client.update(
+            id, chunk_strategy=chunk_strategy, name=name, steps=steps, request_options=request_options
+        )
         return _response.data
 
     async def delete(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> MessageResponse:
