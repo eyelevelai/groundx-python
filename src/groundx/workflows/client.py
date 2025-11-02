@@ -257,7 +257,6 @@ class WorkflowsClient:
         self,
         id: str,
         *,
-        workflow_id: str,
         name: typing.Optional[str] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -269,9 +268,6 @@ class WorkflowsClient:
         ----------
         id : str
             The workflowId of the workflow being updated.
-
-        workflow_id : str
-            The id of the workflow that is being updated.
 
         name : typing.Optional[str]
             The name of the workflow being created.
@@ -295,12 +291,9 @@ class WorkflowsClient:
         )
         client.workflows.update(
             id="id",
-            workflow_id="workflowId",
         )
         """
-        _response = self._raw_client.update(
-            id, workflow_id=workflow_id, name=name, steps=steps, request_options=request_options
-        )
+        _response = self._raw_client.update(id, name=name, steps=steps, request_options=request_options)
         return _response.data
 
     def delete(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> MessageResponse:
@@ -635,7 +628,6 @@ class AsyncWorkflowsClient:
         self,
         id: str,
         *,
-        workflow_id: str,
         name: typing.Optional[str] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -647,9 +639,6 @@ class AsyncWorkflowsClient:
         ----------
         id : str
             The workflowId of the workflow being updated.
-
-        workflow_id : str
-            The id of the workflow that is being updated.
 
         name : typing.Optional[str]
             The name of the workflow being created.
@@ -678,15 +667,12 @@ class AsyncWorkflowsClient:
         async def main() -> None:
             await client.workflows.update(
                 id="id",
-                workflow_id="workflowId",
             )
 
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.update(
-            id, workflow_id=workflow_id, name=name, steps=steps, request_options=request_options
-        )
+        _response = await self._raw_client.update(id, name=name, steps=steps, request_options=request_options)
         return _response.data
 
     async def delete(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> MessageResponse:

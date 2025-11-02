@@ -2544,7 +2544,6 @@ client = GroundX(
 )
 client.workflows.update(
     id="id",
-    workflow_id="workflowId",
 )
 
 ```
@@ -2562,14 +2561,6 @@ client.workflows.update(
 <dd>
 
 **id:** `str` — The workflowId of the workflow being updated.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**workflow_id:** `str` — The id of the workflow that is being updated.
     
 </dd>
 </dl>
