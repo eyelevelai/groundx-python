@@ -2,4 +2,4 @@
 
 import typing
 
-WorkflowPromptRole = typing.Union[typing.Literal["assistant", "system", "user"], typing.Any]
+WorkflowPromptRole = typing.Union[typing.Literal["assistant", "developer", "system", "user"], typing.Any]
