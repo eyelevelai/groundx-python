@@ -2025,7 +2025,7 @@ client.groups.remove_bucket(
 </details>
 
 ## Workflows
-<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">workflow_list</a>()</code></summary>
+<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">list</a>()</code></summary>
 <dl>
 <dd>
 
@@ -2057,7 +2057,7 @@ from groundx import GroundX
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
-client.workflows.workflow_list()
+client.workflows.list()
 
 ```
 </dd>
@@ -2085,7 +2085,7 @@ client.workflows.workflow_list()
 </dl>
 </details>
 
-<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">workflow_create</a>(...)</code></summary>
+<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">create</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -2117,7 +2117,7 @@ from groundx import GroundX
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
-client.workflows.workflow_create()
+client.workflows.create()
 
 ```
 </dd>
@@ -2440,7 +2440,7 @@ client.workflows.remove_from_id(
 </dl>
 </details>
 
-<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">workflow_get</a>(...)</code></summary>
+<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">get</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -2472,7 +2472,7 @@ from groundx import GroundX
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
-client.workflows.workflow_get(
+client.workflows.get(
     id=1,
 )
 
@@ -2490,7 +2490,7 @@ client.workflows.workflow_get(
 <dl>
 <dd>
 
-**id:** `WorkflowGetRequestId` — The id of the group, bucket, or workflow to look up.
+**id:** `WorkflowsGetRequestId` — The id of the group, bucket, or workflow to look up.
     
 </dd>
 </dl>
@@ -2510,7 +2510,7 @@ client.workflows.workflow_get(
 </dl>
 </details>
 
-<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">workflow_update</a>(...)</code></summary>
+<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">update</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -2542,7 +2542,7 @@ from groundx import GroundX
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
-client.workflows.workflow_update(
+client.workflows.update(
     id="id",
     workflow_id="workflowId",
 )
@@ -2605,7 +2605,7 @@ client.workflows.workflow_update(
 </dl>
 </details>
 
-<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">workflow_delete</a>(...)</code></summary>
+<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">delete</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -2637,7 +2637,7 @@ from groundx import GroundX
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
-client.workflows.workflow_delete(
+client.workflows.delete(
     id="id",
 )
 

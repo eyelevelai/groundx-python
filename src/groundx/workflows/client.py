@@ -9,7 +9,7 @@ from ..types.workflow_response import WorkflowResponse
 from ..types.workflow_steps import WorkflowSteps
 from ..types.workflows_response import WorkflowsResponse
 from .raw_client import AsyncRawWorkflowsClient, RawWorkflowsClient
-from .types.workflow_get_request_id import WorkflowGetRequestId
+from .types.workflows_get_request_id import WorkflowsGetRequestId
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -30,7 +30,7 @@ class WorkflowsClient:
         """
         return self._raw_client
 
-    def workflow_list(self, *, request_options: typing.Optional[RequestOptions] = None) -> WorkflowsResponse:
+    def list(self, *, request_options: typing.Optional[RequestOptions] = None) -> WorkflowsResponse:
         """
         Get all workflows associated with the API key.
 
@@ -51,12 +51,12 @@ class WorkflowsClient:
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
-        client.workflows.workflow_list()
+        client.workflows.list()
         """
-        _response = self._raw_client.workflow_list(request_options=request_options)
+        _response = self._raw_client.list(request_options=request_options)
         return _response.data
 
-    def workflow_create(
+    def create(
         self,
         *,
         name: typing.Optional[str] = OMIT,
@@ -88,9 +88,9 @@ class WorkflowsClient:
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
-        client.workflows.workflow_create()
+        client.workflows.create()
         """
-        _response = self._raw_client.workflow_create(name=name, steps=steps, request_options=request_options)
+        _response = self._raw_client.create(name=name, steps=steps, request_options=request_options)
         return _response.data
 
     def add_to_account(
@@ -220,15 +220,15 @@ class WorkflowsClient:
         _response = self._raw_client.remove_from_id(id, request_options=request_options)
         return _response.data
 
-    def workflow_get(
-        self, id: WorkflowGetRequestId, *, request_options: typing.Optional[RequestOptions] = None
+    def get(
+        self, id: WorkflowsGetRequestId, *, request_options: typing.Optional[RequestOptions] = None
     ) -> WorkflowResponse:
         """
         look up a specific workflow by groupId, bucketId, or workflowId.
 
         Parameters
         ----------
-        id : WorkflowGetRequestId
+        id : WorkflowsGetRequestId
             The id of the group, bucket, or workflow to look up.
 
         request_options : typing.Optional[RequestOptions]
@@ -246,14 +246,14 @@ class WorkflowsClient:
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
-        client.workflows.workflow_get(
+        client.workflows.get(
             id=1,
         )
         """
-        _response = self._raw_client.workflow_get(id, request_options=request_options)
+        _response = self._raw_client.get(id, request_options=request_options)
         return _response.data
 
-    def workflow_update(
+    def update(
         self,
         id: str,
         *,
@@ -293,17 +293,17 @@ class WorkflowsClient:
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
-        client.workflows.workflow_update(
+        client.workflows.update(
             id="id",
             workflow_id="workflowId",
         )
         """
-        _response = self._raw_client.workflow_update(
+        _response = self._raw_client.update(
             id, workflow_id=workflow_id, name=name, steps=steps, request_options=request_options
         )
         return _response.data
 
-    def workflow_delete(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> MessageResponse:
+    def delete(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> MessageResponse:
         """
         Delete a workflow.
 
@@ -327,11 +327,11 @@ class WorkflowsClient:
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
-        client.workflows.workflow_delete(
+        client.workflows.delete(
             id="id",
         )
         """
-        _response = self._raw_client.workflow_delete(id, request_options=request_options)
+        _response = self._raw_client.delete(id, request_options=request_options)
         return _response.data
 
 
@@ -350,7 +350,7 @@ class AsyncWorkflowsClient:
         """
         return self._raw_client
 
-    async def workflow_list(self, *, request_options: typing.Optional[RequestOptions] = None) -> WorkflowsResponse:
+    async def list(self, *, request_options: typing.Optional[RequestOptions] = None) -> WorkflowsResponse:
         """
         Get all workflows associated with the API key.
 
@@ -376,15 +376,15 @@ class AsyncWorkflowsClient:
 
 
         async def main() -> None:
-            await client.workflows.workflow_list()
+            await client.workflows.list()
 
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.workflow_list(request_options=request_options)
+        _response = await self._raw_client.list(request_options=request_options)
         return _response.data
 
-    async def workflow_create(
+    async def create(
         self,
         *,
         name: typing.Optional[str] = OMIT,
@@ -421,12 +421,12 @@ class AsyncWorkflowsClient:
 
 
         async def main() -> None:
-            await client.workflows.workflow_create()
+            await client.workflows.create()
 
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.workflow_create(name=name, steps=steps, request_options=request_options)
+        _response = await self._raw_client.create(name=name, steps=steps, request_options=request_options)
         return _response.data
 
     async def add_to_account(
@@ -590,15 +590,15 @@ class AsyncWorkflowsClient:
         _response = await self._raw_client.remove_from_id(id, request_options=request_options)
         return _response.data
 
-    async def workflow_get(
-        self, id: WorkflowGetRequestId, *, request_options: typing.Optional[RequestOptions] = None
+    async def get(
+        self, id: WorkflowsGetRequestId, *, request_options: typing.Optional[RequestOptions] = None
     ) -> WorkflowResponse:
         """
         look up a specific workflow by groupId, bucketId, or workflowId.
 
         Parameters
         ----------
-        id : WorkflowGetRequestId
+        id : WorkflowsGetRequestId
             The id of the group, bucket, or workflow to look up.
 
         request_options : typing.Optional[RequestOptions]
@@ -621,17 +621,17 @@ class AsyncWorkflowsClient:
 
 
         async def main() -> None:
-            await client.workflows.workflow_get(
+            await client.workflows.get(
                 id=1,
             )
 
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.workflow_get(id, request_options=request_options)
+        _response = await self._raw_client.get(id, request_options=request_options)
         return _response.data
 
-    async def workflow_update(
+    async def update(
         self,
         id: str,
         *,
@@ -676,7 +676,7 @@ class AsyncWorkflowsClient:
 
 
         async def main() -> None:
-            await client.workflows.workflow_update(
+            await client.workflows.update(
                 id="id",
                 workflow_id="workflowId",
             )
@@ -684,14 +684,12 @@ class AsyncWorkflowsClient:
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.workflow_update(
+        _response = await self._raw_client.update(
             id, workflow_id=workflow_id, name=name, steps=steps, request_options=request_options
         )
         return _response.data
 
-    async def workflow_delete(
-        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> MessageResponse:
+    async def delete(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> MessageResponse:
         """
         Delete a workflow.
 
@@ -720,12 +718,12 @@ class AsyncWorkflowsClient:
 
 
         async def main() -> None:
-            await client.workflows.workflow_delete(
+            await client.workflows.delete(
                 id="id",
             )
 
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.workflow_delete(id, request_options=request_options)
+        _response = await self._raw_client.delete(id, request_options=request_options)
         return _response.data
