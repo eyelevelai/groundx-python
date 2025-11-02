@@ -3,9 +3,7 @@
 import typing
 
 import pydantic
-import typing_extensions
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
-from ..core.serialization import FieldMetadata
 from .workflow_prompt_role import WorkflowPromptRole
 
 
@@ -19,7 +17,7 @@ class WorkflowPrompt(UniversalBaseModel):
     A short version of the prompt that is included in historical chat transcripts as part of the prompt context
     """
 
-    long_: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="long")] = pydantic.Field(default=None)
+    prompt: typing.Optional[str] = pydantic.Field(default=None)
     """
     The prompt that is sent to the LLM
     """
