@@ -2,6 +2,6 @@
 
 # isort: skip_file
 
-from .types import WorkflowGetRequestId
+from .types import WorkflowsGetRequestId
 
-__all__ = ["WorkflowGetRequestId"]
+__all__ = ["WorkflowsGetRequestId"]

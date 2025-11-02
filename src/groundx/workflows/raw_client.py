@@ -14,7 +14,7 @@ from ..types.message_response import MessageResponse
 from ..types.workflow_response import WorkflowResponse
 from ..types.workflow_steps import WorkflowSteps
 from ..types.workflows_response import WorkflowsResponse
-from .types.workflow_get_request_id import WorkflowGetRequestId
+from .types.workflows_get_request_id import WorkflowsGetRequestId
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -24,9 +24,7 @@ class RawWorkflowsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    def workflow_list(
-        self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> HttpResponse[WorkflowsResponse]:
+    def list(self, *, request_options: typing.Optional[RequestOptions] = None) -> HttpResponse[WorkflowsResponse]:
         """
         Get all workflows associated with the API key.
 
@@ -60,7 +58,7 @@ class RawWorkflowsClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    def workflow_create(
+    def create(
         self,
         *,
         name: typing.Optional[str] = OMIT,
@@ -285,15 +283,15 @@ class RawWorkflowsClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    def workflow_get(
-        self, id: WorkflowGetRequestId, *, request_options: typing.Optional[RequestOptions] = None
+    def get(
+        self, id: WorkflowsGetRequestId, *, request_options: typing.Optional[RequestOptions] = None
     ) -> HttpResponse[WorkflowResponse]:
         """
         look up a specific workflow by groupId, bucketId, or workflowId.
 
         Parameters
         ----------
-        id : WorkflowGetRequestId
+        id : WorkflowsGetRequestId
             The id of the group, bucket, or workflow to look up.
 
         request_options : typing.Optional[RequestOptions]
@@ -324,7 +322,7 @@ class RawWorkflowsClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    def workflow_update(
+    def update(
         self,
         id: str,
         *,
@@ -388,7 +386,7 @@ class RawWorkflowsClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    def workflow_delete(
+    def delete(
         self, id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> HttpResponse[MessageResponse]:
         """
@@ -432,7 +430,7 @@ class AsyncRawWorkflowsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    async def workflow_list(
+    async def list(
         self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> AsyncHttpResponse[WorkflowsResponse]:
         """
@@ -468,7 +466,7 @@ class AsyncRawWorkflowsClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    async def workflow_create(
+    async def create(
         self,
         *,
         name: typing.Optional[str] = OMIT,
@@ -693,15 +691,15 @@ class AsyncRawWorkflowsClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    async def workflow_get(
-        self, id: WorkflowGetRequestId, *, request_options: typing.Optional[RequestOptions] = None
+    async def get(
+        self, id: WorkflowsGetRequestId, *, request_options: typing.Optional[RequestOptions] = None
     ) -> AsyncHttpResponse[WorkflowResponse]:
         """
         look up a specific workflow by groupId, bucketId, or workflowId.
 
         Parameters
         ----------
-        id : WorkflowGetRequestId
+        id : WorkflowsGetRequestId
             The id of the group, bucket, or workflow to look up.
 
         request_options : typing.Optional[RequestOptions]
@@ -732,7 +730,7 @@ class AsyncRawWorkflowsClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    async def workflow_update(
+    async def update(
         self,
         id: str,
         *,
@@ -796,7 +794,7 @@ class AsyncRawWorkflowsClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    async def workflow_delete(
+    async def delete(
         self, id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> AsyncHttpResponse[MessageResponse]:
         """

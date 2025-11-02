@@ -77,7 +77,7 @@ from .environment import GroundXEnvironment
 from .ingest import AsyncGroundX, GroundX
 from .search import SearchContentRequestId
 from .version import __version__
-from .workflows import WorkflowGetRequestId
+from .workflows import WorkflowsGetRequestId
 
 __all__ = [
     "AsyncGroundX",
@@ -139,7 +139,6 @@ __all__ = [
     "WorkflowEngine",
     "WorkflowEngineReasoningEffort",
     "WorkflowEngineService",
-    "WorkflowGetRequestId",
     "WorkflowPrompt",
     "WorkflowPromptGroup",
     "WorkflowPromptRole",
@@ -153,6 +152,7 @@ __all__ = [
     "WorkflowStepsSearchQuery",
     "WorkflowStepsSectInstruct",
     "WorkflowStepsSectSummary",
+    "WorkflowsGetRequestId",
     "WorkflowsResponse",
     "__version__",
     "buckets",

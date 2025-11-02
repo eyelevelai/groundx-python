@@ -2,4 +2,4 @@
 
 import typing
 
-WorkflowGetRequestId = typing.Union[int, str]
+WorkflowsGetRequestId = typing.Union[int, str]
