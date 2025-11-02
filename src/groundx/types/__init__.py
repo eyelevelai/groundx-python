@@ -2,73 +2,168 @@
 
 # isort: skip_file
 
-from .bounding_box_detail import BoundingBoxDetail
-from .bucket_detail import BucketDetail
-from .bucket_list_response import BucketListResponse
-from .bucket_response import BucketResponse
-from .bucket_update_detail import BucketUpdateDetail
-from .bucket_update_response import BucketUpdateResponse
-from .customer_detail import CustomerDetail
-from .customer_response import CustomerResponse
-from .document import Document
-from .document_detail import DocumentDetail
-from .document_list_response import DocumentListResponse
-from .document_local_ingest_request import DocumentLocalIngestRequest
-from .document_lookup_response import DocumentLookupResponse
-from .document_response import DocumentResponse
-from .document_type import DocumentType
-from .group_detail import GroupDetail
-from .group_list_response import GroupListResponse
-from .group_response import GroupResponse
-from .health_response import HealthResponse
-from .health_response_health import HealthResponseHealth
-from .health_service import HealthService
-from .health_service_status import HealthServiceStatus
-from .ingest_local_document import IngestLocalDocument
-from .ingest_local_document_metadata import IngestLocalDocumentMetadata
-from .ingest_remote_document import IngestRemoteDocument
-from .ingest_response import IngestResponse
-from .ingest_status import IngestStatus
-from .ingest_status_light import IngestStatusLight
-from .ingest_status_progress import IngestStatusProgress
-from .ingest_status_progress_cancelled import IngestStatusProgressCancelled
-from .ingest_status_progress_complete import IngestStatusProgressComplete
-from .ingest_status_progress_errors import IngestStatusProgressErrors
-from .ingest_status_progress_processing import IngestStatusProgressProcessing
-from .message_response import MessageResponse
-from .meter_detail import MeterDetail
-from .process_level import ProcessLevel
-from .processes_status_response import ProcessesStatusResponse
-from .processing_status import ProcessingStatus
-from .search_response import SearchResponse
-from .search_response_search import SearchResponseSearch
-from .search_result_item import SearchResultItem
-from .search_result_item_pages_item import SearchResultItemPagesItem
-from .sort import Sort
-from .sort_order import SortOrder
-from .subscription_detail import SubscriptionDetail
-from .subscription_detail_meters import SubscriptionDetailMeters
-from .website_source import WebsiteSource
-from .workflow_apply_request import WorkflowApplyRequest
-from .workflow_detail import WorkflowDetail
-from .workflow_detail_relationships import WorkflowDetailRelationships
-from .workflow_engine import WorkflowEngine
-from .workflow_engine_reasoning_effort import WorkflowEngineReasoningEffort
-from .workflow_engine_service import WorkflowEngineService
-from .workflow_prompt import WorkflowPrompt
-from .workflow_prompt_group import WorkflowPromptGroup
-from .workflow_prompt_role import WorkflowPromptRole
-from .workflow_response import WorkflowResponse
-from .workflow_step import WorkflowStep
-from .workflow_steps import WorkflowSteps
-from .workflow_steps_chunk_instruct import WorkflowStepsChunkInstruct
-from .workflow_steps_chunk_summary import WorkflowStepsChunkSummary
-from .workflow_steps_doc_keys import WorkflowStepsDocKeys
-from .workflow_steps_doc_summary import WorkflowStepsDocSummary
-from .workflow_steps_search_query import WorkflowStepsSearchQuery
-from .workflow_steps_sect_instruct import WorkflowStepsSectInstruct
-from .workflow_steps_sect_summary import WorkflowStepsSectSummary
-from .workflows_response import WorkflowsResponse
+import typing
+from importlib import import_module
+
+if typing.TYPE_CHECKING:
+    from .bounding_box_detail import BoundingBoxDetail
+    from .bucket_detail import BucketDetail
+    from .bucket_list_response import BucketListResponse
+    from .bucket_response import BucketResponse
+    from .bucket_update_detail import BucketUpdateDetail
+    from .bucket_update_response import BucketUpdateResponse
+    from .customer_detail import CustomerDetail
+    from .customer_response import CustomerResponse
+    from .document import Document
+    from .document_detail import DocumentDetail
+    from .document_list_response import DocumentListResponse
+    from .document_local_ingest_request import DocumentLocalIngestRequest
+    from .document_lookup_response import DocumentLookupResponse
+    from .document_response import DocumentResponse
+    from .document_type import DocumentType
+    from .group_detail import GroupDetail
+    from .group_list_response import GroupListResponse
+    from .group_response import GroupResponse
+    from .health_response import HealthResponse
+    from .health_response_health import HealthResponseHealth
+    from .health_service import HealthService
+    from .health_service_status import HealthServiceStatus
+    from .ingest_local_document import IngestLocalDocument
+    from .ingest_local_document_metadata import IngestLocalDocumentMetadata
+    from .ingest_remote_document import IngestRemoteDocument
+    from .ingest_response import IngestResponse
+    from .ingest_status import IngestStatus
+    from .ingest_status_light import IngestStatusLight
+    from .ingest_status_progress import IngestStatusProgress
+    from .ingest_status_progress_cancelled import IngestStatusProgressCancelled
+    from .ingest_status_progress_complete import IngestStatusProgressComplete
+    from .ingest_status_progress_errors import IngestStatusProgressErrors
+    from .ingest_status_progress_processing import IngestStatusProgressProcessing
+    from .message_response import MessageResponse
+    from .meter_detail import MeterDetail
+    from .process_level import ProcessLevel
+    from .processes_status_response import ProcessesStatusResponse
+    from .processing_status import ProcessingStatus
+    from .search_response import SearchResponse
+    from .search_response_search import SearchResponseSearch
+    from .search_result_item import SearchResultItem
+    from .search_result_item_pages_item import SearchResultItemPagesItem
+    from .sort import Sort
+    from .sort_order import SortOrder
+    from .subscription_detail import SubscriptionDetail
+    from .subscription_detail_meters import SubscriptionDetailMeters
+    from .website_source import WebsiteSource
+    from .workflow_apply_request import WorkflowApplyRequest
+    from .workflow_detail import WorkflowDetail
+    from .workflow_detail_relationships import WorkflowDetailRelationships
+    from .workflow_engine import WorkflowEngine
+    from .workflow_engine_reasoning_effort import WorkflowEngineReasoningEffort
+    from .workflow_engine_service import WorkflowEngineService
+    from .workflow_prompt import WorkflowPrompt
+    from .workflow_prompt_group import WorkflowPromptGroup
+    from .workflow_prompt_role import WorkflowPromptRole
+    from .workflow_response import WorkflowResponse
+    from .workflow_step import WorkflowStep
+    from .workflow_steps import WorkflowSteps
+    from .workflow_steps_chunk_instruct import WorkflowStepsChunkInstruct
+    from .workflow_steps_chunk_summary import WorkflowStepsChunkSummary
+    from .workflow_steps_doc_keys import WorkflowStepsDocKeys
+    from .workflow_steps_doc_summary import WorkflowStepsDocSummary
+    from .workflow_steps_search_query import WorkflowStepsSearchQuery
+    from .workflow_steps_sect_instruct import WorkflowStepsSectInstruct
+    from .workflow_steps_sect_summary import WorkflowStepsSectSummary
+    from .workflows_response import WorkflowsResponse
+_dynamic_imports: typing.Dict[str, str] = {
+    "BoundingBoxDetail": ".bounding_box_detail",
+    "BucketDetail": ".bucket_detail",
+    "BucketListResponse": ".bucket_list_response",
+    "BucketResponse": ".bucket_response",
+    "BucketUpdateDetail": ".bucket_update_detail",
+    "BucketUpdateResponse": ".bucket_update_response",
+    "CustomerDetail": ".customer_detail",
+    "CustomerResponse": ".customer_response",
+    "Document": ".document",
+    "DocumentDetail": ".document_detail",
+    "DocumentListResponse": ".document_list_response",
+    "DocumentLocalIngestRequest": ".document_local_ingest_request",
+    "DocumentLookupResponse": ".document_lookup_response",
+    "DocumentResponse": ".document_response",
+    "DocumentType": ".document_type",
+    "GroupDetail": ".group_detail",
+    "GroupListResponse": ".group_list_response",
+    "GroupResponse": ".group_response",
+    "HealthResponse": ".health_response",
+    "HealthResponseHealth": ".health_response_health",
+    "HealthService": ".health_service",
+    "HealthServiceStatus": ".health_service_status",
+    "IngestLocalDocument": ".ingest_local_document",
+    "IngestLocalDocumentMetadata": ".ingest_local_document_metadata",
+    "IngestRemoteDocument": ".ingest_remote_document",
+    "IngestResponse": ".ingest_response",
+    "IngestStatus": ".ingest_status",
+    "IngestStatusLight": ".ingest_status_light",
+    "IngestStatusProgress": ".ingest_status_progress",
+    "IngestStatusProgressCancelled": ".ingest_status_progress_cancelled",
+    "IngestStatusProgressComplete": ".ingest_status_progress_complete",
+    "IngestStatusProgressErrors": ".ingest_status_progress_errors",
+    "IngestStatusProgressProcessing": ".ingest_status_progress_processing",
+    "MessageResponse": ".message_response",
+    "MeterDetail": ".meter_detail",
+    "ProcessLevel": ".process_level",
+    "ProcessesStatusResponse": ".processes_status_response",
+    "ProcessingStatus": ".processing_status",
+    "SearchResponse": ".search_response",
+    "SearchResponseSearch": ".search_response_search",
+    "SearchResultItem": ".search_result_item",
+    "SearchResultItemPagesItem": ".search_result_item_pages_item",
+    "Sort": ".sort",
+    "SortOrder": ".sort_order",
+    "SubscriptionDetail": ".subscription_detail",
+    "SubscriptionDetailMeters": ".subscription_detail_meters",
+    "WebsiteSource": ".website_source",
+    "WorkflowApplyRequest": ".workflow_apply_request",
+    "WorkflowDetail": ".workflow_detail",
+    "WorkflowDetailRelationships": ".workflow_detail_relationships",
+    "WorkflowEngine": ".workflow_engine",
+    "WorkflowEngineReasoningEffort": ".workflow_engine_reasoning_effort",
+    "WorkflowEngineService": ".workflow_engine_service",
+    "WorkflowPrompt": ".workflow_prompt",
+    "WorkflowPromptGroup": ".workflow_prompt_group",
+    "WorkflowPromptRole": ".workflow_prompt_role",
+    "WorkflowResponse": ".workflow_response",
+    "WorkflowStep": ".workflow_step",
+    "WorkflowSteps": ".workflow_steps",
+    "WorkflowStepsChunkInstruct": ".workflow_steps_chunk_instruct",
+    "WorkflowStepsChunkSummary": ".workflow_steps_chunk_summary",
+    "WorkflowStepsDocKeys": ".workflow_steps_doc_keys",
+    "WorkflowStepsDocSummary": ".workflow_steps_doc_summary",
+    "WorkflowStepsSearchQuery": ".workflow_steps_search_query",
+    "WorkflowStepsSectInstruct": ".workflow_steps_sect_instruct",
+    "WorkflowStepsSectSummary": ".workflow_steps_sect_summary",
+    "WorkflowsResponse": ".workflows_response",
+}
+
+
+def __getattr__(attr_name: str) -> typing.Any:
+    module_name = _dynamic_imports.get(attr_name)
+    if module_name is None:
+        raise AttributeError(f"No {attr_name} found in _dynamic_imports for module name -> {__name__}")
+    try:
+        module = import_module(module_name, __package__)
+        if module_name == f".{attr_name}":
+            return module
+        else:
+            return getattr(module, attr_name)
+    except ImportError as e:
+        raise ImportError(f"Failed to import {attr_name} from {module_name}: {e}") from e
+    except AttributeError as e:
+        raise AttributeError(f"Failed to get {attr_name} from {module_name}: {e}") from e
+
+
+def __dir__():
+    lazy_attrs = list(_dynamic_imports.keys())
+    return sorted(lazy_attrs)
+
 
 __all__ = [
     "BoundingBoxDetail",

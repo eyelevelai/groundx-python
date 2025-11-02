@@ -3171,4 +3171,4 @@ extract = ["boto3", "celery", "celery-types", "dateparser", "fastapi", "google-a
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "b4f7dbc3549b13761fc496d49b09d3e1f02eb83ace77971ffb490c2ba5de87c8"
+content-hash = "0a9090dc6fa17a51f172d27ae852ed933b743a8920a678fca7cf453791d8a60d"

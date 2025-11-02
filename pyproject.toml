@@ -3,7 +3,7 @@ name = "groundx"
 
 [tool.poetry]
 name = "groundx"
-version = "2.6.0"
+version = "2.6.1"
 description = ""
 readme = "README.md"
 authors = []
@@ -31,7 +31,7 @@ packages = [
     { include = "groundx", from = "src"}
 ]
 
-[project.urls]
+[tool.poetry.urls]
 Repository = 'https://github.com/eyelevelai/groundx-python'
 
 [tool.poetry.dependencies]
@@ -50,7 +50,7 @@ httpx = ">=0.21.2"
 minio = { version = "*", optional = true}
 pillow = { version = "*", optional = true}
 pydantic = ">= 1.9.2"
-pydantic-core = "^2.18.2"
+pydantic-core = ">=2.18.2"
 pytest = { version = "*", optional = true}
 redis = { version = "*", optional = true}
 requests = ">=2.4.0"
