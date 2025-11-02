@@ -17,6 +17,8 @@ GX_DEFAULT_REGION: str = "GROUNDX_DEFAULT_REGION"
 GX_SECRET: str = "GROUNDX_SECRET_ACCESS_KEY"
 GX_TOKEN: str = "GROUNDX_SESSION_TOKEN"
 VALID_KEYS: str = "GROUNDX_VALID_API_KEYS"
+GX_ADMIN_API_KEY: str = "GROUNDX_ADMIN_API_KEY"
+GX_ADMIN_USERNAME: str = "GROUNDX_ADMIN_USERNAME"
 
 
 class AgentSettings(BaseModel):
@@ -77,22 +79,54 @@ class ContainerSettings(BaseModel):
         if key:
             return key
 
+        key = os.environ.get(GX_ADMIN_API_KEY)
+        if key:
+            return key
+
+        key = os.environ.get(GX_ADMIN_USERNAME)
+        if key:
+            return key
+
+        key = os.environ.get(GX_API_KEY)
+        if key:
+            return key
+
         raise Exception(f"you must set a callback_api_key")
 
     def get_valid_api_keys(self) -> typing.List[str]:
-        if self.valid_api_keys:
-            return self.valid_api_keys
+        keys: typing.List[str] = []
 
-        keys: typing.Optional[str] = os.environ.get(VALID_KEYS)
-        if not keys:
+        if self.valid_api_keys:
+            keys = self.valid_api_keys
+
+        env_keys: typing.Optional[str] = os.environ.get(VALID_KEYS)
+        if env_keys:
+            try:
+                data: typing.List[str] = json.loads(env_keys)
+                keys.extend(data)
+            except Exception as e:
+                raise Exception(f"you must set an array of valid_api_keys: {e}")
+
+        key = os.environ.get(CALLBACK_KEY)
+        if key:
+            keys.append(key)
+
+        key = os.environ.get(GX_ADMIN_API_KEY)
+        if key:
+            keys.append(key)
+
+        key = os.environ.get(GX_ADMIN_USERNAME)
+        if key:
+            keys.append(key)
+
+        key = os.environ.get(GX_API_KEY)
+        if key:
+            keys.append(key)
+
+        if len(keys) < 1:
             raise Exception(f"you must set an array of valid_api_keys")
 
-        try:
-            data: typing.List[str] = json.loads(keys)
-        except Exception as e:
-            raise Exception(f"you must set an array of valid_api_keys: {e}")
-
-        return data
+        return keys
 
     def loglevel(self) -> str:
         return self.log_level.upper()
@@ -164,6 +198,14 @@ class GroundXSettings(BaseModel):
             return self.api_key
 
         key = os.environ.get(GX_API_KEY)
+        if key:
+            return key
+
+        key = os.environ.get(GX_ADMIN_API_KEY)
+        if key:
+            return key
+
+        key = os.environ.get(GX_ADMIN_USERNAME)
         if key:
             return key
 
