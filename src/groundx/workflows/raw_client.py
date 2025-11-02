@@ -20,11 +20,13 @@ from .types.workflow_get_request_id import WorkflowGetRequestId
 OMIT = typing.cast(typing.Any, ...)
 
 
-class RawWorkflowClient:
+class RawWorkflowsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    def list(self, *, request_options: typing.Optional[RequestOptions] = None) -> HttpResponse[WorkflowsResponse]:
+    def workflow_list(
+        self, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> HttpResponse[WorkflowsResponse]:
         """
         Get all workflows associated with the API key.
 
@@ -58,7 +60,7 @@ class RawWorkflowClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    def create(
+    def workflow_create(
         self,
         *,
         name: typing.Optional[str] = OMIT,
@@ -113,7 +115,7 @@ class RawWorkflowClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    def relationship_add_to_account(
+    def add_to_account(
         self, *, workflow_id: str, request_options: typing.Optional[RequestOptions] = None
     ) -> HttpResponse[MessageResponse]:
         """
@@ -159,7 +161,7 @@ class RawWorkflowClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    def relationship_remove_from_account(
+    def remove_from_account(
         self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> HttpResponse[MessageResponse]:
         """
@@ -195,7 +197,7 @@ class RawWorkflowClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    def relationship_add_to_id(
+    def add_to_id(
         self, id: int, *, workflow_id: str, request_options: typing.Optional[RequestOptions] = None
     ) -> HttpResponse[MessageResponse]:
         """
@@ -244,7 +246,7 @@ class RawWorkflowClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    def relationship_remove_from_id(
+    def remove_from_id(
         self, id: int, *, request_options: typing.Optional[RequestOptions] = None
     ) -> HttpResponse[MessageResponse]:
         """
@@ -283,7 +285,7 @@ class RawWorkflowClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    def get(
+    def workflow_get(
         self, id: WorkflowGetRequestId, *, request_options: typing.Optional[RequestOptions] = None
     ) -> HttpResponse[WorkflowResponse]:
         """
@@ -322,7 +324,7 @@ class RawWorkflowClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    def update(
+    def workflow_update(
         self,
         id: str,
         *,
@@ -386,7 +388,7 @@ class RawWorkflowClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    def delete(
+    def workflow_delete(
         self, id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> HttpResponse[MessageResponse]:
         """
@@ -426,11 +428,11 @@ class RawWorkflowClient:
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
 
-class AsyncRawWorkflowClient:
+class AsyncRawWorkflowsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    async def list(
+    async def workflow_list(
         self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> AsyncHttpResponse[WorkflowsResponse]:
         """
@@ -466,7 +468,7 @@ class AsyncRawWorkflowClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    async def create(
+    async def workflow_create(
         self,
         *,
         name: typing.Optional[str] = OMIT,
@@ -521,7 +523,7 @@ class AsyncRawWorkflowClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    async def relationship_add_to_account(
+    async def add_to_account(
         self, *, workflow_id: str, request_options: typing.Optional[RequestOptions] = None
     ) -> AsyncHttpResponse[MessageResponse]:
         """
@@ -567,7 +569,7 @@ class AsyncRawWorkflowClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    async def relationship_remove_from_account(
+    async def remove_from_account(
         self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> AsyncHttpResponse[MessageResponse]:
         """
@@ -603,7 +605,7 @@ class AsyncRawWorkflowClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    async def relationship_add_to_id(
+    async def add_to_id(
         self, id: int, *, workflow_id: str, request_options: typing.Optional[RequestOptions] = None
     ) -> AsyncHttpResponse[MessageResponse]:
         """
@@ -652,7 +654,7 @@ class AsyncRawWorkflowClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    async def relationship_remove_from_id(
+    async def remove_from_id(
         self, id: int, *, request_options: typing.Optional[RequestOptions] = None
     ) -> AsyncHttpResponse[MessageResponse]:
         """
@@ -691,7 +693,7 @@ class AsyncRawWorkflowClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    async def get(
+    async def workflow_get(
         self, id: WorkflowGetRequestId, *, request_options: typing.Optional[RequestOptions] = None
     ) -> AsyncHttpResponse[WorkflowResponse]:
         """
@@ -730,7 +732,7 @@ class AsyncRawWorkflowClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    async def update(
+    async def workflow_update(
         self,
         id: str,
         *,
@@ -794,7 +796,7 @@ class AsyncRawWorkflowClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    async def delete(
+    async def workflow_delete(
         self, id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> AsyncHttpResponse[MessageResponse]:
         """

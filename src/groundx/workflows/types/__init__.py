@@ -6,8 +6,8 @@ import typing
 from importlib import import_module
 
 if typing.TYPE_CHECKING:
-    from .types import SearchContentRequestId
-_dynamic_imports: typing.Dict[str, str] = {"SearchContentRequestId": ".types"}
+    from .workflow_get_request_id import WorkflowGetRequestId
+_dynamic_imports: typing.Dict[str, str] = {"WorkflowGetRequestId": ".workflow_get_request_id"}
 
 
 def __getattr__(attr_name: str) -> typing.Any:
@@ -31,4 +31,4 @@ def __dir__():
     return sorted(lazy_attrs)
 
 
-__all__ = ["SearchContentRequestId"]
+__all__ = ["WorkflowGetRequestId"]
