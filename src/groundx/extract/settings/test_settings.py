@@ -45,7 +45,6 @@ class TestAgentSettings(unittest.TestCase):
                 "expect": {
                     "api_base": "http://test.com",
                     "api_key": "mykey",
-                    "api_key_env": "myenv",
                     "max_steps": 4,
                     "model_id": "gpt-5",
                 },
@@ -452,10 +451,8 @@ class TestGroundXSettings(unittest.TestCase):
     def test(self) -> None:
         tsts: typing.List[typing.Dict[str, typing.Any]] = [
             {
-                "api_key_env": "",
                 "expect": {
                     "api_key": Exception,
-                    "api_key_env": "",
                     "base_url": None,
                     "upload_url": "https://upload.eyelevel.ai",
                 },
