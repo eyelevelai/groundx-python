@@ -2,8 +2,6 @@ import typing
 
 
 def logging_config(name: str, level: str) -> typing.Dict[str, typing.Any]:
-    print(level)
-
     return {
         "version": 1,
         "disable_existing_loggers": False,
