@@ -441,12 +441,13 @@ class GroundX(GroundXBase):
         presigned_info = get_presigned_url(endpoint, file_name, file_extension)
 
         upload_url = presigned_info["URL"]
-        headers = presigned_info.get("Header", {})
+        hd = presigned_info.get("Header", {})
         method = presigned_info.get("Method", "PUT").upper()
 
-        for key, value in headers.items():
+        headers: typing.Dict[str, typing.Any] = {}
+        for key, value in hd.items():
             if isinstance(value, list):
-                headers[key] = value[0]
+                headers[key.upper()] = value[0]
 
         try:
             with open(file_path, "rb") as f:
@@ -740,12 +741,13 @@ class AsyncGroundX(AsyncGroundXBase):
         presigned_info = get_presigned_url(endpoint, file_name, file_extension)
 
         upload_url = presigned_info["URL"]
-        headers = presigned_info.get("Header", {})
+        hd = presigned_info.get("Header", {})
         method = presigned_info.get("Method", "PUT").upper()
 
-        for key, value in headers.items():
+        headers: typing.Dict[str, typing.Any] = {}
+        for key, value in hd.items():
             if isinstance(value, list):
-                headers[key] = value[0]
+                headers[key.upper()] = value[0]
 
         try:
             with open(file_path, "rb") as f:
