@@ -46,9 +46,6 @@ class Upload:
         else:
             raise Exception(f"unsupported upload.type [{self.settings.upload.type}]")
 
-    def get_file(self, url: str) -> bytes:
-        return bytes()
-
     def get_object(self, url: str) -> typing.Optional[bytes]:
         self.client.get_object(url)
 

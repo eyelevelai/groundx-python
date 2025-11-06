@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
 from .groundx import GroundXDocument
 from ..services.logger import Logger
+from ..services.upload import Upload
 from ..utility.classes import clean_json
 
 
@@ -41,6 +42,7 @@ class Document(BaseModel):
     @classmethod
     def from_request(
         cls: typing.Type[DocT],
+        upload: Upload,
         base_url: str,
         cache_dir: Path,
         req: "DocumentRequest",
@@ -56,7 +58,7 @@ class Document(BaseModel):
             base_url=base_url,
             documentID=req.document_id,
             taskID=req.task_id,
-        ).xray(cache_dir=cache_dir, clear_cache=req.clear_cache)
+        ).xray(upload=upload, cache_dir=cache_dir, clear_cache=req.clear_cache)
 
         for page in xray_doc.documentPages:
             st.page_images.append(page.pageUrl)
@@ -249,6 +251,7 @@ class DocumentRequest(BaseModel):
 
     def load_images(
         self,
+        upload: Upload,
         imgs: typing.List[str],
         attempt: int = 0,
         should_sleep: bool = True,
@@ -279,7 +282,7 @@ class DocumentRequest(BaseModel):
                         if should_sleep:
                             time.sleep(2 * attempt + 1)
                         return self.load_images(
-                            imgs, attempt + 1, should_sleep=should_sleep
+                            upload, imgs, attempt + 1, should_sleep=should_sleep
                         )
 
         return pageImages
