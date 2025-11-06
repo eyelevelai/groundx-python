@@ -4,6 +4,7 @@ from io import BytesIO
 from pathlib import Path
 from PIL import Image
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
+from urllib.parse import urlparse
 
 from .groundx import GroundXDocument
 from ..services.logger import Logger
@@ -42,10 +43,10 @@ class Document(BaseModel):
     @classmethod
     def from_request(
         cls: typing.Type[DocT],
-        upload: Upload,
         base_url: str,
         cache_dir: Path,
         req: "DocumentRequest",
+        upload: typing.Optional[Upload] = None,
         **data: typing.Any,
     ) -> DocT:
         st = cls(**data)
@@ -251,8 +252,8 @@ class DocumentRequest(BaseModel):
 
     def load_images(
         self,
-        upload: Upload,
         imgs: typing.List[str],
+        upload: typing.Optional[Upload] = None,
         attempt: int = 0,
         should_sleep: bool = True,
     ) -> typing.List[Image.Image]:
@@ -264,26 +265,39 @@ class DocumentRequest(BaseModel):
                     f"[{attempt}] loading cached [{self.page_image_dict[page]}] [{page}]",
                 )
                 pageImages.append(self.page_images[self.page_image_dict[page]])
-            else:
-                try:
-                    self.print("WARN", f"[{attempt}] downloading [{page}]")
-                    resp = requests.get(page)
-                    resp.raise_for_status()
-                    img = Image.open(BytesIO(resp.content))
+                continue
+
+            if upload:
+                parsed = urlparse(page)
+                path = parsed.path + ("?" + parsed.query if parsed.query else "")
+                ru = upload.get_object(path)
+                if ru:
+                    img = Image.open(BytesIO(ru))
                     if img:
                         self.page_image_dict[page] = len(self.page_images)
                         self.page_images.append(img)
                         pageImages.append(img)
-                except Exception as e:
-                    self.print(
-                        "ERROR", f"[{attempt}] Failed to load image from {page}: {e}"
+                        continue
+
+            try:
+                self.print("WARN", f"[{attempt}] downloading [{page}]")
+                resp = requests.get(page)
+                resp.raise_for_status()
+                img = Image.open(BytesIO(resp.content))
+                if img:
+                    self.page_image_dict[page] = len(self.page_images)
+                    self.page_images.append(img)
+                    pageImages.append(img)
+            except Exception as e:
+                self.print(
+                    "ERROR", f"[{attempt}] Failed to load image from {page}: {e}"
+                )
+                if attempt < 2:
+                    if should_sleep:
+                        time.sleep(2 * attempt + 1)
+                    return self.load_images(
+                        imgs, upload, attempt + 1, should_sleep=should_sleep
                     )
-                    if attempt < 2:
-                        if should_sleep:
-                            time.sleep(2 * attempt + 1)
-                        return self.load_images(
-                            upload, imgs, attempt + 1, should_sleep=should_sleep
-                        )
 
         return pageImages
 

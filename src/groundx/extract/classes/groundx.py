@@ -24,8 +24,8 @@ class GroundXDocument(BaseModel):
 
     def xray(
         self,
-        upload: Upload,
         cache_dir: Path,
+        upload: typing.Optional[Upload] = None,
         clear_cache: bool = False,
         is_test: bool = False,
         base: typing.Optional[str] = None,
@@ -93,8 +93,8 @@ class XRayDocument(BaseModel):
     def download(
         cls,
         gx_doc: GroundXDocument,
-        upload: Upload,
         cache_dir: Path,
+        upload: typing.Optional[Upload] = None,
         clear_cache: bool = False,
         is_test: bool = False,
         base: typing.Optional[str] = None,
@@ -107,40 +107,41 @@ class XRayDocument(BaseModel):
                 with cache_file.open("r", encoding="utf-8") as f:
                     payload = json.load(f)
 
+                return cls(**payload)
             except Exception as e:
                 raise RuntimeError(
                     f"Error loading cached X-ray JSON from {cache_file}: {e}"
                 )
-        else:
+
+        if upload:
             path = gx_doc.xray_path()
-            resp = upload.get_object(path)
-            if resp:
+            ru = upload.get_object(path)
+            if ru:
                 try:
-                    payload = json.loads(resp.decode("utf-8"))
+                    payload = json.loads(ru.decode("utf-8"))
+                    return cls(**payload)
                 except Exception as e:
                     raise RuntimeError(
                         f"Error decoding X-ray JSON bytes from {path}: {e}"
                     )
-            else:
-                url = gx_doc.xray_url(base=base)
-                try:
-                    resp = requests.get(url)
-                    resp.raise_for_status()
-                except requests.RequestException as e:
-                    raise RuntimeError(f"Error fetching X-ray JSON from {url}: {e}")
 
-                try:
-                    payload = resp.json()
-                except ValueError as e:
-                    raise RuntimeError(f"Invalid JSON returned from {url}: {e}")
+        url = gx_doc.xray_url(base=base)
+        try:
+            resp = requests.get(url)
+            resp.raise_for_status()
+        except requests.RequestException as e:
+            raise RuntimeError(f"Error fetching X-ray JSON from {url}: {e}")
 
-                if is_test is False:
-                    try:
-                        with cache_file.open("w", encoding="utf-8") as f:
-                            json.dump(payload, f)
-                    except Exception as e:
-                        print(
-                            f"Warning: failed to write X-ray JSON cache to {cache_file}: {e}"
-                        )
+        try:
+            payload = resp.json()
+        except ValueError as e:
+            raise RuntimeError(f"Invalid JSON returned from {url}: {e}")
+
+        if is_test is False:
+            try:
+                with cache_file.open("w", encoding="utf-8") as f:
+                    json.dump(payload, f)
+            except Exception as e:
+                print(f"Warning: failed to write X-ray JSON cache to {cache_file}: {e}")
 
         return cls(**payload)
