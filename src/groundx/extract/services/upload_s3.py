@@ -28,9 +28,15 @@ class S3Client:
             return None
 
         try:
-            s3_uri_parts = url.replace("s3://", "").split("/")
-            s3_bucket = s3_uri_parts[0]
-            s3_key = "/".join(s3_uri_parts[1:])
+            if url.startswith("s3://"):
+                s3_uri_parts = url.replace("s3://", "").split("/")
+                s3_bucket = s3_uri_parts[0]
+                s3_key = "/".join(s3_uri_parts[1:])
+            else:
+                s3_bucket = self.settings.upload.bucket
+                s3_key = url
+                if url.startswith("/"):
+                    s3_key = url[1:]
 
             response = self.client.get_object(Bucket=s3_bucket, Key=s3_key)
 
