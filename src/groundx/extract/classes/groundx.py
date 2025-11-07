@@ -30,7 +30,9 @@ class GroundXDocument(BaseModel):
         is_test: bool = False,
         base: typing.Optional[str] = None,
     ) -> "XRayDocument":
-        if not upload:
+        if upload:
+            print("xray upload is not None")
+        else:
             print("xray upload is None")
         return XRayDocument.download(
             self,
@@ -116,8 +118,10 @@ class XRayDocument(BaseModel):
                 )
 
         if upload:
+            print("xray.download upload is not None")
             path = gx_doc.xray_path()
             ru = upload.get_object(path)
+            print(f"xray path [{path}]")
             if ru:
                 try:
                     payload = json.loads(ru.decode("utf-8"))
@@ -126,6 +130,8 @@ class XRayDocument(BaseModel):
                     raise RuntimeError(
                         f"Error decoding X-ray JSON bytes from {path}: {e}"
                     )
+            else:
+                print("xray path is None")
         else:
             print("xray.download upload is None")
 
