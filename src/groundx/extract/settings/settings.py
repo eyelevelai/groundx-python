@@ -79,11 +79,11 @@ class ContainerSettings(BaseModel):
         if key:
             return key
 
-        key = os.environ.get(GX_ADMIN_API_KEY)
+        key = os.environ.get(GX_ADMIN_USERNAME)
         if key:
             return key
 
-        key = os.environ.get(GX_ADMIN_USERNAME)
+        key = os.environ.get(GX_ADMIN_API_KEY)
         if key:
             return key
 
@@ -197,15 +197,15 @@ class GroundXSettings(BaseModel):
         if self.api_key:
             return self.api_key
 
+        key = os.environ.get(GX_ADMIN_USERNAME)
+        if key:
+            return key
+
         key = os.environ.get(GX_API_KEY)
         if key:
             return key
 
         key = os.environ.get(GX_ADMIN_API_KEY)
-        if key:
-            return key
-
-        key = os.environ.get(GX_ADMIN_USERNAME)
         if key:
             return key
 
