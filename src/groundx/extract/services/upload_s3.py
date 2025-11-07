@@ -25,6 +25,7 @@ class S3Client:
 
     def get_object(self, url: str) -> typing.Optional[bytes]:
         if not self.client:
+            print("get_object no client")
             return None
 
         try:
@@ -38,7 +39,9 @@ class S3Client:
                 if url.startswith("/"):
                     s3_key = url[1:]
 
+            print(f">>get_object [{s3_bucket}] [{s3_key}] [{url}]")
             response = self.client.get_object(Bucket=s3_bucket, Key=s3_key)
+            print(f"response [{response}]")
 
             return response["Body"].read()
         except Exception as e:

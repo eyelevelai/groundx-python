@@ -131,7 +131,7 @@ class XRayDocument(BaseModel):
                         f"Error decoding X-ray JSON bytes from {path}: {e}"
                     )
             else:
-                print("xray path is None")
+                print("xray path ru is None")
         else:
             print("xray.download upload is None")
 
