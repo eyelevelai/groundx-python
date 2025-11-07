@@ -30,13 +30,15 @@ class GroundXDocument(BaseModel):
         is_test: bool = False,
         base: typing.Optional[str] = None,
     ) -> "XRayDocument":
+        if not upload:
+            print("xray upload is None")
         return XRayDocument.download(
             self,
-            upload=upload,
             cache_dir=cache_dir,
-            base=base,
+            upload=upload,
             clear_cache=clear_cache,
             is_test=is_test,
+            base=base,
         )
 
 
@@ -124,6 +126,8 @@ class XRayDocument(BaseModel):
                     raise RuntimeError(
                         f"Error decoding X-ray JSON bytes from {path}: {e}"
                     )
+        else:
+            print("xray.download upload is None")
 
         url = gx_doc.xray_url(base=base)
         try:
