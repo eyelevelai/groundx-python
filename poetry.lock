@@ -788,13 +788,13 @@ test = ["pytest (>=6)"]
 
 [[package]]
 name = "fastapi"
-version = "0.121.0"
+version = "0.121.1"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
 optional = true
 python-versions = ">=3.8"
 files = [
-    {file = "fastapi-0.121.0-py3-none-any.whl", hash = "sha256:8bdf1b15a55f4e4b0d6201033da9109ea15632cb76cf156e7b8b4019f2172106"},
-    {file = "fastapi-0.121.0.tar.gz", hash = "sha256:06663356a0b1ee93e875bbf05a31fb22314f5bed455afaaad2b2dad7f26e98fa"},
+    {file = "fastapi-0.121.1-py3-none-any.whl", hash = "sha256:2c5c7028bc3a58d8f5f09aecd3fd88a000ccc0c5ad627693264181a3c33aa1fc"},
+    {file = "fastapi-0.121.1.tar.gz", hash = "sha256:b6dba0538fd15dab6fe4d3e5493c3957d8a9e1e9257f56446b5859af66f32441"},
 ]
 
 [package.dependencies]
@@ -2424,13 +2424,13 @@ files = [
 
 [[package]]
 name = "types-boto3"
-version = "1.40.68"
-description = "Type annotations for boto3 1.40.68 generated with mypy-boto3-builder 8.11.0"
+version = "1.40.69"
+description = "Type annotations for boto3 1.40.69 generated with mypy-boto3-builder 8.11.0"
 optional = true
 python-versions = ">=3.8"
 files = [
-    {file = "types_boto3-1.40.68-py3-none-any.whl", hash = "sha256:76d675a157eeb5be92cd50320333124dd1ae9284aa3fd342de9c5b8c7cd7fb69"},
-    {file = "types_boto3-1.40.68.tar.gz", hash = "sha256:d199b3acd3b0250e392d0e9fdaae74e0adaa55ded13948ff33a4b3916f1e009d"},
+    {file = "types_boto3-1.40.69-py3-none-any.whl", hash = "sha256:6ad73f173ca17e3162f1fbfe59e6f5a654bc8a978343053e774c98b7fd86871a"},
+    {file = "types_boto3-1.40.69.tar.gz", hash = "sha256:b7b8aee0210f2fa988f9e6ac4d6d44d4c4d7be5e4741bb0baed0b10f8f49bf23"},
 ]
 
 [package.dependencies]
@@ -2491,7 +2491,7 @@ bedrock-data-automation-runtime = ["types-boto3-bedrock-data-automation-runtime 
 bedrock-runtime = ["types-boto3-bedrock-runtime (>=1.40.0,<1.41.0)"]
 billing = ["types-boto3-billing (>=1.40.0,<1.41.0)"]
 billingconductor = ["types-boto3-billingconductor (>=1.40.0,<1.41.0)"]
-boto3 = ["boto3 (==1.40.68)"]
+boto3 = ["boto3 (==1.40.69)"]
 braket = ["types-boto3-braket (>=1.40.0,<1.41.0)"]
 budgets = ["types-boto3-budgets (>=1.40.0,<1.41.0)"]
 ce = ["types-boto3-ce (>=1.40.0,<1.41.0)"]
