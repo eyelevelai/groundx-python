@@ -56,6 +56,7 @@ class AgentSettings(BaseModel):
 
 class ContainerSettings(BaseModel):
     broker: str
+    broker_type: str = "redis"
     cache_dir: str = "./cache"
     cache_to: int = 300
     google_sheets_drive_id: typing.Optional[str] = None
