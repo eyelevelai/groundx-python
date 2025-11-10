@@ -150,6 +150,7 @@ class GroundX(GroundXBase):
         upload_api: str = "https://api.eyelevel.ai/upload/file",
         callback_url: typing.Optional[str] = None,
         callback_data: typing.Optional[str] = None,
+        override_batch_size: typing.Optional[bool] = False,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
         """
@@ -209,15 +210,17 @@ class GroundX(GroundXBase):
         if len(remote_documents) + len(local_documents) == 0:
             raise ValueError("No valid documents were provided")
 
+        max_n = MAX_BATCH_SIZE
+        if override_batch_size:
+            max_n = 1000
+
         if wait_for_complete:
             with tqdm(
                 total=len(remote_documents) + len(local_documents),
                 desc="Ingesting Files",
                 unit="file",
             ) as pbar:
-                n = max(
-                    MIN_BATCH_SIZE, min(batch_size or MIN_BATCH_SIZE, MAX_BATCH_SIZE)
-                )
+                n = max(MIN_BATCH_SIZE, min(batch_size or MIN_BATCH_SIZE, max_n))
 
                 remote_batch: typing.List[IngestRemoteDocument] = []
                 ingest = IngestResponse(
@@ -299,7 +302,7 @@ class GroundX(GroundXBase):
                     pbar.update(progress)
 
                 return ingest
-        elif len(remote_documents) + len(local_documents) > MAX_BATCH_SIZE:
+        elif len(remote_documents) + len(local_documents) > max_n:
             raise ValueError("You have sent too many documents in this request")
 
         up_docs, _ = self._process_local(local_documents, upload_api, 0, None)
@@ -321,6 +324,7 @@ class GroundX(GroundXBase):
         upload_api: str = "https://api.eyelevel.ai/upload/file",
         callback_url: typing.Optional[str] = None,
         callback_data: typing.Optional[str] = None,
+        override_batch_size: typing.Optional[bool] = False,
         request_options: typing.Optional[RequestOptions] = None,
     ):
         """
@@ -393,7 +397,11 @@ class GroundX(GroundXBase):
         current_batch: typing.List[Path] = []
         current_batch_size: int = 0
 
-        n = max(MIN_BATCH_SIZE, min(batch_size or MIN_BATCH_SIZE, MAX_BATCH_SIZE))
+        max_n = MAX_BATCH_SIZE
+        if override_batch_size:
+            max_n = 1000
+
+        n = max(MIN_BATCH_SIZE, min(batch_size or MIN_BATCH_SIZE, max_n))
 
         with tqdm(total=len(files), desc="Ingesting Files", unit="file") as pbar:
             for file in files:
@@ -635,6 +643,7 @@ class AsyncGroundX(AsyncGroundXBase):
         upload_api: str = "https://api.eyelevel.ai/upload/file",
         callback_url: typing.Optional[str] = None,
         callback_data: typing.Optional[str] = None,
+        override_batch_size: typing.Optional[bool] = False,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
         """
@@ -689,7 +698,11 @@ class AsyncGroundX(AsyncGroundXBase):
         """
         remote_documents, local_documents = prep_documents(documents)
 
-        if len(remote_documents) + len(local_documents) > MAX_BATCH_SIZE:
+        max_n = MAX_BATCH_SIZE
+        if override_batch_size:
+            max_n = 1000
+
+        if len(remote_documents) + len(local_documents) > max_n:
             raise ValueError("You have sent too many documents in this request")
 
         if len(remote_documents) + len(local_documents) == 0:
