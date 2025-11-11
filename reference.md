@@ -530,6 +530,76 @@ client.documents.get_processing_status_by_id(
 </dl>
 </details>
 
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">document_cancel_process</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Cancel an ingest process, along with any files that have not been completely ingested.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from groundx import GroundX
+
+client = GroundX(
+    api_key="YOUR_API_KEY",
+)
+client.documents.document_cancel_process(
+    process_id="processId",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**process_id:** `str` — the processId for the ingest process to be cancelled
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.documents.<a href="src/groundx/documents/client.py">lookup</a>(...)</code></summary>
 <dl>
 <dd>

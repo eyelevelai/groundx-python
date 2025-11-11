@@ -2413,13 +2413,13 @@ telegram = ["requests"]
 
 [[package]]
 name = "types-awscrt"
-version = "0.28.2"
+version = "0.28.4"
 description = "Type annotations and code completion for awscrt"
 optional = true
 python-versions = ">=3.8"
 files = [
-    {file = "types_awscrt-0.28.2-py3-none-any.whl", hash = "sha256:d08916fa735cfc032e6a8cfdac92785f1c4e88623999b224ea4e6267d5de5fcb"},
-    {file = "types_awscrt-0.28.2.tar.gz", hash = "sha256:4349b6fc7b1cd9c9eb782701fb213875db89ab1781219c0e947dd7c4d9dcd65e"},
+    {file = "types_awscrt-0.28.4-py3-none-any.whl", hash = "sha256:2d453f9e27583fcc333771b69a5255a5a4e2c52f86e70f65f3c5a6789d3443d0"},
+    {file = "types_awscrt-0.28.4.tar.gz", hash = "sha256:15929da84802f27019ee8e4484fb1c102e1f6d4cf22eb48688c34a5a86d02eb6"},
 ]
 
 [[package]]

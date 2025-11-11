@@ -470,6 +470,67 @@ class RawDocumentsClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
+    def document_cancel_process(
+        self, process_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> HttpResponse[IngestResponse]:
+        """
+        Cancel an ingest process, along with any files that have not been completely ingested.
+
+        Parameters
+        ----------
+        process_id : str
+            the processId for the ingest process to be cancelled
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[IngestResponse]
+            Cancel success
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"v1/ingest/{jsonable_encoder(process_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    IngestResponse,
+                    parse_obj_as(
+                        type_=IngestResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
+        raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
+
     def lookup(
         self,
         id: int,
@@ -1142,6 +1203,67 @@ class AsyncRawDocumentsClient:
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/ingest/{jsonable_encoder(process_id)}",
             method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    IngestResponse,
+                    parse_obj_as(
+                        type_=IngestResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
+        raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
+
+    async def document_cancel_process(
+        self, process_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> AsyncHttpResponse[IngestResponse]:
+        """
+        Cancel an ingest process, along with any files that have not been completely ingested.
+
+        Parameters
+        ----------
+        process_id : str
+            the processId for the ingest process to be cancelled
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[IngestResponse]
+            Cancel success
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"v1/ingest/{jsonable_encoder(process_id)}",
+            method="DELETE",
             request_options=request_options,
         )
         try:
