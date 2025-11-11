@@ -329,6 +329,39 @@ class DocumentsClient:
         _response = self._raw_client.get_processing_status_by_id(process_id, request_options=request_options)
         return _response.data
 
+    def document_cancel_process(
+        self, process_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> IngestResponse:
+        """
+        Cancel an ingest process, along with any files that have not been completely ingested.
+
+        Parameters
+        ----------
+        process_id : str
+            the processId for the ingest process to be cancelled
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        IngestResponse
+            Cancel success
+
+        Examples
+        --------
+        from groundx import GroundX
+
+        client = GroundX(
+            api_key="YOUR_API_KEY",
+        )
+        client.documents.document_cancel_process(
+            process_id="processId",
+        )
+        """
+        _response = self._raw_client.document_cancel_process(process_id, request_options=request_options)
+        return _response.data
+
     def lookup(
         self,
         id: int,
@@ -868,6 +901,47 @@ class AsyncDocumentsClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.get_processing_status_by_id(process_id, request_options=request_options)
+        return _response.data
+
+    async def document_cancel_process(
+        self, process_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> IngestResponse:
+        """
+        Cancel an ingest process, along with any files that have not been completely ingested.
+
+        Parameters
+        ----------
+        process_id : str
+            the processId for the ingest process to be cancelled
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        IngestResponse
+            Cancel success
+
+        Examples
+        --------
+        import asyncio
+
+        from groundx import AsyncGroundX
+
+        client = AsyncGroundX(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.documents.document_cancel_process(
+                process_id="processId",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.document_cancel_process(process_id, request_options=request_options)
         return _response.data
 
     async def lookup(
