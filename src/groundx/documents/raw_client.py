@@ -470,7 +470,7 @@ class RawDocumentsClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    def document_cancel_process(
+    def cancel_process(
         self, process_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> HttpResponse[IngestResponse]:
         """
@@ -1242,7 +1242,7 @@ class AsyncRawDocumentsClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    async def document_cancel_process(
+    async def cancel_process(
         self, process_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> AsyncHttpResponse[IngestResponse]:
         """

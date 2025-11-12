@@ -530,7 +530,7 @@ client.documents.get_processing_status_by_id(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">document_cancel_process</a>(...)</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">cancel_process</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -562,7 +562,7 @@ from groundx import GroundX
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
-client.documents.document_cancel_process(
+client.documents.cancel_process(
     process_id="processId",
 )
 
