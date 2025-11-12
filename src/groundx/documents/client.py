@@ -329,7 +329,7 @@ class DocumentsClient:
         _response = self._raw_client.get_processing_status_by_id(process_id, request_options=request_options)
         return _response.data
 
-    def document_cancel_process(
+    def cancel_process(
         self, process_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> IngestResponse:
         """
@@ -355,11 +355,11 @@ class DocumentsClient:
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
-        client.documents.document_cancel_process(
+        client.documents.cancel_process(
             process_id="processId",
         )
         """
-        _response = self._raw_client.document_cancel_process(process_id, request_options=request_options)
+        _response = self._raw_client.cancel_process(process_id, request_options=request_options)
         return _response.data
 
     def lookup(
@@ -903,7 +903,7 @@ class AsyncDocumentsClient:
         _response = await self._raw_client.get_processing_status_by_id(process_id, request_options=request_options)
         return _response.data
 
-    async def document_cancel_process(
+    async def cancel_process(
         self, process_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> IngestResponse:
         """
@@ -934,14 +934,14 @@ class AsyncDocumentsClient:
 
 
         async def main() -> None:
-            await client.documents.document_cancel_process(
+            await client.documents.cancel_process(
                 process_id="processId",
             )
 
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.document_cancel_process(process_id, request_options=request_options)
+        _response = await self._raw_client.cancel_process(process_id, request_options=request_options)
         return _response.data
 
     async def lookup(
