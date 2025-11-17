@@ -312,13 +312,13 @@ tzdata = ["tzdata"]
 
 [[package]]
 name = "billiard"
-version = "4.2.2"
+version = "4.2.3"
 description = "Python multiprocessing fork with improvements and bugfixes"
 optional = true
 python-versions = ">=3.7"
 files = [
-    {file = "billiard-4.2.2-py3-none-any.whl", hash = "sha256:4bc05dcf0d1cc6addef470723aac2a6232f3c7ed7475b0b580473a9145829457"},
-    {file = "billiard-4.2.2.tar.gz", hash = "sha256:e815017a062b714958463e07ba15981d802dc53d41c5b69d28c5a7c238f8ecf3"},
+    {file = "billiard-4.2.3-py3-none-any.whl", hash = "sha256:989e9b688e3abf153f307b68a1328dfacfb954e30a4f920005654e276c69236b"},
+    {file = "billiard-4.2.3.tar.gz", hash = "sha256:96486f0885afc38219d02d5f0ccd5bec8226a414b834ab244008cbb0025b8dcb"},
 ]
 
 [[package]]
@@ -463,13 +463,13 @@ typing-extensions = ">=3.10.0,<5.0.0"
 
 [[package]]
 name = "certifi"
-version = "2025.10.5"
+version = "2025.11.12"
 description = "Python package for providing Mozilla's CA Bundle."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "certifi-2025.10.5-py3-none-any.whl", hash = "sha256:0f212c2744a9bb6de0c56639a6f68afe01ecd92d91f14ae897c4fe7bbeeef0de"},
-    {file = "certifi-2025.10.5.tar.gz", hash = "sha256:47c09d31ccf2acf0be3f701ea53595ee7e0b8fa08801c6624be771df09ae7b43"},
+    {file = "certifi-2025.11.12-py3-none-any.whl", hash = "sha256:97de8790030bbd5c2d96b7ec782fc2f7820ef8dba6db909ccf95449f2d062d4b"},
+    {file = "certifi-2025.11.12.tar.gz", hash = "sha256:d8ab5478f2ecd78af242878415affce761ca6bc54a22a27e026d7c25357c3316"},
 ]
 
 [[package]]
@@ -788,13 +788,13 @@ test = ["pytest (>=6)"]
 
 [[package]]
 name = "fastapi"
-version = "0.121.1"
+version = "0.121.2"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
 optional = true
 python-versions = ">=3.8"
 files = [
-    {file = "fastapi-0.121.1-py3-none-any.whl", hash = "sha256:2c5c7028bc3a58d8f5f09aecd3fd88a000ccc0c5ad627693264181a3c33aa1fc"},
-    {file = "fastapi-0.121.1.tar.gz", hash = "sha256:b6dba0538fd15dab6fe4d3e5493c3957d8a9e1e9257f56446b5859af66f32441"},
+    {file = "fastapi-0.121.2-py3-none-any.whl", hash = "sha256:f2d80b49a86a846b70cc3a03eb5ea6ad2939298bf6a7fe377aa9cd3dd079d358"},
+    {file = "fastapi-0.121.2.tar.gz", hash = "sha256:ca8e932b2b823ec1721c641e3669472c855ad9564a2854c9899d904c2848b8b9"},
 ]
 
 [package.dependencies]
@@ -2884,6 +2884,17 @@ files = [
 ]
 
 [[package]]
+name = "types-pyyaml"
+version = "6.0.12.20241230"
+description = "Typing stubs for PyYAML"
+optional = true
+python-versions = ">=3.8"
+files = [
+    {file = "types_PyYAML-6.0.12.20241230-py3-none-any.whl", hash = "sha256:fa4d32565219b68e6dee5f67534c722e53c00d1cfc09c435ef04d7353e1e96e6"},
+    {file = "types_pyyaml-6.0.12.20241230.tar.gz", hash = "sha256:7f07622dbd34bb9c8b264fe860a17e0efcad00d50b5f27e93984909d9363498c"},
+]
+
+[[package]]
 name = "types-requests"
 version = "2.31.0.6"
 description = "Typing stubs for requests"
@@ -3166,9 +3177,9 @@ multidict = ">=4.0"
 propcache = ">=0.2.0"
 
 [extras]
-extract = ["boto3", "celery", "celery-types", "dateparser", "fastapi", "google-api-python-client", "google-api-python-client-stubs", "google-auth-stubs", "gspread", "minio", "pillow", "pytest", "redis", "types-boto3", "types-dateparser"]
+extract = ["boto3", "celery", "celery-types", "dateparser", "fastapi", "google-api-python-client", "google-api-python-client-stubs", "google-auth-stubs", "gspread", "minio", "pillow", "pytest", "redis", "types-boto3", "types-dateparser", "types-pyyaml"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "b4f7dbc3549b13761fc496d49b09d3e1f02eb83ace77971ffb490c2ba5de87c8"
+content-hash = "1615df6d3eb19138ebef475ebbdc298a4c8fd412214ccd038b13c95da8dd6a4b"
