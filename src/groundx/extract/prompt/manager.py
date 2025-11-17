@@ -82,25 +82,22 @@ def load_from_yaml(raw_yaml: str) -> Group:
 
 
 class PromptManager:
-    def __init__(self, config_source: Source) -> None:
+    def __init__(
+        self, config_source: Source, default_workflow_id: str = "latest"
+    ) -> None:
         self._config_source: Source = config_source
-        self._cache: typing.Optional[typing.Dict[str, Prompt]] = None
-        self._version: typing.Optional[str] = None
+        # Cache: workflow_id -> { field_key -> Prompt }
+        self._cache: typing.Dict[str, typing.Dict[str, Prompt]] = {}
+        self._default_workflow_id: str = default_workflow_id
+        self._versions: typing.Dict[str, str] = {}
 
-        raw, version = self._config_source.fetch()
-        self._cache = self._build_prompts_from_raw(raw, version)
-
-    def reload_if_changed(self) -> None:
-        version = self._config_source.peek()
-        if not self._version or version != self._version:
-            raw, version = self._config_source.fetch()
-            self._cache = self._build_prompts_from_raw(raw, version)
+        self._ensure_loaded(default_workflow_id)
 
     def _build_prompts_from_raw(
-        self, raw: str, version: str
+        self,
+        raw: str,
     ) -> typing.Dict[str, Prompt]:
         root_group = load_from_yaml(raw)
-        self._version = version
 
         prompts: typing.Dict[str, Prompt] = {}
 
@@ -126,10 +123,29 @@ class PromptManager:
 
         return prompts
 
-    @property
-    def fields(self) -> typing.Dict[str, Prompt]:
-        if self._cache is None:
-            raw, version = self._config_source.fetch()
-            self._cache = self._build_prompts_from_raw(raw, version)
+    def _ensure_loaded(self, workflow_id: str) -> None:
+        if workflow_id in self._cache:
+            return
 
-        return self._cache
+        raw, version = self._config_source.fetch(workflow_id)
+        prompts = self._build_prompts_from_raw(raw)
+        self._cache[workflow_id] = prompts
+        self._versions[workflow_id] = version
+
+    def reload_if_changed(self, workflow_id: typing.Optional[str] = None) -> None:
+        if workflow_id is None:
+            workflow_id = self._default_workflow_id
+
+        current_version = self._config_source.peek(workflow_id)
+        previous_version = self._versions.get(workflow_id)
+
+        if previous_version is None or current_version != previous_version:
+            raw, version = self._config_source.fetch(workflow_id)
+            prompts = self._build_prompts_from_raw(raw)
+            self._cache[workflow_id] = prompts
+            self._versions[workflow_id] = version
+
+    def get_fields_for_workflow(self, workflow_id: str) -> typing.Dict[str, Prompt]:
+        self._ensure_loaded(workflow_id)
+
+        return self._cache[workflow_id]
