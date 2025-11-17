@@ -3177,9 +3177,9 @@ multidict = ">=4.0"
 propcache = ">=0.2.0"
 
 [extras]
-extract = ["boto3", "celery", "celery-types", "dateparser", "fastapi", "google-api-python-client", "google-api-python-client-stubs", "google-auth-stubs", "gspread", "minio", "pillow", "pytest", "redis", "types-boto3", "types-dateparser", "types-pyyaml"]
+extract = ["boto3", "celery", "celery-types", "dateparser", "fastapi", "google-api-python-client", "google-api-python-client-stubs", "google-auth-stubs", "gspread", "minio", "pillow", "pytest", "redis", "types-PyYAML", "types-boto3", "types-dateparser"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "1615df6d3eb19138ebef475ebbdc298a4c8fd412214ccd038b13c95da8dd6a4b"
+content-hash = "c25ac1f05a50bf4970ac08a70f61d66314c365a4657a3267d08f1d3f7dd047d9"

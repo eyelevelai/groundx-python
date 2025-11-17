@@ -3,7 +3,7 @@ name = "groundx"
 
 [tool.poetry]
 name = "groundx"
-version = "2.8.4"
+version = "2.8.5"
 description = ""
 readme = "README.md"
 authors = []
@@ -55,9 +55,9 @@ pytest = { version = "*", optional = true}
 redis = { version = "*", optional = true}
 requests = ">=2.4.0"
 tqdm = ">=4.60.0"
+types-PyYAML = { version = "*", optional = true}
 types-boto3 = { version = "*", optional = true}
 types-dateparser = { version = "*", optional = true}
-types-pyyaml = { version = "*", optional = true}
 types-tqdm = ">=4.60.0"
 typing_extensions = ">= 4.0.0"
 
@@ -106,7 +106,7 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.extras]
-extract=["boto3", "celery", "celery-types", "dateparser", "fastapi", "google-api-python-client", "google-api-python-client-stubs", "google-auth-stubs", "gspread", "minio", "pillow", "pytest", "redis", "types-boto3", "types-dateparser", "types-pyyaml"]
+extract=["boto3", "celery", "celery-types", "dateparser", "fastapi", "google-api-python-client", "google-api-python-client-stubs", "google-auth-stubs", "gspread", "minio", "pillow", "pytest", "redis", "types-boto3", "types-dateparser", "types-PyYAML"]
 
 [[tool.mypy.overrides]]
 module = ["dateparser.*"]

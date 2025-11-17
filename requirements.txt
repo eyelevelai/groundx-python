@@ -17,8 +17,8 @@ pytest==*
 redis==*
 requests>=2.4.0
 tqdm>=4.60.0
+types-PyYAML==*
 types-boto3==*
 types-dateparser==*
-types-pyyaml==*
 types-tqdm>=4.60.0
 typing_extensions>= 4.0.0
