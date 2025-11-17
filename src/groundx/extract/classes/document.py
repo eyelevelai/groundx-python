@@ -138,6 +138,7 @@ class DocumentRequest(BaseModel):
     model_id: int = Field(alias="modelID")
     processor_id: int = Field(alias="processorID")
     task_id: str = Field(alias="taskID")
+    workflow_id: typing.Optional[str] = Field(alias="workflowID", default="latest")
 
     _logger: typing.Optional[Logger] = PrivateAttr(default=None)
 
