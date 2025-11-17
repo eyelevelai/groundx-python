@@ -1,4 +1,4 @@
-import unittest
+import typing, unittest
 
 from .manager import load_from_yaml, PromptManager
 from .source import Source
@@ -34,11 +34,11 @@ class TestSource(Source):
         self._raw = raw
         self._version = version
 
-    def fetch(self) -> tuple[str, str]:
+    def fetch(self) -> typing.Tuple[str, str]:
         return self._raw, self._version
 
-    def peek(self) -> tuple[str, str]:
-        return self._raw, self._version
+    def peek(self) -> typing.Optional[str]:
+        return self._version
 
     def update(self, raw: str, version: str) -> None:
         self._raw = raw
