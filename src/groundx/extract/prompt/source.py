@@ -6,9 +6,12 @@ from ..settings.settings import ContainerSettings
 
 
 class Source:
-    def __init__(self, key: str, settings: ContainerSettings, logger: Logger) -> None:
-        self._key = key
+    def __init__(self, settings: ContainerSettings, logger: Logger) -> None:
+        self._settings = settings
         self._upload = Upload(settings=settings, logger=logger)
+
+    def _workflow_path(self, workflow_id: str) -> str:
+        return f"prompts/{self._settings.callback_api_key}/prompt.{workflow_id}.yaml"
 
     def _version_from_metadata(self, meta: typing.Dict[str, str]) -> str:
         etag = (meta.get("ETag") or "").strip('"')
@@ -18,10 +21,12 @@ class Source:
 
         return etag
 
-    def fetch(self) -> typing.Tuple[str, str]:
-        res = self._upload.get_object_and_metadata(self._key)
+    def fetch(self, workflow_id: str) -> typing.Tuple[str, str]:
+        res = self._upload.get_object_and_metadata(self._workflow_path(workflow_id))
         if not res:
-            raise Exception(f"failed to get prompt yaml [{self._key}]")
+            raise Exception(
+                f"failed to get prompt yaml [{self._workflow_path(workflow_id)}]"
+            )
 
         body_bytes, meta = res
 
@@ -30,8 +35,8 @@ class Source:
 
         return raw_yaml, version
 
-    def peek(self) -> typing.Optional[str]:
-        meta = self._upload.head_object(self._key)
+    def peek(self, workflow_id: str) -> typing.Optional[str]:
+        meta = self._upload.head_object(self._workflow_path(workflow_id))
         if not meta:
             return None
 
