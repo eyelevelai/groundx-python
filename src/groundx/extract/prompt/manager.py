@@ -36,9 +36,9 @@ def _group_from_mapping(data: typing.Dict[str, typing.Any]) -> Group:
 
     for name, n in raw_fields.items():
         if isinstance(n, list):
-            node = typing.cast(typing.List[typing.Any], n)
+            nl = typing.cast(typing.List[typing.Any], n)
             elements_list: typing.List[Element] = []
-            for item in node:
+            for item in nl:
                 if not isinstance(item, dict):
                     raise TypeError(
                         f"Expected dict for list item under field '{name}', got {type(item)}"
@@ -49,13 +49,13 @@ def _group_from_mapping(data: typing.Dict[str, typing.Any]) -> Group:
                 elements_list.append(elem)
             fields[name] = elements_list
         elif isinstance(n, dict):
-            node = typing.cast(typing.Dict[str, typing.Any], n)
-            if "prompt" in node or "fields" in node or "value" in node:
-                elem = _element_from_mapping(node)
+            nd = typing.cast(typing.Dict[str, typing.Any], n)
+            if "prompt" in nd or "fields" in nd or "value" in nd:
+                elem = _element_from_mapping(nd)
                 fields[name] = elem
             else:
                 inner_dict: typing.Dict[str, Element] = {}
-                for sub_name, sub_node in node.items():
+                for sub_name, sub_node in nd.items():
                     if not isinstance(sub_node, dict):
                         raise TypeError(
                             f"Expected dict for '{name}.{sub_name}', got {type(sub_node)}"
