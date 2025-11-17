@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 from urllib.parse import urlparse
 
 from .groundx import GroundXDocument
+from .group import Group
 from ..services.logger import Logger
 from ..services.upload import Upload
 from ..utility.classes import clean_json
@@ -15,7 +16,7 @@ from ..utility.classes import clean_json
 DocT = typing.TypeVar("DocT", bound="Document")
 
 
-class Document(BaseModel):
+class Document(Group):
     file_name: str = ""
 
     document_id: str = ""

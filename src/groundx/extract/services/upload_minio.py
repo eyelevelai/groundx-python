@@ -64,9 +64,7 @@ class MinIOClient:
         from minio.error import S3Error
 
         try:
-            minio_uri_parts = url.replace("s3://", "").split("/")
-            bucket_name = minio_uri_parts[0]
-            object_name = "/".join(minio_uri_parts[1:])
+            bucket_name, object_name = self.parse_url(url)
 
             response = self.client.get_object(bucket_name, object_name)
 
@@ -74,6 +72,59 @@ class MinIOClient:
         except S3Error as e:
             self.logger.error_msg(f"Failed to get object from {url}: {str(e)}")
             raise
+
+    def get_object_and_metadata(
+        self, url: str
+    ) -> typing.Optional[typing.Tuple[bytes, typing.Dict[str, str]]]:
+        if not self.client:
+            return None
+
+        from minio.error import S3Error
+
+        try:
+            bucket_name, object_name = self.parse_url(url)
+
+            meta = self.head_object(url) or {}
+
+            response = self.client.get_object(bucket_name, object_name)
+
+            body = response.read()
+
+            return body, meta
+        except S3Error as e:
+            self.logger.error_msg(f"Failed to get object from {url}: {str(e)}")
+            raise
+
+    def head_object(self, url: str) -> typing.Optional[typing.Dict[str, str]]:
+        if not self.client:
+            return None
+
+        from minio.error import S3Error
+
+        try:
+            bucket_name, object_name = self.parse_url(url)
+
+            response = self.client.stat_object(bucket_name, object_name)
+            if not response:
+                return None
+
+            res: typing.Dict[str, str] = {}
+            if response.etag:
+                res["ETag"] = response.etag
+            if response.last_modified:
+                res["LastModified"] = str(response.last_modified.timestamp())
+
+            return res
+        except S3Error as e:
+            self.logger.error_msg(f"Failed to get object from {url}: {str(e)}")
+            raise
+
+    def parse_url(self, key: str) -> typing.Tuple[str, str]:
+        minio_uri_parts = key.replace("s3://", "").split("/")
+        bucket_name = minio_uri_parts[0]
+        object_name = "/".join(minio_uri_parts[1:])
+
+        return bucket_name, object_name
 
     def put_object(
         self,

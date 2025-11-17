@@ -8,6 +8,12 @@ from ..settings.settings import ContainerSettings
 class UploadClient(typing.Protocol):
     def get_object(self, url: str) -> typing.Optional[bytes]: ...
 
+    def get_object_and_metadata(
+        self, url: str
+    ) -> typing.Optional[typing.Tuple[bytes, typing.Dict[str, str]]]: ...
+
+    def head_object(self, url: str) -> typing.Optional[typing.Dict[str, str]]: ...
+
     def put_object(
         self,
         bucket: str,
@@ -48,6 +54,14 @@ class Upload:
 
     def get_object(self, url: str) -> typing.Optional[bytes]:
         return self.client.get_object(url)
+
+    def get_object_and_metadata(
+        self, url: str
+    ) -> typing.Optional[typing.Tuple[bytes, typing.Dict[str, str]]]:
+        return self.client.get_object_and_metadata(url)
+
+    def head_object(self, url: str) -> typing.Optional[typing.Dict[str, str]]:
+        return self.client.head_object(url)
 
     def put_object(
         self,

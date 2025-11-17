@@ -1,12 +1,11 @@
 import dateparser, typing
 
-from pydantic import BaseModel
+from .element import Element
 
 
-class ExtractedField(BaseModel):
+class ExtractedField(Element):
     confidence: typing.Optional[str] = None
     conflicts: typing.List[typing.Any] = []
-    key: str
 
     value: typing.Union[str, float, typing.List[typing.Any]] = ""
 
@@ -14,7 +13,7 @@ class ExtractedField(BaseModel):
         self,
         value: typing.Union[str, float, typing.List[typing.Any]],
         **data: typing.Any,
-    ):
+    ) -> None:
         super().__init__(**data)
 
         self.set_value(value)
@@ -71,7 +70,11 @@ class ExtractedField(BaseModel):
     ) -> None:
         if isinstance(value, int):
             self.value = float(value)
-        elif isinstance(value, str) and "date" in self.key.lower():
+        elif (
+            isinstance(value, str)
+            and self.prompt
+            and "date" in self.prompt.key().lower()
+        ):
             try:
                 dt = dateparser.parse(value)
                 if dt is None:
