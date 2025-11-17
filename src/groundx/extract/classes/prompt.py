@@ -6,15 +6,37 @@ from ..utility.classes import str_to_type_sequence
 
 
 class Prompt(BaseModel):
-    attr_name: str
+    attr_name: typing.Optional[str] = None
+    description: typing.Optional[str] = None
+    display_name: typing.Optional[str] = None
     prompt: str
-    type: typing.Union[str, typing.List[str]]
+    type: typing.Optional[typing.Union[str, typing.List[str]]] = None
 
     class Config:
         validate_by_name = True
 
+    def key(self) -> str:
+        if self.attr_name:
+            return self.attr_name
+
+        if self.display_name:
+            return self.display_name
+
+        raise ValueError(f"missing attr_name or display_name")
+
+    def prompt_name(self) -> str:
+        if self.display_name:
+            return self.display_name
+
+        if self.attr_name:
+            return self.attr_name
+
+        raise ValueError(f"missing attr_name or display_name")
+
     def valid_value(self, value: typing.Any) -> bool:
         ty = self.type
+        if not ty:
+            return True
 
         types: typing.List[typing.Type[typing.Any]] = []
         if isinstance(ty, list):

@@ -29,22 +29,68 @@ class S3Client:
             return None
 
         try:
-            if url.startswith("s3://"):
-                s3_uri_parts = url.replace("s3://", "").split("/")
-                s3_bucket = s3_uri_parts[0]
-                s3_key = "/".join(s3_uri_parts[1:])
-            else:
-                s3_bucket = self.settings.upload.bucket
-                s3_key = url
-                if url.startswith("/"):
-                    s3_key = url[1:]
+            s3_bucket, s3_key = self.parse_url(url)
 
             response = self.client.get_object(Bucket=s3_bucket, Key=s3_key)
 
-            return response["Body"].read()
+            return response.get("Body").read()
         except Exception as e:
             self.logger.error_msg(f"[{url}] exception: {e}")
             raise
+
+    def get_object_and_metadata(
+        self, url: str
+    ) -> typing.Optional[typing.Tuple[bytes, typing.Dict[str, str]]]:
+        if not self.client:
+            print("get_object no client")
+            return None
+
+        try:
+            s3_bucket, s3_key = self.parse_url(url)
+
+            response = self.client.get_object(Bucket=s3_bucket, Key=s3_key)
+
+            body = response.get("Body").read()
+
+            return body, {
+                "ETag": response.get("ETag", ""),
+                "LastModified": str(response.get("LastModified").timestamp()),
+            }
+
+        except Exception as e:
+            self.logger.error_msg(f"[{url}] exception: {e}")
+            raise
+
+    def head_object(self, url: str) -> typing.Optional[typing.Dict[str, str]]:
+        if not self.client:
+            print("head_object no client")
+            return None
+
+        try:
+            s3_bucket, s3_key = self.parse_url(url)
+
+            response = self.client.head_object(Bucket=s3_bucket, Key=s3_key)
+
+            return {
+                "ETag": response.get("ETag", ""),
+                "LastModified": str(response.get("LastModified").timestamp()),
+            }
+        except Exception as e:
+            self.logger.error_msg(f"[{url}] exception: {e}")
+            raise
+
+    def parse_url(self, key: str) -> typing.Tuple[str, str]:
+        if key.startswith("s3://"):
+            s3_uri_parts = key.replace("s3://", "").split("/")
+            s3_bucket = s3_uri_parts[0]
+            s3_key = "/".join(s3_uri_parts[1:])
+        else:
+            s3_bucket = self.settings.upload.bucket
+            s3_key = key
+            if key.startswith("/"):
+                s3_key = key[1:]
+
+        return s3_bucket, s3_key
 
     def put_object(
         self,

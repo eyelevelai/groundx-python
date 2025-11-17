@@ -15,7 +15,7 @@ class AgentRequest(BaseModel, typing.Generic[ReqT, DocT]):
 
     @field_validator("request_type")
     @classmethod
-    def validate_request_type(cls, value: str):
+    def validate_request_type(cls, value: str) -> str:
         if value not in cls.allowed_request_types:
             raise ValueError(
                 f"Invalid request_type '{value}'. Must be one of {cls.allowed_request_types}"
