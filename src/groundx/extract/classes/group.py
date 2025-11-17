@@ -44,6 +44,13 @@ class Group(Element):
     def set(
         self,
         name: str,
-        nf: typing.Union[Element, typing.Dict[str, Element], typing.List[Element]],
+        nf: typing.Optional[
+            typing.Union[Element, typing.Dict[str, Element], typing.List[Element]]
+        ],
     ) -> None:
+        if not nf:
+            if name in self.fields:
+                self.fields.pop(name)
+            return
+
         self.fields[name] = nf
