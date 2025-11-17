@@ -1,9 +1,49 @@
 import typing
 
 from .element import Element
+from .field import ExtractedField
 
 
 class Group(Element):
     fields: typing.Dict[
         str, typing.Union[Element, typing.Dict[str, Element], typing.List[Element]]
     ]
+
+    def get(
+        self, name: str
+    ) -> typing.Optional[
+        typing.Union[Element, typing.Dict[str, Element], typing.List[Element]]
+    ]:
+        if name in self.fields:
+            return self.fields[name]
+
+        return None
+
+    def get_element(self, name: str) -> typing.Optional[Element]:
+        obj = self.get(name)
+
+        if not obj:
+            return None
+
+        if not isinstance(obj, Element):
+            return None
+
+        return obj
+
+    def get_field(self, name: str) -> typing.Optional[ExtractedField]:
+        ele = self.get_element(name)
+
+        if not ele:
+            return None
+
+        if not isinstance(ele, ExtractedField):
+            return None
+
+        return ele
+
+    def set(
+        self,
+        name: str,
+        nf: typing.Union[Element, typing.Dict[str, Element], typing.List[Element]],
+    ) -> None:
+        self.fields[name] = nf
