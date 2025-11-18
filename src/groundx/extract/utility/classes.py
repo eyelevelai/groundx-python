@@ -27,8 +27,11 @@ def clean_json(txt: str) -> str:
 
 def coerce_numeric_string(
     value: typing.Any,
-    et: typing.Union[str, typing.List[str]],
+    et: typing.Optional[typing.Union[str, typing.List[str]]] = None,
 ) -> typing.Optional[typing.Union[int, float, typing.Any]]:
+    if not et:
+        return value
+
     expected_types = str_to_type_sequence(et)
 
     if any(t in (int, float) for t in expected_types):

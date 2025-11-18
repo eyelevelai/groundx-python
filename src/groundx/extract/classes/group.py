@@ -17,6 +17,14 @@ class Group(Element):
         if name in self.fields:
             return self.fields[name]
 
+        if name.lower() in self.fields:
+            return self.fields[name.lower()]
+
+        for k, v in self.fields.items():
+            if isinstance(v, ExtractedField):
+                if v.prompt and v.prompt.key().lower() == name.lower():
+                    return self.fields[k]
+
         return None
 
     def get_element(self, name: str) -> typing.Optional[Element]:
