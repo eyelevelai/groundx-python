@@ -49,6 +49,17 @@ class Group(Element):
 
         return ele
 
+    def get_list(self, name: str) -> typing.Optional[typing.List[Element]]:
+        obj = self.get(name)
+
+        if not obj:
+            return None
+
+        if not isinstance(obj, list):
+            return None
+
+        return obj
+
     def set(
         self,
         name: str,
