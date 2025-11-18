@@ -1,7 +1,7 @@
 import typing
 
-if typing.TYPE_CHECKING:
-    from ..classes.prompt import Prompt
+
+from ..classes.prompt import Prompt
 
 
 def class_fields(cls: typing.Any) -> typing.Set[str]:
@@ -28,7 +28,7 @@ def clean_json(txt: str) -> str:
 def coerce_numeric_string(
     value: typing.Any,
     et: typing.Union[str, typing.List[str]],
-) -> typing.Union[typing.Any, typing.List[typing.Any]]:
+) -> typing.Optional[typing.Union[int, float, typing.Any]]:
     expected_types = str_to_type_sequence(et)
 
     if any(t in (int, float) for t in expected_types):
@@ -49,11 +49,11 @@ def coerce_numeric_string(
 
 
 def from_attr_name(
-    name: str, prompts: typing.Sequence[typing.Mapping[str, "Prompt"]]
-) -> typing.Tuple[typing.Optional[str], typing.Optional[typing.Any]]:
+    name: str, prompts: typing.Sequence[typing.Mapping[str, Prompt]]
+) -> typing.Tuple[typing.Optional[str], typing.Optional[Prompt]]:
     for pmps in prompts:
         for key, prompt in pmps.items():
-            if getattr(prompt, "attr_name", None) == name:
+            if prompt.attr_name and prompt.attr_name == name:
                 return key, prompt
 
     return None, None
@@ -61,11 +61,11 @@ def from_attr_name(
 
 def from_key(
     name: str,
-    prompts: typing.Sequence[typing.Mapping[str, "Prompt"]],
-) -> typing.Tuple[typing.Optional[str], typing.Optional[typing.Any]]:
+    prompts: typing.Sequence[typing.Mapping[str, Prompt]],
+) -> typing.Tuple[typing.Optional[str], typing.Optional[Prompt]]:
     for pmps in prompts:
         for k, prompt in pmps.items():
-            if k == name:
+            if prompt.key() == name:
                 return k, prompt
 
     key, pmp = from_attr_name(name, prompts)
@@ -114,6 +114,7 @@ def type_to_str(
                 tys.append(nt)
             else:
                 tys.append("list")
+        return tys
 
     if ty == int:
         return "int"
