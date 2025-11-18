@@ -50,29 +50,25 @@ def coerce_numeric_string(
 
 def from_attr_name(
     name: str, prompts: typing.Sequence[typing.Mapping[str, Prompt]]
-) -> typing.Tuple[typing.Optional[str], typing.Optional[Prompt]]:
+) -> typing.Optional[typing.Any]:
     for pmps in prompts:
-        for key, prompt in pmps.items():
+        for _, prompt in pmps.items():
             if prompt.attr_name and prompt.attr_name == name:
-                return key, prompt
+                return prompt
 
-    return None, None
+    return None
 
 
 def from_key(
     name: str,
     prompts: typing.Sequence[typing.Mapping[str, Prompt]],
-) -> typing.Tuple[typing.Optional[str], typing.Optional[Prompt]]:
+) -> typing.Optional[typing.Any]:
     for pmps in prompts:
-        for k, prompt in pmps.items():
+        for _, prompt in pmps.items():
             if prompt.key() == name:
-                return k, prompt
+                return prompt
 
-    key, pmp = from_attr_name(name, prompts)
-    if pmp:
-        return key, pmp
-
-    return None, None
+    return from_attr_name(name, prompts)
 
 
 def str_to_type_sequence(
