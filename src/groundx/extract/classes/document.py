@@ -10,7 +10,7 @@ from .groundx import GroundXDocument
 from .group import Group
 from ..services.logger import Logger
 from ..services.upload import Upload
-from ..utility.utility import clean_json
+from ..utility import clean_json
 
 
 DocT = typing.TypeVar("DocT", bound="Document")

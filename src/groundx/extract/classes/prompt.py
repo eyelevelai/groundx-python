@@ -2,7 +2,7 @@ import typing
 
 from pydantic import BaseModel
 
-from ..utility.utility import str_to_type_sequence
+from ..utility import str_to_type_sequence
 
 
 class Prompt(BaseModel):
