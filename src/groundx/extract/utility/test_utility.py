@@ -1,6 +1,6 @@
 import typing, unittest
 
-from .classes import class_fields, coerce_numeric_string
+from .utility import class_fields, coerce_numeric_string
 
 
 class DummyModelFields:

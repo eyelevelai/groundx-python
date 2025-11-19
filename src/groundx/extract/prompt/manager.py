@@ -30,7 +30,7 @@ def _group_from_mapping(data: typing.Dict[str, typing.Any]) -> Group:
         typing.Union[
             Element,
             typing.Dict[str, Element],
-            typing.List[Element],
+            typing.Sequence[Element],
         ],
     ] = {}
 

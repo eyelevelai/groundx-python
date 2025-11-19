@@ -15,7 +15,7 @@ from smolagents.models import (  # pyright: ignore[reportMissingTypeStubs]
 
 from ..services.logger import Logger
 from ..settings.settings import AgentSettings
-from ..utility.classes import clean_json
+from ..utility.utility import clean_json
 
 
 prompt_suffix = """
