@@ -20,8 +20,10 @@ def from_key(
     prompts: typing.Sequence[typing.Mapping[str, Prompt]],
 ) -> typing.Optional[typing.Any]:
     for pmps in prompts:
-        for _, prompt in pmps.items():
-            if prompt.key() == name:
+        for key, prompt in pmps.items():
+            if prompt.key().lower() == name.lower():
+                return prompt
+            if key.lower() == name.lower():
                 return prompt
 
     return from_attr_name(name, prompts)
