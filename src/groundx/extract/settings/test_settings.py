@@ -328,7 +328,7 @@ class TestContainerSettings(unittest.TestCase):
                     "task_to": 300,
                     "workers": 1,
                     "callback_api_key": "cbkey",
-                    "valid_api_keys": ["vkeys"],
+                    "valid_api_keys": ["vkeys", "valv", "vale"],
                     "loglevel": "ERROR",
                     "status_broker": "mymetrics",
                 },
@@ -357,14 +357,14 @@ class TestContainerSettings(unittest.TestCase):
                     "task_to": 600,
                     "workers": 1,
                     "callback_api_key": "vale",
-                    "valid_api_keys": ["valv"],
+                    "valid_api_keys": ["valv", "vale"],
                     "loglevel": "INFO",
                     "status_broker": "mybroker",
                 },
             },
         ]
 
-        for _, tst in enumerate(tsts):
+        for i, tst in enumerate(tsts):
             clearEnv()
 
             input: typing.Dict[str, typing.Any] = {}
@@ -432,14 +432,18 @@ class TestContainerSettings(unittest.TestCase):
                 self.assertRaises(Exception, settings.get_callback_api_key)
             else:
                 self.assertEqual(
-                    settings.get_callback_api_key(), tst["expect"]["callback_api_key"]
+                    settings.get_callback_api_key(),
+                    tst["expect"]["callback_api_key"],
+                    f"\n\n[{i}]\n\n",
                 )
 
             if tst["expect"]["valid_api_keys"] == Exception:
                 self.assertRaises(Exception, settings.get_valid_api_keys)
             else:
                 self.assertEqual(
-                    settings.get_valid_api_keys(), tst["expect"]["valid_api_keys"]
+                    settings.get_valid_api_keys(),
+                    tst["expect"]["valid_api_keys"],
+                    f"\n\n[{i}]\n\n",
                 )
 
             self.assertEqual(settings.loglevel(), tst["expect"]["loglevel"])

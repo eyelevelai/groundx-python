@@ -40,8 +40,8 @@ class TestDocument(unittest.TestCase):
         st1: Document = test_doc()
         self.assertEqual(st1.file_name, "F")
         st2: Document = Document.from_request(
-            cache_dir=Path("./cache"),
             base_url="",
+            cache_dir=Path("./cache"),
             req=DR(
                 documentID="D", fileName="F.pdf", modelID=1, processorID=1, taskID="T"
             ),

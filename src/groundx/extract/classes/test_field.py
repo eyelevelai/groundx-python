@@ -1,8 +1,10 @@
-import pytest, typing, unittest
+import dateparser, pytest, typing, unittest
 
 pytest.importorskip("dateparser")
 
+
 from .field import ExtractedField
+from .prompt import Prompt
 
 
 def TestField(
@@ -11,7 +13,10 @@ def TestField(
     conflicts: typing.List[typing.Any] = [],
 ) -> ExtractedField:
     return ExtractedField(
-        key=name.replace("_", " "),
+        prompt=Prompt(
+            attr_name=name.replace("_", " "),
+            prompt=name.replace("_", " "),
+        ),
         value=value,
         conflicts=conflicts,
     )
@@ -37,6 +42,14 @@ class TestExtractedField(unittest.TestCase):
         self.assertEqual(ef1.get_value(), "2025-03-29")
         ef2 = TestField("test date", "2025-03-29")
         self.assertEqual(ef2.get_value(), "2025-03-29")
+
+        tst_date = dateparser.parse("1234")
+        if tst_date is None:
+            raise Exception(f"tst_date is none")
+
+        tst_date = tst_date.strftime("%Y-%m-%d")
+        ef3 = TestField("test date", "1234")
+        self.assertEqual(ef3.get_value(), tst_date)
 
 
 if __name__ == "__main__":
