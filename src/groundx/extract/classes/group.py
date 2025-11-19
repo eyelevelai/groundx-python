@@ -7,7 +7,7 @@ from .field import ExtractedField
 class Group(Element):
     fields: typing.Dict[
         str, typing.Union[Element, typing.Dict[str, Element], typing.Sequence[Element]]
-    ]
+    ] = {}
 
     def get(
         self, name: str
