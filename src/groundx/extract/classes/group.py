@@ -6,13 +6,13 @@ from .field import ExtractedField
 
 class Group(Element):
     fields: typing.Dict[
-        str, typing.Union[Element, typing.Dict[str, Element], typing.List[Element]]
+        str, typing.Union[Element, typing.Dict[str, Element], typing.Sequence[Element]]
     ]
 
     def get(
         self, name: str
     ) -> typing.Optional[
-        typing.Union[Element, typing.Dict[str, Element], typing.List[Element]]
+        typing.Union[Element, typing.Dict[str, Element], typing.Sequence[Element]]
     ]:
         if name in self.fields:
             return self.fields[name]
@@ -49,7 +49,7 @@ class Group(Element):
 
         return ele
 
-    def get_list(self, name: str) -> typing.Optional[typing.List[Element]]:
+    def get_list(self, name: str) -> typing.Optional[typing.Sequence[Element]]:
         obj = self.get(name)
 
         if not obj:
@@ -64,7 +64,7 @@ class Group(Element):
         self,
         name: str,
         nf: typing.Optional[
-            typing.Union[Element, typing.Dict[str, Element], typing.List[Element]]
+            typing.Union[Element, typing.Dict[str, Element], typing.Sequence[Element]]
         ],
     ) -> None:
         if not nf:
