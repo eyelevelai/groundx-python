@@ -1,15 +1,13 @@
-from .classes import (
+from .utility import (
     class_fields,
     clean_json,
     coerce_numeric_string,
-    from_attr_name,
-    from_key,
+    str_to_type_sequence,
 )
 
 __all__ = [
     "class_fields",
     "clean_json",
     "coerce_numeric_string",
-    "from_attr_name",
-    "from_key",
+    "str_to_type_sequence",
 ]
