@@ -7,6 +7,8 @@ from pydantic import model_serializer, model_validator
 
 
 class Group(Element):
+    model_type: str = "group"
+
     fields: typing.Dict[
         str, typing.Union[Element, typing.Dict[str, Element], typing.Sequence[Element]]
     ] = {}
