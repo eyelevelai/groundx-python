@@ -33,7 +33,7 @@ class Group(Element):
         for key, value in data.items():
             if key in non_field_keys or key == "fields":
                 base[key] = value
-            else:
+            elif value:
                 dynamic_fields[key] = value
 
         if dynamic_fields:
