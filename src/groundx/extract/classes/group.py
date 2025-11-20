@@ -55,7 +55,7 @@ class Group(Element):
         data = handler(self)
 
         raw_fields = typing.cast(
-            dict[str, typing.Any],
+            typing.Dict[str, typing.Any],
             data.pop("fields", {}) or {},
         )
 
