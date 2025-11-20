@@ -59,7 +59,7 @@ class TestGroup(unittest.TestCase):
         )
         self.assertEqual(
             Group.model_validate_json(
-                '{"account_number":{"prompt":{"prompt":"account_number_1"}},"fields":{"account_number":{"prompt":{"prompt":"account_number_2"}}}}'
+                '{"account_number":{"prompt":{"prompt":"account_number_1"}},"fields":{"account_number":{"prompt":{"prompt":"account_number_2"}}},"statement_date":null}'
             ),
             grp,
         )
