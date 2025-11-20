@@ -4,13 +4,7 @@ from .element import Element
 
 
 class ExtractedField(Element):
-    """
-    Fields:
-        confidence: Optional[str]
-        conflicts:  List[Any]
-        prompt:     Optional[Prompt]
-        value:      Union[str, float, List[Any]]
-    """
+    model_type: str = "extracted_field"
 
     confidence: typing.Optional[str] = None
     conflicts: typing.List[typing.Any] = []
