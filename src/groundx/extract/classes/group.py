@@ -3,11 +3,65 @@ import typing
 from .element import Element
 from .field import ExtractedField
 
+from pydantic import model_serializer, model_validator
+
 
 class Group(Element):
     fields: typing.Dict[
         str, typing.Union[Element, typing.Dict[str, Element], typing.Sequence[Element]]
     ] = {}
+
+    @model_validator(mode="before")
+    @classmethod
+    def _inflate_fields(
+        cls,
+        data: typing.Any,
+    ) -> typing.Any:
+        if isinstance(data, cls):
+            return data
+
+        if not isinstance(data, dict):
+            return data
+
+        model_fields: typing.Set[str] = set(cls.model_fields.keys())
+        non_field_keys: typing.Set[str] = model_fields - {"fields"}
+
+        base: typing.Dict[str, typing.Any] = {}
+        dynamic_fields: typing.Dict[str, typing.Any] = {}
+
+        data = typing.cast(typing.Dict[str, typing.Any], data)
+        for key, value in data.items():
+            if key in non_field_keys or key == "fields":
+                base[key] = value
+            else:
+                dynamic_fields[key] = value
+
+        if dynamic_fields:
+            existing = base.get("fields")
+            if isinstance(existing, dict):
+                merged = typing.cast(typing.Dict[str, typing.Any], existing)
+                merged.update(dynamic_fields)
+                base["fields"] = merged
+            else:
+                base["fields"] = dynamic_fields
+
+        return base
+
+    @model_serializer(mode="wrap")
+    def _flatten_fields(
+        self,
+        handler: typing.Callable[[typing.Any], typing.Dict[str, typing.Any]],
+    ) -> typing.Dict[str, typing.Any]:
+        data = handler(self)
+
+        raw_fields = typing.cast(
+            dict[str, typing.Any],
+            data.pop("fields", {}) or {},
+        )
+
+        data.update(raw_fields)
+
+        return data
 
     def get(
         self, name: str
