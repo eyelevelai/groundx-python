@@ -15,6 +15,7 @@ from .classes import (
     TestXRay,
     XRayDocument,
 )
+from .prompt import PromptManager, Source
 from .services import Logger, RateLimit, SheetsClient, Status, Upload
 from .settings import (
     AgentSettings,
@@ -40,8 +41,10 @@ __all__ = [
     "Logger",
     "ProcessResponse",
     "Prompt",
+    "PromptManager",
     "RateLimit",
     "SheetsClient",
+    "Source",
     "Status",
     "TestChunk",
     "TestDocumentPage",
