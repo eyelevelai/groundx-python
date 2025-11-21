@@ -87,7 +87,7 @@ class PromptManager:
     ) -> None:
         self._config_source: Source = config_source
         # Cache: workflow_id -> { field_key -> Prompt }
-        self._cache: typing.Dict[str, typing.Dict[str, Prompt]] = {}
+        self._cache: typing.Dict[str, Group] = {}
         self._default_workflow_id: str = default_workflow_id
         self._versions: typing.Dict[str, str] = {}
 
@@ -96,35 +96,8 @@ class PromptManager:
     def _build_prompts_from_raw(
         self,
         raw: str,
-    ) -> typing.Dict[str, Prompt]:
-        root_group = load_from_yaml(raw)
-
-        prompts: typing.Dict[str, Prompt] = {}
-
-        def walk(element: Element, prefix: str = "") -> None:
-            if element.prompt:
-                key = prefix.rstrip(".")
-                if key:
-                    if not element.prompt.attr_name:
-                        element.prompt.attr_name = key.split(".")[-1]
-
-                    prompts[key] = element.prompt
-
-            if isinstance(element, Group) and getattr(element, "fields", None):
-                for name, child in element.fields.items():
-                    child_prefix = f"{prefix}.{name}" if prefix else name
-                    if isinstance(child, Element):
-                        walk(child, child_prefix)
-                    elif isinstance(child, dict):
-                        for sub_name, sub_elem in child.items():
-                            walk(sub_elem, f"{child_prefix}.{sub_name}")
-                    else:
-                        for idx, sub_elem in enumerate(child):
-                            walk(sub_elem, f"{child_prefix}[{idx}]")
-
-        walk(root_group, prefix="")
-
-        return prompts
+    ) -> Group:
+        return load_from_yaml(raw)
 
     def _ensure_loaded(self, workflow_id: str) -> None:
         if workflow_id in self._cache:
@@ -150,7 +123,7 @@ class PromptManager:
 
     def get_fields_for_workflow(
         self, workflow_id: typing.Optional[str] = None
-    ) -> typing.Dict[str, Prompt]:
+    ) -> Group:
         if not workflow_id:
             workflow_id = self._default_workflow_id
 

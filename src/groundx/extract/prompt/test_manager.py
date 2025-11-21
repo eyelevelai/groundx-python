@@ -4,7 +4,6 @@ from .manager import load_from_yaml, PromptManager
 from .source import Source
 from ..classes.element import Element
 from ..classes.group import Group
-from ..classes.prompt import Prompt
 
 
 SAMPLE_YAML = """
@@ -94,25 +93,51 @@ class Test_load_from_yaml(unittest.TestCase):
 
         fields = manager.get_fields_for_workflow("latest")
 
-        self.assertIn("statement_date", fields)
-        self.assertIsInstance(fields["statement_date"], Prompt)
-        self.assertIn("## statement_date", fields["statement_date"].prompt)
+        self.assertIn("meters", fields.fields)
+        self.assertIn("statement_date", fields.fields)
+        self.assertEqual(len(fields.fields), 2)
 
-        self.assertIn("meters", fields)
-        self.assertIsInstance(fields["meters"], Prompt)
-        self.assertIn("## meters", fields["meters"].prompt)
+        sd = fields.fields["statement_date"]
+        self.assertIsInstance(sd, Element)
+        if isinstance(sd, Element):
+            pmp = sd.prompt
+            self.assertIsNotNone(pmp)
+            if pmp:
+                self.assertIn("## statement_date", pmp.prompt)
 
-        self.assertIn("meters.meter_number", fields)
-        self.assertIsInstance(fields["meters.meter_number"], Prompt)
-        self.assertIn("## meter_number", fields["meters.meter_number"].prompt)
+        mtrs = fields.fields["meters"]
+        self.assertIsInstance(mtrs, Group)
+        if isinstance(mtrs, Group):
+            pmp = mtrs.prompt
+            self.assertIsNotNone(pmp)
+            if pmp:
+                self.assertIn("## meters", pmp.prompt)
+
+            self.assertEqual(len(mtrs.fields), 1)
+            self.assertIn("meter_number", mtrs.fields)
+
+            mn = mtrs.fields["meter_number"]
+            self.assertIsInstance(mn, Element)
+            if isinstance(mn, Element):
+                pmp = mn.prompt
+                self.assertIsNotNone(pmp)
+                if pmp:
+                    self.assertIn("## meter_number", pmp.prompt)
 
     def test_reload_if_changed_updates_prompts(self) -> None:
         source = TestSource(SAMPLE_YAML)
         manager = PromptManager(config_source=source)
         initial_fields = manager.get_fields_for_workflow("latest")
 
-        self.assertIn("statement_date", initial_fields)
-        self.assertIn("## statement_date", initial_fields["statement_date"].prompt)
+        self.assertIn("statement_date", initial_fields.fields)
+        self.assertEqual(len(initial_fields.fields), 2)
+        sd = initial_fields.fields["statement_date"]
+        self.assertIsInstance(sd, Element)
+        if isinstance(sd, Element):
+            pmp = sd.prompt
+            self.assertIsNotNone(pmp)
+            if pmp:
+                self.assertIn("## statement_date", pmp.prompt)
 
         updated_yaml = SAMPLE_YAML.replace(
             "## statement_date", "## updated_statement_date"
@@ -122,7 +147,10 @@ class Test_load_from_yaml(unittest.TestCase):
         manager.reload_if_changed()
         updated_fields = manager.get_fields_for_workflow("v2")
 
-        self.assertIn("statement_date", updated_fields)
-        self.assertIn(
-            "## updated_statement_date", updated_fields["statement_date"].prompt
-        )
+        sd = updated_fields.fields["statement_date"]
+        self.assertIsInstance(sd, Element)
+        if isinstance(sd, Element):
+            pmp = sd.prompt
+            self.assertIsNotNone(pmp)
+            if pmp:
+                self.assertIn("## updated_statement_date", pmp.prompt)
