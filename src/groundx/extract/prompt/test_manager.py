@@ -67,6 +67,7 @@ class Test_load_from_yaml(unittest.TestCase):
                     statement_date.prompt.description,
                     "date when the invoice was computed or sent to the customer",
                 )
+                self.assertEqual(statement_date.prompt.attr_name, "statement_date")
                 self.assertIn("## statement_date", statement_date.prompt.prompt)
 
         self.assertIsInstance(meters, Group)
@@ -79,12 +80,12 @@ class Test_load_from_yaml(unittest.TestCase):
 
             if isinstance(meter_number, Element):
                 self.assertIsNotNone(meter_number.prompt)
-
                 if meter_number.prompt:
                     self.assertEqual(
                         meter_number.prompt.description,
                         "unique identifier for the meter that made the utility service measurement",
                     )
+                    self.assertEqual(meter_number.prompt.attr_name, "meter_number")
                     self.assertIn("## meter_number", meter_number.prompt.prompt)
 
     def test_prompt_manager_builds_flat_prompt_dict(self) -> None:
@@ -103,6 +104,7 @@ class Test_load_from_yaml(unittest.TestCase):
             pmp = sd.prompt
             self.assertIsNotNone(pmp)
             if pmp:
+                self.assertEqual(pmp.attr_name, "statement_date")
                 self.assertIn("## statement_date", pmp.prompt)
 
         mtrs = fields.fields["meters"]
@@ -111,6 +113,7 @@ class Test_load_from_yaml(unittest.TestCase):
             pmp = mtrs.prompt
             self.assertIsNotNone(pmp)
             if pmp:
+                self.assertEqual(pmp.attr_name, "meters")
                 self.assertIn("## meters", pmp.prompt)
 
             self.assertEqual(len(mtrs.fields), 1)
@@ -122,6 +125,7 @@ class Test_load_from_yaml(unittest.TestCase):
                 pmp = mn.prompt
                 self.assertIsNotNone(pmp)
                 if pmp:
+                    self.assertEqual(pmp.attr_name, "meter_number")
                     self.assertIn("## meter_number", pmp.prompt)
 
     def test_reload_if_changed_updates_prompts(self) -> None:
@@ -137,6 +141,7 @@ class Test_load_from_yaml(unittest.TestCase):
             pmp = sd.prompt
             self.assertIsNotNone(pmp)
             if pmp:
+                self.assertEqual(pmp.attr_name, "statement_date")
                 self.assertIn("## statement_date", pmp.prompt)
 
         updated_yaml = SAMPLE_YAML.replace(
@@ -153,4 +158,5 @@ class Test_load_from_yaml(unittest.TestCase):
             pmp = sd.prompt
             self.assertIsNotNone(pmp)
             if pmp:
+                self.assertEqual(pmp.attr_name, "statement_date")
                 self.assertIn("## updated_statement_date", pmp.prompt)
