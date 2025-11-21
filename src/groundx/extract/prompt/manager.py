@@ -145,7 +145,12 @@ class PromptManager:
             self._cache[workflow_id] = prompts
             self._versions[workflow_id] = version
 
-    def get_fields_for_workflow(self, workflow_id: str) -> typing.Dict[str, Prompt]:
+    def get_fields_for_workflow(
+        self, workflow_id: typing.Optional[str] = None
+    ) -> typing.Dict[str, Prompt]:
+        if workflow_id is None:
+            workflow_id = self._default_workflow_id
+
         self._ensure_loaded(workflow_id)
 
         return self._cache[workflow_id]
