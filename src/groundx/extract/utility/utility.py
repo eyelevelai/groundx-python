@@ -1,18 +1,6 @@
 import typing
 
 
-def class_fields(cls: typing.Any) -> typing.Set[str]:
-    fields: typing.Set[str] = set()
-    if hasattr(cls, "model_fields"):
-        fields = set(cls.model_fields.keys())
-    elif hasattr(cls, "__fields__"):
-        fields = set(cls.__fields__.keys())  # type: ignore[reportDeprecated]
-    else:
-        fields = set()
-
-    return fields
-
-
 def clean_json(txt: str) -> str:
     for p in ("json```\n", "```json\n", "json\n"):
         if txt.startswith(p):
