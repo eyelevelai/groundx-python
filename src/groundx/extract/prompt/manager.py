@@ -102,9 +102,12 @@ class PromptManager:
         prompts: typing.Dict[str, Prompt] = {}
 
         def walk(element: Element, prefix: str = "") -> None:
-            if element.prompt is not None:
+            if element.prompt:
                 key = prefix.rstrip(".")
                 if key:
+                    if not element.prompt.attr_name:
+                        element.prompt.attr_name = key
+
                     prompts[key] = element.prompt
 
             if isinstance(element, Group) and getattr(element, "fields", None):
@@ -133,13 +136,13 @@ class PromptManager:
         self._versions[workflow_id] = version
 
     def reload_if_changed(self, workflow_id: typing.Optional[str] = None) -> None:
-        if workflow_id is None:
+        if not workflow_id:
             workflow_id = self._default_workflow_id
 
         current_version = self._config_source.peek(workflow_id)
         previous_version = self._versions.get(workflow_id)
 
-        if previous_version is None or current_version != previous_version:
+        if not previous_version or current_version != previous_version:
             raw, version = self._config_source.fetch(workflow_id)
             prompts = self._build_prompts_from_raw(raw)
             self._cache[workflow_id] = prompts
@@ -148,7 +151,7 @@ class PromptManager:
     def get_fields_for_workflow(
         self, workflow_id: typing.Optional[str] = None
     ) -> typing.Dict[str, Prompt]:
-        if workflow_id is None:
+        if not workflow_id:
             workflow_id = self._default_workflow_id
 
         self._ensure_loaded(workflow_id)
