@@ -11,7 +11,7 @@ class Source:
         self._upload = Upload(settings=settings, logger=logger)
 
     def _workflow_path(self, workflow_id: str) -> str:
-        return f"prompts/{self._settings.callback_api_key}/prompt.{workflow_id}.yaml"
+        return f"workflows/extract/{workflow_id}.yaml"
 
     def _version_from_metadata(self, meta: typing.Dict[str, str]) -> str:
         etag = (meta.get("ETag") or "").strip('"')
