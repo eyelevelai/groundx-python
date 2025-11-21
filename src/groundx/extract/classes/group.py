@@ -84,9 +84,6 @@ class Group(Element):
     def get_element(self, name: str) -> typing.Optional[Element]:
         obj = self.get(name)
 
-        if not obj:
-            return None
-
         if not isinstance(obj, Element):
             return None
 
@@ -95,9 +92,6 @@ class Group(Element):
     def get_field(self, name: str) -> typing.Optional[ExtractedField]:
         ele = self.get_element(name)
 
-        if not ele:
-            return None
-
         if not isinstance(ele, ExtractedField):
             return None
 
@@ -105,9 +99,6 @@ class Group(Element):
 
     def get_list(self, name: str) -> typing.Optional[typing.Sequence[Element]]:
         obj = self.get(name)
-
-        if not obj:
-            return None
 
         if not isinstance(obj, list):
             return None
