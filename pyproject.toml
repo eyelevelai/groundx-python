@@ -3,7 +3,7 @@ name = "groundx"
 
 [tool.poetry]
 name = "groundx"
-version = "2.8.26"
+version = "2.8.27"
 description = ""
 readme = "README.md"
 authors = []
