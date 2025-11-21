@@ -122,7 +122,9 @@ class Group(Element):
         ],
     ) -> None:
         if not nf:
-            if name in self.fields:
+            if isinstance(nf, list) or isinstance(nf, dict):
+                self.fields[name] = nf
+            elif name in self.fields:
                 self.fields.pop(name)
             return
 
