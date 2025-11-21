@@ -1,19 +1,24 @@
-import typing
+import datetime, os, typing
 
 from ..services.logger import Logger
-from ..services.upload import Upload
 from ..settings.settings import ContainerSettings
 
 
 class Source:
-    def __init__(self, settings: ContainerSettings, logger: Logger) -> None:
+    def __init__(
+        self,
+        settings: ContainerSettings,
+        logger: Logger,
+        cache_path: str = f"workflows/extract",
+    ) -> None:
+        self._cache_path = cache_path.rstrip("/")
+        self._logger = logger
         self._settings = settings
-        self._upload = Upload(settings=settings, logger=logger)
 
-    def _workflow_path(self, workflow_id: str) -> str:
-        return f"workflows/extract/{workflow_id}.yaml"
+    def workflow_path(self, workflow_id: str) -> str:
+        return f"{self._cache_path}/{workflow_id}.yaml"
 
-    def _version_from_metadata(self, meta: typing.Dict[str, str]) -> str:
+    def version_from_metadata(self, meta: typing.Dict[str, str]) -> str:
         etag = (meta.get("ETag") or "").strip('"')
 
         if not etag and meta.get("LastModified"):
@@ -22,22 +27,32 @@ class Source:
         return etag
 
     def fetch(self, workflow_id: str) -> typing.Tuple[str, str]:
-        res = self._upload.get_object_and_metadata(self._workflow_path(workflow_id))
-        if not res:
-            raise Exception(
-                f"failed to get prompt yaml [{self._workflow_path(workflow_id)}]"
-            )
+        path = self.workflow_path(workflow_id)
 
-        body_bytes, meta = res
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                raw_yaml = f.read()
+        except FileNotFoundError:
+            raise Exception(f"failed to get prompt yaml [{path}]")
 
-        raw_yaml = body_bytes.decode("utf-8")
-        version = self._version_from_metadata(meta)
+        try:
+            mtime = os.path.getmtime(path)
+            version = datetime.datetime.fromtimestamp(
+                mtime, tz=datetime.timezone.utc
+            ).isoformat()
+        except OSError:
+            version = ""
 
         return raw_yaml, version
 
     def peek(self, workflow_id: str) -> typing.Optional[str]:
-        meta = self._upload.head_object(self._workflow_path(workflow_id))
-        if not meta:
+        path = self.workflow_path(workflow_id)
+
+        try:
+            mtime = os.path.getmtime(path)
+        except OSError:
             return None
 
-        return self._version_from_metadata(meta)
+        return datetime.datetime.fromtimestamp(
+            mtime, tz=datetime.timezone.utc
+        ).isoformat()
