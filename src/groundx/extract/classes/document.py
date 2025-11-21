@@ -17,8 +17,6 @@ DocT = typing.TypeVar("DocT", bound="Document")
 
 
 class Document(Group):
-    model_type: str = "document"
-
     file_name: str = ""
     document_id: str = ""
     page_images: typing.List[str] = []
@@ -132,8 +130,6 @@ def _new_page_images() -> typing.List[Image.Image]:
 
 
 class DocumentRequest(BaseModel):
-    model_type: str = "document_request"
-
     model_config = ConfigDict(populate_by_name=True)
     callback_url: str = Field(alias="callbackURL", default="")
     document_id: str = Field(alias="documentID")

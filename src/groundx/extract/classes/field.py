@@ -4,8 +4,6 @@ from .element import Element
 
 
 class ExtractedField(Element):
-    model_type: str = "extracted_field"
-
     confidence: typing.Optional[str] = None
     conflicts: typing.List[typing.Any] = []
 
