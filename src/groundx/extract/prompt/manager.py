@@ -7,14 +7,25 @@ from ..classes.prompt import Prompt
 from .source import Source
 
 
-def _element_from_mapping(data: typing.Dict[str, typing.Any]) -> Element:
+def _element_from_mapping(
+    data: typing.Dict[str, typing.Any], key: typing.Optional[str] = None
+) -> Element:
     if "fields" in data:
-        return _group_from_mapping(data)
+        grp = _group_from_mapping(data)
+        if key and grp.prompt and not grp.prompt.attr_name:
+            grp.prompt.attr_name = key
+        return grp
 
     if any(k in data for k in ("value", "conflicts", "confidence")):
-        return ExtractedField(**data)
+        ef = ExtractedField(**data)
+        if key and ef.prompt and not ef.prompt.attr_name:
+            ef.prompt.attr_name = key
+        return ef
 
-    return Element(**data)
+    ele = Element(**data)
+    if key and ele.prompt and not ele.prompt.attr_name:
+        ele.prompt.attr_name = key
+    return ele
 
 
 def _group_from_mapping(data: typing.Dict[str, typing.Any]) -> Group:
@@ -44,14 +55,14 @@ def _group_from_mapping(data: typing.Dict[str, typing.Any]) -> Group:
                         f"Expected dict for list item under field '{name}', got {type(item)}"
                     )
                 elem = _element_from_mapping(
-                    typing.cast(typing.Dict[str, typing.Any], item)
+                    typing.cast(typing.Dict[str, typing.Any], item), name
                 )
                 elements_list.append(elem)
             fields[name] = elements_list
         elif isinstance(n, dict):
             nd = typing.cast(typing.Dict[str, typing.Any], n)
             if "prompt" in nd or "fields" in nd or "value" in nd:
-                elem = _element_from_mapping(nd)
+                elem = _element_from_mapping(nd, name)
                 fields[name] = elem
             else:
                 inner_dict: typing.Dict[str, Element] = {}
@@ -61,7 +72,7 @@ def _group_from_mapping(data: typing.Dict[str, typing.Any]) -> Group:
                             f"Expected dict for '{name}.{sub_name}', got {type(sub_node)}"
                         )
                     inner_dict[sub_name] = _element_from_mapping(
-                        typing.cast(typing.Dict[str, typing.Any], sub_node)
+                        typing.cast(typing.Dict[str, typing.Any], sub_node), sub_name
                     )
                 fields[name] = inner_dict
         else:
