@@ -106,7 +106,7 @@ class PromptManager:
                 key = prefix.rstrip(".")
                 if key:
                     if not element.prompt.attr_name:
-                        element.prompt.attr_name = key
+                        element.prompt.attr_name = key.split(".")[-1]
 
                     prompts[key] = element.prompt
 
