@@ -15,7 +15,7 @@ def TestField(
     return ExtractedField(
         prompt=Prompt(
             attr_name=name.replace("_", " "),
-            prompt=name.replace("_", " "),
+            full=name.replace("_", " "),
         ),
         value=value,
         conflicts=conflicts,

@@ -11,19 +11,19 @@ statement:
   fields:
     statement_date:
       prompt:
-        description: date when the invoice was computed or sent to the customer
-        prompt: |
+        short: date when the invoice was computed or sent to the customer
+        full: |
           ## statement_date
         type: str
 meters:
   prompt:
-    prompt: |
+    full: |
       ## meters
   fields:
     meter_number:
       prompt:
-        description: unique identifier for the meter that made the utility service measurement
-        prompt: |
+        short: unique identifier for the meter that made the utility service measurement
+        full: |
           ## meter_number
         type: str
 """
@@ -33,19 +33,19 @@ statement:
   fields:
     statement_date:
       prompt:
-        description: date when the invoice was computed or sent to the customer
-        prompt: |
+        short: date when the invoice was computed or sent to the customer
+        full: |
           ## statement_date
         type: str
     meters:
       prompt:
-        prompt: |
+        full: |
           ## meters
       fields:
         meter_number:
           prompt:
-            description: unique identifier for the meter that made the utility service measurement
-            prompt: |
+            short: unique identifier for the meter that made the utility service measurement
+            full: |
               ## meter_number
             type: str
 """
@@ -91,11 +91,11 @@ class TestPromptManager(unittest.TestCase):
             self.assertIsNotNone(statement_date.prompt)
             if statement_date.prompt:
                 self.assertEqual(
-                    statement_date.prompt.description,
+                    statement_date.prompt.description(),
                     "date when the invoice was computed or sent to the customer",
                 )
                 self.assertEqual(statement_date.prompt.attr_name, "statement_date")
-                self.assertIn("## statement_date", statement_date.prompt.prompt)
+                self.assertIn("## statement_date", statement_date.prompt.prompt())
 
         meters = root["meters"]
         self.assertIsInstance(meters, Group)
@@ -107,11 +107,11 @@ class TestPromptManager(unittest.TestCase):
             self.assertIsNotNone(meter_number.prompt)
             if meter_number.prompt:
                 self.assertEqual(
-                    meter_number.prompt.description,
+                    meter_number.prompt.description(),
                     "unique identifier for the meter that made the utility service measurement",
                 )
                 self.assertEqual(meter_number.prompt.attr_name, "meter_number")
-                self.assertIn("## meter_number", meter_number.prompt.prompt)
+                self.assertIn("## meter_number", meter_number.prompt.prompt())
 
     def test_load_from_yaml_2(self) -> None:
         root = load_from_yaml(SAMPLE_YAML_2)
@@ -131,11 +131,11 @@ class TestPromptManager(unittest.TestCase):
             self.assertIsNotNone(statement_date.prompt)
             if statement_date.prompt:
                 self.assertEqual(
-                    statement_date.prompt.description,
+                    statement_date.prompt.description(),
                     "date when the invoice was computed or sent to the customer",
                 )
                 self.assertEqual(statement_date.prompt.attr_name, "statement_date")
-                self.assertIn("## statement_date", statement_date.prompt.prompt)
+                self.assertIn("## statement_date", statement_date.prompt.prompt())
 
         self.assertIn("meters", root["statement"].fields)
         meters = root["statement"].fields["meters"]
@@ -149,11 +149,11 @@ class TestPromptManager(unittest.TestCase):
                 self.assertIsNotNone(meter_number.prompt)
                 if meter_number.prompt:
                     self.assertEqual(
-                        meter_number.prompt.description,
+                        meter_number.prompt.description(),
                         "unique identifier for the meter that made the utility service measurement",
                     )
                     self.assertEqual(meter_number.prompt.attr_name, "meter_number")
-                    self.assertIn("## meter_number", meter_number.prompt.prompt)
+                    self.assertIn("## meter_number", meter_number.prompt.prompt())
 
     def test_get_fields_for_workflow_1(self) -> None:
         source = TestSource(SAMPLE_YAML_1)
@@ -180,7 +180,7 @@ class TestPromptManager(unittest.TestCase):
             self.assertIsNotNone(pmp)
             if pmp:
                 self.assertEqual(pmp.attr_name, "statement_date")
-                self.assertIn("## statement_date", pmp.prompt)
+                self.assertIn("## statement_date", pmp.prompt())
 
         meters = root["meters"]
         self.assertIsInstance(meters, Group)
@@ -189,7 +189,7 @@ class TestPromptManager(unittest.TestCase):
         self.assertIsNotNone(pmp)
         if pmp:
             self.assertEqual(pmp.attr_name, "meters")
-            self.assertIn("## meters", pmp.prompt)
+            self.assertIn("## meters", pmp.prompt())
 
         self.assertIn("meter_number", meters.fields)
         mn = meters.fields["meter_number"]
@@ -200,7 +200,7 @@ class TestPromptManager(unittest.TestCase):
             self.assertIsNotNone(pmp)
             if pmp:
                 self.assertEqual(pmp.attr_name, "meter_number")
-                self.assertIn("## meter_number", pmp.prompt)
+                self.assertIn("## meter_number", pmp.prompt())
 
     def test_reload_if_changed_1(self) -> None:
         source = TestSource(SAMPLE_YAML_1)
@@ -220,7 +220,7 @@ class TestPromptManager(unittest.TestCase):
             self.assertIsNotNone(pmp)
             if pmp:
                 self.assertEqual(pmp.attr_name, "statement_date")
-                self.assertIn("## statement_date", pmp.prompt)
+                self.assertIn("## statement_date", pmp.prompt())
 
         updated_yaml = SAMPLE_YAML_1.replace(
             "## statement_date", "## updated_statement_date"
@@ -242,4 +242,4 @@ class TestPromptManager(unittest.TestCase):
             self.assertIsNotNone(pmp)
             if pmp:
                 self.assertEqual(pmp.attr_name, "statement_date")
-                self.assertIn("## updated_statement_date", pmp.prompt)
+                self.assertIn("## updated_statement_date", pmp.prompt())
