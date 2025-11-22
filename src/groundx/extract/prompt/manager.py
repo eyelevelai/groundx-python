@@ -25,15 +25,20 @@ def _element_from_mapping(
     ele = Element(**data)
     if key and ele.prompt and not ele.prompt.attr_name:
         ele.prompt.attr_name = key
+
     return ele
 
 
-def _group_from_mapping(data: typing.Dict[str, typing.Any]) -> Group:
+def _group_from_mapping(
+    data: typing.Dict[str, typing.Any], key: typing.Optional[str] = None
+) -> Group:
     prompt_data = data.get("prompt")
     prompt: typing.Optional[Prompt] = None
 
     if prompt_data:
         prompt = Prompt(**prompt_data)
+        if key and not prompt.attr_name:
+            prompt.attr_name = key
 
     raw_fields: typing.Dict[str, typing.Any] = data.get("fields", {}) or {}
     fields: typing.Dict[
@@ -81,15 +86,17 @@ def _group_from_mapping(data: typing.Dict[str, typing.Any]) -> Group:
     return Group(prompt=prompt, fields=fields)
 
 
-def load_from_yaml(raw_yaml: str) -> Group:
+def load_from_yaml(raw_yaml: str) -> typing.Dict[str, Group]:
     data = yaml.safe_load(raw_yaml)
     if not isinstance(data, dict):
         raise TypeError(f"Expected top-level YAML mapping, got {type(data)}")
 
-    if "fields" in data:
-        return _group_from_mapping(typing.cast(typing.Dict[str, typing.Any], data))
+    grps: typing.Dict[str, Group] = {}
+    data = typing.cast(typing.Dict[str, typing.Any], data)
+    for k, v in data.items():
+        grps[k] = _group_from_mapping(v, k)
 
-    return _group_from_mapping({"fields": data})
+    return grps
 
 
 class PromptManager:
@@ -98,24 +105,18 @@ class PromptManager:
     ) -> None:
         self._config_source: Source = config_source
         # Cache: workflow_id -> { field_key -> Prompt }
-        self._cache: typing.Dict[str, Group] = {}
+        self._cache: typing.Dict[str, typing.Dict[str, Group]] = {}
         self._default_workflow_id: str = default_workflow_id
         self._versions: typing.Dict[str, str] = {}
 
         self._ensure_loaded(default_workflow_id)
-
-    def _build_prompts_from_raw(
-        self,
-        raw: str,
-    ) -> Group:
-        return load_from_yaml(raw)
 
     def _ensure_loaded(self, workflow_id: str) -> None:
         if workflow_id in self._cache:
             return
 
         raw, version = self._config_source.fetch(workflow_id)
-        prompts = self._build_prompts_from_raw(raw)
+        prompts = load_from_yaml(raw)
         self._cache[workflow_id] = prompts
         self._versions[workflow_id] = version
 
@@ -128,13 +129,13 @@ class PromptManager:
 
         if not previous_version or current_version != previous_version:
             raw, version = self._config_source.fetch(workflow_id)
-            prompts = self._build_prompts_from_raw(raw)
+            prompts = load_from_yaml(raw)
             self._cache[workflow_id] = prompts
             self._versions[workflow_id] = version
 
     def get_fields_for_workflow(
         self, workflow_id: typing.Optional[str] = None
-    ) -> Group:
+    ) -> typing.Dict[str, Group]:
         if not workflow_id:
             workflow_id = self._default_workflow_id
 
