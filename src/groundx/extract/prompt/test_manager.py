@@ -6,7 +6,7 @@ from ..classes.element import Element
 from ..classes.group import Group
 
 
-SAMPLE_YAML = """
+SAMPLE_YAML_1 = """
 statement:
   fields:
     statement_date:
@@ -28,6 +28,28 @@ meters:
         type: str
 """
 
+SAMPLE_YAML_2 = """
+statement:
+  fields:
+    statement_date:
+      prompt:
+        description: date when the invoice was computed or sent to the customer
+        prompt: |
+          ## statement_date
+        type: str
+    meters:
+      prompt:
+        prompt: |
+          ## meters
+      fields:
+        meter_number:
+          prompt:
+            description: unique identifier for the meter that made the utility service measurement
+            prompt: |
+              ## meter_number
+            type: str
+"""
+
 
 class TestSource(Source):
     def __init__(self, raw: str) -> None:
@@ -47,11 +69,12 @@ class TestSource(Source):
         self._raw[workflow_id] = raw
 
 
-class Test_load_from_yaml(unittest.TestCase):
-    def test_load_from_yaml_structure(self) -> None:
-        root = load_from_yaml(SAMPLE_YAML)
+class TestPromptManager(unittest.TestCase):
+    def test_load_from_yaml_1(self) -> None:
+        root = load_from_yaml(SAMPLE_YAML_1)
 
         self.assertIsInstance(root, dict)
+        self.assertEqual(len(root), 2)
 
         self.assertIn("statement", root)
         self.assertIn("meters", root)
@@ -90,11 +113,56 @@ class Test_load_from_yaml(unittest.TestCase):
                 self.assertEqual(meter_number.prompt.attr_name, "meter_number")
                 self.assertIn("## meter_number", meter_number.prompt.prompt)
 
-    def test_prompt_manager_builds_flat_prompt_dict(self) -> None:
-        source = TestSource(SAMPLE_YAML)
+    def test_load_from_yaml_2(self) -> None:
+        root = load_from_yaml(SAMPLE_YAML_2)
+
+        self.assertIsInstance(root, dict)
+        self.assertEqual(len(root), 1)
+
+        self.assertIn("statement", root)
+        self.assertIsInstance(root["statement"], Group)
+        self.assertEqual(len(root["statement"].fields), 2)
+
+        self.assertIn("statement_date", root["statement"].fields)
+        statement_date = root["statement"].fields["statement_date"]
+        self.assertIsInstance(statement_date, Element)
+
+        if isinstance(statement_date, Element):
+            self.assertIsNotNone(statement_date.prompt)
+            if statement_date.prompt:
+                self.assertEqual(
+                    statement_date.prompt.description,
+                    "date when the invoice was computed or sent to the customer",
+                )
+                self.assertEqual(statement_date.prompt.attr_name, "statement_date")
+                self.assertIn("## statement_date", statement_date.prompt.prompt)
+
+        self.assertIn("meters", root["statement"].fields)
+        meters = root["statement"].fields["meters"]
+        self.assertIsInstance(meters, Group)
+        if isinstance(meters, Group):
+            self.assertIn("meter_number", meters.fields)
+            meter_number = meters.fields["meter_number"]
+            self.assertIsInstance(meter_number, Element)
+
+            if isinstance(meter_number, Element):
+                self.assertIsNotNone(meter_number.prompt)
+                if meter_number.prompt:
+                    self.assertEqual(
+                        meter_number.prompt.description,
+                        "unique identifier for the meter that made the utility service measurement",
+                    )
+                    self.assertEqual(meter_number.prompt.attr_name, "meter_number")
+                    self.assertIn("## meter_number", meter_number.prompt.prompt)
+
+    def test_get_fields_for_workflow_1(self) -> None:
+        source = TestSource(SAMPLE_YAML_1)
         manager = PromptManager(config_source=source)
 
         root = manager.get_fields_for_workflow("latest")
+
+        self.assertIsInstance(root, dict)
+        self.assertEqual(len(root), 2)
 
         self.assertIn("statement", root)
         self.assertIn("meters", root)
@@ -134,8 +202,8 @@ class Test_load_from_yaml(unittest.TestCase):
                 self.assertEqual(pmp.attr_name, "meter_number")
                 self.assertIn("## meter_number", pmp.prompt)
 
-    def test_reload_if_changed_updates_prompts(self) -> None:
-        source = TestSource(SAMPLE_YAML)
+    def test_reload_if_changed_1(self) -> None:
+        source = TestSource(SAMPLE_YAML_1)
         manager = PromptManager(config_source=source)
         root = manager.get_fields_for_workflow("latest")
 
@@ -154,7 +222,7 @@ class Test_load_from_yaml(unittest.TestCase):
                 self.assertEqual(pmp.attr_name, "statement_date")
                 self.assertIn("## statement_date", pmp.prompt)
 
-        updated_yaml = SAMPLE_YAML.replace(
+        updated_yaml = SAMPLE_YAML_1.replace(
             "## statement_date", "## updated_statement_date"
         )
         source.update(updated_yaml, "v2")
