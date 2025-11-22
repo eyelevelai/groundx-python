@@ -10,26 +10,26 @@ class TestGroup(unittest.TestCase):
         grp = Group(
             fields={
                 "account_number": Element(
-                    prompt=Prompt(prompt="account_number"),
+                    prompt=Prompt(full="account_number"),
                 ),
             },
         )
         self.assertEqual(
             grp.model_dump_json(exclude_none=True),
-            '{"account_number":{"prompt":{"prompt":"account_number"}}}',
+            '{"account_number":{"prompt":{"full":"account_number"}}}',
         )
 
     def test_model_validate_json_1(self) -> None:
         grp = Group(
             fields={
                 "account_number": Element(
-                    prompt=Prompt(prompt="account_number"),
+                    prompt=Prompt(full="account_number"),
                 ),
             },
         )
         self.assertEqual(
             Group.model_validate_json(
-                '{"account_number":{"prompt":{"prompt":"account_number"}}}'
+                '{"account_number":{"prompt":{"full":"account_number"}}}'
             ),
             grp,
         )
@@ -38,13 +38,13 @@ class TestGroup(unittest.TestCase):
         grp = Group(
             fields={
                 "account_number": Element(
-                    prompt=Prompt(prompt="account_number"),
+                    prompt=Prompt(full="account_number"),
                 ),
             },
         )
         self.assertEqual(
             Group.model_validate_json(
-                '{"fields":{"account_number":{"prompt":{"prompt":"account_number"}}}}'
+                '{"fields":{"account_number":{"prompt":{"full":"account_number"}}}}'
             ),
             grp,
         )
@@ -53,13 +53,13 @@ class TestGroup(unittest.TestCase):
         grp = Group(
             fields={
                 "account_number": Element(
-                    prompt=Prompt(prompt="account_number_1"),
+                    prompt=Prompt(full="account_number_1"),
                 ),
             },
         )
         self.assertEqual(
             Group.model_validate_json(
-                '{"account_number":{"prompt":{"prompt":"account_number_1"}},"fields":{"account_number":{"prompt":{"prompt":"account_number_2"}}},"statement_date":null}'
+                '{"account_number":{"prompt":{"full":"account_number_1"}},"fields":{"account_number":{"prompt":{"full":"account_number_2"}}},"statement_date":null}'
             ),
             grp,
         )
