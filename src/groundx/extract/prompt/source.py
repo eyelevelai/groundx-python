@@ -15,6 +15,10 @@ class Source:
         self._logger = logger
         self._settings = settings
 
+    @property
+    def logger(self) -> Logger:
+        return self._logger
+
     def workflow_path(self, workflow_id: str) -> str:
         return f"{self._cache_path}/{workflow_id}.yaml"
 
