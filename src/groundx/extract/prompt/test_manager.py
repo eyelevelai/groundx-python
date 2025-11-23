@@ -4,6 +4,7 @@ from .manager import load_from_yaml, PromptManager
 from .source import Source
 from ..classes.element import Element
 from ..classes.group import Group
+from ..classes.prompt import Prompt
 
 
 SAMPLE_YAML_1 = """
@@ -201,6 +202,78 @@ class TestPromptManager(unittest.TestCase):
             if pmp:
                 self.assertEqual(pmp.attr_name, "meter_number")
                 self.assertIn("## meter_number", pmp.prompt)
+
+    def test_get_prompt_1(self) -> None:
+        tsts: typing.List[typing.Dict[str, typing.Any]] = [
+            {
+                "expect": Prompt(attr_name="meters", full="## meters\n"),
+                "name": "meters",
+                "yaml": SAMPLE_YAML_1,
+            },
+            {
+                "expect": Exception("[latest.yaml] is missing a [meter] entry"),
+                "name": "meter",
+                "yaml": SAMPLE_YAML_1,
+            },
+            {
+                "expect": Prompt(attr_name="meters", full="## meters\n"),
+                "name": "statement.meters",
+                "yaml": SAMPLE_YAML_2,
+            },
+            {
+                "expect": Exception(
+                    "[latest.yaml] is missing a [meter] entry at [statement.meter]"
+                ),
+                "name": "statement.meter",
+                "yaml": SAMPLE_YAML_2,
+            },
+            {
+                "expect": Prompt(
+                    attr_name="statement_date",
+                    full="## statement_date\n",
+                    short="date when the invoice was computed or sent to the customer",
+                    type="str",
+                ),
+                "name": "statement.statement_date",
+                "yaml": SAMPLE_YAML_2,
+            },
+            {
+                "expect": Exception(
+                    "[latest.yaml] entry at [statement.statement_date] is not a group"
+                ),
+                "name": "statement.statement_date.meters",
+                "yaml": SAMPLE_YAML_2,
+            },
+            {
+                "expect": Prompt(
+                    attr_name="meter_number",
+                    full="## meter_number\n",
+                    short="unique identifier for the meter that made the utility service measurement",
+                    type="str",
+                ),
+                "name": "statement.meters.meter_number",
+                "yaml": SAMPLE_YAML_2,
+            },
+            {
+                "expect": Exception(
+                    "[latest.yaml] is missing a [meter] entry at [statement.meters.meter]"
+                ),
+                "name": "statement.meters.meter",
+                "yaml": SAMPLE_YAML_2,
+            },
+        ]
+
+        for idx, tst in enumerate(tsts):
+            source = TestSource(tst["yaml"])
+            manager = PromptManager(config_source=source)
+
+            if isinstance(tst["expect"], Exception):
+                with self.assertRaises(Exception) as e:
+                    manager.get_prompt(tst["name"])
+                self.assertEqual(str(e.exception), str(tst["expect"]))
+            else:
+                pmp = manager.get_prompt(tst["name"])
+                self.assertEqual(pmp, tst["expect"], f"\n\n[{idx}]\n\n")
 
     def test_reload_if_changed_1(self) -> None:
         source = TestSource(SAMPLE_YAML_1)
