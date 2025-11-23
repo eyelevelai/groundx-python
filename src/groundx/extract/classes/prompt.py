@@ -15,6 +15,7 @@ class Prompt(BaseModel):
     class Config:
         validate_by_name = True
 
+    @property
     def description(self) -> typing.Optional[str]:
         return self.short
 
@@ -27,6 +28,7 @@ class Prompt(BaseModel):
 
         raise ValueError(f"missing attr_name or display_name")
 
+    @property
     def prompt(self) -> str:
         return self.full
 
