@@ -3,6 +3,7 @@ import typing
 from ..classes.element import Element
 from ..classes.group import Group
 from ..classes.prompt import Prompt
+from ..services.logger import Logger
 from .source import Source
 from .utility import load_from_yaml
 
@@ -18,6 +19,10 @@ class PromptManager:
         self._versions: typing.Dict[str, str] = {}
 
         self._ensure_loaded(default_workflow_id)
+
+    @property
+    def logger(self) -> Logger:
+        return self._config_source.logger
 
     def _ensure_loaded(self, workflow_id: str) -> None:
         if workflow_id in self._cache:
