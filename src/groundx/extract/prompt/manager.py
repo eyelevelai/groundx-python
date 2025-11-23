@@ -73,6 +73,8 @@ class PromptManager:
         if attr_name in fld:
             return fld[attr_name]
 
+        return None
+
     def group_field_prompts(
         self, group_name: str, workflow_id: typing.Optional[str] = None
     ) -> str:
