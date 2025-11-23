@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 
 from .groundx import GroundXDocument
 from .group import Group
+from ..prompt.manager import PromptManager
 from ..services.logger import Logger
 from ..services.upload import Upload
 from ..utility import clean_json
@@ -24,6 +25,7 @@ class Document(Group):
     task_id: str = ""
 
     _logger: typing.Optional[Logger] = PrivateAttr(default=None)
+    _prompt_manager: typing.Optional[PromptManager] = PrivateAttr(default=None)
 
     @property
     def logger(self) -> typing.Optional[Logger]:
@@ -40,16 +42,33 @@ class Document(Group):
     def logger(self) -> None:
         del self._logger
 
+    @property
+    def prompt_manager(self) -> typing.Optional[PromptManager]:
+        if self._prompt_manager:
+            return self._prompt_manager
+
+        return None
+
+    @prompt_manager.setter
+    def prompt_manager(self, value: PromptManager) -> None:
+        self._prompt_manager = value
+
+    @prompt_manager.deleter
+    def prompt_manager(self) -> None:
+        del self._prompt_manager
+
     @classmethod
     def from_request(
         cls: typing.Type[DocT],
         base_url: str,
         cache_dir: Path,
         req: "DocumentRequest",
+        prompt_manager: PromptManager,
         upload: typing.Optional[Upload] = None,
         **data: typing.Any,
     ) -> DocT:
         st = cls(**data)
+        st.prompt_manager = prompt_manager
 
         st.document_id = req.document_id
         st.file_name = req.file_name
