@@ -8,7 +8,6 @@ from .group import Group
 from .prompt import Prompt
 from .test_field import TestField
 from .test_groundx import TestChunk, TestDocumentPage, TestXRay
-from .utility import from_attr_name, from_key
 
 
 __all__ = [
@@ -26,6 +25,4 @@ __all__ = [
     "TestField",
     "TestXRay",
     "XRayDocument",
-    "from_attr_name",
-    "from_key",
 ]
