@@ -8,6 +8,8 @@ from PIL import Image
 from unittest.mock import patch
 
 from .document import Document, DocumentRequest
+from ..prompt.manager import PromptManager
+from ..prompt.test_manager import SAMPLE_YAML_1, TestSource
 from .test_groundx import TestXRay
 
 
@@ -15,11 +17,12 @@ def DR(**data: typing.Any) -> DocumentRequest:
     return DocumentRequest.model_validate(data)
 
 
-def test_doc() -> Document:
+def test_doc(prompt_manager: PromptManager) -> Document:
     return Document.from_request(
         cache_dir=Path("./cache"),
         base_url="",
         req=test_request(),
+        prompt_manager=prompt_manager,
     )
 
 
@@ -37,7 +40,10 @@ class TestDocument(unittest.TestCase):
         self.mock_xray.return_value = TestXRay("http://test.co", [])
 
     def test_init_name(self) -> None:
-        st1: Document = test_doc()
+        source = TestSource(SAMPLE_YAML_1)
+        manager = PromptManager(config_source=source)
+
+        st1: Document = test_doc(manager)
         self.assertEqual(st1.file_name, "F")
         st2: Document = Document.from_request(
             base_url="",
@@ -45,12 +51,14 @@ class TestDocument(unittest.TestCase):
             req=DR(
                 documentID="D", fileName="F.pdf", modelID=1, processorID=1, taskID="T"
             ),
+            prompt_manager=manager,
         )
         self.assertEqual(st2.file_name, "F.pdf")
         st3: Document = Document.from_request(
             cache_dir=Path("./cache"),
             base_url="",
             req=DR(documentID="D", fileName="F.", modelID=1, processorID=1, taskID="T"),
+            prompt_manager=manager,
         )
         self.assertEqual(st3.file_name, "F.")
 
