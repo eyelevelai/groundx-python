@@ -18,6 +18,12 @@ class ExtractedField(Element):
 
         self.set_value(value)
 
+    def attr_name(self) -> typing.Optional[str]:
+        if not self.prompt:
+            raise Exception(f"prompt is not set")
+
+        return self.prompt.attr_name
+
     def contains(self, other: "ExtractedField") -> bool:
         self_val = self.get_value()
         other_val = other.get_value()
@@ -61,6 +67,12 @@ class ExtractedField(Element):
             return ""
 
         return self.value
+
+    def key(self) -> str:
+        if not self.prompt:
+            raise Exception(f"prompt is not set")
+
+        return self.prompt.key()
 
     def remove_conflict(self, value: typing.Any) -> None:
         if value in self.conflicts:
@@ -136,6 +148,18 @@ Special Instructions:
                 self.value = value
         else:
             self.value = value
+
+    def type(self) -> typing.Optional[typing.Union[str, typing.List[str]]]:
+        if not self.prompt:
+            raise Exception(f"prompt is not set")
+
+        return self.prompt.type
+
+    def valid_value(self, value: typing.Any) -> bool:
+        if not self.prompt:
+            raise Exception(f"prompt is not set")
+
+        return self.prompt.valid_value(value)
 
 
 ExtractedField.model_rebuild()
