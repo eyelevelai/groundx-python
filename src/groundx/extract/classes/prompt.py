@@ -10,6 +10,7 @@ class Prompt(BaseModel):
     short: typing.Optional[str] = None
     display_name: typing.Optional[str] = None
     full: str
+    required: bool = False
     type: typing.Optional[typing.Union[str, typing.List[str]]] = None
 
     class Config:
