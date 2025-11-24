@@ -7,11 +7,11 @@ class ExtractedField(Element):
     confidence: typing.Optional[str] = None
     conflicts: typing.List[typing.Any] = []
 
-    value: typing.Union[str, float, typing.List[typing.Any]] = ""
+    value: typing.Optional[typing.Union[str, float, typing.List[typing.Any]]] = ""
 
     def __init__(
         self,
-        value: typing.Union[str, float, typing.List[typing.Any]],
+        value: typing.Union[str, float, typing.List[typing.Any]] = "",
         **data: typing.Any,
     ) -> None:
         super().__init__(**data)
@@ -57,6 +57,9 @@ class ExtractedField(Element):
         return type(other) == type(exist) and other == exist
 
     def get_value(self) -> typing.Union[str, float, typing.List[typing.Any]]:
+        if not self.value:
+            return ""
+
         return self.value
 
     def remove_conflict(self, value: typing.Any) -> None:
@@ -64,6 +67,53 @@ class ExtractedField(Element):
             self.conflicts.remove(value)
         if not self.equal_to_value(value):
             self.conflicts.append(self.get_value())
+
+    def render(self) -> str:
+        if not self.prompt:
+            raise Exception(f"prompt is not set")
+
+        if not self.prompt.attr_name:
+            raise Exception(f"prompt.attr_name is not set")
+
+        if not self.prompt.identifiers:
+            raise Exception(f"prompt.identifiers is not set")
+
+        if self.prompt.type is None:
+            raise Exception(f"prompt.type is not set")
+
+        default = ""
+        if self.prompt.default:
+            default = f"\nDefault Value:          {self.prompt.default}"
+
+        description = ""
+        if self.prompt.description:
+            description = f"\nDescription:            {self.prompt.description}"
+
+        format = ""
+        if self.prompt.format or self.prompt.type:
+            if self.prompt.format:
+                format = self.prompt.format
+            elif isinstance(self.prompt.type, str):
+                if self.prompt.type == "int" or self.prompt.type == "float":
+                    format = "number (float or int)"
+                elif self.prompt.type == "str":
+                    format = "string"
+            else:
+                if "int" in self.prompt.type or "float" in self.prompt.type:
+                    format = "number (float or int)"
+                elif "str" in self.prompt.type:
+                    format = "string"
+
+            if format != "":
+                format = f"\nFormat:                 {format}"
+
+        return f"""
+## {self.prompt.attr_name}
+
+Field:                  {self.prompt.attr_name}{description}{default}{format}
+Example Identifiers:    {", ".join(self.prompt.identifiers)}
+Special Instructions:
+{self.prompt.instructions}"""
 
     def set_value(
         self, value: typing.Union[str, float, typing.List[typing.Any]]

@@ -6,26 +6,11 @@ from ..classes.group import Group
 from ..classes.prompt import Prompt
 
 
-def element_from_mapping(
-    data: typing.Dict[str, typing.Any], key: typing.Optional[str] = None
-) -> Element:
+def element_from_mapping(data: typing.Dict[str, typing.Any]) -> Element:
     if "fields" in data:
-        grp = group_from_mapping(data)
-        if key and grp.prompt and not grp.prompt.attr_name:
-            grp.prompt.attr_name = key
-        return grp
+        return group_from_mapping(data)
 
-    if any(k in data for k in ("value", "conflicts", "confidence")):
-        ef = ExtractedField(**data)
-        if key and ef.prompt and not ef.prompt.attr_name:
-            ef.prompt.attr_name = key
-        return ef
-
-    ele = Element(**data)
-    if key and ele.prompt and not ele.prompt.attr_name:
-        ele.prompt.attr_name = key
-
-    return ele
+    return ExtractedField(**data)
 
 
 def group_from_mapping(
@@ -58,15 +43,18 @@ def group_from_mapping(
                     raise TypeError(
                         f"Expected dict for list item under field '{name}', got {type(item)}"
                     )
-                elem = element_from_mapping(
-                    typing.cast(typing.Dict[str, typing.Any], item), name
-                )
+                res = typing.cast(typing.Dict[str, typing.Any], item)
+                if "prompt" in res and "attr_name" not in res["prompt"]:
+                    res["prompt"]["attr_name"] = name
+                elem = element_from_mapping(res)
                 elements_list.append(elem)
             fields[name] = elements_list
         elif isinstance(n, dict):
             nd = typing.cast(typing.Dict[str, typing.Any], n)
             if "prompt" in nd or "fields" in nd or "value" in nd:
-                elem = element_from_mapping(nd, name)
+                if "prompt" in nd and "attr_name" not in nd["prompt"]:
+                    nd["prompt"]["attr_name"] = name
+                elem = element_from_mapping(nd)
                 fields[name] = elem
             else:
                 inner_dict: typing.Dict[str, Element] = {}
@@ -75,9 +63,10 @@ def group_from_mapping(
                         raise TypeError(
                             f"Expected dict for '{name}.{sub_name}', got {type(sub_node)}"
                         )
-                    inner_dict[sub_name] = element_from_mapping(
-                        typing.cast(typing.Dict[str, typing.Any], sub_node), sub_name
-                    )
+                    res = typing.cast(typing.Dict[str, typing.Any], sub_node)
+                    if "prompt" in res and "attr_name" not in res["prompt"]:
+                        res["prompt"]["attr_name"] = sub_name
+                    inner_dict[sub_name] = element_from_mapping(res)
                 fields[name] = inner_dict
         else:
             raise TypeError(f"Unexpected YAML node type for field '{name}': {type(n)}")

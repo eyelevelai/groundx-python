@@ -105,6 +105,19 @@ class Group(Element):
 
         return obj
 
+    def render(self) -> typing.Optional[str]:
+        if not self.prompt:
+            return None
+        if not self.prompt.attr_name:
+            return None
+        if not self.prompt.instructions:
+            return None
+
+        return f"""
+# {self.prompt.attr_name} Definition
+
+{self.prompt.instructions}"""
+
     def set(
         self,
         name: str,
