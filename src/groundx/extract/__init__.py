@@ -15,7 +15,7 @@ from .classes import (
     TestXRay,
     XRayDocument,
 )
-from .prompt import PromptManager, Source
+from .prompt import ObjectStore, PromptManager, Source
 from .services import Logger, RateLimit, SheetsClient, Status, Upload
 from .settings import (
     AgentSettings,
@@ -39,6 +39,7 @@ __all__ = [
     "GroundXSettings",
     "Group",
     "Logger",
+    "ObjectStore",
     "ProcessResponse",
     "Prompt",
     "PromptManager",
