@@ -16,7 +16,7 @@ class TestGroup(unittest.TestCase):
         )
         self.assertEqual(
             grp.model_dump_json(exclude_none=True),
-            '{"account_number":{"prompt":{"full":"account_number"}}}',
+            '{"account_number":{"prompt":{"full":"account_number","required":false}}}',
         )
 
     def test_model_validate_json_1(self) -> None:
