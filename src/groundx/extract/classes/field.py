@@ -127,6 +127,12 @@ Example Identifiers:    {", ".join(self.prompt.identifiers)}
 Special Instructions:
 {self.prompt.instructions}"""
 
+    def required(self) -> bool:
+        if not self.prompt:
+            raise Exception(f"prompt is not set")
+
+        return self.prompt.required
+
     def set_value(
         self, value: typing.Union[str, float, typing.List[typing.Any]]
     ) -> None:
