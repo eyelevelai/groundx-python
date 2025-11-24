@@ -68,7 +68,7 @@ class Document(Group):
         **data: typing.Any,
     ) -> DocT:
         st = cls(**data)
-        st.prompt_manager = prompt_manager
+        st._prompt_manager = prompt_manager
 
         st.document_id = req.document_id
         st.file_name = req.file_name
