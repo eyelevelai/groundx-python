@@ -1,6 +1,6 @@
 import typing
 
-from ..classes.element import Element
+from ..classes.field import ExtractedField
 from ..classes.group import Group
 from ..classes.prompt import Prompt
 from ..services.logger import Logger
@@ -102,10 +102,11 @@ class PromptManager:
     ) -> str:
         grp = self.group_load(group_name=group_name, workflow_id=workflow_id)
 
-        if not grp.prompt:
+        pmp = grp.render()
+        if not pmp:
             return ""
 
-        return grp.prompt.prompt
+        return pmp
 
     def group_descriptions(
         self, group_name: str, indent: int = 2, workflow_id: typing.Optional[str] = None
@@ -114,20 +115,18 @@ class PromptManager:
         grp = self.group_load(group_name, workflow_id=workflow_id)
 
         for _, v in grp.fields.items():
-            if isinstance(v, Group):
-                continue
-            elif isinstance(v, Element):
+            if isinstance(v, ExtractedField):
                 if v.prompt and v.prompt.description:
                     desc.append(
                         (" " * indent)
-                        + f"- **{v.prompt.prompt_name()}** - {v.prompt.description}"
+                        + f"- **{v.prompt.key()}** - {v.prompt.description}"
                     )
 
         return "\n".join(desc)
 
     def group_field(
         self, group_name: str, attr_name: str, workflow_id: typing.Optional[str] = None
-    ) -> typing.Optional[Prompt]:
+    ) -> typing.Optional[ExtractedField]:
         fld = self.group_fields(group_name, workflow_id=workflow_id)
         if attr_name in fld:
             return fld[attr_name]
@@ -138,23 +137,20 @@ class PromptManager:
         self, group_name: str, workflow_id: typing.Optional[str] = None
     ) -> str:
         return "".join(
-            p.prompt
+            p.render()
             for p in self.group_fields(group_name, workflow_id=workflow_id).values()
-            if p.prompt
+            if p.render()
         )
 
     def group_fields(
         self, group_name: str, workflow_id: typing.Optional[str] = None
-    ) -> typing.Dict[str, Prompt]:
-        fields: typing.Dict[str, Prompt] = {}
+    ) -> typing.Dict[str, ExtractedField]:
+        fields: typing.Dict[str, ExtractedField] = {}
         grp = self.group_load(group_name, workflow_id=workflow_id)
 
         for k, v in grp.fields.items():
-            if isinstance(v, Group):
-                continue
-            elif isinstance(v, Element):
-                if v.prompt:
-                    fields[k] = v.prompt
+            if isinstance(v, ExtractedField):
+                fields[k] = v
 
         return fields
 

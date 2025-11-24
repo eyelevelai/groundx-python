@@ -2,7 +2,7 @@ import typing, unittest
 
 from .manager import load_from_yaml, PromptManager
 from .source import Source
-from ..classes.element import Element
+from ..classes.field import ExtractedField
 from ..classes.group import Group
 from ..classes.prompt import Prompt
 
@@ -12,20 +12,42 @@ statement:
   fields:
     statement_date:
       prompt:
-        short: date when the invoice was computed or sent to the customer
-        full: |
-          ## statement_date
+        description: date when the invoice was computed or sent to the customer
+        format: YYYY-mm-dd date string
+        identifiers:
+          - Invoice Date
+          - Billing Date
+          - Account Summary as of XX/XX/XXXX
+          - Bill Date
+          - Account Balance as of XX/XX/XXXX
+        instructions: |
+          - **DO NOT INCLUDE THIS VALUE IF YOU CANNOT FIND AN EXPLICIT LABEL NEAR THE DATE**
         type: str
 meters:
   prompt:
-    full: |
-      ## meters
+    instructions: |
+      A meter is a total measurement of a utility service, charged by a utility provider, over some service period (a time period with a beginning and end).
   fields:
     meter_number:
       prompt:
-        short: unique identifier for the meter that made the utility service measurement
-        full: |
-          ## meter_number
+        description: unique identifier for the meter that made the utility service measurement
+        format: unique string, **always** formatted as a string
+        identifiers:
+          - "Meter #"
+          - Meter ID
+          - Premises Number
+        instructions: |
+          You must follow the following process to determine if you have found a valid meter number:
+        type: str
+    service_address:
+      prompt:
+        default: test address
+        identifiers:
+          - Premises Identifier
+          - Premises Descriptor
+        instructions: |
+          - Strip the recipient name from the service address if it is a proper name, such as a person or company or municipality
+        required: true
         type: str
 """
 
@@ -34,19 +56,23 @@ statement:
   fields:
     statement_date:
       prompt:
-        short: date when the invoice was computed or sent to the customer
-        full: |
+        description: date when the invoice was computed or sent to the customer
+        identifiers:
+          - Statement Date
+        instructions: |
           ## statement_date
         type: str
     meters:
       prompt:
-        full: |
+        instructions: |
           ## meters
       fields:
         meter_number:
           prompt:
-            short: unique identifier for the meter that made the utility service measurement
-            full: |
+            description: unique identifier for the meter that made the utility service measurement
+            identifiers:
+              - Meter Number
+            instructions: |
               ## meter_number
             type: str
 """
@@ -82,37 +108,129 @@ class TestPromptManager(unittest.TestCase):
         self.assertIsInstance(root["statement"], Group)
         self.assertIsInstance(root["meters"], Group)
         self.assertEqual(len(root["statement"].fields), 1)
-        self.assertEqual(len(root["meters"].fields), 1)
+        self.assertEqual(len(root["meters"].fields), 2)
+
+        self.assertIsNone(root["statement"].render())
 
         self.assertIn("statement_date", root["statement"].fields)
         statement_date = root["statement"].fields["statement_date"]
-        self.assertIsInstance(statement_date, Element)
+        self.assertIsInstance(statement_date, ExtractedField)
 
-        if isinstance(statement_date, Element):
-            self.assertIsNotNone(statement_date.prompt)
-            if statement_date.prompt:
-                self.assertEqual(
-                    statement_date.prompt.description,
-                    "date when the invoice was computed or sent to the customer",
-                )
-                self.assertEqual(statement_date.prompt.attr_name, "statement_date")
-                self.assertIn("## statement_date", statement_date.prompt.prompt)
+        if isinstance(statement_date, ExtractedField):
+            check_prompt(
+                self,
+                statement_date.prompt,
+                {
+                    "attr_name": "statement_date",
+                    "description": "date when the invoice was computed or sent to the customer",
+                    "format": "YYYY-mm-dd date string",
+                    "identifiers": [
+                        "Invoice Date",
+                        "Billing Date",
+                        "Account Summary as of XX/XX/XXXX",
+                        "Bill Date",
+                        "Account Balance as of XX/XX/XXXX",
+                    ],
+                    "instructions": "- **DO NOT INCLUDE THIS VALUE IF YOU CANNOT FIND AN EXPLICIT LABEL NEAR THE DATE**\n",
+                    "required": False,
+                    "type": "str",
+                },
+            )
+            self.assertEqual(
+                """
+## statement_date
+
+Field:                  statement_date
+Description:            date when the invoice was computed or sent to the customer
+Format:                 YYYY-mm-dd date string
+Example Identifiers:    Invoice Date, Billing Date, Account Summary as of XX/XX/XXXX, Bill Date, Account Balance as of XX/XX/XXXX
+Special Instructions:
+- **DO NOT INCLUDE THIS VALUE IF YOU CANNOT FIND AN EXPLICIT LABEL NEAR THE DATE**
+""",
+                statement_date.render(),
+            )
 
         meters = root["meters"]
-        self.assertIsInstance(meters, Group)
+        check_prompt(
+            self,
+            meters.prompt,
+            {
+                "attr_name": "meters",
+                "instructions": "A meter is a total measurement of a utility service, charged by a utility provider, over some service period (a time period with a beginning and end).\n",
+                "required": False,
+            },
+        )
+        self.assertEqual(
+            """
+# meters Definition
+
+A meter is a total measurement of a utility service, charged by a utility provider, over some service period (a time period with a beginning and end).
+""",
+            meters.render(),
+        )
+
         self.assertIn("meter_number", meters.fields)
         meter_number = meters.fields["meter_number"]
-        self.assertIsInstance(meter_number, Element)
+        self.assertIsInstance(meter_number, ExtractedField)
 
-        if isinstance(meter_number, Element):
-            self.assertIsNotNone(meter_number.prompt)
-            if meter_number.prompt:
-                self.assertEqual(
-                    meter_number.prompt.description,
-                    "unique identifier for the meter that made the utility service measurement",
-                )
-                self.assertEqual(meter_number.prompt.attr_name, "meter_number")
-                self.assertIn("## meter_number", meter_number.prompt.prompt)
+        if isinstance(meter_number, ExtractedField):
+            check_prompt(
+                self,
+                meter_number.prompt,
+                {
+                    "attr_name": "meter_number",
+                    "description": "unique identifier for the meter that made the utility service measurement",
+                    "format": "unique string, **always** formatted as a string",
+                    "identifiers": ["Meter #", "Meter ID", "Premises Number"],
+                    "instructions": "You must follow the following process to determine if you have found a valid meter number:\n",
+                    "required": False,
+                    "type": "str",
+                },
+            )
+            self.assertEqual(
+                """
+## meter_number
+
+Field:                  meter_number
+Description:            unique identifier for the meter that made the utility service measurement
+Format:                 unique string, **always** formatted as a string
+Example Identifiers:    Meter #, Meter ID, Premises Number
+Special Instructions:
+You must follow the following process to determine if you have found a valid meter number:
+""",
+                meter_number.render(),
+            )
+
+        self.assertIn("service_address", meters.fields)
+        service_address = meters.fields["service_address"]
+        self.assertIsInstance(service_address, ExtractedField)
+
+        if isinstance(service_address, ExtractedField):
+            check_prompt(
+                self,
+                service_address.prompt,
+                {
+                    "attr_name": "service_address",
+                    "default": "test address",
+                    "identifiers": ["Premises Identifier", "Premises Descriptor"],
+                    "instructions": "- Strip the recipient name from the service address if it is a proper name, such as a person or company or municipality\n",
+                    "required": True,
+                    "type": "str",
+                },
+            )
+            self.assertEqual(
+                """
+## service_address
+
+Field:                  service_address
+Default Value:          test address
+Format:                 string
+Example Identifiers:    Premises Identifier, Premises Descriptor
+Special Instructions:
+- Strip the recipient name from the service address if it is a proper name, such as a person or company or municipality
+""",
+                service_address.render(),
+            )
 
     def test_load_from_yaml_2(self) -> None:
         root = load_from_yaml(SAMPLE_YAML_2)
@@ -124,37 +242,91 @@ class TestPromptManager(unittest.TestCase):
         self.assertIsInstance(root["statement"], Group)
         self.assertEqual(len(root["statement"].fields), 2)
 
+        self.assertIsNone(root["statement"].render())
+
         self.assertIn("statement_date", root["statement"].fields)
         statement_date = root["statement"].fields["statement_date"]
-        self.assertIsInstance(statement_date, Element)
+        self.assertIsInstance(statement_date, ExtractedField)
 
-        if isinstance(statement_date, Element):
-            self.assertIsNotNone(statement_date.prompt)
-            if statement_date.prompt:
-                self.assertEqual(
-                    statement_date.prompt.description,
-                    "date when the invoice was computed or sent to the customer",
-                )
-                self.assertEqual(statement_date.prompt.attr_name, "statement_date")
-                self.assertIn("## statement_date", statement_date.prompt.prompt)
+        if isinstance(statement_date, ExtractedField):
+            check_prompt(
+                self,
+                statement_date.prompt,
+                {
+                    "attr_name": "statement_date",
+                    "description": "date when the invoice was computed or sent to the customer",
+                    "identifiers": ["Statement Date"],
+                    "instructions": "## statement_date\n",
+                    "required": False,
+                    "type": "str",
+                },
+            )
+            self.assertEqual(
+                """
+## statement_date
+
+Field:                  statement_date
+Description:            date when the invoice was computed or sent to the customer
+Format:                 string
+Example Identifiers:    Statement Date
+Special Instructions:
+## statement_date
+""",
+                statement_date.render(),
+            )
 
         self.assertIn("meters", root["statement"].fields)
         meters = root["statement"].fields["meters"]
         self.assertIsInstance(meters, Group)
         if isinstance(meters, Group):
+            check_prompt(
+                self,
+                meters.prompt,
+                {
+                    "attr_name": "meters",
+                    "instructions": "## meters\n",
+                    "required": False,
+                },
+            )
+            self.assertEqual(
+                """
+# meters Definition
+
+## meters
+""",
+                meters.render(),
+            )
+
             self.assertIn("meter_number", meters.fields)
             meter_number = meters.fields["meter_number"]
-            self.assertIsInstance(meter_number, Element)
+            self.assertIsInstance(meter_number, ExtractedField)
 
-            if isinstance(meter_number, Element):
-                self.assertIsNotNone(meter_number.prompt)
-                if meter_number.prompt:
-                    self.assertEqual(
-                        meter_number.prompt.description,
-                        "unique identifier for the meter that made the utility service measurement",
-                    )
-                    self.assertEqual(meter_number.prompt.attr_name, "meter_number")
-                    self.assertIn("## meter_number", meter_number.prompt.prompt)
+            if isinstance(meter_number, ExtractedField):
+                check_prompt(
+                    self,
+                    meter_number.prompt,
+                    {
+                        "attr_name": "meter_number",
+                        "description": "unique identifier for the meter that made the utility service measurement",
+                        "identifiers": ["Meter Number"],
+                        "instructions": "## meter_number\n",
+                        "required": False,
+                        "type": "str",
+                    },
+                )
+                self.assertEqual(
+                    """
+## meter_number
+
+Field:                  meter_number
+Description:            unique identifier for the meter that made the utility service measurement
+Format:                 string
+Example Identifiers:    Meter Number
+Special Instructions:
+## meter_number
+""",
+                    meter_number.render(),
+                )
 
     def test_get_fields_for_workflow_1(self) -> None:
         source = TestSource(SAMPLE_YAML_1)
@@ -170,18 +342,30 @@ class TestPromptManager(unittest.TestCase):
         self.assertIsInstance(root["statement"], Group)
         self.assertIsInstance(root["meters"], Group)
         self.assertEqual(len(root["statement"].fields), 1)
-        self.assertEqual(len(root["meters"].fields), 1)
+        self.assertEqual(len(root["meters"].fields), 2)
 
         self.assertIn("statement_date", root["statement"].fields)
         statement_date = root["statement"].fields["statement_date"]
-        self.assertIsInstance(statement_date, Element)
+        self.assertIsInstance(statement_date, ExtractedField)
 
-        if isinstance(statement_date, Element):
+        if isinstance(statement_date, ExtractedField):
             pmp = statement_date.prompt
             self.assertIsNotNone(pmp)
             if pmp:
                 self.assertEqual(pmp.attr_name, "statement_date")
-                self.assertIn("## statement_date", pmp.prompt)
+            self.assertEqual(
+                """
+## statement_date
+
+Field:                  statement_date
+Description:            date when the invoice was computed or sent to the customer
+Format:                 YYYY-mm-dd date string
+Example Identifiers:    Invoice Date, Billing Date, Account Summary as of XX/XX/XXXX, Bill Date, Account Balance as of XX/XX/XXXX
+Special Instructions:
+- **DO NOT INCLUDE THIS VALUE IF YOU CANNOT FIND AN EXPLICIT LABEL NEAR THE DATE**
+""",
+                statement_date.render(),
+            )
 
         meters = root["meters"]
         self.assertIsInstance(meters, Group)
@@ -190,23 +374,68 @@ class TestPromptManager(unittest.TestCase):
         self.assertIsNotNone(pmp)
         if pmp:
             self.assertEqual(pmp.attr_name, "meters")
-            self.assertIn("## meters", pmp.prompt)
+        self.assertEqual(
+            """
+# meters Definition
+
+A meter is a total measurement of a utility service, charged by a utility provider, over some service period (a time period with a beginning and end).
+""",
+            meters.render(),
+        )
 
         self.assertIn("meter_number", meters.fields)
         mn = meters.fields["meter_number"]
-        self.assertIsInstance(mn, Element)
+        self.assertIsInstance(mn, ExtractedField)
 
-        if isinstance(mn, Element):
+        if isinstance(mn, ExtractedField):
             pmp = mn.prompt
             self.assertIsNotNone(pmp)
             if pmp:
                 self.assertEqual(pmp.attr_name, "meter_number")
-                self.assertIn("## meter_number", pmp.prompt)
+            self.assertEqual(
+                """
+## meter_number
+
+Field:                  meter_number
+Description:            unique identifier for the meter that made the utility service measurement
+Format:                 unique string, **always** formatted as a string
+Example Identifiers:    Meter #, Meter ID, Premises Number
+Special Instructions:
+You must follow the following process to determine if you have found a valid meter number:
+""",
+                mn.render(),
+            )
+
+        self.assertIn("service_address", meters.fields)
+        sa = meters.fields["service_address"]
+        self.assertIsInstance(sa, ExtractedField)
+
+        if isinstance(sa, ExtractedField):
+            pmp = sa.prompt
+            self.assertIsNotNone(pmp)
+            if pmp:
+                self.assertEqual(pmp.attr_name, "service_address")
+            self.assertEqual(
+                """
+## service_address
+
+Field:                  service_address
+Default Value:          test address
+Format:                 string
+Example Identifiers:    Premises Identifier, Premises Descriptor
+Special Instructions:
+- Strip the recipient name from the service address if it is a proper name, such as a person or company or municipality
+""",
+                sa.render(),
+            )
 
     def test_get_prompt_1(self) -> None:
         tsts: typing.List[typing.Dict[str, typing.Any]] = [
             {
-                "expect": Prompt(attr_name="meters", full="## meters\n"),
+                "expect": Prompt(
+                    attr_name="meters",
+                    instructions="A meter is a total measurement of a utility service, charged by a utility provider, over some service period (a time period with a beginning and end).\n",
+                ),
                 "name": "meters",
                 "yaml": SAMPLE_YAML_1,
             },
@@ -216,7 +445,7 @@ class TestPromptManager(unittest.TestCase):
                 "yaml": SAMPLE_YAML_1,
             },
             {
-                "expect": Prompt(attr_name="meters", full="## meters\n"),
+                "expect": Prompt(attr_name="meters", instructions="## meters\n"),
                 "name": "statement.meters",
                 "yaml": SAMPLE_YAML_2,
             },
@@ -230,8 +459,9 @@ class TestPromptManager(unittest.TestCase):
             {
                 "expect": Prompt(
                     attr_name="statement_date",
-                    full="## statement_date\n",
-                    short="date when the invoice was computed or sent to the customer",
+                    identifiers=["Statement Date"],
+                    instructions="## statement_date\n",
+                    description="date when the invoice was computed or sent to the customer",
                     type="str",
                 ),
                 "name": "statement.statement_date",
@@ -247,8 +477,9 @@ class TestPromptManager(unittest.TestCase):
             {
                 "expect": Prompt(
                     attr_name="meter_number",
-                    full="## meter_number\n",
-                    short="unique identifier for the meter that made the utility service measurement",
+                    identifiers=["Meter Number"],
+                    instructions="## meter_number\n",
+                    description="unique identifier for the meter that made the utility service measurement",
                     type="str",
                 ),
                 "name": "statement.meters.meter_number",
@@ -286,17 +517,30 @@ class TestPromptManager(unittest.TestCase):
         self.assertIn("statement_date", root["statement"].fields)
         self.assertEqual(len(root["statement"].fields), 1)
         statement_date = root["statement"].fields["statement_date"]
-        self.assertIsInstance(statement_date, Element)
+        self.assertIsInstance(statement_date, ExtractedField)
 
-        if isinstance(statement_date, Element):
+        if isinstance(statement_date, ExtractedField):
             pmp = statement_date.prompt
             self.assertIsNotNone(pmp)
             if pmp:
                 self.assertEqual(pmp.attr_name, "statement_date")
-                self.assertIn("## statement_date", pmp.prompt)
+            self.assertEqual(
+                """
+## statement_date
+
+Field:                  statement_date
+Description:            date when the invoice was computed or sent to the customer
+Format:                 YYYY-mm-dd date string
+Example Identifiers:    Invoice Date, Billing Date, Account Summary as of XX/XX/XXXX, Bill Date, Account Balance as of XX/XX/XXXX
+Special Instructions:
+- **DO NOT INCLUDE THIS VALUE IF YOU CANNOT FIND AN EXPLICIT LABEL NEAR THE DATE**
+""",
+                statement_date.render(),
+            )
 
         updated_yaml = SAMPLE_YAML_1.replace(
-            "## statement_date", "## updated_statement_date"
+            "- **DO NOT INCLUDE THIS VALUE IF YOU CANNOT FIND AN EXPLICIT LABEL NEAR THE DATE**",
+            "## updated_statement_date",
         )
         source.update(updated_yaml, "v2")
 
@@ -308,11 +552,52 @@ class TestPromptManager(unittest.TestCase):
 
         self.assertIn("statement_date", updated_fields["statement"].fields)
         statement_date = updated_fields["statement"].fields["statement_date"]
-        self.assertIsInstance(statement_date, Element)
+        self.assertIsInstance(statement_date, ExtractedField)
 
-        if isinstance(statement_date, Element):
+        if isinstance(statement_date, ExtractedField):
             pmp = statement_date.prompt
             self.assertIsNotNone(pmp)
             if pmp:
                 self.assertEqual(pmp.attr_name, "statement_date")
-                self.assertIn("## updated_statement_date", pmp.prompt)
+            self.assertEqual(
+                """
+## statement_date
+
+Field:                  statement_date
+Description:            date when the invoice was computed or sent to the customer
+Format:                 YYYY-mm-dd date string
+Example Identifiers:    Invoice Date, Billing Date, Account Summary as of XX/XX/XXXX, Bill Date, Account Balance as of XX/XX/XXXX
+Special Instructions:
+## updated_statement_date
+""",
+                statement_date.render(),
+            )
+
+
+def check_value(
+    key: str, mn: TestPromptManager, pmp: Prompt, expect: typing.Dict[str, typing.Any]
+):
+    if key in expect:
+        mn.assertEqual(pmp.__getattribute__(key), expect[key])
+    else:
+        mn.assertIsNone(pmp.__getattribute__(key))
+
+    if key == "attr_name":
+        mn.assertEqual(pmp.key(), expect[key])
+
+
+def check_prompt(
+    mn: TestPromptManager,
+    pmp: typing.Optional[Prompt],
+    expect: typing.Dict[str, typing.Any],
+):
+    mn.assertIsNotNone(pmp)
+    if pmp:
+        check_value("attr_name", mn, pmp, expect)
+        check_value("default", mn, pmp, expect)
+        check_value("description", mn, pmp, expect)
+        check_value("format", mn, pmp, expect)
+        check_value("identifiers", mn, pmp, expect)
+        check_value("instructions", mn, pmp, expect)
+        check_value("required", mn, pmp, expect)
+        check_value("type", mn, pmp, expect)

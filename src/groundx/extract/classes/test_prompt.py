@@ -9,7 +9,8 @@ def TestPrompt(
 ) -> Prompt:
     return Prompt(
         attr_name=name,
-        full=name.replace("_", "-"),
+        identifiers=[name],
+        instructions=name.replace("_", "-"),
         type=ty,
     )
 
