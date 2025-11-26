@@ -1,4 +1,4 @@
-import typing, unittest
+import json, typing, unittest, yaml
 
 from .manager import load_from_yaml, PromptManager
 from .source import Source
@@ -572,6 +572,16 @@ Special Instructions:
 """,
                 statement_date.render(),
             )
+
+    def test_workflow_extract_dict(self):
+        source = TestSource(SAMPLE_YAML_1)
+        manager = PromptManager(config_source=source)
+
+        js = json.dumps(manager.workflow_extract_dict(), indent=2)
+        ym = json.dumps(yaml.safe_load(SAMPLE_YAML_1), indent=2)
+
+        self.maxDiff = None
+        self.assertEqual(js, ym)
 
 
 def check_value(
