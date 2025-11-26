@@ -54,7 +54,7 @@ class Group(Element):
         self,
         handler: typing.Callable[[typing.Any], typing.Dict[str, typing.Any]],
     ) -> typing.Dict[str, typing.Any]:
-        if not self.remove_fields:
+        if not self._remove_fields:
             return handler(self)
 
         data = handler(self)
