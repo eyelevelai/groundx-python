@@ -23,6 +23,24 @@ class TestGroup(unittest.TestCase):
             '{"account_number":{"prompt":{"description":"desc","identifiers":["id"],"instructions":"account_number","required":false}}}',
         )
 
+    def test_model_dump_json_2(self) -> None:
+        grp = Group(
+            fields={
+                "account_number": Element(
+                    prompt=Prompt(
+                        description="desc",
+                        identifiers=["id"],
+                        instructions="account_number",
+                    ),
+                ),
+            },
+        )
+        grp.remove_fields = False
+        self.assertEqual(
+            grp.model_dump_json(exclude_none=True),
+            '{"fields":{"account_number":{"prompt":{"description":"desc","identifiers":["id"],"instructions":"account_number","required":false}}}}',
+        )
+
     def test_model_validate_json_1(self) -> None:
         grp = Group(
             fields={

@@ -5,7 +5,7 @@ from ..classes.group import Group
 from ..classes.prompt import Prompt
 from ..services.logger import Logger
 from .source import Source
-from .utility import load_from_yaml
+from .utility import do_not_remove_fields, load_from_yaml
 
 
 class PromptManager:
@@ -19,6 +19,18 @@ class PromptManager:
         self._versions: typing.Dict[str, str] = {}
 
         self._ensure_loaded(default_workflow_id)
+
+    @property
+    def default_workflow_id(self) -> str:
+        return self._default_workflow_id
+
+    @default_workflow_id.setter
+    def default_workflow_id(self, value: str) -> None:
+        self._default_workflow_id = value
+
+    @default_workflow_id.deleter
+    def default_workflow_id(self) -> None:
+        del self._default_workflow_id
 
     @property
     def logger(self) -> Logger:
@@ -199,6 +211,21 @@ class PromptManager:
             prompts = load_from_yaml(raw)
             self._cache[workflow_id] = prompts
             self._versions[workflow_id] = version
+
+    def workflow_extract_dict(
+        self, workflow_id: typing.Optional[str] = None
+    ) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
+        wf = self.get_fields_for_workflow(workflow_id)
+
+        wfd: typing.Dict[str, typing.Dict[str, typing.Any]] = {}
+        for k, v in wf.items():
+            v = do_not_remove_fields(v)
+
+            wfd[k] = v.model_dump(
+                exclude_defaults=True, exclude_none=True, exclude_unset=True
+            )
+
+        return wfd
 
     def workflow_id(self, workflow_id: typing.Optional[str] = None) -> str:
         if not workflow_id:

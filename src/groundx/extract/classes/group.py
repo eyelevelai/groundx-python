@@ -3,13 +3,15 @@ import typing
 from .element import Element
 from .field import ExtractedField
 
-from pydantic import model_serializer, model_validator
+from pydantic import model_serializer, model_validator, PrivateAttr
 
 
 class Group(Element):
     fields: typing.Dict[
         str, typing.Union[Element, typing.Dict[str, Element], typing.Sequence[Element]]
     ] = {}
+
+    _remove_fields: bool = PrivateAttr(default=True)
 
     @model_validator(mode="before")
     @classmethod
@@ -52,6 +54,9 @@ class Group(Element):
         self,
         handler: typing.Callable[[typing.Any], typing.Dict[str, typing.Any]],
     ) -> typing.Dict[str, typing.Any]:
+        if not self.remove_fields:
+            return handler(self)
+
         data = handler(self)
 
         raw_fields = typing.cast(
@@ -62,6 +67,18 @@ class Group(Element):
         data.update(raw_fields)
 
         return data
+
+    @property
+    def remove_fields(self) -> bool:
+        return self._remove_fields
+
+    @remove_fields.setter
+    def remove_fields(self, value: bool) -> None:
+        self._remove_fields = value
+
+    @remove_fields.deleter
+    def remove_fields(self) -> None:
+        del self._remove_fields
 
     def get(
         self, name: str

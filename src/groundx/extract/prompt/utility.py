@@ -85,3 +85,20 @@ def load_from_yaml(raw_yaml: str) -> typing.Dict[str, Group]:
         grps[k] = group_from_mapping(v, k)
 
     return grps
+
+
+def do_not_remove_fields(grp: Group) -> Group:
+    grp.remove_fields = False
+    if grp.prompt and grp.prompt.attr_name:
+        grp.prompt.attr_name = None
+    for i in grp.fields:
+        if isinstance(grp.fields[i], Group):
+            ngrp = typing.cast(Group, grp.fields[i])
+            grp.fields[i] = do_not_remove_fields(ngrp)
+        elif not isinstance(grp.fields[i], list):
+            fld = typing.cast(ExtractedField, grp.fields[i])
+            if fld.prompt and fld.prompt.attr_name:
+                fld.prompt.attr_name = None
+            grp.fields[i] = fld
+
+    return grp
