@@ -64,6 +64,7 @@ class RawWorkflowsClient:
         *,
         chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
+        extract: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[WorkflowResponse]:
@@ -76,6 +77,9 @@ class RawWorkflowsClient:
 
         name : typing.Optional[str]
             The name of the workflow being created.
+
+        extract : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Extract agent definitions.
 
         steps : typing.Optional[WorkflowSteps]
 
@@ -93,6 +97,7 @@ class RawWorkflowsClient:
             json={
                 "chunkStrategy": chunk_strategy,
                 "name": name,
+                "extract": extract,
                 "steps": convert_and_respect_annotation_metadata(
                     object_=steps, annotation=WorkflowSteps, direction="write"
                 ),
@@ -109,6 +114,42 @@ class RawWorkflowsClient:
                     WorkflowResponse,
                     parse_obj_as(
                         type_=WorkflowResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
+        raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
+
+    def get_account(
+        self, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> HttpResponse[WorkflowsResponse]:
+        """
+        Get the workflow associated with customer account.
+
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[WorkflowsResponse]
+            Look up success
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "v1/workflow/relationship",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    WorkflowsResponse,
+                    parse_obj_as(
+                        type_=WorkflowsResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -333,6 +374,7 @@ class RawWorkflowsClient:
         *,
         chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
+        extract: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[WorkflowResponse]:
@@ -348,6 +390,9 @@ class RawWorkflowsClient:
 
         name : typing.Optional[str]
             The name of the workflow being created.
+
+        extract : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Extract agent definitions.
 
         steps : typing.Optional[WorkflowSteps]
 
@@ -365,6 +410,7 @@ class RawWorkflowsClient:
             json={
                 "chunkStrategy": chunk_strategy,
                 "name": name,
+                "extract": extract,
                 "steps": convert_and_respect_annotation_metadata(
                     object_=steps, annotation=WorkflowSteps, direction="write"
                 ),
@@ -475,6 +521,7 @@ class AsyncRawWorkflowsClient:
         *,
         chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
+        extract: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[WorkflowResponse]:
@@ -487,6 +534,9 @@ class AsyncRawWorkflowsClient:
 
         name : typing.Optional[str]
             The name of the workflow being created.
+
+        extract : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Extract agent definitions.
 
         steps : typing.Optional[WorkflowSteps]
 
@@ -504,6 +554,7 @@ class AsyncRawWorkflowsClient:
             json={
                 "chunkStrategy": chunk_strategy,
                 "name": name,
+                "extract": extract,
                 "steps": convert_and_respect_annotation_metadata(
                     object_=steps, annotation=WorkflowSteps, direction="write"
                 ),
@@ -520,6 +571,42 @@ class AsyncRawWorkflowsClient:
                     WorkflowResponse,
                     parse_obj_as(
                         type_=WorkflowResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
+        raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
+
+    async def get_account(
+        self, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> AsyncHttpResponse[WorkflowsResponse]:
+        """
+        Get the workflow associated with customer account.
+
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[WorkflowsResponse]
+            Look up success
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "v1/workflow/relationship",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    WorkflowsResponse,
+                    parse_obj_as(
+                        type_=WorkflowsResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -744,6 +831,7 @@ class AsyncRawWorkflowsClient:
         *,
         chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
+        extract: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[WorkflowResponse]:
@@ -759,6 +847,9 @@ class AsyncRawWorkflowsClient:
 
         name : typing.Optional[str]
             The name of the workflow being created.
+
+        extract : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Extract agent definitions.
 
         steps : typing.Optional[WorkflowSteps]
 
@@ -776,6 +867,7 @@ class AsyncRawWorkflowsClient:
             json={
                 "chunkStrategy": chunk_strategy,
                 "name": name,
+                "extract": extract,
                 "steps": convert_and_respect_annotation_metadata(
                     object_=steps, annotation=WorkflowSteps, direction="write"
                 ),
