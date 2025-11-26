@@ -2219,10 +2219,78 @@ client.workflows.create()
 <dl>
 <dd>
 
+**extract:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Extract agent definitions.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **steps:** `typing.Optional[WorkflowSteps]` 
     
 </dd>
 </dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">get_account</a>()</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Get the workflow associated with customer account.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from groundx import GroundX
+
+client = GroundX(
+    api_key="YOUR_API_KEY",
+)
+client.workflows.get_account()
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
 
 <dl>
 <dd>
@@ -2655,6 +2723,14 @@ client.workflows.update(
 <dd>
 
 **name:** `typing.Optional[str]` — The name of the workflow being created.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**extract:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Extract agent definitions.
     
 </dd>
 </dl>

@@ -36,6 +36,11 @@ class WorkflowDetail(UniversalBaseModel):
     The human-readable name of the workflow
     """
 
+    extract: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(default=None)
+    """
+    Extract agent definitions.
+    """
+
     steps: typing.Optional[WorkflowSteps] = None
     relationships: typing.Optional[WorkflowDetailRelationships] = pydantic.Field(default=None)
     """

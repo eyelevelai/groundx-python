@@ -62,6 +62,7 @@ class WorkflowsClient:
         *,
         chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
+        extract: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> WorkflowResponse:
@@ -74,6 +75,9 @@ class WorkflowsClient:
 
         name : typing.Optional[str]
             The name of the workflow being created.
+
+        extract : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Extract agent definitions.
 
         steps : typing.Optional[WorkflowSteps]
 
@@ -95,8 +99,34 @@ class WorkflowsClient:
         client.workflows.create()
         """
         _response = self._raw_client.create(
-            chunk_strategy=chunk_strategy, name=name, steps=steps, request_options=request_options
+            chunk_strategy=chunk_strategy, name=name, extract=extract, steps=steps, request_options=request_options
         )
+        return _response.data
+
+    def get_account(self, *, request_options: typing.Optional[RequestOptions] = None) -> WorkflowsResponse:
+        """
+        Get the workflow associated with customer account.
+
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        WorkflowsResponse
+            Look up success
+
+        Examples
+        --------
+        from groundx import GroundX
+
+        client = GroundX(
+            api_key="YOUR_API_KEY",
+        )
+        client.workflows.get_account()
+        """
+        _response = self._raw_client.get_account(request_options=request_options)
         return _response.data
 
     def add_to_account(
@@ -265,6 +295,7 @@ class WorkflowsClient:
         *,
         chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
+        extract: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> WorkflowResponse:
@@ -280,6 +311,9 @@ class WorkflowsClient:
 
         name : typing.Optional[str]
             The name of the workflow being created.
+
+        extract : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Extract agent definitions.
 
         steps : typing.Optional[WorkflowSteps]
 
@@ -303,7 +337,7 @@ class WorkflowsClient:
         )
         """
         _response = self._raw_client.update(
-            id, chunk_strategy=chunk_strategy, name=name, steps=steps, request_options=request_options
+            id, chunk_strategy=chunk_strategy, name=name, extract=extract, steps=steps, request_options=request_options
         )
         return _response.data
 
@@ -393,6 +427,7 @@ class AsyncWorkflowsClient:
         *,
         chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
+        extract: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> WorkflowResponse:
@@ -405,6 +440,9 @@ class AsyncWorkflowsClient:
 
         name : typing.Optional[str]
             The name of the workflow being created.
+
+        extract : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Extract agent definitions.
 
         steps : typing.Optional[WorkflowSteps]
 
@@ -434,8 +472,42 @@ class AsyncWorkflowsClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.create(
-            chunk_strategy=chunk_strategy, name=name, steps=steps, request_options=request_options
+            chunk_strategy=chunk_strategy, name=name, extract=extract, steps=steps, request_options=request_options
         )
+        return _response.data
+
+    async def get_account(self, *, request_options: typing.Optional[RequestOptions] = None) -> WorkflowsResponse:
+        """
+        Get the workflow associated with customer account.
+
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        WorkflowsResponse
+            Look up success
+
+        Examples
+        --------
+        import asyncio
+
+        from groundx import AsyncGroundX
+
+        client = AsyncGroundX(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.workflows.get_account()
+
+
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.get_account(request_options=request_options)
         return _response.data
 
     async def add_to_account(
@@ -646,6 +718,7 @@ class AsyncWorkflowsClient:
         *,
         chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
+        extract: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> WorkflowResponse:
@@ -661,6 +734,9 @@ class AsyncWorkflowsClient:
 
         name : typing.Optional[str]
             The name of the workflow being created.
+
+        extract : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Extract agent definitions.
 
         steps : typing.Optional[WorkflowSteps]
 
@@ -692,7 +768,7 @@ class AsyncWorkflowsClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.update(
-            id, chunk_strategy=chunk_strategy, name=name, steps=steps, request_options=request_options
+            id, chunk_strategy=chunk_strategy, name=name, extract=extract, steps=steps, request_options=request_options
         )
         return _response.data
 

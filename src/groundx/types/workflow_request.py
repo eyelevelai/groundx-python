@@ -19,6 +19,11 @@ class WorkflowRequest(UniversalBaseModel):
     The name of the workflow being created.
     """
 
+    extract: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(default=None)
+    """
+    Extract agent definitions.
+    """
+
     steps: typing.Optional[WorkflowSteps] = None
 
     if IS_PYDANTIC_V2:
