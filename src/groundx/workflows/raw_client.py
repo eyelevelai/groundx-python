@@ -123,9 +123,7 @@ class RawWorkflowsClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    def get_account(
-        self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> HttpResponse[WorkflowsResponse]:
+    def get_account(self, *, request_options: typing.Optional[RequestOptions] = None) -> HttpResponse[WorkflowResponse]:
         """
         Get the workflow associated with customer account.
 
@@ -136,7 +134,7 @@ class RawWorkflowsClient:
 
         Returns
         -------
-        HttpResponse[WorkflowsResponse]
+        HttpResponse[WorkflowResponse]
             Look up success
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -147,9 +145,9 @@ class RawWorkflowsClient:
         try:
             if 200 <= _response.status_code < 300:
                 _data = typing.cast(
-                    WorkflowsResponse,
+                    WorkflowResponse,
                     parse_obj_as(
-                        type_=WorkflowsResponse,  # type: ignore
+                        type_=WorkflowResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -582,7 +580,7 @@ class AsyncRawWorkflowsClient:
 
     async def get_account(
         self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> AsyncHttpResponse[WorkflowsResponse]:
+    ) -> AsyncHttpResponse[WorkflowResponse]:
         """
         Get the workflow associated with customer account.
 
@@ -593,7 +591,7 @@ class AsyncRawWorkflowsClient:
 
         Returns
         -------
-        AsyncHttpResponse[WorkflowsResponse]
+        AsyncHttpResponse[WorkflowResponse]
             Look up success
         """
         _response = await self._client_wrapper.httpx_client.request(
@@ -604,9 +602,9 @@ class AsyncRawWorkflowsClient:
         try:
             if 200 <= _response.status_code < 300:
                 _data = typing.cast(
-                    WorkflowsResponse,
+                    WorkflowResponse,
                     parse_obj_as(
-                        type_=WorkflowsResponse,  # type: ignore
+                        type_=WorkflowResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

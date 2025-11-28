@@ -103,7 +103,7 @@ class WorkflowsClient:
         )
         return _response.data
 
-    def get_account(self, *, request_options: typing.Optional[RequestOptions] = None) -> WorkflowsResponse:
+    def get_account(self, *, request_options: typing.Optional[RequestOptions] = None) -> WorkflowResponse:
         """
         Get the workflow associated with customer account.
 
@@ -114,7 +114,7 @@ class WorkflowsClient:
 
         Returns
         -------
-        WorkflowsResponse
+        WorkflowResponse
             Look up success
 
         Examples
@@ -476,7 +476,7 @@ class AsyncWorkflowsClient:
         )
         return _response.data
 
-    async def get_account(self, *, request_options: typing.Optional[RequestOptions] = None) -> WorkflowsResponse:
+    async def get_account(self, *, request_options: typing.Optional[RequestOptions] = None) -> WorkflowResponse:
         """
         Get the workflow associated with customer account.
 
@@ -487,7 +487,7 @@ class AsyncWorkflowsClient:
 
         Returns
         -------
-        WorkflowsResponse
+        WorkflowResponse
             Look up success
 
         Examples
