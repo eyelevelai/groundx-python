@@ -13,7 +13,7 @@ class PromptManager:
         self, config_source: Source, default_workflow_id: str = "latest"
     ) -> None:
         self._config_source: Source = config_source
-        # Cache: workflow_id -> { field_key -> Prompt }
+
         self._cache: typing.Dict[str, typing.Dict[str, Group]] = {}
         self._default_workflow_id: str = default_workflow_id
         self._versions: typing.Dict[str, str] = {}
@@ -173,6 +173,8 @@ class PromptManager:
             raise Exception(f"group_name is empty")
 
         res = self.get_fields_for_workflow(workflow_id)
+
+        workflow_id = self.workflow_id(workflow_id)
 
         path = group_name.split(".")
         root = path[0]
