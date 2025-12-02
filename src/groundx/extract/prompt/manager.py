@@ -10,8 +10,12 @@ from .utility import do_not_remove_fields, load_from_yaml
 
 class PromptManager:
     def __init__(
-        self, config_source: Source, default_workflow_id: str = "latest"
+        self,
+        cache_source: Source,
+        config_source: Source,
+        default_workflow_id: str = "latest",
     ) -> None:
+        self._cache_source: Source = cache_source
         self._config_source: Source = config_source
 
         self._cache: typing.Dict[str, typing.Dict[str, Group]] = {}
@@ -38,7 +42,11 @@ class PromptManager:
         if workflow_id in self._cache:
             return
 
-        raw, version = self._config_source.fetch(workflow_id)
+        try:
+            raw, version = self._config_source.fetch(workflow_id)
+        except Exception:
+            raw, version = self._cache_source.fetch(workflow_id)
+
         prompts = load_from_yaml(raw)
         self._cache[workflow_id] = prompts
         self._versions[workflow_id] = version
