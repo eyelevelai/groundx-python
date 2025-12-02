@@ -18,8 +18,6 @@ class PromptManager:
         self._default_workflow_id: str = default_workflow_id
         self._versions: typing.Dict[str, str] = {}
 
-        self._ensure_loaded(default_workflow_id)
-
     @property
     def default_workflow_id(self) -> str:
         return self._default_workflow_id
@@ -36,7 +34,7 @@ class PromptManager:
     def logger(self) -> Logger:
         return self._config_source.logger
 
-    def _ensure_loaded(self, workflow_id: str) -> None:
+    def cache_workflow(self, workflow_id: str) -> None:
         if workflow_id in self._cache:
             return
 
@@ -50,7 +48,7 @@ class PromptManager:
     ) -> typing.Dict[str, Group]:
         workflow_id = self.workflow_id(workflow_id)
 
-        self._ensure_loaded(workflow_id)
+        self.cache_workflow(workflow_id)
 
         return self._cache[workflow_id]
 
