@@ -41,7 +41,7 @@ class TestDocument(unittest.TestCase):
 
     def test_init_name(self) -> None:
         source = TestSource(SAMPLE_YAML_1)
-        manager = PromptManager(config_source=source)
+        manager = PromptManager(cache_source=source, config_source=source)
 
         st1: Document = test_doc(manager)
         self.assertEqual(st1.file_name, "F")
