@@ -330,7 +330,7 @@ Special Instructions:
 
     def test_get_fields_for_workflow_1(self) -> None:
         source = TestSource(SAMPLE_YAML_1)
-        manager = PromptManager(config_source=source)
+        manager = PromptManager(cache_source=source, config_source=source)
 
         root = manager.get_fields_for_workflow("latest")
 
@@ -496,7 +496,7 @@ Special Instructions:
 
         for idx, tst in enumerate(tsts):
             source = TestSource(tst["yaml"])
-            manager = PromptManager(config_source=source)
+            manager = PromptManager(cache_source=source, config_source=source)
 
             if isinstance(tst["expect"], Exception):
                 with self.assertRaises(Exception) as e:
@@ -508,7 +508,7 @@ Special Instructions:
 
     def test_reload_if_changed_1(self) -> None:
         source = TestSource(SAMPLE_YAML_1)
-        manager = PromptManager(config_source=source)
+        manager = PromptManager(cache_source=source, config_source=source)
         root = manager.get_fields_for_workflow("latest")
 
         self.assertIn("statement", root)
@@ -575,7 +575,7 @@ Special Instructions:
 
     def test_workflow_extract_dict(self):
         source = TestSource(SAMPLE_YAML_1)
-        manager = PromptManager(config_source=source)
+        manager = PromptManager(cache_source=source, config_source=source)
 
         js = json.dumps(manager.workflow_extract_dict(), indent=2)
         ym = json.dumps(yaml.safe_load(SAMPLE_YAML_1), indent=2)
