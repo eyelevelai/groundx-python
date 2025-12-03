@@ -94,6 +94,9 @@ class Status:
     def key_worker_total(self, id: str) -> str:
         return f"{self.config.service}:{id}:total"
 
+    def prompt_init_lock(self) -> typing.Any:
+        return self.client.lock(name="prompt_manager:init", timeout=15)
+
     def refresh_worker(self, id: str, to: typing.Optional[int] = None) -> None:
         self.refresh_worker_online(id, to)
         self.refresh_worker_total(id, to)
