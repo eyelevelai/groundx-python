@@ -44,7 +44,10 @@ class PromptManager:
 
         try:
             raw, version = self._config_source.fetch(workflow_id)
-        except Exception:
+        except Exception as e:
+            self.logger.info_msg(
+                f"_config_source.fetch exception [{e}]\ntrying _cache_source..."
+            )
             raw, version = self._cache_source.fetch(workflow_id)
 
         prompts = load_from_yaml(raw)
