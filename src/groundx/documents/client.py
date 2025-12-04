@@ -36,6 +36,52 @@ class DocumentsClient:
         """
         return self._raw_client
 
+    def copy(
+        self,
+        *,
+        to_bucket: int,
+        document_ids: typing.Optional[typing.Sequence[str]] = OMIT,
+        from_bucket: typing.Optional[int] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> IngestResponse:
+        """
+        copy documents from one bucket to another
+
+        Parameters
+        ----------
+        to_bucket : int
+            The bucketId of the bucket the file will be copied into.
+
+        document_ids : typing.Optional[typing.Sequence[str]]
+            The document IDs of the files you wish to copy.
+
+        from_bucket : typing.Optional[int]
+            The bucketId of the bucket you wish to copy ALL files from.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        IngestResponse
+            Copy request successfully submitted
+
+        Examples
+        --------
+        from groundx import GroundX
+
+        client = GroundX(
+            api_key="YOUR_API_KEY",
+        )
+        client.documents.copy(
+            to_bucket=1234,
+        )
+        """
+        _response = self._raw_client.copy(
+            to_bucket=to_bucket, document_ids=document_ids, from_bucket=from_bucket, request_options=request_options
+        )
+        return _response.data
+
     def ingest_remote(
         self,
         *,
@@ -557,6 +603,60 @@ class AsyncDocumentsClient:
         AsyncRawDocumentsClient
         """
         return self._raw_client
+
+    async def copy(
+        self,
+        *,
+        to_bucket: int,
+        document_ids: typing.Optional[typing.Sequence[str]] = OMIT,
+        from_bucket: typing.Optional[int] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> IngestResponse:
+        """
+        copy documents from one bucket to another
+
+        Parameters
+        ----------
+        to_bucket : int
+            The bucketId of the bucket the file will be copied into.
+
+        document_ids : typing.Optional[typing.Sequence[str]]
+            The document IDs of the files you wish to copy.
+
+        from_bucket : typing.Optional[int]
+            The bucketId of the bucket you wish to copy ALL files from.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        IngestResponse
+            Copy request successfully submitted
+
+        Examples
+        --------
+        import asyncio
+
+        from groundx import AsyncGroundX
+
+        client = AsyncGroundX(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.documents.copy(
+                to_bucket=1234,
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.copy(
+            to_bucket=to_bucket, document_ids=document_ids, from_bucket=from_bucket, request_options=request_options
+        )
+        return _response.data
 
     async def ingest_remote(
         self,

@@ -1,5 +1,91 @@
 # Reference
 ## Documents
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">copy</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+copy documents from one bucket to another
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from groundx import GroundX
+
+client = GroundX(
+    api_key="YOUR_API_KEY",
+)
+client.documents.copy(
+    to_bucket=1234,
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**to_bucket:** `int` — The bucketId of the bucket the file will be copied into.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**document_ids:** `typing.Optional[typing.Sequence[str]]` — The document IDs of the files you wish to copy.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**from_bucket:** `typing.Optional[int]` — The bucketId of the bucket you wish to copy ALL files from.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.documents.<a href="src/groundx/documents/client.py">ingest_remote</a>(...)</code></summary>
 <dl>
 <dd>
