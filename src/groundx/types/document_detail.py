@@ -7,6 +7,7 @@ import typing_extensions
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 from ..core.serialization import FieldMetadata
 from .document_type import DocumentType
+from .process_level import ProcessLevel
 from .processing_status import ProcessingStatus
 
 
@@ -38,6 +39,9 @@ class DocumentDetail(UniversalBaseModel):
     Unique system generated ID for the ingest request
     """
 
+    process_level: typing_extensions.Annotated[typing.Optional[ProcessLevel], FieldMetadata(alias="processLevel")] = (
+        None
+    )
     search_data: typing_extensions.Annotated[
         typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]], FieldMetadata(alias="searchData")
     ] = None

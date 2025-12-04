@@ -32,6 +32,65 @@ class RawDocumentsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
+    def copy(
+        self,
+        *,
+        to_bucket: int,
+        document_ids: typing.Optional[typing.Sequence[str]] = OMIT,
+        from_bucket: typing.Optional[int] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> HttpResponse[IngestResponse]:
+        """
+        copy documents from one bucket to another
+
+        Parameters
+        ----------
+        to_bucket : int
+            The bucketId of the bucket the file will be copied into.
+
+        document_ids : typing.Optional[typing.Sequence[str]]
+            The document IDs of the files you wish to copy.
+
+        from_bucket : typing.Optional[int]
+            The bucketId of the bucket you wish to copy ALL files from.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[IngestResponse]
+            Copy request successfully submitted
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "v1/ingest/copy",
+            method="POST",
+            json={
+                "documentIds": document_ids,
+                "fromBucket": from_bucket,
+                "toBucket": to_bucket,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    IngestResponse,
+                    parse_obj_as(
+                        type_=IngestResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
+        raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
+
     def ingest_remote(
         self,
         *,
@@ -803,6 +862,65 @@ class RawDocumentsClient:
 class AsyncRawDocumentsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
+
+    async def copy(
+        self,
+        *,
+        to_bucket: int,
+        document_ids: typing.Optional[typing.Sequence[str]] = OMIT,
+        from_bucket: typing.Optional[int] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AsyncHttpResponse[IngestResponse]:
+        """
+        copy documents from one bucket to another
+
+        Parameters
+        ----------
+        to_bucket : int
+            The bucketId of the bucket the file will be copied into.
+
+        document_ids : typing.Optional[typing.Sequence[str]]
+            The document IDs of the files you wish to copy.
+
+        from_bucket : typing.Optional[int]
+            The bucketId of the bucket you wish to copy ALL files from.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[IngestResponse]
+            Copy request successfully submitted
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "v1/ingest/copy",
+            method="POST",
+            json={
+                "documentIds": document_ids,
+                "fromBucket": from_bucket,
+                "toBucket": to_bucket,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    IngestResponse,
+                    parse_obj_as(
+                        type_=IngestResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
+        raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
     async def ingest_remote(
         self,
