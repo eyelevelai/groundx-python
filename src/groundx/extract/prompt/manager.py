@@ -13,14 +13,28 @@ class PromptManager:
         self,
         cache_source: Source,
         config_source: Source,
+        default_file_name: str = "latest",
         default_workflow_id: str = "latest",
     ) -> None:
         self._cache_source: Source = cache_source
         self._config_source: Source = config_source
 
         self._cache: typing.Dict[str, typing.Dict[str, Group]] = {}
+        self._default_file_name: str = default_file_name
         self._default_workflow_id: str = default_workflow_id
         self._versions: typing.Dict[str, str] = {}
+
+    @property
+    def default_file_name(self) -> str:
+        return self._default_file_name
+
+    @default_file_name.setter
+    def default_file_name(self, value: str) -> None:
+        self._default_file_name = value
+
+    @default_file_name.deleter
+    def default_file_name(self) -> None:
+        del self._default_file_name
 
     @property
     def default_workflow_id(self) -> str:
@@ -38,7 +52,7 @@ class PromptManager:
     def logger(self) -> Logger:
         return self._config_source.logger
 
-    def cache_workflow(self, workflow_id: str) -> None:
+    def cache_workflow(self, file_name: str, workflow_id: str) -> None:
         if workflow_id in self._cache:
             return
 
@@ -46,31 +60,43 @@ class PromptManager:
             raw, version = self._config_source.fetch(workflow_id)
         except Exception as e:
             self.logger.info_msg(
-                f"_config_source.fetch exception [{e}]\ntrying _cache_source..."
+                f"_config_source.fetch exception for [{workflow_id}] [{e}]\ntrying _cache_source [{file_name}.yaml]..."
             )
-            raw, version = self._cache_source.fetch(workflow_id)
+            raw, version = self._cache_source.fetch(file_name)
 
         prompts = load_from_yaml(raw)
         self._cache[workflow_id] = prompts
         self._versions[workflow_id] = version
 
+    def file_name(self, file_name: typing.Optional[str] = None) -> str:
+        if not file_name:
+            return self._default_file_name
+
+        return file_name
+
     def get_fields_for_workflow(
-        self, workflow_id: typing.Optional[str] = None
+        self,
+        file_name: typing.Optional[str] = None,
+        workflow_id: typing.Optional[str] = None,
     ) -> typing.Dict[str, Group]:
         workflow_id = self.workflow_id(workflow_id)
 
-        self.cache_workflow(workflow_id)
+        self.cache_workflow(self.file_name(file_name), workflow_id)
 
         return self._cache[workflow_id]
 
     def get_prompt(
-        self, name: str, workflow_id: typing.Optional[str] = None
+        self,
+        name: str,
+        file_name: typing.Optional[str] = None,
+        workflow_id: typing.Optional[str] = None,
     ) -> typing.Optional[Prompt]:
         if not name:
             raise Exception(f"name is empty")
 
-        res = self.get_fields_for_workflow(workflow_id)
+        res = self.get_fields_for_workflow(file_name, workflow_id)
 
+        file_name = self.file_name(file_name)
         workflow_id = self.workflow_id(workflow_id)
 
         path = name.split(".")
@@ -78,7 +104,9 @@ class PromptManager:
         remainder = path[1:]
 
         if root not in res:
-            raise Exception(f"[{workflow_id}.yaml] is missing a [{root}] entry")
+            raise Exception(
+                f"[{workflow_id}] [{file_name}.yaml] is missing a [{root}] entry"
+            )
 
         grp = res[root]
 
@@ -92,7 +120,7 @@ class PromptManager:
         for p in remainder:
             if p not in grp.fields:
                 raise Exception(
-                    f"[{workflow_id}.yaml] is missing a [{p}] entry at [{lineage + '.' + p}]"
+                    f"[{workflow_id}] [{file_name}.yaml] is missing a [{p}] entry at [{lineage + '.' + p}]"
                 )
             nv = grp.fields[p]
             if (
@@ -101,7 +129,7 @@ class PromptManager:
                 or isinstance(nv, typing.Sequence)
             ):
                 raise Exception(
-                    f"[{workflow_id}.yaml] entry at [{lineage + '.' + p}] is not an element"
+                    f"[{workflow_id}] [{file_name}.yaml] entry at [{lineage + '.' + p}] is not an element"
                 )
 
             if idx == n:
@@ -109,7 +137,7 @@ class PromptManager:
 
             if not isinstance(nv, Group):
                 raise Exception(
-                    f"[{workflow_id}.yaml] entry at [{lineage + '.' + p}] is not a group"
+                    f"[{workflow_id}] [{file_name}.yaml] entry at [{lineage + '.' + p}] is not a group"
                 )
 
             lineage += "." + p
@@ -119,9 +147,14 @@ class PromptManager:
         return None
 
     def group_definition(
-        self, group_name: str, workflow_id: typing.Optional[str] = None
+        self,
+        group_name: str,
+        file_name: typing.Optional[str] = None,
+        workflow_id: typing.Optional[str] = None,
     ) -> str:
-        grp = self.group_load(group_name=group_name, workflow_id=workflow_id)
+        grp = self.group_load(
+            group_name=group_name, file_name=file_name, workflow_id=workflow_id
+        )
 
         pmp = grp.render()
         if not pmp:
@@ -130,10 +163,16 @@ class PromptManager:
         return pmp
 
     def group_descriptions(
-        self, group_name: str, indent: int = 2, workflow_id: typing.Optional[str] = None
+        self,
+        group_name: str,
+        indent: int = 2,
+        file_name: typing.Optional[str] = None,
+        workflow_id: typing.Optional[str] = None,
     ) -> str:
         desc: typing.List[str] = []
-        grp = self.group_load(group_name, workflow_id=workflow_id)
+        grp = self.group_load(
+            group_name=group_name, file_name=file_name, workflow_id=workflow_id
+        )
 
         for _, v in grp.fields.items():
             if isinstance(v, ExtractedField):
@@ -146,28 +185,44 @@ class PromptManager:
         return "\n".join(desc)
 
     def group_field(
-        self, group_name: str, attr_name: str, workflow_id: typing.Optional[str] = None
+        self,
+        group_name: str,
+        attr_name: str,
+        file_name: typing.Optional[str] = None,
+        workflow_id: typing.Optional[str] = None,
     ) -> typing.Optional[ExtractedField]:
-        fld = self.group_fields(group_name, workflow_id=workflow_id)
+        fld = self.group_fields(
+            group_name=group_name, file_name=file_name, workflow_id=workflow_id
+        )
         if attr_name in fld:
             return fld[attr_name]
 
         return None
 
     def group_field_prompts(
-        self, group_name: str, workflow_id: typing.Optional[str] = None
+        self,
+        group_name: str,
+        file_name: typing.Optional[str] = None,
+        workflow_id: typing.Optional[str] = None,
     ) -> str:
         return "".join(
             p.render()
-            for p in self.group_fields(group_name, workflow_id=workflow_id).values()
+            for p in self.group_fields(
+                group_name=group_name, file_name=file_name, workflow_id=workflow_id
+            ).values()
             if p.render()
         )
 
     def group_fields(
-        self, group_name: str, workflow_id: typing.Optional[str] = None
+        self,
+        group_name: str,
+        file_name: typing.Optional[str] = None,
+        workflow_id: typing.Optional[str] = None,
     ) -> typing.Dict[str, ExtractedField]:
         fields: typing.Dict[str, ExtractedField] = {}
-        grp = self.group_load(group_name, workflow_id=workflow_id)
+        grp = self.group_load(
+            group_name=group_name, file_name=file_name, workflow_id=workflow_id
+        )
 
         for k, v in grp.fields.items():
             if isinstance(v, ExtractedField):
@@ -176,13 +231,17 @@ class PromptManager:
         return fields
 
     def group_load(
-        self, group_name: str, workflow_id: typing.Optional[str] = None
+        self,
+        group_name: str,
+        file_name: typing.Optional[str] = None,
+        workflow_id: typing.Optional[str] = None,
     ) -> Group:
         if not group_name:
             raise Exception(f"group_name is empty")
 
-        res = self.get_fields_for_workflow(workflow_id)
+        res = self.get_fields_for_workflow(file_name, workflow_id)
 
+        file_name = self.file_name(file_name)
         workflow_id = self.workflow_id(workflow_id)
 
         path = group_name.split(".")
@@ -190,7 +249,9 @@ class PromptManager:
         remainder = path[1:]
 
         if root not in res:
-            raise Exception(f"[{workflow_id}.yaml] is missing a {root} entry")
+            raise Exception(
+                f"[{workflow_id}] [{file_name}.yaml] is missing a {root} entry"
+            )
 
         grp = res[root]
 
@@ -198,12 +259,12 @@ class PromptManager:
         for p in remainder:
             if p not in grp.fields:
                 raise Exception(
-                    f"[{workflow_id}.yaml] is missing a [{p}] entry at [{lineage + '.' + p}]"
+                    f"[{workflow_id}] [{file_name}.yaml] is missing a [{p}] entry at [{lineage + '.' + p}]"
                 )
             nv = grp.fields[p]
             if not isinstance(nv, Group):
                 raise Exception(
-                    f"[{workflow_id}.yaml] entry at [{lineage + '.' + p}] is not a group"
+                    f"[{workflow_id}] [{file_name}.yaml] entry at [{lineage + '.' + p}] is not a group"
                 )
 
             lineage += "." + p
@@ -224,9 +285,11 @@ class PromptManager:
             self._versions[workflow_id] = version
 
     def workflow_extract_dict(
-        self, workflow_id: typing.Optional[str] = None
+        self,
+        file_name: typing.Optional[str] = None,
+        workflow_id: typing.Optional[str] = None,
     ) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
-        wf = self.get_fields_for_workflow(workflow_id)
+        wf = self.get_fields_for_workflow(file_name, workflow_id)
 
         wfd: typing.Dict[str, typing.Dict[str, typing.Any]] = {}
         for k, v in wf.items():

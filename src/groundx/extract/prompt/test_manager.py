@@ -440,7 +440,9 @@ Special Instructions:
                 "yaml": SAMPLE_YAML_1,
             },
             {
-                "expect": Exception("[latest.yaml] is missing a [meter] entry"),
+                "expect": Exception(
+                    "[latest] [latest.yaml] is missing a [meter] entry"
+                ),
                 "name": "meter",
                 "yaml": SAMPLE_YAML_1,
             },
@@ -451,7 +453,7 @@ Special Instructions:
             },
             {
                 "expect": Exception(
-                    "[latest.yaml] is missing a [meter] entry at [statement.meter]"
+                    "[latest] [latest.yaml] is missing a [meter] entry at [statement.meter]"
                 ),
                 "name": "statement.meter",
                 "yaml": SAMPLE_YAML_2,
@@ -469,7 +471,7 @@ Special Instructions:
             },
             {
                 "expect": Exception(
-                    "[latest.yaml] entry at [statement.statement_date] is not a group"
+                    "[latest] [latest.yaml] entry at [statement.statement_date] is not a group"
                 ),
                 "name": "statement.statement_date.meters",
                 "yaml": SAMPLE_YAML_2,
@@ -487,7 +489,7 @@ Special Instructions:
             },
             {
                 "expect": Exception(
-                    "[latest.yaml] is missing a [meter] entry at [statement.meters.meter]"
+                    "[latest] [latest.yaml] is missing a [meter] entry at [statement.meters.meter]"
                 ),
                 "name": "statement.meters.meter",
                 "yaml": SAMPLE_YAML_2,
@@ -545,7 +547,7 @@ Special Instructions:
         source.update(updated_yaml, "v2")
 
         manager.reload_if_changed()
-        updated_fields = manager.get_fields_for_workflow("v2")
+        updated_fields = manager.get_fields_for_workflow(workflow_id="v2")
 
         self.assertIn("statement", updated_fields)
         self.assertEqual(len(updated_fields["statement"].fields), 1)
@@ -571,6 +573,7 @@ Special Instructions:
 ## updated_statement_date
 """,
                 statement_date.render(),
+                f"\n\n{statement_date.render()}\n\n",
             )
 
     def test_workflow_extract_dict(self):
