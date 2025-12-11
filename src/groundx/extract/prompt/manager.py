@@ -20,7 +20,7 @@ class PromptManager:
         self._config_source: Source = config_source
 
         self._cache: typing.Dict[str, typing.Dict[str, Group]] = {}
-        self._default_file_name: str = default_file_name
+        self._default_file_name: str = default_file_name.replace(".yaml", "")
         self._default_workflow_id: str = default_workflow_id
         self._versions: typing.Dict[str, str] = {}
 
