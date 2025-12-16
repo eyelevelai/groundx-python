@@ -82,16 +82,16 @@ class ExtractedField(Element):
 
     def render(self) -> str:
         if not self.prompt:
-            raise Exception(f"prompt is not set")
+            raise Exception(f"prompt is not set\n{self.prompt}")
 
         if not self.prompt.attr_name:
-            raise Exception(f"prompt.attr_name is not set")
+            raise Exception(f"prompt.attr_name is not set\n{self.prompt}")
 
         if not self.prompt.identifiers:
-            raise Exception(f"prompt.identifiers is not set")
+            raise Exception(f"prompt.identifiers is not set for [{self.attr_name()}]")
 
         if self.prompt.type is None:
-            raise Exception(f"prompt.type is not set")
+            raise Exception(f"prompt.type is not set for [{self.attr_name()}]")
 
         default = ""
         if self.prompt.default:
