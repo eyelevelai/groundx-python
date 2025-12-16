@@ -38,6 +38,12 @@ class TestExtractedField(unittest.TestCase):
         ef = TestField("test", 3.14)
         self.assertFalse(ef.equal_to_value(2.71))
 
+    def test_render_error(self):
+        ef = TestField("test", "hello")
+        with self.assertRaises(Exception) as e:
+            ef.render()
+        self.assertEqual(str(e.exception), "prompt.type is not set for [test]")
+
     def test_set_value_dates(self):
         ef1 = TestField("test date", "3/29/25")
         self.assertEqual(ef1.get_value(), "2025-03-29")
