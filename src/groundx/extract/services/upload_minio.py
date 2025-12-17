@@ -64,13 +64,11 @@ class MinIOClient:
         from minio.error import S3Error
 
         try:
-            bucket_name, object_name = self.parse_url(url)
-
-            response = self.client.get_object(bucket_name, object_name)
+            response = self.client.get_object(self.settings.upload.bucket, url)
 
             return response.read()
         except S3Error as e:
-            self.logger.error_msg(f"Failed to get object from {url}: {str(e)}")
+            self.logger.error_msg(f"Failed to get object from [{url}]: {str(e)}")
             raise
 
     def get_object_and_metadata(
@@ -82,17 +80,15 @@ class MinIOClient:
         from minio.error import S3Error
 
         try:
-            bucket_name, object_name = self.parse_url(url)
-
             meta = self.head_object(url) or {}
 
-            response = self.client.get_object(bucket_name, object_name)
+            response = self.client.get_object(self.settings.upload.bucket, url)
 
             body = response.read()
 
             return body, meta
         except S3Error as e:
-            self.logger.error_msg(f"Failed to get object from {url}: {str(e)}")
+            self.logger.error_msg(f"Failed to get object from [{url}]: {str(e)}")
             raise
 
     def head_object(self, url: str) -> typing.Optional[typing.Dict[str, str]]:
@@ -102,9 +98,7 @@ class MinIOClient:
         from minio.error import S3Error
 
         try:
-            bucket_name, object_name = self.parse_url(url)
-
-            response = self.client.stat_object(bucket_name, object_name)
+            response = self.client.stat_object(self.settings.upload.bucket, url)
             if not response:
                 return None
 
@@ -116,7 +110,7 @@ class MinIOClient:
 
             return res
         except S3Error as e:
-            self.logger.error_msg(f"Failed to get object from {url}: {str(e)}")
+            self.logger.error_msg(f"Failed to get object from [{url}]: {str(e)}")
             raise
 
     def parse_url(self, key: str) -> typing.Tuple[str, str]:
@@ -152,7 +146,7 @@ class MinIOClient:
                 content_type=content_type,
             )
         except S3Error as e:
-            self.logger.error_msg(f"Failed to put object in {bucket}/{key}: {str(e)}")
+            self.logger.error_msg(f"Failed to put object in [{bucket}/{key}]: {str(e)}")
             raise
 
     def put_json_stream(

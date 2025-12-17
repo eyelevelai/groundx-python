@@ -60,7 +60,7 @@ class PromptManager:
                 print(f"workflows.cache_workflow [1] exception: {e}")
 
         self.logger.info_msg(
-            f"[{self._default_file_name}] [{self._default_workflow_id}.yaml] init"
+            f"[{self._default_workflow_id}] [{self._default_file_name}.yaml] init"
         )
 
         if self._default_workflow_id == "latest":
