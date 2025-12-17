@@ -1,5 +1,9 @@
 import typing
 
+from pydantic import PrivateAttr
+
+from groundx import GroundX, WorkflowResponse
+
 from ..classes.field import ExtractedField
 from ..classes.group import Group
 from ..classes.prompt import Prompt
@@ -9,12 +13,19 @@ from .utility import do_not_remove_fields, load_from_yaml
 
 
 class PromptManager:
+    _gx_client: GroundX = PrivateAttr()
+    _logger: Logger = PrivateAttr()
+    is_init: bool = False
+
     def __init__(
         self,
         cache_source: Source,
         config_source: Source,
+        gx_client: typing.Optional[GroundX] = None,
+        logger: typing.Optional[Logger] = None,
         default_file_name: str = "latest",
         default_workflow_id: str = "latest",
+        should_init: bool = False,
     ) -> None:
         self._cache_source: Source = cache_source
         self._config_source: Source = config_source
@@ -22,7 +33,89 @@ class PromptManager:
         self._cache: typing.Dict[str, typing.Dict[str, Group]] = {}
         self._default_file_name: str = default_file_name.replace(".yaml", "")
         self._default_workflow_id: str = default_workflow_id
+
+        if gx_client:
+            self._gx_client = gx_client
+        if logger:
+            self._logger = logger
+
         self._versions: typing.Dict[str, str] = {}
+
+        if (
+            (
+                self._default_file_name != "latest"
+                and self._default_workflow_id != "latest"
+            )
+            or not gx_client
+            or not logger
+        ):
+            print(
+                f"[{self._default_workflow_id}] [{self._default_file_name}.yaml] loading cache_workflow"
+            )
+
+            try:
+                self.cache_workflow(self._default_file_name, self._default_workflow_id)
+                self.is_init = True
+                return
+            except Exception as e:
+                print(f"workflows.cache_workflow [1] exception: {e}")
+
+        self.logger.info_msg(
+            f"[{self._default_file_name}] [{self._default_workflow_id}.yaml] init"
+        )
+
+        if self._default_workflow_id == "latest":
+            res: typing.Optional[WorkflowResponse] = None
+            try:
+                res = self._gx_client.workflows.get_account()
+            except Exception as e:
+                self.logger.debug_msg(f"workflows.get_account exception: {e}")
+
+            if res and res.workflow and res.workflow.workflow_id:
+                self.default_workflow_id = res.workflow.workflow_id
+                self.logger.info_msg(
+                    f"workflow_id from get_account, assigned to account: [{self.default_workflow_id}]"
+                )
+
+                try:
+                    self.cache_workflow(
+                        self.default_file_name, self.default_workflow_id
+                    )
+                    self.is_init = True
+                    return
+                except Exception as e:
+                    self.logger.debug_msg(
+                        f"workflows.cache_workflow [2] exception: {e}"
+                    )
+
+        if "latest" in self._default_file_name:
+            try:
+                ls = self._gx_client.workflows.list()
+                for wf in ls.workflows:
+                    if wf.workflow_id and wf.relationships and wf.relationships.account:
+                        self.default_workflow_id = wf.workflow_id
+                        self.logger.info_msg(
+                            f"workflow_id from list, assigned to account: [{self.default_workflow_id}]"
+                        )
+
+                        try:
+                            self.cache_workflow(
+                                self.default_file_name, self.default_workflow_id
+                            )
+                            self.is_init = True
+                            return
+                        except Exception as e:
+                            self.logger.debug_msg(
+                                f"workflows.cache_workflow [3] exception: {e}"
+                            )
+            except Exception as e:
+                self.logger.debug_msg(f"workflows.list exception: {e}")
+
+        if not should_init:
+            self.logger.info_msg(
+                f"account workflow not found [{self.workflow_id(None)}]"
+            )
+            return
 
     @property
     def default_file_name(self) -> str:
@@ -49,8 +142,28 @@ class PromptManager:
         del self._default_workflow_id
 
     @property
+    def gx_client(self) -> GroundX:
+        return self._gx_client
+
+    @gx_client.setter
+    def gx_client(self, value: GroundX) -> None:
+        self._gx_client = value
+
+    @gx_client.deleter
+    def gx_client(self) -> None:
+        del self._gx_client
+
+    @property
     def logger(self) -> Logger:
-        return self._config_source.logger
+        return self._logger
+
+    @logger.setter
+    def logger(self, value: Logger) -> None:
+        self._logger = value
+
+    @logger.deleter
+    def logger(self) -> None:
+        del self._logger
 
     def cache_workflow(self, file_name: str, workflow_id: str) -> None:
         if workflow_id in self._cache:
