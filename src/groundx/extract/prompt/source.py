@@ -1,19 +1,16 @@
 import datetime, os, typing
 
 from ..services.logger import Logger
-from ..settings.settings import ContainerSettings
 
 
 class Source:
     def __init__(
         self,
-        settings: ContainerSettings,
         logger: Logger,
         cache_path: str = f"workflows/extract",
     ) -> None:
         self._cache_path = cache_path.rstrip("/")
         self._logger = logger
-        self._settings = settings
 
     @property
     def logger(self) -> Logger:

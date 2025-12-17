@@ -1,6 +1,5 @@
 import typing
 
-from ..services.logger import Logger
 from ..services.upload import Upload
 from ..settings.settings import ContainerSettings
 from .source import Source
@@ -10,11 +9,12 @@ class ObjectStore(Source):
     def __init__(
         self,
         settings: ContainerSettings,
-        logger: Logger,
-        cache_path: str = f"workflows/extract",
+        **data: typing.Any,
     ) -> None:
-        super().__init__(settings, logger, cache_path)
-        self._upload = Upload(settings=settings, logger=logger)
+        super().__init__(**data)
+
+        self._settings = settings
+        self._upload = Upload(settings=settings, logger=self.logger)
 
     def fetch(self, workflow_id: str) -> typing.Tuple[str, str]:
         res = self._upload.get_object_and_metadata(self.workflow_path(workflow_id))
