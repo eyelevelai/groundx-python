@@ -25,7 +25,6 @@ class PromptManager:
         logger: typing.Optional[Logger] = None,
         default_file_name: str = "latest",
         default_workflow_id: str = "latest",
-        should_init: bool = False,
     ) -> None:
         self._cache_source: Source = cache_source
         self._config_source: Source = config_source
@@ -110,12 +109,6 @@ class PromptManager:
                             )
             except Exception as e:
                 self.logger.debug_msg(f"workflows.list exception: {e}")
-
-        if not should_init:
-            self.logger.info_msg(
-                f"account workflow not found [{self.workflow_id(None)}]"
-            )
-            return
 
     @property
     def default_file_name(self) -> str:
