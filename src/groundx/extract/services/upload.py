@@ -41,6 +41,10 @@ class Upload:
         self.settings = settings
         self.logger = logger
 
+        self.logger.info_msg(
+            f"upload type [{self.settings.upload.type}] [{self.settings.upload.bucket}]"
+        )
+
         if self.settings.upload.type == "minio":
             from .upload_minio import MinIOClient
 
