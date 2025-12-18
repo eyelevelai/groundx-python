@@ -64,11 +64,16 @@ class MinIOClient:
         from minio.error import S3Error
 
         try:
-            response = self.client.get_object(self.settings.upload.bucket, url)
+            response = self.client.get_object(
+                self.settings.upload.bucket,
+                self.parse_url(url),
+            )
 
             return response.read()
         except S3Error as e:
-            self.logger.error_msg(f"Failed to get object from [{url}]: {str(e)}")
+            self.logger.error_msg(
+                f"Failed to get object from [{url}] [{self.parse_url(url)}]: {str(e)}"
+            )
             raise
 
     def get_object_and_metadata(
@@ -80,15 +85,25 @@ class MinIOClient:
         from minio.error import S3Error
 
         try:
-            meta = self.head_object(url) or {}
+            meta = (
+                self.head_object(
+                    self.parse_url(url),
+                )
+                or {}
+            )
 
-            response = self.client.get_object(self.settings.upload.bucket, url)
+            response = self.client.get_object(
+                self.settings.upload.bucket,
+                self.parse_url(url),
+            )
 
             body = response.read()
 
             return body, meta
         except S3Error as e:
-            self.logger.error_msg(f"Failed to get object from [{url}]: {str(e)}")
+            self.logger.error_msg(
+                f"Failed to get object from [{url}] [{self.parse_url(url)}]: {str(e)}"
+            )
             raise
 
     def head_object(self, url: str) -> typing.Optional[typing.Dict[str, str]]:
@@ -98,7 +113,10 @@ class MinIOClient:
         from minio.error import S3Error
 
         try:
-            response = self.client.stat_object(self.settings.upload.bucket, url)
+            response = self.client.stat_object(
+                self.settings.upload.bucket,
+                self.parse_url(url),
+            )
             if not response:
                 return None
 
@@ -110,15 +128,28 @@ class MinIOClient:
 
             return res
         except S3Error as e:
-            self.logger.error_msg(f"Failed to get object from [{url}]: {str(e)}")
+            self.logger.error_msg(
+                f"Failed to get object from [{url}] [{self.parse_url(url)}]: {str(e)}"
+            )
             raise
 
-    def parse_url(self, key: str) -> typing.Tuple[str, str]:
-        minio_uri_parts = key.replace("s3://", "").split("/")
-        bucket_name = minio_uri_parts[0]
-        object_name = "/".join(minio_uri_parts[1:])
+    def parse_url(self, ur: str) -> str:
+        minio_uri_parts = ur.replace("s3://", "").split("/")
 
-        return bucket_name, object_name
+        nur = "/".join(minio_uri_parts)
+        if len(minio_uri_parts) < 2:
+            if nur.startswith("/"):
+                return nur[1:]
+
+            return nur
+
+        if minio_uri_parts[0] == self.settings.upload.bucket:
+            nur = "/".join(minio_uri_parts)
+
+        if nur.startswith("/"):
+            return nur[1:]
+
+        return nur
 
     def put_object(
         self,
