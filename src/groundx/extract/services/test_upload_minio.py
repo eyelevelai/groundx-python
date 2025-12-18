@@ -15,7 +15,7 @@ class TestMinIOClient(unittest.TestCase):
                 service="parse_url",
                 upload=ContainerUploadSettings(
                     base_domain="",
-                    bucket="eyeleve",
+                    bucket="eyelevel",
                     type="",
                     url="",
                 ),
@@ -25,16 +25,24 @@ class TestMinIOClient(unittest.TestCase):
         )
 
         obj = cl.parse_url("/eyelevel/layout")
-        self.assertEqual(obj, "eyelevel/layout")
+        self.assertEqual(obj, "layout")
 
         obj = cl.parse_url("s3://eyelevel/prod/file")
-        self.assertEqual(obj, "eyelevel/prod/file")
+        self.assertEqual(obj, "prod/file")
 
         obj = cl.parse_url("eyelevel/layout")
-        self.assertEqual(obj, "eyelevel/layout")
+        self.assertEqual(obj, "layout")
 
         obj = cl.parse_url("/layout/prod")
         self.assertEqual(obj, "layout/prod")
 
         obj = cl.parse_url("layout/prod")
         self.assertEqual(obj, "layout/prod")
+
+        obj = cl.parse_url(
+            "/eyelevel/layout/raw/prod/db5915cc-69ae-4cea-884e-fa029712cd16/78b97664-47ac-4363-89d9-9004938d8161/1.jpg"
+        )
+        self.assertEqual(
+            obj,
+            "layout/raw/prod/db5915cc-69ae-4cea-884e-fa029712cd16/78b97664-47ac-4363-89d9-9004938d8161/1.jpg",
+        )
