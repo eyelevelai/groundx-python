@@ -4,6 +4,7 @@ from pydantic import PrivateAttr
 
 from groundx import GroundX, WorkflowResponse
 
+from ..classes.element import Element
 from ..classes.field import ExtractedField
 from ..classes.group import Group
 from ..classes.prompt import Prompt
@@ -252,6 +253,23 @@ class PromptManager:
 
         return None
 
+    def group(
+        self,
+        group_name: str,
+        file_name: typing.Optional[str] = None,
+        workflow_id: typing.Optional[str] = None,
+    ) -> typing.Dict[str, Element]:
+        fields: typing.Dict[str, Element] = {}
+        grp = self.group_load(
+            group_name=group_name, file_name=file_name, workflow_id=workflow_id
+        )
+
+        for k, v in grp.fields.items():
+            if isinstance(v, ExtractedField) or isinstance(v, Group):
+                fields[k] = v
+
+        return fields
+
     def group_definition(
         self,
         group_name: str,
@@ -335,6 +353,40 @@ class PromptManager:
                 fields[k] = v
 
         return fields
+
+    def group_field_keys(
+        self,
+        group_name: str,
+        file_name: typing.Optional[str] = None,
+        workflow_id: typing.Optional[str] = None,
+    ) -> typing.List[str]:
+        grp = self.group_load(
+            group_name=group_name, file_name=file_name, workflow_id=workflow_id
+        )
+
+        attrs: typing.List[str] = []
+        for k, v in grp.fields.items():
+            if isinstance(v, ExtractedField):
+                attrs.append(k)
+
+        return attrs
+
+    def group_keys(
+        self,
+        group_name: str,
+        file_name: typing.Optional[str] = None,
+        workflow_id: typing.Optional[str] = None,
+    ) -> typing.List[str]:
+        grp = self.group_load(
+            group_name=group_name, file_name=file_name, workflow_id=workflow_id
+        )
+
+        attrs: typing.List[str] = []
+        for k, v in grp.fields.items():
+            if isinstance(v, ExtractedField) or isinstance(v, Group):
+                attrs.append(k)
+
+        return attrs
 
     def group_load(
         self,
