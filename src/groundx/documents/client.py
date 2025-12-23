@@ -547,6 +547,39 @@ class DocumentsClient:
         _response = self._raw_client.delete_by_id(document_id, request_options=request_options)
         return _response.data
 
+    def get_extract(
+        self, document_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> typing.Dict[str, typing.Optional[typing.Any]]:
+        """
+        Look up extractions for an existing document by documentId.
+
+        Parameters
+        ----------
+        document_id : str
+            The documentId of the document for which GroundX extract has extracted information.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        typing.Dict[str, typing.Optional[typing.Any]]
+            Look up success
+
+        Examples
+        --------
+        from groundx import GroundX
+
+        client = GroundX(
+            api_key="YOUR_API_KEY",
+        )
+        client.documents.get_extract(
+            document_id="documentId",
+        )
+        """
+        _response = self._raw_client.get_extract(document_id, request_options=request_options)
+        return _response.data
+
     def get_processes(
         self,
         *,
@@ -1207,6 +1240,47 @@ class AsyncDocumentsClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.delete_by_id(document_id, request_options=request_options)
+        return _response.data
+
+    async def get_extract(
+        self, document_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> typing.Dict[str, typing.Optional[typing.Any]]:
+        """
+        Look up extractions for an existing document by documentId.
+
+        Parameters
+        ----------
+        document_id : str
+            The documentId of the document for which GroundX extract has extracted information.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        typing.Dict[str, typing.Optional[typing.Any]]
+            Look up success
+
+        Examples
+        --------
+        import asyncio
+
+        from groundx import AsyncGroundX
+
+        client = AsyncGroundX(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.documents.get_extract(
+                document_id="documentId",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.get_extract(document_id, request_options=request_options)
         return _response.data
 
     async def get_processes(
