@@ -61,11 +61,15 @@ class BoundingBox(BaseModel):
 class Chunk(BaseModel):
     boundingBoxes: typing.Optional[typing.List[BoundingBox]] = []
     chunk: typing.Optional[str] = None
+    chunkKeywords: typing.Optional[str] = None
     contentType: typing.Optional[typing.List[str]] = []
+    fileKeywords: typing.Optional[str] = None
+    fileSummary: typing.Optional[str] = None
     json_: typing.Optional[typing.List[typing.Any]] = Field(None, alias="json")
     multimodalUrl: typing.Optional[str] = None
     narrative: typing.Optional[typing.List[str]] = None
     pageNumbers: typing.Optional[typing.List[int]] = []
+    sectionKeywords: typing.Optional[str] = None
     sectionSummary: typing.Optional[str] = None
     suggestedText: typing.Optional[str] = None
     text: typing.Optional[str] = None
