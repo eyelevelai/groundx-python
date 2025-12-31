@@ -133,13 +133,21 @@ class Document(Group):
 
         lvl = level.upper()
         if lvl == "ERROR":
-            self.logger.error_msg(msg, self.file_name, self.document_id, self.task_id)
+            self.logger.error_msg(
+                msg, self.file_name, self.document_id, self.task_id, self.workflow_id
+            )
         elif lvl == "INFO":
-            self.logger.info_msg(msg, self.file_name, self.document_id, self.task_id)
+            self.logger.info_msg(
+                msg, self.file_name, self.document_id, self.task_id, self.workflow_id
+            )
         elif lvl in ("WARN", "WARNING"):
-            self.logger.warning_msg(msg, self.file_name, self.document_id, self.task_id)
+            self.logger.warning_msg(
+                msg, self.file_name, self.document_id, self.task_id, self.workflow_id
+            )
         else:
-            self.logger.debug_msg(msg, self.file_name, self.document_id, self.task_id)
+            self.logger.debug_msg(
+                msg, self.file_name, self.document_id, self.task_id, self.workflow_id
+            )
 
 
 def _new_page_image_dict() -> typing.Dict[str, int]:
@@ -330,13 +338,21 @@ class DocumentRequest(BaseModel):
 
         lvl = level.upper()
         if lvl == "ERROR":
-            self.logger.error_msg(msg, self.file_name, self.document_id, self.task_id)
+            self.logger.error_msg(
+                msg, self.file_name, self.document_id, self.task_id, self.workflow_id
+            )
         elif lvl == "INFO":
-            self.logger.info_msg(msg, self.file_name, self.document_id, self.task_id)
+            self.logger.info_msg(
+                msg, self.file_name, self.document_id, self.task_id, self.workflow_id
+            )
         elif lvl in ("WARN", "WARNING"):
-            self.logger.warning_msg(msg, self.file_name, self.document_id, self.task_id)
+            self.logger.warning_msg(
+                msg, self.file_name, self.document_id, self.task_id, self.workflow_id
+            )
         else:
-            self.logger.debug_msg(msg, self.file_name, self.document_id, self.task_id)
+            self.logger.debug_msg(
+                msg, self.file_name, self.document_id, self.task_id, self.workflow_id
+            )
 
     def write_debug(self, file_name: str, data: typing.Any) -> None:
         if not self.debug_path:
