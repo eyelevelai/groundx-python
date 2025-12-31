@@ -12,6 +12,7 @@ from ..core.request_options import RequestOptions
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..types.message_response import MessageResponse
 from ..types.workflow_request_chunk_strategy import WorkflowRequestChunkStrategy
+from ..types.workflow_request_section_strategy import WorkflowRequestSectionStrategy
 from ..types.workflow_response import WorkflowResponse
 from ..types.workflow_steps import WorkflowSteps
 from ..types.workflows_response import WorkflowsResponse
@@ -65,6 +66,7 @@ class RawWorkflowsClient:
         chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
         extract: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[WorkflowResponse]:
@@ -80,6 +82,8 @@ class RawWorkflowsClient:
 
         extract : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Extract agent definitions.
+
+        section_strategy : typing.Optional[WorkflowRequestSectionStrategy]
 
         steps : typing.Optional[WorkflowSteps]
 
@@ -98,6 +102,7 @@ class RawWorkflowsClient:
                 "chunkStrategy": chunk_strategy,
                 "name": name,
                 "extract": extract,
+                "sectionStrategy": section_strategy,
                 "steps": convert_and_respect_annotation_metadata(
                     object_=steps, annotation=WorkflowSteps, direction="write"
                 ),
@@ -373,6 +378,7 @@ class RawWorkflowsClient:
         chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
         extract: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[WorkflowResponse]:
@@ -392,6 +398,8 @@ class RawWorkflowsClient:
         extract : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Extract agent definitions.
 
+        section_strategy : typing.Optional[WorkflowRequestSectionStrategy]
+
         steps : typing.Optional[WorkflowSteps]
 
         request_options : typing.Optional[RequestOptions]
@@ -409,6 +417,7 @@ class RawWorkflowsClient:
                 "chunkStrategy": chunk_strategy,
                 "name": name,
                 "extract": extract,
+                "sectionStrategy": section_strategy,
                 "steps": convert_and_respect_annotation_metadata(
                     object_=steps, annotation=WorkflowSteps, direction="write"
                 ),
@@ -520,6 +529,7 @@ class AsyncRawWorkflowsClient:
         chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
         extract: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[WorkflowResponse]:
@@ -535,6 +545,8 @@ class AsyncRawWorkflowsClient:
 
         extract : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Extract agent definitions.
+
+        section_strategy : typing.Optional[WorkflowRequestSectionStrategy]
 
         steps : typing.Optional[WorkflowSteps]
 
@@ -553,6 +565,7 @@ class AsyncRawWorkflowsClient:
                 "chunkStrategy": chunk_strategy,
                 "name": name,
                 "extract": extract,
+                "sectionStrategy": section_strategy,
                 "steps": convert_and_respect_annotation_metadata(
                     object_=steps, annotation=WorkflowSteps, direction="write"
                 ),
@@ -830,6 +843,7 @@ class AsyncRawWorkflowsClient:
         chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
         extract: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[WorkflowResponse]:
@@ -849,6 +863,8 @@ class AsyncRawWorkflowsClient:
         extract : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Extract agent definitions.
 
+        section_strategy : typing.Optional[WorkflowRequestSectionStrategy]
+
         steps : typing.Optional[WorkflowSteps]
 
         request_options : typing.Optional[RequestOptions]
@@ -866,6 +882,7 @@ class AsyncRawWorkflowsClient:
                 "chunkStrategy": chunk_strategy,
                 "name": name,
                 "extract": extract,
+                "sectionStrategy": section_strategy,
                 "steps": convert_and_respect_annotation_metadata(
                     object_=steps, annotation=WorkflowSteps, direction="write"
                 ),

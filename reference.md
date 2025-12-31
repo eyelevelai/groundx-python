@@ -2383,6 +2383,14 @@ client.workflows.create()
 <dl>
 <dd>
 
+**section_strategy:** `typing.Optional[WorkflowRequestSectionStrategy]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **steps:** `typing.Optional[WorkflowSteps]` 
     
 </dd>
@@ -2887,6 +2895,14 @@ client.workflows.update(
 <dd>
 
 **extract:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Extract agent definitions.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**section_strategy:** `typing.Optional[WorkflowRequestSectionStrategy]` 
     
 </dd>
 </dl>
