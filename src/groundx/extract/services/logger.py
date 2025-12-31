@@ -118,6 +118,7 @@ class Logger:
             if workflow_id:
                 logMsg["workflow_id"] = workflow_id
         else:
+            logMsg = ""
             prefix = ""
             if name:
                 if prefix != "":
