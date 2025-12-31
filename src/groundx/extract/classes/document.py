@@ -93,26 +93,88 @@ class Document(Group):
             try:
                 data = json.loads(stxt)
             except json.JSONDecodeError:
-                st.print("ERROR", f"\njson.JSONDecodeError stxt\n{stxt}\n\n")
+                st.print("ERROR", f"\njson.JSONDecodeError sectionSummary\n{stxt}\n\n")
                 continue
 
             for key, value in data.items():
                 err = st.add(key, value)
                 if err:
-                    raise Exception(f"\n\ninit document error:\n\t{err}\n")
+                    raise Exception(f"\n\ninit sectionSummary error:\n\t{err}\n")
 
             mtxt = chunk.suggestedText or "{}"
             mtxt = clean_json(mtxt)
             try:
                 data = json.loads(mtxt)
             except json.JSONDecodeError:
-                st.print("ERROR", f"\njson.JSONDecodeError mtxt\n{mtxt}\n\n")
+                st.print("ERROR", f"\njson.JSONDecodeError suggestedText\n{mtxt}\n\n")
                 continue
 
             for key, value in data.items():
                 err = st.add(key, value)
                 if err:
-                    raise Exception(f"\n\ninit document error:\n\t{err}\n")
+                    raise Exception(f"\n\ninit suggestedText error:\n\t{err}\n")
+
+            if chunk.chunkKeywords:
+                ntxt = chunk.chunkKeywords or "{}"
+                ntxt = clean_json(ntxt)
+                try:
+                    data = json.loads(ntxt)
+                except json.JSONDecodeError:
+                    st.print(
+                        "ERROR", f"\njson.JSONDecodeError chunkKeywords\n{ntxt}\n\n"
+                    )
+                    continue
+
+                for key, value in data.items():
+                    err = st.add(key, value)
+                    if err:
+                        raise Exception(f"\n\ninit chunkKeywords error:\n\t{err}\n")
+
+            if chunk.sectionKeywords:
+                ntxt = chunk.sectionKeywords or "{}"
+                ntxt = clean_json(ntxt)
+                try:
+                    data = json.loads(ntxt)
+                except json.JSONDecodeError:
+                    st.print(
+                        "ERROR", f"\njson.JSONDecodeError sectionKeywords\n{ntxt}\n\n"
+                    )
+                    continue
+
+                for key, value in data.items():
+                    err = st.add(key, value)
+                    if err:
+                        raise Exception(f"\n\ninit sectionKeywords error:\n\t{err}\n")
+
+            if chunk.fileKeywords:
+                ntxt = chunk.fileKeywords or "{}"
+                ntxt = clean_json(ntxt)
+                try:
+                    data = json.loads(ntxt)
+                except json.JSONDecodeError:
+                    st.print(
+                        "ERROR", f"\njson.JSONDecodeError fileKeywords\n{ntxt}\n\n"
+                    )
+                    continue
+
+                for key, value in data.items():
+                    err = st.add(key, value)
+                    if err:
+                        raise Exception(f"\n\ninit fileKeywords error:\n\t{err}\n")
+
+            if chunk.fileSummary:
+                ntxt = chunk.fileSummary or "{}"
+                ntxt = clean_json(ntxt)
+                try:
+                    data = json.loads(ntxt)
+                except json.JSONDecodeError:
+                    st.print("ERROR", f"\njson.JSONDecodeError fileSummary\n{ntxt}\n\n")
+                    continue
+
+                for key, value in data.items():
+                    err = st.add(key, value)
+                    if err:
+                        raise Exception(f"\n\ninit fileSummary error:\n\t{err}\n")
 
         st.finalize_init()
 
