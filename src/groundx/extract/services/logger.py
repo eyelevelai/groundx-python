@@ -8,10 +8,12 @@ class Logger:
         self,
         name: str,
         level: str,
+        output: str = "json",
     ) -> None:
         logging.config.dictConfig(logging_config(name, level))
 
         self.logger = logging.getLogger(name)
+        self.output = output.lower()
 
     def debug_msg(
         self,
@@ -19,8 +21,9 @@ class Logger:
         name: typing.Optional[str] = None,
         document_id: typing.Optional[str] = None,
         task_id: typing.Optional[str] = None,
+        workflow_id: typing.Optional[str] = None,
     ) -> None:
-        self.print_msg("DEBUG", msg, name, document_id, task_id)
+        self.print_msg("DEBUG", msg, name, document_id, task_id, workflow_id)
 
     def error_msg(
         self,
@@ -28,8 +31,9 @@ class Logger:
         name: typing.Optional[str] = None,
         document_id: typing.Optional[str] = None,
         task_id: typing.Optional[str] = None,
+        workflow_id: typing.Optional[str] = None,
     ) -> None:
-        self.print_msg("ERROR", msg, name, document_id, task_id)
+        self.print_msg("ERROR", msg, name, document_id, task_id, workflow_id)
 
     def info_msg(
         self,
@@ -37,8 +41,9 @@ class Logger:
         name: typing.Optional[str] = None,
         document_id: typing.Optional[str] = None,
         task_id: typing.Optional[str] = None,
+        workflow_id: typing.Optional[str] = None,
     ) -> None:
-        self.print_msg("INFO", msg, name, document_id, task_id)
+        self.print_msg("INFO", msg, name, document_id, task_id, workflow_id)
 
     def report_error(
         self,
@@ -85,8 +90,9 @@ class Logger:
         name: typing.Optional[str] = None,
         document_id: typing.Optional[str] = None,
         task_id: typing.Optional[str] = None,
+        workflow_id: typing.Optional[str] = None,
     ) -> None:
-        self.print_msg("WARNING", msg, name, document_id, task_id)
+        self.print_msg("WARNING", msg, name, document_id, task_id, workflow_id)
 
     def print_msg(
         self,
@@ -95,32 +101,51 @@ class Logger:
         name: typing.Optional[str] = None,
         document_id: typing.Optional[str] = None,
         task_id: typing.Optional[str] = None,
+        workflow_id: typing.Optional[str] = None,
     ) -> None:
-        prefix = ""
-        if name:
-            if prefix != "":
-                prefix += " "
-            prefix += f"[{name}]"
-        if document_id:
-            if prefix != "":
-                prefix += " "
-            prefix += f"d [{document_id}]"
-        if task_id:
-            if prefix != "":
-                prefix += " "
-            prefix += f"t [{task_id}]"
+        logMsg: typing.Union[str, typing.Dict[str, typing.Any]] = ""
 
-        text = ""
-        if prefix != "":
-            text += f"{prefix} "
-        text += f"\n\n\t>> {msg}\n"
+        if self.output == "json":
+            logMsg = {
+                "message": msg,
+            }
+            if name:
+                logMsg["file_name"] = name
+            if document_id:
+                logMsg["document_id"] = document_id
+            if task_id:
+                logMsg["task_id"] = task_id
+            if workflow_id:
+                logMsg["workflow_id"] = workflow_id
+        else:
+            prefix = ""
+            if name:
+                if prefix != "":
+                    prefix += " "
+                prefix += f"[{name}]"
+            if document_id:
+                if prefix != "":
+                    prefix += " "
+                prefix += f"d [{document_id}]"
+            if task_id:
+                if prefix != "":
+                    prefix += " "
+                prefix += f"t [{task_id}]"
+            if workflow_id:
+                if prefix != "":
+                    prefix += " "
+                prefix += f"t [{workflow_id}]"
+
+            if prefix != "":
+                logMsg += f"{prefix} "
+            logMsg += f"\n\n\t>> {msg}\n"
 
         lvl = level.upper()
         if lvl == "ERROR":
-            self.logger.error(text)
+            self.logger.error(logMsg)
         elif lvl in ("WARN", "WARNING"):
-            self.logger.warning(text)
+            self.logger.warning(logMsg)
         elif lvl == "INFO":
-            self.logger.info(text)
+            self.logger.info(logMsg)
         else:
-            self.logger.debug(text)
+            self.logger.debug(logMsg)
