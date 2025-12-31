@@ -135,7 +135,7 @@ class Logger:
             if workflow_id:
                 if prefix != "":
                     prefix += " "
-                prefix += f"t [{workflow_id}]"
+                prefix += f"w [{workflow_id}]"
 
             if prefix != "":
                 logMsg += f"{prefix} "

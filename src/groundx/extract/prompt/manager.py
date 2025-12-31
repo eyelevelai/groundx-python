@@ -61,7 +61,8 @@ class PromptManager:
                 print(f"workflows.cache_workflow [1] exception: {e}")
 
         self.logger.info_msg(
-            f"[{self._default_workflow_id}] [{self._default_file_name}.yaml] init"
+            f"[{self._default_file_name}.yaml] init",
+            workflow_id=self._default_workflow_id,
         )
 
         if self._default_workflow_id == "latest":
@@ -69,12 +70,16 @@ class PromptManager:
             try:
                 res = self._gx_client.workflows.get_account()
             except Exception as e:
-                self.logger.debug_msg(f"workflows.get_account exception: {e}")
+                self.logger.debug_msg(
+                    f"workflows.get_account exception: {e}",
+                    workflow_id=self._default_workflow_id,
+                )
 
             if res and res.workflow and res.workflow.workflow_id:
                 self.default_workflow_id = res.workflow.workflow_id
                 self.logger.info_msg(
-                    f"workflow_id from get_account, assigned to account: [{self.default_workflow_id}]"
+                    f"workflow_id from get_account, assigned to account",
+                    workflow_id=self.default_workflow_id,
                 )
 
                 try:
@@ -85,7 +90,8 @@ class PromptManager:
                     return
                 except Exception as e:
                     self.logger.debug_msg(
-                        f"workflows.cache_workflow [2] exception: {e}"
+                        f"workflows.cache_workflow [2] exception: {e}",
+                        workflow_id=self.default_workflow_id,
                     )
 
         if "latest" in self._default_file_name:
@@ -95,7 +101,8 @@ class PromptManager:
                     if wf.workflow_id and wf.relationships and wf.relationships.account:
                         self.default_workflow_id = wf.workflow_id
                         self.logger.info_msg(
-                            f"workflow_id from list, assigned to account: [{self.default_workflow_id}]"
+                            f"workflow_id from list, assigned to account",
+                            workflow_id=self.default_workflow_id,
                         )
 
                         try:
@@ -106,10 +113,14 @@ class PromptManager:
                             return
                         except Exception as e:
                             self.logger.debug_msg(
-                                f"workflows.cache_workflow [3] exception: {e}"
+                                f"workflows.cache_workflow [3] exception: {e}",
+                                workflow_id=self.default_workflow_id,
                             )
             except Exception as e:
-                self.logger.debug_msg(f"workflows.list exception: {e}")
+                self.logger.debug_msg(
+                    f"workflows.list exception: {e}",
+                    workflow_id=self.default_workflow_id,
+                )
 
     @property
     def default_file_name(self) -> str:
@@ -167,7 +178,8 @@ class PromptManager:
             raw, version = self._config_source.fetch(workflow_id)
         except Exception as e:
             self.logger.info_msg(
-                f"_config_source.fetch exception for [{workflow_id}] [{e}]\ntrying _cache_source [{file_name}.yaml]..."
+                f"_config_source.fetch exception [{e}]\ntrying _cache_source [{file_name}.yaml]...",
+                workflow_id=workflow_id,
             )
             raw, version = self._cache_source.fetch(file_name)
 
