@@ -23,6 +23,7 @@ class Document(Group):
     page_images: typing.List[str] = []
     source_url: str = ""
     task_id: str = ""
+    workflow_id: typing.Optional[str] = None
 
     _logger: typing.Optional[Logger] = PrivateAttr(default=None)
     _prompt_manager: typing.Optional[PromptManager] = PrivateAttr(default=None)
@@ -73,6 +74,7 @@ class Document(Group):
         st.document_id = req.document_id
         st.file_name = req.file_name
         st.task_id = req.task_id
+        st.workflow_id = req.workflow_id
 
         xray_doc = GroundXDocument(
             base_url=base_url,
@@ -156,7 +158,7 @@ class DocumentRequest(BaseModel):
     model_id: int = Field(alias="modelID")
     processor_id: int = Field(alias="processorID")
     task_id: str = Field(alias="taskID")
-    workflow_id: typing.Optional[str] = Field(alias="workflowID", default="latest")
+    workflow_id: typing.Optional[str] = Field(alias="workflowID", default=None)
 
     _logger: typing.Optional[Logger] = PrivateAttr(default=None)
 
