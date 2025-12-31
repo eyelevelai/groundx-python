@@ -7,6 +7,7 @@ import typing_extensions
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 from ..core.serialization import FieldMetadata
 from .workflow_request_chunk_strategy import WorkflowRequestChunkStrategy
+from .workflow_request_section_strategy import WorkflowRequestSectionStrategy
 from .workflow_steps import WorkflowSteps
 
 
@@ -24,6 +25,9 @@ class WorkflowRequest(UniversalBaseModel):
     Extract agent definitions.
     """
 
+    section_strategy: typing_extensions.Annotated[
+        typing.Optional[WorkflowRequestSectionStrategy], FieldMetadata(alias="sectionStrategy")
+    ] = None
     steps: typing.Optional[WorkflowSteps] = None
 
     if IS_PYDANTIC_V2:

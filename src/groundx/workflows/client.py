@@ -6,6 +6,7 @@ from ..core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ..core.request_options import RequestOptions
 from ..types.message_response import MessageResponse
 from ..types.workflow_request_chunk_strategy import WorkflowRequestChunkStrategy
+from ..types.workflow_request_section_strategy import WorkflowRequestSectionStrategy
 from ..types.workflow_response import WorkflowResponse
 from ..types.workflow_steps import WorkflowSteps
 from ..types.workflows_response import WorkflowsResponse
@@ -63,6 +64,7 @@ class WorkflowsClient:
         chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
         extract: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> WorkflowResponse:
@@ -78,6 +80,8 @@ class WorkflowsClient:
 
         extract : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Extract agent definitions.
+
+        section_strategy : typing.Optional[WorkflowRequestSectionStrategy]
 
         steps : typing.Optional[WorkflowSteps]
 
@@ -99,7 +103,12 @@ class WorkflowsClient:
         client.workflows.create()
         """
         _response = self._raw_client.create(
-            chunk_strategy=chunk_strategy, name=name, extract=extract, steps=steps, request_options=request_options
+            chunk_strategy=chunk_strategy,
+            name=name,
+            extract=extract,
+            section_strategy=section_strategy,
+            steps=steps,
+            request_options=request_options,
         )
         return _response.data
 
@@ -296,6 +305,7 @@ class WorkflowsClient:
         chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
         extract: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> WorkflowResponse:
@@ -314,6 +324,8 @@ class WorkflowsClient:
 
         extract : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Extract agent definitions.
+
+        section_strategy : typing.Optional[WorkflowRequestSectionStrategy]
 
         steps : typing.Optional[WorkflowSteps]
 
@@ -337,7 +349,13 @@ class WorkflowsClient:
         )
         """
         _response = self._raw_client.update(
-            id, chunk_strategy=chunk_strategy, name=name, extract=extract, steps=steps, request_options=request_options
+            id,
+            chunk_strategy=chunk_strategy,
+            name=name,
+            extract=extract,
+            section_strategy=section_strategy,
+            steps=steps,
+            request_options=request_options,
         )
         return _response.data
 
@@ -428,6 +446,7 @@ class AsyncWorkflowsClient:
         chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
         extract: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> WorkflowResponse:
@@ -443,6 +462,8 @@ class AsyncWorkflowsClient:
 
         extract : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Extract agent definitions.
+
+        section_strategy : typing.Optional[WorkflowRequestSectionStrategy]
 
         steps : typing.Optional[WorkflowSteps]
 
@@ -472,7 +493,12 @@ class AsyncWorkflowsClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.create(
-            chunk_strategy=chunk_strategy, name=name, extract=extract, steps=steps, request_options=request_options
+            chunk_strategy=chunk_strategy,
+            name=name,
+            extract=extract,
+            section_strategy=section_strategy,
+            steps=steps,
+            request_options=request_options,
         )
         return _response.data
 
@@ -719,6 +745,7 @@ class AsyncWorkflowsClient:
         chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
         extract: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> WorkflowResponse:
@@ -737,6 +764,8 @@ class AsyncWorkflowsClient:
 
         extract : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Extract agent definitions.
+
+        section_strategy : typing.Optional[WorkflowRequestSectionStrategy]
 
         steps : typing.Optional[WorkflowSteps]
 
@@ -768,7 +797,13 @@ class AsyncWorkflowsClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.update(
-            id, chunk_strategy=chunk_strategy, name=name, extract=extract, steps=steps, request_options=request_options
+            id,
+            chunk_strategy=chunk_strategy,
+            name=name,
+            extract=extract,
+            section_strategy=section_strategy,
+            steps=steps,
+            request_options=request_options,
         )
         return _response.data
 

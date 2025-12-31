@@ -8,6 +8,7 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 from ..core.serialization import FieldMetadata
 from .workflow_detail_chunk_strategy import WorkflowDetailChunkStrategy
 from .workflow_detail_relationships import WorkflowDetailRelationships
+from .workflow_detail_section_strategy import WorkflowDetailSectionStrategy
 from .workflow_steps import WorkflowSteps
 
 
@@ -41,6 +42,9 @@ class WorkflowDetail(UniversalBaseModel):
     Extract agent definitions.
     """
 
+    section_strategy: typing_extensions.Annotated[
+        typing.Optional[WorkflowDetailSectionStrategy], FieldMetadata(alias="sectionStrategy")
+    ] = None
     steps: typing.Optional[WorkflowSteps] = None
     relationships: typing.Optional[WorkflowDetailRelationships] = pydantic.Field(default=None)
     """

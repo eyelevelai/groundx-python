@@ -53,6 +53,7 @@ from .workflow_apply_request import WorkflowApplyRequest
 from .workflow_detail import WorkflowDetail
 from .workflow_detail_chunk_strategy import WorkflowDetailChunkStrategy
 from .workflow_detail_relationships import WorkflowDetailRelationships
+from .workflow_detail_section_strategy import WorkflowDetailSectionStrategy
 from .workflow_engine import WorkflowEngine
 from .workflow_engine_reasoning_effort import WorkflowEngineReasoningEffort
 from .workflow_engine_service import WorkflowEngineService
@@ -61,6 +62,7 @@ from .workflow_prompt_group import WorkflowPromptGroup
 from .workflow_prompt_role import WorkflowPromptRole
 from .workflow_request import WorkflowRequest
 from .workflow_request_chunk_strategy import WorkflowRequestChunkStrategy
+from .workflow_request_section_strategy import WorkflowRequestSectionStrategy
 from .workflow_response import WorkflowResponse
 from .workflow_step import WorkflowStep
 from .workflow_step_config import WorkflowStepConfig
@@ -120,6 +122,7 @@ __all__ = [
     "WorkflowDetail",
     "WorkflowDetailChunkStrategy",
     "WorkflowDetailRelationships",
+    "WorkflowDetailSectionStrategy",
     "WorkflowEngine",
     "WorkflowEngineReasoningEffort",
     "WorkflowEngineService",
@@ -128,6 +131,7 @@ __all__ = [
     "WorkflowPromptRole",
     "WorkflowRequest",
     "WorkflowRequestChunkStrategy",
+    "WorkflowRequestSectionStrategy",
     "WorkflowResponse",
     "WorkflowStep",
     "WorkflowStepConfig",
