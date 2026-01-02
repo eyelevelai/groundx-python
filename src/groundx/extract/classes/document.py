@@ -27,6 +27,7 @@ class Document(Group):
 
     _logger: typing.Optional[Logger] = PrivateAttr(default=None)
     _prompt_manager: typing.Optional[PromptManager] = PrivateAttr(default=None)
+    _upload: typing.Optional[Upload] = PrivateAttr(default=None)
 
     @property
     def logger(self) -> typing.Optional[Logger]:
@@ -58,6 +59,21 @@ class Document(Group):
     def prompt_manager(self) -> None:
         del self._prompt_manager
 
+    @property
+    def upload(self) -> typing.Optional[Upload]:
+        if self._upload:
+            return self._upload
+
+        return None
+
+    @upload.setter
+    def upload(self, value: Upload) -> None:
+        self._upload = value
+
+    @upload.deleter
+    def upload(self) -> None:
+        del self._upload
+
     @classmethod
     def from_request(
         cls: typing.Type[DocT],
@@ -66,10 +82,13 @@ class Document(Group):
         req: "DocumentRequest",
         prompt_manager: PromptManager,
         upload: typing.Optional[Upload] = None,
+        logger: typing.Optional[Logger] = None,
         **data: typing.Any,
     ) -> DocT:
         st = cls(**data)
+        st._logger = logger
         st._prompt_manager = prompt_manager
+        st._upload = upload
 
         st.document_id = req.document_id
         st.file_name = req.file_name
