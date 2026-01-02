@@ -32,7 +32,7 @@ class PromptManager:
 
         self._cache: typing.Dict[str, typing.Dict[str, Group]] = {}
         self._default_file_name: str = default_file_name.replace(".yaml", "")
-        self._default_workflow_id: str = default_workflow_id
+        self._default_workflow_id: str = default_workflow_id.replace(".yaml", "")
 
         if gx_client:
             self._gx_client = gx_client
