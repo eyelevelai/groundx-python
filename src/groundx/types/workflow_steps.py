@@ -17,6 +17,7 @@ class WorkflowSteps(UniversalBaseModel):
     chunk_instruct: typing_extensions.Annotated[
         typing.Optional[WorkflowStep], FieldMetadata(alias="chunk-instruct")
     ] = None
+    chunk_keys: typing_extensions.Annotated[typing.Optional[WorkflowStep], FieldMetadata(alias="chunk-keys")] = None
     chunk_summary: typing_extensions.Annotated[typing.Optional[WorkflowStep], FieldMetadata(alias="chunk-summary")] = (
         None
     )
@@ -26,6 +27,7 @@ class WorkflowSteps(UniversalBaseModel):
     sect_instruct: typing_extensions.Annotated[typing.Optional[WorkflowStep], FieldMetadata(alias="sect-instruct")] = (
         None
     )
+    sect_keys: typing_extensions.Annotated[typing.Optional[WorkflowStep], FieldMetadata(alias="sect-keys")] = None
     sect_summary: typing_extensions.Annotated[typing.Optional[WorkflowStep], FieldMetadata(alias="sect-summary")] = None
 
     if IS_PYDANTIC_V2:
