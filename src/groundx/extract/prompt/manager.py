@@ -24,13 +24,19 @@ class PromptManager:
         config_source: Source,
         gx_client: typing.Optional[GroundX] = None,
         logger: typing.Optional[Logger] = None,
-        default_file_name: str = "latest",
-        default_workflow_id: str = "latest",
+        default_file_name: typing.Optional[str] = None,
+        default_workflow_id: typing.Optional[str] = None,
     ) -> None:
         self._cache_source: Source = cache_source
         self._config_source: Source = config_source
 
         self._cache: typing.Dict[str, typing.Dict[str, Group]] = {}
+
+        if not default_file_name:
+            default_file_name = "latest"
+        if not default_workflow_id:
+            default_workflow_id = "latest"
+
         self._default_file_name: str = default_file_name.replace(".yaml", "")
         self._default_workflow_id: str = default_workflow_id.replace(".yaml", "")
 
