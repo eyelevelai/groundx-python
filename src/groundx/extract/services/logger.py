@@ -22,8 +22,9 @@ class Logger:
         document_id: typing.Optional[str] = None,
         task_id: typing.Optional[str] = None,
         workflow_id: typing.Optional[str] = None,
+        extras: typing.Dict[str, typing.Any] = {},
     ) -> None:
-        self.print_msg("DEBUG", msg, name, document_id, task_id, workflow_id)
+        self.print_msg("DEBUG", msg, name, document_id, task_id, workflow_id, extras)
 
     def error_msg(
         self,
@@ -32,8 +33,9 @@ class Logger:
         document_id: typing.Optional[str] = None,
         task_id: typing.Optional[str] = None,
         workflow_id: typing.Optional[str] = None,
+        extras: typing.Dict[str, typing.Any] = {},
     ) -> None:
-        self.print_msg("ERROR", msg, name, document_id, task_id, workflow_id)
+        self.print_msg("ERROR", msg, name, document_id, task_id, workflow_id, extras)
 
     def info_msg(
         self,
@@ -42,8 +44,9 @@ class Logger:
         document_id: typing.Optional[str] = None,
         task_id: typing.Optional[str] = None,
         workflow_id: typing.Optional[str] = None,
+        extras: typing.Dict[str, typing.Any] = {},
     ) -> None:
-        self.print_msg("INFO", msg, name, document_id, task_id, workflow_id)
+        self.print_msg("INFO", msg, name, document_id, task_id, workflow_id, extras)
 
     def report_error(
         self,
@@ -91,8 +94,9 @@ class Logger:
         document_id: typing.Optional[str] = None,
         task_id: typing.Optional[str] = None,
         workflow_id: typing.Optional[str] = None,
+        extras: typing.Dict[str, typing.Any] = {},
     ) -> None:
-        self.print_msg("WARNING", msg, name, document_id, task_id, workflow_id)
+        self.print_msg("WARNING", msg, name, document_id, task_id, workflow_id, extras)
 
     def print_msg(
         self,
@@ -102,6 +106,7 @@ class Logger:
         document_id: typing.Optional[str] = None,
         task_id: typing.Optional[str] = None,
         workflow_id: typing.Optional[str] = None,
+        extras: typing.Dict[str, typing.Any] = {},
     ) -> None:
         logMsg: typing.Union[str, typing.Dict[str, typing.Any]] = ""
 
@@ -117,6 +122,8 @@ class Logger:
                 logMsg["task_id"] = task_id
             if workflow_id:
                 logMsg["workflow_id"] = workflow_id
+            for k, v in extras.items():
+                logMsg[k] = v
         else:
             logMsg = ""
             prefix = ""
@@ -136,6 +143,17 @@ class Logger:
                 if prefix != "":
                     prefix += " "
                 prefix += f"w [{workflow_id}]"
+
+            ex = ""
+            for k, v in extras.items():
+                if ex != "":
+                    ex += " "
+                ex += f"{k} [{v}]"
+
+            if ex != "":
+                if prefix != "":
+                    prefix += "\n"
+                prefix += ex
 
             if prefix != "":
                 logMsg += f"{prefix} "
