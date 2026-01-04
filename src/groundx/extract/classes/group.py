@@ -3,7 +3,13 @@ import typing
 from .element import Element
 from .field import ExtractedField
 
-from pydantic import Field, model_serializer, model_validator, PrivateAttr
+from pydantic import (
+    Field,
+    model_serializer,
+    model_validator,
+    PrivateAttr,
+    SerializeAsAny,
+)
 from typing_extensions import Annotated
 
 
@@ -11,7 +17,11 @@ class Group(Element):
     fields: Annotated[
         typing.Dict[
             str,
-            typing.Union[Element, typing.Dict[str, Element], typing.Sequence[Element]],
+            typing.Union[
+                SerializeAsAny[Element],
+                typing.Dict[str, SerializeAsAny[Element]],
+                typing.Sequence[SerializeAsAny[Element]],
+            ],
         ],
         Field(default_factory=dict),
     ]
