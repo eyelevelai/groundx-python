@@ -10,21 +10,17 @@ from pydantic import (
     PrivateAttr,
     SerializeAsAny,
 )
-from typing_extensions import Annotated
 
 
 class Group(Element):
-    fields: Annotated[
-        typing.Dict[
-            str,
-            typing.Union[
-                SerializeAsAny[Element],
-                typing.Dict[str, SerializeAsAny[Element]],
-                typing.Sequence[SerializeAsAny[Element]],
-            ],
+    fields: typing.Dict[
+        str,
+        typing.Union[
+            SerializeAsAny[Element],
+            typing.Dict[str, SerializeAsAny[Element]],
+            typing.Sequence[SerializeAsAny[Element]],
         ],
-        Field(default_factory=dict),
-    ]
+    ] = Field(default_factory=dict)
 
     _remove_fields: bool = PrivateAttr(default=True)
 
