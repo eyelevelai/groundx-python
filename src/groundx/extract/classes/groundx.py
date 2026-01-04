@@ -60,22 +60,16 @@ class BoundingBox(BaseModel):
 
 
 class Chunk(BaseModel):
-    boundingBoxes: Annotated[
-        typing.Optional[typing.List[BoundingBox]], Field(default_factory=list)
-    ]
+    boundingBoxes: Annotated[typing.List[BoundingBox], Field(default_factory=list)]
     chunk: typing.Optional[str] = None
     chunkKeywords: typing.Optional[str] = None
-    contentType: Annotated[
-        typing.Optional[typing.List[str]], Field(default_factory=list)
-    ]
+    contentType: Annotated[typing.List[str], Field(default_factory=list)]
     fileKeywords: typing.Optional[str] = None
     fileSummary: typing.Optional[str] = None
     json_: typing.Optional[typing.List[typing.Any]] = Field(None, alias="json")
     multimodalUrl: typing.Optional[str] = None
     narrative: typing.Optional[typing.List[str]] = None
-    pageNumbers: Annotated[
-        typing.Optional[typing.List[int]], Field(default_factory=list)
-    ]
+    pageNumbers: Annotated[typing.List[int], Field(default_factory=list)]
     sectionKeywords: typing.Optional[str] = None
     sectionSummary: typing.Optional[str] = None
     suggestedText: typing.Optional[str] = None
