@@ -1,4 +1,4 @@
-import inspect, logging, logging.config, typing
+import inspect, json, logging, logging.config, typing
 
 from .logging_cfg import logging_config
 
@@ -118,22 +118,23 @@ class Logger:
         workflow_id: typing.Optional[str] = None,
         extras: typing.Dict[str, typing.Any] = {},
     ) -> None:
-        logMsg: typing.Union[str, typing.Dict[str, typing.Any]] = ""
+        logMsg: str = ""
 
         if self.output == "json":
-            logMsg = {
+            logDict: typing.Dict[str, typing.Any] = {
                 "message": msg,
             }
             if name:
-                logMsg["file_name"] = name
+                logDict["file_name"] = name
             if document_id:
-                logMsg["document_id"] = document_id
+                logDict["document_id"] = document_id
             if task_id:
-                logMsg["task_id"] = task_id
+                logDict["task_id"] = task_id
             if workflow_id:
-                logMsg["workflow_id"] = workflow_id
+                logDict["workflow_id"] = workflow_id
             for k, v in extras.items():
-                logMsg[k] = v
+                logDict[k] = v
+            logMsg = json.dumps(logDict)
         else:
             logMsg = ""
             prefix = ""
