@@ -1,11 +1,13 @@
 import dateparser, typing
+from pydantic import Field
+from typing_extensions import Annotated
 
 from .element import Element
 
 
 class ExtractedField(Element):
     confidence: typing.Optional[str] = None
-    conflicts: typing.List[typing.Any] = []
+    conflicts: Annotated[typing.List[typing.Any], Field(default_factory=list)]
 
     value: typing.Optional[typing.Union[str, float, typing.List[typing.Any]]] = ""
 

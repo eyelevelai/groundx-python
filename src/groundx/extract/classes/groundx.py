@@ -1,9 +1,8 @@
-from __future__ import annotations
 import json, requests, typing
 from pathlib import Path
 
 from pydantic import BaseModel, ConfigDict, Field
-from typing import Annotated
+from typing_extensions import Annotated
 
 from ..services.upload import Upload
 
@@ -66,7 +65,9 @@ class Chunk(BaseModel):
     ]
     chunk: typing.Optional[str] = None
     chunkKeywords: typing.Optional[str] = None
-    contentType: typing.Optional[typing.List[str]] = Field(default_factory=list)
+    contentType: Annotated[
+        typing.Optional[typing.List[str]], Field(default_factory=list)
+    ]
     fileKeywords: typing.Optional[str] = None
     fileSummary: typing.Optional[str] = None
     json_: typing.Optional[typing.List[typing.Any]] = Field(None, alias="json")
