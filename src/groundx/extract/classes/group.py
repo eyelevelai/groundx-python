@@ -63,19 +63,21 @@ class Group(Element):
     @model_serializer(mode="wrap")
     def _flatten_fields(
         self,
-        handler: typing.Callable[[typing.Any], typing.Dict[str, typing.Any]],
-    ) -> typing.Dict[str, typing.Any]:
+        handler: typing.Callable[[typing.Any], typing.Any],
+    ) -> typing.Any:
         if not self._remove_fields:
             return handler(self)
 
-        data = handler(self)
+        data_any = handler(self)
 
-        raw_fields = typing.cast(
-            typing.Dict[str, typing.Any],
-            data.pop("fields", {}) or {},
-        )
+        if not isinstance(data_any, dict):
+            return data_any
 
-        data.update(raw_fields)
+        data = typing.cast(dict[str, typing.Any], data_any)
+
+        raw_fields = data.pop("fields", None)
+        if isinstance(raw_fields, dict):
+            data.update(typing.cast(dict[str, typing.Any], raw_fields))
 
         return data
 
