@@ -1,5 +1,5 @@
 import typing
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, Field
 
 from .document import Document, DocumentRequest
 
@@ -8,7 +8,9 @@ DocT = typing.TypeVar("DocT", bound=Document)
 
 
 class AgentRequest(BaseModel, typing.Generic[ReqT, DocT]):
-    allowed_request_types: typing.ClassVar[typing.List[str]] = []
+    allowed_request_types: typing.ClassVar[typing.List[str]] = Field(
+        default_factory=list
+    )
     request: ReqT
     request_type: str
     statement: DocT

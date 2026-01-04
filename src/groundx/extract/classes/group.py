@@ -3,13 +3,13 @@ import typing
 from .element import Element
 from .field import ExtractedField
 
-from pydantic import model_serializer, model_validator, PrivateAttr
+from pydantic import Field, model_serializer, model_validator, PrivateAttr
 
 
 class Group(Element):
     fields: typing.Dict[
         str, typing.Union[Element, typing.Dict[str, Element], typing.Sequence[Element]]
-    ] = {}
+    ] = Field(default_factory=dict)
 
     _remove_fields: bool = PrivateAttr(default=True)
 
