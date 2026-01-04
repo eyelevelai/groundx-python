@@ -1,7 +1,9 @@
+from __future__ import annotations
 import json, requests, typing
 from pathlib import Path
 
 from pydantic import BaseModel, ConfigDict, Field
+from typing import Annotated
 
 from ..services.upload import Upload
 
@@ -59,16 +61,20 @@ class BoundingBox(BaseModel):
 
 
 class Chunk(BaseModel):
-    boundingBoxes: typing.Optional[typing.List[BoundingBox]] = []
+    boundingBoxes: Annotated[
+        typing.Optional[typing.List[BoundingBox]], Field(default_factory=list)
+    ]
     chunk: typing.Optional[str] = None
     chunkKeywords: typing.Optional[str] = None
-    contentType: typing.Optional[typing.List[str]] = []
+    contentType: typing.Optional[typing.List[str]] = Field(default_factory=list)
     fileKeywords: typing.Optional[str] = None
     fileSummary: typing.Optional[str] = None
     json_: typing.Optional[typing.List[typing.Any]] = Field(None, alias="json")
     multimodalUrl: typing.Optional[str] = None
     narrative: typing.Optional[typing.List[str]] = None
-    pageNumbers: typing.Optional[typing.List[int]] = []
+    pageNumbers: Annotated[
+        typing.Optional[typing.List[int]], Field(default_factory=list)
+    ]
     sectionKeywords: typing.Optional[str] = None
     sectionSummary: typing.Optional[str] = None
     suggestedText: typing.Optional[str] = None
@@ -85,7 +91,7 @@ class DocumentPage(BaseModel):
 
 class XRayDocument(BaseModel):
     chunks: typing.List[Chunk]
-    documentPages: typing.List[DocumentPage] = []
+    documentPages: Annotated[typing.List[DocumentPage], Field(default_factory=list)]
     sourceUrl: str
     fileKeywords: typing.Optional[str] = None
     fileName: typing.Optional[str] = None

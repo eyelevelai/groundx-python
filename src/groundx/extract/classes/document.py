@@ -20,7 +20,7 @@ DocT = typing.TypeVar("DocT", bound="Document")
 class Document(Group):
     file_name: str = ""
     document_id: str = ""
-    page_images: typing.List[str] = []
+    page_images: typing.List[str] = Field(default_factory=list)
     source_url: str = ""
     task_id: str = ""
     workflow_id: typing.Optional[str] = None
