@@ -1,6 +1,16 @@
-import logging, logging.config, typing
+import inspect, logging, logging.config, typing
 
 from .logging_cfg import logging_config
+
+
+def caller_info() -> typing.Dict[str, typing.Any]:
+    f = inspect.currentframe()
+    c = inspect.getouterframes(f, 2)[1]
+    return {
+        "caller_function": c.function,
+        "caller_file": c.filename,
+        "caller_line": c.lineno,
+    }
 
 
 class Logger:
