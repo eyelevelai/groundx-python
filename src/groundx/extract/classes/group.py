@@ -73,11 +73,11 @@ class Group(Element):
         if not isinstance(data_any, dict):
             return data_any
 
-        data = typing.cast(dict[str, typing.Any], data_any)
+        data = typing.cast(typing.Dict[str, typing.Any], data_any)
 
         raw_fields = data.pop("fields", None)
         if isinstance(raw_fields, dict):
-            data.update(typing.cast(dict[str, typing.Any], raw_fields))
+            data.update(typing.cast(typing.Dict[str, typing.Any], raw_fields))
 
         return data
 
