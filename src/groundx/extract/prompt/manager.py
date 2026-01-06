@@ -55,7 +55,7 @@ class PromptManager:
             or not gx_client
             or not logger
         ):
-            print(
+            self.logger.info_msg(
                 f"[{self._default_workflow_id}] [{self._default_file_name}.yaml] loading cache_workflow"
             )
 
@@ -64,7 +64,7 @@ class PromptManager:
                 self.is_init = True
                 return
             except Exception as e:
-                print(f"workflows.cache_workflow [1] exception: {e}")
+                self.logger.debug_msg(f"workflows.cache_workflow [1] exception: {e}")
 
         self.logger.info_msg(
             f"[{self._default_file_name}.yaml] init",
