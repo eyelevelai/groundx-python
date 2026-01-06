@@ -147,6 +147,8 @@ class XRayDocument(BaseModel):
                 with cache_file.open("w", encoding="utf-8") as f:
                     json.dump(payload, f)
             except Exception as e:
-                print(f"Warning: failed to write X-ray JSON cache to {cache_file}: {e}")
+                raise RuntimeError(
+                    f"Failed to write X-ray JSON cache to {cache_file}: {e}"
+                )
 
         return cls(**payload)

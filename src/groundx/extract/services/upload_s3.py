@@ -25,7 +25,7 @@ class S3Client:
 
     def get_object(self, url: str) -> typing.Optional[bytes]:
         if not self.client:
-            print("get_object no client")
+            self.logger.warning_msg("get_object no client")
             return None
 
         try:
@@ -42,7 +42,7 @@ class S3Client:
         self, url: str
     ) -> typing.Optional[typing.Tuple[bytes, typing.Dict[str, str]]]:
         if not self.client:
-            print("get_object no client")
+            self.logger.warning_msg("get_object no client")
             return None
 
         try:
@@ -63,7 +63,7 @@ class S3Client:
 
     def head_object(self, url: str) -> typing.Optional[typing.Dict[str, str]]:
         if not self.client:
-            print("head_object no client")
+            self.logger.warning_msg("head_object no client")
             return None
 
         try:
