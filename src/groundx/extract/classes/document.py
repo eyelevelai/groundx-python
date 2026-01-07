@@ -207,7 +207,9 @@ class Document(Group):
     def finalize_init(self) -> None:
         self.print("WARNING", "finalize_init is not implemented")
 
-    def print(self, level: str, msg: str) -> None:
+    def print(
+        self, level: str, msg: str, extras: typing.Dict[str, typing.Any] = {}
+    ) -> None:
         if not self.logger:
             print(msg)
             return
@@ -215,19 +217,39 @@ class Document(Group):
         lvl = level.upper()
         if lvl == "ERROR":
             self.logger.error_msg(
-                msg, self.file_name, self.document_id, self.task_id, self.workflow_id
+                msg=msg,
+                name=self.file_name,
+                document_id=self.document_id,
+                task_id=self.task_id,
+                workflow_id=self.workflow_id,
+                extras=extras,
             )
         elif lvl == "INFO":
             self.logger.info_msg(
-                msg, self.file_name, self.document_id, self.task_id, self.workflow_id
+                msg=msg,
+                name=self.file_name,
+                document_id=self.document_id,
+                task_id=self.task_id,
+                workflow_id=self.workflow_id,
+                extras=extras,
             )
         elif lvl in ("WARN", "WARNING"):
             self.logger.warning_msg(
-                msg, self.file_name, self.document_id, self.task_id, self.workflow_id
+                msg=msg,
+                name=self.file_name,
+                document_id=self.document_id,
+                task_id=self.task_id,
+                workflow_id=self.workflow_id,
+                extras=extras,
             )
         else:
             self.logger.debug_msg(
-                msg, self.file_name, self.document_id, self.task_id, self.workflow_id
+                msg=msg,
+                name=self.file_name,
+                document_id=self.document_id,
+                task_id=self.task_id,
+                workflow_id=self.workflow_id,
+                extras=extras,
             )
 
 
@@ -412,7 +434,9 @@ class DocumentRequest(BaseModel):
 
         return pageImages
 
-    def print(self, level: str, msg: str) -> None:
+    def print(
+        self, level: str, msg: str, extras: typing.Dict[str, typing.Any] = {}
+    ) -> None:
         if not self.logger:
             print(msg)
             return
@@ -420,19 +444,39 @@ class DocumentRequest(BaseModel):
         lvl = level.upper()
         if lvl == "ERROR":
             self.logger.error_msg(
-                msg, self.file_name, self.document_id, self.task_id, self.workflow_id
+                msg=msg,
+                name=self.file_name,
+                document_id=self.document_id,
+                task_id=self.task_id,
+                workflow_id=self.workflow_id,
+                extras=extras,
             )
         elif lvl == "INFO":
             self.logger.info_msg(
-                msg, self.file_name, self.document_id, self.task_id, self.workflow_id
+                msg=msg,
+                name=self.file_name,
+                document_id=self.document_id,
+                task_id=self.task_id,
+                workflow_id=self.workflow_id,
+                extras=extras,
             )
         elif lvl in ("WARN", "WARNING"):
             self.logger.warning_msg(
-                msg, self.file_name, self.document_id, self.task_id, self.workflow_id
+                msg=msg,
+                name=self.file_name,
+                document_id=self.document_id,
+                task_id=self.task_id,
+                workflow_id=self.workflow_id,
+                extras=extras,
             )
         else:
             self.logger.debug_msg(
-                msg, self.file_name, self.document_id, self.task_id, self.workflow_id
+                msg=msg,
+                name=self.file_name,
+                document_id=self.document_id,
+                task_id=self.task_id,
+                workflow_id=self.workflow_id,
+                extras=extras,
             )
 
     def write_debug(self, file_name: str, data: typing.Any) -> None:
