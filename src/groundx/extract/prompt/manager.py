@@ -44,6 +44,8 @@ class PromptManager:
             self._gx_client = gx_client
         if logger:
             self._logger = logger
+        else:
+            self.logger = Logger("prompt-manager", "WARNING")
 
         self._versions: typing.Dict[str, str] = {}
 

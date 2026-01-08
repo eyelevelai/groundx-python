@@ -123,6 +123,78 @@ class TestGroundX(unittest.TestCase):
                 test_xray(gx)
             self.assertIn("Field required", str(cm.exception))
 
+    def test_xray_get_extract(self) -> None:
+        xray_doc = XRayDocument.model_validate(
+            {
+                "chunks": [
+                    {
+                        "boundingBoxes": [
+                            {
+                                "bottomRightX": 10.0,
+                                "bottomRightY": 20.0,
+                                "topLeftX": 1.0,
+                                "topLeftY": 2.0,
+                                "corrected": True,
+                                "pageNumber": 1,
+                            }
+                        ],
+                        "chunk": "foo",
+                        "contentType": ["paragraph"],
+                        "json": [{"a": 1}],
+                        "multimodalUrl": None,
+                        "narrative": ["narr1"],
+                        "pageNumbers": [1],
+                        "sectionSummary": None,
+                        "suggestedText": None,
+                        "text": "hello",
+                    }
+                ],
+                "documentPages": [
+                    {
+                        "chunks": [{"text": "hello"}],
+                        "height": 500,
+                        "pageNumber": 1,
+                        "pageUrl": "https://page.jpg",
+                        "width": 400,
+                    }
+                ],
+                "sourceUrl": "https://doc.pdf",
+                "fileKeywords": "kw",
+                "fileName": "file.pdf",
+                "fileType": "pdf",
+                "fileSummary": "sum",
+                "language": "en",
+            }
+        )
+
+        self.maxDiff = None
+        self.assertEqual(
+            xray_doc.get_extract(),
+            {
+                "chunks": [
+                    {
+                        "chunk": "foo",
+                        "contentType": ["paragraph"],
+                        "pageNumbers": [1],
+                    }
+                ],
+                "documentPages": [
+                    {
+                        "height": 500,
+                        "pageNumber": 1,
+                        "pageUrl": "https://page.jpg",
+                        "width": 400,
+                    }
+                ],
+                "sourceUrl": "https://doc.pdf",
+                "fileKeywords": "kw",
+                "fileName": "file.pdf",
+                "fileType": "pdf",
+                "fileSummary": "sum",
+                "language": "en",
+            },
+        )
+
     def test_xray_method_delegates_to_download(self) -> None:
         gx = GD(base_url="", documentID="X", taskID="Y")
 
@@ -207,7 +279,7 @@ class TestGroundX(unittest.TestCase):
             self.assertIsInstance(chunk, Chunk)
             self.assertEqual(chunk.chunk, "foo")
             bb: typing.Optional[BoundingBox] = None
-            if chunk.boundingBoxes is not None and len(chunk.boundingBoxes) > 0:
+            if len(chunk.boundingBoxes) > 0:
                 bb = chunk.boundingBoxes[0]
             self.assertIsInstance(bb, BoundingBox)
             assert bb is not None, "BoundingBox should not be None"
