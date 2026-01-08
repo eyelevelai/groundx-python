@@ -75,6 +75,20 @@ class Chunk(BaseModel):
     suggestedText: typing.Optional[str] = None
     text: typing.Optional[str] = None
 
+    def get_extract(self) -> typing.Dict[str, typing.Any]:
+        chunk_dict = self.model_dump(exclude_none=True)
+
+        if "boundingBoxes" in chunk_dict:
+            chunk_dict.pop("boundingBoxes")
+        if "json_" in chunk_dict:
+            chunk_dict.pop("json_")
+        if "narrative" in chunk_dict:
+            chunk_dict.pop("narrative")
+        if "text" in chunk_dict:
+            chunk_dict.pop("text")
+
+        return chunk_dict
+
 
 class DocumentPage(BaseModel):
     chunks: typing.List[Chunk]
@@ -82,6 +96,14 @@ class DocumentPage(BaseModel):
     pageNumber: int
     pageUrl: str
     width: float
+
+    def get_extract(self) -> typing.Dict[str, typing.Any]:
+        page_dict = self.model_dump(exclude_none=True)
+
+        if "chunks" in page_dict:
+            page_dict.pop("chunks")
+
+        return page_dict
 
 
 class XRayDocument(BaseModel):
@@ -152,3 +174,18 @@ class XRayDocument(BaseModel):
                 )
 
         return cls(**payload)
+
+    def get_extract(self) -> typing.Dict[str, typing.Any]:
+        xray_dict = self.model_dump(exclude_none=True)
+
+        chunks_list: typing.List[typing.Dict[str, typing.Any]] = []
+        for c in self.chunks:
+            chunks_list.append(c.get_extract())
+        xray_dict["chunks"] = chunks_list
+
+        pages_list: typing.List[typing.Dict[str, typing.Any]] = []
+        for p in self.documentPages:
+            pages_list.append(p.get_extract())
+        xray_dict["documentPages"] = pages_list
+
+        return xray_dict
