@@ -59,6 +59,16 @@ class BoundingBox(BaseModel):
     pageNumber: typing.Optional[int]
 
 
+json_fields: typing.List[str] = [
+    "chunkKeywords",
+    "fileKeywords",
+    "fileSummary",
+    "sectionKeywords",
+    "sectionSummary",
+    "suggestedText",
+]
+
+
 class Chunk(BaseModel):
     boundingBoxes: Annotated[typing.List[BoundingBox], Field(default_factory=list)]
     chunk: typing.Optional[str] = None
@@ -86,6 +96,13 @@ class Chunk(BaseModel):
             chunk_dict.pop("narrative")
         if "text" in chunk_dict:
             chunk_dict.pop("text")
+
+        for k, v in chunk_dict.items():
+            if k in json_fields:
+                try:
+                    chunk_dict[k] = json.loads(v)
+                except:
+                    continue
 
         return chunk_dict
 

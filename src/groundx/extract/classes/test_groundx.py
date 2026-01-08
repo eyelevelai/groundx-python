@@ -139,6 +139,7 @@ class TestGroundX(unittest.TestCase):
                             }
                         ],
                         "chunk": "foo",
+                        "chunkKeywords": '{"foo":"bar"}',
                         "contentType": ["paragraph"],
                         "json": [{"a": 1}],
                         "multimodalUrl": None,
@@ -174,6 +175,7 @@ class TestGroundX(unittest.TestCase):
                 "chunks": [
                     {
                         "chunk": "foo",
+                        "chunkKeywords": {"foo": "bar"},
                         "contentType": ["paragraph"],
                         "pageNumbers": [1],
                     }
