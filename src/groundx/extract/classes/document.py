@@ -6,7 +6,7 @@ from PIL import Image
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 from urllib.parse import urlparse
 
-from .groundx import GroundXDocument
+from .groundx import GroundXDocument, XRayDocument
 from .group import Group
 from ..prompt.manager import PromptManager
 from ..services.logger import Logger
@@ -86,14 +86,6 @@ class Document(Group):
         **data: typing.Any,
     ) -> DocT:
         st = cls(**data)
-        st._logger = logger
-        st._prompt_manager = prompt_manager
-        st._upload = upload
-
-        st.document_id = req.document_id
-        st.file_name = req.file_name
-        st.task_id = req.task_id
-        st.workflow_id = req.workflow_id
 
         xray_doc = GroundXDocument(
             base_url=base_url,
@@ -101,22 +93,51 @@ class Document(Group):
             taskID=req.task_id,
         ).xray(upload=upload, cache_dir=cache_dir, clear_cache=req.clear_cache)
 
-        for page in xray_doc.documentPages:
-            st.page_images.append(page.pageUrl)
+        st.load_xray(
+            req=req,
+            xray=xray_doc,
+            prompt_manager=prompt_manager,
+            upload=upload,
+            logger=logger,
+        )
 
-        st.source_url = xray_doc.sourceUrl
+        return st
 
-        for chunk in xray_doc.chunks:
+    def load_xray(
+        self,
+        req: "DocumentRequest",
+        xray: XRayDocument,
+        prompt_manager: PromptManager,
+        upload: typing.Optional[Upload] = None,
+        logger: typing.Optional[Logger] = None,
+    ) -> None:
+        self._logger = logger
+        self._prompt_manager = prompt_manager
+        self._upload = upload
+
+        self.document_id = req.document_id
+        self.file_name = req.file_name
+        self.task_id = req.task_id
+        self.workflow_id = req.workflow_id
+
+        for page in xray.documentPages:
+            self.page_images.append(page.pageUrl)
+
+        self.source_url = xray.sourceUrl
+
+        for chunk in xray.chunks:
             stxt = chunk.sectionSummary or "{}"
             stxt = clean_json(stxt)
             try:
                 data = json.loads(stxt)
             except json.JSONDecodeError:
-                st.print("ERROR", f"\njson.JSONDecodeError sectionSummary\n{stxt}\n\n")
+                self.print(
+                    "ERROR", f"\njson.JSONDecodeError sectionSummary\n{stxt}\n\n"
+                )
                 continue
 
             for key, value in data.items():
-                err = st.add(key, value)
+                err = self.add(key, value)
                 if err:
                     raise Exception(f"\n\ninit sectionSummary error:\n\t{err}\n")
 
@@ -125,11 +146,11 @@ class Document(Group):
             try:
                 data = json.loads(mtxt)
             except json.JSONDecodeError:
-                st.print("ERROR", f"\njson.JSONDecodeError suggestedText\n{mtxt}\n\n")
+                self.print("ERROR", f"\njson.JSONDecodeError suggestedText\n{mtxt}\n\n")
                 continue
 
             for key, value in data.items():
-                err = st.add(key, value)
+                err = self.add(key, value)
                 if err:
                     raise Exception(f"\n\ninit suggestedText error:\n\t{err}\n")
 
@@ -139,13 +160,13 @@ class Document(Group):
                 try:
                     data = json.loads(ntxt)
                 except json.JSONDecodeError:
-                    st.print(
+                    self.print(
                         "ERROR", f"\njson.JSONDecodeError chunkKeywords\n{ntxt}\n\n"
                     )
                     continue
 
                 for key, value in data.items():
-                    err = st.add(key, value)
+                    err = self.add(key, value)
                     if err:
                         raise Exception(f"\n\ninit chunkKeywords error:\n\t{err}\n")
 
@@ -155,13 +176,13 @@ class Document(Group):
                 try:
                     data = json.loads(ntxt)
                 except json.JSONDecodeError:
-                    st.print(
+                    self.print(
                         "ERROR", f"\njson.JSONDecodeError sectionKeywords\n{ntxt}\n\n"
                     )
                     continue
 
                 for key, value in data.items():
-                    err = st.add(key, value)
+                    err = self.add(key, value)
                     if err:
                         raise Exception(f"\n\ninit sectionKeywords error:\n\t{err}\n")
 
@@ -171,13 +192,13 @@ class Document(Group):
                 try:
                     data = json.loads(ntxt)
                 except json.JSONDecodeError:
-                    st.print(
+                    self.print(
                         "ERROR", f"\njson.JSONDecodeError fileKeywords\n{ntxt}\n\n"
                     )
                     continue
 
                 for key, value in data.items():
-                    err = st.add(key, value)
+                    err = self.add(key, value)
                     if err:
                         raise Exception(f"\n\ninit fileKeywords error:\n\t{err}\n")
 
@@ -187,17 +208,17 @@ class Document(Group):
                 try:
                     data = json.loads(ntxt)
                 except json.JSONDecodeError:
-                    st.print("ERROR", f"\njson.JSONDecodeError fileSummary\n{ntxt}\n\n")
+                    self.print(
+                        "ERROR", f"\njson.JSONDecodeError fileSummary\n{ntxt}\n\n"
+                    )
                     continue
 
                 for key, value in data.items():
-                    err = st.add(key, value)
+                    err = self.add(key, value)
                     if err:
                         raise Exception(f"\n\ninit fileSummary error:\n\t{err}\n")
 
-        st.finalize_init()
-
-        return st
+        self.finalize_init()
 
     def add(self, k: str, value: typing.Any) -> typing.Union[str, None]:
         self.print("WARNING", "add is not implemented")
