@@ -111,6 +111,53 @@ class TestGroundX(unittest.TestCase):
                 test_xray(gx)
             self.assertIn("Invalid JSON returned", str(cm.exception))
 
+    def test_DocumentPage(self):
+        self.assertEqual(
+            DocumentPage.model_validate(
+                {
+                    "chunks": None,
+                    "height": 0,
+                    "pageNumber": 1,
+                    "pageUrl": "",
+                    "width": 0,
+                }
+            ),
+            DocumentPage(chunks=[], height=0, pageNumber=1, pageUrl="", width=0),
+        )
+
+        self.assertEqual(
+            DocumentPage.model_validate(
+                {"chunks": [], "height": 0, "pageNumber": 1, "pageUrl": "", "width": 0}
+            ),
+            DocumentPage(chunks=[], height=0, pageNumber=1, pageUrl="", width=0),
+        )
+
+        self.assertEqual(
+            DocumentPage.model_validate(
+                {"height": 0, "pageNumber": 1, "pageUrl": "", "width": 0}
+            ),
+            DocumentPage(chunks=[], height=0, pageNumber=1, pageUrl="", width=0),
+        )
+
+        self.assertEqual(
+            DocumentPage.model_validate(
+                {
+                    "chunks": [{}],
+                    "height": 0,
+                    "pageNumber": 1,
+                    "pageUrl": "",
+                    "width": 0,
+                }
+            ),
+            DocumentPage(
+                chunks=[Chunk(boundingBoxes=[], contentType=[], pageNumbers=[])],
+                height=0,
+                pageNumber=1,
+                pageUrl="",
+                width=0,
+            ),
+        )
+
     def test_validation_error_on_missing_required_fields(self) -> None:
         payload: typing.Dict[str, typing.Any] = {
             "documentPages": [],
