@@ -1,7 +1,7 @@
 import json, requests, typing
 from pathlib import Path
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from typing_extensions import Annotated
 
 from ..services.upload import Upload
@@ -76,7 +76,7 @@ class Chunk(BaseModel):
     contentType: Annotated[typing.List[str], Field(default_factory=list)]
     fileKeywords: typing.Optional[str] = None
     fileSummary: typing.Optional[str] = None
-    json_: typing.Optional[typing.List[typing.Any]] = Field(None, alias="json")
+    json_: typing.Optional[typing.List[typing.Any]] = Field(default=None, alias="json")
     multimodalUrl: typing.Optional[str] = None
     narrative: typing.Optional[typing.List[str]] = None
     pageNumbers: Annotated[typing.List[int], Field(default_factory=list)]
@@ -84,6 +84,21 @@ class Chunk(BaseModel):
     sectionSummary: typing.Optional[str] = None
     suggestedText: typing.Optional[str] = None
     text: typing.Optional[str] = None
+
+    @field_validator("boundingBoxes", mode="before")
+    @classmethod
+    def chunks_none(cls, v: typing.Optional[typing.List[BoundingBox]]):
+        return [] if v is None else v
+
+    @field_validator("contentType", mode="before")
+    @classmethod
+    def content_type_none(cls, v: typing.Optional[typing.List[str]]):
+        return [] if v is None else v
+
+    @field_validator("pageNumbers", mode="before")
+    @classmethod
+    def page_numbers_none(cls, v: typing.Optional[typing.List[int]]):
+        return [] if v is None else v
 
     def get_extract(self) -> typing.Dict[str, typing.Any]:
         chunk_dict = self.model_dump(exclude_none=True)
@@ -108,11 +123,16 @@ class Chunk(BaseModel):
 
 
 class DocumentPage(BaseModel):
-    chunks: typing.List[Chunk]
+    chunks: Annotated[typing.List[Chunk], Field(default_factory=list)]
     height: float
     pageNumber: int
     pageUrl: str
     width: float
+
+    @field_validator("chunks", mode="before")
+    @classmethod
+    def chunks_none(cls, v: typing.Optional[typing.List[Chunk]]):
+        return [] if v is None else v
 
     def get_extract(self) -> typing.Dict[str, typing.Any]:
         page_dict = self.model_dump(exclude_none=True)

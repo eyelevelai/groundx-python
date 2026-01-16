@@ -33,6 +33,7 @@ class TestUtilCoerceNumericString(unittest.TestCase):
         self.assertEqual(coerce_numeric_string("foo", types), "foo")
         self.assertEqual(coerce_numeric_string(11, types), 11)
         self.assertEqual(coerce_numeric_string(2.718, types), 2.718)
+        self.assertEqual(coerce_numeric_string("0.00", types), 0.0)
 
 
 if __name__ == "__main__":
