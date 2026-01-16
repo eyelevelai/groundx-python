@@ -21,6 +21,9 @@ def coerce_numeric_string(
 
     if any(t in (int, float) for t in expected_types):
         if isinstance(value, str):
+            if value == "":
+                return 0.0
+
             value = value.replace(",", "")
             try:
                 value = float(value)
@@ -33,7 +36,7 @@ def coerce_numeric_string(
     if str in expected_types and isinstance(value, str) and value == "0":
         return None
 
-    return value
+    return str(value)
 
 
 def str_to_type_sequence(
