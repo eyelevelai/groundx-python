@@ -20,6 +20,7 @@ class TestUtilCoerceNumericString(unittest.TestCase):
         self.assertEqual(coerce_numeric_string(8, "int"), 8)
         self.assertEqual(coerce_numeric_string(3.14, "int"), 3)
         self.assertEqual(coerce_numeric_string("", "int"), 0)
+        self.assertEqual(coerce_numeric_string("0", "int"), 0)
 
     def test_expected_float(self) -> None:
         self.assertEqual(coerce_numeric_string("42", "float"), 42.0)
@@ -28,6 +29,7 @@ class TestUtilCoerceNumericString(unittest.TestCase):
         self.assertEqual(coerce_numeric_string(9.81, "float"), 9.81)
         self.assertEqual(coerce_numeric_string(10, "float"), 10)
         self.assertEqual(coerce_numeric_string("", "float"), 0.0)
+        self.assertEqual(coerce_numeric_string("0.0", "float"), 0.0)
 
     def test_expected_int_float_list(self) -> None:
         types: typing.List[str] = ["int", "float"]
