@@ -46,7 +46,7 @@ class ExtractedField(Element):
     ) -> typing.Optional[typing.Optional[typing.Union[int, float, typing.Any]]]:
         ty = self.type()
         if ty is None:
-            return
+            return None
         expected_types = str_to_type_sequence(ty)
 
         if any(t in (int, float) for t in expected_types):
