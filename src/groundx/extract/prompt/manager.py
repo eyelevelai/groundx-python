@@ -285,7 +285,11 @@ class PromptManager:
         )
 
         for k, v in grp.fields.items():
-            if isinstance(v, ExtractedField) or isinstance(v, Group):
+            if isinstance(v, ExtractedField):
+                if v.prompt and not v.prompt.attr_name:
+                    v.prompt.attr_name = k
+                fields[k] = v
+            elif isinstance(v, Group):
                 fields[k] = v
 
         return fields
@@ -370,6 +374,8 @@ class PromptManager:
 
         for k, v in grp.fields.items():
             if isinstance(v, ExtractedField):
+                if v.prompt and not v.prompt.attr_name:
+                    v.prompt.attr_name = k
                 fields[k] = v
 
         return fields
