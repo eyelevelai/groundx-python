@@ -3,6 +3,7 @@ from pydantic import Field
 from typing_extensions import Annotated
 
 from .element import Element
+from ..utility import str_to_type_sequence
 
 
 class ExtractedField(Element):
@@ -40,6 +41,30 @@ class ExtractedField(Element):
 
         return False
 
+    def empty_value(
+        self,
+    ) -> typing.Optional[typing.Optional[typing.Union[int, float, typing.Any]]]:
+        ty = self.type()
+        if ty is None:
+            return
+        expected_types = str_to_type_sequence(ty)
+
+        if any(t in (int, float) for t in expected_types):
+            if float in expected_types:
+                return float(0)
+            return int(0)
+
+        if str in expected_types:
+            return ""
+
+        if list in expected_types:
+            return []
+
+        if dict in expected_types:
+            return {}
+
+        return None
+
     def equal_to_field(self, other: "ExtractedField") -> bool:
         self_val = self.get_value()
         other_val = other.get_value()
@@ -65,8 +90,11 @@ class ExtractedField(Element):
         return type(other) == type(exist) and other == exist
 
     def get_value(self) -> typing.Union[str, float, typing.List[typing.Any]]:
-        if not self.value:
-            return ""
+        if self.value is None:
+            dflt = self.empty_value()
+            if not dflt:
+                return ""
+            return dflt
 
         return self.value
 
