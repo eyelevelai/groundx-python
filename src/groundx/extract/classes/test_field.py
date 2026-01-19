@@ -38,6 +38,40 @@ class TestExtractedField(unittest.TestCase):
         ef = TestField("test", 3.14)
         self.assertFalse(ef.equal_to_value(2.71))
 
+    def test_get_value(self):
+        ef1 = TestField("test", "")
+        if not ef1.prompt:
+            self.fail("prompt is None")
+
+        self.assertEqual(ef1.get_value(), "")
+
+        ef1.prompt.type = ["int", "float"]
+        self.assertEqual(ef1.get_value(), 0)
+
+        ef1.prompt.type = "int"
+        self.assertEqual(ef1.get_value(), 0)
+
+        ef1.prompt.type = "float"
+        self.assertEqual(ef1.get_value(), 0)
+
+        ef2 = TestField("test", 0)
+        if not ef2.prompt:
+            self.fail("prompt is None")
+
+        self.assertEqual(ef2.get_value(), 0)
+
+        ef2.prompt.type = "str"
+        self.assertEqual(ef2.get_value(), "0.0")
+
+        ef2.prompt.type = ["str"]
+        self.assertEqual(ef2.get_value(), "0.0")
+
+        ef2.prompt.type = ["list"]
+        self.assertEqual(ef2.get_value(), "0.0")
+
+        ef2.prompt.type = "dict"
+        self.assertEqual(ef2.get_value(), "0.0")
+
     def test_render_error(self):
         ef = TestField("test", "hello")
         with self.assertRaises(Exception) as e:
