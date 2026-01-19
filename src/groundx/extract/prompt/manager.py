@@ -178,7 +178,15 @@ class PromptManager:
 
     def cache_workflow(self, file_name: str, workflow_id: str) -> None:
         if workflow_id in self._cache:
-            version = self._config_source.peek(workflow_id)
+            version: typing.Optional[str] = None
+            try:
+                version = self._config_source.peek(workflow_id)
+            except Exception as e:
+                self.logger.debug_msg(
+                    f"_config_source.peek exception [{e}]",
+                    workflow_id=workflow_id,
+                )
+
             if not version:
                 self.logger.debug_msg(
                     f"_config_source.peek failed\ntrying _cache_source [{file_name}.yaml]...",
