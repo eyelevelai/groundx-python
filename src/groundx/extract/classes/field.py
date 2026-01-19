@@ -92,11 +92,33 @@ class ExtractedField(Element):
     def get_value(self) -> typing.Union[str, float, typing.List[typing.Any]]:
         if self.value is None:
             dflt = self.empty_value()
-            if not dflt:
+            if dflt is None:
                 return ""
             return dflt
 
-        return self.value
+        ty = self.type()
+        if ty is None:
+            return self.value
+
+        expected_types = str_to_type_sequence(ty)
+
+        if type(self.value) in expected_types:
+            return self.value
+
+        if not isinstance(self.value, (str, float, int)):
+            return self.value
+
+        if isinstance(self.value, str):
+            if not self.value:
+                ev = self.empty_value()
+                if ev is not None:
+                    return ev
+                return self.value
+            if float in expected_types:
+                return float(self.value)
+            return int(self.value)
+
+        return str(self.value)
 
     def key(self) -> str:
         if not self.prompt:
