@@ -190,11 +190,6 @@ class PromptManager:
                 and workflow_id in self._versions
                 and self._versions.get(workflow_id) == version
             ):
-                self.logger.debug_msg(
-                    f"loading cached version",
-                    workflow_id=workflow_id,
-                    extras={"version": version},
-                )
                 return
             if version and workflow_id in self._versions:
                 self.logger.info_msg(
