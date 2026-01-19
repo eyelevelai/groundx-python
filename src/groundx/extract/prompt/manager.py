@@ -27,10 +27,10 @@ class PromptManager:
         default_file_name: typing.Optional[str] = None,
         default_workflow_id: typing.Optional[str] = None,
     ) -> None:
+        self._cache: typing.Dict[str, typing.Dict[str, Group]] = {}
+        self._versions: typing.Dict[str, str] = {}
         self._cache_source: Source = cache_source
         self._config_source: Source = config_source
-
-        self._cache: typing.Dict[str, typing.Dict[str, Group]] = {}
 
         if not default_file_name:
             default_file_name = "latest"
@@ -46,8 +46,6 @@ class PromptManager:
             self._logger = logger
         else:
             self.logger = Logger("prompt-manager", "WARNING")
-
-        self._versions: typing.Dict[str, str] = {}
 
         if (
             (
@@ -180,7 +178,37 @@ class PromptManager:
 
     def cache_workflow(self, file_name: str, workflow_id: str) -> None:
         if workflow_id in self._cache:
-            return
+            version = self._config_source.peek(workflow_id)
+            if not version:
+                self.logger.debug_msg(
+                    f"_config_source.peek failed\ntrying _cache_source [{file_name}.yaml]...",
+                    workflow_id=workflow_id,
+                )
+                version = self._cache_source.peek(file_name)
+            if (
+                version
+                and workflow_id in self._versions
+                and self._versions.get(workflow_id) == version
+            ):
+                self.logger.info_msg(
+                    f"loading cached version",
+                    workflow_id=workflow_id,
+                    extras={"version": version},
+                )
+                return
+            if version and workflow_id in self._versions:
+                self.logger.info_msg(
+                    f"cached version out of date",
+                    workflow_id=workflow_id,
+                    extras={
+                        "current_version": self._versions.get(workflow_id),
+                        "new_version": version,
+                    },
+                )
+            else:
+                self.logger.info_msg(f"no cached version", workflow_id=workflow_id)
+        else:
+            self.logger.info_msg(f"no cached version", workflow_id=workflow_id)
 
         try:
             raw, version = self._config_source.fetch(workflow_id)
@@ -191,6 +219,9 @@ class PromptManager:
             )
             raw, version = self._cache_source.fetch(file_name)
 
+        self.logger.info_msg(
+            f"saving version", workflow_id=workflow_id, extras={"version": version}
+        )
         prompts = load_from_yaml(raw)
         self._cache[workflow_id] = prompts
         self._versions[workflow_id] = version
@@ -210,7 +241,11 @@ class PromptManager:
 
         self.cache_workflow(self.file_name(file_name), workflow_id)
 
-        return self._cache[workflow_id]
+        grp = self._cache.get(workflow_id)
+        if not grp:
+            raise Exception(f"group is None in cache [{workflow_id}]")
+
+        return {k: v.model_copy(deep=True) for k, v in grp.items()}
 
     def get_prompt(
         self,
@@ -285,11 +320,7 @@ class PromptManager:
         )
 
         for k, v in grp.fields.items():
-            if isinstance(v, ExtractedField):
-                if v.prompt and not v.prompt.attr_name:
-                    v.prompt.attr_name = k
-                fields[k] = v
-            elif isinstance(v, Group):
+            if isinstance(v, ExtractedField) or isinstance(v, Group):
                 fields[k] = v
 
         return fields
@@ -374,8 +405,6 @@ class PromptManager:
 
         for k, v in grp.fields.items():
             if isinstance(v, ExtractedField):
-                if v.prompt and not v.prompt.attr_name:
-                    v.prompt.attr_name = k
                 fields[k] = v
 
         return fields
