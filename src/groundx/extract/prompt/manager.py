@@ -190,7 +190,7 @@ class PromptManager:
                 and workflow_id in self._versions
                 and self._versions.get(workflow_id) == version
             ):
-                self.logger.info_msg(
+                self.logger.debug_msg(
                     f"loading cached version",
                     workflow_id=workflow_id,
                     extras={"version": version},
@@ -213,7 +213,7 @@ class PromptManager:
         try:
             raw, version = self._config_source.fetch(workflow_id)
         except Exception as e:
-            self.logger.info_msg(
+            self.logger.debug_msg(
                 f"_config_source.fetch exception [{e}]\ntrying _cache_source [{file_name}.yaml]...",
                 workflow_id=workflow_id,
             )
