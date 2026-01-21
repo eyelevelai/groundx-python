@@ -8,8 +8,10 @@ from PIL import Image
 from unittest.mock import patch
 
 from .document import Document, DocumentRequest
+from .field import ExtractedField
+from .group import Group
 from ..prompt.manager import PromptManager
-from ..prompt.test_manager import SAMPLE_YAML_1, TestSource
+from ..prompt.test_manager import SAMPLE_YAML_1, SAMPLE_YAML_2, TestSource
 from .test_groundx import TestXRay
 
 
@@ -61,6 +63,177 @@ class TestDocument(unittest.TestCase):
             prompt_manager=manager,
         )
         self.assertEqual(st3.file_name, "F.")
+
+    def test_inject_context_1(self) -> None:
+        source = TestSource(SAMPLE_YAML_1)
+        manager = PromptManager(cache_source=source, config_source=source)
+
+        ef1 = manager.group_field("statement", "statement_date")
+        if not ef1:
+            self.fail("statement_date is None")
+        g1 = manager.group_load("meters")
+        if not g1:
+            self.fail("meters is None")
+        ef2 = manager.group_field("meters", "meter_number")
+        if not ef2:
+            self.fail("meter_number is None")
+
+        doc = Document(
+            fields={
+                "meters": Group(
+                    fields={
+                        "meter_number": ExtractedField(
+                            prompt=ef2.prompt,
+                            value="456",
+                        ),
+                    },
+                    prompt=g1.prompt,
+                ),
+                "statement_date": ExtractedField(
+                    prompt=ef1.prompt,
+                    value="123",
+                ),
+            },
+        )
+        doc.prompt_manager = manager
+
+        self.maxDiff = None
+        self.assertEqual(
+            Document.model_validate(
+                {
+                    "fields": {
+                        "statement_date": {
+                            "value": "123",
+                        },
+                        "meters": {
+                            "fields": {
+                                "meter_number": {
+                                    "value": "456",
+                                },
+                            },
+                        },
+                    },
+                },
+                context={
+                    "prompt_manager": manager,
+                },
+            ),
+            doc,
+        )
+
+    def test_inject_context_2(self) -> None:
+        source = TestSource(SAMPLE_YAML_2)
+        manager = PromptManager(cache_source=source, config_source=source)
+
+        ef1 = manager.group_field("statement", "statement_date")
+        if not ef1:
+            self.fail("statement_date is None")
+        g1 = manager.group_load("statement.meters")
+        if not g1:
+            self.fail("meters is None")
+        ef2 = manager.group_field("statement.meters", "meter_number")
+        if not ef2:
+            self.fail("meter_number is None")
+
+        doc = Document(
+            fields={
+                "meters": Group(
+                    fields={
+                        "meter_number": ExtractedField(
+                            prompt=ef2.prompt,
+                            value="456",
+                        ),
+                    },
+                    prompt=g1.prompt,
+                ),
+                "statement_date": ExtractedField(
+                    prompt=ef1.prompt,
+                    value="123",
+                ),
+            },
+        )
+        doc.prompt_manager = manager
+
+        self.maxDiff = None
+        self.assertEqual(
+            Document.model_validate(
+                {
+                    "fields": {
+                        "statement_date": {
+                            "value": "123",
+                        },
+                        "meters": {
+                            "fields": {
+                                "meter_number": {
+                                    "value": "456",
+                                },
+                            },
+                        },
+                    },
+                },
+                context={
+                    "prompt_manager": manager,
+                },
+            ),
+            doc,
+        )
+
+    def test_model_dump_1(self) -> None:
+        source = TestSource(SAMPLE_YAML_1)
+        manager = PromptManager(cache_source=source, config_source=source)
+
+        doc = Document(
+            fields={
+                "meters": Group(
+                    fields={
+                        "meter_number": ExtractedField(
+                            value="456",
+                        ),
+                    },
+                ),
+                "statement_date": ExtractedField(
+                    value="123",
+                ),
+            },
+        )
+        doc.prompt_manager = manager
+
+        st1 = Document.model_validate(
+            {
+                "fields": {
+                    "statement_date": {
+                        "value": "123",
+                    },
+                    "meters": {
+                        "fields": {
+                            "meter_number": {
+                                "value": "456",
+                            },
+                        },
+                    },
+                },
+            },
+            context={
+                "prompt_manager": manager,
+            },
+        )
+
+        self.maxDiff = None
+        self.assertEqual(
+            st1.model_dump(
+                serialize_as_any=True,
+                exclude_none=True,
+                exclude={
+                    "fields": {
+                        "__all__": {
+                            "prompt": True,
+                            "fields": {"__all__": {"prompt": True}},
+                        }
+                    }
+                },
+            ),
+            doc.model_dump(serialize_as_any=True, exclude_none=True),
+        )
 
 
 class TestDocumentRequest(unittest.TestCase):
