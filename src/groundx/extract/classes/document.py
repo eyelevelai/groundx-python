@@ -3,9 +3,19 @@ from datetime import datetime, timezone
 from io import BytesIO
 from pathlib import Path
 from PIL import Image
-from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    model_validator,
+    PrivateAttr,
+    SerializeAsAny,
+    ValidationInfo,
+)
 from urllib.parse import urlparse
 
+from .element import Element
+from .field import ExtractedField
 from .groundx import GroundXDocument, XRayDocument
 from .group import Group
 from ..prompt.manager import PromptManager
@@ -28,6 +38,25 @@ class Document(Group):
     _logger: typing.Optional[Logger] = PrivateAttr(default=None)
     _prompt_manager: typing.Optional[PromptManager] = PrivateAttr(default=None)
     _upload: typing.Optional[Upload] = PrivateAttr(default=None)
+
+    @model_validator(mode="after")
+    def _inject_context(self, info: ValidationInfo) -> "Document":
+        ctx_raw = info.context
+        ctx: dict[str, typing.Any] = {}
+        if isinstance(ctx_raw, dict):
+            ctx = typing.cast(dict[str, typing.Any], ctx_raw)
+
+        lg = ctx.get("logger")
+        if lg:
+            self.logger = lg
+
+        pm = ctx.get("prompt_manager")
+        if not pm:
+            return self
+
+        self._prompt_manager = pm
+
+        return self.add_prompts()
 
     @property
     def logger(self) -> typing.Optional[Logger]:
@@ -102,6 +131,124 @@ class Document(Group):
         )
 
         return st
+
+    def add_prompt_to_field(
+        self, group_name: str, attr_name: str, element: Element
+    ) -> typing.Tuple[typing.Optional[str], Element]:
+        if not self._prompt_manager or element.prompt:
+            return None, element
+
+        res = self._prompt_manager.find_field(
+            group_name=group_name,
+            attr_name=attr_name,
+            file_name=self.file_name,
+            workflow_id=self.workflow_id,
+        )
+        if not res:
+            return None, element
+
+        (parent, gf) = res
+
+        if not gf:
+            return None, element
+
+        element.prompt = gf.prompt
+
+        if group_name != parent:
+            return parent, element
+
+        return None, element
+
+    def add_prompt(
+        self,
+        group_name: str,
+        parent: str,
+        n: str,
+        v: typing.Union[
+            SerializeAsAny[Element],
+            typing.Dict[str, SerializeAsAny[Element]],
+            typing.Sequence[SerializeAsAny[Element]],
+        ],
+    ) -> typing.Tuple[
+        typing.Optional[str],
+        typing.Union[
+            SerializeAsAny[Element],
+            typing.Dict[str, SerializeAsAny[Element]],
+            typing.Sequence[SerializeAsAny[Element]],
+        ],
+    ]:
+        if not self._prompt_manager:
+            return None, v
+
+        if not isinstance(v, Element) and not isinstance(v, list):
+            return None, v
+
+        if isinstance(v, ExtractedField):
+            return self.add_prompt_to_field(parent, n, v)
+        elif isinstance(v, Group):
+            gn1 = f"{parent}.{n}"
+            if parent == "":
+                gn1 = n
+            gn2 = f"{group_name}.{n}"
+            if group_name == "":
+                gn2 = n
+
+            if not v.prompt:
+                try:
+                    gf = self._prompt_manager.group_load(
+                        gn1,
+                        file_name=self.file_name,
+                        workflow_id=self.workflow_id,
+                    )
+                    v.prompt = gf.prompt
+                    return None, self.add_prompt_to_group(gn1, v)
+                except:
+                    gf = self._prompt_manager.group_load(
+                        gn2,
+                        file_name=self.file_name,
+                        workflow_id=self.workflow_id,
+                    )
+                    v.prompt = gf.prompt
+                    return None, self.add_prompt_to_group(gn2, v)
+        elif isinstance(v, list):
+            nnv: typing.List[SerializeAsAny[Element]] = []
+            for nv in v:
+                _, vv = self.add_prompt(group_name=group_name, parent=parent, n=n, v=nv)
+                if isinstance(vv, Element):
+                    nnv.append(vv)
+            return None, nnv
+
+        return None, v
+
+    def add_prompt_to_group(self, group_name: str, group: Group) -> Group:
+        if not self._prompt_manager:
+            return group
+
+        new_fields: typing.Dict[
+            str,
+            typing.Union[
+                SerializeAsAny[Element],
+                typing.Dict[str, SerializeAsAny[Element]],
+                typing.Sequence[SerializeAsAny[Element]],
+            ],
+        ] = {}
+        parent = group_name
+        for n, v in group.fields.items():
+            nv, new_fields[n] = self.add_prompt(
+                group_name=group_name, parent=parent, n=n, v=v
+            )
+            if nv:
+                parent = nv
+
+        group.fields = new_fields
+
+        return group
+
+    def add_prompts(self) -> "Document":
+        if not self.prompt_manager or not self.fields:
+            return self
+
+        return typing.cast("Document", self.add_prompt_to_group("", self))
 
     def load_xray(
         self,
@@ -307,6 +454,19 @@ class DocumentRequest(BaseModel):
         default_factory=lambda: int(datetime.now(timezone.utc).timestamp())
     )
     _write_lock: typing.Optional[typing.Any] = PrivateAttr(default=None)
+
+    @model_validator(mode="after")
+    def _inject_context(self, info: ValidationInfo) -> "DocumentRequest":
+        ctx_raw = info.context
+        ctx: dict[str, typing.Any] = {}
+        if isinstance(ctx_raw, dict):
+            ctx = typing.cast(dict[str, typing.Any], ctx_raw)
+
+        lg = ctx.get("logger")
+        if lg:
+            self.logger = lg
+
+        return self
 
     @property
     def append_values(self) -> bool:

@@ -193,6 +193,7 @@ Special Instructions:
         elif (
             isinstance(value, str)
             and self.prompt
+            and self.prompt.attr_name
             and "date" in self.prompt.key().lower()
         ):
             try:

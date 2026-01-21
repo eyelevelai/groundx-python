@@ -488,6 +488,33 @@ class PromptManager:
 
         return grp
 
+    def find_field(
+        self,
+        group_name: str,
+        attr_name: str,
+        file_name: typing.Optional[str] = None,
+        workflow_id: typing.Optional[str] = None,
+    ) -> typing.Optional[typing.Tuple[str, ExtractedField]]:
+        try:
+            gf = self.group_field(
+                group_name=group_name,
+                attr_name=attr_name,
+                file_name=file_name,
+                workflow_id=workflow_id,
+            )
+            if gf:
+                return group_name, gf
+        except Exception:
+            """"""
+
+        res = self.get_fields_for_workflow(file_name=file_name, workflow_id=workflow_id)
+        for parent, v1 in res.items():
+            for k2, v2 in v1.fields.items():
+                if k2 == attr_name and isinstance(v2, ExtractedField):
+                    return parent, v2
+
+        return None
+
     def reload_if_changed(self, workflow_id: typing.Optional[str] = None) -> None:
         workflow_id = self.workflow_id(workflow_id)
 

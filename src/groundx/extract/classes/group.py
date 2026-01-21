@@ -58,6 +58,20 @@ class Group(Element):
             else:
                 base["fields"] = dynamic_fields
 
+        if "fields" in base:
+            new_fields: typing.Dict[str, typing.Any] = {}
+            for k, v in base["fields"].items():
+                if isinstance(v, dict):
+                    if any(key in v for key in ("fields",)):
+                        new_fields[k] = Group.model_validate(v)
+                    elif any(key in v for key in ("confidence", "conflicts", "value")):
+                        new_fields[k] = ExtractedField.model_validate(v)
+                    else:
+                        new_fields[k] = v
+                else:
+                    new_fields[k] = v
+            base["fields"] = new_fields
+
         return base
 
     @model_serializer(mode="wrap")

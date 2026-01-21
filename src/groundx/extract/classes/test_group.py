@@ -51,11 +51,18 @@ class TestGroup(unittest.TestCase):
                         instructions="account_number",
                     ),
                 ),
+                "meters": {
+                    "meter_number": Element(
+                        prompt=Prompt(
+                            instructions="meter_number",
+                        ),
+                    ),
+                },
             },
         )
         self.assertEqual(
             Group.model_validate_json(
-                '{"account_number":{"prompt":{"description":"test","identifiers":["id"],"instructions":"account_number"}}}'
+                '{"account_number":{"prompt":{"description":"test","identifiers":["id"],"instructions":"account_number"}},"meters":{"meter_number":{"prompt":{"instructions":"meter_number"}}}}'
             ),
             grp,
         )
@@ -66,11 +73,20 @@ class TestGroup(unittest.TestCase):
                 "account_number": Element(
                     prompt=Prompt(description="test", instructions="account_number"),
                 ),
+                "meters": Group(
+                    fields={
+                        "meter_number": Element(
+                            prompt=Prompt(
+                                instructions="meter_number",
+                            ),
+                        ),
+                    },
+                ),
             },
         )
         self.assertEqual(
             Group.model_validate_json(
-                '{"fields":{"account_number":{"prompt":{"description":"test","instructions":"account_number"}}}}'
+                '{"fields":{"account_number":{"prompt":{"description":"test","instructions":"account_number"}},"meters":{"fields":{"meter_number":{"prompt":{"instructions":"meter_number"}}}}}}'
             ),
             grp,
         )
