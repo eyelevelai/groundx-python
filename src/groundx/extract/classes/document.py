@@ -42,9 +42,9 @@ class Document(Group):
     @model_validator(mode="after")
     def _inject_context(self, info: ValidationInfo) -> "Document":
         ctx_raw = info.context
-        ctx: dict[str, typing.Any] = {}
+        ctx: typing.Dict[str, typing.Any] = {}
         if isinstance(ctx_raw, dict):
-            ctx = typing.cast(dict[str, typing.Any], ctx_raw)
+            ctx = typing.cast(typing.Dict[str, typing.Any], ctx_raw)
 
         lg = ctx.get("logger")
         if lg:
@@ -458,9 +458,9 @@ class DocumentRequest(BaseModel):
     @model_validator(mode="after")
     def _inject_context(self, info: ValidationInfo) -> "DocumentRequest":
         ctx_raw = info.context
-        ctx: dict[str, typing.Any] = {}
+        ctx: typing.Dict[str, typing.Any] = {}
         if isinstance(ctx_raw, dict):
-            ctx = typing.cast(dict[str, typing.Any], ctx_raw)
+            ctx = typing.cast(typing.Dict[str, typing.Any], ctx_raw)
 
         lg = ctx.get("logger")
         if lg:
