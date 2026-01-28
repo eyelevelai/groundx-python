@@ -28,7 +28,8 @@ DocT = typing.TypeVar("DocT", bound="Document")
 
 
 class Document(Group):
-    file_name: str = ""
+    prompt_file_name: str = ""
+    invoice_name: str = ""
     document_id: str = ""
     page_images: typing.List[str] = Field(default_factory=list)
     source_url: str = ""
@@ -141,7 +142,7 @@ class Document(Group):
         res = self._prompt_manager.find_field(
             group_name=group_name,
             attr_name=attr_name,
-            file_name=self.file_name,
+            file_name=self.prompt_file_name,
             workflow_id=self.workflow_id,
         )
         if not res:
@@ -197,7 +198,7 @@ class Document(Group):
                 try:
                     gf = self._prompt_manager.group_load(
                         gn1,
-                        file_name=self.file_name,
+                        file_name=self.prompt_file_name,
                         workflow_id=self.workflow_id,
                     )
                     v.prompt = gf.prompt
@@ -205,7 +206,7 @@ class Document(Group):
                 except:
                     gf = self._prompt_manager.group_load(
                         gn2,
-                        file_name=self.file_name,
+                        file_name=self.prompt_file_name,
                         workflow_id=self.workflow_id,
                     )
                     v.prompt = gf.prompt
@@ -263,7 +264,7 @@ class Document(Group):
         self._upload = upload
 
         self.document_id = req.document_id
-        self.file_name = req.file_name
+        self.invoice_name = req.file_name
         self.task_id = req.task_id
         self.workflow_id = req.workflow_id
 
@@ -386,7 +387,7 @@ class Document(Group):
         if lvl == "ERROR":
             self.logger.error_msg(
                 msg=msg,
-                name=self.file_name,
+                name=self.invoice_name,
                 document_id=self.document_id,
                 task_id=self.task_id,
                 workflow_id=self.workflow_id,
@@ -395,7 +396,7 @@ class Document(Group):
         elif lvl == "INFO":
             self.logger.info_msg(
                 msg=msg,
-                name=self.file_name,
+                name=self.invoice_name,
                 document_id=self.document_id,
                 task_id=self.task_id,
                 workflow_id=self.workflow_id,
@@ -404,7 +405,7 @@ class Document(Group):
         elif lvl in ("WARN", "WARNING"):
             self.logger.warning_msg(
                 msg=msg,
-                name=self.file_name,
+                name=self.invoice_name,
                 document_id=self.document_id,
                 task_id=self.task_id,
                 workflow_id=self.workflow_id,
@@ -413,7 +414,7 @@ class Document(Group):
         else:
             self.logger.debug_msg(
                 msg=msg,
-                name=self.file_name,
+                name=self.invoice_name,
                 document_id=self.document_id,
                 task_id=self.task_id,
                 workflow_id=self.workflow_id,
