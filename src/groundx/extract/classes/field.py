@@ -105,6 +105,15 @@ class ExtractedField(Element):
         if type(self.value) in expected_types:
             return self.value
 
+        if isinstance(self.value, dict):
+            nv = typing.cast(typing.Dict[str, typing.Any], self.value)
+            if "value" in nv and (
+                isinstance(nv["value"], str)
+                or isinstance(nv["value"], float)
+                or isinstance(nv["value"], int)
+            ):
+                return nv["value"]
+
         if not isinstance(self.value, (str, float, int)):
             return self.value
 
