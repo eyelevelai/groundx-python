@@ -46,7 +46,7 @@ class TestDocument(unittest.TestCase):
         manager = PromptManager(cache_source=source, config_source=source)
 
         st1: Document = test_doc(manager)
-        self.assertEqual(st1.file_name, "F")
+        self.assertEqual(st1.invoice_name, "F")
         st2: Document = Document.from_request(
             base_url="",
             cache_dir=Path("./cache"),
@@ -55,14 +55,14 @@ class TestDocument(unittest.TestCase):
             ),
             prompt_manager=manager,
         )
-        self.assertEqual(st2.file_name, "F.pdf")
+        self.assertEqual(st2.invoice_name, "F.pdf")
         st3: Document = Document.from_request(
             cache_dir=Path("./cache"),
             base_url="",
             req=DR(documentID="D", fileName="F.", modelID=1, processorID=1, taskID="T"),
             prompt_manager=manager,
         )
-        self.assertEqual(st3.file_name, "F.")
+        self.assertEqual(st3.invoice_name, "F.")
 
     def test_inject_context_1(self) -> None:
         source = TestSource(SAMPLE_YAML_1)
