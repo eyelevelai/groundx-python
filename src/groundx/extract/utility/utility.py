@@ -19,6 +19,16 @@ def coerce_numeric_string(
 
     expected_types = str_to_type_sequence(et)
 
+    if isinstance(value, dict):
+        if (
+            "value" not in value
+            or not isinstance(value["value"], str)
+            or not isinstance(value["value"], float)
+            or not isinstance(value["value"], int)
+        ):
+            return ""
+        value = value["value"]
+
     if any(t in (int, float) for t in expected_types):
         if isinstance(value, str):
             if value == "":
