@@ -9,7 +9,9 @@ from ..core.serialization import FieldMetadata
 
 
 class WorkflowApplyRequest(UniversalBaseModel):
-    workflow_id: typing_extensions.Annotated[str, FieldMetadata(alias="workflowId")] = pydantic.Field()
+    workflow_id: typing_extensions.Annotated[str, FieldMetadata(alias="workflowId")] = pydantic.Field(
+        alias="workflowId"
+    )
     """
     The id of the workflow that is being applied.
     """

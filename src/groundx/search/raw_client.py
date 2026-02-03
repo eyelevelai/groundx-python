@@ -30,7 +30,7 @@ class RawSearchClient:
         n: typing.Optional[int] = None,
         next_token: typing.Optional[str] = None,
         verbosity: typing.Optional[int] = None,
-        filter: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        filter: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         relevance: typing.Optional[float] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[SearchResponse]:
@@ -55,7 +55,7 @@ class RawSearchClient:
         verbosity : typing.Optional[int]
             The amount of data returned with each search result. 0 == no search results, only the recommended context. 1 == search results but no searchData. 2 == search results and searchData.
 
-        filter : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+        filter : typing.Optional[typing.Dict[str, typing.Any]]
             A dictionary of key-value pairs that can be used to pre-filter documents prior to a search.
 
         relevance : typing.Optional[float]
@@ -102,9 +102,9 @@ class RawSearchClient:
                 raise BadRequestError(
                     headers=dict(_response.headers),
                     body=typing.cast(
-                        typing.Optional[typing.Any],
+                        typing.Any,
                         parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
+                            type_=typing.Any,  # type: ignore
                             object_=_response.json(),
                         ),
                     ),
@@ -113,9 +113,9 @@ class RawSearchClient:
                 raise UnauthorizedError(
                     headers=dict(_response.headers),
                     body=typing.cast(
-                        typing.Optional[typing.Any],
+                        typing.Any,
                         parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
+                            type_=typing.Any,  # type: ignore
                             object_=_response.json(),
                         ),
                     ),
@@ -133,7 +133,7 @@ class RawSearchClient:
         n: typing.Optional[int] = None,
         next_token: typing.Optional[str] = None,
         verbosity: typing.Optional[int] = None,
-        filter: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        filter: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         relevance: typing.Optional[float] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[SearchResponse]:
@@ -158,7 +158,7 @@ class RawSearchClient:
         verbosity : typing.Optional[int]
             The amount of data returned with each search result. 0 == no search results, only the recommended context. 1 == search results but no searchData. 2 == search results and searchData.
 
-        filter : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+        filter : typing.Optional[typing.Dict[str, typing.Any]]
             A dictionary of key-value pairs that can be used to pre-filter documents prior to a search.
 
         relevance : typing.Optional[float]
@@ -206,9 +206,9 @@ class RawSearchClient:
                 raise BadRequestError(
                     headers=dict(_response.headers),
                     body=typing.cast(
-                        typing.Optional[typing.Any],
+                        typing.Any,
                         parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
+                            type_=typing.Any,  # type: ignore
                             object_=_response.json(),
                         ),
                     ),
@@ -217,9 +217,9 @@ class RawSearchClient:
                 raise UnauthorizedError(
                     headers=dict(_response.headers),
                     body=typing.cast(
-                        typing.Optional[typing.Any],
+                        typing.Any,
                         parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
+                            type_=typing.Any,  # type: ignore
                             object_=_response.json(),
                         ),
                     ),
@@ -242,7 +242,7 @@ class AsyncRawSearchClient:
         n: typing.Optional[int] = None,
         next_token: typing.Optional[str] = None,
         verbosity: typing.Optional[int] = None,
-        filter: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        filter: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         relevance: typing.Optional[float] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[SearchResponse]:
@@ -267,7 +267,7 @@ class AsyncRawSearchClient:
         verbosity : typing.Optional[int]
             The amount of data returned with each search result. 0 == no search results, only the recommended context. 1 == search results but no searchData. 2 == search results and searchData.
 
-        filter : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+        filter : typing.Optional[typing.Dict[str, typing.Any]]
             A dictionary of key-value pairs that can be used to pre-filter documents prior to a search.
 
         relevance : typing.Optional[float]
@@ -314,9 +314,9 @@ class AsyncRawSearchClient:
                 raise BadRequestError(
                     headers=dict(_response.headers),
                     body=typing.cast(
-                        typing.Optional[typing.Any],
+                        typing.Any,
                         parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
+                            type_=typing.Any,  # type: ignore
                             object_=_response.json(),
                         ),
                     ),
@@ -325,9 +325,9 @@ class AsyncRawSearchClient:
                 raise UnauthorizedError(
                     headers=dict(_response.headers),
                     body=typing.cast(
-                        typing.Optional[typing.Any],
+                        typing.Any,
                         parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
+                            type_=typing.Any,  # type: ignore
                             object_=_response.json(),
                         ),
                     ),
@@ -345,7 +345,7 @@ class AsyncRawSearchClient:
         n: typing.Optional[int] = None,
         next_token: typing.Optional[str] = None,
         verbosity: typing.Optional[int] = None,
-        filter: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        filter: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         relevance: typing.Optional[float] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[SearchResponse]:
@@ -370,7 +370,7 @@ class AsyncRawSearchClient:
         verbosity : typing.Optional[int]
             The amount of data returned with each search result. 0 == no search results, only the recommended context. 1 == search results but no searchData. 2 == search results and searchData.
 
-        filter : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+        filter : typing.Optional[typing.Dict[str, typing.Any]]
             A dictionary of key-value pairs that can be used to pre-filter documents prior to a search.
 
         relevance : typing.Optional[float]
@@ -418,9 +418,9 @@ class AsyncRawSearchClient:
                 raise BadRequestError(
                     headers=dict(_response.headers),
                     body=typing.cast(
-                        typing.Optional[typing.Any],
+                        typing.Any,
                         parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
+                            type_=typing.Any,  # type: ignore
                             object_=_response.json(),
                         ),
                     ),
@@ -429,9 +429,9 @@ class AsyncRawSearchClient:
                 raise UnauthorizedError(
                     headers=dict(_response.headers),
                     body=typing.cast(
-                        typing.Optional[typing.Any],
+                        typing.Any,
                         parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
+                            type_=typing.Any,  # type: ignore
                             object_=_response.json(),
                         ),
                     ),

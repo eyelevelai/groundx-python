@@ -8,7 +8,7 @@ from .ingest_local_document_metadata import IngestLocalDocumentMetadata
 
 
 class IngestLocalDocument(UniversalBaseModel):
-    blob: str = pydantic.Field()
+    blob: bytes = pydantic.Field()
     """
     The binary file data being ingested.
     """

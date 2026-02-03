@@ -15,7 +15,7 @@ class SearchResultItemPagesItem(UniversalBaseModel):
     """
 
     image_url: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="imageUrl")] = pydantic.Field(
-        default=None
+        alias="imageUrl", default=None
     )
     """
     A jpg of the page the chunk appears on

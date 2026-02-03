@@ -549,7 +549,7 @@ class DocumentsClient:
 
     def get_extract(
         self, document_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.Dict[str, typing.Optional[typing.Any]]:
+    ) -> typing.Dict[str, typing.Any]:
         """
         Look up extractions for an existing document by documentId.
 
@@ -563,7 +563,7 @@ class DocumentsClient:
 
         Returns
         -------
-        typing.Dict[str, typing.Optional[typing.Any]]
+        typing.Dict[str, typing.Any]
             Look up success
 
         Examples
@@ -582,7 +582,7 @@ class DocumentsClient:
 
     def get_xray(
         self, document_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.Dict[str, typing.Optional[typing.Any]]:
+    ) -> typing.Dict[str, typing.Any]:
         """
         Look up X-Ray data for an existing document by documentId.
 
@@ -596,7 +596,7 @@ class DocumentsClient:
 
         Returns
         -------
-        typing.Dict[str, typing.Optional[typing.Any]]
+        typing.Dict[str, typing.Any]
             Look up success
 
         Examples
@@ -1277,7 +1277,7 @@ class AsyncDocumentsClient:
 
     async def get_extract(
         self, document_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.Dict[str, typing.Optional[typing.Any]]:
+    ) -> typing.Dict[str, typing.Any]:
         """
         Look up extractions for an existing document by documentId.
 
@@ -1291,7 +1291,7 @@ class AsyncDocumentsClient:
 
         Returns
         -------
-        typing.Dict[str, typing.Optional[typing.Any]]
+        typing.Dict[str, typing.Any]
             Look up success
 
         Examples
@@ -1318,7 +1318,7 @@ class AsyncDocumentsClient:
 
     async def get_xray(
         self, document_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.Dict[str, typing.Optional[typing.Any]]:
+    ) -> typing.Dict[str, typing.Any]:
         """
         Look up X-Ray data for an existing document by documentId.
 
@@ -1332,7 +1332,7 @@ class AsyncDocumentsClient:
 
         Returns
         -------
-        typing.Dict[str, typing.Optional[typing.Any]]
+        typing.Dict[str, typing.Any]
             Look up success
 
         Examples

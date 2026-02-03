@@ -19,9 +19,9 @@ class WorkflowDetail(UniversalBaseModel):
 
     chunk_strategy: typing_extensions.Annotated[
         typing.Optional[WorkflowDetailChunkStrategy], FieldMetadata(alias="chunkStrategy")
-    ] = None
+    ] = pydantic.Field(alias="chunkStrategy", default=None)
     document_id: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="documentId")] = pydantic.Field(
-        default=None
+        alias="documentId", default=None
     )
     """
     The documentId associated with the workflow
@@ -37,14 +37,14 @@ class WorkflowDetail(UniversalBaseModel):
     The human-readable name of the workflow
     """
 
-    extract: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(default=None)
+    extract: typing.Optional[typing.Dict[str, typing.Any]] = pydantic.Field(default=None)
     """
     Extract agent definitions.
     """
 
     section_strategy: typing_extensions.Annotated[
         typing.Optional[WorkflowDetailSectionStrategy], FieldMetadata(alias="sectionStrategy")
-    ] = None
+    ] = pydantic.Field(alias="sectionStrategy", default=None)
     steps: typing.Optional[WorkflowSteps] = None
     relationships: typing.Optional[WorkflowDetailRelationships] = pydantic.Field(default=None)
     """
@@ -52,7 +52,7 @@ class WorkflowDetail(UniversalBaseModel):
     """
 
     workflow_id: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="workflowId")] = pydantic.Field(
-        default=None
+        alias="workflowId", default=None
     )
     """
     Unique system generated ID for the workflow

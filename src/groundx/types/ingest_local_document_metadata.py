@@ -12,31 +12,33 @@ from .process_level import ProcessLevel
 
 class IngestLocalDocumentMetadata(UniversalBaseModel):
     bucket_id: typing_extensions.Annotated[typing.Optional[int], FieldMetadata(alias="bucketId")] = pydantic.Field(
-        default=None
+        alias="bucketId", default=None
     )
     """
     The bucketId of the bucket which this local file will be ingested into.
     """
 
     file_name: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="fileName")] = pydantic.Field(
-        default=None
+        alias="fileName", default=None
     )
     """
     The name of the file being ingested
     """
 
-    file_type: typing_extensions.Annotated[typing.Optional[DocumentType], FieldMetadata(alias="fileType")] = None
-    filter: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(default=None)
+    file_type: typing_extensions.Annotated[typing.Optional[DocumentType], FieldMetadata(alias="fileType")] = (
+        pydantic.Field(alias="fileType", default=None)
+    )
+    filter: typing.Optional[typing.Dict[str, typing.Any]] = pydantic.Field(default=None)
     """
     A dictionary of key-value pairs that can be used to pre-filter documents prior to a search.
     """
 
     process_level: typing_extensions.Annotated[typing.Optional[ProcessLevel], FieldMetadata(alias="processLevel")] = (
-        None
+        pydantic.Field(alias="processLevel", default=None)
     )
     search_data: typing_extensions.Annotated[
-        typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]], FieldMetadata(alias="searchData")
-    ] = pydantic.Field(default=None)
+        typing.Optional[typing.Dict[str, typing.Any]], FieldMetadata(alias="searchData")
+    ] = pydantic.Field(alias="searchData", default=None)
     """
     Custom metadata which can be used to influence GroundX's search functionality. This data can be used to further hone GroundX search.
     """

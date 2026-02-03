@@ -16,21 +16,21 @@ class WorkflowEngine(UniversalBaseModel):
     """
 
     api_key: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="apiKey")] = pydantic.Field(
-        default=None
+        alias="apiKey", default=None
     )
     """
     A token that is added to the header of a request as an authorization bearer token
     """
 
     base_url: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="baseURL")] = pydantic.Field(
-        default=None
+        alias="baseURL", default=None
     )
     """
     The base URL that precedes '/chat/completion' for an OpenAI chat completion-compatible endpoint
     """
 
     engine_id: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="engineID")] = pydantic.Field(
-        default=None
+        alias="engineID", default=None
     )
     """
     The model name that will be included in the request
@@ -38,7 +38,7 @@ class WorkflowEngine(UniversalBaseModel):
 
     reasoning_effort: typing_extensions.Annotated[
         typing.Optional[WorkflowEngineReasoningEffort], FieldMetadata(alias="reasoningEffort")
-    ] = pydantic.Field(default=None)
+    ] = pydantic.Field(alias="reasoningEffort", default=None)
     """
     An enumerated value that conforms to OpenAI '/chat/completion' specifications
     """
