@@ -1,6 +1,79 @@
 # Reference
+## MCP
+<details><summary><code>client.mcp.<a href="src/groundx/mcp/client.py">mcp</a>(...) -&gt; AsyncHttpResponse[typing.Dict[str, typing.Any]]</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Integrate with GroundX via the MCP protocol. Currently requires an Enterprise subscription.
+
+This endpoint can be accessed at either `/api/v1/mcp` or `/mcp`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from groundx import GroundX
+
+client = GroundX(
+    api_key="YOUR_API_KEY",
+)
+client.mcp.mcp(
+    request={"key": "value"},
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**request:** `typing.Dict[str, typing.Any]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## Documents
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">copy</a>(...)</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">copy</a>(...) -&gt; AsyncHttpResponse[IngestResponse]</code></summary>
 <dl>
 <dd>
 
@@ -86,7 +159,7 @@ client.documents.copy(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">ingest_remote</a>(...)</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">ingest_remote</a>(...) -&gt; AsyncHttpResponse[IngestResponse]</code></summary>
 <dl>
 <dd>
 
@@ -181,7 +254,7 @@ client.documents.ingest_remote(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">ingest_local</a>(...)</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">ingest_local</a>(...) -&gt; AsyncHttpResponse[IngestResponse]</code></summary>
 <dl>
 <dd>
 
@@ -262,7 +335,7 @@ client.documents.ingest_local(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">crawl_website</a>(...)</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">crawl_website</a>(...) -&gt; AsyncHttpResponse[IngestResponse]</code></summary>
 <dl>
 <dd>
 
@@ -361,7 +434,7 @@ client.documents.crawl_website(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">list</a>(...)</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">list</a>(...) -&gt; AsyncHttpResponse[DocumentListResponse]</code></summary>
 <dl>
 <dd>
 
@@ -476,7 +549,7 @@ client.documents.list(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">delete</a>(...)</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">delete</a>(...) -&gt; AsyncHttpResponse[IngestResponse]</code></summary>
 <dl>
 <dd>
 
@@ -546,7 +619,7 @@ client.documents.delete(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">get_processing_status_by_id</a>(...)</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">get_processing_status_by_id</a>(...) -&gt; AsyncHttpResponse[IngestResponse]</code></summary>
 <dl>
 <dd>
 
@@ -616,7 +689,7 @@ client.documents.get_processing_status_by_id(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">cancel_process</a>(...)</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">cancel_process</a>(...) -&gt; AsyncHttpResponse[IngestResponse]</code></summary>
 <dl>
 <dd>
 
@@ -686,7 +759,7 @@ client.documents.cancel_process(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">lookup</a>(...)</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">lookup</a>(...) -&gt; AsyncHttpResponse[DocumentLookupResponse]</code></summary>
 <dl>
 <dd>
 
@@ -810,7 +883,7 @@ client.documents.lookup(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">get</a>(...)</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">get</a>(...) -&gt; AsyncHttpResponse[DocumentResponse]</code></summary>
 <dl>
 <dd>
 
@@ -880,7 +953,7 @@ client.documents.get(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">delete_by_id</a>(...)</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">delete_by_id</a>(...) -&gt; AsyncHttpResponse[IngestResponse]</code></summary>
 <dl>
 <dd>
 
@@ -950,7 +1023,7 @@ client.documents.delete_by_id(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">get_extract</a>(...)</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">get_extract</a>(...) -&gt; AsyncHttpResponse[typing.Dict[str, typing.Any]]</code></summary>
 <dl>
 <dd>
 
@@ -1020,7 +1093,7 @@ client.documents.get_extract(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">get_xray</a>(...)</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">get_xray</a>(...) -&gt; AsyncHttpResponse[typing.Dict[str, typing.Any]]</code></summary>
 <dl>
 <dd>
 
@@ -1090,7 +1163,7 @@ client.documents.get_xray(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">get_processes</a>(...)</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">get_processes</a>(...) -&gt; AsyncHttpResponse[ProcessesStatusResponse]</code></summary>
 <dl>
 <dd>
 
@@ -1170,7 +1243,7 @@ client.documents.get_processes(
 </details>
 
 ## Search
-<details><summary><code>client.search.<a href="src/groundx/search/client.py">content</a>(...)</code></summary>
+<details><summary><code>client.search.<a href="src/groundx/search/client.py">content</a>(...) -&gt; AsyncHttpResponse[SearchResponse]</code></summary>
 <dl>
 <dd>
 
@@ -1265,7 +1338,7 @@ client.search.content(
 <dl>
 <dd>
 
-**filter:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — A dictionary of key-value pairs that can be used to pre-filter documents prior to a search.
+**filter:** `typing.Optional[typing.Dict[str, typing.Any]]` — A dictionary of key-value pairs that can be used to pre-filter documents prior to a search.
     
 </dd>
 </dl>
@@ -1293,7 +1366,7 @@ client.search.content(
 </dl>
 </details>
 
-<details><summary><code>client.search.<a href="src/groundx/search/client.py">documents</a>(...)</code></summary>
+<details><summary><code>client.search.<a href="src/groundx/search/client.py">documents</a>(...) -&gt; AsyncHttpResponse[SearchResponse]</code></summary>
 <dl>
 <dd>
 
@@ -1388,7 +1461,7 @@ client.search.documents(
 <dl>
 <dd>
 
-**filter:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — A dictionary of key-value pairs that can be used to pre-filter documents prior to a search.
+**filter:** `typing.Optional[typing.Dict[str, typing.Any]]` — A dictionary of key-value pairs that can be used to pre-filter documents prior to a search.
     
 </dd>
 </dl>
@@ -1417,7 +1490,7 @@ client.search.documents(
 </details>
 
 ## Buckets
-<details><summary><code>client.buckets.<a href="src/groundx/buckets/client.py">list</a>(...)</code></summary>
+<details><summary><code>client.buckets.<a href="src/groundx/buckets/client.py">list</a>(...) -&gt; AsyncHttpResponse[BucketListResponse]</code></summary>
 <dl>
 <dd>
 
@@ -1496,7 +1569,7 @@ client.buckets.list(
 </dl>
 </details>
 
-<details><summary><code>client.buckets.<a href="src/groundx/buckets/client.py">create</a>(...)</code></summary>
+<details><summary><code>client.buckets.<a href="src/groundx/buckets/client.py">create</a>(...) -&gt; AsyncHttpResponse[BucketResponse]</code></summary>
 <dl>
 <dd>
 
@@ -1566,7 +1639,7 @@ client.buckets.create(
 </dl>
 </details>
 
-<details><summary><code>client.buckets.<a href="src/groundx/buckets/client.py">get</a>(...)</code></summary>
+<details><summary><code>client.buckets.<a href="src/groundx/buckets/client.py">get</a>(...) -&gt; AsyncHttpResponse[BucketResponse]</code></summary>
 <dl>
 <dd>
 
@@ -1636,7 +1709,7 @@ client.buckets.get(
 </dl>
 </details>
 
-<details><summary><code>client.buckets.<a href="src/groundx/buckets/client.py">update</a>(...)</code></summary>
+<details><summary><code>client.buckets.<a href="src/groundx/buckets/client.py">update</a>(...) -&gt; AsyncHttpResponse[BucketUpdateResponse]</code></summary>
 <dl>
 <dd>
 
@@ -1715,7 +1788,7 @@ client.buckets.update(
 </dl>
 </details>
 
-<details><summary><code>client.buckets.<a href="src/groundx/buckets/client.py">delete</a>(...)</code></summary>
+<details><summary><code>client.buckets.<a href="src/groundx/buckets/client.py">delete</a>(...) -&gt; AsyncHttpResponse[MessageResponse]</code></summary>
 <dl>
 <dd>
 
@@ -1786,7 +1859,7 @@ client.buckets.delete(
 </details>
 
 ## Groups
-<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">list</a>(...)</code></summary>
+<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">list</a>(...) -&gt; AsyncHttpResponse[GroupListResponse]</code></summary>
 <dl>
 <dd>
 
@@ -1865,7 +1938,7 @@ client.groups.list(
 </dl>
 </details>
 
-<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">create</a>(...)</code></summary>
+<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">create</a>(...) -&gt; AsyncHttpResponse[GroupResponse]</code></summary>
 <dl>
 <dd>
 
@@ -1943,7 +2016,7 @@ client.groups.create(
 </dl>
 </details>
 
-<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">get</a>(...)</code></summary>
+<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">get</a>(...) -&gt; AsyncHttpResponse[GroupResponse]</code></summary>
 <dl>
 <dd>
 
@@ -2013,7 +2086,7 @@ client.groups.get(
 </dl>
 </details>
 
-<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">update</a>(...)</code></summary>
+<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">update</a>(...) -&gt; AsyncHttpResponse[GroupResponse]</code></summary>
 <dl>
 <dd>
 
@@ -2092,7 +2165,7 @@ client.groups.update(
 </dl>
 </details>
 
-<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">delete</a>(...)</code></summary>
+<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">delete</a>(...) -&gt; AsyncHttpResponse[MessageResponse]</code></summary>
 <dl>
 <dd>
 
@@ -2162,7 +2235,7 @@ client.groups.delete(
 </dl>
 </details>
 
-<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">add_bucket</a>(...)</code></summary>
+<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">add_bucket</a>(...) -&gt; AsyncHttpResponse[MessageResponse]</code></summary>
 <dl>
 <dd>
 
@@ -2241,7 +2314,7 @@ client.groups.add_bucket(
 </dl>
 </details>
 
-<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">remove_bucket</a>(...)</code></summary>
+<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">remove_bucket</a>(...) -&gt; AsyncHttpResponse[MessageResponse]</code></summary>
 <dl>
 <dd>
 
@@ -2321,7 +2394,7 @@ client.groups.remove_bucket(
 </details>
 
 ## Workflows
-<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">list</a>()</code></summary>
+<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">list</a>() -&gt; AsyncHttpResponse[WorkflowsResponse]</code></summary>
 <dl>
 <dd>
 
@@ -2381,7 +2454,7 @@ client.workflows.list()
 </dl>
 </details>
 
-<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">create</a>(...)</code></summary>
+<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">create</a>(...) -&gt; AsyncHttpResponse[WorkflowResponse]</code></summary>
 <dl>
 <dd>
 
@@ -2445,7 +2518,7 @@ client.workflows.create()
 <dl>
 <dd>
 
-**extract:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Extract agent definitions.
+**extract:** `typing.Optional[typing.Dict[str, typing.Any]]` — Extract agent definitions.
     
 </dd>
 </dl>
@@ -2481,7 +2554,7 @@ client.workflows.create()
 </dl>
 </details>
 
-<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">get_account</a>()</code></summary>
+<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">get_account</a>() -&gt; AsyncHttpResponse[WorkflowResponse]</code></summary>
 <dl>
 <dd>
 
@@ -2541,7 +2614,7 @@ client.workflows.get_account()
 </dl>
 </details>
 
-<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">add_to_account</a>(...)</code></summary>
+<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">add_to_account</a>(...) -&gt; AsyncHttpResponse[MessageResponse]</code></summary>
 <dl>
 <dd>
 
@@ -2611,7 +2684,7 @@ client.workflows.add_to_account(
 </dl>
 </details>
 
-<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">remove_from_account</a>()</code></summary>
+<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">remove_from_account</a>() -&gt; AsyncHttpResponse[MessageResponse]</code></summary>
 <dl>
 <dd>
 
@@ -2671,7 +2744,7 @@ client.workflows.remove_from_account()
 </dl>
 </details>
 
-<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">add_to_id</a>(...)</code></summary>
+<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">add_to_id</a>(...) -&gt; AsyncHttpResponse[MessageResponse]</code></summary>
 <dl>
 <dd>
 
@@ -2750,7 +2823,7 @@ client.workflows.add_to_id(
 </dl>
 </details>
 
-<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">remove_from_id</a>(...)</code></summary>
+<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">remove_from_id</a>(...) -&gt; AsyncHttpResponse[MessageResponse]</code></summary>
 <dl>
 <dd>
 
@@ -2820,7 +2893,7 @@ client.workflows.remove_from_id(
 </dl>
 </details>
 
-<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">get</a>(...)</code></summary>
+<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">get</a>(...) -&gt; AsyncHttpResponse[WorkflowResponse]</code></summary>
 <dl>
 <dd>
 
@@ -2890,7 +2963,7 @@ client.workflows.get(
 </dl>
 </details>
 
-<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">update</a>(...)</code></summary>
+<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">update</a>(...) -&gt; AsyncHttpResponse[WorkflowResponse]</code></summary>
 <dl>
 <dd>
 
@@ -2964,7 +3037,7 @@ client.workflows.update(
 <dl>
 <dd>
 
-**extract:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Extract agent definitions.
+**extract:** `typing.Optional[typing.Dict[str, typing.Any]]` — Extract agent definitions.
     
 </dd>
 </dl>
@@ -3000,7 +3073,7 @@ client.workflows.update(
 </dl>
 </details>
 
-<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">delete</a>(...)</code></summary>
+<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">delete</a>(...) -&gt; AsyncHttpResponse[MessageResponse]</code></summary>
 <dl>
 <dd>
 
@@ -3071,7 +3144,7 @@ client.workflows.delete(
 </details>
 
 ## Customer
-<details><summary><code>client.customer.<a href="src/groundx/customer/client.py">get</a>()</code></summary>
+<details><summary><code>client.customer.<a href="src/groundx/customer/client.py">get</a>() -&gt; AsyncHttpResponse[CustomerResponse]</code></summary>
 <dl>
 <dd>
 
@@ -3132,7 +3205,7 @@ client.customer.get()
 </details>
 
 ## Health
-<details><summary><code>client.health.<a href="src/groundx/health/client.py">list</a>()</code></summary>
+<details><summary><code>client.health.<a href="src/groundx/health/client.py">list</a>() -&gt; AsyncHttpResponse[HealthResponse]</code></summary>
 <dl>
 <dd>
 
@@ -3192,7 +3265,7 @@ client.health.list()
 </dl>
 </details>
 
-<details><summary><code>client.health.<a href="src/groundx/health/client.py">get</a>(...)</code></summary>
+<details><summary><code>client.health.<a href="src/groundx/health/client.py">get</a>(...) -&gt; AsyncHttpResponse[HealthResponse]</code></summary>
 <dl>
 <dd>
 

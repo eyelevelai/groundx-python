@@ -14,20 +14,20 @@ from .workflow_steps import WorkflowSteps
 class WorkflowRequest(UniversalBaseModel):
     chunk_strategy: typing_extensions.Annotated[
         typing.Optional[WorkflowRequestChunkStrategy], FieldMetadata(alias="chunkStrategy")
-    ] = None
+    ] = pydantic.Field(alias="chunkStrategy", default=None)
     name: typing.Optional[str] = pydantic.Field(default=None)
     """
     The name of the workflow being created.
     """
 
-    extract: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(default=None)
+    extract: typing.Optional[typing.Dict[str, typing.Any]] = pydantic.Field(default=None)
     """
     Extract agent definitions.
     """
 
     section_strategy: typing_extensions.Annotated[
         typing.Optional[WorkflowRequestSectionStrategy], FieldMetadata(alias="sectionStrategy")
-    ] = None
+    ] = pydantic.Field(alias="sectionStrategy", default=None)
     steps: typing.Optional[WorkflowSteps] = None
 
     if IS_PYDANTIC_V2:

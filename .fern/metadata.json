@@ -1,0 +1,114 @@
+{
+  "cliVersion": "3.51.3",
+  "generatorName": "fernapi/fern-python-sdk",
+  "generatorVersion": "4.54.2",
+  "generatorConfig": {
+    "client": {
+      "class_name": "GroundXBase",
+      "filename": "client.py",
+      "exported_class_name": "GroundX",
+      "exported_filename": "ingest.py"
+    },
+    "client_class_name": "GroundXBase",
+    "extra_dependencies": {
+      "aiohttp": ">=3.8.0",
+      "requests": ">=2.4.0",
+      "tqdm": ">=4.60.0",
+      "types-tqdm": ">=4.60.0",
+      "boto3": {
+        "version": "*",
+        "optional": true
+      },
+      "celery": {
+        "version": "*",
+        "extras": [
+          "redis"
+        ],
+        "optional": true
+      },
+      "celery-types": {
+        "version": "*",
+        "optional": true
+      },
+      "dateparser": {
+        "version": "*",
+        "optional": true
+      },
+      "fastapi": {
+        "version": "*",
+        "optional": true
+      },
+      "google-api-python-client": {
+        "version": "*",
+        "optional": true
+      },
+      "google-api-python-client-stubs": {
+        "version": "*",
+        "optional": true
+      },
+      "google-auth-stubs": {
+        "version": "*",
+        "optional": true
+      },
+      "gspread": {
+        "version": "*",
+        "optional": true
+      },
+      "minio": {
+        "version": "*",
+        "optional": true
+      },
+      "pillow": {
+        "version": "*",
+        "optional": true
+      },
+      "pytest": {
+        "version": "*",
+        "optional": true
+      },
+      "redis": {
+        "version": "*",
+        "optional": true
+      },
+      "types-boto3": {
+        "version": "*",
+        "optional": true
+      },
+      "types-dateparser": {
+        "version": "*",
+        "optional": true
+      },
+      "types-PyYAML": {
+        "version": "*",
+        "optional": true
+      }
+    },
+    "extra_dev_dependencies": {
+      "types-requests": ">=2.0.0"
+    },
+    "extras": {
+      "extract": [
+        "boto3",
+        "celery",
+        "celery-types",
+        "dateparser",
+        "fastapi",
+        "google-api-python-client",
+        "google-api-python-client-stubs",
+        "google-auth-stubs",
+        "gspread",
+        "minio",
+        "pillow",
+        "pytest",
+        "redis",
+        "types-boto3",
+        "types-dateparser",
+        "types-PyYAML"
+      ]
+    },
+    "use_typeddict_requests": false,
+    "package_name": "groundx",
+    "pyproject_toml": "[[tool.mypy.overrides]]\nmodule = [\"dateparser.*\"]\nignore_missing_imports = true\n\n[[tool.mypy.overrides]]\nmodule = [\"boto3.*\", \"botocore.*\"]\nignore_missing_imports = true\n\n[[tool.mypy.overrides]]\nmodule = [\"fastapi.*\", \"starlette.*\", \"redis.*\"]\nignore_missing_imports = true\n\n[[tool.mypy.overrides]]\nmodule = [\"google.*\", \"googleapiclient.*\", \"gspread.*\"]\nignore_missing_imports = true\n\n[[tool.mypy.overrides]]\nmodule = [\"minio.*\"]\nignore_missing_imports = true\n\n[[tool.mypy.overrides]]\nmodule = [\"PIL.*\"]\nignore_missing_imports = true\n\n[[tool.mypy.overrides]]\nmodule = [\"smolagents.*\"]\nignore_missing_imports = true\n\n[[tool.mypy.overrides]]\nmodule = [\"yaml.*\"]\nignore_missing_imports = true\n\n[[tool.mypy.overrides]]\nmodule = [\"groundx.extract.classes.document\"]\ndisable_error_code = [\"call-arg\"]\n\n[[tool.mypy.overrides]]\nmodule = [\"groundx.extract.tasks.utility\"]\ndisable_error_code = [\"call-arg\"]\n"
+  },
+  "sdkVersion": "3.3.0"
+}

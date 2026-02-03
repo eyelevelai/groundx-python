@@ -10,21 +10,21 @@ from ..core.serialization import FieldMetadata
 
 
 class BucketDetail(UniversalBaseModel):
-    bucket_id: typing_extensions.Annotated[int, FieldMetadata(alias="bucketId")]
+    bucket_id: typing_extensions.Annotated[int, FieldMetadata(alias="bucketId")] = pydantic.Field(alias="bucketId")
     created: typing.Optional[dt.datetime] = pydantic.Field(default=None)
     """
     The data time when the bucket was created, in RFC3339 format
     """
 
     file_count: typing_extensions.Annotated[typing.Optional[int], FieldMetadata(alias="fileCount")] = pydantic.Field(
-        default=None
+        alias="fileCount", default=None
     )
     """
     The number of files contained in the content bucket
     """
 
     file_size: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="fileSize")] = pydantic.Field(
-        default=None
+        alias="fileSize", default=None
     )
     """
     The total file size of files contained in the content bucket

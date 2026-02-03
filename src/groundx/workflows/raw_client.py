@@ -65,7 +65,7 @@ class RawWorkflowsClient:
         *,
         chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
-        extract: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        extract: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -80,7 +80,7 @@ class RawWorkflowsClient:
         name : typing.Optional[str]
             The name of the workflow being created.
 
-        extract : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+        extract : typing.Optional[typing.Dict[str, typing.Any]]
             Extract agent definitions.
 
         section_strategy : typing.Optional[WorkflowRequestSectionStrategy]
@@ -377,7 +377,7 @@ class RawWorkflowsClient:
         *,
         chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
-        extract: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        extract: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -395,7 +395,7 @@ class RawWorkflowsClient:
         name : typing.Optional[str]
             The name of the workflow being created.
 
-        extract : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+        extract : typing.Optional[typing.Dict[str, typing.Any]]
             Extract agent definitions.
 
         section_strategy : typing.Optional[WorkflowRequestSectionStrategy]
@@ -528,7 +528,7 @@ class AsyncRawWorkflowsClient:
         *,
         chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
-        extract: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        extract: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -543,7 +543,7 @@ class AsyncRawWorkflowsClient:
         name : typing.Optional[str]
             The name of the workflow being created.
 
-        extract : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+        extract : typing.Optional[typing.Dict[str, typing.Any]]
             Extract agent definitions.
 
         section_strategy : typing.Optional[WorkflowRequestSectionStrategy]
@@ -842,7 +842,7 @@ class AsyncRawWorkflowsClient:
         *,
         chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
-        extract: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        extract: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -860,7 +860,7 @@ class AsyncRawWorkflowsClient:
         name : typing.Optional[str]
             The name of the workflow being created.
 
-        extract : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+        extract : typing.Optional[typing.Dict[str, typing.Any]]
             Extract agent definitions.
 
         section_strategy : typing.Optional[WorkflowRequestSectionStrategy]

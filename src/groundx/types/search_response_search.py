@@ -31,7 +31,7 @@ class SearchResponseSearch(UniversalBaseModel):
     """
 
     search_query: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="searchQuery")] = (
-        pydantic.Field(default=None)
+        pydantic.Field(alias="searchQuery", default=None)
     )
     """
     The actual search query, if the search request query was re-written
@@ -43,7 +43,7 @@ class SearchResponseSearch(UniversalBaseModel):
     """
 
     next_token: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="nextToken")] = pydantic.Field(
-        default=None
+        alias="nextToken", default=None
     )
     """
     For paginated results
