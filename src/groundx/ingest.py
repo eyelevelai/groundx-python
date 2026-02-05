@@ -47,6 +47,9 @@ TSV_SPLITS = {
 }
 
 SUFFIX_ALIASES = {
+    ".jfi": "jpg",
+    ".jfif": "jpg",
+    ".jpe": "jpg",
     ".jpeg": "jpg",
     ".heic": "heif",
     ".tif": "tiff",
