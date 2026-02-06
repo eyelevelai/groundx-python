@@ -11,11 +11,11 @@ from .processing_status import ProcessingStatus
 
 class IngestStatusLight(UniversalBaseModel):
     id: typing.Optional[int] = None
-    process_id: typing_extensions.Annotated[str, FieldMetadata(alias="processId")] = pydantic.Field(alias="processId")
+    process_id: typing_extensions.Annotated[str, FieldMetadata(alias="processId"), pydantic.Field(alias="processId")]
     status: ProcessingStatus
-    status_message: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="statusMessage")] = (
-        pydantic.Field(alias="statusMessage", default=None)
-    )
+    status_message: typing_extensions.Annotated[
+        typing.Optional[str], FieldMetadata(alias="statusMessage"), pydantic.Field(alias="statusMessage")
+    ] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

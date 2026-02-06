@@ -9,11 +9,13 @@ from ..core.serialization import FieldMetadata
 
 
 class WebsiteSource(UniversalBaseModel):
-    bucket_id: typing_extensions.Annotated[int, FieldMetadata(alias="bucketId")] = pydantic.Field(alias="bucketId")
-    """
-    The bucketId of the bucket which this website will be ingested into.
-    """
-
+    bucket_id: typing_extensions.Annotated[
+        int,
+        FieldMetadata(alias="bucketId"),
+        pydantic.Field(
+            alias="bucketId", description="The bucketId of the bucket which this website will be ingested into."
+        ),
+    ]
     cap: typing.Optional[int] = pydantic.Field(default=None)
     """
     The maximum number of pages to crawl
@@ -25,16 +27,18 @@ class WebsiteSource(UniversalBaseModel):
     """
 
     search_data: typing_extensions.Annotated[
-        typing.Optional[typing.Dict[str, typing.Any]], FieldMetadata(alias="searchData")
-    ] = pydantic.Field(alias="searchData", default=None)
-    """
-    Custom metadata which can be used to influence GroundX's search functionality. This data can be used to further hone GroundX search.
-    """
-
-    source_url: typing_extensions.Annotated[str, FieldMetadata(alias="sourceUrl")] = pydantic.Field(alias="sourceUrl")
-    """
-    The URL from which the crawl is initiated.
-    """
+        typing.Optional[typing.Dict[str, typing.Any]],
+        FieldMetadata(alias="searchData"),
+        pydantic.Field(
+            alias="searchData",
+            description="Custom metadata which can be used to influence GroundX's search functionality. This data can be used to further hone GroundX search.",
+        ),
+    ] = None
+    source_url: typing_extensions.Annotated[
+        str,
+        FieldMetadata(alias="sourceUrl"),
+        pydantic.Field(alias="sourceUrl", description="The URL from which the crawl is initiated."),
+    ]
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

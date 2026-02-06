@@ -10,26 +10,22 @@ from ..core.serialization import FieldMetadata
 
 
 class BucketDetail(UniversalBaseModel):
-    bucket_id: typing_extensions.Annotated[int, FieldMetadata(alias="bucketId")] = pydantic.Field(alias="bucketId")
+    bucket_id: typing_extensions.Annotated[int, FieldMetadata(alias="bucketId"), pydantic.Field(alias="bucketId")]
     created: typing.Optional[dt.datetime] = pydantic.Field(default=None)
     """
     The data time when the bucket was created, in RFC3339 format
     """
 
-    file_count: typing_extensions.Annotated[typing.Optional[int], FieldMetadata(alias="fileCount")] = pydantic.Field(
-        alias="fileCount", default=None
-    )
-    """
-    The number of files contained in the content bucket
-    """
-
-    file_size: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="fileSize")] = pydantic.Field(
-        alias="fileSize", default=None
-    )
-    """
-    The total file size of files contained in the content bucket
-    """
-
+    file_count: typing_extensions.Annotated[
+        typing.Optional[int],
+        FieldMetadata(alias="fileCount"),
+        pydantic.Field(alias="fileCount", description="The number of files contained in the content bucket"),
+    ] = None
+    file_size: typing_extensions.Annotated[
+        typing.Optional[str],
+        FieldMetadata(alias="fileSize"),
+        pydantic.Field(alias="fileSize", description="The total file size of files contained in the content bucket"),
+    ] = None
     name: typing.Optional[str] = None
     updated: typing.Optional[dt.datetime] = pydantic.Field(default=None)
     """

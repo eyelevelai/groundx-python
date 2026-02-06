@@ -10,9 +10,9 @@ from .meter_detail import MeterDetail
 
 
 class SubscriptionDetailMeters(UniversalBaseModel):
-    file_tokens: typing_extensions.Annotated[typing.Optional[MeterDetail], FieldMetadata(alias="fileTokens")] = (
-        pydantic.Field(alias="fileTokens", default=None)
-    )
+    file_tokens: typing_extensions.Annotated[
+        typing.Optional[MeterDetail], FieldMetadata(alias="fileTokens"), pydantic.Field(alias="fileTokens")
+    ] = None
     searches: typing.Optional[MeterDetail] = None
 
     if IS_PYDANTIC_V2:

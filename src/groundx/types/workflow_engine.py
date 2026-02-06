@@ -15,34 +15,35 @@ class WorkflowEngine(UniversalBaseModel):
     Configurations for the LLM an agent uses in a workflow
     """
 
-    api_key: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="apiKey")] = pydantic.Field(
-        alias="apiKey", default=None
-    )
-    """
-    A token that is added to the header of a request as an authorization bearer token
-    """
-
-    base_url: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="baseURL")] = pydantic.Field(
-        alias="baseURL", default=None
-    )
-    """
-    The base URL that precedes '/chat/completion' for an OpenAI chat completion-compatible endpoint
-    """
-
-    engine_id: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="engineID")] = pydantic.Field(
-        alias="engineID", default=None
-    )
-    """
-    The model name that will be included in the request
-    """
-
+    api_key: typing_extensions.Annotated[
+        typing.Optional[str],
+        FieldMetadata(alias="apiKey"),
+        pydantic.Field(
+            alias="apiKey",
+            description="A token that is added to the header of a request as an authorization bearer token",
+        ),
+    ] = None
+    base_url: typing_extensions.Annotated[
+        typing.Optional[str],
+        FieldMetadata(alias="baseURL"),
+        pydantic.Field(
+            alias="baseURL",
+            description="The base URL that precedes '/chat/completion' for an OpenAI chat completion-compatible endpoint",
+        ),
+    ] = None
+    engine_id: typing_extensions.Annotated[
+        typing.Optional[str],
+        FieldMetadata(alias="engineID"),
+        pydantic.Field(alias="engineID", description="The model name that will be included in the request"),
+    ] = None
     reasoning_effort: typing_extensions.Annotated[
-        typing.Optional[WorkflowEngineReasoningEffort], FieldMetadata(alias="reasoningEffort")
-    ] = pydantic.Field(alias="reasoningEffort", default=None)
-    """
-    An enumerated value that conforms to OpenAI '/chat/completion' specifications
-    """
-
+        typing.Optional[WorkflowEngineReasoningEffort],
+        FieldMetadata(alias="reasoningEffort"),
+        pydantic.Field(
+            alias="reasoningEffort",
+            description="An enumerated value that conforms to OpenAI '/chat/completion' specifications",
+        ),
+    ] = None
     service: typing.Optional[WorkflowEngineService] = pydantic.Field(default=None)
     """
     An enumerated descriptor of the service type, impacts how the requests are configured

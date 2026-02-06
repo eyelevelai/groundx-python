@@ -15,32 +15,32 @@ class WorkflowSteps(UniversalBaseModel):
     """
 
     chunk_instruct: typing_extensions.Annotated[
-        typing.Optional[WorkflowStep], FieldMetadata(alias="chunk-instruct")
-    ] = pydantic.Field(alias="chunk-instruct", default=None)
-    chunk_keys: typing_extensions.Annotated[typing.Optional[WorkflowStep], FieldMetadata(alias="chunk-keys")] = (
-        pydantic.Field(alias="chunk-keys", default=None)
-    )
-    chunk_summary: typing_extensions.Annotated[typing.Optional[WorkflowStep], FieldMetadata(alias="chunk-summary")] = (
-        pydantic.Field(alias="chunk-summary", default=None)
-    )
-    doc_keys: typing_extensions.Annotated[typing.Optional[WorkflowStep], FieldMetadata(alias="doc-keys")] = (
-        pydantic.Field(alias="doc-keys", default=None)
-    )
-    doc_summary: typing_extensions.Annotated[typing.Optional[WorkflowStep], FieldMetadata(alias="doc-summary")] = (
-        pydantic.Field(alias="doc-summary", default=None)
-    )
-    search_query: typing_extensions.Annotated[typing.Optional[WorkflowStep], FieldMetadata(alias="search-query")] = (
-        pydantic.Field(alias="search-query", default=None)
-    )
-    sect_instruct: typing_extensions.Annotated[typing.Optional[WorkflowStep], FieldMetadata(alias="sect-instruct")] = (
-        pydantic.Field(alias="sect-instruct", default=None)
-    )
-    sect_keys: typing_extensions.Annotated[typing.Optional[WorkflowStep], FieldMetadata(alias="sect-keys")] = (
-        pydantic.Field(alias="sect-keys", default=None)
-    )
-    sect_summary: typing_extensions.Annotated[typing.Optional[WorkflowStep], FieldMetadata(alias="sect-summary")] = (
-        pydantic.Field(alias="sect-summary", default=None)
-    )
+        typing.Optional[WorkflowStep], FieldMetadata(alias="chunk-instruct"), pydantic.Field(alias="chunk-instruct")
+    ] = None
+    chunk_keys: typing_extensions.Annotated[
+        typing.Optional[WorkflowStep], FieldMetadata(alias="chunk-keys"), pydantic.Field(alias="chunk-keys")
+    ] = None
+    chunk_summary: typing_extensions.Annotated[
+        typing.Optional[WorkflowStep], FieldMetadata(alias="chunk-summary"), pydantic.Field(alias="chunk-summary")
+    ] = None
+    doc_keys: typing_extensions.Annotated[
+        typing.Optional[WorkflowStep], FieldMetadata(alias="doc-keys"), pydantic.Field(alias="doc-keys")
+    ] = None
+    doc_summary: typing_extensions.Annotated[
+        typing.Optional[WorkflowStep], FieldMetadata(alias="doc-summary"), pydantic.Field(alias="doc-summary")
+    ] = None
+    search_query: typing_extensions.Annotated[
+        typing.Optional[WorkflowStep], FieldMetadata(alias="search-query"), pydantic.Field(alias="search-query")
+    ] = None
+    sect_instruct: typing_extensions.Annotated[
+        typing.Optional[WorkflowStep], FieldMetadata(alias="sect-instruct"), pydantic.Field(alias="sect-instruct")
+    ] = None
+    sect_keys: typing_extensions.Annotated[
+        typing.Optional[WorkflowStep], FieldMetadata(alias="sect-keys"), pydantic.Field(alias="sect-keys")
+    ] = None
+    sect_summary: typing_extensions.Annotated[
+        typing.Optional[WorkflowStep], FieldMetadata(alias="sect-summary"), pydantic.Field(alias="sect-summary")
+    ] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

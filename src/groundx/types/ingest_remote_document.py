@@ -11,40 +11,42 @@ from .process_level import ProcessLevel
 
 
 class IngestRemoteDocument(UniversalBaseModel):
-    bucket_id: typing_extensions.Annotated[int, FieldMetadata(alias="bucketId")] = pydantic.Field(alias="bucketId")
-    """
-    The bucketId of the bucket which this remote file will be ingested into.
-    """
-
-    file_name: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="fileName")] = pydantic.Field(
-        alias="fileName", default=None
-    )
-    """
-    The name of the file being ingested.
-    """
-
-    file_type: typing_extensions.Annotated[typing.Optional[DocumentType], FieldMetadata(alias="fileType")] = (
-        pydantic.Field(alias="fileType", default=None)
-    )
+    bucket_id: typing_extensions.Annotated[
+        int,
+        FieldMetadata(alias="bucketId"),
+        pydantic.Field(
+            alias="bucketId", description="The bucketId of the bucket which this remote file will be ingested into."
+        ),
+    ]
+    file_name: typing_extensions.Annotated[
+        typing.Optional[str],
+        FieldMetadata(alias="fileName"),
+        pydantic.Field(alias="fileName", description="The name of the file being ingested."),
+    ] = None
+    file_type: typing_extensions.Annotated[
+        typing.Optional[DocumentType], FieldMetadata(alias="fileType"), pydantic.Field(alias="fileType")
+    ] = None
     filter: typing.Optional[typing.Dict[str, typing.Any]] = pydantic.Field(default=None)
     """
     A dictionary of key-value pairs that can be used to pre-filter documents prior to a search.
     """
 
-    process_level: typing_extensions.Annotated[typing.Optional[ProcessLevel], FieldMetadata(alias="processLevel")] = (
-        pydantic.Field(alias="processLevel", default=None)
-    )
+    process_level: typing_extensions.Annotated[
+        typing.Optional[ProcessLevel], FieldMetadata(alias="processLevel"), pydantic.Field(alias="processLevel")
+    ] = None
     search_data: typing_extensions.Annotated[
-        typing.Optional[typing.Dict[str, typing.Any]], FieldMetadata(alias="searchData")
-    ] = pydantic.Field(alias="searchData", default=None)
-    """
-    Custom metadata which can be used to influence GroundX's search functionality. This data can be used to further hone GroundX search.
-    """
-
-    source_url: typing_extensions.Annotated[str, FieldMetadata(alias="sourceUrl")] = pydantic.Field(alias="sourceUrl")
-    """
-    The URL of the document being ingested by GroundX.
-    """
+        typing.Optional[typing.Dict[str, typing.Any]],
+        FieldMetadata(alias="searchData"),
+        pydantic.Field(
+            alias="searchData",
+            description="Custom metadata which can be used to influence GroundX's search functionality. This data can be used to further hone GroundX search.",
+        ),
+    ] = None
+    source_url: typing_extensions.Annotated[
+        str,
+        FieldMetadata(alias="sourceUrl"),
+        pydantic.Field(alias="sourceUrl", description="The URL of the document being ingested by GroundX."),
+    ]
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

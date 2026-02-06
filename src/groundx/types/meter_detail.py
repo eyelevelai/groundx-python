@@ -18,13 +18,11 @@ class MeterDetail(UniversalBaseModel):
     Maximum limit for the current billing period
     """
 
-    meter_id: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="meterId")] = pydantic.Field(
-        alias="meterId", default=None
-    )
-    """
-    Unique system generated ID for the meteric
-    """
-
+    meter_id: typing_extensions.Annotated[
+        typing.Optional[str],
+        FieldMetadata(alias="meterId"),
+        pydantic.Field(alias="meterId", description="Unique system generated ID for the meteric"),
+    ] = None
     value: typing.Optional[int] = pydantic.Field(default=None)
     """
     Current usage for the current billing period

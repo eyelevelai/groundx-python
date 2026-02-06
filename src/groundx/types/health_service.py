@@ -11,13 +11,13 @@ from .health_service_status import HealthServiceStatus
 
 
 class HealthService(UniversalBaseModel):
-    last_update: typing_extensions.Annotated[dt.datetime, FieldMetadata(alias="lastUpdate")] = pydantic.Field(
-        alias="lastUpdate"
-    )
-    """
-    The data time when the service status was last updated, in RFC3339 format
-    """
-
+    last_update: typing_extensions.Annotated[
+        dt.datetime,
+        FieldMetadata(alias="lastUpdate"),
+        pydantic.Field(
+            alias="lastUpdate", description="The data time when the service status was last updated, in RFC3339 format"
+        ),
+    ]
     service: str = pydantic.Field()
     """
     The name of the service

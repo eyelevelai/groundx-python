@@ -14,13 +14,11 @@ class SearchResultItemPagesItem(UniversalBaseModel):
     The height of the page image
     """
 
-    image_url: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="imageUrl")] = pydantic.Field(
-        alias="imageUrl", default=None
-    )
-    """
-    A jpg of the page the chunk appears on
-    """
-
+    image_url: typing_extensions.Annotated[
+        typing.Optional[str],
+        FieldMetadata(alias="imageUrl"),
+        pydantic.Field(alias="imageUrl", description="A jpg of the page the chunk appears on"),
+    ] = None
     number: typing.Optional[float] = pydantic.Field(default=None)
     """
     The page number
