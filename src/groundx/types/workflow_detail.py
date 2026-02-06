@@ -18,15 +18,15 @@ class WorkflowDetail(UniversalBaseModel):
     """
 
     chunk_strategy: typing_extensions.Annotated[
-        typing.Optional[WorkflowDetailChunkStrategy], FieldMetadata(alias="chunkStrategy")
-    ] = pydantic.Field(alias="chunkStrategy", default=None)
-    document_id: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="documentId")] = pydantic.Field(
-        alias="documentId", default=None
-    )
-    """
-    The documentId associated with the workflow
-    """
-
+        typing.Optional[WorkflowDetailChunkStrategy],
+        FieldMetadata(alias="chunkStrategy"),
+        pydantic.Field(alias="chunkStrategy"),
+    ] = None
+    document_id: typing_extensions.Annotated[
+        typing.Optional[str],
+        FieldMetadata(alias="documentId"),
+        pydantic.Field(alias="documentId", description="The documentId associated with the workflow"),
+    ] = None
     id: typing.Optional[int] = pydantic.Field(default=None)
     """
     The bucketId or groupId associated with the workflow
@@ -43,20 +43,21 @@ class WorkflowDetail(UniversalBaseModel):
     """
 
     section_strategy: typing_extensions.Annotated[
-        typing.Optional[WorkflowDetailSectionStrategy], FieldMetadata(alias="sectionStrategy")
-    ] = pydantic.Field(alias="sectionStrategy", default=None)
+        typing.Optional[WorkflowDetailSectionStrategy],
+        FieldMetadata(alias="sectionStrategy"),
+        pydantic.Field(alias="sectionStrategy"),
+    ] = None
     steps: typing.Optional[WorkflowSteps] = None
     relationships: typing.Optional[WorkflowDetailRelationships] = pydantic.Field(default=None)
     """
     Information describing what the workflow is associated with
     """
 
-    workflow_id: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="workflowId")] = pydantic.Field(
-        alias="workflowId", default=None
-    )
-    """
-    Unique system generated ID for the workflow
-    """
+    workflow_id: typing_extensions.Annotated[
+        typing.Optional[str],
+        FieldMetadata(alias="workflowId"),
+        pydantic.Field(alias="workflowId", description="Unique system generated ID for the workflow"),
+    ] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

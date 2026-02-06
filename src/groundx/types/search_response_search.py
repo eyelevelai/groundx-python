@@ -30,24 +30,23 @@ class SearchResponseSearch(UniversalBaseModel):
     Confidence score in the search results
     """
 
-    search_query: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="searchQuery")] = (
-        pydantic.Field(alias="searchQuery", default=None)
-    )
-    """
-    The actual search query, if the search request query was re-written
-    """
-
+    search_query: typing_extensions.Annotated[
+        typing.Optional[str],
+        FieldMetadata(alias="searchQuery"),
+        pydantic.Field(
+            alias="searchQuery", description="The actual search query, if the search request query was re-written"
+        ),
+    ] = None
     text: typing.Optional[str] = pydantic.Field(default=None)
     """
     Suggested context for LLM completion
     """
 
-    next_token: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="nextToken")] = pydantic.Field(
-        alias="nextToken", default=None
-    )
-    """
-    For paginated results
-    """
+    next_token: typing_extensions.Annotated[
+        typing.Optional[str],
+        FieldMetadata(alias="nextToken"),
+        pydantic.Field(alias="nextToken", description="For paginated results"),
+    ] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

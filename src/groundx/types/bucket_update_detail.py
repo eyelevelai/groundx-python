@@ -9,7 +9,7 @@ from ..core.serialization import FieldMetadata
 
 
 class BucketUpdateDetail(UniversalBaseModel):
-    bucket_id: typing_extensions.Annotated[int, FieldMetadata(alias="bucketId")] = pydantic.Field(alias="bucketId")
+    bucket_id: typing_extensions.Annotated[int, FieldMetadata(alias="bucketId"), pydantic.Field(alias="bucketId")]
     name: typing.Optional[str] = None
 
     if IS_PYDANTIC_V2:

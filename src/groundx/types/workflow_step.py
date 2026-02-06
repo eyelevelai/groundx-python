@@ -14,18 +14,18 @@ class WorkflowStep(UniversalBaseModel):
     Configurations for an agent, including LLM information and prompts
     """
 
-    all_: typing_extensions.Annotated[typing.Optional[WorkflowStepConfig], FieldMetadata(alias="all")] = pydantic.Field(
-        alias="all", default=None
-    )
+    all_: typing_extensions.Annotated[
+        typing.Optional[WorkflowStepConfig], FieldMetadata(alias="all"), pydantic.Field(alias="all")
+    ] = None
     figure: typing.Optional[WorkflowStepConfig] = None
-    json_: typing_extensions.Annotated[typing.Optional[WorkflowStepConfig], FieldMetadata(alias="json")] = (
-        pydantic.Field(alias="json", default=None)
-    )
+    json_: typing_extensions.Annotated[
+        typing.Optional[WorkflowStepConfig], FieldMetadata(alias="json"), pydantic.Field(alias="json")
+    ] = None
     paragraph: typing.Optional[WorkflowStepConfig] = None
     table: typing.Optional[WorkflowStepConfig] = None
     table_figure: typing_extensions.Annotated[
-        typing.Optional[WorkflowStepConfig], FieldMetadata(alias="table-figure")
-    ] = pydantic.Field(alias="table-figure", default=None)
+        typing.Optional[WorkflowStepConfig], FieldMetadata(alias="table-figure"), pydantic.Field(alias="table-figure")
+    ] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

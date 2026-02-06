@@ -13,8 +13,10 @@ from .workflow_steps import WorkflowSteps
 
 class WorkflowRequest(UniversalBaseModel):
     chunk_strategy: typing_extensions.Annotated[
-        typing.Optional[WorkflowRequestChunkStrategy], FieldMetadata(alias="chunkStrategy")
-    ] = pydantic.Field(alias="chunkStrategy", default=None)
+        typing.Optional[WorkflowRequestChunkStrategy],
+        FieldMetadata(alias="chunkStrategy"),
+        pydantic.Field(alias="chunkStrategy"),
+    ] = None
     name: typing.Optional[str] = pydantic.Field(default=None)
     """
     The name of the workflow being created.
@@ -26,8 +28,10 @@ class WorkflowRequest(UniversalBaseModel):
     """
 
     section_strategy: typing_extensions.Annotated[
-        typing.Optional[WorkflowRequestSectionStrategy], FieldMetadata(alias="sectionStrategy")
-    ] = pydantic.Field(alias="sectionStrategy", default=None)
+        typing.Optional[WorkflowRequestSectionStrategy],
+        FieldMetadata(alias="sectionStrategy"),
+        pydantic.Field(alias="sectionStrategy"),
+    ] = None
     steps: typing.Optional[WorkflowSteps] = None
 
     if IS_PYDANTIC_V2:
