@@ -122,6 +122,7 @@ class AgentCode(CodeAgent):
         images: typing.List[Image],
         expected_types: typing.Union[type, typing.Tuple[type, ...]] = dict,
         attempt: int = 0,
+        type: str = "",
     ) -> typing.Any:
         res = super().run(  # pyright: ignore[reportUnknownMemberType]
             conflict + prompt_suffix,
@@ -180,6 +181,7 @@ class AgentTool(ToolCallingAgent):
         images: typing.List[Image],
         expected_types: typing.Union[type, typing.Tuple[type, ...]] = dict,
         attempt: int = 0,
+        type: str = "",
     ) -> typing.Any:
         res = super().run(  # pyright: ignore[reportUnknownMemberType]
             conflict + prompt_suffix,
