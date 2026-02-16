@@ -1008,17 +1008,17 @@ uritemplate = ">=3.0.1,<5"
 
 [[package]]
 name = "google-api-python-client-stubs"
-version = "1.31.0"
+version = "1.32.0"
 description = "Type stubs for google-api-python-client"
 optional = true
 python-versions = ">=3.7"
 files = [
-    {file = "google_api_python_client_stubs-1.31.0-py3-none-any.whl", hash = "sha256:3cf1c119372c747322bfad75048cdd3159ac53df305804c5dbfa13988b027aa9"},
-    {file = "google_api_python_client_stubs-1.31.0.tar.gz", hash = "sha256:219e1033dc440f4742008b4f2aab228c77a5175fd5724b5d2763221d3b01199a"},
+    {file = "google_api_python_client_stubs-1.32.0-py3-none-any.whl", hash = "sha256:d7024eb0fa3a66ee57f5949cd84b01b8138085e4f186b99747dc7b6c740d5e8f"},
+    {file = "google_api_python_client_stubs-1.32.0.tar.gz", hash = "sha256:1c1840b12ec110019340a404558e270fc812a6365ad6888f632e16bb5e420a71"},
 ]
 
 [package.dependencies]
-google-api-python-client = ">=2.186.0"
+google-api-python-client = ">=2.190.0"
 types-httplib2 = ">=0.22.0.2"
 typing-extensions = ">=3.10.0"
 
@@ -2491,13 +2491,13 @@ telegram = ["requests"]
 
 [[package]]
 name = "types-awscrt"
-version = "0.31.1"
+version = "0.31.2"
 description = "Type annotations and code completion for awscrt"
 optional = true
 python-versions = ">=3.8"
 files = [
-    {file = "types_awscrt-0.31.1-py3-none-any.whl", hash = "sha256:7e4364ac635f72bd57f52b093883640b1448a6eded0ecbac6e900bf4b1e4777b"},
-    {file = "types_awscrt-0.31.1.tar.gz", hash = "sha256:08b13494f93f45c1a92eb264755fce50ed0d1dc75059abb5e31670feb9a09724"},
+    {file = "types_awscrt-0.31.2-py3-none-any.whl", hash = "sha256:3d6a29c1cca894b191be408f4d985a8e3a14d919785652dd3fa4ee558143e4bf"},
+    {file = "types_awscrt-0.31.2.tar.gz", hash = "sha256:dc79705acd24094656b8105b8d799d7e273c8eac37c69137df580cd84beb54f6"},
 ]
 
 [[package]]
