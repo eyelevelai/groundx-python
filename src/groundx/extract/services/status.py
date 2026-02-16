@@ -1,9 +1,11 @@
-import typing
+import time, typing
 
 from fastapi import Response
 
 from .logger import Logger
 from ..settings.settings import ContainerSettings
+
+latency_to = 60
 
 
 class Status:
@@ -85,6 +87,9 @@ class Status:
 
         return available, total
 
+    def key_api_latency(self, id: str) -> str:
+        return f"{id}:{time.time_ns()}:latency"
+
     def key_worker_available(self, id: str) -> str:
         return f"{self.config.service}:{id}:requests"
 
@@ -121,6 +126,16 @@ class Status:
 
     def refresh_worker_total(self, id: str, to: typing.Optional[int] = None) -> None:
         self.set_value(self.key_worker_total(id), self.config.workers, to)
+
+    def set_api_latency(
+        self, id: str, val: int, to: typing.Optional[int] = None
+    ) -> None:
+        if to is None:
+            global latency_to
+
+            to = latency_to
+
+        self.set_value(self.key_api_latency(id), val, to)
 
     def set_headers(
         self,
