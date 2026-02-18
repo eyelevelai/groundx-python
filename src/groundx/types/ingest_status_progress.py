@@ -8,6 +8,7 @@ from .ingest_status_progress_cancelled import IngestStatusProgressCancelled
 from .ingest_status_progress_complete import IngestStatusProgressComplete
 from .ingest_status_progress_errors import IngestStatusProgressErrors
 from .ingest_status_progress_processing import IngestStatusProgressProcessing
+from .ingest_status_progress_queued import IngestStatusProgressQueued
 
 
 class IngestStatusProgress(UniversalBaseModel):
@@ -15,6 +16,7 @@ class IngestStatusProgress(UniversalBaseModel):
     complete: typing.Optional[IngestStatusProgressComplete] = None
     errors: typing.Optional[IngestStatusProgressErrors] = None
     processing: typing.Optional[IngestStatusProgressProcessing] = None
+    queued: typing.Optional[IngestStatusProgressQueued] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
