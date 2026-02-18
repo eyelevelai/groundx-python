@@ -39,6 +39,7 @@ if typing.TYPE_CHECKING:
     from .ingest_status_progress_complete import IngestStatusProgressComplete
     from .ingest_status_progress_errors import IngestStatusProgressErrors
     from .ingest_status_progress_processing import IngestStatusProgressProcessing
+    from .ingest_status_progress_queued import IngestStatusProgressQueued
     from .message_response import MessageResponse
     from .meter_detail import MeterDetail
     from .process_level import ProcessLevel
@@ -107,6 +108,7 @@ _dynamic_imports: typing.Dict[str, str] = {
     "IngestStatusProgressComplete": ".ingest_status_progress_complete",
     "IngestStatusProgressErrors": ".ingest_status_progress_errors",
     "IngestStatusProgressProcessing": ".ingest_status_progress_processing",
+    "IngestStatusProgressQueued": ".ingest_status_progress_queued",
     "MessageResponse": ".message_response",
     "MeterDetail": ".meter_detail",
     "ProcessLevel": ".process_level",
@@ -199,6 +201,7 @@ __all__ = [
     "IngestStatusProgressComplete",
     "IngestStatusProgressErrors",
     "IngestStatusProgressProcessing",
+    "IngestStatusProgressQueued",
     "MessageResponse",
     "MeterDetail",
     "ProcessLevel",
