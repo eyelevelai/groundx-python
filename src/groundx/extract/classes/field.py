@@ -118,6 +118,8 @@ class ExtractedField(Element):
 
         if isinstance(self.value, str):
             if not self.value:
+                if any(t in (int, float) for t in expected_types):
+                    return self.none_value()
                 ev = self.empty_value()
                 if ev is not None:
                     return ev
