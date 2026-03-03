@@ -24,12 +24,12 @@ class BaseClientWrapper:
         import platform
 
         headers: typing.Dict[str, str] = {
-            "User-Agent": "groundx/3.3.5",
+            "User-Agent": "groundx/3.3.6",
             "X-Fern-Language": "Python",
             "X-Fern-Runtime": f"python/{platform.python_version()}",
             "X-Fern-Platform": f"{platform.system().lower()}/{platform.release()}",
             "X-Fern-SDK-Name": "groundx",
-            "X-Fern-SDK-Version": "3.3.5",
+            "X-Fern-SDK-Version": "3.3.6",
             **(self.get_custom_headers() or {}),
         }
         headers["X-API-Key"] = self.api_key
