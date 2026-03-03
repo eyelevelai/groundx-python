@@ -89,12 +89,11 @@ class ExtractedField(Element):
 
         return type(other) == type(exist) and other == exist
 
-    def get_value(self) -> typing.Union[str, float, typing.List[typing.Any]]:
+    def get_value(
+        self,
+    ) -> typing.Optional[typing.Union[str, float, typing.List[typing.Any]]]:
         if self.value is None:
-            dflt = self.empty_value()
-            if dflt is None:
-                return ""
-            return dflt
+            return self.none_value()
 
         ty = self.type()
         if ty is None:
@@ -134,6 +133,28 @@ class ExtractedField(Element):
             raise Exception(f"prompt is not set")
 
         return self.prompt.key()
+
+    def none_value(
+        self,
+    ) -> typing.Optional[typing.Optional[typing.Union[int, float, typing.Any]]]:
+        ty = self.type()
+        if ty is None:
+            return None
+        expected_types = str_to_type_sequence(ty)
+
+        if any(t in (int, float) for t in expected_types):
+            return None
+
+        if str in expected_types:
+            return ""
+
+        if list in expected_types:
+            return []
+
+        if dict in expected_types:
+            return {}
+
+        return None
 
     def remove_conflict(self, value: typing.Any) -> None:
         if value in self.conflicts:
