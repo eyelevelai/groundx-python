@@ -42,7 +42,7 @@ class AgentSettings(BaseModel):
     ]
     max_steps: int = 7
     model_id: str = "gpt-5-mini"
-    reasoning_effort: typing.Optional[str] = "high"
+    reasoning_effort: typing.Optional[str] = "medium"
 
     def get_api_key(self) -> str:
         if self.api_key:
