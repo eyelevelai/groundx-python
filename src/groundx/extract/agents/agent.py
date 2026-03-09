@@ -97,6 +97,7 @@ class AgentCode(CodeAgent):
             model_id=settings.model_id,
             api_base=settings.api_base,
             api_key=settings.get_api_key(),
+            reasoning_effort=settings.reasoning_effort,
         )
 
         super().__init__(  # pyright: ignore[reportUnknownMemberType]
@@ -106,7 +107,6 @@ class AgentCode(CodeAgent):
             tools=tools,
             model=model,
             max_steps=settings.max_steps,
-            reasoning_effort=settings.reasoning_effort,
             verbosity_level=verbosity,
         )
 
@@ -163,6 +163,7 @@ class AgentTool(ToolCallingAgent):
             model_id=settings.model_id,
             api_base=settings.api_base,
             api_key=settings.get_api_key(),
+            reasoning_effort=settings.reasoning_effort,
         )
 
         super().__init__(  # pyright: ignore[reportUnknownMemberType]
