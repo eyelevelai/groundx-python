@@ -106,6 +106,7 @@ class AgentCode(CodeAgent):
             tools=tools,
             model=model,
             max_steps=settings.max_steps,
+            reasoning_effort=settings.reasoning_effort,
             verbosity_level=verbosity,
         )
 
