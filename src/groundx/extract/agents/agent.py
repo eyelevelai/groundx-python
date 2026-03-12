@@ -93,12 +93,21 @@ class AgentCode(CodeAgent):
         if tools is None:
             tools = []
 
-        model = OpenAIServerModel(
-            model_id=settings.model_id,
-            api_base=settings.api_base,
-            api_key=settings.get_api_key(),
-            reasoning_effort=settings.reasoning_effort,
-        )
+        if settings.kwargs:
+            model = OpenAIServerModel(
+                model_id=settings.model_id,
+                api_base=settings.api_base,
+                api_key=settings.get_api_key(),
+                reasoning_effort=settings.reasoning_effort,
+                **settings.kwargs,
+            )
+        else:
+            model = OpenAIServerModel(
+                model_id=settings.model_id,
+                api_base=settings.api_base,
+                api_key=settings.get_api_key(),
+                reasoning_effort=settings.reasoning_effort,
+            )
 
         super().__init__(  # pyright: ignore[reportUnknownMemberType]
             name=name,
@@ -159,12 +168,21 @@ class AgentTool(ToolCallingAgent):
         if tools is None:
             tools = []
 
-        model = OpenAIServerModel(
-            model_id=settings.model_id,
-            api_base=settings.api_base,
-            api_key=settings.get_api_key(),
-            reasoning_effort=settings.reasoning_effort,
-        )
+        if settings.kwargs:
+            model = OpenAIServerModel(
+                model_id=settings.model_id,
+                api_base=settings.api_base,
+                api_key=settings.get_api_key(),
+                reasoning_effort=settings.reasoning_effort,
+                **settings.kwargs,
+            )
+        else:
+            model = OpenAIServerModel(
+                model_id=settings.model_id,
+                api_base=settings.api_base,
+                api_key=settings.get_api_key(),
+                reasoning_effort=settings.reasoning_effort,
+            )
 
         super().__init__(  # pyright: ignore[reportUnknownMemberType]
             name=name,
