@@ -93,13 +93,13 @@ class AgentCode(CodeAgent):
         if tools is None:
             tools = []
 
-        if settings.kwargs:
+        if settings.model_kwargs:
             model = OpenAIServerModel(
                 model_id=settings.model_id,
                 api_base=settings.api_base,
                 api_key=settings.get_api_key(),
                 reasoning_effort=settings.reasoning_effort,
-                **settings.kwargs,
+                **settings.model_kwargs,
             )
         else:
             model = OpenAIServerModel(
@@ -168,13 +168,13 @@ class AgentTool(ToolCallingAgent):
         if tools is None:
             tools = []
 
-        if settings.kwargs:
+        if settings.model_kwargs:
             model = OpenAIServerModel(
                 model_id=settings.model_id,
                 api_base=settings.api_base,
                 api_key=settings.get_api_key(),
                 reasoning_effort=settings.reasoning_effort,
-                **settings.kwargs,
+                **settings.model_kwargs,
             )
         else:
             model = OpenAIServerModel(
