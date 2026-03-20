@@ -169,19 +169,33 @@ class AgentTool(ToolCallingAgent):
             tools = []
 
         if settings.model_kwargs:
+            if settings.reasoning_effort:
+                model = OpenAIServerModel(
+                    model_id=settings.model_id,
+                    api_base=settings.api_base,
+                    api_key=settings.get_api_key(),
+                    reasoning_effort=settings.reasoning_effort,
+                    **settings.model_kwargs,
+                )
+            else:
+                model = OpenAIServerModel(
+                    model_id=settings.model_id,
+                    api_base=settings.api_base,
+                    api_key=settings.get_api_key(),
+                    **settings.model_kwargs,
+                )
+        elif settings.reasoning_effort:
             model = OpenAIServerModel(
                 model_id=settings.model_id,
                 api_base=settings.api_base,
                 api_key=settings.get_api_key(),
                 reasoning_effort=settings.reasoning_effort,
-                **settings.model_kwargs,
             )
         else:
             model = OpenAIServerModel(
                 model_id=settings.model_id,
                 api_base=settings.api_base,
                 api_key=settings.get_api_key(),
-                reasoning_effort=settings.reasoning_effort,
             )
 
         super().__init__(  # pyright: ignore[reportUnknownMemberType]
