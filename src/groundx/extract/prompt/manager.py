@@ -350,19 +350,26 @@ class PromptManager:
         indent: int = 2,
         file_name: typing.Optional[str] = None,
         workflow_id: typing.Optional[str] = None,
+        extra_fields: typing.Optional[typing.List[ExtractedField]] = None,
     ) -> str:
         desc: typing.List[str] = []
-        grp = self.group_load(
-            group_name=group_name, file_name=file_name, workflow_id=workflow_id
+
+        fields = list(
+            self.group_fields(
+                group_name=group_name,
+                file_name=file_name,
+                workflow_id=workflow_id,
+            ).values()
         )
 
-        for _, v in grp.fields.items():
-            if isinstance(v, ExtractedField):
-                if v.prompt and v.prompt.description:
-                    desc.append(
-                        (" " * indent)
-                        + f"- **{v.prompt.key()}** - {v.prompt.description}"
-                    )
+        if extra_fields:
+            fields.extend(extra_fields)
+
+        for v in fields:
+            if v.prompt and v.prompt.description:
+                desc.append(
+                    (" " * indent) + f"- **{v.prompt.key()}** - {v.prompt.description}"
+                )
 
         return "\n".join(desc)
 
@@ -386,14 +393,20 @@ class PromptManager:
         group_name: str,
         file_name: typing.Optional[str] = None,
         workflow_id: typing.Optional[str] = None,
+        extra_fields: typing.Optional[typing.List[ExtractedField]] = None,
     ) -> str:
-        return "".join(
-            p.render()
-            for p in self.group_fields(
-                group_name=group_name, file_name=file_name, workflow_id=workflow_id
+        fields = list(
+            self.group_fields(
+                group_name=group_name,
+                file_name=file_name,
+                workflow_id=workflow_id,
             ).values()
-            if p.render()
         )
+
+        if extra_fields:
+            fields.extend(extra_fields)
+
+        return "".join(p.render() for p in fields if p.render())
 
     def group_fields(
         self,
