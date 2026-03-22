@@ -7,28 +7,28 @@ from ..core.request_options import RequestOptions
 from ..types.api_key_request_api_key import ApiKeyRequestApiKey
 from ..types.api_key_response import ApiKeyResponse
 from ..types.message_response import MessageResponse
-from .raw_client import AsyncRawApiKeysClient, RawApiKeysClient
+from .raw_client import AsyncRawApiKeyClient, RawApiKeyClient
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
 
 
-class ApiKeysClient:
+class ApiKeyClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
-        self._raw_client = RawApiKeysClient(client_wrapper=client_wrapper)
+        self._raw_client = RawApiKeyClient(client_wrapper=client_wrapper)
 
     @property
-    def with_raw_response(self) -> RawApiKeysClient:
+    def with_raw_response(self) -> RawApiKeyClient:
         """
         Retrieves a raw implementation of this client that returns raw responses.
 
         Returns
         -------
-        RawApiKeysClient
+        RawApiKeyClient
         """
         return self._raw_client
 
-    def api_key_list(self, *, request_options: typing.Optional[RequestOptions] = None) -> ApiKeyResponse:
+    def list(self, *, request_options: typing.Optional[RequestOptions] = None) -> ApiKeyResponse:
         """
         List all API keys within your GroundX account
 
@@ -49,12 +49,12 @@ class ApiKeysClient:
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
-        client.api_keys.api_key_list()
+        client.api_key.list()
         """
-        _response = self._raw_client.api_key_list(request_options=request_options)
+        _response = self._raw_client.list(request_options=request_options)
         return _response.data
 
-    def api_key_create(
+    def create(
         self, *, api_key: ApiKeyRequestApiKey, request_options: typing.Optional[RequestOptions] = None
     ) -> ApiKeyResponse:
         """
@@ -79,16 +79,16 @@ class ApiKeysClient:
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
-        client.api_keys.api_key_create(
+        client.api_key.create(
             api_key=ApiKeyRequestApiKey(
                 name="your_apikey_name",
             ),
         )
         """
-        _response = self._raw_client.api_key_create(api_key=api_key, request_options=request_options)
+        _response = self._raw_client.create(api_key=api_key, request_options=request_options)
         return _response.data
 
-    def api_key_update(
+    def update(
         self, api_key_: str, *, api_key: ApiKeyRequestApiKey, request_options: typing.Optional[RequestOptions] = None
     ) -> ApiKeyResponse:
         """
@@ -116,19 +116,17 @@ class ApiKeysClient:
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
-        client.api_keys.api_key_update(
+        client.api_key.update(
             api_key_="apiKey",
             api_key=ApiKeyRequestApiKey(
                 name="your_apikey_name",
             ),
         )
         """
-        _response = self._raw_client.api_key_update(api_key_, api_key=api_key, request_options=request_options)
+        _response = self._raw_client.update(api_key_, api_key=api_key, request_options=request_options)
         return _response.data
 
-    def api_key_delete(
-        self, api_key: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> MessageResponse:
+    def delete(self, api_key: str, *, request_options: typing.Optional[RequestOptions] = None) -> MessageResponse:
         """
         Delete an API key.
 
@@ -152,30 +150,30 @@ class ApiKeysClient:
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
-        client.api_keys.api_key_delete(
+        client.api_key.delete(
             api_key="apiKey",
         )
         """
-        _response = self._raw_client.api_key_delete(api_key, request_options=request_options)
+        _response = self._raw_client.delete(api_key, request_options=request_options)
         return _response.data
 
 
-class AsyncApiKeysClient:
+class AsyncApiKeyClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
-        self._raw_client = AsyncRawApiKeysClient(client_wrapper=client_wrapper)
+        self._raw_client = AsyncRawApiKeyClient(client_wrapper=client_wrapper)
 
     @property
-    def with_raw_response(self) -> AsyncRawApiKeysClient:
+    def with_raw_response(self) -> AsyncRawApiKeyClient:
         """
         Retrieves a raw implementation of this client that returns raw responses.
 
         Returns
         -------
-        AsyncRawApiKeysClient
+        AsyncRawApiKeyClient
         """
         return self._raw_client
 
-    async def api_key_list(self, *, request_options: typing.Optional[RequestOptions] = None) -> ApiKeyResponse:
+    async def list(self, *, request_options: typing.Optional[RequestOptions] = None) -> ApiKeyResponse:
         """
         List all API keys within your GroundX account
 
@@ -201,15 +199,15 @@ class AsyncApiKeysClient:
 
 
         async def main() -> None:
-            await client.api_keys.api_key_list()
+            await client.api_key.list()
 
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.api_key_list(request_options=request_options)
+        _response = await self._raw_client.list(request_options=request_options)
         return _response.data
 
-    async def api_key_create(
+    async def create(
         self, *, api_key: ApiKeyRequestApiKey, request_options: typing.Optional[RequestOptions] = None
     ) -> ApiKeyResponse:
         """
@@ -239,7 +237,7 @@ class AsyncApiKeysClient:
 
 
         async def main() -> None:
-            await client.api_keys.api_key_create(
+            await client.api_key.create(
                 api_key=ApiKeyRequestApiKey(
                     name="your_apikey_name",
                 ),
@@ -248,10 +246,10 @@ class AsyncApiKeysClient:
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.api_key_create(api_key=api_key, request_options=request_options)
+        _response = await self._raw_client.create(api_key=api_key, request_options=request_options)
         return _response.data
 
-    async def api_key_update(
+    async def update(
         self, api_key_: str, *, api_key: ApiKeyRequestApiKey, request_options: typing.Optional[RequestOptions] = None
     ) -> ApiKeyResponse:
         """
@@ -284,7 +282,7 @@ class AsyncApiKeysClient:
 
 
         async def main() -> None:
-            await client.api_keys.api_key_update(
+            await client.api_key.update(
                 api_key_="apiKey",
                 api_key=ApiKeyRequestApiKey(
                     name="your_apikey_name",
@@ -294,12 +292,10 @@ class AsyncApiKeysClient:
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.api_key_update(api_key_, api_key=api_key, request_options=request_options)
+        _response = await self._raw_client.update(api_key_, api_key=api_key, request_options=request_options)
         return _response.data
 
-    async def api_key_delete(
-        self, api_key: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> MessageResponse:
+    async def delete(self, api_key: str, *, request_options: typing.Optional[RequestOptions] = None) -> MessageResponse:
         """
         Delete an API key.
 
@@ -328,12 +324,12 @@ class AsyncApiKeysClient:
 
 
         async def main() -> None:
-            await client.api_keys.api_key_delete(
+            await client.api_key.delete(
                 api_key="apiKey",
             )
 
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.api_key_delete(api_key, request_options=request_options)
+        _response = await self._raw_client.delete(api_key, request_options=request_options)
         return _response.data
