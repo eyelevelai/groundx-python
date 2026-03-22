@@ -19,11 +19,11 @@ from ..types.message_response import MessageResponse
 OMIT = typing.cast(typing.Any, ...)
 
 
-class RawApiKeysClient:
+class RawApiKeyClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    def api_key_list(self, *, request_options: typing.Optional[RequestOptions] = None) -> HttpResponse[ApiKeyResponse]:
+    def list(self, *, request_options: typing.Optional[RequestOptions] = None) -> HttpResponse[ApiKeyResponse]:
         """
         List all API keys within your GroundX account
 
@@ -57,7 +57,7 @@ class RawApiKeysClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    def api_key_create(
+    def create(
         self, *, api_key: ApiKeyRequestApiKey, request_options: typing.Optional[RequestOptions] = None
     ) -> HttpResponse[ApiKeyResponse]:
         """
@@ -115,7 +115,7 @@ class RawApiKeysClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    def api_key_update(
+    def update(
         self, api_key_: str, *, api_key: ApiKeyRequestApiKey, request_options: typing.Optional[RequestOptions] = None
     ) -> HttpResponse[ApiKeyResponse]:
         """
@@ -165,7 +165,7 @@ class RawApiKeysClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    def api_key_delete(
+    def delete(
         self, api_key: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> HttpResponse[MessageResponse]:
         """
@@ -205,11 +205,11 @@ class RawApiKeysClient:
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
 
-class AsyncRawApiKeysClient:
+class AsyncRawApiKeyClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    async def api_key_list(
+    async def list(
         self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> AsyncHttpResponse[ApiKeyResponse]:
         """
@@ -245,7 +245,7 @@ class AsyncRawApiKeysClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    async def api_key_create(
+    async def create(
         self, *, api_key: ApiKeyRequestApiKey, request_options: typing.Optional[RequestOptions] = None
     ) -> AsyncHttpResponse[ApiKeyResponse]:
         """
@@ -303,7 +303,7 @@ class AsyncRawApiKeysClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    async def api_key_update(
+    async def update(
         self, api_key_: str, *, api_key: ApiKeyRequestApiKey, request_options: typing.Optional[RequestOptions] = None
     ) -> AsyncHttpResponse[ApiKeyResponse]:
         """
@@ -353,7 +353,7 @@ class AsyncRawApiKeysClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
-    async def api_key_delete(
+    async def delete(
         self, api_key: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> AsyncHttpResponse[MessageResponse]:
         """

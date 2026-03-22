@@ -3204,8 +3204,8 @@ client.customer.get()
 </dl>
 </details>
 
-## API Keys
-<details><summary><code>client.api_keys.<a href="src/groundx/api_keys/client.py">api_key_list</a>() -&gt; AsyncHttpResponse[ApiKeyResponse]</code></summary>
+## ApiKey
+<details><summary><code>client.api_key.<a href="src/groundx/api_key/client.py">list</a>() -&gt; AsyncHttpResponse[ApiKeyResponse]</code></summary>
 <dl>
 <dd>
 
@@ -3237,7 +3237,7 @@ from groundx import GroundX
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
-client.api_keys.api_key_list()
+client.api_key.list()
 
 ```
 </dd>
@@ -3265,7 +3265,7 @@ client.api_keys.api_key_list()
 </dl>
 </details>
 
-<details><summary><code>client.api_keys.<a href="src/groundx/api_keys/client.py">api_key_create</a>(...) -&gt; AsyncHttpResponse[ApiKeyResponse]</code></summary>
+<details><summary><code>client.api_key.<a href="src/groundx/api_key/client.py">create</a>(...) -&gt; AsyncHttpResponse[ApiKeyResponse]</code></summary>
 <dl>
 <dd>
 
@@ -3297,7 +3297,7 @@ from groundx import ApiKeyRequestApiKey, GroundX
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
-client.api_keys.api_key_create(
+client.api_key.create(
     api_key=ApiKeyRequestApiKey(
         name="your_apikey_name",
     ),
@@ -3337,7 +3337,7 @@ client.api_keys.api_key_create(
 </dl>
 </details>
 
-<details><summary><code>client.api_keys.<a href="src/groundx/api_keys/client.py">api_key_update</a>(...) -&gt; AsyncHttpResponse[ApiKeyResponse]</code></summary>
+<details><summary><code>client.api_key.<a href="src/groundx/api_key/client.py">update</a>(...) -&gt; AsyncHttpResponse[ApiKeyResponse]</code></summary>
 <dl>
 <dd>
 
@@ -3369,7 +3369,7 @@ from groundx import ApiKeyRequestApiKey, GroundX
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
-client.api_keys.api_key_update(
+client.api_key.update(
     api_key_="apiKey",
     api_key=ApiKeyRequestApiKey(
         name="your_apikey_name",
@@ -3418,7 +3418,7 @@ client.api_keys.api_key_update(
 </dl>
 </details>
 
-<details><summary><code>client.api_keys.<a href="src/groundx/api_keys/client.py">api_key_delete</a>(...) -&gt; AsyncHttpResponse[MessageResponse]</code></summary>
+<details><summary><code>client.api_key.<a href="src/groundx/api_key/client.py">delete</a>(...) -&gt; AsyncHttpResponse[MessageResponse]</code></summary>
 <dl>
 <dd>
 
@@ -3450,7 +3450,7 @@ from groundx import GroundX
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
-client.api_keys.api_key_delete(
+client.api_key.delete(
     api_key="apiKey",
 )
 

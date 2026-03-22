@@ -81,7 +81,7 @@ if typing.TYPE_CHECKING:
         WorkflowsResponse,
     )
     from .errors import BadRequestError, UnauthorizedError
-    from . import api_keys, buckets, customer, documents, groups, health, mcp, search, workflows
+    from . import api_key, buckets, customer, documents, groups, health, mcp, search, workflows
     from .environment import GroundXEnvironment
     from .ingest import AsyncGroundX, GroundX
     from .search import SearchContentRequestId
@@ -168,7 +168,7 @@ _dynamic_imports: typing.Dict[str, str] = {
     "WorkflowsGetRequestId": ".workflows",
     "WorkflowsResponse": ".types",
     "__version__": ".version",
-    "api_keys": ".api_keys",
+    "api_key": ".api_key",
     "buckets": ".buckets",
     "customer": ".customer",
     "documents": ".documents",
@@ -282,7 +282,7 @@ __all__ = [
     "WorkflowsGetRequestId",
     "WorkflowsResponse",
     "__version__",
-    "api_keys",
+    "api_key",
     "buckets",
     "customer",
     "documents",
