@@ -7,6 +7,10 @@ from importlib import import_module
 
 if typing.TYPE_CHECKING:
     from .types import (
+        ApiKeyDetail,
+        ApiKeyRequest,
+        ApiKeyRequestApiKey,
+        ApiKeyResponse,
         BoundingBoxDetail,
         BucketDetail,
         BucketListResponse,
@@ -77,13 +81,17 @@ if typing.TYPE_CHECKING:
         WorkflowsResponse,
     )
     from .errors import BadRequestError, UnauthorizedError
-    from . import buckets, customer, documents, groups, health, mcp, search, workflows
+    from . import api_keys, buckets, customer, documents, groups, health, mcp, search, workflows
     from .environment import GroundXEnvironment
     from .ingest import AsyncGroundX, GroundX
     from .search import SearchContentRequestId
     from .version import __version__
     from .workflows import WorkflowsGetRequestId
 _dynamic_imports: typing.Dict[str, str] = {
+    "ApiKeyDetail": ".types",
+    "ApiKeyRequest": ".types",
+    "ApiKeyRequestApiKey": ".types",
+    "ApiKeyResponse": ".types",
     "AsyncGroundX": ".ingest",
     "BadRequestError": ".errors",
     "BoundingBoxDetail": ".types",
@@ -160,6 +168,7 @@ _dynamic_imports: typing.Dict[str, str] = {
     "WorkflowsGetRequestId": ".workflows",
     "WorkflowsResponse": ".types",
     "__version__": ".version",
+    "api_keys": ".api_keys",
     "buckets": ".buckets",
     "customer": ".customer",
     "documents": ".documents",
@@ -193,6 +202,10 @@ def __dir__():
 
 
 __all__ = [
+    "ApiKeyDetail",
+    "ApiKeyRequest",
+    "ApiKeyRequestApiKey",
+    "ApiKeyResponse",
     "AsyncGroundX",
     "BadRequestError",
     "BoundingBoxDetail",
@@ -269,6 +282,7 @@ __all__ = [
     "WorkflowsGetRequestId",
     "WorkflowsResponse",
     "__version__",
+    "api_keys",
     "buckets",
     "customer",
     "documents",

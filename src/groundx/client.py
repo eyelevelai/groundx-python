@@ -9,6 +9,7 @@ from .core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from .environment import GroundXEnvironment
 
 if typing.TYPE_CHECKING:
+    from .api_keys.client import ApiKeysClient, AsyncApiKeysClient
     from .buckets.client import AsyncBucketsClient, BucketsClient
     from .customer.client import AsyncCustomerClient, CustomerClient
     from .documents.client import AsyncDocumentsClient, DocumentsClient
@@ -91,6 +92,7 @@ class GroundXBase:
         self._groups: typing.Optional[GroupsClient] = None
         self._workflows: typing.Optional[WorkflowsClient] = None
         self._customer: typing.Optional[CustomerClient] = None
+        self._api_keys: typing.Optional[ApiKeysClient] = None
         self._health: typing.Optional[HealthClient] = None
 
     @property
@@ -148,6 +150,14 @@ class GroundXBase:
 
             self._customer = CustomerClient(client_wrapper=self._client_wrapper)
         return self._customer
+
+    @property
+    def api_keys(self):
+        if self._api_keys is None:
+            from .api_keys.client import ApiKeysClient  # noqa: E402
+
+            self._api_keys = ApiKeysClient(client_wrapper=self._client_wrapper)
+        return self._api_keys
 
     @property
     def health(self):
@@ -230,6 +240,7 @@ class AsyncGroundXBase:
         self._groups: typing.Optional[AsyncGroupsClient] = None
         self._workflows: typing.Optional[AsyncWorkflowsClient] = None
         self._customer: typing.Optional[AsyncCustomerClient] = None
+        self._api_keys: typing.Optional[AsyncApiKeysClient] = None
         self._health: typing.Optional[AsyncHealthClient] = None
 
     @property
@@ -287,6 +298,14 @@ class AsyncGroundXBase:
 
             self._customer = AsyncCustomerClient(client_wrapper=self._client_wrapper)
         return self._customer
+
+    @property
+    def api_keys(self):
+        if self._api_keys is None:
+            from .api_keys.client import AsyncApiKeysClient  # noqa: E402
+
+            self._api_keys = AsyncApiKeysClient(client_wrapper=self._client_wrapper)
+        return self._api_keys
 
     @property
     def health(self):
