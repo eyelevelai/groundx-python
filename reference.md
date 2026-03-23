@@ -3292,15 +3292,13 @@ Create a new API key.
 <dd>
 
 ```python
-from groundx import ApiKeyRequestApiKey, GroundX
+from groundx import GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
 client.api_key.create(
-    api_key=ApiKeyRequestApiKey(
-        name="your_apikey_name",
-    ),
+    name="your_apikey_name",
 )
 
 ```
@@ -3317,7 +3315,7 @@ client.api_key.create(
 <dl>
 <dd>
 
-**api_key:** `ApiKeyRequestApiKey` 
+**name:** `str` 
     
 </dd>
 </dl>
@@ -3364,16 +3362,14 @@ Rename an API key.
 <dd>
 
 ```python
-from groundx import ApiKeyRequestApiKey, GroundX
+from groundx import GroundX
 
 client = GroundX(
     api_key="YOUR_API_KEY",
 )
 client.api_key.update(
-    api_key_="apiKey",
-    api_key=ApiKeyRequestApiKey(
-        name="your_apikey_name",
-    ),
+    api_key="apiKey",
+    name="your_apikey_name",
 )
 
 ```
@@ -3390,7 +3386,7 @@ client.api_key.update(
 <dl>
 <dd>
 
-**api_key_:** `str` — The API key being updated.
+**api_key:** `str` — The API key being updated.
     
 </dd>
 </dl>
@@ -3398,7 +3394,7 @@ client.api_key.update(
 <dl>
 <dd>
 
-**api_key:** `ApiKeyRequestApiKey` 
+**name:** `str` 
     
 </dd>
 </dl>
