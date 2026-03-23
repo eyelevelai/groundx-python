@@ -4,7 +4,7 @@ dynamic = ["version"]
 
 [tool.poetry]
 name = "groundx"
-version = "3.4.5"
+version = "3.4.6"
 description = ""
 readme = "README.md"
 authors = []

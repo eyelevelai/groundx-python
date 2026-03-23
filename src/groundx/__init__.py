@@ -9,7 +9,6 @@ if typing.TYPE_CHECKING:
     from .types import (
         ApiKeyDetail,
         ApiKeyRequest,
-        ApiKeyRequestApiKey,
         ApiKeyResponse,
         BoundingBoxDetail,
         BucketDetail,
@@ -90,7 +89,6 @@ if typing.TYPE_CHECKING:
 _dynamic_imports: typing.Dict[str, str] = {
     "ApiKeyDetail": ".types",
     "ApiKeyRequest": ".types",
-    "ApiKeyRequestApiKey": ".types",
     "ApiKeyResponse": ".types",
     "AsyncGroundX": ".ingest",
     "BadRequestError": ".errors",
@@ -204,7 +202,6 @@ def __dir__():
 __all__ = [
     "ApiKeyDetail",
     "ApiKeyRequest",
-    "ApiKeyRequestApiKey",
     "ApiKeyResponse",
     "AsyncGroundX",
     "BadRequestError",

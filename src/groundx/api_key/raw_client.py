@@ -9,9 +9,7 @@ from ..core.http_response import AsyncHttpResponse, HttpResponse
 from ..core.jsonable_encoder import jsonable_encoder
 from ..core.pydantic_utilities import parse_obj_as
 from ..core.request_options import RequestOptions
-from ..core.serialization import convert_and_respect_annotation_metadata
 from ..errors.bad_request_error import BadRequestError
-from ..types.api_key_request_api_key import ApiKeyRequestApiKey
 from ..types.api_key_response import ApiKeyResponse
 from ..types.message_response import MessageResponse
 
@@ -58,14 +56,14 @@ class RawApiKeyClient:
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
     def create(
-        self, *, api_key: ApiKeyRequestApiKey, request_options: typing.Optional[RequestOptions] = None
+        self, *, name: str, request_options: typing.Optional[RequestOptions] = None
     ) -> HttpResponse[ApiKeyResponse]:
         """
         Create a new API key.
 
         Parameters
         ----------
-        api_key : ApiKeyRequestApiKey
+        name : str
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -79,9 +77,7 @@ class RawApiKeyClient:
             "v1/apikey",
             method="POST",
             json={
-                "apiKey": convert_and_respect_annotation_metadata(
-                    object_=api_key, annotation=ApiKeyRequestApiKey, direction="write"
-                ),
+                "name": name,
             },
             headers={
                 "content-type": "application/json",
@@ -116,17 +112,17 @@ class RawApiKeyClient:
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
     def update(
-        self, api_key_: str, *, api_key: ApiKeyRequestApiKey, request_options: typing.Optional[RequestOptions] = None
+        self, api_key: str, *, name: str, request_options: typing.Optional[RequestOptions] = None
     ) -> HttpResponse[ApiKeyResponse]:
         """
         Rename an API key.
 
         Parameters
         ----------
-        api_key_ : str
+        api_key : str
             The API key being updated.
 
-        api_key : ApiKeyRequestApiKey
+        name : str
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -137,12 +133,10 @@ class RawApiKeyClient:
             API key successfully updated
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"v1/apikey/{jsonable_encoder(api_key_)}",
+            f"v1/apikey/{jsonable_encoder(api_key)}",
             method="PUT",
             json={
-                "apiKey": convert_and_respect_annotation_metadata(
-                    object_=api_key, annotation=ApiKeyRequestApiKey, direction="write"
-                ),
+                "name": name,
             },
             headers={
                 "content-type": "application/json",
@@ -246,14 +240,14 @@ class AsyncRawApiKeyClient:
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
     async def create(
-        self, *, api_key: ApiKeyRequestApiKey, request_options: typing.Optional[RequestOptions] = None
+        self, *, name: str, request_options: typing.Optional[RequestOptions] = None
     ) -> AsyncHttpResponse[ApiKeyResponse]:
         """
         Create a new API key.
 
         Parameters
         ----------
-        api_key : ApiKeyRequestApiKey
+        name : str
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -267,9 +261,7 @@ class AsyncRawApiKeyClient:
             "v1/apikey",
             method="POST",
             json={
-                "apiKey": convert_and_respect_annotation_metadata(
-                    object_=api_key, annotation=ApiKeyRequestApiKey, direction="write"
-                ),
+                "name": name,
             },
             headers={
                 "content-type": "application/json",
@@ -304,17 +296,17 @@ class AsyncRawApiKeyClient:
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
     async def update(
-        self, api_key_: str, *, api_key: ApiKeyRequestApiKey, request_options: typing.Optional[RequestOptions] = None
+        self, api_key: str, *, name: str, request_options: typing.Optional[RequestOptions] = None
     ) -> AsyncHttpResponse[ApiKeyResponse]:
         """
         Rename an API key.
 
         Parameters
         ----------
-        api_key_ : str
+        api_key : str
             The API key being updated.
 
-        api_key : ApiKeyRequestApiKey
+        name : str
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -325,12 +317,10 @@ class AsyncRawApiKeyClient:
             API key successfully updated
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"v1/apikey/{jsonable_encoder(api_key_)}",
+            f"v1/apikey/{jsonable_encoder(api_key)}",
             method="PUT",
             json={
-                "apiKey": convert_and_respect_annotation_metadata(
-                    object_=api_key, annotation=ApiKeyRequestApiKey, direction="write"
-                ),
+                "name": name,
             },
             headers={
                 "content-type": "application/json",

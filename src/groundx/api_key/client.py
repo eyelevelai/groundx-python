@@ -4,7 +4,6 @@ import typing
 
 from ..core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ..core.request_options import RequestOptions
-from ..types.api_key_request_api_key import ApiKeyRequestApiKey
 from ..types.api_key_response import ApiKeyResponse
 from ..types.message_response import MessageResponse
 from .raw_client import AsyncRawApiKeyClient, RawApiKeyClient
@@ -54,15 +53,13 @@ class ApiKeyClient:
         _response = self._raw_client.list(request_options=request_options)
         return _response.data
 
-    def create(
-        self, *, api_key: ApiKeyRequestApiKey, request_options: typing.Optional[RequestOptions] = None
-    ) -> ApiKeyResponse:
+    def create(self, *, name: str, request_options: typing.Optional[RequestOptions] = None) -> ApiKeyResponse:
         """
         Create a new API key.
 
         Parameters
         ----------
-        api_key : ApiKeyRequestApiKey
+        name : str
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -74,32 +71,30 @@ class ApiKeyClient:
 
         Examples
         --------
-        from groundx import ApiKeyRequestApiKey, GroundX
+        from groundx import GroundX
 
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.api_key.create(
-            api_key=ApiKeyRequestApiKey(
-                name="your_apikey_name",
-            ),
+            name="your_apikey_name",
         )
         """
-        _response = self._raw_client.create(api_key=api_key, request_options=request_options)
+        _response = self._raw_client.create(name=name, request_options=request_options)
         return _response.data
 
     def update(
-        self, api_key_: str, *, api_key: ApiKeyRequestApiKey, request_options: typing.Optional[RequestOptions] = None
+        self, api_key: str, *, name: str, request_options: typing.Optional[RequestOptions] = None
     ) -> ApiKeyResponse:
         """
         Rename an API key.
 
         Parameters
         ----------
-        api_key_ : str
+        api_key : str
             The API key being updated.
 
-        api_key : ApiKeyRequestApiKey
+        name : str
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -111,19 +106,17 @@ class ApiKeyClient:
 
         Examples
         --------
-        from groundx import ApiKeyRequestApiKey, GroundX
+        from groundx import GroundX
 
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.api_key.update(
-            api_key_="apiKey",
-            api_key=ApiKeyRequestApiKey(
-                name="your_apikey_name",
-            ),
+            api_key="apiKey",
+            name="your_apikey_name",
         )
         """
-        _response = self._raw_client.update(api_key_, api_key=api_key, request_options=request_options)
+        _response = self._raw_client.update(api_key, name=name, request_options=request_options)
         return _response.data
 
     def delete(self, api_key: str, *, request_options: typing.Optional[RequestOptions] = None) -> MessageResponse:
@@ -207,15 +200,13 @@ class AsyncApiKeyClient:
         _response = await self._raw_client.list(request_options=request_options)
         return _response.data
 
-    async def create(
-        self, *, api_key: ApiKeyRequestApiKey, request_options: typing.Optional[RequestOptions] = None
-    ) -> ApiKeyResponse:
+    async def create(self, *, name: str, request_options: typing.Optional[RequestOptions] = None) -> ApiKeyResponse:
         """
         Create a new API key.
 
         Parameters
         ----------
-        api_key : ApiKeyRequestApiKey
+        name : str
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -229,7 +220,7 @@ class AsyncApiKeyClient:
         --------
         import asyncio
 
-        from groundx import ApiKeyRequestApiKey, AsyncGroundX
+        from groundx import AsyncGroundX
 
         client = AsyncGroundX(
             api_key="YOUR_API_KEY",
@@ -238,29 +229,27 @@ class AsyncApiKeyClient:
 
         async def main() -> None:
             await client.api_key.create(
-                api_key=ApiKeyRequestApiKey(
-                    name="your_apikey_name",
-                ),
+                name="your_apikey_name",
             )
 
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.create(api_key=api_key, request_options=request_options)
+        _response = await self._raw_client.create(name=name, request_options=request_options)
         return _response.data
 
     async def update(
-        self, api_key_: str, *, api_key: ApiKeyRequestApiKey, request_options: typing.Optional[RequestOptions] = None
+        self, api_key: str, *, name: str, request_options: typing.Optional[RequestOptions] = None
     ) -> ApiKeyResponse:
         """
         Rename an API key.
 
         Parameters
         ----------
-        api_key_ : str
+        api_key : str
             The API key being updated.
 
-        api_key : ApiKeyRequestApiKey
+        name : str
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -274,7 +263,7 @@ class AsyncApiKeyClient:
         --------
         import asyncio
 
-        from groundx import ApiKeyRequestApiKey, AsyncGroundX
+        from groundx import AsyncGroundX
 
         client = AsyncGroundX(
             api_key="YOUR_API_KEY",
@@ -283,16 +272,14 @@ class AsyncApiKeyClient:
 
         async def main() -> None:
             await client.api_key.update(
-                api_key_="apiKey",
-                api_key=ApiKeyRequestApiKey(
-                    name="your_apikey_name",
-                ),
+                api_key="apiKey",
+                name="your_apikey_name",
             )
 
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.update(api_key_, api_key=api_key, request_options=request_options)
+        _response = await self._raw_client.update(api_key, name=name, request_options=request_options)
         return _response.data
 
     async def delete(self, api_key: str, *, request_options: typing.Optional[RequestOptions] = None) -> MessageResponse:

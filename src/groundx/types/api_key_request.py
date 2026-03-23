@@ -3,16 +3,11 @@
 import typing
 
 import pydantic
-import typing_extensions
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
-from ..core.serialization import FieldMetadata
-from .api_key_request_api_key import ApiKeyRequestApiKey
 
 
 class ApiKeyRequest(UniversalBaseModel):
-    api_key: typing_extensions.Annotated[
-        ApiKeyRequestApiKey, FieldMetadata(alias="apiKey"), pydantic.Field(alias="apiKey")
-    ]
+    name: str
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

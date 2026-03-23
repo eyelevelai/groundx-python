@@ -8,7 +8,6 @@ from importlib import import_module
 if typing.TYPE_CHECKING:
     from .api_key_detail import ApiKeyDetail
     from .api_key_request import ApiKeyRequest
-    from .api_key_request_api_key import ApiKeyRequestApiKey
     from .api_key_response import ApiKeyResponse
     from .bounding_box_detail import BoundingBoxDetail
     from .bucket_detail import BucketDetail
@@ -81,7 +80,6 @@ if typing.TYPE_CHECKING:
 _dynamic_imports: typing.Dict[str, str] = {
     "ApiKeyDetail": ".api_key_detail",
     "ApiKeyRequest": ".api_key_request",
-    "ApiKeyRequestApiKey": ".api_key_request_api_key",
     "ApiKeyResponse": ".api_key_response",
     "BoundingBoxDetail": ".bounding_box_detail",
     "BucketDetail": ".bucket_detail",
@@ -178,7 +176,6 @@ def __dir__():
 __all__ = [
     "ApiKeyDetail",
     "ApiKeyRequest",
-    "ApiKeyRequestApiKey",
     "ApiKeyResponse",
     "BoundingBoxDetail",
     "BucketDetail",
