@@ -17,6 +17,7 @@ from ..types.document_list_response import DocumentListResponse
 from ..types.document_local_ingest_request import DocumentLocalIngestRequest
 from ..types.document_lookup_response import DocumentLookupResponse
 from ..types.document_response import DocumentResponse
+from ..types.document_update import DocumentUpdate
 from ..types.ingest_remote_document import IngestRemoteDocument
 from ..types.ingest_response import IngestResponse
 from ..types.processes_status_response import ProcessesStatusResponse
@@ -24,7 +25,6 @@ from ..types.processing_status import ProcessingStatus
 from ..types.sort import Sort
 from ..types.sort_order import SortOrder
 from ..types.website_source import WebsiteSource
-from .types.document_update_request_documents_item import DocumentUpdateRequestDocumentsItem
 from pydantic import ValidationError
 
 # this is used as the default value for optional parameters
@@ -427,7 +427,7 @@ class RawDocumentsClient:
     def update(
         self,
         *,
-        documents: typing.Sequence[DocumentUpdateRequestDocumentsItem],
+        documents: typing.Sequence[DocumentUpdate],
         callback_url: typing.Optional[str] = OMIT,
         callback_data: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -437,7 +437,7 @@ class RawDocumentsClient:
 
         Parameters
         ----------
-        documents : typing.Sequence[DocumentUpdateRequestDocumentsItem]
+        documents : typing.Sequence[DocumentUpdate]
 
         callback_url : typing.Optional[str]
             An endpoint that will receive processing event updates as POST.
@@ -458,7 +458,7 @@ class RawDocumentsClient:
             method="PUT",
             json={
                 "documents": convert_and_respect_annotation_metadata(
-                    object_=documents, annotation=typing.Sequence[DocumentUpdateRequestDocumentsItem], direction="write"
+                    object_=documents, annotation=typing.Sequence[DocumentUpdate], direction="write"
                 ),
                 "callbackUrl": callback_url,
                 "callbackData": callback_data,
@@ -1524,7 +1524,7 @@ class AsyncRawDocumentsClient:
     async def update(
         self,
         *,
-        documents: typing.Sequence[DocumentUpdateRequestDocumentsItem],
+        documents: typing.Sequence[DocumentUpdate],
         callback_url: typing.Optional[str] = OMIT,
         callback_data: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -1534,7 +1534,7 @@ class AsyncRawDocumentsClient:
 
         Parameters
         ----------
-        documents : typing.Sequence[DocumentUpdateRequestDocumentsItem]
+        documents : typing.Sequence[DocumentUpdate]
 
         callback_url : typing.Optional[str]
             An endpoint that will receive processing event updates as POST.
@@ -1555,7 +1555,7 @@ class AsyncRawDocumentsClient:
             method="PUT",
             json={
                 "documents": convert_and_respect_annotation_metadata(
-                    object_=documents, annotation=typing.Sequence[DocumentUpdateRequestDocumentsItem], direction="write"
+                    object_=documents, annotation=typing.Sequence[DocumentUpdate], direction="write"
                 ),
                 "callbackUrl": callback_url,
                 "callbackData": callback_data,

@@ -8,6 +8,7 @@ from ..types.document_list_response import DocumentListResponse
 from ..types.document_local_ingest_request import DocumentLocalIngestRequest
 from ..types.document_lookup_response import DocumentLookupResponse
 from ..types.document_response import DocumentResponse
+from ..types.document_update import DocumentUpdate
 from ..types.ingest_remote_document import IngestRemoteDocument
 from ..types.ingest_response import IngestResponse
 from ..types.processes_status_response import ProcessesStatusResponse
@@ -16,7 +17,6 @@ from ..types.sort import Sort
 from ..types.sort_order import SortOrder
 from ..types.website_source import WebsiteSource
 from .raw_client import AsyncRawDocumentsClient, RawDocumentsClient
-from .types.document_update_request_documents_item import DocumentUpdateRequestDocumentsItem
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -310,7 +310,7 @@ class DocumentsClient:
     def update(
         self,
         *,
-        documents: typing.Sequence[DocumentUpdateRequestDocumentsItem],
+        documents: typing.Sequence[DocumentUpdate],
         callback_url: typing.Optional[str] = OMIT,
         callback_data: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -320,7 +320,7 @@ class DocumentsClient:
 
         Parameters
         ----------
-        documents : typing.Sequence[DocumentUpdateRequestDocumentsItem]
+        documents : typing.Sequence[DocumentUpdate]
 
         callback_url : typing.Optional[str]
             An endpoint that will receive processing event updates as POST.
@@ -338,15 +338,14 @@ class DocumentsClient:
 
         Examples
         --------
-        from groundx import GroundX
-        from groundx.documents import DocumentUpdateRequestDocumentsItem
+        from groundx import DocumentUpdate, GroundX
 
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.update(
             documents=[
-                DocumentUpdateRequestDocumentsItem(
+                DocumentUpdate(
                     document_id="documentId",
                 )
             ],
@@ -1038,7 +1037,7 @@ class AsyncDocumentsClient:
     async def update(
         self,
         *,
-        documents: typing.Sequence[DocumentUpdateRequestDocumentsItem],
+        documents: typing.Sequence[DocumentUpdate],
         callback_url: typing.Optional[str] = OMIT,
         callback_data: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -1048,7 +1047,7 @@ class AsyncDocumentsClient:
 
         Parameters
         ----------
-        documents : typing.Sequence[DocumentUpdateRequestDocumentsItem]
+        documents : typing.Sequence[DocumentUpdate]
 
         callback_url : typing.Optional[str]
             An endpoint that will receive processing event updates as POST.
@@ -1068,8 +1067,7 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundX
-        from groundx.documents import DocumentUpdateRequestDocumentsItem
+        from groundx import AsyncGroundX, DocumentUpdate
 
         client = AsyncGroundX(
             api_key="YOUR_API_KEY",
@@ -1079,7 +1077,7 @@ class AsyncDocumentsClient:
         async def main() -> None:
             await client.documents.update(
                 documents=[
-                    DocumentUpdateRequestDocumentsItem(
+                    DocumentUpdate(
                         document_id="documentId",
                     )
                 ],
