@@ -598,9 +598,8 @@ Update the attributes of documents that have been uploaded to GroundX.
 <dd>
 
 ```python
-from groundx import GroundX
+from groundx import GroundX, DocumentUpdate
 from groundx.environment import GroundXEnvironment
-from groundx.documents import DocumentUpdateRequestDocumentsItem
 
 client = GroundX(
     api_key="<value>",
@@ -609,7 +608,7 @@ client = GroundX(
 
 client.documents.update(
     documents=[
-        DocumentUpdateRequestDocumentsItem(
+        DocumentUpdate(
             document_id="documentId",
         )
     ],
@@ -629,7 +628,7 @@ client.documents.update(
 <dl>
 <dd>
 
-**documents:** `typing.List[DocumentUpdateRequestDocumentsItem]` 
+**documents:** `typing.List[DocumentUpdate]` 
     
 </dd>
 </dl>

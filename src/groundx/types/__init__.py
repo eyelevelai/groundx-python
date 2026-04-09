@@ -24,6 +24,7 @@ if typing.TYPE_CHECKING:
     from .document_lookup_response import DocumentLookupResponse
     from .document_response import DocumentResponse
     from .document_type import DocumentType
+    from .document_update import DocumentUpdate
     from .group_detail import GroupDetail
     from .group_list_response import GroupListResponse
     from .group_response import GroupResponse
@@ -96,6 +97,7 @@ _dynamic_imports: typing.Dict[str, str] = {
     "DocumentLookupResponse": ".document_lookup_response",
     "DocumentResponse": ".document_response",
     "DocumentType": ".document_type",
+    "DocumentUpdate": ".document_update",
     "GroupDetail": ".group_detail",
     "GroupListResponse": ".group_list_response",
     "GroupResponse": ".group_response",
@@ -192,6 +194,7 @@ __all__ = [
     "DocumentLookupResponse",
     "DocumentResponse",
     "DocumentType",
+    "DocumentUpdate",
     "GroupDetail",
     "GroupListResponse",
     "GroupResponse",
