@@ -583,7 +583,7 @@ client.documents.list(
 <dl>
 <dd>
 
-Update some attributes of documents that have been uploaded to GroundX.
+Update the attributes of documents that have been uploaded to GroundX.
 </dd>
 </dl>
 </dd>
@@ -598,8 +598,9 @@ Update some attributes of documents that have been uploaded to GroundX.
 <dd>
 
 ```python
-from groundx import GroundX, DocumentUpdateRequestItem
+from groundx import GroundX
 from groundx.environment import GroundXEnvironment
+from groundx.documents import DocumentUpdateRequestDocumentsItem
 
 client = GroundX(
     api_key="<value>",
@@ -607,8 +608,8 @@ client = GroundX(
 )
 
 client.documents.update(
-    request=[
-        DocumentUpdateRequestItem(
+    documents=[
+        DocumentUpdateRequestDocumentsItem(
             document_id="documentId",
         )
     ],
@@ -628,7 +629,23 @@ client.documents.update(
 <dl>
 <dd>
 
-**request:** `DocumentUpdateRequest` 
+**documents:** `typing.List[DocumentUpdateRequestDocumentsItem]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**callback_url:** `typing.Optional[str]` — An endpoint that will receive processing event updates as POST.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**callback_data:** `typing.Optional[str]` — A string that is returned, along with processing event updates, to the callback URL.
     
 </dd>
 </dl>
