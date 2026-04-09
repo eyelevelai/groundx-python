@@ -6,8 +6,10 @@ import typing
 from importlib import import_module
 
 if typing.TYPE_CHECKING:
-    from .types import DocumentUpdateRequestDocumentsItem
-_dynamic_imports: typing.Dict[str, str] = {"DocumentUpdateRequestDocumentsItem": ".types"}
+    from .document_update_request_documents_item import DocumentUpdateRequestDocumentsItem
+_dynamic_imports: typing.Dict[str, str] = {
+    "DocumentUpdateRequestDocumentsItem": ".document_update_request_documents_item"
+}
 
 
 def __getattr__(attr_name: str) -> typing.Any:

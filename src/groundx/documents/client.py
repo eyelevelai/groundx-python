@@ -8,7 +8,6 @@ from ..types.document_list_response import DocumentListResponse
 from ..types.document_local_ingest_request import DocumentLocalIngestRequest
 from ..types.document_lookup_response import DocumentLookupResponse
 from ..types.document_response import DocumentResponse
-from ..types.document_update_request import DocumentUpdateRequest
 from ..types.ingest_remote_document import IngestRemoteDocument
 from ..types.ingest_response import IngestResponse
 from ..types.processes_status_response import ProcessesStatusResponse
@@ -17,6 +16,7 @@ from ..types.sort import Sort
 from ..types.sort_order import SortOrder
 from ..types.website_source import WebsiteSource
 from .raw_client import AsyncRawDocumentsClient, RawDocumentsClient
+from .types.document_update_request_documents_item import DocumentUpdateRequestDocumentsItem
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -308,14 +308,25 @@ class DocumentsClient:
         return _response.data
 
     def update(
-        self, *, request: DocumentUpdateRequest, request_options: typing.Optional[RequestOptions] = None
+        self,
+        *,
+        documents: typing.Sequence[DocumentUpdateRequestDocumentsItem],
+        callback_url: typing.Optional[str] = OMIT,
+        callback_data: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
         """
-        Update some attributes of documents that have been uploaded to GroundX.
+        Update the attributes of documents that have been uploaded to GroundX.
 
         Parameters
         ----------
-        request : DocumentUpdateRequest
+        documents : typing.Sequence[DocumentUpdateRequestDocumentsItem]
+
+        callback_url : typing.Optional[str]
+            An endpoint that will receive processing event updates as POST.
+
+        callback_data : typing.Optional[str]
+            A string that is returned, along with processing event updates, to the callback URL.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -327,20 +338,23 @@ class DocumentsClient:
 
         Examples
         --------
-        from groundx import DocumentUpdateRequestItem, GroundX
+        from groundx import GroundX
+        from groundx.documents import DocumentUpdateRequestDocumentsItem
 
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.documents.update(
-            request=[
-                DocumentUpdateRequestItem(
+            documents=[
+                DocumentUpdateRequestDocumentsItem(
                     document_id="documentId",
                 )
             ],
         )
         """
-        _response = self._raw_client.update(request=request, request_options=request_options)
+        _response = self._raw_client.update(
+            documents=documents, callback_url=callback_url, callback_data=callback_data, request_options=request_options
+        )
         return _response.data
 
     def delete(
@@ -1022,14 +1036,25 @@ class AsyncDocumentsClient:
         return _response.data
 
     async def update(
-        self, *, request: DocumentUpdateRequest, request_options: typing.Optional[RequestOptions] = None
+        self,
+        *,
+        documents: typing.Sequence[DocumentUpdateRequestDocumentsItem],
+        callback_url: typing.Optional[str] = OMIT,
+        callback_data: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
         """
-        Update some attributes of documents that have been uploaded to GroundX.
+        Update the attributes of documents that have been uploaded to GroundX.
 
         Parameters
         ----------
-        request : DocumentUpdateRequest
+        documents : typing.Sequence[DocumentUpdateRequestDocumentsItem]
+
+        callback_url : typing.Optional[str]
+            An endpoint that will receive processing event updates as POST.
+
+        callback_data : typing.Optional[str]
+            A string that is returned, along with processing event updates, to the callback URL.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1043,7 +1068,8 @@ class AsyncDocumentsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundX, DocumentUpdateRequestItem
+        from groundx import AsyncGroundX
+        from groundx.documents import DocumentUpdateRequestDocumentsItem
 
         client = AsyncGroundX(
             api_key="YOUR_API_KEY",
@@ -1052,8 +1078,8 @@ class AsyncDocumentsClient:
 
         async def main() -> None:
             await client.documents.update(
-                request=[
-                    DocumentUpdateRequestItem(
+                documents=[
+                    DocumentUpdateRequestDocumentsItem(
                         document_id="documentId",
                     )
                 ],
@@ -1062,7 +1088,9 @@ class AsyncDocumentsClient:
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.update(request=request, request_options=request_options)
+        _response = await self._raw_client.update(
+            documents=documents, callback_url=callback_url, callback_data=callback_data, request_options=request_options
+        )
         return _response.data
 
     async def delete(

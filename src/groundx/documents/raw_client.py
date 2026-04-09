@@ -17,7 +17,6 @@ from ..types.document_list_response import DocumentListResponse
 from ..types.document_local_ingest_request import DocumentLocalIngestRequest
 from ..types.document_lookup_response import DocumentLookupResponse
 from ..types.document_response import DocumentResponse
-from ..types.document_update_request import DocumentUpdateRequest
 from ..types.ingest_remote_document import IngestRemoteDocument
 from ..types.ingest_response import IngestResponse
 from ..types.processes_status_response import ProcessesStatusResponse
@@ -25,6 +24,7 @@ from ..types.processing_status import ProcessingStatus
 from ..types.sort import Sort
 from ..types.sort_order import SortOrder
 from ..types.website_source import WebsiteSource
+from .types.document_update_request_documents_item import DocumentUpdateRequestDocumentsItem
 from pydantic import ValidationError
 
 # this is used as the default value for optional parameters
@@ -425,14 +425,25 @@ class RawDocumentsClient:
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
     def update(
-        self, *, request: DocumentUpdateRequest, request_options: typing.Optional[RequestOptions] = None
+        self,
+        *,
+        documents: typing.Sequence[DocumentUpdateRequestDocumentsItem],
+        callback_url: typing.Optional[str] = OMIT,
+        callback_data: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[IngestResponse]:
         """
-        Update some attributes of documents that have been uploaded to GroundX.
+        Update the attributes of documents that have been uploaded to GroundX.
 
         Parameters
         ----------
-        request : DocumentUpdateRequest
+        documents : typing.Sequence[DocumentUpdateRequestDocumentsItem]
+
+        callback_url : typing.Optional[str]
+            An endpoint that will receive processing event updates as POST.
+
+        callback_data : typing.Optional[str]
+            A string that is returned, along with processing event updates, to the callback URL.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -445,9 +456,13 @@ class RawDocumentsClient:
         _response = self._client_wrapper.httpx_client.request(
             "v1/ingest/documents",
             method="PUT",
-            json=convert_and_respect_annotation_metadata(
-                object_=request, annotation=DocumentUpdateRequest, direction="write"
-            ),
+            json={
+                "documents": convert_and_respect_annotation_metadata(
+                    object_=documents, annotation=typing.Sequence[DocumentUpdateRequestDocumentsItem], direction="write"
+                ),
+                "callbackUrl": callback_url,
+                "callbackData": callback_data,
+            },
             headers={
                 "content-type": "application/json",
             },
@@ -1507,14 +1522,25 @@ class AsyncRawDocumentsClient:
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
     async def update(
-        self, *, request: DocumentUpdateRequest, request_options: typing.Optional[RequestOptions] = None
+        self,
+        *,
+        documents: typing.Sequence[DocumentUpdateRequestDocumentsItem],
+        callback_url: typing.Optional[str] = OMIT,
+        callback_data: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[IngestResponse]:
         """
-        Update some attributes of documents that have been uploaded to GroundX.
+        Update the attributes of documents that have been uploaded to GroundX.
 
         Parameters
         ----------
-        request : DocumentUpdateRequest
+        documents : typing.Sequence[DocumentUpdateRequestDocumentsItem]
+
+        callback_url : typing.Optional[str]
+            An endpoint that will receive processing event updates as POST.
+
+        callback_data : typing.Optional[str]
+            A string that is returned, along with processing event updates, to the callback URL.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1527,9 +1553,13 @@ class AsyncRawDocumentsClient:
         _response = await self._client_wrapper.httpx_client.request(
             "v1/ingest/documents",
             method="PUT",
-            json=convert_and_respect_annotation_metadata(
-                object_=request, annotation=DocumentUpdateRequest, direction="write"
-            ),
+            json={
+                "documents": convert_and_respect_annotation_metadata(
+                    object_=documents, annotation=typing.Sequence[DocumentUpdateRequestDocumentsItem], direction="write"
+                ),
+                "callbackUrl": callback_url,
+                "callbackData": callback_data,
+            },
             headers={
                 "content-type": "application/json",
             },

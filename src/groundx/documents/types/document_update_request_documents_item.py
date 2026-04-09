@@ -4,11 +4,11 @@ import typing
 
 import pydantic
 import typing_extensions
-from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
-from ..core.serialization import FieldMetadata
+from ...core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
+from ...core.serialization import FieldMetadata
 
 
-class DocumentUpdateRequestItem(UniversalBaseModel):
+class DocumentUpdateRequestDocumentsItem(UniversalBaseModel):
     document_id: typing_extensions.Annotated[
         str,
         FieldMetadata(alias="documentId"),
