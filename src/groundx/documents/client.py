@@ -8,6 +8,7 @@ from ..types.document_list_response import DocumentListResponse
 from ..types.document_local_ingest_request import DocumentLocalIngestRequest
 from ..types.document_lookup_response import DocumentLookupResponse
 from ..types.document_response import DocumentResponse
+from ..types.document_update_request import DocumentUpdateRequest
 from ..types.ingest_remote_document import IngestRemoteDocument
 from ..types.ingest_response import IngestResponse
 from ..types.processes_status_response import ProcessesStatusResponse
@@ -304,6 +305,42 @@ class DocumentsClient:
             next_token=next_token,
             request_options=request_options,
         )
+        return _response.data
+
+    def update(
+        self, *, request: DocumentUpdateRequest, request_options: typing.Optional[RequestOptions] = None
+    ) -> IngestResponse:
+        """
+        Update some attributes of documents that have been uploaded to GroundX.
+
+        Parameters
+        ----------
+        request : DocumentUpdateRequest
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        IngestResponse
+            Documents successfully submitted for updates
+
+        Examples
+        --------
+        from groundx import DocumentUpdateRequestItem, GroundX
+
+        client = GroundX(
+            api_key="YOUR_API_KEY",
+        )
+        client.documents.update(
+            request=[
+                DocumentUpdateRequestItem(
+                    document_id="documentId",
+                )
+            ],
+        )
+        """
+        _response = self._raw_client.update(request=request, request_options=request_options)
         return _response.data
 
     def delete(
@@ -982,6 +1019,50 @@ class AsyncDocumentsClient:
             next_token=next_token,
             request_options=request_options,
         )
+        return _response.data
+
+    async def update(
+        self, *, request: DocumentUpdateRequest, request_options: typing.Optional[RequestOptions] = None
+    ) -> IngestResponse:
+        """
+        Update some attributes of documents that have been uploaded to GroundX.
+
+        Parameters
+        ----------
+        request : DocumentUpdateRequest
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        IngestResponse
+            Documents successfully submitted for updates
+
+        Examples
+        --------
+        import asyncio
+
+        from groundx import AsyncGroundX, DocumentUpdateRequestItem
+
+        client = AsyncGroundX(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.documents.update(
+                request=[
+                    DocumentUpdateRequestItem(
+                        document_id="documentId",
+                    )
+                ],
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.update(request=request, request_options=request_options)
         return _response.data
 
     async def delete(
