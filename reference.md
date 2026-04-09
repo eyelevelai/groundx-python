@@ -1,6 +1,6 @@
 # Reference
 ## MCP
-<details><summary><code>client.mcp.<a href="src/groundx/mcp/client.py">mcp</a>(...) -&gt; AsyncHttpResponse[typing.Dict[str, typing.Any]]</code></summary>
+<details><summary><code>client.mcp.<a href="src/groundx/mcp/client.py">mcp</a>(...) -> typing.Dict[str, typing.Any]</code></summary>
 <dl>
 <dd>
 
@@ -30,12 +30,17 @@ This endpoint can be accessed at either `/api/v1/mcp` or `/mcp`.
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.mcp.mcp(
-    request={"key": "value"},
+    request={
+        "key": "value"
+    },
 )
 
 ```
@@ -73,7 +78,7 @@ client.mcp.mcp(
 </details>
 
 ## Documents
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">copy</a>(...) -&gt; AsyncHttpResponse[IngestResponse]</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">copy</a>(...) -> IngestResponse</code></summary>
 <dl>
 <dd>
 
@@ -101,10 +106,13 @@ copy documents from one bucket to another
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.documents.copy(
     to_bucket=1234,
 )
@@ -131,7 +139,7 @@ client.documents.copy(
 <dl>
 <dd>
 
-**document_ids:** `typing.Optional[typing.Sequence[str]]` — The document IDs of the files you wish to copy.
+**document_ids:** `typing.Optional[typing.List[str]]` — The document IDs of the files you wish to copy.
     
 </dd>
 </dl>
@@ -159,7 +167,7 @@ client.documents.copy(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">ingest_remote</a>(...) -&gt; AsyncHttpResponse[IngestResponse]</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">ingest_remote</a>(...) -> IngestResponse</code></summary>
 <dl>
 <dd>
 
@@ -189,10 +197,13 @@ Ingest documents hosted on public URLs into a GroundX bucket.
 
 ```python
 from groundx import GroundX, IngestRemoteDocument
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.documents.ingest_remote(
     documents=[
         IngestRemoteDocument(
@@ -218,7 +229,7 @@ client.documents.ingest_remote(
 <dl>
 <dd>
 
-**documents:** `typing.Sequence[IngestRemoteDocument]` 
+**documents:** `typing.List[IngestRemoteDocument]` 
     
 </dd>
 </dl>
@@ -254,7 +265,7 @@ client.documents.ingest_remote(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">ingest_local</a>(...) -&gt; AsyncHttpResponse[IngestResponse]</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">ingest_local</a>(...) -> IngestResponse</code></summary>
 <dl>
 <dd>
 
@@ -284,10 +295,13 @@ Upload documents hosted on a local file system into a GroundX bucket.
 
 ```python
 from groundx import GroundX, IngestLocalDocument, IngestLocalDocumentMetadata
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.documents.ingest_local(
     request=[
         IngestLocalDocument(
@@ -335,7 +349,7 @@ client.documents.ingest_local(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">crawl_website</a>(...) -&gt; AsyncHttpResponse[IngestResponse]</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">crawl_website</a>(...) -> IngestResponse</code></summary>
 <dl>
 <dd>
 
@@ -368,17 +382,22 @@ Note2: The `source_url` must include the protocol, http:// or https://.
 
 ```python
 from groundx import GroundX, WebsiteSource
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.documents.crawl_website(
     websites=[
         WebsiteSource(
             bucket_id=1234,
             cap=10,
             depth=2,
-            search_data={"key": "value"},
+            search_data={
+                "key": "value"
+            },
             source_url="https://my.website.com",
         )
     ],
@@ -398,7 +417,7 @@ client.documents.crawl_website(
 <dl>
 <dd>
 
-**websites:** `typing.Sequence[WebsiteSource]` 
+**websites:** `typing.List[WebsiteSource]` 
     
 </dd>
 </dl>
@@ -434,7 +453,7 @@ client.documents.crawl_website(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">list</a>(...) -&gt; AsyncHttpResponse[DocumentListResponse]</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">list</a>(...) -> DocumentListResponse</code></summary>
 <dl>
 <dd>
 
@@ -462,10 +481,13 @@ lookup all documents across all resources which are currently on GroundX
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.documents.list(
     n=1,
     filter="filter",
@@ -549,7 +571,84 @@ client.documents.list(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">delete</a>(...) -&gt; AsyncHttpResponse[IngestResponse]</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">update</a>(...) -> IngestResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Update some attributes of documents that have been uploaded to GroundX.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from groundx import GroundX, DocumentUpdateRequestItem
+from groundx.environment import GroundXEnvironment
+
+client = GroundX(
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
+)
+
+client.documents.update(
+    request=[
+        DocumentUpdateRequestItem(
+            document_id="documentId",
+        )
+    ],
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**request:** `DocumentUpdateRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">delete</a>(...) -> IngestResponse</code></summary>
 <dl>
 <dd>
 
@@ -577,12 +676,17 @@ Delete multiple documents hosted on GroundX
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.documents.delete(
-    document_ids="123e4567-e89b-12d3-a456-426614174000,9f7c11a6-24b8-4d52-a9f3-90a7e70a9e49",
+    document_ids=[
+        "123e4567-e89b-12d3-a456-426614174000,9f7c11a6-24b8-4d52-a9f3-90a7e70a9e49"
+    ],
 )
 
 ```
@@ -619,7 +723,7 @@ client.documents.delete(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">get_processing_status_by_id</a>(...) -&gt; AsyncHttpResponse[IngestResponse]</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">get_processing_status_by_id</a>(...) -> IngestResponse</code></summary>
 <dl>
 <dd>
 
@@ -647,10 +751,13 @@ Get the current status of an ingest, initiated with documents.ingest_remote, doc
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.documents.get_processing_status_by_id(
     process_id="processId",
 )
@@ -689,7 +796,7 @@ client.documents.get_processing_status_by_id(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">cancel_process</a>(...) -&gt; AsyncHttpResponse[IngestResponse]</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">cancel_process</a>(...) -> IngestResponse</code></summary>
 <dl>
 <dd>
 
@@ -717,10 +824,13 @@ Cancel an ingest process, along with any files that have not been completely ing
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.documents.cancel_process(
     process_id="processId",
 )
@@ -759,7 +869,7 @@ client.documents.cancel_process(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">lookup</a>(...) -&gt; AsyncHttpResponse[DocumentLookupResponse]</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">lookup</a>(...) -> DocumentLookupResponse</code></summary>
 <dl>
 <dd>
 
@@ -787,10 +897,13 @@ lookup the document(s) associated with a processId, bucketId, or groupId.
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.documents.lookup(
     id=1,
     n=1,
@@ -883,7 +996,7 @@ client.documents.lookup(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">get</a>(...) -&gt; AsyncHttpResponse[DocumentResponse]</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">get</a>(...) -> DocumentResponse</code></summary>
 <dl>
 <dd>
 
@@ -911,10 +1024,13 @@ Look up an existing document by documentId.
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.documents.get(
     document_id="documentId",
 )
@@ -953,7 +1069,7 @@ client.documents.get(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">delete_by_id</a>(...) -&gt; AsyncHttpResponse[IngestResponse]</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">delete_by_id</a>(...) -> IngestResponse</code></summary>
 <dl>
 <dd>
 
@@ -981,10 +1097,13 @@ Delete a single document hosted on GroundX
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.documents.delete_by_id(
     document_id="documentId",
 )
@@ -1023,7 +1142,7 @@ client.documents.delete_by_id(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">get_extract</a>(...) -&gt; AsyncHttpResponse[typing.Dict[str, typing.Any]]</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">get_extract</a>(...) -> typing.Dict[str, typing.Any]</code></summary>
 <dl>
 <dd>
 
@@ -1051,10 +1170,13 @@ Look up extractions for an existing document by documentId.
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.documents.get_extract(
     document_id="documentId",
 )
@@ -1093,7 +1215,7 @@ client.documents.get_extract(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">get_xray</a>(...) -&gt; AsyncHttpResponse[typing.Dict[str, typing.Any]]</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">get_xray</a>(...) -> typing.Dict[str, typing.Any]</code></summary>
 <dl>
 <dd>
 
@@ -1121,10 +1243,13 @@ Look up X-Ray data for an existing document by documentId.
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.documents.get_xray(
     document_id="documentId",
 )
@@ -1163,7 +1288,7 @@ client.documents.get_xray(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">get_processes</a>(...) -&gt; AsyncHttpResponse[ProcessesStatusResponse]</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">get_processes</a>(...) -> ProcessesStatusResponse</code></summary>
 <dl>
 <dd>
 
@@ -1191,10 +1316,13 @@ Get a list of ingest process requests, sorted from most recent to least.
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.documents.get_processes(
     n=1,
     status="queued",
@@ -1243,7 +1371,7 @@ client.documents.get_processes(
 </details>
 
 ## Search
-<details><summary><code>client.search.<a href="src/groundx/search/client.py">content</a>(...) -&gt; AsyncHttpResponse[SearchResponse]</code></summary>
+<details><summary><code>client.search.<a href="src/groundx/search/client.py">content</a>(...) -> SearchResponse</code></summary>
 <dl>
 <dd>
 
@@ -1272,10 +1400,13 @@ The result of this query is typically used in one of two ways; `result.search.te
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.search.content(
     id=1,
     n=1,
@@ -1366,7 +1497,7 @@ client.search.content(
 </dl>
 </details>
 
-<details><summary><code>client.search.<a href="src/groundx/search/client.py">documents</a>(...) -&gt; AsyncHttpResponse[SearchResponse]</code></summary>
+<details><summary><code>client.search.<a href="src/groundx/search/client.py">documents</a>(...) -> SearchResponse</code></summary>
 <dl>
 <dd>
 
@@ -1395,16 +1526,22 @@ The result of this query is typically used in one of two ways; `result.search.te
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.search.documents(
     n=1,
     next_token="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9",
     verbosity=1,
     query="my search query",
-    document_ids=["docUUID1", "docUUID2"],
+    document_ids=[
+        "docUUID1",
+        "docUUID2"
+    ],
 )
 
 ```
@@ -1429,7 +1566,7 @@ client.search.documents(
 <dl>
 <dd>
 
-**document_ids:** `typing.Sequence[str]` — An array of unique documentIds to be searched.
+**document_ids:** `typing.List[str]` — An array of unique documentIds to be searched.
     
 </dd>
 </dl>
@@ -1490,7 +1627,7 @@ client.search.documents(
 </details>
 
 ## Buckets
-<details><summary><code>client.buckets.<a href="src/groundx/buckets/client.py">list</a>(...) -&gt; AsyncHttpResponse[BucketListResponse]</code></summary>
+<details><summary><code>client.buckets.<a href="src/groundx/buckets/client.py">list</a>(...) -> BucketListResponse</code></summary>
 <dl>
 <dd>
 
@@ -1518,10 +1655,13 @@ List all buckets within your GroundX account
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.buckets.list(
     n=1,
     next_token="nextToken",
@@ -1569,7 +1709,7 @@ client.buckets.list(
 </dl>
 </details>
 
-<details><summary><code>client.buckets.<a href="src/groundx/buckets/client.py">create</a>(...) -&gt; AsyncHttpResponse[BucketResponse]</code></summary>
+<details><summary><code>client.buckets.<a href="src/groundx/buckets/client.py">create</a>(...) -> BucketResponse</code></summary>
 <dl>
 <dd>
 
@@ -1597,10 +1737,13 @@ Create a new bucket.
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.buckets.create(
     name="your_bucket_name",
 )
@@ -1639,7 +1782,7 @@ client.buckets.create(
 </dl>
 </details>
 
-<details><summary><code>client.buckets.<a href="src/groundx/buckets/client.py">get</a>(...) -&gt; AsyncHttpResponse[BucketResponse]</code></summary>
+<details><summary><code>client.buckets.<a href="src/groundx/buckets/client.py">get</a>(...) -> BucketResponse</code></summary>
 <dl>
 <dd>
 
@@ -1667,10 +1810,13 @@ Look up a specific bucket by its bucketId.
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.buckets.get(
     bucket_id=1,
 )
@@ -1709,7 +1855,7 @@ client.buckets.get(
 </dl>
 </details>
 
-<details><summary><code>client.buckets.<a href="src/groundx/buckets/client.py">update</a>(...) -&gt; AsyncHttpResponse[BucketUpdateResponse]</code></summary>
+<details><summary><code>client.buckets.<a href="src/groundx/buckets/client.py">update</a>(...) -> BucketUpdateResponse</code></summary>
 <dl>
 <dd>
 
@@ -1737,10 +1883,13 @@ Rename a bucket.
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.buckets.update(
     bucket_id=1,
     new_name="your_bucket_name",
@@ -1788,7 +1937,7 @@ client.buckets.update(
 </dl>
 </details>
 
-<details><summary><code>client.buckets.<a href="src/groundx/buckets/client.py">delete</a>(...) -&gt; AsyncHttpResponse[MessageResponse]</code></summary>
+<details><summary><code>client.buckets.<a href="src/groundx/buckets/client.py">delete</a>(...) -> MessageResponse</code></summary>
 <dl>
 <dd>
 
@@ -1816,10 +1965,13 @@ Delete a bucket.
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.buckets.delete(
     bucket_id=1,
 )
@@ -1859,7 +2011,7 @@ client.buckets.delete(
 </details>
 
 ## Groups
-<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">list</a>(...) -&gt; AsyncHttpResponse[GroupListResponse]</code></summary>
+<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">list</a>(...) -> GroupListResponse</code></summary>
 <dl>
 <dd>
 
@@ -1887,10 +2039,13 @@ list all groups within your GroundX account.
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.groups.list(
     n=1,
     next_token="nextToken",
@@ -1938,7 +2093,7 @@ client.groups.list(
 </dl>
 </details>
 
-<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">create</a>(...) -&gt; AsyncHttpResponse[GroupResponse]</code></summary>
+<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">create</a>(...) -> GroupResponse</code></summary>
 <dl>
 <dd>
 
@@ -1966,10 +2121,13 @@ create a new group, a group being a collection of buckets which can be searched.
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.groups.create(
     name="your_group_name",
 )
@@ -2016,7 +2174,7 @@ client.groups.create(
 </dl>
 </details>
 
-<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">get</a>(...) -&gt; AsyncHttpResponse[GroupResponse]</code></summary>
+<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">get</a>(...) -> GroupResponse</code></summary>
 <dl>
 <dd>
 
@@ -2044,10 +2202,13 @@ look up a specific group by its groupId.
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.groups.get(
     group_id=1,
 )
@@ -2086,7 +2247,7 @@ client.groups.get(
 </dl>
 </details>
 
-<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">update</a>(...) -&gt; AsyncHttpResponse[GroupResponse]</code></summary>
+<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">update</a>(...) -> GroupResponse</code></summary>
 <dl>
 <dd>
 
@@ -2114,10 +2275,13 @@ Rename a group
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.groups.update(
     group_id=1,
     new_name="your_group_name",
@@ -2165,7 +2329,7 @@ client.groups.update(
 </dl>
 </details>
 
-<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">delete</a>(...) -&gt; AsyncHttpResponse[MessageResponse]</code></summary>
+<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">delete</a>(...) -> MessageResponse</code></summary>
 <dl>
 <dd>
 
@@ -2193,10 +2357,13 @@ Delete a group.
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.groups.delete(
     group_id=1,
 )
@@ -2235,7 +2402,7 @@ client.groups.delete(
 </dl>
 </details>
 
-<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">add_bucket</a>(...) -&gt; AsyncHttpResponse[MessageResponse]</code></summary>
+<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">add_bucket</a>(...) -> MessageResponse</code></summary>
 <dl>
 <dd>
 
@@ -2263,10 +2430,13 @@ Add an existing bucket to an existing group. Buckets and groups can be associate
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.groups.add_bucket(
     group_id=1,
     bucket_id=1,
@@ -2314,7 +2484,7 @@ client.groups.add_bucket(
 </dl>
 </details>
 
-<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">remove_bucket</a>(...) -&gt; AsyncHttpResponse[MessageResponse]</code></summary>
+<details><summary><code>client.groups.<a href="src/groundx/groups/client.py">remove_bucket</a>(...) -> MessageResponse</code></summary>
 <dl>
 <dd>
 
@@ -2342,10 +2512,13 @@ remove a bucket from a group. Buckets and groups can be associated many to many,
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.groups.remove_bucket(
     group_id=1,
     bucket_id=1,
@@ -2394,7 +2567,7 @@ client.groups.remove_bucket(
 </details>
 
 ## Workflows
-<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">list</a>() -&gt; AsyncHttpResponse[WorkflowsResponse]</code></summary>
+<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">list</a>() -> WorkflowsResponse</code></summary>
 <dl>
 <dd>
 
@@ -2422,10 +2595,13 @@ Get all workflows associated with the API key.
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.workflows.list()
 
 ```
@@ -2454,7 +2630,7 @@ client.workflows.list()
 </dl>
 </details>
 
-<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">create</a>(...) -&gt; AsyncHttpResponse[WorkflowResponse]</code></summary>
+<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">create</a>(...) -> WorkflowResponse</code></summary>
 <dl>
 <dd>
 
@@ -2482,10 +2658,13 @@ Create a workflow.
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.workflows.create()
 
 ```
@@ -2502,39 +2681,7 @@ client.workflows.create()
 <dl>
 <dd>
 
-**chunk_strategy:** `typing.Optional[WorkflowRequestChunkStrategy]` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**name:** `typing.Optional[str]` — The name of the workflow being created.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**extract:** `typing.Optional[typing.Dict[str, typing.Any]]` — Extract agent definitions.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**section_strategy:** `typing.Optional[WorkflowRequestSectionStrategy]` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**steps:** `typing.Optional[WorkflowSteps]` 
+**request:** `WorkflowRequest` 
     
 </dd>
 </dl>
@@ -2554,7 +2701,7 @@ client.workflows.create()
 </dl>
 </details>
 
-<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">get_account</a>() -&gt; AsyncHttpResponse[WorkflowResponse]</code></summary>
+<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">get_account</a>() -> WorkflowResponse</code></summary>
 <dl>
 <dd>
 
@@ -2582,10 +2729,13 @@ Get the workflow associated with customer account.
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.workflows.get_account()
 
 ```
@@ -2614,7 +2764,7 @@ client.workflows.get_account()
 </dl>
 </details>
 
-<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">add_to_account</a>(...) -&gt; AsyncHttpResponse[MessageResponse]</code></summary>
+<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">add_to_account</a>(...) -> MessageResponse</code></summary>
 <dl>
 <dd>
 
@@ -2642,10 +2792,13 @@ Assigns the given workflow to the customer account and is applied by default to 
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.workflows.add_to_account(
     workflow_id="workflowId",
 )
@@ -2664,7 +2817,7 @@ client.workflows.add_to_account(
 <dl>
 <dd>
 
-**workflow_id:** `str` — The id of the workflow that is being applied.
+**request:** `WorkflowApplyRequest` 
     
 </dd>
 </dl>
@@ -2684,7 +2837,7 @@ client.workflows.add_to_account(
 </dl>
 </details>
 
-<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">remove_from_account</a>() -&gt; AsyncHttpResponse[MessageResponse]</code></summary>
+<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">remove_from_account</a>() -> MessageResponse</code></summary>
 <dl>
 <dd>
 
@@ -2712,10 +2865,13 @@ Removes the assigned workflow from the customer account.
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.workflows.remove_from_account()
 
 ```
@@ -2744,7 +2900,7 @@ client.workflows.remove_from_account()
 </dl>
 </details>
 
-<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">add_to_id</a>(...) -&gt; AsyncHttpResponse[MessageResponse]</code></summary>
+<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">add_to_id</a>(...) -> MessageResponse</code></summary>
 <dl>
 <dd>
 
@@ -2772,10 +2928,13 @@ Assigns the given workflow to the group or bucket and is applied by default to a
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.workflows.add_to_id(
     id=1,
     workflow_id="workflowId",
@@ -2803,7 +2962,7 @@ client.workflows.add_to_id(
 <dl>
 <dd>
 
-**workflow_id:** `str` — The id of the workflow that is being applied.
+**request:** `WorkflowApplyRequest` 
     
 </dd>
 </dl>
@@ -2823,7 +2982,7 @@ client.workflows.add_to_id(
 </dl>
 </details>
 
-<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">remove_from_id</a>(...) -&gt; AsyncHttpResponse[MessageResponse]</code></summary>
+<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">remove_from_id</a>(...) -> MessageResponse</code></summary>
 <dl>
 <dd>
 
@@ -2851,10 +3010,13 @@ Removes the assigned workflow from the customer account.
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.workflows.remove_from_id(
     id=1,
 )
@@ -2893,7 +3055,7 @@ client.workflows.remove_from_id(
 </dl>
 </details>
 
-<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">get</a>(...) -&gt; AsyncHttpResponse[WorkflowResponse]</code></summary>
+<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">get</a>(...) -> WorkflowResponse</code></summary>
 <dl>
 <dd>
 
@@ -2921,10 +3083,13 @@ look up a specific workflow by groupId, bucketId, or workflowId.
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.workflows.get(
     id=1,
 )
@@ -2963,7 +3128,7 @@ client.workflows.get(
 </dl>
 </details>
 
-<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">update</a>(...) -&gt; AsyncHttpResponse[WorkflowResponse]</code></summary>
+<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">update</a>(...) -> WorkflowResponse</code></summary>
 <dl>
 <dd>
 
@@ -2991,10 +3156,13 @@ Update an existing workflow.
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.workflows.update(
     id="id",
 )
@@ -3021,39 +3189,7 @@ client.workflows.update(
 <dl>
 <dd>
 
-**chunk_strategy:** `typing.Optional[WorkflowRequestChunkStrategy]` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**name:** `typing.Optional[str]` — The name of the workflow being created.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**extract:** `typing.Optional[typing.Dict[str, typing.Any]]` — Extract agent definitions.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**section_strategy:** `typing.Optional[WorkflowRequestSectionStrategy]` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**steps:** `typing.Optional[WorkflowSteps]` 
+**request:** `WorkflowRequest` 
     
 </dd>
 </dl>
@@ -3073,7 +3209,7 @@ client.workflows.update(
 </dl>
 </details>
 
-<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">delete</a>(...) -&gt; AsyncHttpResponse[MessageResponse]</code></summary>
+<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">delete</a>(...) -> MessageResponse</code></summary>
 <dl>
 <dd>
 
@@ -3101,10 +3237,13 @@ Delete a workflow.
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.workflows.delete(
     id="id",
 )
@@ -3144,7 +3283,7 @@ client.workflows.delete(
 </details>
 
 ## Customer
-<details><summary><code>client.customer.<a href="src/groundx/customer/client.py">get</a>() -&gt; AsyncHttpResponse[CustomerResponse]</code></summary>
+<details><summary><code>client.customer.<a href="src/groundx/customer/client.py">get</a>() -> CustomerResponse</code></summary>
 <dl>
 <dd>
 
@@ -3172,10 +3311,13 @@ Get the account information associated with the API key.
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.customer.get()
 
 ```
@@ -3205,7 +3347,7 @@ client.customer.get()
 </details>
 
 ## ApiKey
-<details><summary><code>client.api_key.<a href="src/groundx/api_key/client.py">list</a>() -&gt; AsyncHttpResponse[ApiKeyResponse]</code></summary>
+<details><summary><code>client.api_key.<a href="src/groundx/api_key/client.py">list</a>() -> ApiKeyResponse</code></summary>
 <dl>
 <dd>
 
@@ -3233,10 +3375,13 @@ List all API keys within your GroundX account
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.api_key.list()
 
 ```
@@ -3265,7 +3410,7 @@ client.api_key.list()
 </dl>
 </details>
 
-<details><summary><code>client.api_key.<a href="src/groundx/api_key/client.py">create</a>(...) -&gt; AsyncHttpResponse[ApiKeyResponse]</code></summary>
+<details><summary><code>client.api_key.<a href="src/groundx/api_key/client.py">create</a>(...) -> ApiKeyResponse</code></summary>
 <dl>
 <dd>
 
@@ -3293,10 +3438,13 @@ Create a new API key.
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.api_key.create(
     name="your_apikey_name",
 )
@@ -3315,7 +3463,7 @@ client.api_key.create(
 <dl>
 <dd>
 
-**name:** `str` 
+**request:** `ApiKeyRequest` 
     
 </dd>
 </dl>
@@ -3335,7 +3483,7 @@ client.api_key.create(
 </dl>
 </details>
 
-<details><summary><code>client.api_key.<a href="src/groundx/api_key/client.py">update</a>(...) -&gt; AsyncHttpResponse[ApiKeyResponse]</code></summary>
+<details><summary><code>client.api_key.<a href="src/groundx/api_key/client.py">update</a>(...) -> ApiKeyResponse</code></summary>
 <dl>
 <dd>
 
@@ -3363,10 +3511,13 @@ Rename an API key.
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.api_key.update(
     api_key="apiKey",
     name="your_apikey_name",
@@ -3394,7 +3545,7 @@ client.api_key.update(
 <dl>
 <dd>
 
-**name:** `str` 
+**request:** `ApiKeyRequest` 
     
 </dd>
 </dl>
@@ -3414,7 +3565,7 @@ client.api_key.update(
 </dl>
 </details>
 
-<details><summary><code>client.api_key.<a href="src/groundx/api_key/client.py">delete</a>(...) -&gt; AsyncHttpResponse[MessageResponse]</code></summary>
+<details><summary><code>client.api_key.<a href="src/groundx/api_key/client.py">delete</a>(...) -> MessageResponse</code></summary>
 <dl>
 <dd>
 
@@ -3442,10 +3593,13 @@ Delete an API key.
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.api_key.delete(
     api_key="apiKey",
 )
@@ -3485,7 +3639,7 @@ client.api_key.delete(
 </details>
 
 ## Health
-<details><summary><code>client.health.<a href="src/groundx/health/client.py">list</a>() -&gt; AsyncHttpResponse[HealthResponse]</code></summary>
+<details><summary><code>client.health.<a href="src/groundx/health/client.py">list</a>() -> HealthResponse</code></summary>
 <dl>
 <dd>
 
@@ -3513,10 +3667,13 @@ List the current health status of all services. Statuses update every 5 minutes.
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.health.list()
 
 ```
@@ -3545,7 +3702,7 @@ client.health.list()
 </dl>
 </details>
 
-<details><summary><code>client.health.<a href="src/groundx/health/client.py">get</a>(...) -&gt; AsyncHttpResponse[HealthResponse]</code></summary>
+<details><summary><code>client.health.<a href="src/groundx/health/client.py">get</a>(...) -> HealthResponse</code></summary>
 <dl>
 <dd>
 
@@ -3573,10 +3730,13 @@ Look up the current health status of a specific service. Statuses update every 5
 
 ```python
 from groundx import GroundX
+from groundx.environment import GroundXEnvironment
 
 client = GroundX(
-    api_key="YOUR_API_KEY",
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
 )
+
 client.health.get(
     service="search",
 )

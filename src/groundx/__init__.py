@@ -25,6 +25,8 @@ if typing.TYPE_CHECKING:
         DocumentLookupResponse,
         DocumentResponse,
         DocumentType,
+        DocumentUpdateRequest,
+        DocumentUpdateRequestItem,
         GroupDetail,
         GroupListResponse,
         GroupResponse,
@@ -81,6 +83,7 @@ if typing.TYPE_CHECKING:
     )
     from .errors import BadRequestError, UnauthorizedError
     from . import api_key, buckets, customer, documents, groups, health, mcp, search, workflows
+    from ._default_clients import DefaultAioHttpClient, DefaultAsyncHttpxClient
     from .environment import GroundXEnvironment
     from .ingest import AsyncGroundX, GroundX
     from .search import SearchContentRequestId
@@ -100,6 +103,8 @@ _dynamic_imports: typing.Dict[str, str] = {
     "BucketUpdateResponse": ".types",
     "CustomerDetail": ".types",
     "CustomerResponse": ".types",
+    "DefaultAioHttpClient": "._default_clients",
+    "DefaultAsyncHttpxClient": "._default_clients",
     "Document": ".types",
     "DocumentDetail": ".types",
     "DocumentListResponse": ".types",
@@ -107,6 +112,8 @@ _dynamic_imports: typing.Dict[str, str] = {
     "DocumentLookupResponse": ".types",
     "DocumentResponse": ".types",
     "DocumentType": ".types",
+    "DocumentUpdateRequest": ".types",
+    "DocumentUpdateRequestItem": ".types",
     "GroundX": ".ingest",
     "GroundXEnvironment": ".environment",
     "GroupDetail": ".types",
@@ -213,6 +220,8 @@ __all__ = [
     "BucketUpdateResponse",
     "CustomerDetail",
     "CustomerResponse",
+    "DefaultAioHttpClient",
+    "DefaultAsyncHttpxClient",
     "Document",
     "DocumentDetail",
     "DocumentListResponse",
@@ -220,6 +229,8 @@ __all__ = [
     "DocumentLookupResponse",
     "DocumentResponse",
     "DocumentType",
+    "DocumentUpdateRequest",
+    "DocumentUpdateRequestItem",
     "GroundX",
     "GroundXEnvironment",
     "GroupDetail",
