@@ -81,7 +81,7 @@ if typing.TYPE_CHECKING:
         WorkflowsResponse,
     )
     from .errors import BadRequestError, UnauthorizedError
-    from . import api_key, buckets, customer, documents, groups, health, mcp, search, workflows
+    from . import api_key, buckets, customer, documents, groups, health, search, workflows
     from ._default_clients import DefaultAioHttpClient, DefaultAsyncHttpxClient
     from .environment import GroundXEnvironment
     from .ingest import AsyncGroundX, GroundX
@@ -177,7 +177,6 @@ _dynamic_imports: typing.Dict[str, str] = {
     "documents": ".documents",
     "groups": ".groups",
     "health": ".health",
-    "mcp": ".mcp",
     "search": ".search",
     "workflows": ".workflows",
 }
@@ -293,7 +292,6 @@ __all__ = [
     "documents",
     "groups",
     "health",
-    "mcp",
     "search",
     "workflows",
 ]
