@@ -6,7 +6,7 @@ from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
 from ..core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ..core.http_response import AsyncHttpResponse, HttpResponse
-from ..core.jsonable_encoder import jsonable_encoder
+from ..core.jsonable_encoder import encode_path_param
 from ..core.parse_error import ParsingError
 from ..core.pydantic_utilities import parse_obj_as
 from ..core.request_options import RequestOptions
@@ -168,7 +168,7 @@ class RawGroupsClient:
             Successful retrieval of group
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"v1/group/{jsonable_encoder(group_id)}",
+            f"v1/group/{encode_path_param(group_id)}",
             method="GET",
             request_options=request_options,
         )
@@ -236,7 +236,7 @@ class RawGroupsClient:
             Successful update of group
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"v1/group/{jsonable_encoder(group_id)}",
+            f"v1/group/{encode_path_param(group_id)}",
             method="PUT",
             json={
                 "newName": new_name,
@@ -308,7 +308,7 @@ class RawGroupsClient:
             Group successfully deleted
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"v1/group/{jsonable_encoder(group_id)}",
+            f"v1/group/{encode_path_param(group_id)}",
             method="DELETE",
             request_options=request_options,
         )
@@ -376,7 +376,7 @@ class RawGroupsClient:
             Successful update of group
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"v1/group/{jsonable_encoder(group_id)}/bucket/{jsonable_encoder(bucket_id)}",
+            f"v1/group/{encode_path_param(group_id)}/bucket/{encode_path_param(bucket_id)}",
             method="POST",
             request_options=request_options,
         )
@@ -444,7 +444,7 @@ class RawGroupsClient:
             Successful update of group
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"v1/group/{jsonable_encoder(group_id)}/bucket/{jsonable_encoder(bucket_id)}",
+            f"v1/group/{encode_path_param(group_id)}/bucket/{encode_path_param(bucket_id)}",
             method="DELETE",
             request_options=request_options,
         )
@@ -637,7 +637,7 @@ class AsyncRawGroupsClient:
             Successful retrieval of group
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"v1/group/{jsonable_encoder(group_id)}",
+            f"v1/group/{encode_path_param(group_id)}",
             method="GET",
             request_options=request_options,
         )
@@ -705,7 +705,7 @@ class AsyncRawGroupsClient:
             Successful update of group
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"v1/group/{jsonable_encoder(group_id)}",
+            f"v1/group/{encode_path_param(group_id)}",
             method="PUT",
             json={
                 "newName": new_name,
@@ -777,7 +777,7 @@ class AsyncRawGroupsClient:
             Group successfully deleted
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"v1/group/{jsonable_encoder(group_id)}",
+            f"v1/group/{encode_path_param(group_id)}",
             method="DELETE",
             request_options=request_options,
         )
@@ -845,7 +845,7 @@ class AsyncRawGroupsClient:
             Successful update of group
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"v1/group/{jsonable_encoder(group_id)}/bucket/{jsonable_encoder(bucket_id)}",
+            f"v1/group/{encode_path_param(group_id)}/bucket/{encode_path_param(bucket_id)}",
             method="POST",
             request_options=request_options,
         )
@@ -913,7 +913,7 @@ class AsyncRawGroupsClient:
             Successful update of group
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"v1/group/{jsonable_encoder(group_id)}/bucket/{jsonable_encoder(bucket_id)}",
+            f"v1/group/{encode_path_param(group_id)}/bucket/{encode_path_param(bucket_id)}",
             method="DELETE",
             request_options=request_options,
         )

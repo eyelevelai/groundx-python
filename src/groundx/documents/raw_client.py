@@ -6,7 +6,7 @@ from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
 from ..core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ..core.http_response import AsyncHttpResponse, HttpResponse
-from ..core.jsonable_encoder import jsonable_encoder
+from ..core.jsonable_encoder import encode_path_param
 from ..core.parse_error import ParsingError
 from ..core.pydantic_utilities import parse_obj_as
 from ..core.request_options import RequestOptions
@@ -603,7 +603,7 @@ class RawDocumentsClient:
             Look up success
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"v1/ingest/{jsonable_encoder(process_id)}",
+            f"v1/ingest/{encode_path_param(process_id)}",
             method="GET",
             request_options=request_options,
         )
@@ -668,7 +668,7 @@ class RawDocumentsClient:
             Cancel success
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"v1/ingest/{jsonable_encoder(process_id)}",
+            f"v1/ingest/{encode_path_param(process_id)}",
             method="DELETE",
             request_options=request_options,
         )
@@ -760,7 +760,7 @@ class RawDocumentsClient:
             Look up success
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"v1/ingest/documents/{jsonable_encoder(id)}",
+            f"v1/ingest/documents/{encode_path_param(id)}",
             method="GET",
             params={
                 "n": n,
@@ -833,7 +833,7 @@ class RawDocumentsClient:
             Look up success
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"v1/ingest/document/{jsonable_encoder(document_id)}",
+            f"v1/ingest/document/{encode_path_param(document_id)}",
             method="GET",
             request_options=request_options,
         )
@@ -898,7 +898,7 @@ class RawDocumentsClient:
             Document successfully deleted
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"v1/ingest/document/{jsonable_encoder(document_id)}",
+            f"v1/ingest/document/{encode_path_param(document_id)}",
             method="DELETE",
             request_options=request_options,
         )
@@ -963,7 +963,7 @@ class RawDocumentsClient:
             Look up success
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"v1/ingest/document/extract/{jsonable_encoder(document_id)}",
+            f"v1/ingest/document/extract/{encode_path_param(document_id)}",
             method="GET",
             request_options=request_options,
         )
@@ -1028,7 +1028,7 @@ class RawDocumentsClient:
             Look up success
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"v1/ingest/document/xray/{jsonable_encoder(document_id)}",
+            f"v1/ingest/document/xray/{encode_path_param(document_id)}",
             method="GET",
             request_options=request_options,
         )
@@ -1700,7 +1700,7 @@ class AsyncRawDocumentsClient:
             Look up success
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"v1/ingest/{jsonable_encoder(process_id)}",
+            f"v1/ingest/{encode_path_param(process_id)}",
             method="GET",
             request_options=request_options,
         )
@@ -1765,7 +1765,7 @@ class AsyncRawDocumentsClient:
             Cancel success
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"v1/ingest/{jsonable_encoder(process_id)}",
+            f"v1/ingest/{encode_path_param(process_id)}",
             method="DELETE",
             request_options=request_options,
         )
@@ -1857,7 +1857,7 @@ class AsyncRawDocumentsClient:
             Look up success
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"v1/ingest/documents/{jsonable_encoder(id)}",
+            f"v1/ingest/documents/{encode_path_param(id)}",
             method="GET",
             params={
                 "n": n,
@@ -1930,7 +1930,7 @@ class AsyncRawDocumentsClient:
             Look up success
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"v1/ingest/document/{jsonable_encoder(document_id)}",
+            f"v1/ingest/document/{encode_path_param(document_id)}",
             method="GET",
             request_options=request_options,
         )
@@ -1995,7 +1995,7 @@ class AsyncRawDocumentsClient:
             Document successfully deleted
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"v1/ingest/document/{jsonable_encoder(document_id)}",
+            f"v1/ingest/document/{encode_path_param(document_id)}",
             method="DELETE",
             request_options=request_options,
         )
@@ -2060,7 +2060,7 @@ class AsyncRawDocumentsClient:
             Look up success
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"v1/ingest/document/extract/{jsonable_encoder(document_id)}",
+            f"v1/ingest/document/extract/{encode_path_param(document_id)}",
             method="GET",
             request_options=request_options,
         )
@@ -2125,7 +2125,7 @@ class AsyncRawDocumentsClient:
             Look up success
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"v1/ingest/document/xray/{jsonable_encoder(document_id)}",
+            f"v1/ingest/document/xray/{encode_path_param(document_id)}",
             method="GET",
             request_options=request_options,
         )

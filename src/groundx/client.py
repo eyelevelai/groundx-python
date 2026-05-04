@@ -16,7 +16,6 @@ if typing.TYPE_CHECKING:
     from .documents.client import AsyncDocumentsClient, DocumentsClient
     from .groups.client import AsyncGroupsClient, GroupsClient
     from .health.client import AsyncHealthClient, HealthClient
-    from .mcp.client import AsyncMcpClient, McpClient
     from .search.client import AsyncSearchClient, SearchClient
     from .workflows.client import AsyncWorkflowsClient, WorkflowsClient
 
@@ -91,7 +90,6 @@ class GroundXBase:
             timeout=_defaulted_timeout,
             logging=logging,
         )
-        self._mcp: typing.Optional[McpClient] = None
         self._documents: typing.Optional[DocumentsClient] = None
         self._search: typing.Optional[SearchClient] = None
         self._buckets: typing.Optional[BucketsClient] = None
@@ -100,14 +98,6 @@ class GroundXBase:
         self._customer: typing.Optional[CustomerClient] = None
         self._api_key: typing.Optional[ApiKeyClient] = None
         self._health: typing.Optional[HealthClient] = None
-
-    @property
-    def mcp(self):
-        if self._mcp is None:
-            from .mcp.client import McpClient  # noqa: E402
-
-            self._mcp = McpClient(client_wrapper=self._client_wrapper)
-        return self._mcp
 
     @property
     def documents(self):
@@ -260,7 +250,6 @@ class AsyncGroundXBase:
             timeout=_defaulted_timeout,
             logging=logging,
         )
-        self._mcp: typing.Optional[AsyncMcpClient] = None
         self._documents: typing.Optional[AsyncDocumentsClient] = None
         self._search: typing.Optional[AsyncSearchClient] = None
         self._buckets: typing.Optional[AsyncBucketsClient] = None
@@ -269,14 +258,6 @@ class AsyncGroundXBase:
         self._customer: typing.Optional[AsyncCustomerClient] = None
         self._api_key: typing.Optional[AsyncApiKeyClient] = None
         self._health: typing.Optional[AsyncHealthClient] = None
-
-    @property
-    def mcp(self):
-        if self._mcp is None:
-            from .mcp.client import AsyncMcpClient  # noqa: E402
-
-            self._mcp = AsyncMcpClient(client_wrapper=self._client_wrapper)
-        return self._mcp
 
     @property
     def documents(self):

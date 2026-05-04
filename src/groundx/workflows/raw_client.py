@@ -6,7 +6,7 @@ from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
 from ..core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ..core.http_response import AsyncHttpResponse, HttpResponse
-from ..core.jsonable_encoder import jsonable_encoder
+from ..core.jsonable_encoder import encode_path_param
 from ..core.parse_error import ParsingError
 from ..core.pydantic_utilities import parse_obj_as
 from ..core.request_options import RequestOptions
@@ -289,7 +289,7 @@ class RawWorkflowsClient:
             Apply success
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"v1/workflow/relationship/{jsonable_encoder(id)}",
+            f"v1/workflow/relationship/{encode_path_param(id)}",
             method="POST",
             json={
                 "workflowId": workflow_id,
@@ -339,7 +339,7 @@ class RawWorkflowsClient:
             Apply success
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"v1/workflow/relationship/{jsonable_encoder(id)}",
+            f"v1/workflow/relationship/{encode_path_param(id)}",
             method="DELETE",
             request_options=request_options,
         )
@@ -382,7 +382,7 @@ class RawWorkflowsClient:
             Look up success
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"v1/workflow/{jsonable_encoder(id)}",
+            f"v1/workflow/{encode_path_param(id)}",
             method="GET",
             request_options=request_options,
         )
@@ -445,7 +445,7 @@ class RawWorkflowsClient:
             Update success
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"v1/workflow/{jsonable_encoder(id)}",
+            f"v1/workflow/{encode_path_param(id)}",
             method="PUT",
             json={
                 "chunkStrategy": chunk_strategy,
@@ -501,7 +501,7 @@ class RawWorkflowsClient:
             Delete success
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"v1/workflow/{jsonable_encoder(id)}",
+            f"v1/workflow/{encode_path_param(id)}",
             method="DELETE",
             request_options=request_options,
         )
@@ -794,7 +794,7 @@ class AsyncRawWorkflowsClient:
             Apply success
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"v1/workflow/relationship/{jsonable_encoder(id)}",
+            f"v1/workflow/relationship/{encode_path_param(id)}",
             method="POST",
             json={
                 "workflowId": workflow_id,
@@ -844,7 +844,7 @@ class AsyncRawWorkflowsClient:
             Apply success
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"v1/workflow/relationship/{jsonable_encoder(id)}",
+            f"v1/workflow/relationship/{encode_path_param(id)}",
             method="DELETE",
             request_options=request_options,
         )
@@ -887,7 +887,7 @@ class AsyncRawWorkflowsClient:
             Look up success
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"v1/workflow/{jsonable_encoder(id)}",
+            f"v1/workflow/{encode_path_param(id)}",
             method="GET",
             request_options=request_options,
         )
@@ -950,7 +950,7 @@ class AsyncRawWorkflowsClient:
             Update success
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"v1/workflow/{jsonable_encoder(id)}",
+            f"v1/workflow/{encode_path_param(id)}",
             method="PUT",
             json={
                 "chunkStrategy": chunk_strategy,
@@ -1006,7 +1006,7 @@ class AsyncRawWorkflowsClient:
             Delete success
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"v1/workflow/{jsonable_encoder(id)}",
+            f"v1/workflow/{encode_path_param(id)}",
             method="DELETE",
             request_options=request_options,
         )

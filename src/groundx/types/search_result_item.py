@@ -50,6 +50,14 @@ class SearchResultItem(UniversalBaseModel):
         typing.Optional[typing.List[str]], FieldMetadata(alias="pageImages"), pydantic.Field(alias="pageImages")
     ] = None
     pages: typing.Optional[typing.List[SearchResultItemPagesItem]] = None
+    process_id: typing_extensions.Annotated[
+        typing.Optional[str],
+        FieldMetadata(alias="processId"),
+        pydantic.Field(
+            alias="processId",
+            description="Unique system generated ID for the ingest process that included this document",
+        ),
+    ] = None
     score: typing.Optional[float] = pydantic.Field(default=None)
     """
     Confidence score in the search result
