@@ -17,9 +17,6 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "Programming Language :: Python :: 3.14",
-    "Programming Language :: Python :: 3.15",
     "Operating System :: OS Independent",
     "Operating System :: POSIX",
     "Operating System :: MacOS",
@@ -37,7 +34,7 @@ packages = [
 Repository = 'https://github.com/eyelevelai/groundx-python'
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = ">=3.10,<3.13"
 aiohttp = ">=3.8.0"
 boto3 = { version = "*", optional = true}
 celery = { version = "*", optional = true}
@@ -57,6 +54,7 @@ pydantic-core = ">=2.18.2,<2.44.0"
 pytest = { version = "*", optional = true}
 redis = { version = "*", optional = true}
 requests = ">=2.4.0"
+smolagents = { version = "*", optional = true}
 tqdm = ">=4.60.0"
 types-PyYAML = { version = "*", optional = true}
 types-boto3 = { version = "*", optional = true}
@@ -113,7 +111,7 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.extras]
-extract=["boto3", "celery", "celery-types", "dateparser", "fastapi", "google-api-python-client", "google-api-python-client-stubs", "google-auth-stubs", "gspread", "minio", "pillow", "pytest", "redis", "types-boto3", "types-dateparser", "types-PyYAML"]
+extract=["boto3", "celery", "celery-types", "dateparser", "fastapi", "google-api-python-client", "google-api-python-client-stubs", "google-auth-stubs", "gspread", "minio", "pillow", "pytest", "redis", "smolagents", "types-boto3", "types-dateparser", "types-PyYAML"]
 aiohttp=["aiohttp", "httpx-aiohttp"]
 
 [[tool.mypy.overrides]]
