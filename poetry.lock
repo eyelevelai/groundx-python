@@ -324,17 +324,17 @@ files = [
 
 [[package]]
 name = "boto3"
-version = "1.43.9"
+version = "1.43.10"
 description = "The AWS SDK for Python"
 optional = true
 python-versions = ">=3.10"
 files = [
-    {file = "boto3-1.43.9-py3-none-any.whl", hash = "sha256:5e967292d361482793471bd80fad1e714515b7401f65a0d5b4aa6ef9d009c030"},
-    {file = "boto3-1.43.9.tar.gz", hash = "sha256:37dac72f2921095378c0200caf07918d5e10a82b7c1f611abb70e44f69d0b962"},
+    {file = "boto3-1.43.10-py3-none-any.whl", hash = "sha256:83918184d95967e4c6e9ed1e9a2f58250b291e6ea2cb847ab0825d52596b39e5"},
+    {file = "boto3-1.43.10.tar.gz", hash = "sha256:27342e5d5f6170fcc8d1e21cdd939af2448d58ac56b08d494250eaad998e30c7"},
 ]
 
 [package.dependencies]
-botocore = ">=1.43.9,<1.44.0"
+botocore = ">=1.43.10,<1.44.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.17.0,<0.18.0"
 
@@ -343,13 +343,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.43.9"
+version = "1.43.10"
 description = "Low-level, data-driven core of boto 3."
 optional = true
 python-versions = ">=3.10"
 files = [
-    {file = "botocore-1.43.9-py3-none-any.whl", hash = "sha256:b9bdcd9c87fc552aad30006f00167d9ebb3480e1b06f1902bac5b2c41014fdab"},
-    {file = "botocore-1.43.9.tar.gz", hash = "sha256:93e91c7160678182860f5902ee4cfe6d643cac0d9ee84d3eb65becc9f4c00228"},
+    {file = "botocore-1.43.10-py3-none-any.whl", hash = "sha256:8a0176d8c2f8bebe95d4f923a824a1ace04b02f360e220681c388e097f32c3b6"},
+    {file = "botocore-1.43.10.tar.gz", hash = "sha256:2f4af585b41dbccdfc9f49677d7bd72d713a12ef89a1dc9c8538a927649498bf"},
 ]
 
 [package.dependencies]
@@ -696,13 +696,13 @@ files = [
 
 [[package]]
 name = "click"
-version = "8.3.3"
+version = "8.4.0"
 description = "Composable command line interface toolkit"
 optional = true
 python-versions = ">=3.10"
 files = [
-    {file = "click-8.3.3-py3-none-any.whl", hash = "sha256:a2bf429bb3033c89fa4936ffb35d5cb471e3719e1f3c8a7c3fff0b8314305613"},
-    {file = "click-8.3.3.tar.gz", hash = "sha256:398329ad4837b2ff7cbe1dd166a4c0f8900c3ca3a218de04466f38f6497f18a2"},
+    {file = "click-8.4.0-py3-none-any.whl", hash = "sha256:40c50b7c6c6adac2823d411041ec84f3f103f1b280d5e9ce0d7f998995832f81"},
+    {file = "click-8.4.0.tar.gz", hash = "sha256:638f1338fe1235c8f4e008e4a8a254fb5c5fbdcbb40ece3c9142ebb78e792973"},
 ]
 
 [package.dependencies]
@@ -1143,17 +1143,17 @@ uritemplate = ">=3.0.1,<5"
 
 [[package]]
 name = "google-api-python-client-stubs"
-version = "1.36.0"
+version = "1.37.0"
 description = "Type stubs for google-api-python-client"
 optional = true
 python-versions = ">=3.7"
 files = [
-    {file = "google_api_python_client_stubs-1.36.0-py3-none-any.whl", hash = "sha256:e03fbcabc3d25cdb276de0aa4677012f544b1eaabd8b48f6dfd08095976c6a05"},
-    {file = "google_api_python_client_stubs-1.36.0.tar.gz", hash = "sha256:abbe9584564993f754c7367258239f6ba7080847288d91d9cad75ffccce19fa3"},
+    {file = "google_api_python_client_stubs-1.37.0-py3-none-any.whl", hash = "sha256:aa102cbf2ef0c8cac6f6ded06fc8d2ada0664e7b6a124d25cfd8e2cc7b2af88c"},
+    {file = "google_api_python_client_stubs-1.37.0.tar.gz", hash = "sha256:be221c68f80b2672d96d2a645d31e63011fa1336f15db183dafbb59811fcb94b"},
 ]
 
 [package.dependencies]
-google-api-python-client = ">=2.195.0"
+google-api-python-client = ">=2.196.0"
 types-httplib2 = ">=0.22.0.2"
 typing-extensions = ">=3.10.0"
 
@@ -3394,13 +3394,13 @@ files = [
 
 [[package]]
 name = "types-boto3"
-version = "1.43.9"
-description = "Type annotations for boto3 1.43.9 generated with mypy-boto3-builder 8.12.0"
+version = "1.43.10"
+description = "Type annotations for boto3 1.43.10 generated with mypy-boto3-builder 8.12.0"
 optional = true
 python-versions = ">=3.9"
 files = [
-    {file = "types_boto3-1.43.9-py3-none-any.whl", hash = "sha256:a1ed78238c3e1e79431e16609f2ddbd0cdaa91e0b456524706f3609ba17f127c"},
-    {file = "types_boto3-1.43.9.tar.gz", hash = "sha256:4dae30c3d11348e2216ebc9b669a0296259ca9f4935d41b3233bac9118626157"},
+    {file = "types_boto3-1.43.10-py3-none-any.whl", hash = "sha256:263a96b0720ce5645fc89ee1392bab3495e8365e460663fc8639bd762181a77b"},
+    {file = "types_boto3-1.43.10.tar.gz", hash = "sha256:22f87cb4caea240cadbf857115e4463ec667e30275502a61adf089800969ae9b"},
 ]
 
 [package.dependencies]
@@ -3461,7 +3461,7 @@ bedrock-data-automation-runtime = ["types-boto3-bedrock-data-automation-runtime 
 bedrock-runtime = ["types-boto3-bedrock-runtime (>=1.43.0,<1.44.0)"]
 billing = ["types-boto3-billing (>=1.43.0,<1.44.0)"]
 billingconductor = ["types-boto3-billingconductor (>=1.43.0,<1.44.0)"]
-boto3 = ["boto3 (==1.43.9)"]
+boto3 = ["boto3 (==1.43.10)"]
 braket = ["types-boto3-braket (>=1.43.0,<1.44.0)"]
 budgets = ["types-boto3-budgets (>=1.43.0,<1.44.0)"]
 ce = ["types-boto3-ce (>=1.43.0,<1.44.0)"]
@@ -3839,13 +3839,13 @@ xray = ["types-boto3-xray (>=1.43.0,<1.44.0)"]
 
 [[package]]
 name = "types-dateparser"
-version = "1.4.0.20260508"
+version = "1.4.0.20260518"
 description = "Typing stubs for dateparser"
 optional = true
 python-versions = ">=3.10"
 files = [
-    {file = "types_dateparser-1.4.0.20260508-py3-none-any.whl", hash = "sha256:b829afe62f3d18ad95dec1308e3a832cedc5c2f87fe639f3897697cde0bebd83"},
-    {file = "types_dateparser-1.4.0.20260508.tar.gz", hash = "sha256:b4c998ec46b3b047d01b3086bf34f8a7d23a5b1fc0132f95077ec2669a539c32"},
+    {file = "types_dateparser-1.4.0.20260518-py3-none-any.whl", hash = "sha256:c20b4e0979da9edf2729daba71b36b749b7afc18bec6afb6f89f1052d085a0e3"},
+    {file = "types_dateparser-1.4.0.20260518.tar.gz", hash = "sha256:db4ca45883e98e9247db1e7cc0cc09c763d641b87bda7a31cbd6e1cdf80127a9"},
 ]
 
 [[package]]
@@ -3861,35 +3861,35 @@ files = [
 
 [[package]]
 name = "types-python-dateutil"
-version = "2.9.0.20260508"
+version = "2.9.0.20260518"
 description = "Typing stubs for python-dateutil"
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "types_python_dateutil-2.9.0.20260508-py3-none-any.whl", hash = "sha256:bfc6fd2d81aa86e5ac97206a64304f6bd247426eedbca9b98619bbc48c6a1c10"},
-    {file = "types_python_dateutil-2.9.0.20260508.tar.gz", hash = "sha256:596a6d63d81f587bf04c8254fb78df9d2344e915ce67948d7400512e3a6206d5"},
+    {file = "types_python_dateutil-2.9.0.20260518-py3-none-any.whl", hash = "sha256:d6a9c5bd0de61460c8fdef8ab2b400f956a1a1075cce08d4e2b4434e478c50b8"},
+    {file = "types_python_dateutil-2.9.0.20260518.tar.gz", hash = "sha256:51f02dc03b61c7f6a07df45797d4dfe8a1aa47f0b7db9ad89f6fd3a1a70e1b51"},
 ]
 
 [[package]]
 name = "types-pyyaml"
-version = "6.0.12.20260510"
+version = "6.0.12.20260518"
 description = "Typing stubs for PyYAML"
 optional = true
 python-versions = ">=3.10"
 files = [
-    {file = "types_pyyaml-6.0.12.20260510-py3-none-any.whl", hash = "sha256:3492eb9ba4d9d833473214c4d5736cccf5f37d93f5854059721e1c84f785309d"},
-    {file = "types_pyyaml-6.0.12.20260510.tar.gz", hash = "sha256:09c1f1cb65a6eebea1e2e51ccf4918b8288e152909609a35cdb0d805efd125ad"},
+    {file = "types_pyyaml-6.0.12.20260518-py3-none-any.whl", hash = "sha256:d2150f75a231c9fe9c7463bd29487d93e60bac90400287351384bc2284eba7cd"},
+    {file = "types_pyyaml-6.0.12.20260518.tar.gz", hash = "sha256:d917f83fb38462550338c1297faedd860b3ec83912b96b1e3d73255f7473e466"},
 ]
 
 [[package]]
 name = "types-requests"
-version = "2.33.0.20260513"
+version = "2.33.0.20260518"
 description = "Typing stubs for requests"
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "types_requests-2.33.0.20260513-py3-none-any.whl", hash = "sha256:d5a965f9d18b6e06b72039a69565de9027e58f36a7f709857da747fbe7521122"},
-    {file = "types_requests-2.33.0.20260513.tar.gz", hash = "sha256:bd845450e954e751373d5d33526742592f298808a3ee3bda7e858e46b839b57f"},
+    {file = "types_requests-2.33.0.20260518-py3-none-any.whl", hash = "sha256:626d697d1adaaff76e2044dc8c5c051d8f21abc157bdfe204a75558076fe0bf0"},
+    {file = "types_requests-2.33.0.20260518.tar.gz", hash = "sha256:df7bd3bfe0ca8402dfb841e7d9be714bb5578203283d66d7dc4ef69343449a5e"},
 ]
 
 [package.dependencies]
@@ -3908,13 +3908,13 @@ files = [
 
 [[package]]
 name = "types-tqdm"
-version = "4.67.3.20260508"
+version = "4.67.3.20260518"
 description = "Typing stubs for tqdm"
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "types_tqdm-4.67.3.20260508-py3-none-any.whl", hash = "sha256:0440759cc861a90c1cc98870f2c15ac633c0b6b14651dcafb83f98ab83bad0f4"},
-    {file = "types_tqdm-4.67.3.20260508.tar.gz", hash = "sha256:9acfdd179bdf5cc81f7ce7353b5b85eb92b16667bba89ec6c187b5e7ce617986"},
+    {file = "types_tqdm-4.67.3.20260518-py3-none-any.whl", hash = "sha256:4969f5b97257c6d082c163d7a0715fffe7a83cb6863e108eac45c3fb82305a68"},
+    {file = "types_tqdm-4.67.3.20260518.tar.gz", hash = "sha256:1f0cf61de56a76a454fbe2c6cc48d05e483470a38f8a9071893b923e7be47190"},
 ]
 
 [package.dependencies]

@@ -39,6 +39,11 @@ class GroupDetail(UniversalBaseModel):
     ] = None
     group_id: typing_extensions.Annotated[int, FieldMetadata(alias="groupId"), pydantic.Field(alias="groupId")]
     name: typing.Optional[str] = None
+    prompt: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    The group chat prompt stored in settings, when configured.
+    """
+
     updated: typing.Optional[dt.datetime] = pydantic.Field(default=None)
     """
     The data time when the group was last updated, in RFC3339 format
