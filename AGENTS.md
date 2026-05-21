@@ -84,6 +84,9 @@ hand. Use this sparingly — every entry is a maintenance commitment.
 Hand-written tests that exercise generated code live under `tests/custom/`. Everything
 else in `tests/` is regenerated.
 
+To coordinate an upstream API change, open a [GitHub issue](https://github.com/eyelevelai/groundx-python/issues) describing the
+needed shape change. A maintainer routes it to the appropriate Fern workspace.
+
 ---
 
 ## 4. The `extract` submodule
@@ -92,6 +95,9 @@ else in `tests/` is regenerated.
 templates, classes, celery tasks, post-processing, services, and settings — the
 building blocks for GroundX extraction workflows. End users install it via
 `pip install groundx[extract]`.
+
+The extract submodule's public API is **provided as-is and may change between minor
+versions.** External code that depends on it should pin a minor-version range.
 
 It has a much larger optional-dep footprint than the core SDK (boto3, celery, fastapi,
 google-api-python-client, gspread, minio, openai, pillow, redis, smolagents, and
