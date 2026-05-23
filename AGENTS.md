@@ -5,7 +5,7 @@ the Python equivalent of [`groundx-typescript`](https://github.com/eyelevelai/gr
 
 This file is the canonical contribution guide for agents and humans working in this
 repo. Other agent-tool surfaces (Codex, Claude, Cursor, Replit, Gemini/Antigravity)
-should **route here** rather than duplicate rules — see [§9](#9-other-agent-surfaces).
+should **route here** rather than duplicate rules — see [§10](#10-other-agent-surfaces).
 
 ---
 
@@ -133,11 +133,65 @@ handled via `[[tool.mypy.overrides]]` blocks declared in
 Editing `pyproject.toml`'s overrides directly will be overwritten on regen.
 
 **No live network in unit tests.** Mock S3, Google Sheets, Redis, OpenAI, etc. Live
-integration tests follow the policy in [§5](#5-credentials-and-live-tests).
+integration tests follow the policy in [§6](#6-credentials-and-live-tests).
+
+**Where extract tests live.** Extract uses a collocated test convention separate from
+the SDK surface: unit tests sit next to the modules they test (e.g.
+`src/groundx/extract/classes/test_group.py` tests `classes/group.py`), use
+`unittest.TestCase`, and use relative imports. Run with
+`poetry run pytest -rP -n auto .` (the explicit `.` matters — running `poetry run pytest`
+without a path argument honors `pyproject.toml`'s `testpaths = ["tests"]` and silently
+skips the colocated extract tests). For new extract tests, follow the surrounding
+collocated pattern. The collocated-vs-`tests/` split is a known inconsistency tracked
+separately and may be reconciled later.
 
 ---
 
-## 5. Credentials and live tests
+## 5. Extending or adding a hand-written submodule
+
+Two distinct cases for adding hand-written code.
+
+### 5.1 Extending an existing hand-written area (e.g. extract)
+
+Inside `src/groundx/extract/`:
+
+- **New module in an existing subdir** — add the file, update the subdir's
+  `__init__.py` to re-export the public surface, optionally update
+  `src/groundx/extract/__init__.py` if the symbol should be importable from
+  `groundx.extract`. Add a collocated test (see [§4](#4-the-extract-submodule)).
+- **New subdir under extract** — create the directory with a hand-written
+  `__init__.py` that re-exports the public surface; no `.fernignore` change needed
+  (the parent `src/groundx/extract` is already covered).
+- **New optional dep** — declare in `.fern/metadata.json`'s
+  `generatorConfig.extra_dependencies` and append to `generatorConfig.extras.extract`
+  per [§4](#4-the-extract-submodule). Don't edit `pyproject.toml` directly.
+
+### 5.2 Adding a new sibling submodule (like `extract`)
+
+Order matters here:
+
+1. **Add the path to `.fernignore` first.** Otherwise Fern wipes the new directory on
+   the next regen.
+2. **Create the directory** with a hand-written `__init__.py` that re-exports the
+   public surface.
+3. **Decide the import surface.** Users will import via
+   `from groundx.<submodule> import X` — **not** from `groundx` at the top level. The
+   top-level `src/groundx/__init__.py` is Fern-generated and won't know about the new
+   submodule's symbols.
+4. **Pick a test convention** and document it locally — either collocated (matching
+   extract) or under `tests/<submodule>/`.
+
+### 5.3 What requires upstream Fern coordination
+
+A new hand-written submodule whose symbols need to appear at top-level
+`from groundx import ...` requires changing the generator config (see how `ingest.py`
+gets there via `.fern/metadata.json`'s `generatorConfig.client.exported_filename`).
+That's a Fern-generator-config conversation, not a self-service contribution. For most
+new submodules, the `from groundx.<submodule> import X` import path is the right call.
+
+---
+
+## 6. Credentials and live tests
 
 CI tests **do not use live GroundX credentials.** Everything under `tests/utils/` and
 `tests/custom/` runs against mocked HTTP. A new contributor can clone the repo and run
@@ -153,7 +207,7 @@ If a contribution needs to verify against the live GroundX API:
 
 ---
 
-## 6. Release flow
+## 7. Release flow
 
 Releases are triggered by tag pushes. `ci.yml`'s `publish` job runs on any push to a
 `refs/tags/*` ref and publishes to PyPI using `$PYPI_USERNAME` / `$PYPI_PASSWORD`
@@ -168,7 +222,7 @@ Most commits in this repo are `Release X.Y.Z` markers driven by SDK regeneration
 
 ---
 
-## 7. Workflow
+## 8. Workflow
 
 1. Branch from `main` with a descriptive name.
 2. Make changes scoped to the right surface ([§3](#3-contributing-to-generated-code)
@@ -181,7 +235,7 @@ Most commits in this repo are `Release X.Y.Z` markers driven by SDK regeneration
    ```
 4. Open a PR against `main`. CI runs `compile` (mypy) and `test` (pytest, both with and
    without the aiohttp extra). Both must pass.
-5. After merge, a maintainer tags a release (see [§6](#6-release-flow)) to ship to PyPI.
+5. After merge, a maintainer tags a release (see [§7](#7-release-flow)) to ship to PyPI.
 
 **Commit messages.** Clear, descriptive, present tense. Reference the relevant issue
 or ticket ID in the subject when applicable.
@@ -193,7 +247,7 @@ rather than the whole tree.
 
 ---
 
-## 8. Package layout
+## 9. Package layout
 
 `src/groundx/` contains the SDK. Run `cat .fernignore` for the hand-written paths;
 everything else under `src/groundx/` is generated. `reference.md` is also generated
@@ -201,7 +255,7 @@ and should not be edited by hand.
 
 ---
 
-## 9. Other agent surfaces
+## 10. Other agent surfaces
 
 **Do not duplicate this file** into agent-specific variants (`CLAUDE.md`, `CURSOR.md`,
 `CODEX.md`, `.cursorrules`, `.replit`, `GEMINI.md`). Duplicated rules drift, then
@@ -213,7 +267,7 @@ pointer goes here.
 
 ---
 
-## 10. Boundaries
+## 11. Boundaries
 
 - ✅ **Always do:** run `poetry run mypy .` and `poetry run pytest -rP -n auto .` before pushing, read credentials from `os.environ`, edit code in paths listed in `.fernignore`
 - ⚠️ **Ask first:** add a new optional dep to `groundx[extract]`, add a path to `.fernignore`, modify `.fern/metadata.json` or `ci.yml` non-trivially, add a CI job requiring shared GroundX credentials
@@ -221,7 +275,7 @@ pointer goes here.
 
 ---
 
-## 11. Questions, links, license
+## 12. Questions, links, license
 
 **Questions or issues?**
 - [Fern documentation](https://buildwithfern.com) (generator and customization model)
