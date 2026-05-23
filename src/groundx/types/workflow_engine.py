@@ -44,6 +44,14 @@ class WorkflowEngine(UniversalBaseModel):
             description="An enumerated value that conforms to OpenAI '/chat/completion' specifications",
         ),
     ] = None
+    request_passthrough: typing_extensions.Annotated[
+        typing.Optional[typing.Dict[str, typing.Any]],
+        FieldMetadata(alias="requestPassthrough"),
+        pydantic.Field(
+            alias="requestPassthrough",
+            description="A JSON object merged into the LLM request body after GroundX builds the standard request. Values in this object override generated request fields on key conflicts.",
+        ),
+    ] = None
     service: typing.Optional[WorkflowEngineService] = pydantic.Field(default=None)
     """
     An enumerated descriptor of the service type, impacts how the requests are configured
