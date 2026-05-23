@@ -215,9 +215,9 @@ pointer goes here.
 
 ## 10. Boundaries
 
-- ✅ **Always do:** edit hand-written files listed in `.fernignore`, run `poetry run mypy .` and `poetry run pytest -rP -n auto .` before pushing, read credentials from `os.environ`, scope changes to the right surface (see [§2](#2-generated-vs-hand-written-code))
-- ⚠️ **Ask first:** add a new optional dep to `groundx[extract]` (every dep enlarges install footprint — justify in the PR), add a path to `.fernignore` (every entry is a maintenance commitment), add a live-integration CI job that requires shared GroundX credentials, propose an upstream API-shape change ([§3](#3-contributing-to-generated-code))
-- 🚫 **Never do:** edit Fern-generated files directly (they get overwritten on next regen), edit `pyproject.toml` to add deps or mypy config (use `.fern/metadata.json` per [§4](#4-the-extract-submodule)), commit credentials in any form (env files, test fixtures, examples), create agent-tool-specific files that duplicate this one (`CLAUDE.md`, `CURSOR.md`, `.cursorrules`, etc.)
+- ✅ **Always do:** run `poetry run mypy .` and `poetry run pytest -rP -n auto .` before pushing, read credentials from `os.environ`, edit code in paths listed in `.fernignore`
+- ⚠️ **Ask first:** add a new optional dep to `groundx[extract]`, add a path to `.fernignore`, modify `.fern/metadata.json` or `ci.yml` non-trivially, add a CI job requiring shared GroundX credentials
+- 🚫 **Never do:** edit Fern-generated files directly (overwritten on next regen), edit `pyproject.toml` for deps or mypy (use `.fern/metadata.json` per [§4](#4-the-extract-submodule)), remove a path from `.fernignore` without first re-homing the hand-written code, commit credentials in any form, create agent-tool-specific files that duplicate this one (`CLAUDE.md`, `.cursorrules`, etc.)
 
 ---
 
