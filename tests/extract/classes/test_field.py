@@ -1,12 +1,11 @@
 import unittest
 
-import dateparser, pytest
+import dateparser
+import pytest
 
 pytest.importorskip("dateparser")
 
 
-from groundx.extract.classes.field import ExtractedField
-from groundx.extract.classes.prompt import Prompt
 from groundx.extract.classes.testing import TestField
 
 
@@ -76,7 +75,7 @@ class TestExtractedField(unittest.TestCase):
 
         tst_date = dateparser.parse("1234")
         if tst_date is None:
-            raise Exception(f"tst_date is none")
+            raise Exception("tst_date is none")
 
         tst_date = tst_date.strftime("%Y-%m-%d")
         ef3 = TestField("test date", "1234")
