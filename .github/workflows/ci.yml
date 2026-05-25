@@ -41,6 +41,8 @@ jobs:
         run: poetry run pytest -rP -n auto
 
       - name: Install aiohttp extra
+        # adds aiohttp on top of the extras already installed above; both must stay so the
+        # already-installed extract test deps remain resolved after this incremental install
         run: poetry install --extras extract --extras aiohttp
 
       - name: Test (aiohttp)
