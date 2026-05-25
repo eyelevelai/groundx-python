@@ -55,7 +55,6 @@ openapi = { version = "*", optional = true}
 pillow = { version = "*", optional = true}
 pydantic = ">= 1.9.2"
 pydantic-core = ">=2.18.2,<2.44.0"
-pytest = { version = "*", optional = true}
 redis = { version = "*", optional = true}
 requests = ">=2.4.0"
 smolagents = { version = "*", optional = true}
@@ -115,7 +114,7 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.extras]
-extract=["boto3", "celery", "celery-types", "dateparser", "fastapi", "google-api-python-client", "google-api-python-client-stubs", "google-auth-stubs", "gspread", "minio", "openai", "pillow", "pytest", "redis", "smolagents", "types-boto3", "types-dateparser", "types-PyYAML"]
+extract=["boto3", "celery", "celery-types", "dateparser", "fastapi", "google-api-python-client", "google-api-python-client-stubs", "google-auth-stubs", "gspread", "minio", "openai", "pillow", "redis", "smolagents", "types-boto3", "types-dateparser", "types-PyYAML"]
 aiohttp=["aiohttp", "httpx-aiohttp"]
 
 [[tool.mypy.overrides]]

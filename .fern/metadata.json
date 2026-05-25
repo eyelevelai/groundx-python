@@ -66,10 +66,6 @@
         "version": "*",
         "optional": true
       },
-      "pytest": {
-        "version": "*",
-        "optional": true
-      },
       "redis": {
         "version": "*",
         "optional": true
@@ -108,7 +104,6 @@
         "minio",
         "openai",
         "pillow",
-        "pytest",
         "redis",
         "smolagents",
         "types-boto3",
