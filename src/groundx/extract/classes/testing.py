@@ -17,7 +17,6 @@ import typing
 from .field import ExtractedField
 from .prompt import Prompt
 
-
 __all__ = [
     "TestChunk",
     "TestDocumentPage",

@@ -8,7 +8,6 @@ from .group import Group
 from .prompt import Prompt
 from .testing import TestChunk, TestDocumentPage, TestField, TestXRay
 
-
 __all__ = [
     "AgentRequest",
     "Document",
