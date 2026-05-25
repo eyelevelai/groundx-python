@@ -6,8 +6,7 @@ from .field import ExtractedField
 from .groundx import GroundXDocument, XRayDocument
 from .group import Group
 from .prompt import Prompt
-from .test_field import TestField
-from .test_groundx import TestChunk, TestDocumentPage, TestXRay
+from .testing import TestChunk, TestDocumentPage, TestField, TestXRay
 
 
 __all__ = [

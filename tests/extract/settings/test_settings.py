@@ -1,6 +1,6 @@
 import typing, os, unittest
 
-from .settings import (
+from groundx.extract.settings.settings import (
     AgentSettings,
     ContainerSettings,
     ContainerUploadSettings,

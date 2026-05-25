@@ -1,26 +1,13 @@
-import dateparser, pytest, typing, unittest
+import unittest
+
+import dateparser, pytest
 
 pytest.importorskip("dateparser")
 
 
-from .field import ExtractedField
-from .prompt import Prompt
-
-
-def TestField(
-    name: str,
-    value: typing.Union[str, float, typing.List[typing.Any]],
-    conflicts: typing.List[typing.Any] = [],
-) -> ExtractedField:
-    return ExtractedField(
-        prompt=Prompt(
-            attr_name=name.replace("_", " "),
-            identifiers=[name],
-            instructions=name.replace("_", " "),
-        ),
-        value=value,
-        conflicts=conflicts,
-    )
+from groundx.extract.classes.field import ExtractedField
+from groundx.extract.classes.prompt import Prompt
+from groundx.extract.classes.testing import TestField
 
 
 class TestExtractedField(unittest.TestCase):
