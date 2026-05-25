@@ -21,7 +21,7 @@ class Prompt(BaseModel):
         if self.attr_name:
             return self.attr_name
 
-        raise ValueError(f"missing attr_name")
+        raise ValueError("missing attr_name")
 
     def valid_value(self, value: typing.Any) -> bool:
         ty = self.type
