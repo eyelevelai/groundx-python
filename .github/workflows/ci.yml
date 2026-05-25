@@ -38,13 +38,13 @@ jobs:
         run: poetry install
 
       - name: Test
-        run: poetry run pytest -rP -n auto .
+        run: poetry run pytest -rP -n auto
 
       - name: Install aiohttp extra
         run: poetry install --extras aiohttp
 
       - name: Test (aiohttp)
-        run: poetry run pytest -rP -n auto -m aiohttp .
+        run: poetry run pytest -rP -n auto -m aiohttp
 
   publish:
     needs: [compile, test]

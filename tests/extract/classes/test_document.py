@@ -7,28 +7,28 @@ from pathlib import Path
 from PIL import Image
 from unittest.mock import patch
 
-from .document import Document, DocumentRequest
-from .field import ExtractedField
-from .group import Group
-from ..prompt.manager import PromptManager
-from ..prompt.test_manager import SAMPLE_YAML_1, SAMPLE_YAML_2, TestSource
-from .test_groundx import TestXRay
+from groundx.extract.classes.document import Document, DocumentRequest
+from groundx.extract.classes.field import ExtractedField
+from groundx.extract.classes.group import Group
+from groundx.extract.prompt.manager import PromptManager
+from ..prompt._fixtures import SAMPLE_YAML_1, SAMPLE_YAML_2, TestSource
+from groundx.extract.classes.testing import TestXRay
 
 
 def DR(**data: typing.Any) -> DocumentRequest:
     return DocumentRequest.model_validate(data)
 
 
-def test_doc(prompt_manager: PromptManager) -> Document:
+def _make_doc(prompt_manager: PromptManager) -> Document:
     return Document.from_request(
         cache_dir=Path("./cache"),
         base_url="",
-        req=test_request(),
+        req=_make_request(),
         prompt_manager=prompt_manager,
     )
 
 
-def test_request() -> DocumentRequest:
+def _make_request() -> DocumentRequest:
     return DR(documentID="D", fileName="F", modelID=1, processorID=1, taskID="T")
 
 
@@ -45,7 +45,7 @@ class TestDocument(unittest.TestCase):
         source = TestSource(SAMPLE_YAML_1)
         manager = PromptManager(cache_source=source, config_source=source)
 
-        st1: Document = test_doc(manager)
+        st1: Document = _make_doc(manager)
         self.assertEqual(st1.invoice_name, "F")
         st2: Document = Document.from_request(
             base_url="",
@@ -247,7 +247,7 @@ class TestDocumentRequest(unittest.TestCase):
         buf = BytesIO()
         red_img.save(buf, format="PNG")
 
-        st = test_request()
+        st = _make_request()
         st.page_images = [red_img, red_img]
         st.page_image_dict = {
             urls[0]: 0,
@@ -272,7 +272,7 @@ class TestDocumentRequest(unittest.TestCase):
                 pass
 
         with patch("requests.get", return_value=TestResp()):
-            st = test_request()
+            st = _make_request()
             st.load_images(urls)
 
             self.assertEqual(len(st.page_images), 2)
@@ -284,7 +284,7 @@ class TestDocumentRequest(unittest.TestCase):
     def test_load_images_error(self) -> None:
         urls = ["http://example.com/page1.png", "http://example.com/page2.png"]
 
-        st = test_request()
+        st = _make_request()
         st.load_images(urls, should_sleep=False)
         self.assertEqual(len(st.page_images), 0)
         self.assertEqual(len(st.page_image_dict), 0)
