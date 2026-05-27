@@ -39,6 +39,11 @@ class SearchResultItem(UniversalBaseModel):
         FieldMetadata(alias="fileName"),
         pydantic.Field(alias="fileName", description="Name of ingested file"),
     ] = None
+    file_summary: typing_extensions.Annotated[
+        typing.Optional[str],
+        FieldMetadata(alias="fileSummary"),
+        pydantic.Field(alias="fileSummary", description="System-generated summary of the source document"),
+    ] = None
     multimodal_url: typing_extensions.Annotated[
         typing.Optional[str],
         FieldMetadata(alias="multimodalUrl"),
@@ -68,6 +73,14 @@ class SearchResultItem(UniversalBaseModel):
         FieldMetadata(alias="searchData"),
         pydantic.Field(
             alias="searchData", description="Document, section, and chunk search data, both custom and system-generated"
+        ),
+    ] = None
+    section_summary: typing_extensions.Annotated[
+        typing.Optional[str],
+        FieldMetadata(alias="sectionSummary"),
+        pydantic.Field(
+            alias="sectionSummary",
+            description="System-generated summary of the document section containing this result",
         ),
     ] = None
     source_url: typing_extensions.Annotated[

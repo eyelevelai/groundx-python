@@ -16,6 +16,7 @@ if typing.TYPE_CHECKING:
     from .bucket_update_detail import BucketUpdateDetail
     from .bucket_update_response import BucketUpdateResponse
     from .customer_detail import CustomerDetail
+    from .customer_detail_status import CustomerDetailStatus
     from .customer_response import CustomerResponse
     from .document import Document
     from .document_detail import DocumentDetail
@@ -89,6 +90,7 @@ _dynamic_imports: typing.Dict[str, str] = {
     "BucketUpdateDetail": ".bucket_update_detail",
     "BucketUpdateResponse": ".bucket_update_response",
     "CustomerDetail": ".customer_detail",
+    "CustomerDetailStatus": ".customer_detail_status",
     "CustomerResponse": ".customer_response",
     "Document": ".document",
     "DocumentDetail": ".document_detail",
@@ -186,6 +188,7 @@ __all__ = [
     "BucketUpdateDetail",
     "BucketUpdateResponse",
     "CustomerDetail",
+    "CustomerDetailStatus",
     "CustomerResponse",
     "Document",
     "DocumentDetail",

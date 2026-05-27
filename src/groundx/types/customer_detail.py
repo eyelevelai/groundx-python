@@ -4,6 +4,7 @@ import typing
 
 import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
+from .customer_detail_status import CustomerDetailStatus
 from .subscription_detail import SubscriptionDetail
 
 
@@ -25,6 +26,11 @@ class CustomerDetail(UniversalBaseModel):
     last: typing.Optional[str] = pydantic.Field(default=None)
     """
     Family name associated with the account, if known
+    """
+
+    status: typing.Optional[CustomerDetailStatus] = pydantic.Field(default=None)
+    """
+    Account status associated with the customer, if known
     """
 
     subscription: typing.Optional[SubscriptionDetail] = None
