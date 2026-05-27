@@ -113,9 +113,6 @@ class RawWorkflowsClient:
                     object_=steps, annotation=WorkflowSteps, direction="write"
                 ),
             },
-            headers={
-                "content-type": "application/json",
-            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -200,9 +197,6 @@ class RawWorkflowsClient:
             method="POST",
             json={
                 "workflowId": workflow_id,
-            },
-            headers={
-                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -293,9 +287,6 @@ class RawWorkflowsClient:
             method="POST",
             json={
                 "workflowId": workflow_id,
-            },
-            headers={
-                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -456,9 +447,6 @@ class RawWorkflowsClient:
                     object_=steps, annotation=WorkflowSteps, direction="write"
                 ),
             },
-            headers={
-                "content-type": "application/json",
-            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -616,9 +604,6 @@ class AsyncRawWorkflowsClient:
                     object_=steps, annotation=WorkflowSteps, direction="write"
                 ),
             },
-            headers={
-                "content-type": "application/json",
-            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -705,9 +690,6 @@ class AsyncRawWorkflowsClient:
             method="POST",
             json={
                 "workflowId": workflow_id,
-            },
-            headers={
-                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -798,9 +780,6 @@ class AsyncRawWorkflowsClient:
             method="POST",
             json={
                 "workflowId": workflow_id,
-            },
-            headers={
-                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -960,9 +939,6 @@ class AsyncRawWorkflowsClient:
                 "steps": convert_and_respect_annotation_metadata(
                     object_=steps, annotation=WorkflowSteps, direction="write"
                 ),
-            },
-            headers={
-                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,

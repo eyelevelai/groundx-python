@@ -85,9 +85,6 @@ class RawApiKeyClient:
             json={
                 "name": name,
             },
-            headers={
-                "content-type": "application/json",
-            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -147,9 +144,6 @@ class RawApiKeyClient:
             method="PUT",
             json={
                 "name": name,
-            },
-            headers={
-                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -285,9 +279,6 @@ class AsyncRawApiKeyClient:
             json={
                 "name": name,
             },
-            headers={
-                "content-type": "application/json",
-            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -347,9 +338,6 @@ class AsyncRawApiKeyClient:
             method="PUT",
             json={
                 "name": name,
-            },
-            headers={
-                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
