@@ -58,7 +58,7 @@
         "version": "*",
         "optional": true
       },
-      "openapi": {
+      "openai": {
         "version": "*",
         "optional": true
       },
@@ -71,6 +71,10 @@
         "optional": true
       },
       "smolagents": {
+        "version": "*",
+        "optional": true
+      },
+      "PyYAML": {
         "version": "*",
         "optional": true
       },
@@ -88,6 +92,8 @@
       }
     },
     "extra_dev_dependencies": {
+      "dateparser": "*",
+      "PyYAML": "*",
       "types-requests": ">=2.0.0"
     },
     "extras": {
@@ -106,6 +112,7 @@
         "pillow",
         "redis",
         "smolagents",
+        "PyYAML",
         "types-boto3",
         "types-dateparser",
         "types-PyYAML"
@@ -115,10 +122,10 @@
     "package_name": "groundx",
     "pyproject_toml": "[[tool.mypy.overrides]]\nmodule = [\"dateparser.*\"]\nignore_missing_imports = true\n\n[[tool.mypy.overrides]]\nmodule = [\"boto3.*\", \"botocore.*\"]\nignore_missing_imports = true\n\n[[tool.mypy.overrides]]\nmodule = [\"fastapi.*\", \"starlette.*\", \"redis.*\"]\nignore_missing_imports = true\n\n[[tool.mypy.overrides]]\nmodule = [\"google.*\", \"googleapiclient.*\", \"gspread.*\"]\nignore_missing_imports = true\n\n[[tool.mypy.overrides]]\nmodule = [\"minio.*\"]\nignore_missing_imports = true\n\n[[tool.mypy.overrides]]\nmodule = [\"openai.*\"]\nignore_missing_imports = true\n\n[[tool.mypy.overrides]]\nmodule = [\"PIL.*\"]\nignore_missing_imports = true\n\n[[tool.mypy.overrides]]\nmodule = [\"smolagents.*\"]\nignore_missing_imports = true\n\n[[tool.mypy.overrides]]\nmodule = [\"yaml.*\"]\nignore_missing_imports = true\n\n[[tool.mypy.overrides]]\nmodule = [\"groundx.extract.classes.document\"]\ndisable_error_code = [\"call-arg\"]\n\n[[tool.mypy.overrides]]\nmodule = [\"groundx.extract.tasks.utility\"]\ndisable_error_code = [\"call-arg\"]\n"
   },
-  "originGitCommit": "c75d2f93f9addd5e83670a928a63f3643c862199",
+  "originGitCommit": "2d2ad2629d2362ae01e18549e4705fa09c08ae7e",
   "originGitCommitIsDirty": false,
   "invokedBy": "ci",
-  "requestedVersion": "3.5.6",
+  "requestedVersion": "3.5.61",
   "ciProvider": "github",
-  "sdkVersion": "3.5.6"
+  "sdkVersion": "3.5.61"
 }
