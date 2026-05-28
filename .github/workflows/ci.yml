@@ -35,18 +35,16 @@ jobs:
         run: |
           curl -sSL https://install.python-poetry.org | python - -y --version 1.5.1
       - name: Install dependencies
-        run: poetry install --extras extract
+        run: poetry install
 
       - name: Test
-        run: poetry run pytest -rP -n auto
+        run: poetry run pytest -rP -n auto .
 
       - name: Install aiohttp extra
-        # adds aiohttp on top of the extras already installed above; both must stay so the
-        # already-installed extract test deps remain resolved after this incremental install
-        run: poetry install --extras extract --extras aiohttp
+        run: poetry install --extras aiohttp
 
       - name: Test (aiohttp)
-        run: poetry run pytest -rP -n auto -m aiohttp
+        run: poetry run pytest -rP -n auto -m aiohttp .
 
   publish:
     needs: [compile, test]
