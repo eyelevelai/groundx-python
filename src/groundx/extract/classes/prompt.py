@@ -1,11 +1,13 @@
 import typing
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from ..utility import str_to_type_sequence
 
 
 class Prompt(BaseModel):
+    model_config = ConfigDict(validate_by_name=True)
+
     attr_name: typing.Optional[str] = None
     default: typing.Optional[str] = None
     description: typing.Optional[str] = None
@@ -15,14 +17,11 @@ class Prompt(BaseModel):
     required: bool = False
     type: typing.Optional[typing.Union[str, typing.List[str]]] = None
 
-    class Config:
-        validate_by_name = True
-
     def key(self) -> str:
         if self.attr_name:
             return self.attr_name
 
-        raise ValueError(f"missing attr_name")
+        raise ValueError("missing attr_name")
 
     def valid_value(self, value: typing.Any) -> bool:
         ty = self.type

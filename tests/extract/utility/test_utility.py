@@ -1,6 +1,6 @@
 import typing, unittest
 
-from .utility import coerce_numeric_string
+from groundx.extract.utility.utility import coerce_numeric_string
 
 
 class TestUtilCoerceNumericString(unittest.TestCase):
