@@ -1,8 +1,8 @@
 import unittest
 
-from .logger import Logger
-from ..settings.settings import ContainerSettings, ContainerUploadSettings
-from .upload_minio import MinIOClient
+from groundx.extract.services.logger import Logger
+from groundx.extract.settings.settings import ContainerSettings, ContainerUploadSettings
+from groundx.extract.services.upload_minio import MinIOClient
 
 
 class TestMinIOClient(unittest.TestCase):

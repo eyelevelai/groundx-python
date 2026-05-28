@@ -1,6 +1,6 @@
 import typing, unittest
 
-from .prompt import Prompt
+from groundx.extract.classes.prompt import Prompt
 
 
 def TestPrompt(

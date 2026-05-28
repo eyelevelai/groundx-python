@@ -1,8 +1,8 @@
 import unittest
 
-from .element import Element
-from .group import Group
-from .prompt import Prompt
+from groundx.extract.classes.element import Element
+from groundx.extract.classes.group import Group
+from groundx.extract.classes.prompt import Prompt
 
 
 class TestGroup(unittest.TestCase):

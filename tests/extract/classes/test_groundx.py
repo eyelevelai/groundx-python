@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 from pydantic import ValidationError
 
-from .groundx import (
+from groundx.extract.classes.groundx import (
     GroundXDocument,
     XRayDocument,
     Chunk,
@@ -13,37 +13,11 @@ from .groundx import (
 )
 
 
-class TestChunk:
-    def __init__(self, json_str: str):
-        self.sectionSummary = None
-        self.suggestedText = json_str
-
-
-class TestDocumentPage:
-    def __init__(self, page_url: str):
-        self.pageUrl = page_url
-
-
-class TestXRay:
-    def __init__(
-        self,
-        source_url: str,
-        chunks: typing.Optional[typing.List[TestChunk]] = [],
-        document_pages: typing.Optional[typing.List[str]] = [],
-    ):
-        self.chunks = chunks
-        self.documentPages: typing.List[TestDocumentPage] = []
-        if document_pages is not None:
-            for p in document_pages:
-                self.documentPages.append(TestDocumentPage(p))
-        self.sourceUrl = source_url
-
-
 def GD(**data: typing.Any) -> GroundXDocument:
     return GroundXDocument.model_validate(data)
 
 
-def test_xray(gx: GroundXDocument) -> XRayDocument:
+def _download_xray(gx: GroundXDocument) -> XRayDocument:
     return XRayDocument.download(
         gx, cache_dir=Path("./cache"), base="https://upload.test", is_test=True
     )
@@ -82,7 +56,7 @@ class TestGroundX(unittest.TestCase):
         dummy = self.make_dummy_response(payload=payload, status_ok=True)
         with patch("requests.get", return_value=dummy):
             gx = GD(base_url="", documentID="D", taskID="T")
-            xdoc = test_xray(gx)
+            xdoc = _download_xray(gx)
             self.assertIsInstance(xdoc, XRayDocument)
             self.assertEqual(xdoc.chunks, [])
             self.assertEqual(xdoc.documentPages, [])
@@ -92,7 +66,7 @@ class TestGroundX(unittest.TestCase):
         with patch("requests.get", side_effect=requests.RequestException("no network")):
             gx = GD(base_url="", documentID="D", taskID="T")
             with self.assertRaises(RuntimeError) as cm:
-                test_xray(gx)
+                _download_xray(gx)
             self.assertIn("Error fetching X-ray JSON", str(cm.exception))
 
     def test_download_http_error(self):
@@ -100,7 +74,7 @@ class TestGroundX(unittest.TestCase):
         with patch("requests.get", return_value=dummy):
             gx = GD(base_url="", documentID="D", taskID="T")
             with self.assertRaises(RuntimeError) as cm:
-                test_xray(gx)
+                _download_xray(gx)
             self.assertIn("HTTP error!", str(cm.exception))
 
     def test_download_json_error(self):
@@ -108,7 +82,7 @@ class TestGroundX(unittest.TestCase):
         with patch("requests.get", return_value=dummy):
             gx = GD(base_url="", documentID="D", taskID="T")
             with self.assertRaises(RuntimeError) as cm:
-                test_xray(gx)
+                _download_xray(gx)
             self.assertIn("Invalid JSON returned", str(cm.exception))
 
     def test_DocumentPage(self):
@@ -167,7 +141,7 @@ class TestGroundX(unittest.TestCase):
         with patch("requests.get", return_value=dummy):
             gx = GD(base_url="", documentID="D", taskID="T")
             with self.assertRaises(ValidationError) as cm:
-                test_xray(gx)
+                _download_xray(gx)
             self.assertIn("Field required", str(cm.exception))
 
     def test_xray_get_extract(self) -> None:
@@ -316,7 +290,7 @@ class TestGroundX(unittest.TestCase):
         dummy = self.make_dummy_response(payload=payload, status_ok=True)
         with patch("requests.get", return_value=dummy):
             gx = GD(base_url="", documentID="D", taskID="T")
-            xdoc = test_xray(gx)
+            xdoc = _download_xray(gx)
 
             self.assertEqual(xdoc.fileType, "pdf")
             self.assertEqual(xdoc.fileName, "file.pdf")
