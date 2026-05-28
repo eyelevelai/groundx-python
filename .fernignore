@@ -1,5 +1,6 @@
 # Specify files that shouldn't be modified by Fern
 README.md
+AGENTS.md
 src/groundx/ingest.py
 src/groundx/csv_splitter.py
 src/groundx/test.py
