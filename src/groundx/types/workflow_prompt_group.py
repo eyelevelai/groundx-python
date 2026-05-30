@@ -9,11 +9,18 @@ from .workflow_prompt import WorkflowPrompt
 
 class WorkflowPromptGroup(UniversalBaseModel):
     """
-    A grouping of system task and request prompts
+    A grouping of system task and request prompts. On workflow update, omitted prompt members use defaults and explicit null removes that member.
     """
 
-    request: typing.Optional[WorkflowPrompt] = None
-    task: typing.Optional[WorkflowPrompt] = None
+    request: typing.Optional[WorkflowPrompt] = pydantic.Field(default=None)
+    """
+    The request prompt. On workflow update, omit this member to use the default and send null to remove it.
+    """
+
+    task: typing.Optional[WorkflowPrompt] = pydantic.Field(default=None)
+    """
+    The task prompt. On workflow update, omit this member to use the default and send null to remove it.
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
