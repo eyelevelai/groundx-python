@@ -21,7 +21,10 @@ class WorkflowStepConfig(UniversalBaseModel):
     """
 
     includes: typing.Optional[typing.Dict[str, bool]] = None
-    prompt: typing.Optional[WorkflowPromptGroup] = None
+    prompt: typing.Optional[WorkflowPromptGroup] = pydantic.Field(default=None)
+    """
+    Prompt group for this step config. On workflow update, omit prompt or send an empty object to use the default prompt group, send an object to customize supplied prompt members, and send null to use no prompt group.
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

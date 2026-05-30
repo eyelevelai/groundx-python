@@ -3078,7 +3078,7 @@ client.workflows.get(
 <dl>
 <dd>
 
-Update an existing workflow.
+Update an existing workflow. The request body is the desired custom overlay relative to GroundX defaults, not a delta against the currently stored custom workflow. Omitted steps and omitted step config fields return to defaults. Step null disables or clears that default step. For step configs, omitted prompt and prompt: {} use the default prompt group; prompt: null intentionally uses no prompt group. A name-only update is not metadata-only; include custom processing settings again if they should remain in effect.
 </dd>
 </dl>
 </dd>

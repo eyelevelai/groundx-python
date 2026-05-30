@@ -3,5 +3,6 @@
 import typing
 
 ProcessingStatus = typing.Union[
-    typing.Literal["queued", "processing", "error", "complete", "cancelled", "active", "inactive"], typing.Any
+    typing.Literal["queued", "training", "processing", "error", "complete", "cancelled", "active", "inactive"],
+    typing.Any,
 ]
