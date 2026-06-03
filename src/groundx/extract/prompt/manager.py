@@ -1,16 +1,24 @@
 import typing
 
-from pydantic import PrivateAttr
-
-from groundx import GroundX, WorkflowResponse
-
 from ..classes.element import Element
 from ..classes.field import ExtractedField
 from ..classes.group import Group
 from ..classes.prompt import Prompt
 from ..services.logger import Logger
 from .source import Source
-from .utility import do_not_remove_fields, load_from_yaml
+from .utility import (
+    do_not_remove_fields,
+    load_from_mapping,
+    prepare_extraction_yaml,
+)
+from .utility import (
+    load_from_yaml as _load_from_yaml,
+)
+from pydantic import PrivateAttr
+
+from groundx import GroundX, WorkflowResponse
+
+load_from_yaml = _load_from_yaml
 
 
 class PromptManager:
@@ -28,6 +36,10 @@ class PromptManager:
         default_workflow_id: typing.Optional[str] = None,
     ) -> None:
         self._cache: typing.Dict[str, typing.Dict[str, Group]] = {}
+        self._data_object_cache: typing.Dict[str, typing.Dict[str, Group]] = {}
+        self._workflow_field_paths: typing.Dict[
+            str, typing.Dict[str, typing.Dict[str, str]]
+        ] = {}
         self._versions: typing.Dict[str, str] = {}
         self._cache_source: Source = cache_source
         self._config_source: Source = config_source
@@ -225,8 +237,10 @@ class PromptManager:
         self.logger.info_msg(
             f"saving version", workflow_id=workflow_id, extras={"version": version}
         )
-        prompts = load_from_yaml(raw)
-        self._cache[workflow_id] = prompts
+        prepared = prepare_extraction_yaml(raw)
+        self._cache[workflow_id] = load_from_mapping(prepared.workflow_groups)
+        self._data_object_cache[workflow_id] = load_from_mapping(prepared.groups)
+        self._workflow_field_paths[workflow_id] = prepared.workflow_field_paths
         self._versions[workflow_id] = version
 
     def file_name(self, file_name: typing.Optional[str] = None) -> str:
@@ -247,6 +261,21 @@ class PromptManager:
         grp = self._cache.get(workflow_id)
         if not grp:
             raise Exception(f"group is None in cache [{workflow_id}]")
+
+        return {k: v.model_copy(deep=True) for k, v in grp.items()}
+
+    def get_fields_for_data_object(
+        self,
+        file_name: typing.Optional[str] = None,
+        workflow_id: typing.Optional[str] = None,
+    ) -> typing.Dict[str, Group]:
+        workflow_id = self.workflow_id(workflow_id)
+
+        self.cache_workflow(self.file_name(file_name), workflow_id)
+
+        grp = self._data_object_cache.get(workflow_id)
+        if not grp:
+            raise Exception(f"group is None in data object cache [{workflow_id}]")
 
         return {k: v.model_copy(deep=True) for k, v in grp.items()}
 
@@ -536,8 +565,10 @@ class PromptManager:
 
         if not previous_version or current_version != previous_version:
             raw, version = self._config_source.fetch(workflow_id)
-            prompts = load_from_yaml(raw)
-            self._cache[workflow_id] = prompts
+            prepared = prepare_extraction_yaml(raw)
+            self._cache[workflow_id] = load_from_mapping(prepared.workflow_groups)
+            self._data_object_cache[workflow_id] = load_from_mapping(prepared.groups)
+            self._workflow_field_paths[workflow_id] = prepared.workflow_field_paths
             self._versions[workflow_id] = version
 
     def workflow_extract_dict(
@@ -557,8 +588,29 @@ class PromptManager:
 
         return wfd
 
+    def workflow_field_paths(
+        self,
+        file_name: typing.Optional[str] = None,
+        workflow_id: typing.Optional[str] = None,
+    ) -> typing.Dict[str, typing.Dict[str, str]]:
+        workflow_id = self.workflow_id(workflow_id)
+
+        self.cache_workflow(self.file_name(file_name), workflow_id)
+
+        paths = self._workflow_field_paths.get(workflow_id)
+        if paths is None:
+            raise Exception(f"workflow field paths are None in cache [{workflow_id}]")
+
+        return copy_nested_dict(paths)
+
     def workflow_id(self, workflow_id: typing.Optional[str] = None) -> str:
         if not workflow_id:
             return self._default_workflow_id
 
         return workflow_id
+
+
+def copy_nested_dict(
+    data: typing.Dict[str, typing.Dict[str, str]]
+) -> typing.Dict[str, typing.Dict[str, str]]:
+    return {k: dict(v) for k, v in data.items()}
