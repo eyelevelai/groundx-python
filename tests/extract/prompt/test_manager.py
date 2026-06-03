@@ -1,11 +1,20 @@
-import json, typing, unittest, yaml
+import json
+import typing
+import unittest
 
+import yaml
+from ._fixtures import (
+    SAMPLE_YAML_1,
+    SAMPLE_YAML_2,
+    SAMPLE_YAML_PSEUDO_GROUPS,
+    TestSource,
+)
+
+from groundx.extract import PreparedExtractionYaml, prepare_extraction_yaml
 from groundx.extract.classes.field import ExtractedField
 from groundx.extract.classes.group import Group
 from groundx.extract.classes.prompt import Prompt
-from groundx.extract.prompt.manager import load_from_yaml, PromptManager
-
-from ._fixtures import SAMPLE_YAML_1, SAMPLE_YAML_2, TestSource
+from groundx.extract.prompt.manager import PromptManager, load_from_yaml
 
 
 class TestPromptManager(unittest.TestCase):
@@ -340,6 +349,325 @@ Special Instructions:
 """,
                 sa.render(),
             )
+
+    def test_prepare_extraction_yaml_with_pseudo_groups(self) -> None:
+        prepared = prepare_extraction_yaml(SAMPLE_YAML_PSEUDO_GROUPS)
+
+        self.assertIsInstance(prepared, PreparedExtractionYaml)
+        self.assertEqual(
+            list(prepared.groups.keys()),
+            ["statement", "customer", "service_address"],
+        )
+        self.assertEqual(
+            list(prepared.pseudo_groups.keys()),
+            ["statement_identity", "statement_totals", "customer_packet"],
+        )
+        self.assertEqual(
+            list(prepared.workflow_groups.keys()),
+            [
+                "statement_identity",
+                "statement_totals",
+                "customer_packet",
+                "statement",
+            ],
+        )
+        self.assertEqual(
+            prepared.workflow_field_paths,
+            {
+                "statement_identity": {
+                    "account_number": "statement.account_number",
+                    "bill_start_date": "statement.bill_start_date",
+                },
+                "statement_totals": {
+                    "total_amount_due": "statement.total_amount_due",
+                },
+                "customer_packet": {
+                    "customer_name": "customer.customer_name",
+                    "service_street": "service_address.street",
+                },
+                "statement": {
+                    "late_fee": "statement.late_fee",
+                },
+            },
+        )
+
+        statement_identity = prepared.workflow_groups["statement_identity"]
+        self.assertEqual(
+            statement_identity["prompt"]["instructions"],
+            "Extract statement-level fields for the final statement object.",
+        )
+        self.assertEqual(
+            statement_identity["fields"]["account_number"]["prompt"]["attr_name"],
+            "account_number",
+        )
+
+    def test_load_from_yaml_returns_final_groups_only_with_pseudo_groups(self) -> None:
+        root = load_from_yaml(SAMPLE_YAML_PSEUDO_GROUPS)
+
+        self.assertEqual(list(root.keys()), ["statement", "customer", "service_address"])
+        self.assertIn("total_amount_due", root["statement"].fields)
+        self.assertIn("customer_name", root["customer"].fields)
+        self.assertNotIn("_pseudo_groups", root)
+        self.assertNotIn("statement_identity", root)
+
+    def test_manager_workflow_groups_use_pseudo_group_names(self) -> None:
+        source = TestSource(SAMPLE_YAML_PSEUDO_GROUPS)
+        manager = PromptManager(cache_source=source, config_source=source)
+
+        workflow = manager.get_fields_for_workflow("latest")
+
+        self.assertEqual(
+            list(workflow.keys()),
+            [
+                "statement_identity",
+                "statement_totals",
+                "customer_packet",
+                "statement",
+            ],
+        )
+
+        statement_identity = workflow["statement_identity"]
+        self.assertIsInstance(statement_identity, Group)
+        self.assertIsNotNone(statement_identity.prompt)
+        if statement_identity.prompt:
+            self.assertEqual(statement_identity.prompt.attr_name, "statement_identity")
+            self.assertEqual(
+                statement_identity.prompt.instructions,
+                "Extract statement-level fields for the final statement object.",
+            )
+        self.assertEqual(
+            list(statement_identity.fields.keys()),
+            ["account_number", "bill_start_date"],
+        )
+
+        customer_packet = workflow["customer_packet"]
+        service_street = customer_packet.fields["service_street"]
+        self.assertIsInstance(service_street, ExtractedField)
+        if isinstance(service_street, ExtractedField):
+            self.assertIsNotNone(service_street.prompt)
+            if service_street.prompt:
+                self.assertEqual(service_street.prompt.attr_name, "service_street")
+                self.assertEqual(
+                    service_street.prompt.description,
+                    "The service street address.",
+                )
+
+        residual_statement = workflow["statement"]
+        self.assertEqual(list(residual_statement.fields.keys()), ["late_fee"])
+
+    def test_manager_data_object_groups_remain_final_shape(self) -> None:
+        source = TestSource(SAMPLE_YAML_PSEUDO_GROUPS)
+        manager = PromptManager(cache_source=source, config_source=source)
+
+        data_groups = manager.get_fields_for_data_object("latest")
+
+        self.assertEqual(
+            list(data_groups.keys()), ["statement", "customer", "service_address"]
+        )
+        self.assertEqual(
+            list(data_groups["statement"].fields.keys()),
+            ["account_number", "bill_start_date", "total_amount_due", "late_fee"],
+        )
+
+    def test_manager_workflow_field_paths(self) -> None:
+        source = TestSource(SAMPLE_YAML_PSEUDO_GROUPS)
+        manager = PromptManager(cache_source=source, config_source=source)
+
+        self.assertEqual(
+            manager.workflow_field_paths(),
+            {
+                "statement_identity": {
+                    "account_number": "statement.account_number",
+                    "bill_start_date": "statement.bill_start_date",
+                },
+                "statement_totals": {
+                    "total_amount_due": "statement.total_amount_due",
+                },
+                "customer_packet": {
+                    "customer_name": "customer.customer_name",
+                    "service_street": "service_address.street",
+                },
+                "statement": {
+                    "late_fee": "statement.late_fee",
+                },
+            },
+        )
+
+    def test_prepare_extraction_yaml_identity_route_map_for_legacy_yaml(self) -> None:
+        prepared = prepare_extraction_yaml(SAMPLE_YAML_1)
+
+        self.assertEqual(list(prepared.groups.keys()), ["statement", "meters"])
+        self.assertEqual(list(prepared.workflow_groups.keys()), ["statement", "meters"])
+        self.assertEqual(
+            prepared.workflow_field_paths,
+            {
+                "statement": {
+                    "statement_date": "statement.statement_date",
+                },
+                "meters": {
+                    "meter_number": "meters.meter_number",
+                    "service_address": "meters.service_address",
+                },
+            },
+        )
+
+    def test_prepare_extraction_yaml_rejects_duplicate_keys(self) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                """
+statement:
+  fields: {}
+statement:
+  fields: {}
+"""
+            )
+
+        self.assertIn("duplicate YAML key", str(exc.exception))
+
+    def test_prepare_extraction_yaml_rejects_duplicate_pseudo_routes(self) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                """
+statement:
+  fields:
+    account_number:
+      prompt:
+        identifiers:
+          - Account Number
+        instructions: Return the account number.
+        type: str
+_pseudo_groups:
+  first:
+    fields:
+      account_number:
+        path: statement.account_number
+  second:
+    fields:
+      duplicate_account_number:
+        path: statement.account_number
+"""
+            )
+
+        self.assertIn("routed more than once", str(exc.exception))
+
+    def test_prepare_extraction_yaml_rejects_unknown_pseudo_path(self) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                """
+statement:
+  fields:
+    account_number:
+      prompt:
+        identifiers:
+          - Account Number
+        instructions: Return the account number.
+        type: str
+_pseudo_groups:
+  identity:
+    fields:
+      missing:
+        path: statement.missing
+"""
+            )
+
+        self.assertIn("unknown final field path", str(exc.exception))
+
+    def test_prepare_extraction_yaml_rejects_multi_parent_pseudo_without_prompt(
+        self,
+    ) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                """
+customer:
+  fields:
+    customer_name:
+      prompt:
+        identifiers:
+          - Customer Name
+        instructions: Return the customer name.
+        type: str
+service_address:
+  fields:
+    street:
+      prompt:
+        identifiers:
+          - Service Address
+        instructions: Return the service address.
+        type: str
+_pseudo_groups:
+  customer_packet:
+    fields:
+      customer_name:
+        path: customer.customer_name
+      service_street:
+        path: service_address.street
+"""
+            )
+
+        self.assertIn("must declare prompt", str(exc.exception))
+
+    def test_prepare_extraction_yaml_composes_defs_fields_only(self) -> None:
+        prepared = prepare_extraction_yaml(
+            """
+_defs:
+  identity_fields:
+    fields:
+      account_number:
+        prompt:
+          identifiers:
+            - Account Number
+          instructions: Return the account number.
+          type: str
+statement:
+  include:
+    - identity_fields
+  fields:
+    total_amount_due:
+      prompt:
+        identifiers:
+          - Total Amount Due
+        instructions: Return the total amount due.
+        type: float
+_pseudo_groups:
+  statement_identity:
+    fields:
+      account_number:
+        path: statement.account_number
+"""
+        )
+
+        self.assertEqual(
+            list(prepared.groups["statement"]["fields"].keys()),
+            ["account_number", "total_amount_due"],
+        )
+        self.assertEqual(
+            prepared.workflow_field_paths,
+            {
+                "statement_identity": {
+                    "account_number": "statement.account_number",
+                },
+                "statement": {
+                    "total_amount_due": "statement.total_amount_due",
+                },
+            },
+        )
+
+    def test_prepare_extraction_yaml_rejects_defs_prompt_text(self) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                """
+_defs:
+  identity_fields:
+    prompt:
+      instructions: Shared prompt text is not allowed in defs.
+    fields: {}
+statement:
+  include: identity_fields
+  fields: {}
+"""
+            )
+
+        self.assertIn("unsupported _defs keys", str(exc.exception))
 
     def test_get_prompt_1(self) -> None:
         tsts: typing.List[typing.Dict[str, typing.Any]] = [

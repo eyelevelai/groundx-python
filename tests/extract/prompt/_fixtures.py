@@ -11,7 +11,6 @@ import typing
 
 from groundx.extract.prompt.source import Source
 
-
 SAMPLE_YAML_1 = """
 statement:
   fields:
@@ -80,6 +79,89 @@ statement:
             instructions: |
               ## meter_number
             type: str
+"""
+
+SAMPLE_YAML_PSEUDO_GROUPS = """
+statement:
+  prompt:
+    instructions: Extract statement-level fields for the final statement object.
+  fields:
+    account_number:
+      prompt:
+        description: The account number printed on the statement.
+        identifiers:
+          - Account Number
+          - Account #
+        instructions: Return the account number exactly as printed.
+        type: str
+    bill_start_date:
+      prompt:
+        description: The billing period start date.
+        identifiers:
+          - Billing Period
+          - Service From
+        instructions: Return the billing period start date as YYYY-MM-DD.
+        type: str
+    total_amount_due:
+      prompt:
+        description: The total amount due.
+        identifiers:
+          - Total Amount Due
+          - Amount Due
+        instructions: Return the total amount due as a number.
+        type: float
+    late_fee:
+      prompt:
+        description: The late fee charged on this statement.
+        identifiers:
+          - Late Fee
+        instructions: Return the late fee as a number.
+        type: float
+
+customer:
+  fields:
+    customer_name:
+      prompt:
+        description: The customer name as printed.
+        identifiers:
+          - Customer Name
+          - Name
+        instructions: Return the customer name exactly as printed.
+        type: str
+
+service_address:
+  fields:
+    street:
+      prompt:
+        description: The service street address.
+        identifiers:
+          - Service Address
+        instructions: Return the street address exactly as printed.
+        type: str
+
+_pseudo_groups:
+  statement_identity:
+    fields:
+      account_number:
+        path: statement.account_number
+      bill_start_date:
+        path: statement.bill_start_date
+
+  statement_totals:
+    prompt:
+      instructions: Extract only the statement total fields.
+    fields:
+      total_amount_due:
+        path: statement.total_amount_due
+
+  customer_packet:
+    prompt:
+      instructions: Extract customer and service-address fields together.
+    fields:
+      customer_name:
+        path: customer.customer_name
+      service_street:
+        path: service_address.street
 """
 
 

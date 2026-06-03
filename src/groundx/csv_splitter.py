@@ -1,26 +1,32 @@
-import csv, math, os, tempfile, typing
+import csv
+import math
+import os
+import tempfile
+import typing
 from pathlib import Path
+
+PathLike = typing.Union[str, os.PathLike[str]]
 
 
 class CSVSplitter:
-    def __init__(self, filepath, delimiter=','):
+    def __init__(self, filepath: PathLike, delimiter: str = ",") -> None:
         self.filepath = filepath
         self.delimiter = delimiter
         self.filename = os.path.basename(filepath)
         self.file_size = os.path.getsize(filepath)
         self.rows_count = self.get_row_count()
 
-    def get_row_count(self):
+    def get_row_count(self) -> int:
         with open(self.filepath, "r", newline="", encoding="utf-8") as csvfile:
             return sum(1 for _ in csvfile) - 1
 
-    def determine_splits(self):
+    def determine_splits(self) -> int:
         row_mod = int(self.rows_count / 1000) + 1
         file_mod = int(self.file_size / 1024 / 1024) + 1
 
         return max(row_mod, file_mod)
 
-    def split(self):
+    def split(self) -> typing.List[Path]:
         splits = self.determine_splits()
         if splits < 2:
             return [Path(self.filepath)]
@@ -36,8 +42,8 @@ class CSVSplitter:
 
             current_file_number = 1
             current_row = 0
-            current_writer = None
-            current_output_file = None
+            current_writer: typing.Optional[typing.Any] = None
+            current_output_file: typing.Optional[typing.TextIO] = None
 
             for row in reader:
                 if current_row % rows_per_file == 0:
@@ -55,6 +61,8 @@ class CSVSplitter:
                     current_writer.writerow(headers)
                     current_file_number += 1
 
+                if current_writer is None:
+                    raise RuntimeError("CSV split writer was not initialized")
                 current_writer.writerow(row)
                 current_row += 1
 
