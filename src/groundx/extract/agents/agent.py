@@ -1,6 +1,4 @@
-import json, pytest, traceback, typing
-
-pytest.importorskip("PIL")
+import json, traceback, typing
 
 from PIL.Image import Image
 
