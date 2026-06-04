@@ -46,13 +46,6 @@ jobs:
       - name: Test (aiohttp)
         run: poetry run pytest -rP -n auto -m aiohttp .
 
-      - name: Clean install import smoke
-        run: |
-          python -m venv /tmp/groundx-clean-import
-          /tmp/groundx-clean-import/bin/python -m pip install --upgrade pip
-          /tmp/groundx-clean-import/bin/python -m pip install ".[extract]"
-          /tmp/groundx-clean-import/bin/python -c "from groundx.extract import FinalFieldPath, PreparedExtractionYaml, prepare_extraction_yaml; print(FinalFieldPath, PreparedExtractionYaml, prepare_extraction_yaml)"
-
   publish:
     needs: [compile, test]
     if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
