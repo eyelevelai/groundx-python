@@ -1,3 +1,4 @@
+import copy
 import typing
 
 from ..classes.element import Element
@@ -7,6 +8,7 @@ from ..classes.prompt import Prompt
 from ..services.logger import Logger
 from .source import Source
 from .utility import (
+    PreparedExtractionYaml,
     do_not_remove_fields,
     load_from_mapping,
     prepare_extraction_yaml,
@@ -34,15 +36,28 @@ class PromptManager:
         logger: typing.Optional[Logger] = None,
         default_file_name: typing.Optional[str] = None,
         default_workflow_id: typing.Optional[str] = None,
+        top_level_metadata_keys: typing.Optional[typing.Iterable[str]] = None,
+        final_group_metadata_keys: typing.Optional[typing.Iterable[str]] = None,
+        workflow_group_metadata_keys: typing.Optional[typing.Iterable[str]] = None,
     ) -> None:
         self._cache: typing.Dict[str, typing.Dict[str, Group]] = {}
         self._data_object_cache: typing.Dict[str, typing.Dict[str, Group]] = {}
         self._workflow_field_paths: typing.Dict[
             str, typing.Dict[str, typing.Dict[str, str]]
         ] = {}
+        self._top_level_metadata: typing.Dict[str, typing.Dict[str, typing.Any]] = {}
+        self._final_group_metadata: typing.Dict[
+            str, typing.Dict[str, typing.Dict[str, typing.Any]]
+        ] = {}
+        self._workflow_group_metadata: typing.Dict[
+            str, typing.Dict[str, typing.Dict[str, typing.Any]]
+        ] = {}
         self._versions: typing.Dict[str, str] = {}
         self._cache_source: Source = cache_source
         self._config_source: Source = config_source
+        self._top_level_metadata_keys = set(top_level_metadata_keys or [])
+        self._final_group_metadata_keys = set(final_group_metadata_keys or [])
+        self._workflow_group_metadata_keys = set(workflow_group_metadata_keys or [])
 
         if not default_file_name:
             default_file_name = "latest"
@@ -96,7 +111,7 @@ class PromptManager:
             if res and res.workflow and res.workflow.workflow_id:
                 self.default_workflow_id = res.workflow.workflow_id
                 self.logger.info_msg(
-                    f"workflow_id from get_account, assigned to account",
+                    "workflow_id from get_account, assigned to account",
                     workflow_id=self.default_workflow_id,
                 )
 
@@ -119,7 +134,7 @@ class PromptManager:
                     if wf.workflow_id and wf.relationships and wf.relationships.account:
                         self.default_workflow_id = wf.workflow_id
                         self.logger.info_msg(
-                            f"workflow_id from list, assigned to account",
+                            "workflow_id from list, assigned to account",
                             workflow_id=self.default_workflow_id,
                         )
 
@@ -213,7 +228,7 @@ class PromptManager:
                 return
             if version and workflow_id in self._versions:
                 self.logger.info_msg(
-                    f"cached version out of date",
+                    "cached version out of date",
                     workflow_id=workflow_id,
                     extras={
                         "current_version": self._versions.get(workflow_id),
@@ -221,9 +236,9 @@ class PromptManager:
                     },
                 )
             else:
-                self.logger.info_msg(f"no cached version", workflow_id=workflow_id)
+                self.logger.info_msg("no cached version", workflow_id=workflow_id)
         else:
-            self.logger.info_msg(f"no cached version", workflow_id=workflow_id)
+            self.logger.info_msg("no cached version", workflow_id=workflow_id)
 
         try:
             raw, version = self._config_source.fetch(workflow_id)
@@ -235,13 +250,24 @@ class PromptManager:
             raw, version = self._cache_source.fetch(file_name)
 
         self.logger.info_msg(
-            f"saving version", workflow_id=workflow_id, extras={"version": version}
+            "saving version", workflow_id=workflow_id, extras={"version": version}
         )
-        prepared = prepare_extraction_yaml(raw)
+        prepared = self._prepare_extraction_yaml(raw)
         self._cache[workflow_id] = load_from_mapping(prepared.workflow_groups)
         self._data_object_cache[workflow_id] = load_from_mapping(prepared.groups)
         self._workflow_field_paths[workflow_id] = prepared.workflow_field_paths
+        self._top_level_metadata[workflow_id] = prepared.top_level_metadata
+        self._final_group_metadata[workflow_id] = prepared.final_group_metadata
+        self._workflow_group_metadata[workflow_id] = prepared.workflow_group_metadata
         self._versions[workflow_id] = version
+
+    def _prepare_extraction_yaml(self, raw: str) -> PreparedExtractionYaml:
+        return prepare_extraction_yaml(
+            raw,
+            top_level_metadata_keys=self._top_level_metadata_keys,
+            final_group_metadata_keys=self._final_group_metadata_keys,
+            workflow_group_metadata_keys=self._workflow_group_metadata_keys,
+        )
 
     def file_name(self, file_name: typing.Optional[str] = None) -> str:
         if not file_name:
@@ -286,7 +312,7 @@ class PromptManager:
         workflow_id: typing.Optional[str] = None,
     ) -> typing.Optional[Prompt]:
         if not name:
-            raise Exception(f"name is empty")
+            raise Exception("name is empty")
 
         res = self.get_fields_for_workflow(file_name, workflow_id)
 
@@ -495,7 +521,7 @@ class PromptManager:
         workflow_id: typing.Optional[str] = None,
     ) -> Group:
         if not group_name:
-            raise Exception(f"group_name is empty")
+            raise Exception("group_name is empty")
 
         res = self.get_fields_for_workflow(file_name, workflow_id)
 
@@ -565,10 +591,13 @@ class PromptManager:
 
         if not previous_version or current_version != previous_version:
             raw, version = self._config_source.fetch(workflow_id)
-            prepared = prepare_extraction_yaml(raw)
+            prepared = self._prepare_extraction_yaml(raw)
             self._cache[workflow_id] = load_from_mapping(prepared.workflow_groups)
             self._data_object_cache[workflow_id] = load_from_mapping(prepared.groups)
             self._workflow_field_paths[workflow_id] = prepared.workflow_field_paths
+            self._top_level_metadata[workflow_id] = prepared.top_level_metadata
+            self._final_group_metadata[workflow_id] = prepared.final_group_metadata
+            self._workflow_group_metadata[workflow_id] = prepared.workflow_group_metadata
             self._versions[workflow_id] = version
 
     def workflow_extract_dict(
@@ -602,6 +631,51 @@ class PromptManager:
             raise Exception(f"workflow field paths are None in cache [{workflow_id}]")
 
         return copy_nested_dict(paths)
+
+    def top_level_metadata(
+        self,
+        file_name: typing.Optional[str] = None,
+        workflow_id: typing.Optional[str] = None,
+    ) -> typing.Dict[str, typing.Any]:
+        workflow_id = self.workflow_id(workflow_id)
+
+        self.cache_workflow(self.file_name(file_name), workflow_id)
+
+        metadata = self._top_level_metadata.get(workflow_id)
+        if metadata is None:
+            raise Exception(f"top level metadata is None in cache [{workflow_id}]")
+
+        return copy.deepcopy(metadata)
+
+    def final_group_metadata(
+        self,
+        file_name: typing.Optional[str] = None,
+        workflow_id: typing.Optional[str] = None,
+    ) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
+        workflow_id = self.workflow_id(workflow_id)
+
+        self.cache_workflow(self.file_name(file_name), workflow_id)
+
+        metadata = self._final_group_metadata.get(workflow_id)
+        if metadata is None:
+            raise Exception(f"final group metadata is None in cache [{workflow_id}]")
+
+        return copy.deepcopy(metadata)
+
+    def workflow_group_metadata(
+        self,
+        file_name: typing.Optional[str] = None,
+        workflow_id: typing.Optional[str] = None,
+    ) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
+        workflow_id = self.workflow_id(workflow_id)
+
+        self.cache_workflow(self.file_name(file_name), workflow_id)
+
+        metadata = self._workflow_group_metadata.get(workflow_id)
+        if metadata is None:
+            raise Exception(f"workflow group metadata is None in cache [{workflow_id}]")
+
+        return copy.deepcopy(metadata)
 
     def workflow_id(self, workflow_id: typing.Optional[str] = None) -> str:
         if not workflow_id:

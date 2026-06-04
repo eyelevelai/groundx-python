@@ -1,6 +1,6 @@
 # Change: Extract YAML Pseudo Groups
 
-Status: planned
+Status: completed
 
 This repository does not currently have an OpenSpec validation harness. This
 change folder is an OpenSpec-style execution artifact for the hand-written
@@ -40,12 +40,18 @@ to expose only the customer-facing final groups.
   replacement context.
 - Expose a reassembly map from workflow group field keys to final data paths so
   `internal-arcadia-agents` can rebuild the final object.
+- Define the versioned serialized metadata artifact that carries route maps,
+  final schema, and metadata surfaces from harness workflow compilation to
+  Arcadia reassembly.
+- Expose separate final-group/business metadata and workflow-group metadata
+  surfaces so workflow assignment keys such as `slot` do not blur with
+  reconcile/dedupe/conflict metadata.
 - Preserve legacy extraction YAML behavior when `_pseudo_groups` is absent.
 - Preserve `_defs` as fields-only reusable authoring fragments, not prompt or
   execution-group containers.
 - Produce clear validation errors for malformed pseudo groups, unknown field
-  paths, duplicate routing, duplicate YAML keys, scalar `prompt:` shorthand, and
-  unsupported metadata placement.
+  paths, duplicate routing, duplicate YAML keys, YAML merge keys, recursive YAML
+  aliases, scalar `prompt:` shorthand, and unsupported metadata placement.
 - Add focused unit coverage under `tests/extract/` without live network calls or
   new runtime dependencies.
 - Stage public documentation, harness, and Arcadia reassembly updates after the
@@ -72,17 +78,21 @@ to expose only the customer-facing final groups.
 
 ## Handoff Plans
 
-Execute these plans in order from the main SDK plan:
+Execute these plans from the main SDK plan with this gating:
 
 1. SDK implementation:
    `/Users/benjaminfletcher/git/groundx-python/openspec/changes/extract-yaml-group-fragments/tasks.md`
-2. Public documentation:
+2. Public documentation draft:
    `/Users/benjaminfletcher/git/eyelevel-fern-config/openspec/changes/document-extraction-workflow-walkthrough/tasks.md`
-3. Harness extraction skill and workflow guide:
+3. Harness extraction skill and workflow guide draft/source updates:
    `/Users/benjaminfletcher/git/groundx-studio-harness/openspec/changes/extraction-yaml-fragments-and-howto/tasks.md`
 4. Arcadia reassembly:
    `/Users/benjaminfletcher/git/internal-arcadia-agents/openspec/changes/extraction-pseudo-groups-reassembly/tasks.md`
+5. Public documentation publication, harness plugin mirror sync, and final
+   closeout after Arcadia reassembly is implemented, or after public/harness
+   copy explicitly excludes unavailable reassembly behavior.
 
 The documentation, harness, and Arcadia plans must not be treated as complete
 until SDK tests prove the final YAML contract, workflow-group shape, route map,
-and error semantics.
+and error semantics. Public docs and plugin bundles must not be published as
+deployed end-to-end behavior until Arcadia reassembly has matching tests.

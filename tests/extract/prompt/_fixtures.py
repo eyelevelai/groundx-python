@@ -143,25 +143,25 @@ _pseudo_groups:
   statement_identity:
     fields:
       account_number:
-        path: statement.account_number
+        path: /statement/account_number
       bill_start_date:
-        path: statement.bill_start_date
+        path: /statement/bill_start_date
 
   statement_totals:
     prompt:
       instructions: Extract only the statement total fields.
     fields:
       total_amount_due:
-        path: statement.total_amount_due
+        path: /statement/total_amount_due
 
   customer_packet:
     prompt:
       instructions: Extract customer and service-address fields together.
     fields:
       customer_name:
-        path: customer.customer_name
+        path: /customer/customer_name
       service_street:
-        path: service_address.street
+        path: /service_address/street
 """
 
 
