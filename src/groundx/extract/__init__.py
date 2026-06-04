@@ -16,6 +16,7 @@ from .classes import (
     XRayDocument,
 )
 from .prompt import (
+    FinalFieldPath,
     ObjectStore,
     PreparedExtractionYaml,
     PromptManager,
@@ -41,6 +42,7 @@ __all__ = [
     "DocumentRequest",
     "Element",
     "ExtractedField",
+    "FinalFieldPath",
     "GroundXDocument",
     "GroundXSettings",
     "Group",
