@@ -140,5 +140,17 @@ real behavior gaps require a focused fix plus adversarial review.
   on the eager `PIL.Image` import, then passed after the lazy import fix.
 - `poetry run pytest -rP -n auto .`: passed with 143 tests passed and 2
   skipped after the Pillow import-boundary fix.
+- CI follow-up bugfix 2026-06-04, part 2: CI next failed without Google client
+  libraries because `groundx.extract.prompt` and `groundx.extract.services`
+  package initializers eagerly imported `PromptManager`, `ObjectStore`, and
+  `SheetsClient`. Made both package namespaces lazy and mapped top-level prompt
+  exports directly to their defining modules.
+- Extended `tests/extract/test_import_boundaries.py` to block `PIL`, `google`,
+  `googleapiclient`, and `gspread`; it first failed on the eager
+  `google.oauth2` import, then passed after the lazy prompt/services fix.
+- Final local SDK sweep after the Google import-boundary fix:
+  `git diff --check && poetry run pytest -rP -n auto . && poetry run mypy . && poetry run pyright -p pyrightconfig.json`
+  passed with 143 tests passed, 2 skipped, mypy success in 203 source files,
+  and pyright 0 errors / 0 warnings.
 - Final release-readiness remains open because Arcadia runtime wiring, docs
   preview/publish, and harness release hardening still have open plan items.

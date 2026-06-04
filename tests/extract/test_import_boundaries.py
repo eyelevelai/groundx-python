@@ -5,7 +5,7 @@ import sys
 import textwrap
 
 
-def test_non_image_extract_imports_do_not_require_pillow() -> None:
+def test_non_optional_extract_imports_do_not_require_image_or_google_deps() -> None:
     src_path = Path(__file__).resolve().parents[2] / "src"
     env = os.environ.copy()
     env["PYTHONPATH"] = f"{src_path}{os.pathsep}{env.get('PYTHONPATH', '')}"
@@ -16,14 +16,18 @@ def test_non_image_extract_imports_do_not_require_pillow() -> None:
         import sys
 
 
-        class BlockPillow(importlib.abc.MetaPathFinder):
+        class BlockOptionalDeps(importlib.abc.MetaPathFinder):
             def find_spec(self, fullname, path=None, target=None):
-                if fullname == "PIL" or fullname.startswith("PIL."):
-                    raise ModuleNotFoundError("No module named 'PIL'")
+                blocked_roots = ("PIL", "google", "googleapiclient", "gspread")
+                if fullname in blocked_roots or fullname.startswith(
+                    tuple(f"{root}." for root in blocked_roots)
+                ):
+                    root = fullname.split(".", 1)[0]
+                    raise ModuleNotFoundError(f"No module named '{root}'")
                 return None
 
 
-        sys.meta_path.insert(0, BlockPillow())
+        sys.meta_path.insert(0, BlockOptionalDeps())
 
         from groundx.extract import (
             FinalFieldPath,
