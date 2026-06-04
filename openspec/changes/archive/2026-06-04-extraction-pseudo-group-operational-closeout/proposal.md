@@ -15,9 +15,9 @@ release-ready:
 - Arcadia runtime wiring still needs a live caller to pass
   `extraction_workflow_metadata_v1` into the reassembly helper.
 - Live extraction regression tests need credentials and a deployed workflow.
-- The SDK package version containing `prepare_extraction_yaml()` has been
-  confirmed as `3.5.9`, and the downstream clean-install import smoke is now
-  tracked so release CI does not rely only on development dependencies.
+- The SDK package version containing `prepare_extraction_yaml()` was first
+  confirmed in `3.5.9`; the clean public import gate is satisfied by
+  `groundx[extract]==3.6.0`.
 - Generated-source durability must be proven so Fern regeneration does not
   overwrite the hand-written extract SDK surfaces.
 - Public docs need a publish/preview pass with Fern organization access.

@@ -611,6 +611,101 @@ _pseudo_groups:
 
         self.assertIn("unknown final field path", str(exc.exception))
 
+    def test_prepare_extraction_yaml_rejects_malformed_pseudo_field_mapping(
+        self,
+    ) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                """
+statement:
+  fields:
+    account_number:
+      prompt:
+        identifiers:
+          - Account Number
+        instructions: Return the account number.
+        type: str
+_pseudo_groups:
+  statement_identity:
+    fields:
+      account_number: /statement/account_number
+"""
+            )
+
+        self.assertIn(
+            "_pseudo_groups.statement_identity.fields.account_number",
+            str(exc.exception),
+        )
+
+    def test_prepare_extraction_yaml_rejects_pseudo_final_group_name_collision(
+        self,
+    ) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                """
+statement:
+  fields:
+    account_number:
+      prompt:
+        identifiers:
+          - Account Number
+        instructions: Return the account number.
+        type: str
+_pseudo_groups:
+  statement:
+    fields:
+      account_number:
+        path: /statement/account_number
+"""
+            )
+
+        self.assertIn("collides with a final group", str(exc.exception))
+
+    def test_prepare_extraction_yaml_rejects_pseudo_group_include(self) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                """
+_defs:
+  identity_fields:
+    fields:
+      account_number:
+        prompt:
+          identifiers:
+            - Account Number
+          instructions: Return the account number.
+          type: str
+statement:
+  include: identity_fields
+  fields: {}
+_pseudo_groups:
+  statement_identity:
+    include: identity_fields
+    fields:
+      account_number:
+        path: /statement/account_number
+"""
+            )
+
+        self.assertIn("unsupported pseudo-group keys", str(exc.exception))
+
+    def test_prepare_extraction_yaml_rejects_scalar_prompt_shorthand(self) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                """
+statement:
+  prompt: Extract statement fields.
+  fields:
+    account_number:
+      prompt:
+        identifiers:
+          - Account Number
+        instructions: Return the account number.
+        type: str
+"""
+            )
+
+        self.assertIn("mapping-shaped prompt", str(exc.exception))
+
     def test_prepare_extraction_yaml_rejects_multi_parent_pseudo_without_prompt(
         self,
     ) -> None:
@@ -1035,6 +1130,189 @@ statement:
             )
 
         self.assertIn("unsupported _defs keys", str(exc.exception))
+
+    def test_prepare_extraction_yaml_rejects_duplicate_nested_prompt_key(
+        self,
+    ) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                """
+statement:
+  fields:
+    account_number:
+      prompt:
+        identifiers:
+          - Account Number
+        instructions: Return the account number.
+        type: str
+        type: int
+"""
+            )
+
+        self.assertIn("duplicate YAML key [type]", str(exc.exception))
+
+    def test_prepare_extraction_yaml_rejects_duplicate_pseudo_group_names(
+        self,
+    ) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                """
+statement:
+  fields:
+    account_number:
+      prompt:
+        identifiers:
+          - Account Number
+        instructions: Return the account number.
+        type: str
+_pseudo_groups:
+  statement_identity:
+    fields:
+      account_number:
+        path: /statement/account_number
+  statement_identity:
+    fields:
+      duplicate_account_number:
+        path: /statement/account_number
+"""
+            )
+
+        self.assertIn("duplicate YAML key [statement_identity]", str(exc.exception))
+
+    def test_prepare_extraction_yaml_rejects_duplicate_pseudo_field_keys(
+        self,
+    ) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                """
+statement:
+  fields:
+    account_number:
+      prompt:
+        identifiers:
+          - Account Number
+        instructions: Return the account number.
+        type: str
+_pseudo_groups:
+  statement_identity:
+    fields:
+      account_number:
+        path: /statement/account_number
+      account_number:
+        path: /statement/account_number
+"""
+            )
+
+        self.assertIn("duplicate YAML key [account_number]", str(exc.exception))
+
+    def test_prepare_extraction_yaml_rejects_duplicate_defs_fragment_names(
+        self,
+    ) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                """
+_defs:
+  identity_fields:
+    fields: {}
+  identity_fields:
+    fields: {}
+statement:
+  include: identity_fields
+  fields: {}
+"""
+            )
+
+        self.assertIn("duplicate YAML key [identity_fields]", str(exc.exception))
+
+    def test_prepare_extraction_yaml_rejects_duplicate_final_field_from_defs(
+        self,
+    ) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                """
+_defs:
+  identity_fields:
+    fields:
+      account_number:
+        prompt:
+          identifiers:
+            - Account Number
+          instructions: Return the account number.
+          type: str
+statement:
+  include: identity_fields
+  fields:
+    account_number:
+      prompt:
+        identifiers:
+          - Account Number
+        instructions: Return the account number again.
+        type: str
+"""
+            )
+
+        self.assertIn(
+            "duplicate final field name [statement.account_number]",
+            str(exc.exception),
+        )
+
+    def test_prepare_extraction_yaml_treats_pseudo_slot_null_as_unset(
+        self,
+    ) -> None:
+        prepared = prepare_extraction_yaml(
+            """
+statement:
+  slot: chunk-instruct
+  fields:
+    account_number:
+      prompt:
+        identifiers:
+          - Account Number
+        instructions: Return the account number.
+        type: str
+_pseudo_groups:
+  statement_identity:
+    slot:
+    fields:
+      account_number:
+        path: /statement/account_number
+""",
+            workflow_group_metadata_keys={"slot"},
+        )
+
+        self.assertEqual(
+            prepared.workflow_group_metadata,
+            {"statement_identity": {"slot": "chunk-instruct"}},
+        )
+
+    def test_prepare_extraction_yaml_preserves_empty_string_slot(
+        self,
+    ) -> None:
+        prepared = prepare_extraction_yaml(
+            """
+statement:
+  slot: chunk-instruct
+  fields:
+    account_number:
+      prompt:
+        identifiers:
+          - Account Number
+        instructions: Return the account number.
+        type: str
+_pseudo_groups:
+  statement_identity:
+    slot: ""
+    fields:
+      account_number:
+        path: /statement/account_number
+""",
+            workflow_group_metadata_keys={"slot"},
+        )
+
+        self.assertEqual(
+            prepared.workflow_group_metadata,
+            {"statement_identity": {"slot": ""}},
+        )
 
     def test_get_prompt_1(self) -> None:
         tsts: typing.List[typing.Dict[str, typing.Any]] = [
