@@ -1,6 +1,6 @@
-import json, traceback, typing
+from __future__ import annotations
 
-from PIL.Image import Image
+import json, traceback, typing
 
 from smolagents import (  # pyright: ignore[reportMissingTypeStubs]
     CodeAgent,
@@ -14,6 +14,9 @@ from smolagents.models import (  # pyright: ignore[reportMissingTypeStubs]
 from ..services.logger import Logger
 from ..settings.settings import AgentSettings
 from ..utility.utility import clean_json
+
+if typing.TYPE_CHECKING:
+    from PIL.Image import Image
 
 
 prompt_suffix = """

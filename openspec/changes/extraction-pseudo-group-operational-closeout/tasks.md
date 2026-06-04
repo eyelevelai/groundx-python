@@ -129,5 +129,16 @@ real behavior gaps require a focused fix plus adversarial review.
 - Public package smoke for `groundx[extract]==3.5.9` still fails importing
   `groundx.extract` with `ModuleNotFoundError: No module named 'pytest'`,
   confirming that a follow-up SDK package release is still required.
+- CI follow-up bugfix 2026-06-04: after removing the runtime `pytest` import,
+  CI still failed test collection without Pillow because `groundx.extract` and
+  `groundx.extract.classes` eagerly imported optional image-dependent modules.
+  Added lazy public export tables for both packages, changed `AgentCode` and
+  `AgentTool` image annotations to type-checking-only Pillow imports, and added
+  `tests/extract/test_import_boundaries.py` to prove non-image extract imports
+  do not require Pillow.
+- `poetry run pytest -q tests/extract/test_import_boundaries.py`: first failed
+  on the eager `PIL.Image` import, then passed after the lazy import fix.
+- `poetry run pytest -rP -n auto .`: passed with 143 tests passed and 2
+  skipped after the Pillow import-boundary fix.
 - Final release-readiness remains open because Arcadia runtime wiring, docs
   preview/publish, and harness release hardening still have open plan items.
