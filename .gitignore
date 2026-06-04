@@ -6,3 +6,4 @@ poetry.toml
 test.py
 .DS_Store
 src/groundx/extract/cache
+.vscode

@@ -1,0 +1,18 @@
+{
+  "typeCheckingMode": "strict",
+  "useLibraryCodeForTypes": true,
+  "extraPaths": ["src"],
+  "include": [
+    "src/groundx/extract",
+    "tests/extract"
+  ],
+  "exclude": [
+    "**/__pycache__",
+    "**/.pytest_cache",
+    ".mypy_cache",
+    ".ruff_cache",
+    "cache",
+    "dist"
+  ],
+  "reportMissingTypeStubs": "none"
+}
