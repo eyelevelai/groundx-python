@@ -15,7 +15,14 @@ from .classes import (
     TestXRay,
     XRayDocument,
 )
-from .prompt import ObjectStore, PromptManager, Source
+from .prompt import (
+    FinalFieldPath,
+    ObjectStore,
+    PreparedExtractionYaml,
+    PromptManager,
+    Source,
+    prepare_extraction_yaml,
+)
 from .services import Logger, RateLimit, SheetsClient, Status, Upload
 from .settings import (
     AgentSettings,
@@ -35,11 +42,13 @@ __all__ = [
     "DocumentRequest",
     "Element",
     "ExtractedField",
+    "FinalFieldPath",
     "GroundXDocument",
     "GroundXSettings",
     "Group",
     "Logger",
     "ObjectStore",
+    "PreparedExtractionYaml",
     "ProcessResponse",
     "Prompt",
     "PromptManager",
@@ -53,4 +62,5 @@ __all__ = [
     "TestXRay",
     "Upload",
     "XRayDocument",
+    "prepare_extraction_yaml",
 ]
