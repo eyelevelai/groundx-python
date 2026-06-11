@@ -181,7 +181,8 @@ If the answer is bad or unclear, fix the issue before moving to the next task.
   poetry run pytest tests/extract -q
   ```
 
-- [x] Run broader gates available in the repo:
+- [ ] Run broader gates available in the repo before archive/merge if repo state
+      allows:
 
   ```bash
   poetry run pytest -rP -n auto .
@@ -189,7 +190,8 @@ If the answer is bad or unclear, fix the issue before moving to the next task.
   poetry run pyright -p pyrightconfig.json
   ```
 
-- [x] If a broad gate fails for unrelated generated-code reasons, record the
+- [x] Broad gates were not run for this closeout; if they are run later and fail
+      for unrelated generated-code reasons, record the
       exact failure and keep the extract-specific evidence.
 - [x] Adversarially review the final diff for accidental edits outside
       `src/groundx/extract/`, targeted workflow request compatibility tests,
