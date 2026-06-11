@@ -363,7 +363,7 @@ Special Instructions:
             )
 
     def test_cache_workflow_falls_back_to_workflow_api_extract(self) -> None:
-        workflow_extract = {
+        workflow_extract: typing.Dict[str, typing.Any] = {
             "statement_identity": {
                 "fields": {
                     "provider_name": {
@@ -453,7 +453,7 @@ Special Instructions:
         )
 
     def test_reload_if_changed_falls_back_to_workflow_api_extract(self) -> None:
-        workflow_extract = {
+        workflow_extract: typing.Dict[str, typing.Any] = {
             "statement_identity": {
                 "fields": {
                     "provider_name": {
@@ -537,12 +537,12 @@ Special Instructions:
             "provider_name",
             workflow_id="wf-1",
         )
-        self.assertIsNotNone(provider)
-        if provider:
-            self.assertEqual(
-                provider.prompt.instructions,
-                "Return the updated provider name.",
-            )
+        assert provider is not None
+        assert provider.prompt is not None
+        self.assertEqual(
+            provider.prompt.instructions,
+            "Return the updated provider name.",
+        )
 
     def test_prepare_extraction_yaml_with_pseudo_groups(self) -> None:
         prepared = prepare_extraction_yaml(SAMPLE_YAML_PSEUDO_GROUPS)
