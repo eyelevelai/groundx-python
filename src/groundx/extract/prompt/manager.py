@@ -45,6 +45,9 @@ class PromptManager:
         self._workflow_field_paths: typing.Dict[
             str, typing.Dict[str, typing.Dict[str, str]]
         ] = {}
+        self._persisted_workflow_extract: typing.Dict[
+            str, typing.Dict[str, typing.Any]
+        ] = {}
         self._top_level_metadata: typing.Dict[str, typing.Dict[str, typing.Any]] = {}
         self._final_group_metadata: typing.Dict[
             str, typing.Dict[str, typing.Dict[str, typing.Any]]
@@ -256,6 +259,9 @@ class PromptManager:
         self._cache[workflow_id] = load_from_mapping(prepared.workflow_groups)
         self._data_object_cache[workflow_id] = load_from_mapping(prepared.groups)
         self._workflow_field_paths[workflow_id] = prepared.workflow_field_paths
+        self._persisted_workflow_extract[workflow_id] = (
+            prepared.persisted_workflow_extract
+        )
         self._top_level_metadata[workflow_id] = prepared.top_level_metadata
         self._final_group_metadata[workflow_id] = prepared.final_group_metadata
         self._workflow_group_metadata[workflow_id] = prepared.workflow_group_metadata
@@ -595,6 +601,9 @@ class PromptManager:
             self._cache[workflow_id] = load_from_mapping(prepared.workflow_groups)
             self._data_object_cache[workflow_id] = load_from_mapping(prepared.groups)
             self._workflow_field_paths[workflow_id] = prepared.workflow_field_paths
+            self._persisted_workflow_extract[workflow_id] = (
+                prepared.persisted_workflow_extract
+            )
             self._top_level_metadata[workflow_id] = prepared.top_level_metadata
             self._final_group_metadata[workflow_id] = prepared.final_group_metadata
             self._workflow_group_metadata[workflow_id] = prepared.workflow_group_metadata
@@ -631,6 +640,23 @@ class PromptManager:
             raise Exception(f"workflow field paths are None in cache [{workflow_id}]")
 
         return copy_nested_dict(paths)
+
+    def persisted_workflow_extract_dict(
+        self,
+        file_name: typing.Optional[str] = None,
+        workflow_id: typing.Optional[str] = None,
+    ) -> typing.Dict[str, typing.Any]:
+        workflow_id = self.workflow_id(workflow_id)
+
+        self.cache_workflow(self.file_name(file_name), workflow_id)
+
+        extract = self._persisted_workflow_extract.get(workflow_id)
+        if extract is None:
+            raise Exception(
+                f"persisted workflow extract is None in cache [{workflow_id}]"
+            )
+
+        return copy.deepcopy(extract)
 
     def top_level_metadata(
         self,
