@@ -1,4 +1,5 @@
 import json
+import types
 import typing
 import unittest
 
@@ -15,6 +16,17 @@ from groundx.extract.classes.field import ExtractedField
 from groundx.extract.classes.group import Group
 from groundx.extract.classes.prompt import Prompt
 from groundx.extract.prompt.manager import PromptManager, load_from_yaml
+
+
+class FailingSource(TestSource):
+    def __init__(self) -> None:
+        super().__init__("")
+
+    def fetch(self, workflow_id: str) -> typing.Tuple[str, str]:
+        raise Exception(f"missing prompt yaml [{workflow_id}]")
+
+    def peek(self, workflow_id: str) -> typing.Optional[str]:
+        return None
 
 
 class TestPromptManager(unittest.TestCase):
@@ -349,6 +361,188 @@ Special Instructions:
 """,
                 sa.render(),
             )
+
+    def test_cache_workflow_falls_back_to_workflow_api_extract(self) -> None:
+        workflow_extract: typing.Dict[str, typing.Any] = {
+            "statement_identity": {
+                "fields": {
+                    "provider_name": {
+                        "prompt": {
+                            "description": "Provider name.",
+                            "instructions": "Return the provider name.",
+                            "type": "str",
+                        }
+                    }
+                }
+            },
+            "_groundx_persisted_extract": {
+                "extraction_policy_version": "v1",
+                "statement": {
+                    "slot": "chunk-instruct",
+                    "fields": {
+                        "provider_name": {
+                            "prompt": {
+                                "description": "Provider name.",
+                                "instructions": "Return the provider name.",
+                                "type": "str",
+                            }
+                        }
+                    },
+                },
+                "_pseudo_groups": {
+                    "statement_identity": {
+                        "slot": "chunk-instruct",
+                        "fields": {
+                            "provider_name": {
+                                "path": "/statement/provider_name",
+                            }
+                        },
+                    }
+                },
+            },
+        }
+
+        class Workflows:
+            def __init__(self) -> None:
+                self.requested_ids: typing.List[str] = []
+
+            def get(self, id: str) -> typing.Any:
+                self.requested_ids.append(id)
+                return types.SimpleNamespace(
+                    workflow=types.SimpleNamespace(
+                        workflow_id=id,
+                        extract=workflow_extract,
+                    )
+                )
+
+        workflows = Workflows()
+        gx_client = types.SimpleNamespace(workflows=workflows)
+        source = FailingSource()
+        manager = PromptManager(
+            cache_source=source,
+            config_source=source,
+            gx_client=typing.cast(typing.Any, gx_client),
+            default_file_name="wf-1",
+            default_workflow_id="wf-1",
+            top_level_metadata_keys={"extraction_policy_version"},
+            workflow_group_metadata_keys={"slot"},
+        )
+
+        fields = manager.get_fields_for_workflow(workflow_id="wf-1")
+
+        self.assertIn("wf-1", workflows.requested_ids)
+        self.assertIn("statement_identity", fields)
+        self.assertEqual(
+            manager.top_level_metadata(workflow_id="wf-1"),
+            {"extraction_policy_version": "v1"},
+        )
+        self.assertEqual(
+            manager.workflow_field_paths(workflow_id="wf-1"),
+            {"statement_identity": {"provider_name": "/statement/provider_name"}},
+        )
+        persisted = manager.persisted_workflow_extract_dict(workflow_id="wf-1")
+        self.assertEqual(
+            persisted["_groundx_persisted_extract"],
+            workflow_extract["_groundx_persisted_extract"],
+        )
+        self.assertEqual(
+            persisted["statement_identity"]["fields"]["provider_name"]["prompt"][
+                "attr_name"
+            ],
+            "provider_name",
+        )
+
+    def test_reload_if_changed_falls_back_to_workflow_api_extract(self) -> None:
+        workflow_extract: typing.Dict[str, typing.Any] = {
+            "statement_identity": {
+                "fields": {
+                    "provider_name": {
+                        "prompt": {
+                            "description": "Provider name.",
+                            "instructions": "Return the provider name.",
+                            "type": "str",
+                        }
+                    }
+                }
+            },
+            "_groundx_persisted_extract": {
+                "extraction_policy_version": "v1",
+                "statement": {
+                    "fields": {
+                        "provider_name": {
+                            "prompt": {
+                                "description": "Provider name.",
+                                "instructions": "Return the provider name.",
+                                "type": "str",
+                            }
+                        }
+                    },
+                },
+                "_pseudo_groups": {
+                    "statement_identity": {
+                        "fields": {
+                            "provider_name": {
+                                "path": "/statement/provider_name",
+                            }
+                        },
+                    }
+                },
+            },
+        }
+
+        class Workflows:
+            def __init__(self) -> None:
+                self.requested_ids: typing.List[str] = []
+
+            def get(self, id: str) -> typing.Any:
+                self.requested_ids.append(id)
+                return types.SimpleNamespace(
+                    workflow=types.SimpleNamespace(
+                        workflow_id=id,
+                        extract=workflow_extract,
+                    )
+                )
+
+        workflows = Workflows()
+        gx_client = types.SimpleNamespace(workflows=workflows)
+        source = FailingSource()
+        manager = PromptManager(
+            cache_source=source,
+            config_source=source,
+            gx_client=typing.cast(typing.Any, gx_client),
+            default_file_name="wf-1",
+            default_workflow_id="wf-1",
+            top_level_metadata_keys={"extraction_policy_version"},
+        )
+
+        workflow_extract["_groundx_persisted_extract"][
+            "extraction_policy_version"
+        ] = "v2"
+        workflow_extract["statement_identity"]["fields"]["provider_name"]["prompt"][
+            "instructions"
+        ] = "Return the updated provider name."
+        workflow_extract["_groundx_persisted_extract"]["statement"]["fields"][
+            "provider_name"
+        ]["prompt"]["instructions"] = "Return the updated provider name."
+
+        manager.reload_if_changed("wf-1")
+
+        self.assertGreaterEqual(workflows.requested_ids.count("wf-1"), 2)
+        self.assertEqual(
+            manager.top_level_metadata(workflow_id="wf-1"),
+            {"extraction_policy_version": "v2"},
+        )
+        provider = manager.group_field(
+            "statement_identity",
+            "provider_name",
+            workflow_id="wf-1",
+        )
+        assert provider is not None
+        assert provider.prompt is not None
+        self.assertEqual(
+            provider.prompt.instructions,
+            "Return the updated provider name.",
+        )
 
     def test_prepare_extraction_yaml_with_pseudo_groups(self) -> None:
         prepared = prepare_extraction_yaml(SAMPLE_YAML_PSEUDO_GROUPS)
