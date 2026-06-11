@@ -29,8 +29,7 @@
   test suite.
 - No production dependency pinning was added in this repo.
 - Broader generated-repo gates (`poetry run pytest -rP -n auto .`, `mypy`, and
-  `pyright`) were not run for this closeout. The extract-specific regression
-  gate was run and passed.
+  `pyright`) were run for this closeout and passed.
 
 ## Files
 
@@ -189,7 +188,7 @@ If the answer is bad or unclear, fix the issue before moving to the next task.
   poetry run pytest tests/extract -q
   ```
 
-- [ ] Run broader gates available in the repo before archive/merge if repo state
+- [x] Run broader gates available in the repo before archive/merge if repo state
       allows:
 
   ```bash
@@ -198,9 +197,10 @@ If the answer is bad or unclear, fix the issue before moving to the next task.
   poetry run pyright -p pyrightconfig.json
   ```
 
-- [x] Broad gates were not run for this closeout; if they are run later and fail
-      for unrelated generated-code reasons, record the
-      exact failure and keep the extract-specific evidence.
+- [x] Broader gates ran successfully during closeout:
+      `poetry run pytest -rP -n auto .`,
+      `poetry run mypy .`, and
+      `poetry run pyright -p pyrightconfig.json`.
 - [x] Adversarially review the final diff for accidental edits outside
       `src/groundx/extract/`, targeted workflow request compatibility tests,
       and this OpenSpec-style folder.
