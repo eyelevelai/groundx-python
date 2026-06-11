@@ -1,3 +1,4 @@
+import collections.abc
 import copy
 import dataclasses
 import typing
@@ -8,7 +9,8 @@ from ..classes.field import ExtractedField
 from ..classes.group import Group
 from ..classes.prompt import Prompt
 
-_RESERVED_TOP_LEVEL_KEYS = {"_defs", "_pseudo_groups"}
+_PERSISTED_WORKFLOW_EXTRACT_KEY = "_groundx_persisted_extract"
+_RESERVED_TOP_LEVEL_KEYS = {"_defs", "_pseudo_groups", _PERSISTED_WORKFLOW_EXTRACT_KEY}
 _PSEUDO_GROUP_BODY_KEYS = {"prompt", "fields"}
 _PSEUDO_FIELD_KEYS = {"path"}
 
@@ -54,6 +56,9 @@ class PreparedExtractionYaml:
     workflow_groups: typing.Dict[str, typing.Dict[str, typing.Any]]
     pseudo_groups: typing.Dict[str, typing.Dict[str, typing.Any]]
     workflow_field_paths: typing.Dict[str, typing.Dict[str, str]]
+    persisted_workflow_extract: typing.Dict[str, typing.Any] = dataclasses.field(
+        default_factory=_metadata_factory
+    )
     top_level_metadata: typing.Dict[str, typing.Any] = dataclasses.field(
         default_factory=_metadata_factory
     )
@@ -132,6 +137,19 @@ def _load_yaml_mapping(raw_yaml: str) -> typing.Dict[str, typing.Any]:
 
     _assert_no_cycles(data, "$", set())
     return typing.cast(typing.Dict[str, typing.Any], data)
+
+
+def _load_extraction_mapping(raw_yaml: typing.Any) -> typing.Dict[str, typing.Any]:
+    if isinstance(raw_yaml, str):
+        return _load_yaml_mapping(raw_yaml)
+
+    if not isinstance(raw_yaml, collections.abc.Mapping):
+        raise TypeError(f"Expected YAML text or mapping, got {type(raw_yaml)}")
+
+    source_mapping = typing.cast(typing.Mapping[str, typing.Any], raw_yaml)
+    raw_mapping = dict(source_mapping)
+    _assert_no_cycles(raw_mapping, "$", set())
+    return copy.deepcopy(raw_mapping)
 
 
 def _assert_no_cycles(
@@ -473,6 +491,49 @@ def _without_unset_metadata(
     return {key: value for key, value in metadata.items() if value is not None}
 
 
+def _has_declared_metadata(
+    data: typing.Dict[str, typing.Any],
+    top_metadata_keys: typing.Set[str],
+    final_metadata_keys: typing.Set[str],
+    workflow_metadata_keys: typing.Set[str],
+) -> bool:
+    if "_defs" in data or "_pseudo_groups" in data:
+        return True
+
+    if any(key in data for key in top_metadata_keys):
+        return True
+
+    group_metadata_keys = final_metadata_keys | workflow_metadata_keys
+    for group_name, group_data in data.items():
+        if group_name in _RESERVED_TOP_LEVEL_KEYS or group_name in top_metadata_keys:
+            continue
+        if isinstance(group_data, dict) and any(
+            key in group_data for key in group_metadata_keys
+        ):
+            return True
+
+    return False
+
+
+def _persisted_workflow_extract(
+    authored_data: typing.Dict[str, typing.Any],
+    workflow_groups: typing.Dict[str, typing.Dict[str, typing.Any]],
+    top_metadata_keys: typing.Set[str],
+    final_metadata_keys: typing.Set[str],
+    workflow_metadata_keys: typing.Set[str],
+) -> typing.Dict[str, typing.Any]:
+    persisted: typing.Dict[str, typing.Any] = _copy_mapping(workflow_groups)
+    if _has_declared_metadata(
+        authored_data,
+        top_metadata_keys,
+        final_metadata_keys,
+        workflow_metadata_keys,
+    ):
+        persisted[_PERSISTED_WORKFLOW_EXTRACT_KEY] = _copy_mapping(authored_data)
+
+    return persisted
+
+
 def _resolve_pseudo_workflow_metadata(
     pseudo_group_name: str,
     explicit_metadata: typing.Dict[str, typing.Any],
@@ -521,12 +582,19 @@ def _resolve_pseudo_workflow_metadata(
 
 
 def prepare_extraction_yaml(
-    raw_yaml: str,
+    raw_yaml: typing.Union[str, typing.Mapping[str, typing.Any]],
     top_level_metadata_keys: typing.Optional[typing.Iterable[str]] = None,
     final_group_metadata_keys: typing.Optional[typing.Iterable[str]] = None,
     workflow_group_metadata_keys: typing.Optional[typing.Iterable[str]] = None,
 ) -> PreparedExtractionYaml:
-    data = _load_yaml_mapping(raw_yaml)
+    data = _load_extraction_mapping(raw_yaml)
+    if _PERSISTED_WORKFLOW_EXTRACT_KEY in data:
+        data = _copy_mapping(
+            _ensure_mapping(
+                data[_PERSISTED_WORKFLOW_EXTRACT_KEY],
+                _PERSISTED_WORKFLOW_EXTRACT_KEY,
+            )
+        )
     top_metadata_key_set = set(top_level_metadata_keys or [])
     final_metadata_key_set = set(final_group_metadata_keys or [])
     workflow_metadata_key_set = set(workflow_group_metadata_keys or [])
@@ -690,11 +758,19 @@ def prepare_extraction_yaml(
             workflow_group_metadata[pseudo_group_name] = resolved_metadata
 
     if not pseudo_groups:
+        workflow_groups = _copy_mapping(groups)
         return PreparedExtractionYaml(
             groups=groups,
-            workflow_groups=_copy_mapping(groups),
+            workflow_groups=workflow_groups,
             pseudo_groups={},
             workflow_field_paths=_build_identity_route_map(groups),
+            persisted_workflow_extract=_persisted_workflow_extract(
+                data,
+                workflow_groups,
+                top_metadata_key_set,
+                final_metadata_key_set,
+                workflow_metadata_key_set,
+            ),
             top_level_metadata=top_level_metadata,
             final_group_metadata=final_group_metadata,
             workflow_group_metadata=_copy_mapping(final_workflow_metadata),
@@ -722,6 +798,13 @@ def prepare_extraction_yaml(
         workflow_groups=workflow_groups,
         pseudo_groups=_copy_mapping(pseudo_groups),
         workflow_field_paths=workflow_field_paths,
+        persisted_workflow_extract=_persisted_workflow_extract(
+            data,
+            workflow_groups,
+            top_metadata_key_set,
+            final_metadata_key_set,
+            workflow_metadata_key_set,
+        ),
         top_level_metadata=top_level_metadata,
         final_group_metadata=final_group_metadata,
         workflow_group_metadata=workflow_group_metadata,
