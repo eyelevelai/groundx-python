@@ -1,4 +1,7 @@
+import collections.abc
 import copy
+import hashlib
+import json
 import typing
 
 from ..classes.element import Element
@@ -21,6 +24,7 @@ from pydantic import PrivateAttr
 from groundx import GroundX, WorkflowResponse
 
 load_from_yaml = _load_from_yaml
+RawExtractionConfig = typing.Union[str, typing.Mapping[str, typing.Any]]
 
 
 class PromptManager:
@@ -243,14 +247,7 @@ class PromptManager:
         else:
             self.logger.info_msg("no cached version", workflow_id=workflow_id)
 
-        try:
-            raw, version = self._config_source.fetch(workflow_id)
-        except Exception as e:
-            self.logger.debug_msg(
-                f"_config_source.fetch exception [{e}]\ntrying _cache_source [{file_name}.yaml]...",
-                workflow_id=workflow_id,
-            )
-            raw, version = self._cache_source.fetch(file_name)
+        raw, version = self._fetch_workflow_config(file_name, workflow_id)
 
         self.logger.info_msg(
             "saving version", workflow_id=workflow_id, extras={"version": version}
@@ -267,7 +264,51 @@ class PromptManager:
         self._workflow_group_metadata[workflow_id] = prepared.workflow_group_metadata
         self._versions[workflow_id] = version
 
-    def _prepare_extraction_yaml(self, raw: str) -> PreparedExtractionYaml:
+    def _fetch_workflow_config(
+        self, file_name: str, workflow_id: str
+    ) -> typing.Tuple[RawExtractionConfig, str]:
+        try:
+            return self._config_source.fetch(workflow_id)
+        except Exception as e:
+            self.logger.debug_msg(
+                f"_config_source.fetch exception [{e}]\ntrying workflow extract [{workflow_id}]...",
+                workflow_id=workflow_id,
+            )
+
+        try:
+            return self._fetch_workflow_extract(workflow_id)
+        except Exception as e:
+            self.logger.debug_msg(
+                f"workflow extract fetch exception [{e}]\ntrying _cache_source [{file_name}.yaml]...",
+                workflow_id=workflow_id,
+            )
+
+        return self._cache_source.fetch(file_name)
+
+    def _fetch_workflow_extract(
+        self, workflow_id: str
+    ) -> typing.Tuple[typing.Mapping[str, typing.Any], str]:
+        gx_client = getattr(self, "_gx_client", None)
+        workflows = getattr(gx_client, "workflows", None)
+        get_workflow = getattr(workflows, "get", None)
+        if not callable(get_workflow):
+            raise Exception("GroundX workflows.get is not available")
+
+        try:
+            response = get_workflow(id=workflow_id)
+        except TypeError:
+            response = get_workflow(workflow_id)
+
+        workflow = _object_value(response, "workflow")
+        extract = _object_value(workflow, "extract")
+        if not isinstance(extract, collections.abc.Mapping):
+            raise Exception(f"workflow [{workflow_id}] has no extract mapping")
+
+        return extract, _workflow_extract_version(workflow_id, extract)
+
+    def _prepare_extraction_yaml(
+        self, raw: RawExtractionConfig
+    ) -> PreparedExtractionYaml:
         return prepare_extraction_yaml(
             raw,
             top_level_metadata_keys=self._top_level_metadata_keys,
@@ -592,11 +633,30 @@ class PromptManager:
     def reload_if_changed(self, workflow_id: typing.Optional[str] = None) -> None:
         workflow_id = self.workflow_id(workflow_id)
 
-        current_version = self._config_source.peek(workflow_id)
+        current_version: typing.Optional[str] = None
+        try:
+            current_version = self._config_source.peek(workflow_id)
+        except Exception as e:
+            self.logger.debug_msg(
+                f"_config_source.peek exception [{e}]",
+                workflow_id=workflow_id,
+            )
+
+        if not current_version:
+            try:
+                current_version = self._cache_source.peek(self.file_name(None))
+            except Exception as e:
+                self.logger.debug_msg(
+                    f"_cache_source.peek exception [{e}]",
+                    workflow_id=workflow_id,
+                )
+
         previous_version = self._versions.get(workflow_id)
 
         if not previous_version or current_version != previous_version:
-            raw, version = self._config_source.fetch(workflow_id)
+            raw, version = self._fetch_workflow_config(
+                self.file_name(None), workflow_id
+            )
             prepared = self._prepare_extraction_yaml(raw)
             self._cache[workflow_id] = load_from_mapping(prepared.workflow_groups)
             self._data_object_cache[workflow_id] = load_from_mapping(prepared.groups)
@@ -714,3 +774,18 @@ def copy_nested_dict(
     data: typing.Dict[str, typing.Dict[str, str]]
 ) -> typing.Dict[str, typing.Dict[str, str]]:
     return {k: dict(v) for k, v in data.items()}
+
+
+def _object_value(obj: typing.Any, key: str) -> typing.Any:
+    if isinstance(obj, collections.abc.Mapping):
+        return obj.get(key)
+
+    return getattr(obj, key, None)
+
+
+def _workflow_extract_version(
+    workflow_id: str, extract: typing.Mapping[str, typing.Any]
+) -> str:
+    payload = json.dumps(extract, sort_keys=True, default=str)
+    digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()
+    return f"workflow.extract:{workflow_id}:{digest}"

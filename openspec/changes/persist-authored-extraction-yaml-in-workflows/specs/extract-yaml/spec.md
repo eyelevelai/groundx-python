@@ -45,3 +45,12 @@ surface.
 - **THEN** existing final group loading and execution workflow group behavior
   remain unchanged
 - **AND** callers do not need to add `extraction_policy_version`
+
+#### Scenario: PromptManager falls back to deployed workflow extract
+- **WHEN** `PromptManager` cannot fetch YAML from its configured prompt source
+- **AND** it has a GroundX client and workflow ID
+- **THEN** it fetches the workflow details through
+  `gx_client.workflows.get(id=workflow_id)`
+- **AND** it prepares the returned workflow `extract` mapping through the same
+  SDK metadata and route-map path
+- **AND** the local cache source remains a final fallback for legacy callers
