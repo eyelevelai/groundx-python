@@ -139,19 +139,17 @@ def _load_yaml_mapping(raw_yaml: str) -> typing.Dict[str, typing.Any]:
     return typing.cast(typing.Dict[str, typing.Any], data)
 
 
-def _load_extraction_mapping(
-    raw_yaml: typing.Union[str, typing.Mapping[str, typing.Any]],
-) -> typing.Dict[str, typing.Any]:
+def _load_extraction_mapping(raw_yaml: typing.Any) -> typing.Dict[str, typing.Any]:
     if isinstance(raw_yaml, str):
         return _load_yaml_mapping(raw_yaml)
 
     if not isinstance(raw_yaml, collections.abc.Mapping):
         raise TypeError(f"Expected YAML text or mapping, got {type(raw_yaml)}")
 
-    raw_mapping = dict(raw_yaml)
+    source_mapping = typing.cast(typing.Mapping[str, typing.Any], raw_yaml)
+    raw_mapping = dict(source_mapping)
     _assert_no_cycles(raw_mapping, "$", set())
-    data = copy.deepcopy(raw_mapping)
-    return typing.cast(typing.Dict[str, typing.Any], data)
+    return copy.deepcopy(raw_mapping)
 
 
 def _assert_no_cycles(

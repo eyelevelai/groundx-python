@@ -304,7 +304,8 @@ class PromptManager:
         if not isinstance(extract, collections.abc.Mapping):
             raise Exception(f"workflow [{workflow_id}] has no extract mapping")
 
-        return extract, _workflow_extract_version(workflow_id, extract)
+        extract_mapping = typing.cast(typing.Mapping[str, typing.Any], extract)
+        return extract_mapping, _workflow_extract_version(workflow_id, extract_mapping)
 
     def _prepare_extraction_yaml(
         self, raw: RawExtractionConfig
@@ -778,7 +779,8 @@ def copy_nested_dict(
 
 def _object_value(obj: typing.Any, key: str) -> typing.Any:
     if isinstance(obj, collections.abc.Mapping):
-        return obj.get(key)
+        mapping = typing.cast(typing.Mapping[typing.Any, typing.Any], obj)
+        return mapping.get(key)
 
     return getattr(obj, key, None)
 
