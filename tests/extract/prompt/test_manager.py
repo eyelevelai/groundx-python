@@ -452,6 +452,98 @@ Special Instructions:
             "provider_name",
         )
 
+    def test_reload_if_changed_falls_back_to_workflow_api_extract(self) -> None:
+        workflow_extract = {
+            "statement_identity": {
+                "fields": {
+                    "provider_name": {
+                        "prompt": {
+                            "description": "Provider name.",
+                            "instructions": "Return the provider name.",
+                            "type": "str",
+                        }
+                    }
+                }
+            },
+            "_groundx_persisted_extract": {
+                "extraction_policy_version": "v1",
+                "statement": {
+                    "fields": {
+                        "provider_name": {
+                            "prompt": {
+                                "description": "Provider name.",
+                                "instructions": "Return the provider name.",
+                                "type": "str",
+                            }
+                        }
+                    },
+                },
+                "_pseudo_groups": {
+                    "statement_identity": {
+                        "fields": {
+                            "provider_name": {
+                                "path": "/statement/provider_name",
+                            }
+                        },
+                    }
+                },
+            },
+        }
+
+        class Workflows:
+            def __init__(self) -> None:
+                self.requested_ids: typing.List[str] = []
+
+            def get(self, id: str) -> typing.Any:
+                self.requested_ids.append(id)
+                return types.SimpleNamespace(
+                    workflow=types.SimpleNamespace(
+                        workflow_id=id,
+                        extract=workflow_extract,
+                    )
+                )
+
+        workflows = Workflows()
+        gx_client = types.SimpleNamespace(workflows=workflows)
+        source = FailingSource()
+        manager = PromptManager(
+            cache_source=source,
+            config_source=source,
+            gx_client=typing.cast(typing.Any, gx_client),
+            default_file_name="wf-1",
+            default_workflow_id="wf-1",
+            top_level_metadata_keys={"extraction_policy_version"},
+        )
+
+        workflow_extract["_groundx_persisted_extract"][
+            "extraction_policy_version"
+        ] = "v2"
+        workflow_extract["statement_identity"]["fields"]["provider_name"]["prompt"][
+            "instructions"
+        ] = "Return the updated provider name."
+        workflow_extract["_groundx_persisted_extract"]["statement"]["fields"][
+            "provider_name"
+        ]["prompt"]["instructions"] = "Return the updated provider name."
+
+        manager.reload_if_changed("wf-1")
+
+        self.assertGreaterEqual(workflows.requested_ids.count("wf-1"), 2)
+        self.assertEqual(
+            manager.top_level_metadata(workflow_id="wf-1"),
+            {"extraction_policy_version": "v2"},
+        )
+        provider = manager.group_field(
+            "statement_identity",
+            "provider_name",
+            workflow_id="wf-1",
+        )
+        self.assertIsNotNone(provider)
+        if provider:
+            self.assertEqual(
+                provider.prompt.instructions,
+                "Return the updated provider name.",
+            )
+
     def test_prepare_extraction_yaml_with_pseudo_groups(self) -> None:
         prepared = prepare_extraction_yaml(SAMPLE_YAML_PSEUDO_GROUPS)
 
