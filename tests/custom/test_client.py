@@ -140,6 +140,9 @@ def test_workflow_detail_deserializes_custom_routes_and_outputs() -> None:
 
     detail = WorkflowDetail.model_validate(payload)
 
+    assert detail.custom_steps is not None
+    assert detail.output_routes is not None
+    assert detail.leaf_fields is not None
     assert isinstance(detail.custom_steps[0], CustomWorkflowStep)
     assert isinstance(detail.output_routes[0], CustomWorkflowOutputRoute)
     assert isinstance(detail.leaf_fields[0], CustomWorkflowLeafField)

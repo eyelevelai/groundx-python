@@ -1607,6 +1607,43 @@ _pseudo_groups:
         self.assertEqual(workflow["field_counts"], {"line_item_labels": 1})
         self.assertRegex(workflow["schema_hash"], r"^[0-9a-f]{64}$")
 
+    def test_prepare_extraction_yaml_routes_repeated_custom_fields_with_list_name(
+        self,
+    ) -> None:
+        prepared = prepare_extraction_yaml(
+            """
+workflow:
+  custom_steps:
+    - name: line_item_labels
+      level: chunk
+      kind: keys
+invoice:
+  workflow_step: line_item_labels
+  fields:
+    charges:
+      - fields:
+          description:
+            workflow_output_key: label
+            prompt:
+              instructions: Return the repeated charge description.
+              type: str
+"""
+        )
+
+        workflow = prepared.persisted_workflow_extract["workflow"]
+        self.assertEqual(
+            workflow["output_routes"][0]["final_path"],
+            "/invoice/charges/*/description",
+        )
+        self.assertEqual(
+            workflow["output_routes"][0]["workflow_field"],
+            "charges.description",
+        )
+        self.assertEqual(
+            workflow["leaf_fields"][0]["repetition_scope"],
+            "/invoice/charges/*",
+        )
+
     def test_prepare_extraction_yaml_rejects_slot_and_workflow_step_conflict(
         self,
     ) -> None:
@@ -1705,6 +1742,30 @@ line_items:
 
         self.assertIn("overloaded_fields", str(exc.exception))
         self.assertIn("at most 20 fields", str(exc.exception))
+
+    def test_prepare_extraction_yaml_rejects_custom_step_without_routes(
+        self,
+    ) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                """
+workflow:
+  custom_steps:
+    - name: unrouted_fields
+      level: chunk
+      kind: keys
+invoice:
+  workflow_step: unrouted_fields
+  fields:
+    account_number:
+      prompt:
+        instructions: Return the account number.
+        type: str
+"""
+            )
+
+        self.assertIn("output routes", str(exc.exception))
+        self.assertIn("workflow_output_key", str(exc.exception))
 
     def test_get_prompt_1(self) -> None:
         tsts: typing.List[typing.Dict[str, typing.Any]] = [

@@ -64,12 +64,12 @@
       and `workflow_step` appear on the same group.
 - [x] Add X-Ray/readback parsing for `customChunkOutputs`,
       `customSectionOutputs`, and `customDocumentOutputs`.
-- [ ] Run `poetry run pytest tests/custom/test_client.py tests/extract/prompt/test_manager.py tests/extract/prompt/test_persisted_workflow_extract.py -q`.
-- [ ] Run `poetry run pytest tests/extract/classes/test_groundx.py tests/extract/classes/test_document.py -q`.
-- [ ] Run `poetry run pytest tests/extract -q`.
-- [ ] Run `poetry run pytest -rP -n auto tests/custom tests/extract`.
-- [ ] Run `poetry run mypy .`.
-- [ ] Run `poetry run pytest -rP -n auto .` before release readiness.
-- [ ] Commit generated files separately from handwritten extract changes.
-- [ ] Adversarial review: confirm fixed workflows, old persisted extracts, and
+- [x] Run `poetry run pytest tests/custom/test_client.py tests/extract/prompt/test_manager.py tests/extract/prompt/test_persisted_workflow_extract.py -q`.
+- [x] Run `poetry run pytest tests/extract/classes/test_groundx.py tests/extract/classes/test_document.py -q`.
+- [x] Run `poetry run pytest tests/extract -q`.
+- [x] Run `poetry run pytest -rP -n auto tests/custom tests/extract`.
+- [x] Run `poetry run mypy .`.
+- [x] Run `poetry run pytest -rP -n auto .` before release readiness.
+- [x] Commit generated files separately from handwritten extract changes.
+- [x] Adversarial review: confirm fixed workflows, old persisted extracts, and
       old X-Ray/readback fields still work and custom behavior is additive.

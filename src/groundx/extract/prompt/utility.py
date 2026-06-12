@@ -783,6 +783,12 @@ def _repetition_scope(segments: typing.Tuple[str, ...]) -> str:
     return _encode_pointer(segments[: idx + 1])
 
 
+def _custom_workflow_field_name(
+    prefix: typing.Tuple[str, ...], field_name: str
+) -> str:
+    return ".".join(segment for segment in (*prefix, field_name) if segment != "*")
+
+
 def _custom_route_identity(route: typing.Dict[str, typing.Any]) -> str:
     return "\x00".join(
         [
@@ -1066,6 +1072,11 @@ def _normalize_persisted_custom_workflow_metadata(
         _normalize_custom_leaf(leaf, idx, steps_by_name)
         for idx, leaf in enumerate(workflow.get("leaf_fields") or [])
     ]
+    if custom_steps and (not routes or not leaves):
+        raise ValueError(
+            "custom workflow steps require output routes and leaf fields; "
+            "add workflow_output_key metadata to routed fields"
+        )
     field_counts = _validate_custom_workflow_routes_and_leaves(routes, leaves)
 
     caller_field_counts = workflow.get("field_counts")
@@ -1123,7 +1134,7 @@ def _collect_custom_workflow_routes(
                         group_name,
                         typing.cast(typing.Optional[str], nested_step),
                         steps_by_name,
-                        (*prefix, "*"),
+                        (*prefix, field_name, "*"),
                     )
                     routes.extend(nested_routes)
                     leaves.extend(nested_leaves)
@@ -1152,9 +1163,10 @@ def _collect_custom_workflow_routes(
             segments = (group_name, *prefix, field_name)
             final_path = _encode_pointer(segments)
             level = typing.cast(str, step["level"])
+            workflow_field = _custom_workflow_field_name(prefix, field_name)
             route = {
                 "workflow_group": group_name,
-                "workflow_field": ".".join([*prefix, field_name]),
+                "workflow_field": workflow_field,
                 "final_path": final_path,
                 "step_name": nested_step,
                 "level": level,
@@ -1167,7 +1179,7 @@ def _collect_custom_workflow_routes(
             leaf = {
                 "final_path": final_path,
                 "workflow_group": group_name,
-                "workflow_field": ".".join([*prefix, field_name]),
+                "workflow_field": workflow_field,
                 "step_name": nested_step,
                 "level": level,
                 "output_key": output_key,
@@ -1233,6 +1245,11 @@ def _build_authored_custom_workflow_metadata(
         routes.extend(group_routes)
         leaves.extend(group_leaves)
 
+    if not routes or not leaves:
+        raise ValueError(
+            "custom workflow steps require output routes and leaf fields; "
+            "add workflow_output_key metadata to routed fields"
+        )
     field_counts = _validate_custom_workflow_routes_and_leaves(routes, leaves)
     metadata: typing.Dict[str, typing.Any] = {
         "metadata_version": _CUSTOM_WORKFLOW_METADATA_VERSION,
