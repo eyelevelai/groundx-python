@@ -13,16 +13,21 @@ are complete. Task 4's Fern/OpenAPI schema checkpoint is committed in
 SDK checkpoint is committed in isolated worktree
 `/Users/benjaminfletcher/git/groundx-python-support-custom-workflow-steps-sdk`
 on branch `codex/support-custom-workflow-steps-sdk` as `cf85f52`, with full SDK
-pytest, mypy, OpenSpec, and `git diff --check` verification. The
+pytest, mypy, OpenSpec, and `git diff --check` verification. Task 8's harness
+checkpoint is committed in isolated worktree
+`/Users/benjaminfletcher/git/groundx-studio-harness-support-custom-workflow-steps`
+on branch `codex/support-custom-workflow-steps-harness` as `b5d8122`, with
+Python template tests, Node skill/eval gates, plugin mirror/version checks,
+full `node scripts/validate.mjs`, OpenSpec, and `git diff --check`
+verification. The
 `internal-arcadia-agents` current-wave deferral stub is complete; the full
 Arcadia `reconcile_fields` / `qa_fields` / `save_fields` implementation plan is
 intentionally follow-on work after central cleanup and closeout. The
 source-backed trace is recorded in `chunk-keywords-trace.md`, repo-specific
 implementation planning blockers are recorded in `repo-plan-blockers.md`, and
 Task 3 repo-owned plans are linked below. Remaining current-wave implementation
-repos still needing execution are `groundx-studio-harness`,
-`eyelevel-fern-config` public docs, `adp-poc`, end-to-end validation, and
-closeout.
+repos still needing execution are `eyelevel-fern-config` public docs, `adp-poc`,
+end-to-end validation, and closeout.
 
 Repo-owned Task 3 artifacts, in dependency order:
 

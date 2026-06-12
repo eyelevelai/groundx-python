@@ -577,24 +577,41 @@ cleanup and closeout, not prerequisites for Task 8.
 - `scripts/tests/test-groundx-extraction-workflows.mjs`
 - plugin mirror through `node scripts/sync-plugin.mjs`
 
-- [ ] Update harness compiler/templates to emit custom steps only after SDK and
+Status: completed in isolated worktree
+`/Users/benjaminfletcher/git/groundx-studio-harness-support-custom-workflow-steps`
+on branch `codex/support-custom-workflow-steps-harness`, commit `b5d8122`.
+Plugin payloads were mirrored to `plugins/groundx-studio-harness/` and
+`plugins/groundx-agent-harness/`; plugin version bumped to `2.1.6`.
+Verification passed:
+
+- `python -m pytest skills/groundx-extraction-workflows/templates/test_compile_workflow.py skills/groundx-extraction-workflows/templates/test_validate_workflow_json.py skills/groundx-extraction-workflows/templates/test_xray_to_extract.py skills/groundx-extraction-workflows/templates/test_imports.py -q`
+  (`39 passed`)
+- `node scripts/tests/test-groundx-extraction-workflows.mjs`
+- `node scripts/tests/test-evals.mjs`
+- `node scripts/sync-plugin.mjs --check`
+- `node scripts/scans/scan-version-bump.mjs`
+- `node scripts/validate.mjs`
+- `OPENSPEC_TELEMETRY=0 npx @fission-ai/openspec@1.3.1 validate support-custom-workflow-steps --strict`
+- `git diff --check`
+
+- [x] Update harness compiler/templates to emit custom steps only after SDK and
       Go support exists.
-- [ ] Update X-Ray local aggregation to read `customChunkOutputs`,
+- [x] Update X-Ray local aggregation to read `customChunkOutputs`,
       `customSectionOutputs`, and `customDocumentOutputs`.
-- [ ] Update references so agents know when to use custom steps.
-- [ ] Update public-docs guidance so agents keep public docs plain and
+- [x] Update references so agents know when to use custom steps.
+- [x] Update public-docs guidance so agents keep public docs plain and
       SDK-centered.
-- [ ] Update scanners that currently enforce the old three-slot menu.
-- [ ] Update evals/examples/changelog language that says only the old three
+- [x] Update scanners that currently enforce the old three-slot menu.
+- [x] Update evals/examples/changelog language that says only the old three
       slots are supported.
-- [ ] Update `validate_workflow_json.py` to validate both legacy fixed slots and
+- [x] Update `validate_workflow_json.py` to validate both legacy fixed slots and
       custom-step workflow JSON.
-- [ ] Mirror the runtime/API hard-fail behavior for custom-step YAML that exceeds
+- [x] Mirror the runtime/API hard-fail behavior for custom-step YAML that exceeds
       20 fields per executable workflow step.
-- [ ] Add compile tests for legacy YAML and custom-step YAML.
-- [ ] Run `node scripts/validate.mjs`.
-- [ ] Run `node scripts/sync-plugin.mjs --check` after mirror update.
-- [ ] Adversarial review: confirm installed skill guidance does not describe
+- [x] Add compile tests for legacy YAML and custom-step YAML.
+- [x] Run `node scripts/validate.mjs`.
+- [x] Run `node scripts/sync-plugin.mjs --check` after mirror update.
+- [x] Adversarial review: confirm installed skill guidance does not describe
       unimplemented platform behavior.
 
 ## Task 9: Update Public Docs
