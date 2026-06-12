@@ -366,7 +366,57 @@ class Document(Group):
                     if err:
                         raise Exception(f"\n\ninit fileSummary error:\n\t{err}\n")
 
+            self.load_custom_outputs(
+                getattr(chunk, "customChunkOutputs", None),
+                "customChunkOutputs",
+            )
+            self.load_custom_outputs(
+                getattr(chunk, "customSectionOutputs", None),
+                "customSectionOutputs",
+            )
+
+        self.load_custom_outputs(
+            getattr(xray, "customDocumentOutputs", None),
+            "customDocumentOutputs",
+        )
         self.finalize_init()
+
+    def load_custom_outputs(
+        self,
+        custom_outputs: typing.Optional[typing.Dict[str, typing.Dict[str, typing.Any]]],
+        source: str,
+    ) -> None:
+        if not custom_outputs:
+            return
+
+        for step_name, outputs in custom_outputs.items():
+            if not isinstance(outputs, dict):
+                continue
+
+            for output_key, value in outputs.items():
+                data: typing.Any = value
+                if isinstance(data, str):
+                    try:
+                        data = json.loads(clean_json(data))
+                    except json.JSONDecodeError:
+                        pass
+
+                if isinstance(data, dict):
+                    for key, nested_value in data.items():
+                        err = self.add(key, nested_value)
+                        if err:
+                            raise Exception(
+                                f"\n\ninit {source} error for "
+                                f"[{step_name}.{output_key}]:\n\t{err}\n"
+                            )
+                    continue
+
+                err = self.add(output_key, data)
+                if err:
+                    raise Exception(
+                        f"\n\ninit {source} error for "
+                        f"[{step_name}.{output_key}]:\n\t{err}\n"
+                    )
 
     def add(self, k: str, value: typing.Any) -> typing.Union[str, None]:
         self.print("WARNING", "add is not implemented")

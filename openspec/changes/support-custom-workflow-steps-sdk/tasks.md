@@ -62,7 +62,7 @@
       20-field validation before sending workflows.
 - [x] Preserve legacy `slot:` behavior for existing YAML and fail when `slot`
       and `workflow_step` appear on the same group.
-- [ ] Add X-Ray/readback parsing for `customChunkOutputs`,
+- [x] Add X-Ray/readback parsing for `customChunkOutputs`,
       `customSectionOutputs`, and `customDocumentOutputs`.
 - [ ] Run `poetry run pytest tests/custom/test_client.py tests/extract/prompt/test_manager.py tests/extract/prompt/test_persisted_workflow_extract.py -q`.
 - [ ] Run `poetry run pytest tests/extract/classes/test_groundx.py tests/extract/classes/test_document.py -q`.
