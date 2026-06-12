@@ -25,9 +25,12 @@ Arcadia `reconcile_fields` / `qa_fields` / `save_fields` implementation plan is
 intentionally follow-on work after central cleanup and closeout. The
 source-backed trace is recorded in `chunk-keywords-trace.md`, repo-specific
 implementation planning blockers are recorded in `repo-plan-blockers.md`, and
-Task 3 repo-owned plans are linked below. Remaining current-wave implementation
-repos still needing execution are `eyelevel-fern-config` public docs, `adp-poc`,
-end-to-end validation, and closeout.
+Task 9's public docs checkpoint is committed in `eyelevel-fern-config` on branch
+`codex/support-custom-workflow-steps-fern` as `c8074b8`, with `fern check`,
+docs-definition validation, OpenSpec strict validation, and `git diff --check`
+verification. Docs publishing remains gated on Fern org access and the
+published-artifact e2e phase. Remaining current-wave implementation repos still
+needing execution are `adp-poc`, end-to-end validation, and closeout.
 
 Repo-owned Task 3 artifacts, in dependency order:
 

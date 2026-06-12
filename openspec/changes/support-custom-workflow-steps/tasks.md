@@ -623,16 +623,20 @@ Verification passed:
 - `fern/pages/extract-data-from-documents.mdx`
 - `fern/pages/mcp.mdx`
 
-- [ ] Update and publish public docs only after cashbot-go, groundx-python, and
-      harness have verified runtime, SDK, and harness behavior, as the final
-      prerequisite before e2e if published docs are required by that e2e path.
-- [ ] Explain custom workflow steps in plain language without harness internals.
-- [ ] Explain `template` as workflow-level config.
-- [ ] Include one legacy YAML example and one custom-step YAML example if the
+- [x] Update public docs only after cashbot-go, groundx-python, and harness have
+      verified runtime, SDK, and harness behavior.
+- [ ] Publish public docs only as the final prerequisite before e2e if published
+      docs are required by that e2e path.
+- [x] Explain custom workflow steps in plain language without harness internals.
+- [x] Explain `template` as workflow-level config.
+- [x] Include one legacy YAML example and one custom-step YAML example if the
       final contract supports YAML authoring directly.
-- [ ] Run `fern generate --docs` as the local docs validation check. Do not
+- [x] Run `fern generate --docs` as the local docs validation check. Do not
       publish docs until the publish-last gate opens.
-- [ ] Adversarial review: confirm public docs explain what engineers do, not
+      Note: `fern generate --docs --preview --skip-upload --no-require-env-vars
+      --no-prompt` reported 0 docs-definition errors and 3 warnings, then failed
+      at remote preview publishing with `User does not belong to organization`.
+- [x] Adversarial review: confirm public docs explain what engineers do, not
       the internal implementation.
 
 ## Task 10: Update ADP POC YAML And Validation
