@@ -315,21 +315,28 @@ models/processors/X-Ray tests, Celery/pytest in Arcadia, Node harness scanners.
 - `fern/generators.yml`
 - generated smoke output or review notes for `python-sdk` and `ts-sdk`
 
-- [ ] Add failing OpenAPI/schema checks or exact diffs for `customSteps`,
+- [x] Add failing OpenAPI/schema checks or exact diffs for `customSteps`,
       custom step `config`, custom step legacy `field` rejection, `outputRoutes`,
       `outputKey`, `leafFields`, route/leaf one-to-one validation, `isRepeated`,
       `repetitionScope`, wildcard repeated-item final paths, `template`,
       `requiredTemplateKeys`, reserved template key names, custom output maps, and
       field-count metadata.
-- [ ] Add `template` to the workflow config schema.
-- [ ] Add the custom-step and custom route schemas chosen in Task 2.
-- [ ] Keep existing fixed `WorkflowSteps` fields.
-- [ ] Run `fern generate --group ts-sdk` as the TypeScript generation smoke
+- [x] Add `template` to the workflow config schema.
+- [x] Add the custom-step and custom route schemas chosen in Task 2.
+- [x] Keep existing fixed `WorkflowSteps` fields.
+- [x] Run `fern generate --group ts-sdk` as the TypeScript generation smoke
       check. If generation cannot pass, block the schema change instead of
       treating generator compatibility as out of scope.
-- [ ] Run `fern check` and `fern generate --docs` as local docs/OpenAPI
+- [x] Run `fern check` and `fern generate --docs` as local docs/OpenAPI
       validation. Do not publish docs until the publish-last gate opens.
-- [ ] Adversarial review: confirm the schema is additive, generated SDKs can
+      Note: `fern check` passed. Release-mode TypeScript generation requires
+      `NPM_TOKEN`, so the successful smoke command was
+      `fern generate --group ts-sdk --local --no-require-env-vars --no-prompt`.
+      `fern generate --docs --preview --skip-upload --no-require-env-vars
+      --no-prompt` reached 0 docs-definition errors, then attempted remote
+      preview publishing and failed with `User does not belong to organization`;
+      docs publish remains gated on Fern org access during publish-last.
+- [x] Adversarial review: confirm the schema is additive, generated SDKs can
       represent it, and no public docs describe unverified behavior yet.
 
 ## Task 5: Update cashbot-go Models, Loading, Processing, And X-Ray

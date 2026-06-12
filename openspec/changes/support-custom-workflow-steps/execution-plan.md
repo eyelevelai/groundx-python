@@ -5,11 +5,13 @@ and Task 2 produce a reviewed contract and Task 3 produces repo-specific
 implementation plans plus the `internal-arcadia-agents` deferral stub.
 
 Current status: Phase 0 discovery, contract, and repo-owned planning artifacts
-are complete. The source-backed trace is recorded in `chunk-keywords-trace.md`,
-repo-specific implementation planning blockers are recorded in
-`repo-plan-blockers.md`, and Task 3 repo-owned plans are linked below.
-Phases 1-5 remain blocked until each current-wave implementation repo creates or
-selects the clean branch/worktree named by its repo-owned plan.
+are complete. Task 4's Fern/OpenAPI schema checkpoint is committed in
+`eyelevel-fern-config` on branch `codex/support-custom-workflow-steps-fern`
+(`71b7585`). The source-backed trace is recorded in
+`chunk-keywords-trace.md`, repo-specific implementation planning blockers are
+recorded in `repo-plan-blockers.md`, and Task 3 repo-owned plans are linked
+below. Remaining current-wave implementation repos still need the clean
+branch/worktree named by their repo-owned plans before code changes begin.
 
 Repo-owned Task 3 artifacts, in dependency order:
 
