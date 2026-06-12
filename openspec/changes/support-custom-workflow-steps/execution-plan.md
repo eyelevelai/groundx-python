@@ -7,11 +7,14 @@ implementation plans plus the `internal-arcadia-agents` deferral stub.
 Current status: Phase 0 discovery, contract, and repo-owned planning artifacts
 are complete. Task 4's Fern/OpenAPI schema checkpoint is committed in
 `eyelevel-fern-config` on branch `codex/support-custom-workflow-steps-fern`
-(`71b7585`). The source-backed trace is recorded in
-`chunk-keywords-trace.md`, repo-specific implementation planning blockers are
-recorded in `repo-plan-blockers.md`, and Task 3 repo-owned plans are linked
-below. Remaining current-wave implementation repos still need the clean
-branch/worktree named by their repo-owned plans before code changes begin.
+(`71b7585`), with a follow-up X-Ray response-schema mirror fix committed as
+`cf393f5`. Task 5's cashbot-go runtime/API checkpoint is committed on branch
+`codex/support-custom-workflow-steps-runtime` as `4e8b0ef6a`. The
+source-backed trace is recorded in `chunk-keywords-trace.md`, repo-specific
+implementation planning blockers are recorded in `repo-plan-blockers.md`, and
+Task 3 repo-owned plans are linked below. Remaining current-wave implementation
+repos still need the clean branch/worktree named by their repo-owned plans
+before code changes begin.
 
 Repo-owned Task 3 artifacts, in dependency order:
 

@@ -343,6 +343,14 @@ models/processors/X-Ray tests, Celery/pytest in Arcadia, Node harness scanners.
 
 **Repo:** `/Users/benjaminfletcher/git/cashbot-go`
 
+Status: completed in worktree
+`/Users/benjaminfletcher/git/cashbot-go-support-custom-workflow-steps` on
+branch `codex/support-custom-workflow-steps-runtime` and committed as
+`4e8b0ef6a`. The Fern mirror endpoint correction is committed in
+`eyelevel-fern-config` as `cf393f5`. Plan-specific targeted Go packages pass;
+`go test ./...` remains blocked by repo-wide generated `version.go`
+prerequisites and external service/state dependencies.
+
 **Likely files:**
 
 - `pkg/model/summarizer/process.go`
@@ -369,38 +377,38 @@ models/processors/X-Ray tests, Celery/pytest in Arcadia, Node harness scanners.
 - `server/GroundX/openapi.yml`
 - `lambda/GroundX/openapi.yml`
 
-- [ ] Add tests that prove the current runtime rejects or drops the proposed
+- [x] Add tests that prove the current runtime rejects or drops the proposed
       custom-step shape.
-- [ ] Add tests that prove `template` round-trips through workflow create/update
+- [x] Add tests that prove `template` round-trips through workflow create/update
       and reaches prompt rendering through workflow/process config, while the
       separate top-level partner template object is not silently accepted as the
       workflow prompt-variable map.
-- [ ] Add tests for `template` unknown keys, missing required keys, reserved keys,
+- [x] Add tests for `template` unknown keys, missing required keys, reserved keys,
       invalid value types, payload size, escaping/rendering failures, and fixed
       versus custom prompt behavior.
-- [ ] Add model support for custom named steps without breaking `StepType`.
-- [ ] Add storage support for custom chunk/section/document outputs.
-- [ ] Add persistence and readback tests for old workflows/documents, new custom
+- [x] Add model support for custom named steps without breaking `StepType`.
+- [x] Add storage support for custom chunk/section/document outputs.
+- [x] Add persistence and readback tests for old workflows/documents, new custom
       outputs, missing metadata versions, and unknown metadata versions.
-- [ ] Add processor support for executing allowlisted custom step levels/kinds.
-- [ ] Add X-Ray output support for custom outputs.
-- [ ] Add custom section/document output persistence support for the chosen
+- [x] Add processor support for executing allowlisted custom step levels/kinds.
+- [x] Add X-Ray output support for custom outputs.
+- [x] Add custom section/document output persistence support for the chosen
       storage/readback shape.
-- [ ] Enforce the chosen field-load validation in the public API/runtime path so
+- [x] Enforce the chosen field-load validation in the public API/runtime path so
       direct callers cannot bypass the guardrail.
-- [ ] Reject custom extraction workflow create/update requests with missing,
+- [x] Reject custom extraction workflow create/update requests with missing,
       unparseable, stale, caller-only, mismatched, or unknown-version
       field-count metadata.
-- [ ] Add a direct API regression test proving spoofed caller-provided field
+- [x] Add a direct API regression test proving spoofed caller-provided field
       counts cannot bypass the oversized-step guardrail.
-- [ ] Add direct API regression tests proving mismatched, missing, extra, or
+- [x] Add direct API regression tests proving mismatched, missing, extra, or
       duplicate route/leaf records cannot bypass field-load validation.
-- [ ] Update server and lambda OpenAPI mirrors.
-- [ ] Extend existing `chunk-keys`/`ChunkKeywords` tests instead of replacing
+- [x] Update server and lambda OpenAPI mirrors.
+- [x] Extend existing `chunk-keys`/`ChunkKeywords` tests instead of replacing
       them.
-- [ ] Run targeted Go tests for summarizer model, processor, X-Ray, workflow,
+- [x] Run targeted Go tests for summarizer model, processor, X-Ray, workflow,
       and partner workflow paths.
-- [ ] Adversarial review: confirm default workflows and existing fixed-step
+- [x] Adversarial review: confirm default workflows and existing fixed-step
       overlays still behave exactly as before.
 
 ## Task 6: Regenerate And Extend groundx-python
