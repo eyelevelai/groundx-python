@@ -52,15 +52,15 @@
       fixed fields still load.
 - [x] Consume generated SDK surfaces from the approved Fern/OpenAPI source path;
       do not hand-edit generated files outside that path.
-- [ ] Implement extraction YAML parsing for workflow-level `workflow.template`,
+- [x] Implement extraction YAML parsing for workflow-level `workflow.template`,
       custom step definitions, `workflow_step`, and `workflow_output_key`.
-- [ ] Implement persisted `workflow.extract.workflow` metadata for
+- [x] Implement persisted `workflow.extract.workflow` metadata for
       `metadata_version`, `custom_steps`, `output_routes`, `leaf_fields`,
       optional `field_counts`, and optional `schema_hash`.
-- [ ] Enforce custom step identity, route/leaf one-to-one integrity, repeated
+- [x] Enforce custom step identity, route/leaf one-to-one integrity, repeated
       item wildcard path semantics, deterministic hash sorting, and mirrored
       20-field validation before sending workflows.
-- [ ] Preserve legacy `slot:` behavior for existing YAML and fail when `slot`
+- [x] Preserve legacy `slot:` behavior for existing YAML and fail when `slot`
       and `workflow_step` appear on the same group.
 - [ ] Add X-Ray/readback parsing for `customChunkOutputs`,
       `customSectionOutputs`, and `customDocumentOutputs`.

@@ -21,9 +21,7 @@ def test_workflow_request_serializes_template_and_custom_steps() -> None:
     request = WorkflowRequest(
         name="line item workflow",
         template={
-            "CUSTOM_WORKFLOW_GROUP": "line_items",
-            "CUSTOM_WORKFLOW_FIELD": "description",
-            "CUSTOM_WORKFLOW_OUTPUT_KEY": "label",
+            "BILLING_HINT": "Prefer values from the charge table.",
         },
         steps=WorkflowSteps(
             chunk_keys=WorkflowStep(
@@ -35,7 +33,7 @@ def test_workflow_request_serializes_template_and_custom_steps() -> None:
                 name="line_item_labels",
                 level="chunk",
                 kind="keys",
-                required_template_keys=["CUSTOM_WORKFLOW_GROUP"],
+                required_template_keys=["BILLING_HINT"],
                 config=CustomWorkflowStepConfig(
                     all_=CustomWorkflowStepElementConfig(
                         includes={"text": True},
@@ -72,11 +70,11 @@ def test_workflow_request_serializes_template_and_custom_steps() -> None:
 
     payload = request.model_dump(by_alias=True, exclude_none=True)
 
-    assert payload["template"]["CUSTOM_WORKFLOW_GROUP"] == "line_items"
+    assert payload["template"]["BILLING_HINT"] == "Prefer values from the charge table."
     assert payload["steps"]["chunk-keys"]["all"]["includes"] == {"text": True}
     assert payload["customSteps"][0]["name"] == "line_item_labels"
     assert payload["customSteps"][0]["requiredTemplateKeys"] == [
-        "CUSTOM_WORKFLOW_GROUP"
+        "BILLING_HINT"
     ]
     assert payload["customSteps"][0]["config"]["all"]["includes"] == {"text": True}
     assert "field" not in payload["customSteps"][0]["config"]["all"]
@@ -97,13 +95,13 @@ def test_workflow_detail_deserializes_custom_routes_and_outputs() -> None:
         "workflowId": "9c79a6d3-65ac-4108-83cf-572cc7b6dbd8",
         "name": "line item workflow",
         "extract": {"line_items": {"fields": {}}},
-        "template": {"CUSTOM_WORKFLOW_GROUP": "line_items"},
+        "template": {"BILLING_HINT": "Prefer values from the charge table."},
         "customSteps": [
             {
                 "name": "line_item_labels",
                 "level": "chunk",
                 "kind": "keys",
-                "requiredTemplateKeys": ["CUSTOM_WORKFLOW_GROUP"],
+                "requiredTemplateKeys": ["BILLING_HINT"],
             }
         ],
         "outputRoutes": [

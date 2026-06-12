@@ -32,15 +32,13 @@ class FailingSource(TestSource):
 CUSTOM_WORKFLOW_YAML = """
 workflow:
   template:
-    CUSTOM_WORKFLOW_GROUP: line_items
-    CUSTOM_WORKFLOW_FIELD: description
-    CUSTOM_WORKFLOW_OUTPUT_KEY: label
+    BILLING_HINT: Prefer values from the charge table.
   custom_steps:
     - name: line_item_labels
       level: chunk
       kind: keys
       required_template_keys:
-        - CUSTOM_WORKFLOW_GROUP
+        - BILLING_HINT
       config:
         all:
           includes:
@@ -1555,11 +1553,7 @@ _pseudo_groups:
         self.assertEqual(workflow["metadata_version"], 1)
         self.assertEqual(
             workflow["template"],
-            {
-                "CUSTOM_WORKFLOW_GROUP": "line_items",
-                "CUSTOM_WORKFLOW_FIELD": "description",
-                "CUSTOM_WORKFLOW_OUTPUT_KEY": "label",
-            },
+            {"BILLING_HINT": "Prefer values from the charge table."},
         )
         self.assertEqual(
             workflow["custom_steps"],
@@ -1568,7 +1562,7 @@ _pseudo_groups:
                     "name": "line_item_labels",
                     "level": "chunk",
                     "kind": "keys",
-                    "required_template_keys": ["CUSTOM_WORKFLOW_GROUP"],
+                    "required_template_keys": ["BILLING_HINT"],
                     "config": {
                         "all": {
                             "includes": {"text": True},
@@ -1675,12 +1669,12 @@ workflow:
         with self.assertRaises(ValueError) as exc:
             prepare_extraction_yaml(
                 CUSTOM_WORKFLOW_YAML.replace(
-                    "    CUSTOM_WORKFLOW_GROUP: line_items\n", ""
+                    "    BILLING_HINT: Prefer values from the charge table.\n", ""
                 )
             )
 
         self.assertIn("missing template key", str(exc.exception))
-        self.assertIn("CUSTOM_WORKFLOW_GROUP", str(exc.exception))
+        self.assertIn("BILLING_HINT", str(exc.exception))
 
     def test_prepare_extraction_yaml_rejects_custom_step_over_20_fields(
         self,

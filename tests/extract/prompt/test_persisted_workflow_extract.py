@@ -38,15 +38,14 @@ def _custom_workflow_metadata() -> typing.Dict[str, typing.Any]:
     return {
         "metadata_version": 1,
         "template": {
-            "CUSTOM_WORKFLOW_GROUP": "line_items",
-            "CUSTOM_WORKFLOW_FIELD": "description",
+            "BILLING_HINT": "Prefer values from the charge table.",
         },
         "custom_steps": [
             {
                 "name": "line_item_labels",
                 "level": "chunk",
                 "kind": "keys",
-                "required_template_keys": ["CUSTOM_WORKFLOW_GROUP"],
+                "required_template_keys": ["BILLING_HINT"],
             }
         ],
         "output_routes": [
@@ -334,8 +333,7 @@ def test_persisted_custom_workflow_extract_hash_is_deterministic() -> None:
     first = _persisted_custom_workflow_extract()
     second = _persisted_custom_workflow_extract()
     second["workflow"]["template"] = {
-        "CUSTOM_WORKFLOW_FIELD": "renamed by prompt only",
-        "CUSTOM_WORKFLOW_GROUP": "also ignored by hash",
+        "BILLING_HINT": "Template values are ignored by hash",
     }
     second["workflow"]["custom_steps"][0]["required_template_keys"] = list(
         reversed(second["workflow"]["custom_steps"][0]["required_template_keys"])
