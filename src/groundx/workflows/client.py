@@ -9,6 +9,7 @@ from ..types.workflow_request_chunk_strategy import WorkflowRequestChunkStrategy
 from ..types.workflow_request_section_strategy import WorkflowRequestSectionStrategy
 from ..types.workflow_response import WorkflowResponse
 from ..types.workflow_steps import WorkflowSteps
+from ..types.workflow_template import WorkflowTemplate
 from ..types.workflows_response import WorkflowsResponse
 from .raw_client import AsyncRawWorkflowsClient, RawWorkflowsClient
 from .types.workflows_get_request_id import WorkflowsGetRequestId
@@ -66,6 +67,7 @@ class WorkflowsClient:
         extract: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
+        template: typing.Optional[WorkflowTemplate] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> WorkflowResponse:
         """
@@ -84,6 +86,8 @@ class WorkflowsClient:
         section_strategy : typing.Optional[WorkflowRequestSectionStrategy]
 
         steps : typing.Optional[WorkflowSteps]
+
+        template : typing.Optional[WorkflowTemplate]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -108,6 +112,7 @@ class WorkflowsClient:
             extract=extract,
             section_strategy=section_strategy,
             steps=steps,
+            template=template,
             request_options=request_options,
         )
         return _response.data
@@ -307,6 +312,7 @@ class WorkflowsClient:
         extract: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
+        template: typing.Optional[WorkflowTemplate] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> WorkflowResponse:
         """
@@ -328,6 +334,8 @@ class WorkflowsClient:
         section_strategy : typing.Optional[WorkflowRequestSectionStrategy]
 
         steps : typing.Optional[WorkflowSteps]
+
+        template : typing.Optional[WorkflowTemplate]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -355,6 +363,7 @@ class WorkflowsClient:
             extract=extract,
             section_strategy=section_strategy,
             steps=steps,
+            template=template,
             request_options=request_options,
         )
         return _response.data
@@ -448,6 +457,7 @@ class AsyncWorkflowsClient:
         extract: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
+        template: typing.Optional[WorkflowTemplate] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> WorkflowResponse:
         """
@@ -466,6 +476,8 @@ class AsyncWorkflowsClient:
         section_strategy : typing.Optional[WorkflowRequestSectionStrategy]
 
         steps : typing.Optional[WorkflowSteps]
+
+        template : typing.Optional[WorkflowTemplate]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -498,6 +510,7 @@ class AsyncWorkflowsClient:
             extract=extract,
             section_strategy=section_strategy,
             steps=steps,
+            template=template,
             request_options=request_options,
         )
         return _response.data
@@ -747,6 +760,7 @@ class AsyncWorkflowsClient:
         extract: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
+        template: typing.Optional[WorkflowTemplate] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> WorkflowResponse:
         """
@@ -768,6 +782,8 @@ class AsyncWorkflowsClient:
         section_strategy : typing.Optional[WorkflowRequestSectionStrategy]
 
         steps : typing.Optional[WorkflowSteps]
+
+        template : typing.Optional[WorkflowTemplate]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -803,6 +819,7 @@ class AsyncWorkflowsClient:
             extract=extract,
             section_strategy=section_strategy,
             steps=steps,
+            template=template,
             request_options=request_options,
         )
         return _response.data

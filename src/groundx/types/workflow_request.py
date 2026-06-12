@@ -9,6 +9,7 @@ from ..core.serialization import FieldMetadata
 from .workflow_request_chunk_strategy import WorkflowRequestChunkStrategy
 from .workflow_request_section_strategy import WorkflowRequestSectionStrategy
 from .workflow_steps import WorkflowSteps
+from .workflow_template import WorkflowTemplate
 
 
 class WorkflowRequest(UniversalBaseModel):
@@ -33,6 +34,7 @@ class WorkflowRequest(UniversalBaseModel):
         pydantic.Field(alias="sectionStrategy"),
     ] = None
     steps: typing.Optional[WorkflowSteps] = None
+    template: typing.Optional[WorkflowTemplate] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
