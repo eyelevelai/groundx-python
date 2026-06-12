@@ -35,7 +35,10 @@ in isolated worktree
 `codex/support-custom-workflow-steps-adp` as `004f844`, with ADP manifest,
 converter/source-review, local SDK/harness compile, workflow validation,
 OpenSpec strict validation, and `git diff --check` verification. Remaining
-current-wave execution is end-to-end validation and closeout.
+current-wave execution is end-to-end validation and closeout. Task 11 has a
+partial e2e checkpoint in `task11-e2e-checkpoint.md`; release remains blocked
+because the deployed API accepted an oversized/spoofed custom-step workflow that
+should have been rejected by the Task 5 runtime/API validation.
 
 Repo-owned Task 3 artifacts, in dependency order:
 
@@ -331,22 +334,33 @@ Review questions:
 
 ## Phase 5: End-To-End Proof
 
-1. Run one legacy YAML path.
-2. Run one custom-step YAML path.
-3. Inspect workflow `extract`, X-Ray, and final JSON.
+Status: partially executed and blocked. See `task11-e2e-checkpoint.md`.
+
+1. Run one legacy YAML path. Completed locally and via live workflow
+   create/get/delete.
+2. Run one custom-step YAML path. Completed locally and via live workflow
+   create/get/delete.
+3. Inspect workflow `extract`, X-Ray, and final JSON. Workflow `extract`
+   readback and local synthetic X-Ray-to-final-JSON route mapping are complete;
+   live X-Ray/final extract remains blocked.
 4. Confirm Arcadia legacy path and confirm custom field-action work remains
-   deferred to the follow-on plan.
-5. Publish SDK/docs if required by the final e2e path.
-6. Run e2e against the published SDK/docs/runtime artifacts.
+   deferred to the follow-on plan. Current-wave deferral stub confirmed.
+5. Publish SDK/docs if required by the final e2e path. Blocked on publish
+   credentials/Fern org access and the deployed-runtime guardrail failure.
+6. Run e2e against the published SDK/docs/runtime artifacts. Blocked.
 7. Confirm downstream repos use `groundx-python >= <released version>` and no
    exact SDK pins were introduced only after published-artifact e2e passes.
+   Blocked until publish and e2e pass.
 8. Confirm old persisted workflow extracts and old legacy YAML still load or
-   fail with the documented compatibility behavior.
+   fail with the documented compatibility behavior. Legacy workflow
+   create/get/delete passed on the deployed API; broader persisted-workflow
+   checks remain blocked until the deployed validation failure is fixed.
 9. Confirm the deployed path with live credentials/documents/approval for release
-   readiness. If unavailable, release remains blocked unless the release-governance
-   spec's explicitly reviewed non-live substitute is approved and recorded.
+   readiness. Blocked: deployed API accepted an oversized/spoofed custom-step
+   workflow.
 10. Record skipped live checks only with the approving reviewer, substitute
-   evidence, or blocked-release status.
+   evidence, or blocked-release status. Blocked-release status recorded.
 11. If published-artifact e2e fails, mark the release failed and fix forward
     with a corrective patch or replacement publication before dependency bumps.
-12. Adversarial review and closeout.
+    Current failure is deployed-runtime/API guardrail mismatch.
+12. Adversarial review and closeout. Pending after blocker resolution.

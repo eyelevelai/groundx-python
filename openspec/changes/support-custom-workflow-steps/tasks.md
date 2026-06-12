@@ -686,25 +686,30 @@ Status: completed in isolated worktree
 
 ## Task 11: End-To-End Validation
 
-- [ ] Create or select one legacy YAML and one custom-step YAML.
-- [ ] Compile both.
-- [ ] Create/update workflows with both.
-- [ ] Confirm workflow `extract` preserves authored YAML/custom step metadata.
+Status: partially executed and blocked. Evidence is recorded in
+`task11-e2e-checkpoint.md`.
+
+- [x] Create or select one legacy YAML and one custom-step YAML.
+- [x] Compile both.
+- [x] Create/update workflows with both.
+- [x] Confirm workflow `extract` preserves authored YAML/custom step metadata.
 - [ ] For release readiness, ingest one small representative document for each
       path with live credentials, representative documents, and approval. If any
       are unavailable, record blocked-release status or the explicitly reviewed
       non-live substitute evidence approved by release governance.
 - [ ] Retrieve X-Ray and final extract output.
 - [ ] Confirm custom step outputs are visible in X-Ray under the chosen shape.
-- [ ] Confirm custom output route metadata maps the X-Ray/readback value to the
+- [x] Confirm custom output route metadata maps the X-Ray/readback value to the
       expected final JSON field.
-- [ ] Confirm final JSON uses only user-facing YAML group/value names.
+- [x] Confirm final JSON uses only user-facing YAML group/value names.
 - [ ] Confirm old persisted workflow extracts and legacy YAML continue to load or
       fail with the documented compatibility behavior.
 - [ ] Confirm direct workflow create/update rejects spoofed, caller-only, or
       mismatched field-count metadata for an oversized custom step.
+      Blocked: the deployed API accepted an oversized/spoofed custom-step
+      workflow and the test workflow was immediately deleted.
 - [ ] Confirm Arcadia default path works for legacy YAML.
-- [ ] Confirm Arcadia custom field-action implementation is deferred to the
+- [x] Confirm Arcadia custom field-action implementation is deferred to the
       follow-on `reconcile_fields`/`qa_fields`/`save_fields` plan.
 - [ ] Publish SDK/docs if required by the final e2e path, after
       local/runtime/schema/SDK/harness verification passes.

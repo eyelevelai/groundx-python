@@ -125,3 +125,15 @@ Locked decisions:
   path exists.
 - Plan preserves the 11 final ADP output sections while splitting the 159
   fields across platform-supported custom executable steps.
+
+## Task 11 E2E Blocker
+
+- Local legacy/custom compile and live workflow create/get/delete checks passed.
+- Release e2e is blocked because the deployed API accepted an oversized/spoofed
+  custom-step workflow that assigned all 159 ADP routes to one custom step while
+  spoofing a low `field_counts` value.
+- The created negative-test workflow was deleted and a cleanup scan found no
+  remaining `codex-e2e-support-custom-workflow-steps-*` workflows.
+- Continue only after the runtime/API artifact with Task 5 field-count
+  validation is deployed or e2e is pointed at an approved equivalent deployed
+  environment.
