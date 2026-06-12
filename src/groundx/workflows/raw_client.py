@@ -16,6 +16,7 @@ from ..types.workflow_request_chunk_strategy import WorkflowRequestChunkStrategy
 from ..types.workflow_request_section_strategy import WorkflowRequestSectionStrategy
 from ..types.workflow_response import WorkflowResponse
 from ..types.workflow_steps import WorkflowSteps
+from ..types.workflow_template import WorkflowTemplate
 from ..types.workflows_response import WorkflowsResponse
 from .types.workflows_get_request_id import WorkflowsGetRequestId
 from pydantic import ValidationError
@@ -74,6 +75,7 @@ class RawWorkflowsClient:
         extract: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
+        template: typing.Optional[WorkflowTemplate] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[WorkflowResponse]:
         """
@@ -92,6 +94,8 @@ class RawWorkflowsClient:
         section_strategy : typing.Optional[WorkflowRequestSectionStrategy]
 
         steps : typing.Optional[WorkflowSteps]
+
+        template : typing.Optional[WorkflowTemplate]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -112,6 +116,7 @@ class RawWorkflowsClient:
                 "steps": convert_and_respect_annotation_metadata(
                     object_=steps, annotation=WorkflowSteps, direction="write"
                 ),
+                "template": template,
             },
             request_options=request_options,
             omit=OMIT,
@@ -405,6 +410,7 @@ class RawWorkflowsClient:
         extract: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
+        template: typing.Optional[WorkflowTemplate] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[WorkflowResponse]:
         """
@@ -427,6 +433,8 @@ class RawWorkflowsClient:
 
         steps : typing.Optional[WorkflowSteps]
 
+        template : typing.Optional[WorkflowTemplate]
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -446,6 +454,7 @@ class RawWorkflowsClient:
                 "steps": convert_and_respect_annotation_metadata(
                     object_=steps, annotation=WorkflowSteps, direction="write"
                 ),
+                "template": template,
             },
             request_options=request_options,
             omit=OMIT,
@@ -565,6 +574,7 @@ class AsyncRawWorkflowsClient:
         extract: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
+        template: typing.Optional[WorkflowTemplate] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[WorkflowResponse]:
         """
@@ -583,6 +593,8 @@ class AsyncRawWorkflowsClient:
         section_strategy : typing.Optional[WorkflowRequestSectionStrategy]
 
         steps : typing.Optional[WorkflowSteps]
+
+        template : typing.Optional[WorkflowTemplate]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -603,6 +615,7 @@ class AsyncRawWorkflowsClient:
                 "steps": convert_and_respect_annotation_metadata(
                     object_=steps, annotation=WorkflowSteps, direction="write"
                 ),
+                "template": template,
             },
             request_options=request_options,
             omit=OMIT,
@@ -898,6 +911,7 @@ class AsyncRawWorkflowsClient:
         extract: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
+        template: typing.Optional[WorkflowTemplate] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[WorkflowResponse]:
         """
@@ -920,6 +934,8 @@ class AsyncRawWorkflowsClient:
 
         steps : typing.Optional[WorkflowSteps]
 
+        template : typing.Optional[WorkflowTemplate]
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -939,6 +955,7 @@ class AsyncRawWorkflowsClient:
                 "steps": convert_and_respect_annotation_metadata(
                     object_=steps, annotation=WorkflowSteps, direction="write"
                 ),
+                "template": template,
             },
             request_options=request_options,
             omit=OMIT,

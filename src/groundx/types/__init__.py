@@ -78,6 +78,7 @@ if typing.TYPE_CHECKING:
     from .workflow_step_config import WorkflowStepConfig
     from .workflow_step_config_field import WorkflowStepConfigField
     from .workflow_steps import WorkflowSteps
+    from .workflow_template import WorkflowTemplate
     from .workflows_response import WorkflowsResponse
 _dynamic_imports: typing.Dict[str, str] = {
     "ApiKeyDetail": ".api_key_detail",
@@ -152,6 +153,7 @@ _dynamic_imports: typing.Dict[str, str] = {
     "WorkflowStepConfig": ".workflow_step_config",
     "WorkflowStepConfigField": ".workflow_step_config_field",
     "WorkflowSteps": ".workflow_steps",
+    "WorkflowTemplate": ".workflow_template",
     "WorkflowsResponse": ".workflows_response",
 }
 
@@ -250,5 +252,6 @@ __all__ = [
     "WorkflowStepConfig",
     "WorkflowStepConfigField",
     "WorkflowSteps",
+    "WorkflowTemplate",
     "WorkflowsResponse",
 ]

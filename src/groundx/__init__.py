@@ -79,6 +79,7 @@ if typing.TYPE_CHECKING:
         WorkflowStepConfig,
         WorkflowStepConfigField,
         WorkflowSteps,
+        WorkflowTemplate,
         WorkflowsResponse,
     )
     from .errors import BadRequestError, UnauthorizedError
@@ -170,6 +171,7 @@ _dynamic_imports: typing.Dict[str, str] = {
     "WorkflowStepConfig": ".types",
     "WorkflowStepConfigField": ".types",
     "WorkflowSteps": ".types",
+    "WorkflowTemplate": ".types",
     "WorkflowsGetRequestId": ".workflows",
     "WorkflowsResponse": ".types",
     "__version__": ".version",
@@ -286,6 +288,7 @@ __all__ = [
     "WorkflowStepConfig",
     "WorkflowStepConfigField",
     "WorkflowSteps",
+    "WorkflowTemplate",
     "WorkflowsGetRequestId",
     "WorkflowsResponse",
     "__version__",

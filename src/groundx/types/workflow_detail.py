@@ -10,6 +10,7 @@ from .workflow_detail_chunk_strategy import WorkflowDetailChunkStrategy
 from .workflow_detail_relationships import WorkflowDetailRelationships
 from .workflow_detail_section_strategy import WorkflowDetailSectionStrategy
 from .workflow_steps import WorkflowSteps
+from .workflow_template import WorkflowTemplate
 
 
 class WorkflowDetail(UniversalBaseModel):
@@ -48,6 +49,7 @@ class WorkflowDetail(UniversalBaseModel):
         pydantic.Field(alias="sectionStrategy"),
     ] = None
     steps: typing.Optional[WorkflowSteps] = None
+    template: typing.Optional[WorkflowTemplate] = None
     relationships: typing.Optional[WorkflowDetailRelationships] = pydantic.Field(default=None)
     """
     Information describing what the workflow is associated with
