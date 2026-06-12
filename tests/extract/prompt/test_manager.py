@@ -1700,6 +1700,56 @@ workflow:
         self.assertIn("invalid custom step name", str(exc.exception))
         self.assertIn("line-item-labels", str(exc.exception))
 
+    def test_prepare_extraction_yaml_rejects_case_normalized_step_name(
+        self,
+    ) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                CUSTOM_WORKFLOW_YAML.replace("line_item_labels", "LineItemLabels")
+            )
+
+        self.assertIn("invalid custom step name", str(exc.exception))
+        self.assertIn("LineItemLabels", str(exc.exception))
+
+    def test_prepare_extraction_yaml_rejects_duplicate_custom_step_name(
+        self,
+    ) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                """
+workflow:
+  custom_steps:
+    - name: line_item_labels
+      level: chunk
+      kind: keys
+    - name: line_item_labels
+      level: chunk
+      kind: keys
+line_items:
+  workflow_step: line_item_labels
+  fields:
+    description:
+      workflow_output_key: label
+      prompt:
+        instructions: Return the description.
+        type: str
+"""
+            )
+
+        self.assertIn("duplicate custom step name", str(exc.exception))
+        self.assertIn("line_item_labels", str(exc.exception))
+
+    def test_prepare_extraction_yaml_rejects_reserved_custom_step_name(
+        self,
+    ) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                CUSTOM_WORKFLOW_YAML.replace("line_item_labels", "chunk_keys")
+            )
+
+        self.assertIn("reserved custom step name", str(exc.exception))
+        self.assertIn("chunk_keys", str(exc.exception))
+
     def test_prepare_extraction_yaml_rejects_missing_required_template_keys(
         self,
     ) -> None:
@@ -1742,6 +1792,36 @@ line_items:
 
         self.assertIn("overloaded_fields", str(exc.exception))
         self.assertIn("at most 20 fields", str(exc.exception))
+
+    def test_prepare_extraction_yaml_rejects_duplicate_output_destination(
+        self,
+    ) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                """
+workflow:
+  custom_steps:
+    - name: line_item_labels
+      level: chunk
+      kind: keys
+line_items:
+  workflow_step: line_item_labels
+  fields:
+    description:
+      workflow_output_key: label
+      prompt:
+        instructions: Return the description.
+        type: str
+    amount:
+      workflow_output_key: label
+      prompt:
+        instructions: Return the amount.
+        type: str
+"""
+            )
+
+        self.assertIn("duplicate output destination", str(exc.exception))
+        self.assertIn("line_item_labels.label", str(exc.exception))
 
     def test_prepare_extraction_yaml_rejects_custom_step_without_routes(
         self,

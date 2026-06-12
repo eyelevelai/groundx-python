@@ -321,11 +321,27 @@ def test_persisted_custom_workflow_extract_rejects_unknown_version() -> None:
         prepare_extraction_yaml(persisted)
 
 
+def test_persisted_custom_workflow_extract_rejects_missing_version() -> None:
+    persisted = _persisted_custom_workflow_extract()
+    del persisted["workflow"]["metadata_version"]
+
+    with pytest.raises(ValueError, match="metadata_version"):
+        prepare_extraction_yaml(persisted)
+
+
 def test_persisted_custom_workflow_extract_rejects_route_leaf_mismatch() -> None:
     persisted = _persisted_custom_workflow_extract()
     persisted["workflow"]["leaf_fields"][0]["final_path"] = "/line_items/*/amount"
 
     with pytest.raises(ValueError, match="route.*leaf|leaf.*route"):
+        prepare_extraction_yaml(persisted)
+
+
+def test_persisted_custom_workflow_extract_rejects_field_count_mismatch() -> None:
+    persisted = _persisted_custom_workflow_extract()
+    persisted["workflow"]["field_counts"] = {"line_item_labels": 2}
+
+    with pytest.raises(ValueError, match="field_counts"):
         prepare_extraction_yaml(persisted)
 
 

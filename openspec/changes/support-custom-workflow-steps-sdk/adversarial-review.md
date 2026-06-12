@@ -30,6 +30,21 @@ field-level `workflow_output_key`, producing metadata the runtime would reject.
 The SDK now fails early for authored and persisted custom metadata that defines
 custom steps without matching output routes and leaf fields.
 
+### Fixed: Workflow create/update calls were not directly covered
+
+The generated type tests covered `WorkflowRequest` and `WorkflowDetail`, but not
+the actual workflow create/update call bodies. The tests now record the raw
+workflow client request body after the same HTTP encoding path used by the SDK
+and assert `template`, `customSteps`, `outputRoutes`, and `leafFields` survive
+both POST and PUT calls.
+
+### Fixed: Duplicate custom output destinations were accepted
+
+The route/leaf one-to-one check did not reject two fields that targeted the same
+custom step output destination, such as `line_item_labels.label`. The SDK now
+fails these duplicate destinations during authored and persisted metadata
+validation.
+
 ## Residual Risk
 
 - Local generated SDK output was produced from Fern/OpenAPI with

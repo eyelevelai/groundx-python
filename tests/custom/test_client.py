@@ -1,5 +1,6 @@
 import typing
 
+from groundx.core.http_client import get_request_body
 from groundx.types import (
     WorkflowDetail,
     WorkflowRequest,
@@ -7,6 +8,104 @@ from groundx.types import (
     WorkflowStepConfig,
     WorkflowSteps,
 )
+from groundx.workflows.raw_client import RawWorkflowsClient
+
+
+class _DummyWorkflowResponse:
+    status_code = 200
+    headers: typing.Dict[str, str] = {}
+    text = ""
+
+    def json(self) -> typing.Dict[str, typing.Any]:
+        return {"workflow": {"workflowId": "9c79a6d3-65ac-4108-83cf-572cc7b6dbd8"}}
+
+
+class _RecordingHttpClient:
+    def __init__(self) -> None:
+        self.calls: typing.List[typing.Tuple[str, typing.Dict[str, typing.Any]]] = []
+
+    def request(self, path: str, **kwargs: typing.Any) -> _DummyWorkflowResponse:
+        json_body, data_body = get_request_body(
+            json=kwargs.get("json"),
+            data=kwargs.get("data"),
+            request_options=kwargs.get("request_options"),
+            omit=kwargs.get("omit"),
+        )
+        encoded_kwargs = dict(kwargs)
+        encoded_kwargs["json"] = json_body
+        encoded_kwargs["data"] = data_body
+        self.calls.append((path, encoded_kwargs))
+        return _DummyWorkflowResponse()
+
+
+class _RecordingWrapper:
+    def __init__(self, http_client: _RecordingHttpClient) -> None:
+        self.httpx_client = http_client
+
+
+def _custom_workflow_parts() -> typing.Dict[str, typing.Any]:
+    from groundx.types import (
+        CustomWorkflowLeafField,
+        CustomWorkflowOutputRoute,
+        CustomWorkflowStep,
+        CustomWorkflowStepConfig,
+        CustomWorkflowStepElementConfig,
+    )
+
+    return {
+        "template": {"BILLING_HINT": "Prefer values from the charge table."},
+        "custom_steps": [
+            CustomWorkflowStep(
+                name="line_item_labels",
+                level="chunk",
+                kind="keys",
+                required_template_keys=["BILLING_HINT"],
+                config=CustomWorkflowStepConfig(
+                    all_=CustomWorkflowStepElementConfig(
+                        includes={"text": True},
+                    )
+                ),
+            )
+        ],
+        "output_routes": [
+            CustomWorkflowOutputRoute(
+                workflow_group="line_items",
+                workflow_field="description",
+                final_path="/line_items/*/description",
+                step_name="line_item_labels",
+                level="chunk",
+                output_map="customChunkOutputs",
+                output_key="label",
+                readback_path="/chunks/*/customChunkOutputs/line_item_labels/label",
+            )
+        ],
+        "leaf_fields": [
+            CustomWorkflowLeafField(
+                final_path="/line_items/*/description",
+                workflow_group="line_items",
+                workflow_field="description",
+                step_name="line_item_labels",
+                level="chunk",
+                output_key="label",
+                field_type="str",
+                is_repeated=True,
+                repetition_scope="/line_items/*",
+            )
+        ],
+    }
+
+
+def _assert_custom_workflow_body(body: typing.Dict[str, typing.Any]) -> None:
+    assert body["template"] == {
+        "BILLING_HINT": "Prefer values from the charge table."
+    }
+    assert body["customSteps"][0]["name"] == "line_item_labels"
+    assert body["customSteps"][0]["requiredTemplateKeys"] == ["BILLING_HINT"]
+    assert body["customSteps"][0]["config"]["all"]["includes"] == {"text": True}
+    assert body["outputRoutes"][0]["readbackPath"] == (
+        "/chunks/*/customChunkOutputs/line_item_labels/label"
+    )
+    assert body["leafFields"][0]["repetitionScope"] == "/line_items/*"
 
 
 def test_workflow_request_serializes_template_and_custom_steps() -> None:
@@ -153,3 +252,32 @@ def test_workflow_detail_deserializes_custom_routes_and_outputs() -> None:
     assert detail.leaf_fields[0].repetition_scope == "/line_items/*"
     assert detail.steps is not None
     assert detail.steps.chunk_keys is not None
+
+
+def test_workflow_create_and_update_calls_serialize_custom_config() -> None:
+    http_client = _RecordingHttpClient()
+    client = RawWorkflowsClient(
+        client_wrapper=typing.cast(typing.Any, _RecordingWrapper(http_client))
+    )
+    parts = _custom_workflow_parts()
+
+    client.create(
+        name="line item workflow",
+        extract={"line_items": {"fields": {}}},
+        **parts,
+    )
+    client.update(
+        "9c79a6d3-65ac-4108-83cf-572cc7b6dbd8",
+        name="line item workflow",
+        extract={"line_items": {"fields": {}}},
+        **parts,
+    )
+
+    assert http_client.calls[0][0] == "v1/workflow"
+    assert http_client.calls[0][1]["method"] == "POST"
+    _assert_custom_workflow_body(http_client.calls[0][1]["json"])
+    assert http_client.calls[1][0] == (
+        "v1/workflow/9c79a6d3-65ac-4108-83cf-572cc7b6dbd8"
+    )
+    assert http_client.calls[1][1]["method"] == "PUT"
+    _assert_custom_workflow_body(http_client.calls[1][1]["json"])

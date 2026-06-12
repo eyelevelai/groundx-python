@@ -980,12 +980,20 @@ def _validate_custom_workflow_routes_and_leaves(
 ) -> typing.Dict[str, int]:
     route_by_match_key: typing.Dict[str, typing.Dict[str, typing.Any]] = {}
     leaf_by_match_key: typing.Dict[str, typing.Dict[str, typing.Any]] = {}
+    route_destinations: typing.Set[typing.Tuple[str, str]] = set()
     counts: typing.Dict[str, int] = {}
 
     for route in routes:
         match_key = _custom_route_leaf_match_key(route)
         if match_key in route_by_match_key:
             raise ValueError(f"duplicate route identity for [{route['final_path']}]")
+        destination = (route["step_name"], route["output_key"])
+        if destination in route_destinations:
+            raise ValueError(
+                "duplicate output destination "
+                f"[{route['step_name']}.{route['output_key']}]"
+            )
+        route_destinations.add(destination)
         route_by_match_key[match_key] = route
         counts[route["step_name"]] = counts.get(route["step_name"], 0) + 1
 
