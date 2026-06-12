@@ -40,6 +40,11 @@ coordination artifact; this folder is the repo-owned SDK implementation plan.
 - Local generated output may be used for verification before public publishing.
 - Handwritten SDK commits must not directly edit generated files outside the
   approved generation path.
+- Local generation evidence: `fern generate --group python-sdk --local
+  --version 3.6.4 --no-require-env-vars` from
+  `/Users/benjaminfletcher/git/eyelevel-fern-config/fern` succeeded and wrote
+  non-release output to a temp directory before generated SDK files were copied
+  into this implementation worktree.
 
 ## Expected Failing Tests
 
@@ -125,4 +130,3 @@ handwritten extract behavior, harness compile/readback, and TypeScript
 generation smoke have passed. If the final e2e requires a published SDK, publish
 only as the final prerequisite and do not allow downstream dependency bumps
 until that published-artifact e2e passes.
-

@@ -50,7 +50,7 @@
       `test_document_preserves_fixed_and_custom_readback_fields`.
       Expected before implementation: custom output maps are unavailable while
       fixed fields still load.
-- [ ] Consume generated SDK surfaces from the approved Fern/OpenAPI source path;
+- [x] Consume generated SDK surfaces from the approved Fern/OpenAPI source path;
       do not hand-edit generated files outside that path.
 - [ ] Implement extraction YAML parsing for workflow-level `workflow.template`,
       custom step definitions, `workflow_step`, and `workflow_output_key`.
