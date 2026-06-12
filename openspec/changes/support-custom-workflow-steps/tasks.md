@@ -643,6 +643,22 @@ Verification passed:
 
 **Repo:** `/Users/benjaminfletcher/git/adp-poc`
 
+Status: completed in isolated worktree
+`/Users/benjaminfletcher/git/adp-poc-support-custom-workflow-steps` on branch
+`codex/support-custom-workflow-steps-adp` as commit `004f844`. Verification:
+
+- `python -m pytest tests/test_v1_schema_manifest.py -q` (`4 passed`)
+- `python -m pytest tests/test_convert_v1_schema_to_yaml.py tests/test_source_review_tools.py -q`
+  (`53 passed`)
+- Local compile via
+  `/Users/benjaminfletcher/git/groundx-studio-harness-support-custom-workflow-steps/skills/groundx-extraction-workflows/templates/compile_workflow.py`
+  with
+  `PYTHONPATH=/Users/benjaminfletcher/git/groundx-python-support-custom-workflow-steps-sdk/src`
+- Local workflow structural validation passed with the same SDK/harness
+  worktrees
+- `OPENSPEC_TELEMETRY=0 npx @fission-ai/openspec@1.3.1 validate support-custom-workflow-steps --strict`
+- `git diff --check`
+
 **Likely files:**
 
 - `workflows/adp_401k_v1/prompt.yaml`
@@ -653,19 +669,19 @@ Verification passed:
 - `docs/reference/groundx-extraction-implementation.md`
 - `openspec/specs/adp-401k-extraction-yaml/spec.md`
 
-- [ ] Add a failing validation that hard-rejects assigning all 159 fields to one
+- [x] Add a failing validation that hard-rejects assigning all 159 fields to one
       chunk-level extraction step once custom steps are available.
-- [ ] Encode the 20-field executable-step limit in the converter or local
+- [x] Encode the 20-field executable-step limit in the converter or local
       validation tests.
-- [ ] Confirm ADP validation mirrors, but does not replace, the shared SDK and
+- [x] Confirm ADP validation mirrors, but does not replace, the shared SDK and
       runtime/API 20-field executable-step validation.
-- [ ] Update the converter to assign coherent final sections or pseudo groups
+- [x] Update the converter to assign coherent final sections or pseudo groups
       to custom steps.
-- [ ] Preserve the 11 final output sections.
-- [ ] Keep field count and source-review requirements unchanged.
-- [ ] Compile the YAML through the updated harness/SDK path.
-- [ ] Run ADP converter and manifest tests.
-- [ ] Adversarial review: confirm the ADP migration uses platform features and
+- [x] Preserve the 11 final output sections.
+- [x] Keep field count and source-review requirements unchanged.
+- [x] Compile the YAML through the updated harness/SDK path.
+- [x] Run ADP converter and manifest tests.
+- [x] Adversarial review: confirm the ADP migration uses platform features and
       does not hardcode ADP into shared repos.
 
 ## Task 11: End-To-End Validation

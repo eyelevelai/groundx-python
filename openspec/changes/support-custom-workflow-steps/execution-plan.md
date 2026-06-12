@@ -29,8 +29,13 @@ Task 9's public docs checkpoint is committed in `eyelevel-fern-config` on branch
 `codex/support-custom-workflow-steps-fern` as `c8074b8`, with `fern check`,
 docs-definition validation, OpenSpec strict validation, and `git diff --check`
 verification. Docs publishing remains gated on Fern org access and the
-published-artifact e2e phase. Remaining current-wave implementation repos still
-needing execution are `adp-poc`, end-to-end validation, and closeout.
+published-artifact e2e phase. Task 10's ADP migration checkpoint is committed
+in isolated worktree
+`/Users/benjaminfletcher/git/adp-poc-support-custom-workflow-steps` on branch
+`codex/support-custom-workflow-steps-adp` as `004f844`, with ADP manifest,
+converter/source-review, local SDK/harness compile, workflow validation,
+OpenSpec strict validation, and `git diff --check` verification. Remaining
+current-wave execution is end-to-end validation and closeout.
 
 Repo-owned Task 3 artifacts, in dependency order:
 
@@ -303,18 +308,26 @@ Review questions:
 
 ## Phase 4: ADP Migration
 
-1. Update ADP converter/YAML to use custom steps.
-2. Encode the chosen field-load rule in ADP validation, mirroring the shared
-   runtime/API and SDK validation contract.
-3. Compile ADP YAML through the updated harness/SDK path.
-4. Run ADP converter and manifest tests.
-5. Adversarial review.
+Status: completed in isolated worktree
+`/Users/benjaminfletcher/git/adp-poc-support-custom-workflow-steps` on branch
+`codex/support-custom-workflow-steps-adp` as commit `004f844`.
+
+1. ADP converter/YAML now use 13 custom chunk/instruct workflow steps.
+2. The 20-field executable-step rule is mirrored in ADP validation; the largest
+   ADP custom step contains 18 fields.
+3. ADP YAML compiles through the updated unpublished SDK/harness worktrees.
+4. ADP manifest, converter, and source-review tests pass.
+5. Adversarial review is recorded in ADP OpenSpec.
 
 Review questions:
 
-- Does ADP preserve the same final 11-section JSON shape?
-- Does the ADP workflow avoid the 159-field single-slot load?
+- Does ADP preserve the same final 11-section JSON shape? Yes: tests and
+  conversion report preserve 11 sections and 159 final fields.
+- Does the ADP workflow avoid the 159-field single-slot load? Yes: 13 custom
+  steps, max 18 fields per step.
 - Is ADP using shared platform behavior instead of hardcoded shared-repo logic?
+  Yes for local validation via the updated SDK/harness worktrees; published
+  artifact e2e remains in Phase 5.
 
 ## Phase 5: End-To-End Proof
 
