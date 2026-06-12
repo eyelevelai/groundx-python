@@ -20,13 +20,13 @@
 - [x] Create or select clean branch `codex/support-custom-workflow-steps-sdk`
       from `origin/main`.
 - [x] Confirm clean implementation state with `git status --short --branch`.
-- [ ] Add failing generated-client serialization tests in
+- [x] Add failing generated-client serialization tests in
       `tests/custom/test_client.py` named
       `test_workflow_request_serializes_template_and_custom_steps` and
       `test_workflow_detail_deserializes_custom_routes_and_outputs`.
       Expected before generated update: `WorkflowRequest` and `WorkflowDetail`
       cannot represent the new fields or reject them as unknown extras.
-- [ ] Add failing extraction YAML tests in
+- [x] Add failing extraction YAML tests in
       `tests/extract/prompt/test_manager.py` named
       `test_prepare_extraction_yaml_accepts_custom_workflow_steps`,
       `test_prepare_extraction_yaml_rejects_slot_and_workflow_step_conflict`,
@@ -36,7 +36,7 @@
       and `test_prepare_extraction_yaml_rejects_custom_step_over_20_fields`.
       Expected before implementation: preparation treats `workflow:` as an
       ordinary group, rejects unknown metadata, or drops custom metadata.
-- [ ] Add failing persisted extract tests in
+- [x] Add failing persisted extract tests in
       `tests/extract/prompt/test_persisted_workflow_extract.py` named
       `test_persisted_custom_workflow_extract_round_trips_routes_and_leaf_fields`,
       `test_persisted_custom_workflow_extract_rejects_unknown_version`,
@@ -44,7 +44,7 @@
       and `test_persisted_custom_workflow_extract_hash_is_deterministic`.
       Expected before implementation: custom workflow metadata is not preserved
       or is silently ignored.
-- [ ] Add failing readback tests in `tests/extract/classes/test_groundx.py`
+- [x] Add failing readback tests in `tests/extract/classes/test_groundx.py`
       named `test_xray_loads_custom_output_maps` and in
       `tests/extract/classes/test_document.py` named
       `test_document_preserves_fixed_and_custom_readback_fields`.

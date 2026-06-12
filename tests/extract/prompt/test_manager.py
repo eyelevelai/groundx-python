@@ -29,6 +29,36 @@ class FailingSource(TestSource):
         return None
 
 
+CUSTOM_WORKFLOW_YAML = """
+workflow:
+  template:
+    CUSTOM_WORKFLOW_GROUP: line_items
+    CUSTOM_WORKFLOW_FIELD: description
+    CUSTOM_WORKFLOW_OUTPUT_KEY: label
+  custom_steps:
+    - name: line_item_labels
+      level: chunk
+      kind: keys
+      required_template_keys:
+        - CUSTOM_WORKFLOW_GROUP
+      config:
+        all:
+          includes:
+            text: true
+
+line_items:
+  workflow_step: line_item_labels
+  fields:
+    description:
+      workflow_output_key: label
+      prompt:
+        identifiers:
+          - Description
+        instructions: Return the printed line-item description.
+        type: str
+"""
+
+
 class TestPromptManager(unittest.TestCase):
     def test_load_from_yaml_1(self) -> None:
         root = load_from_yaml(SAMPLE_YAML_1)
@@ -1507,6 +1537,180 @@ _pseudo_groups:
             prepared.workflow_group_metadata,
             {"statement_identity": {"slot": ""}},
         )
+
+    def test_prepare_extraction_yaml_accepts_custom_workflow_steps(self) -> None:
+        prepared = prepare_extraction_yaml(CUSTOM_WORKFLOW_YAML)
+
+        self.assertNotIn("workflow", prepared.groups)
+        self.assertNotIn("workflow", prepared.workflow_groups)
+        self.assertIn("line_items", prepared.groups)
+        self.assertIn("description", prepared.groups["line_items"]["fields"])
+        self.assertNotIn("workflow_step", prepared.groups["line_items"])
+        self.assertNotIn(
+            "workflow_output_key",
+            prepared.groups["line_items"]["fields"]["description"],
+        )
+
+        workflow = prepared.persisted_workflow_extract["workflow"]
+        self.assertEqual(workflow["metadata_version"], 1)
+        self.assertEqual(
+            workflow["template"],
+            {
+                "CUSTOM_WORKFLOW_GROUP": "line_items",
+                "CUSTOM_WORKFLOW_FIELD": "description",
+                "CUSTOM_WORKFLOW_OUTPUT_KEY": "label",
+            },
+        )
+        self.assertEqual(
+            workflow["custom_steps"],
+            [
+                {
+                    "name": "line_item_labels",
+                    "level": "chunk",
+                    "kind": "keys",
+                    "required_template_keys": ["CUSTOM_WORKFLOW_GROUP"],
+                    "config": {
+                        "all": {
+                            "includes": {"text": True},
+                        }
+                    },
+                }
+            ],
+        )
+        self.assertEqual(
+            workflow["output_routes"],
+            [
+                {
+                    "workflow_group": "line_items",
+                    "workflow_field": "description",
+                    "final_path": "/line_items/description",
+                    "step_name": "line_item_labels",
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": "label",
+                    "readback_path": (
+                        "/chunks/*/customChunkOutputs/line_item_labels/label"
+                    ),
+                }
+            ],
+        )
+        self.assertEqual(
+            workflow["leaf_fields"],
+            [
+                {
+                    "final_path": "/line_items/description",
+                    "workflow_group": "line_items",
+                    "workflow_field": "description",
+                    "step_name": "line_item_labels",
+                    "level": "chunk",
+                    "output_key": "label",
+                    "field_type": "str",
+                    "is_repeated": False,
+                    "repetition_scope": "none",
+                }
+            ],
+        )
+        self.assertEqual(workflow["field_counts"], {"line_item_labels": 1})
+        self.assertRegex(workflow["schema_hash"], r"^[0-9a-f]{64}$")
+
+    def test_prepare_extraction_yaml_rejects_slot_and_workflow_step_conflict(
+        self,
+    ) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                """
+workflow:
+  custom_steps:
+    - name: line_item_labels
+      level: chunk
+      kind: keys
+line_items:
+  slot: chunk-keys
+  workflow_step: line_item_labels
+  fields:
+    description:
+      workflow_output_key: label
+      prompt:
+        instructions: Return the description.
+        type: str
+""",
+                workflow_group_metadata_keys={"slot"},
+            )
+
+        self.assertIn("slot", str(exc.exception))
+        self.assertIn("workflow_step", str(exc.exception))
+
+    def test_prepare_extraction_yaml_rejects_reserved_workflow_final_group(
+        self,
+    ) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                """
+workflow:
+  fields:
+    status:
+      prompt:
+        instructions: Return the workflow status.
+        type: str
+"""
+            )
+
+        self.assertIn("workflow", str(exc.exception))
+        self.assertIn("reserved", str(exc.exception).lower())
+
+    def test_prepare_extraction_yaml_rejects_invalid_custom_step_identity(
+        self,
+    ) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                CUSTOM_WORKFLOW_YAML.replace("line_item_labels", "line-item-labels")
+            )
+
+        self.assertIn("invalid custom step name", str(exc.exception))
+        self.assertIn("line-item-labels", str(exc.exception))
+
+    def test_prepare_extraction_yaml_rejects_missing_required_template_keys(
+        self,
+    ) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                CUSTOM_WORKFLOW_YAML.replace(
+                    "    CUSTOM_WORKFLOW_GROUP: line_items\n", ""
+                )
+            )
+
+        self.assertIn("missing template key", str(exc.exception))
+        self.assertIn("CUSTOM_WORKFLOW_GROUP", str(exc.exception))
+
+    def test_prepare_extraction_yaml_rejects_custom_step_over_20_fields(
+        self,
+    ) -> None:
+        fields = "\n".join(
+            f"""    field_{idx}:
+      workflow_output_key: label_{idx}
+      prompt:
+        instructions: Return field {idx}.
+        type: str"""
+            for idx in range(21)
+        )
+
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                f"""
+workflow:
+  custom_steps:
+    - name: overloaded_fields
+      level: chunk
+      kind: keys
+line_items:
+  workflow_step: overloaded_fields
+  fields:
+{fields}
+"""
+            )
+
+        self.assertIn("overloaded_fields", str(exc.exception))
+        self.assertIn("at most 20 fields", str(exc.exception))
 
     def test_get_prompt_1(self) -> None:
         tsts: typing.List[typing.Dict[str, typing.Any]] = [
