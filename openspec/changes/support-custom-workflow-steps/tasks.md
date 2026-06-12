@@ -430,54 +430,77 @@ prerequisites and external service/state dependencies.
 - `tests/extract/classes/test_groundx.py`
 - `tests/extract/classes/test_document.py`
 
-- [ ] Consume generated SDK surfaces from the upstream Fern/OpenAPI change through
+Status: completed in isolated worktree
+`/Users/benjaminfletcher/git/groundx-python-support-custom-workflow-steps-sdk`
+on branch `codex/support-custom-workflow-steps-sdk`, final commit `cf85f52`.
+Generated SDK output was produced from the upstream Fern/OpenAPI source with
+`fern generate --group python-sdk --local --version 3.6.4
+--no-require-env-vars` and committed separately from handwritten extract
+changes. Verification passed:
+
+- `poetry run pytest tests/custom/test_client.py tests/extract/prompt/test_manager.py tests/extract/prompt/test_persisted_workflow_extract.py -q`
+  (`68 passed, 5 subtests passed`)
+- `poetry run pytest tests/extract/classes/test_groundx.py tests/extract/classes/test_document.py -q`
+  (`20 passed`)
+- `poetry run pytest tests/extract -q`
+  (`111 passed, 1 skipped, 5 subtests passed`)
+- `poetry run pytest -rP -n auto tests/custom tests/extract`
+  (`114 passed, 1 skipped`)
+- `poetry run mypy .`
+  (`Success: no issues found in 219 source files`)
+- `poetry run pytest -rP -n auto .`
+  (`180 passed, 4 skipped`)
+- `OPENSPEC_TELEMETRY=0 npx @fission-ai/openspec@1.3.1 validate support-custom-workflow-steps-sdk --strict`
+- `git diff --check`
+
+- [x] Consume generated SDK surfaces from the upstream Fern/OpenAPI change through
       local verification output or the approved SDK release path; do not hand-edit
       generated files.
-- [ ] Add generated-client serialization tests proving `WorkflowRequest`,
+- [x] Add generated-client serialization tests proving `WorkflowRequest`,
       `WorkflowDetail`, and workflow create/update calls carry `template` and
       custom step config.
-- [ ] Add hand-written extract tests for YAML custom step metadata.
-- [ ] Add hand-written extract tests for invalid custom step names, duplicate
+- [x] Add hand-written extract tests for YAML custom step metadata.
+- [x] Add hand-written extract tests for invalid custom step names, duplicate
       names, fixed-step collisions, case normalization, reserved names, and
       duplicate output destinations.
-- [ ] Add hand-written extract tests for reserved `workflow:` handling,
+- [x] Add hand-written extract tests for reserved `workflow:` handling,
       duplicate/conflicting reserved names, and attempted final groups named
       `workflow` failing with a clear migration error.
-- [ ] Add hand-written extract tests for legacy `slot:` behavior.
-- [ ] Add extract X-Ray tests for the chosen custom chunk/section/document
+- [x] Add hand-written extract tests for legacy `slot:` behavior.
+- [x] Add extract X-Ray tests for the chosen custom chunk/section/document
       output shape.
-- [ ] Add document loader tests proving custom X-Ray outputs are available to
+- [x] Add document loader tests proving custom X-Ray outputs are available to
       extraction code without breaking `chunkKeywords`.
-- [ ] Add document-loader/readback tests proving legacy top-level
+- [x] Add document-loader/readback tests proving legacy top-level
       `xray.fileSummary` and per-chunk `chunk.fileSummary` behavior remains
       unchanged while custom document outputs use `customDocumentOutputs`.
-- [ ] Add tests proving custom output route metadata maps the chosen X-Ray path
+- [x] Add tests proving custom output route metadata maps the chosen X-Ray path
       back to the final JSON path.
-- [ ] Ensure `PreparedExtractionYaml.persisted_workflow_extract` preserves
+- [x] Ensure `PreparedExtractionYaml.persisted_workflow_extract` preserves
       custom step definitions.
-- [ ] Ensure mapping input reloads custom step definitions from workflow
+- [x] Ensure mapping input reloads custom step definitions from workflow
       `extract`.
-- [ ] Add persisted extract version tests for missing, current, unknown, and
+- [x] Add persisted extract version tests for missing, current, unknown, and
       future-version metadata.
-- [ ] Add SDK-side validation or mirrored errors for oversized executable steps
+- [x] Add SDK-side validation or mirrored errors for oversized executable steps
       according to the Task 2 contract.
-- [ ] Ensure `PreparedExtractionYaml.persisted_workflow_extract` includes the
+- [x] Ensure `PreparedExtractionYaml.persisted_workflow_extract` includes the
       canonical metadata needed for public API/runtime validation to derive or
       verify per-executable-step field counts; optional `field_counts` and
       `schema_hash` remain non-authoritative hints.
-- [ ] Add tests proving caller-provided field counts that disagree with canonical
+- [x] Add tests proving caller-provided field counts that disagree with canonical
       workflow extract metadata fail validation rather than becoming accepted SDK
       output.
-- [ ] Add tests proving mismatched, missing, extra, or duplicate `outputRoutes`
+- [x] Add tests proving mismatched, missing, extra, or duplicate `outputRoutes`
       and `leafFields` fail validation.
-- [ ] Add tests proving repeated item/object leaves use wildcard schema paths and
+- [x] Add tests proving repeated item/object leaves use wildcard schema paths and
       count once per prompted item leaf.
-- [ ] Keep `workflow_groups` execution-only.
-- [ ] Run `poetry run pytest tests/extract -q`.
-- [ ] Run `poetry run pytest -rP -n auto tests/custom tests/extract`.
-- [ ] Run `poetry run mypy .`.
-- [ ] Run `poetry run pytest -rP -n auto .` before PR or release readiness.
-- [ ] Adversarial review: confirm generated files are not hand-edited directly
+- [x] Keep `workflow_groups` execution-only.
+- [x] Run `poetry run pytest tests/extract -q`.
+- [x] Run `poetry run pytest -rP -n auto tests/custom tests/extract`.
+- [x] Run `poetry run mypy .`.
+- [x] Run `poetry run pytest -rP -n auto .` before PR or release readiness.
+- [x] Adversarial review: confirm generated files are not hand-edited directly
       unless the repo guide permits it.
 
 ## Task 7: Create Follow-On internal-arcadia-agents Plan
@@ -500,7 +523,12 @@ prerequisites and external service/state dependencies.
 - `docs/arcadia-yaml-classes/charge.md`
 - co-located tests in `prompts/`, `classes/`, and `testdata/`
 
-- [ ] During this central plan, create only the deferral stub required by Task 3.
+Status: current-wave deferral stub is complete at
+`/Users/benjaminfletcher/git/internal-arcadia-agents/openspec/notes/support-custom-workflow-steps-deferral.md`.
+The remaining Task 7 items are intentionally follow-on work after central
+cleanup and closeout, not prerequisites for Task 8.
+
+- [x] During this central plan, create only the deferral stub required by Task 3.
 - [ ] After cleanup and closeout of this central planning change, create a new
       repo-owned plan for implementation.
 - [ ] The follow-on plan must preserve current reconcile/QA/save behavior except
