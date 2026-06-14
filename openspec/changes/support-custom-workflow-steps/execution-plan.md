@@ -40,6 +40,15 @@ partial e2e checkpoint in `task11-e2e-checkpoint.md`; release remains blocked
 because the deployed API accepted an oversized/spoofed custom-step workflow that
 should have been rejected by the Task 5 runtime/API validation.
 
+Fresh-scan correction: see
+`fresh-scan-generated-sdk-and-xray-corrections.md`. Before closeout, the plan
+must remove hand-written edits from generated `groundx-python` folders, confirm
+Cashbot emits the custom X-Ray output maps at runtime, and confirm Arcadia reads
+those custom X-Ray attrs in metadata-backed reassembly. The relevant docs,
+agent-facing guidance, OpenSpec files, OpenAPI mirrors, SDK helpers, harness
+skills, ADP migration artifacts, and implementations must be updated together or
+listed as blocked.
+
 Repo-owned Task 3 artifacts, in dependency order:
 
 1. Fern/OpenAPI and public docs:

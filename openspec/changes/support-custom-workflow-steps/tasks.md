@@ -54,6 +54,11 @@ models/processors/X-Ray tests, Celery/pytest in Arcadia, Node harness scanners.
 - Generated SDK files in `groundx-python` must come from the upstream
   Fern/OpenAPI source and approved regeneration or release path. Do not hand-edit
   or commit generated files as implementation work outside that path.
+- The fresh-scan correction in
+  `fresh-scan-generated-sdk-and-xray-corrections.md` is mandatory closeout
+  scope. Documentation and implementation must be checked across the OpenSpec
+  plan PR, SDK helpers PR, Fern docs PR, Studio Harness PR, Arcadia PR, ADP PR,
+  and the Cashbot runtime/API work.
 - Run an adversarial review after each task before starting the next task.
 - Keep repo changes narrow and repo-owned.
 
@@ -129,6 +134,8 @@ models/processors/X-Ray tests, Celery/pytest in Arcadia, Node harness scanners.
 - [x] Update `chunk-keywords-trace.md` with missing code points.
 - [x] Adversarial review: confirm the trace follows real runtime paths for
       chunk, section, and document outputs, not only tests or docs.
+- [x] Fresh-scan correction recorded for generated SDK boundary and X-Ray
+      runtime/readback coverage across all touched repos.
 
 ## Task 2: Finalize The Public Contract
 
