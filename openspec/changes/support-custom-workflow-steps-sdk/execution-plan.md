@@ -11,17 +11,19 @@ coordination artifact; this folder is the repo-owned SDK implementation plan.
 
 ## Fresh-Scan Correction
 
-The current implementation branch is not compliant because it contains manual
-changes under generated folders:
+The reviewed implementation branch previously was not compliant because it
+contained manual changes under generated folders:
 
 - `src/groundx/types`
 - `src/groundx/workflows`
 
-Those changes will be overwritten by Fern and must be removed from this PR.
-The corresponding type definitions and workflow create/update fields must be
-declared in `eyelevel-fern-config/fern/openapi.yml`; Fern then regenerates the
-Python SDK classes and workflow client parameters. This PR may keep only
-handwritten helper logic in preserved files.
+Those changes are removed from this PR. The corresponding type definitions and
+workflow create/update fields are declared in
+`eyelevel-fern-config/fern/openapi.yml`; Fern then regenerates the Python SDK
+classes and workflow client parameters. This PR keeps only handwritten helper
+logic in preserved files. Until that generated client release lands, the
+high-level create/update helpers raise a clear runtime gate when a custom-step
+definition would require unavailable generated parameters.
 
 ## Files
 

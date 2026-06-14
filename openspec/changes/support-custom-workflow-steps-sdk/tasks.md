@@ -23,27 +23,27 @@
 
 ## Corrective Tasks
 
-- [ ] Remove every manual diff under `src/groundx/types`.
-- [ ] Remove every manual diff under `src/groundx/workflows`.
-- [ ] Move any required type/schema work to
+- [x] Remove every manual diff under `src/groundx/types`.
+- [x] Remove every manual diff under `src/groundx/workflows`.
+- [x] Move any required type/schema work to
       `/Users/benjaminfletcher/git/eyelevel-fern-config/fern/openapi.yml`.
-- [ ] Remove `src/groundx/extract` dependencies on new generated custom workflow
+- [x] Remove `src/groundx/extract` dependencies on new generated custom workflow
       classes. Use plain dict/list normalization or existing released generated
       types only.
-- [ ] Keep helper implementation under `src/groundx/extract/*` and
+- [x] Keep helper implementation under `src/groundx/extract/*` and
       `src/groundx/ingest.py`.
-- [ ] Gate create/update helper behavior that needs generated workflow client
+- [x] Gate create/update helper behavior that needs generated workflow client
       parameters until the Fern-generated SDK release provides them.
-- [ ] Update tests so this PR validates handwritten helper behavior without
+- [x] Update tests so this PR validates handwritten helper behavior without
       requiring hand-created generated classes.
-- [ ] Run
+- [x] Run
       `git diff --name-only origin/main...HEAD -- src/groundx/types src/groundx/workflows`
       and confirm it prints nothing.
-- [ ] Run
+- [x] Run
       `rg -n "from \\.\\.types|from groundx\\.types" src/groundx/extract`
       and confirm no extract helper depends on new generated custom workflow
       classes.
-- [ ] Re-run SDK OpenSpec, pytest, mypy, and full diff checks after cleanup.
+- [x] Re-run SDK OpenSpec, pytest, mypy, and full diff checks after cleanup.
 
 ## Tasks
 
@@ -80,7 +80,7 @@
       `test_document_preserves_fixed_and_custom_readback_fields`.
       Expected before implementation: custom output maps are unavailable while
       fixed fields still load.
-- [ ] Consume generated SDK surfaces only through the approved Fern/OpenAPI
+- [x] Consume generated SDK surfaces only through the approved Fern/OpenAPI
       release path; do not hand-edit generated files in this PR.
 - [x] Implement extraction YAML parsing for workflow-level `workflow.template`,
       custom step definitions, `workflow_step`, and `workflow_output_key`.
@@ -100,7 +100,7 @@
 - [x] Run `poetry run pytest -rP -n auto tests/custom tests/extract`.
 - [x] Run `poetry run mypy .`.
 - [x] Run `poetry run pytest -rP -n auto .` before release readiness.
-- [ ] Confirm generated files are absent from this PR, or explicitly produced by
+- [x] Confirm generated files are absent from this PR, or explicitly produced by
       the approved Fern-generated release path.
 - [x] Adversarial review: confirm fixed workflows, old persisted extracts, and
       old X-Ray/readback fields still work and custom behavior is additive.

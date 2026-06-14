@@ -1,10 +1,10 @@
 import copy
 import dataclasses
+import inspect
 import typing
 from collections.abc import Mapping
 from pathlib import Path
 
-from ..types import WorkflowSteps
 from .prompt import PreparedExtractionYaml, prepare_extraction_yaml
 
 _PERSISTED_WORKFLOW_EXTRACT_KEY = "_groundx_persisted_extract"
@@ -18,15 +18,42 @@ _PERSISTED_WORKFLOW_METADATA_KEYS = {
     "field_counts",
     "schema_hash",
 }
-_FIXED_DEFAULT_STEP_FIELDS = (
-    "chunk_instruct",
-    "chunk_keys",
-    "chunk_summary",
-    "doc_keys",
-    "doc_summary",
-    "sect_instruct",
-    "sect_summary",
+_FIXED_DEFAULT_STEP_KEYS = (
+    "chunk-instruct",
+    "chunk-keys",
+    "chunk-summary",
+    "doc-keys",
+    "doc-summary",
+    "sect-instruct",
+    "sect-summary",
 )
+_UNRELEASED_WORKFLOW_KWARGS = (
+    "custom_steps",
+    "output_routes",
+    "leaf_fields",
+)
+_CUSTOM_STEP_ALIASES = {
+    "requiredTemplateKeys": "required_template_keys",
+}
+_OUTPUT_ROUTE_ALIASES = {
+    "workflowGroup": "workflow_group",
+    "workflowField": "workflow_field",
+    "finalPath": "final_path",
+    "stepName": "step_name",
+    "outputMap": "output_map",
+    "outputKey": "output_key",
+    "readbackPath": "readback_path",
+}
+_LEAF_FIELD_ALIASES = {
+    "finalPath": "final_path",
+    "workflowGroup": "workflow_group",
+    "workflowField": "workflow_field",
+    "stepName": "step_name",
+    "outputKey": "output_key",
+    "fieldType": "field_type",
+    "isRepeated": "is_repeated",
+    "repetitionScope": "repetition_scope",
+}
 
 
 @dataclasses.dataclass(frozen=True)
@@ -141,9 +168,9 @@ def load_extraction_definition_from_workflow_response(
         extract=extract_mapping,
         prepared=_prepared_from_workflow_extract(extract_mapping),
         template=_normalize_template(template),
-        custom_steps=_plain_sequence(custom_steps),
-        output_routes=_plain_sequence(output_routes),
-        leaf_fields=_plain_sequence(leaf_fields),
+        custom_steps=_plain_metadata_sequence(custom_steps, _CUSTOM_STEP_ALIASES),
+        output_routes=_plain_metadata_sequence(output_routes, _OUTPUT_ROUTE_ALIASES),
+        leaf_fields=_plain_metadata_sequence(leaf_fields, _LEAF_FIELD_ALIASES),
         chunk_strategy=_get_workflow_value(workflow, "chunk_strategy"),
         section_strategy=_get_workflow_value(workflow, "section_strategy"),
         steps=_plain_or_none(_get_workflow_value(workflow, "steps")),
@@ -242,10 +269,26 @@ def workflow_kwargs_from_extraction_definition(
     return kwargs
 
 
-def disabled_fixed_default_steps() -> WorkflowSteps:
-    return WorkflowSteps(
-        **{field: None for field in _FIXED_DEFAULT_STEP_FIELDS}
-    )
+def ensure_workflow_method_supports_kwargs(
+    method: typing.Any,
+    kwargs: typing.Mapping[str, typing.Any],
+) -> None:
+    unsupported = [
+        key for key in _UNRELEASED_WORKFLOW_KWARGS
+        if key in kwargs and not _method_accepts_keyword(method, key)
+    ]
+    if unsupported:
+        unsupported_list = ", ".join(unsupported)
+        raise RuntimeError(
+            "This GroundX SDK build cannot create or update extraction "
+            "workflows with custom workflow steps yet. Regenerate and publish "
+            "the SDK from the Fern/OpenAPI schema before using: "
+            f"{unsupported_list}."
+        )
+
+
+def disabled_fixed_default_steps() -> typing.Dict[str, None]:
+    return {field: None for field in _FIXED_DEFAULT_STEP_KEYS}
 
 
 def _definition_from_prepared(prepared: PreparedExtractionYaml) -> ExtractionDefinition:
@@ -255,9 +298,18 @@ def _definition_from_prepared(prepared: PreparedExtractionYaml) -> ExtractionDef
         extract=extract,
         prepared=prepared,
         template=_normalize_template(metadata.get("template")),
-        custom_steps=_plain_sequence(metadata.get("custom_steps")),
-        output_routes=_plain_sequence(metadata.get("output_routes")),
-        leaf_fields=_plain_sequence(metadata.get("leaf_fields")),
+        custom_steps=_plain_metadata_sequence(
+            metadata.get("custom_steps"),
+            _CUSTOM_STEP_ALIASES,
+        ),
+        output_routes=_plain_metadata_sequence(
+            metadata.get("output_routes"),
+            _OUTPUT_ROUTE_ALIASES,
+        ),
+        leaf_fields=_plain_metadata_sequence(
+            metadata.get("leaf_fields"),
+            _LEAF_FIELD_ALIASES,
+        ),
     )
 
 
@@ -270,9 +322,18 @@ def _definition_from_workflow_extract(
         extract=extract_mapping,
         prepared=_prepared_from_workflow_extract(extract_mapping),
         template=_normalize_template(metadata.get("template")),
-        custom_steps=_plain_sequence(metadata.get("custom_steps")),
-        output_routes=_plain_sequence(metadata.get("output_routes")),
-        leaf_fields=_plain_sequence(metadata.get("leaf_fields")),
+        custom_steps=_plain_metadata_sequence(
+            metadata.get("custom_steps"),
+            _CUSTOM_STEP_ALIASES,
+        ),
+        output_routes=_plain_metadata_sequence(
+            metadata.get("output_routes"),
+            _OUTPUT_ROUTE_ALIASES,
+        ),
+        leaf_fields=_plain_metadata_sequence(
+            metadata.get("leaf_fields"),
+            _LEAF_FIELD_ALIASES,
+        ),
     )
 
 
@@ -362,6 +423,16 @@ def _plain_sequence(value: typing.Any) -> typing.Optional[typing.Sequence[typing
     return typing.cast(typing.Sequence[typing.Any], _plain_or_none(value))
 
 
+def _plain_metadata_sequence(
+    value: typing.Any,
+    aliases: typing.Mapping[str, str],
+) -> typing.Optional[typing.Sequence[typing.Any]]:
+    sequence = _plain_sequence(value)
+    if sequence is None:
+        return None
+    return [_normalize_mapping_aliases(item, aliases) for item in sequence]
+
+
 def _plain_or_none(value: typing.Any) -> typing.Any:
     if value is None:
         return None
@@ -380,6 +451,22 @@ def _plain_or_none(value: typing.Any) -> typing.Any:
     if hasattr(value, "dict"):
         return value.dict(by_alias=False, exclude_none=True, exclude_unset=True)
     return copy.deepcopy(value)
+
+
+def _normalize_mapping_aliases(
+    value: typing.Any,
+    aliases: typing.Mapping[str, str],
+) -> typing.Any:
+    if isinstance(value, Mapping):
+        mapping = typing.cast(typing.Mapping[typing.Any, typing.Any], value)
+        return {
+            aliases.get(key, key): _normalize_mapping_aliases(item, aliases)
+            for key, item in mapping.items()
+        }
+    if isinstance(value, (list, tuple)):
+        sequence = typing.cast(typing.Sequence[typing.Any], value)
+        return [_normalize_mapping_aliases(item, aliases) for item in sequence]
+    return value
 
 
 def _get_workflow_value(workflow: typing.Any, name: str) -> typing.Any:
@@ -407,3 +494,19 @@ def _resolve_defaulted_value(
     if preserved is not None:
         return preserved
     return default
+
+
+def _method_accepts_keyword(method: typing.Any, key: str) -> bool:
+    try:
+        signature = inspect.signature(method)
+    except (TypeError, ValueError):
+        return False
+    for parameter in signature.parameters.values():
+        if parameter.kind == inspect.Parameter.VAR_KEYWORD:
+            return True
+        if parameter.kind in {
+            inspect.Parameter.KEYWORD_ONLY,
+            inspect.Parameter.POSITIONAL_OR_KEYWORD,
+        } and parameter.name == key:
+            return True
+    return False

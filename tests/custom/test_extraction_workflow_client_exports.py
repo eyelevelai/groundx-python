@@ -35,17 +35,6 @@ line_items:
 """
 
 
-EXPECTED_DISABLED_STEPS = {
-    "chunk-instruct": None,
-    "chunk-keys": None,
-    "chunk-summary": None,
-    "doc-keys": None,
-    "doc-summary": None,
-    "sect-instruct": None,
-    "sect-summary": None,
-}
-
-
 def _request_json(request: httpx.Request) -> typing.Dict[str, typing.Any]:
     return typing.cast(typing.Dict[str, typing.Any], json.loads(request.content.decode()))
 
@@ -148,7 +137,7 @@ def test_extraction_methods_raise_install_hint_when_extract_extra_is_missing(
         client.load_extraction_definition_from_yaml(yaml_text=CUSTOM_WORKFLOW_YAML)
 
 
-def test_create_extraction_workflow_serializes_custom_steps_and_disabled_defaults() -> None:
+def test_create_extraction_workflow_gates_custom_steps_until_generated_client_release() -> None:
     captured: typing.List[httpx.Request] = []
 
     def handler(request: httpx.Request) -> httpx.Response:
@@ -169,23 +158,10 @@ def test_create_extraction_workflow_serializes_custom_steps_and_disabled_default
             base_url="https://api.test",
             httpx_client=httpx_client,
         )
-        client.create_extraction_workflow(
-            yaml_text=CUSTOM_WORKFLOW_YAML,
-            name="statement extraction",
-        )
+        with pytest.raises(RuntimeError, match="Regenerate and publish"):
+            client.create_extraction_workflow(
+                yaml_text=CUSTOM_WORKFLOW_YAML,
+                name="statement extraction",
+            )
 
-    body = _request_json(captured[0])
-
-    assert captured[0].method == "POST"
-    assert captured[0].url.path == "/v1/workflow"
-    assert body["template"] == {
-        "{{LANGUAGE}}": "English",
-        "{{LANGUAGE_UNKNOWN}}": "",
-    }
-    assert body["customSteps"][0]["name"] == "line_item_labels"
-    assert body["customSteps"][0]["requiredTemplateKeys"] == ["{{LANGUAGE}}"]
-    assert body["outputRoutes"][0]["outputKey"] == "label"
-    assert body["leafFields"][0]["fieldType"] == "str"
-    assert body["steps"] == EXPECTED_DISABLED_STEPS
-    assert "search-query" not in body["steps"]
-    assert "sect-keys" not in body["steps"]
+    assert captured == []

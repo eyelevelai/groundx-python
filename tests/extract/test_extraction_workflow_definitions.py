@@ -168,6 +168,8 @@ def _step_value(value: typing.Any, field: str) -> typing.Any:
 
 
 def _model_to_alias_dict(value: typing.Any) -> typing.Dict[str, typing.Any]:
+    if isinstance(value, dict):
+        return typing.cast(typing.Dict[str, typing.Any], value)
     if hasattr(value, "dict"):
         return typing.cast(typing.Dict[str, typing.Any], value.dict())
     return typing.cast(

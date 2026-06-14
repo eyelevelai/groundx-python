@@ -452,6 +452,10 @@ class GroundX(GroundXBase):
             steps=steps,
             request_options=request_options,
         )
+        extraction_workflows.ensure_workflow_method_supports_kwargs(
+            self.workflows.create,
+            kwargs,
+        )
         return self.workflows.create(**kwargs)
 
     def update_extraction_workflow(
@@ -543,6 +547,10 @@ class GroundX(GroundXBase):
             section_strategy=section_strategy,
             steps=steps,
             request_options=request_options,
+        )
+        extraction_workflows.ensure_workflow_method_supports_kwargs(
+            self.workflows.update,
+            kwargs,
         )
         return self.workflows.update(workflow_id, **kwargs)
 
@@ -1238,6 +1246,10 @@ class AsyncGroundX(AsyncGroundXBase):
             steps=steps,
             request_options=request_options,
         )
+        extraction_workflows.ensure_workflow_method_supports_kwargs(
+            self.workflows.create,
+            kwargs,
+        )
         return await self.workflows.create(**kwargs)
 
     async def update_extraction_workflow(
@@ -1323,6 +1335,10 @@ class AsyncGroundX(AsyncGroundXBase):
             section_strategy=section_strategy,
             steps=steps,
             request_options=request_options,
+        )
+        extraction_workflows.ensure_workflow_method_supports_kwargs(
+            self.workflows.update,
+            kwargs,
         )
         return await self.workflows.update(workflow_id, **kwargs)
 

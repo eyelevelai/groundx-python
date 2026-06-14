@@ -15,18 +15,6 @@ if typing.TYPE_CHECKING:
     from .bucket_response import BucketResponse
     from .bucket_update_detail import BucketUpdateDetail
     from .bucket_update_response import BucketUpdateResponse
-    from .custom_workflow_leaf_field import CustomWorkflowLeafField
-    from .custom_workflow_leaf_field_level import CustomWorkflowLeafFieldLevel
-    from .custom_workflow_leaf_field_repetition_scope import CustomWorkflowLeafFieldRepetitionScope
-    from .custom_workflow_output_map import CustomWorkflowOutputMap
-    from .custom_workflow_output_route import CustomWorkflowOutputRoute
-    from .custom_workflow_output_route_level import CustomWorkflowOutputRouteLevel
-    from .custom_workflow_output_route_output_map import CustomWorkflowOutputRouteOutputMap
-    from .custom_workflow_step import CustomWorkflowStep
-    from .custom_workflow_step_config import CustomWorkflowStepConfig
-    from .custom_workflow_step_element_config import CustomWorkflowStepElementConfig
-    from .custom_workflow_step_kind import CustomWorkflowStepKind
-    from .custom_workflow_step_level import CustomWorkflowStepLevel
     from .customer_detail import CustomerDetail
     from .customer_detail_status import CustomerDetailStatus
     from .customer_response import CustomerResponse
@@ -38,9 +26,6 @@ if typing.TYPE_CHECKING:
     from .document_response import DocumentResponse
     from .document_type import DocumentType
     from .document_update import DocumentUpdate
-    from .document_xray import DocumentXray
-    from .document_xray_chunk import DocumentXrayChunk
-    from .document_xray_page import DocumentXrayPage
     from .group_detail import GroupDetail
     from .group_list_response import GroupListResponse
     from .group_response import GroupResponse
@@ -105,18 +90,6 @@ _dynamic_imports: typing.Dict[str, str] = {
     "BucketResponse": ".bucket_response",
     "BucketUpdateDetail": ".bucket_update_detail",
     "BucketUpdateResponse": ".bucket_update_response",
-    "CustomWorkflowLeafField": ".custom_workflow_leaf_field",
-    "CustomWorkflowLeafFieldLevel": ".custom_workflow_leaf_field_level",
-    "CustomWorkflowLeafFieldRepetitionScope": ".custom_workflow_leaf_field_repetition_scope",
-    "CustomWorkflowOutputMap": ".custom_workflow_output_map",
-    "CustomWorkflowOutputRoute": ".custom_workflow_output_route",
-    "CustomWorkflowOutputRouteLevel": ".custom_workflow_output_route_level",
-    "CustomWorkflowOutputRouteOutputMap": ".custom_workflow_output_route_output_map",
-    "CustomWorkflowStep": ".custom_workflow_step",
-    "CustomWorkflowStepConfig": ".custom_workflow_step_config",
-    "CustomWorkflowStepElementConfig": ".custom_workflow_step_element_config",
-    "CustomWorkflowStepKind": ".custom_workflow_step_kind",
-    "CustomWorkflowStepLevel": ".custom_workflow_step_level",
     "CustomerDetail": ".customer_detail",
     "CustomerDetailStatus": ".customer_detail_status",
     "CustomerResponse": ".customer_response",
@@ -128,9 +101,6 @@ _dynamic_imports: typing.Dict[str, str] = {
     "DocumentResponse": ".document_response",
     "DocumentType": ".document_type",
     "DocumentUpdate": ".document_update",
-    "DocumentXray": ".document_xray",
-    "DocumentXrayChunk": ".document_xray_chunk",
-    "DocumentXrayPage": ".document_xray_page",
     "GroupDetail": ".group_detail",
     "GroupListResponse": ".group_list_response",
     "GroupResponse": ".group_response",
@@ -219,18 +189,6 @@ __all__ = [
     "BucketResponse",
     "BucketUpdateDetail",
     "BucketUpdateResponse",
-    "CustomWorkflowLeafField",
-    "CustomWorkflowLeafFieldLevel",
-    "CustomWorkflowLeafFieldRepetitionScope",
-    "CustomWorkflowOutputMap",
-    "CustomWorkflowOutputRoute",
-    "CustomWorkflowOutputRouteLevel",
-    "CustomWorkflowOutputRouteOutputMap",
-    "CustomWorkflowStep",
-    "CustomWorkflowStepConfig",
-    "CustomWorkflowStepElementConfig",
-    "CustomWorkflowStepKind",
-    "CustomWorkflowStepLevel",
     "CustomerDetail",
     "CustomerDetailStatus",
     "CustomerResponse",
@@ -242,9 +200,6 @@ __all__ = [
     "DocumentResponse",
     "DocumentType",
     "DocumentUpdate",
-    "DocumentXray",
-    "DocumentXrayChunk",
-    "DocumentXrayPage",
     "GroupDetail",
     "GroupListResponse",
     "GroupResponse",
