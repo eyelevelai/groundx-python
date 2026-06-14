@@ -13,12 +13,15 @@ strict validation, YAML parsing, and `git diff --check` passed locally. Public
 docs publishing remains gated on Fern org access and the publish-last e2e phase.
 
 Task 5 is in `cashbot-go` PR #1493 on branch
-`codex/support-custom-workflow-steps-runtime`, current head `491b177d6`, base
-`master`. The runtime/API/X-Ray/OpenAPI mirror work is pushed, targeted Go and
-OpenSpec checks passed, the CI staticcheck finding was fixed, and all GitHub PR
-checks now pass. The PR is blocked only by required review. `go test ./...`
-remains blocked locally by repo-wide generated `version.go` prerequisites plus
-external service/state dependencies.
+`codex/support-custom-workflow-steps-runtime`, current head `c4e17a6cf`, base
+`hotfix-search-dell`. The branch was rebased from its earlier `master` base onto
+`hotfix-search-dell`; the workflow-template hotfix and custom workflow-step
+runtime/API changes were merged, duplicate OpenAPI schema/property entries were
+removed, targeted Go and OpenSpec checks passed, and the branch now has a clean
+local merge simulation against `origin/hotfix-search-dell`. GitHub checks are
+rerunning after retarget; the remaining remote gates are CI completion and
+review. `go test ./...` remains blocked locally by repo-wide generated
+`version.go` prerequisites plus external service/state dependencies.
 
 Task 6 is in `groundx-python` PR #11 on branch
 `codex/support-custom-workflow-steps-sdk`, current head `46e06e4`. The helper

@@ -353,16 +353,17 @@ models/processors/X-Ray tests, Celery/pytest in Arcadia, Node harness scanners.
 
 Status: completed and pushed to PR #1493 in worktree
 `/Users/benjaminfletcher/git/cashbot-go-support-custom-workflow-steps` on
-branch `codex/support-custom-workflow-steps-runtime` and committed as
-`491b177d6`, base `master`. The Fern mirror endpoint correction is committed in
-`eyelevel-fern-config` and merged into the current Fern PR head `5f9650d`.
-Plan-specific targeted Go packages, OpenSpec strict validation, and `git diff
---check` pass. CI staticcheck initially failed on two S1011 findings in
-`pkg/model/summarizer/custom_workflow.go`; commit `491b177d6` applies the
-variadic-append fix, package-level staticcheck now passes locally, and all
-GitHub PR checks now pass. The PR is blocked only by required review. `go test
-./...` remains blocked locally by repo-wide generated `version.go` prerequisites
-and external service/state dependencies.
+branch `codex/support-custom-workflow-steps-runtime`, current head
+`c4e17a6cf`, base `hotfix-search-dell`. The Fern mirror endpoint correction is
+committed in `eyelevel-fern-config` and merged into the current Fern PR head
+`5f9650d`. Plan-specific targeted Go packages, OpenSpec strict validation,
+`git diff --check`, and local merge simulation against
+`origin/hotfix-search-dell` pass. CI staticcheck initially failed on two S1011
+findings in `pkg/model/summarizer/custom_workflow.go`; rebased commit
+`f62b0e5c6` applies the variadic-append fix, and local package-level checks now
+pass. GitHub checks are rerunning after retarget; the remaining remote gates are
+CI completion and review. `go test ./...` remains blocked locally by repo-wide
+generated `version.go` prerequisites and external service/state dependencies.
 
 **Likely files:**
 
