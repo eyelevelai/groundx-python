@@ -353,11 +353,14 @@ models/processors/X-Ray tests, Celery/pytest in Arcadia, Node harness scanners.
 Status: completed and pushed to PR #1493 in worktree
 `/Users/benjaminfletcher/git/cashbot-go-support-custom-workflow-steps` on
 branch `codex/support-custom-workflow-steps-runtime` and committed as
-`b74b135c6`, base `master`. The Fern mirror endpoint correction is committed in
+`491b177d6`, base `master`. The Fern mirror endpoint correction is committed in
 `eyelevel-fern-config` and merged into the current Fern PR head `5f9650d`.
 Plan-specific targeted Go packages, OpenSpec strict validation, and `git diff
---check` pass. `go test ./...` remains blocked by repo-wide generated
-`version.go` prerequisites and external service/state dependencies.
+--check` pass. CI staticcheck initially failed on two S1011 findings in
+`pkg/model/summarizer/custom_workflow.go`; commit `491b177d6` applies the
+variadic-append fix, and package-level staticcheck now passes locally. `go test
+./...` remains blocked locally by repo-wide generated `version.go` prerequisites
+and external service/state dependencies.
 
 **Likely files:**
 
