@@ -1,28 +1,32 @@
-import json, os, shutil, requests, time, typing
+import json
+import os
+import shutil
+import time
+import typing
 from datetime import datetime, timezone
 from io import BytesIO
 from pathlib import Path
+from urllib.parse import urlparse
+
+import requests
+from ..prompt.manager import PromptManager
+from ..services.logger import Logger
+from ..services.upload import Upload
+from ..utility import clean_json
+from .element import Element
+from .field import ExtractedField
+from .groundx import GroundXDocument, XRayDocument
+from .group import Group
 from PIL import Image
 from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
-    model_validator,
     PrivateAttr,
     SerializeAsAny,
     ValidationInfo,
+    model_validator,
 )
-from urllib.parse import urlparse
-
-from .element import Element
-from .field import ExtractedField
-from .groundx import GroundXDocument, XRayDocument
-from .group import Group
-from ..prompt.manager import PromptManager
-from ..services.logger import Logger
-from ..services.upload import Upload
-from ..utility import clean_json
-
 
 DocT = typing.TypeVar("DocT", bound="Document")
 
@@ -366,7 +370,59 @@ class Document(Group):
                     if err:
                         raise Exception(f"\n\ninit fileSummary error:\n\t{err}\n")
 
+            self.load_custom_outputs(
+                getattr(chunk, "customChunkOutputs", None),
+                "customChunkOutputs",
+            )
+            self.load_custom_outputs(
+                getattr(chunk, "customSectionOutputs", None),
+                "customSectionOutputs",
+            )
+
+        self.load_custom_outputs(
+            getattr(xray, "customDocumentOutputs", None),
+            "customDocumentOutputs",
+        )
         self.finalize_init()
+
+    def load_custom_outputs(
+        self,
+        custom_outputs: typing.Optional[typing.Mapping[str, typing.Any]],
+        source: str,
+    ) -> None:
+        if not custom_outputs:
+            return
+
+        for step_name, outputs in custom_outputs.items():
+            if not isinstance(outputs, dict):
+                continue
+
+            output_mapping = typing.cast(typing.Dict[str, typing.Any], outputs)
+            for output_key, value in output_mapping.items():
+                data: typing.Any = value
+                if isinstance(data, str):
+                    try:
+                        data = json.loads(clean_json(data))
+                    except json.JSONDecodeError:
+                        pass
+
+                if isinstance(data, dict):
+                    data_mapping = typing.cast(typing.Dict[str, typing.Any], data)
+                    for key, nested_value in data_mapping.items():
+                        err = self.add(key, nested_value)
+                        if err:
+                            raise Exception(
+                                f"\n\ninit {source} error for "
+                                f"[{step_name}.{output_key}]:\n\t{err}\n"
+                            )
+                    continue
+
+                err = self.add(output_key, data)
+                if err:
+                    raise Exception(
+                        f"\n\ninit {source} error for "
+                        f"[{step_name}.{output_key}]:\n\t{err}\n"
+                    )
 
     def add(self, k: str, value: typing.Any) -> typing.Union[str, None]:
         self.print("WARNING", "add is not implemented")
