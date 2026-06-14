@@ -186,8 +186,14 @@ def resolve_extraction_definition_source(
     prepared: typing.Any = ...,
     mapping_kind: typing.Optional[str] = None,
 ) -> ExtractionDefinition:
-    source_name, source_value = _select_source(
-        definition=definition,
+    if definition is not ...:
+        if mapping_kind is not None:
+            raise ValueError("mapping_kind is only valid when mapping is the selected source")
+        if not isinstance(definition, ExtractionDefinition):
+            raise TypeError("definition must be an ExtractionDefinition")
+        return definition
+
+    source_name, _source_value = _select_source(
         path=path,
         yaml_text=yaml_text,
         mapping=mapping,
@@ -195,11 +201,6 @@ def resolve_extraction_definition_source(
     )
     if mapping_kind is not None and source_name != "mapping":
         raise ValueError("mapping_kind is only valid when mapping is the selected source")
-
-    if source_name == "definition":
-        if not isinstance(source_value, ExtractionDefinition):
-            raise TypeError("definition must be an ExtractionDefinition")
-        return source_value
 
     return load_extraction_definition_from_yaml(
         path=path,

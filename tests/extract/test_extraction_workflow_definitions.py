@@ -232,7 +232,45 @@ def test_load_extraction_definition_uses_workflow_id() -> None:
     assert definition.template["{{LANGUAGE_UNKNOWN}}"] == ""
 
 
-def test_load_extraction_definition_rejects_multiple_sources(tmp_path: Path) -> None:
+def test_load_extraction_definition_uses_workflow_id_before_yaml_sources(tmp_path: Path) -> None:
+    path = tmp_path / "statement.yaml"
+    path.write_text("not: [valid")
+    response = WorkflowResponse(
+        workflow=WorkflowDetail(
+            workflow_id="workflow-1",
+            extract=EXECUTION_ONLY_EXTRACT,
+            template={"{{LANGUAGE}}": "English", "{{LANGUAGE_UNKNOWN}}": ""},
+        )
+    )
+    workflows = RecordingWorkflows(response)
+    request_options: RequestOptions = {"timeout_in_seconds": 1}
+
+    definition = _client(workflows).load_extraction_definition(
+        workflow_id="workflow-1",
+        path=path,
+        request_options=request_options,
+    )
+
+    assert workflows.calls == [("get", "workflow-1", request_options)]
+    assert definition.extract == EXECUTION_ONLY_EXTRACT
+
+
+def test_load_extraction_definition_rejects_mapping_kind_with_workflow_id() -> None:
+    response = WorkflowResponse(
+        workflow=WorkflowDetail(
+            workflow_id="workflow-1",
+            extract=EXECUTION_ONLY_EXTRACT,
+        )
+    )
+
+    with pytest.raises(ValueError, match="mapping_kind"):
+        _client(RecordingWorkflows(response)).load_extraction_definition(
+            workflow_id="workflow-1",
+            mapping_kind="workflow_extract",
+        )
+
+
+def test_load_extraction_definition_rejects_missing_or_ambiguous_yaml_sources(tmp_path: Path) -> None:
     path = tmp_path / "statement.yaml"
     path.write_text(CUSTOM_WORKFLOW_YAML)
 
@@ -240,8 +278,8 @@ def test_load_extraction_definition_rejects_multiple_sources(tmp_path: Path) -> 
         _client(RecordingWorkflows()).load_extraction_definition()
     with pytest.raises(ValueError, match="exactly one"):
         _client(RecordingWorkflows()).load_extraction_definition(
-            workflow_id="workflow-1",
             path=path,
+            yaml_text=CUSTOM_WORKFLOW_YAML,
         )
     with pytest.raises(ValueError, match="request_options"):
         _client(RecordingWorkflows()).load_extraction_definition(
@@ -392,15 +430,60 @@ def test_load_definition_from_workflow_requires_extract() -> None:
         _client(RecordingWorkflows(response)).load_extraction_definition_from_workflow("workflow-1")
 
 
-def test_create_and_update_accept_exactly_one_source() -> None:
+def test_create_and_update_use_definition_before_yaml_sources() -> None:
     client = _client(RecordingWorkflows())
     definition = client.load_extraction_definition_from_yaml(yaml_text=CUSTOM_WORKFLOW_YAML)
 
-    with pytest.raises(ValueError, match="exactly one"):
-        client.create_extraction_workflow(name="statement extraction")
-    with pytest.raises(ValueError, match="definition.*yaml_text|yaml_text.*definition"):
+    assert (
         client.create_extraction_workflow(
             definition=definition,
+            yaml_text="not: [valid",
+            name="statement extraction",
+        )
+        == "created"
+    )
+    assert (
+        client.update_extraction_workflow(
+            "workflow-1",
+            definition=definition,
+            yaml_text="not: [valid",
+            name="statement extraction",
+        )
+        == "updated"
+    )
+
+    assert client.workflows.calls[0][1]["extract"] == definition.extract
+    assert client.workflows.calls[1][2]["extract"] == definition.extract
+
+
+def test_create_and_update_reject_mapping_kind_with_definition() -> None:
+    client = _client(RecordingWorkflows())
+    definition = client.load_extraction_definition_from_yaml(yaml_text=CUSTOM_WORKFLOW_YAML)
+
+    with pytest.raises(ValueError, match="mapping_kind"):
+        client.create_extraction_workflow(
+            definition=definition,
+            mapping_kind="workflow_extract",
+            name="statement extraction",
+        )
+
+    with pytest.raises(ValueError, match="mapping_kind"):
+        client.update_extraction_workflow(
+            "workflow-1",
+            definition=definition,
+            mapping_kind="workflow_extract",
+            name="statement extraction",
+        )
+
+
+def test_create_and_update_reject_missing_or_ambiguous_yaml_sources() -> None:
+    client = _client(RecordingWorkflows())
+
+    with pytest.raises(ValueError, match="exactly one"):
+        client.create_extraction_workflow(name="statement extraction")
+    with pytest.raises(ValueError, match="path.*yaml_text|yaml_text.*path"):
+        client.create_extraction_workflow(
+            path="statement.yaml",
             yaml_text=CUSTOM_WORKFLOW_YAML,
             name="statement extraction",
         )
@@ -540,25 +623,34 @@ async def test_async_methods_match_sync_source_loading_and_forwarding() -> None:
 
     definition = await client.load_extraction_definition_from_yaml(yaml_text=CUSTOM_WORKFLOW_YAML)
     direct_definition = await client.load_extraction_definition(yaml_text=CUSTOM_WORKFLOW_YAML)
+    workflow_definition = await client.load_extraction_definition(
+        workflow_id="workflow-1",
+        yaml_text="not: [valid",
+        request_options=request_options,
+    )
     from_workflow = await client.load_extraction_definition_from_workflow(
         "workflow-1",
         request_options=request_options,
     )
     created = await client.create_extraction_workflow(
         definition=definition,
+        yaml_text="not: [valid",
         name="statement extraction",
         request_options=request_options,
     )
     updated = await client.update_extraction_workflow(
         "workflow-1",
         definition=from_workflow,
+        yaml_text="not: [valid",
         request_options=request_options,
     )
 
     assert created == "created"
     assert updated == "updated"
     assert workflows.calls[0] == ("get", "workflow-1", request_options)
-    assert workflows.calls[1][1]["request_options"] is request_options
-    assert workflows.calls[2][2]["request_options"] is request_options
-    assert workflows.calls[1][1]["template"]["{{LANGUAGE_UNKNOWN}}"] == ""
+    assert workflows.calls[1] == ("get", "workflow-1", request_options)
+    assert workflows.calls[2][1]["request_options"] is request_options
+    assert workflows.calls[3][2]["request_options"] is request_options
+    assert workflows.calls[2][1]["template"]["{{LANGUAGE_UNKNOWN}}"] == ""
     assert direct_definition.extract == definition.extract
+    assert workflow_definition.extract == from_workflow.extract

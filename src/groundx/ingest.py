@@ -85,23 +85,27 @@ def _select_extraction_definition_loader_source(
     mapping_kind: typing.Optional[str],
     request_options: typing.Optional[RequestOptions],
 ) -> str:
-    sources = {
-        "workflow_id": workflow_id,
+    yaml_sources = {
         "path": path,
         "yaml_text": yaml_text,
         "mapping": mapping,
         "prepared": prepared,
     }
-    selected = [name for name, value in sources.items() if value is not OMIT]
+    if workflow_id is not OMIT:
+        if mapping_kind is not None:
+            raise ValueError("mapping_kind is only valid when mapping is the selected source")
+        return "workflow_id"
+
+    selected = [name for name, value in yaml_sources.items() if value is not OMIT]
     if len(selected) != 1:
-        source_names = ", ".join(sources.keys())
+        source_names = ", ".join(("workflow_id", *yaml_sources.keys()))
         if not selected:
             raise ValueError(f"expected exactly one source: {source_names}")
         conflicts = ", ".join(selected)
-        raise ValueError(f"expected exactly one source from {source_names}; received {conflicts}")
+        raise ValueError(f"expected exactly one YAML source from {source_names}; received {conflicts}")
     if mapping_kind is not None and selected[0] != "mapping":
         raise ValueError("mapping_kind is only valid when mapping is the selected source")
-    if request_options is not None and selected[0] != "workflow_id":
+    if request_options is not None:
         raise ValueError("request_options is only valid when workflow_id is selected")
     return selected[0]
 
@@ -199,7 +203,7 @@ class GroundX(GroundXBase):
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Any:
         """
-        Load an extraction definition from one YAML source or an existing workflow ID.
+        Load an extraction definition from YAML/prepared input or an existing workflow ID.
 
         Extraction workflow helpers require the extract extra:
         `pip install groundx[extract]`.
@@ -237,8 +241,9 @@ class GroundX(GroundXBase):
 
         Notes
         -----
-        Pass exactly one source: `workflow_id`, `path`, `yaml_text`, `mapping`,
-        or `prepared`.
+        When `workflow_id` is provided, it takes precedence over YAML/prepared
+        inputs. Otherwise pass exactly one of `path`, `yaml_text`, `mapping`, or
+        `prepared`.
         """
         selected = _select_extraction_definition_loader_source(
             workflow_id=workflow_id,
@@ -379,7 +384,7 @@ class GroundX(GroundXBase):
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Any:
         """
-        Create an extraction workflow from exactly one definition source.
+        Create an extraction workflow from a definition or YAML/prepared source.
 
         Extraction workflow helpers require the extract extra:
         `pip install groundx[extract]`.
@@ -432,6 +437,9 @@ class GroundX(GroundXBase):
         -----
         This delegates to `client.workflows.create(...)` after loading the
         extraction definition and copying workflow template/custom-step settings.
+        If `definition` is provided, it takes precedence over YAML/prepared
+        inputs. Otherwise pass exactly one of `path`, `yaml_text`, `mapping`, or
+        `prepared`.
         Assign the returned workflow to a bucket, group, or account explicitly.
         """
         extraction_workflows = _import_extraction_workflows()
@@ -475,7 +483,7 @@ class GroundX(GroundXBase):
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Any:
         """
-        Update an extraction workflow from exactly one definition source.
+        Update an extraction workflow from a definition or YAML/prepared source.
 
         Extraction workflow helpers require the extract extra:
         `pip install groundx[extract]`.
@@ -530,6 +538,9 @@ class GroundX(GroundXBase):
         -----
         Update sends the full extraction workflow settings, not a patch. Pass
         the YAML or definition again so custom workflow settings are preserved.
+        If `definition` is provided, it takes precedence over YAML/prepared
+        inputs. Otherwise pass exactly one of `path`, `yaml_text`, `mapping`, or
+        `prepared`.
         """
         extraction_workflows = _import_extraction_workflows()
         resolved = extraction_workflows.resolve_extraction_definition_source(
@@ -1023,7 +1034,7 @@ class AsyncGroundX(AsyncGroundXBase):
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Any:
         """
-        Load an extraction definition from one YAML source or an existing workflow ID.
+        Load an extraction definition from YAML/prepared input or an existing workflow ID.
 
         Parameters
         ----------
@@ -1057,8 +1068,9 @@ class AsyncGroundX(AsyncGroundXBase):
 
         Notes
         -----
-        Pass exactly one source: `workflow_id`, `path`, `yaml_text`, `mapping`,
-        or `prepared`.
+        When `workflow_id` is provided, it takes precedence over YAML/prepared
+        inputs. Otherwise pass exactly one of `path`, `yaml_text`, `mapping`, or
+        `prepared`.
         """
         selected = _select_extraction_definition_loader_source(
             workflow_id=workflow_id,
@@ -1185,7 +1197,7 @@ class AsyncGroundX(AsyncGroundXBase):
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Any:
         """
-        Create an extraction workflow from exactly one definition source.
+        Create an extraction workflow from a definition or YAML/prepared source.
 
         Parameters
         ----------
@@ -1227,6 +1239,10 @@ class AsyncGroundX(AsyncGroundXBase):
         ...     path="statement.yaml",
         ...     name="statement extraction",
         ... )
+
+        If `definition` is provided, it takes precedence over YAML/prepared
+        inputs. Otherwise pass exactly one of `path`, `yaml_text`, `mapping`, or
+        `prepared`.
         """
         extraction_workflows = _import_extraction_workflows()
         resolved = extraction_workflows.resolve_extraction_definition_source(
@@ -1269,7 +1285,7 @@ class AsyncGroundX(AsyncGroundXBase):
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Any:
         """
-        Update an extraction workflow from exactly one definition source.
+        Update an extraction workflow from a definition or YAML/prepared source.
 
         Parameters
         ----------
@@ -1317,7 +1333,10 @@ class AsyncGroundX(AsyncGroundXBase):
 
         Notes
         -----
-        Update sends the full extraction workflow settings, not a patch.
+        Update sends the full extraction workflow settings, not a patch. If
+        `definition` is provided, it takes precedence over YAML/prepared inputs.
+        Otherwise pass exactly one of `path`, `yaml_text`, `mapping`, or
+        `prepared`.
         """
         extraction_workflows = _import_extraction_workflows()
         resolved = extraction_workflows.resolve_extraction_definition_source(

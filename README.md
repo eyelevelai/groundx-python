@@ -76,6 +76,11 @@ definition = client.load_extraction_definition(path="statement.yaml")
 existing = client.load_extraction_definition(workflow_id="workflow-id")
 ```
 
+If `workflow_id` is provided, the SDK loads from that workflow before considering
+YAML inputs. For create/update, pass `path=...` directly for the common case or
+pass `definition=...` when you already loaded one; `definition` takes precedence
+over YAML inputs.
+
 Workflow assignment is still explicit. After creating a workflow, assign it to a
 bucket, group, or account with the normal workflow API.
 
