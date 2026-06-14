@@ -69,7 +69,10 @@ class MinIOClient:
                 self.parse_url(url),
             )
 
-            return response.read()
+            try:
+                return response.read()
+            finally:
+                self._close_response(response)
         except S3Error as e:
             self.logger.error_msg(
                 f"Failed to get object from [{url}] [{self.parse_url(url)}]: {str(e)}"
@@ -97,7 +100,10 @@ class MinIOClient:
                 self.parse_url(url),
             )
 
-            body = response.read()
+            try:
+                body = response.read()
+            finally:
+                self._close_response(response)
 
             return body, meta
         except S3Error as e:
@@ -184,6 +190,16 @@ class MinIOClient:
         except S3Error as e:
             self.logger.error_msg(f"Failed to put object in [{bucket}/{key}]: {str(e)}")
             raise
+
+    @staticmethod
+    def _close_response(response: typing.Any) -> None:
+        close = getattr(response, "close", None)
+        if callable(close):
+            close()
+
+        release_conn = getattr(response, "release_conn", None)
+        if callable(release_conn):
+            release_conn()
 
     def put_json_stream(
         self,
