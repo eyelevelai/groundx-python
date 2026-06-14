@@ -15,9 +15,10 @@ docs publishing remains gated on Fern org access and the publish-last e2e phase.
 Task 5 is in `cashbot-go` PR #1493 on branch
 `codex/support-custom-workflow-steps-runtime`, current head `491b177d6`, base
 `master`. The runtime/API/X-Ray/OpenAPI mirror work is pushed, targeted Go and
-OpenSpec checks passed, the CI staticcheck finding was fixed, and `go test
-./...` remains blocked locally by repo-wide generated `version.go` prerequisites
-plus external service/state dependencies.
+OpenSpec checks passed, the CI staticcheck finding was fixed, and all GitHub PR
+checks now pass. The PR is blocked only by required review. `go test ./...`
+remains blocked locally by repo-wide generated `version.go` prerequisites plus
+external service/state dependencies.
 
 Task 6 is in `groundx-python` PR #11 on branch
 `codex/support-custom-workflow-steps-sdk`, current head `46e06e4`. The helper
@@ -79,9 +80,10 @@ All repo-owned OpenSpec changes validate with their repo-specific change IDs:
 `groundx-python/openspec/changes/support-custom-workflow-steps/` change also
 validates, but remains a coordination artifact until Task 12 closes or reduces
 it.
-`internal-arcadia-agents` intentionally has a non-implementation deferral stub
-outside `openspec/changes/`, because current-wave Arcadia work has no durable
-spec delta or implementation task.
+`internal-arcadia-agents` intentionally keeps the future
+`reconcile_fields` / `qa_fields` / `save_fields` task-graph work in a
+non-implementation deferral stub outside `openspec/changes/`. Its current-wave
+implementation is limited to metadata-backed custom X-Ray reassembly in PR #66.
 
 Locked decisions so far:
 
@@ -123,7 +125,8 @@ Locked decisions so far:
   is dead legacy.
 - New Arcadia `reconcile_fields`, `qa_fields`, and `save_fields` work is a
   follow-on plan after cleanup and closeout of this central plan; the current
-  gate requires only an `internal-arcadia-agents` deferral stub.
+  gate requires only the `internal-arcadia-agents` deferral stub plus
+  metadata-backed custom X-Ray reassembly support.
 - SDK/docs publishing is allowed only late, as the final prerequisite for the
   e2e path that requires published artifacts; downstream dependency changes wait
   until that published-artifact e2e passes.
@@ -186,8 +189,9 @@ Locked decisions so far:
 24. Create valid repo-specific OpenSpec changes or non-OpenSpec implementation
     plans with exact tests, expected
     failures, implementation steps, verification commands, and commit
-    checkpoints. For `internal-arcadia-agents`, create only a deferral stub in
-    this current wave.
+    checkpoints. For `internal-arcadia-agents`, defer the new field-action task
+    graph in this current wave while allowing metadata-backed custom X-Ray
+    reassembly support.
 25. Create or select clean branches/worktrees for every current-wave
     implementation repo and record any existing dirty state that must not be
     mixed into this work.

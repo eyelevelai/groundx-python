@@ -37,9 +37,10 @@ models/processors/X-Ray tests, Celery/pytest in Arcadia, Node harness scanners.
 - After Task 2 locks the contract, do not begin code changes until repo-specific
   implementation plans exist with exact failing tests, expected failures,
   implementation steps, verification commands, and commit checkpoints.
-- For `internal-arcadia-agents`, the current gate requires only a deferral stub
-  that records preserved legacy behavior and the follow-on plan boundary; the
-  full `reconcile_fields` / `qa_fields` / `save_fields` implementation plan is
+- For `internal-arcadia-agents`, the current gate requires the deferral stub
+  that records preserved legacy behavior and the follow-on plan boundary, plus
+  metadata-backed custom X-Ray reassembly support. The full
+  `reconcile_fields` / `qa_fields` / `save_fields` implementation plan is
   created after central cleanup and closeout.
 - Tasks 4-12 are blocked until Tasks 1-3 are complete, reviewed, and updated in
   this OpenSpec change. Treat the later tasks as scope inventory until then.
@@ -276,9 +277,9 @@ models/processors/X-Ray tests, Celery/pytest in Arcadia, Node harness scanners.
   - `/Users/benjaminfletcher/git/groundx-studio-harness/openspec/changes/support-custom-workflow-steps/`
   - `/Users/benjaminfletcher/git/adp-poc/openspec/changes/support-custom-workflow-steps/`
 - A non-implementation deferral stub for
-  `/Users/benjaminfletcher/git/internal-arcadia-agents` that states no current
-  code changes begin there and the full custom field-action plan is created
-  after central cleanup/closeout.
+  `/Users/benjaminfletcher/git/internal-arcadia-agents` that keeps the full
+  custom field-action plan after central cleanup/closeout, while allowing the
+  current-wave custom X-Ray reassembly support needed by readback.
 - Each repo OpenSpec change folder must include `proposal.md`, `tasks.md`, and
   `execution-plan.md`.
 - Each repo OpenSpec change folder must include `specs/<capability>/spec.md`
@@ -358,7 +359,8 @@ branch `codex/support-custom-workflow-steps-runtime` and committed as
 Plan-specific targeted Go packages, OpenSpec strict validation, and `git diff
 --check` pass. CI staticcheck initially failed on two S1011 findings in
 `pkg/model/summarizer/custom_workflow.go`; commit `491b177d6` applies the
-variadic-append fix, and package-level staticcheck now passes locally. `go test
+variadic-append fix, package-level staticcheck now passes locally, and all
+GitHub PR checks now pass. The PR is blocked only by required review. `go test
 ./...` remains blocked locally by repo-wide generated `version.go` prerequisites
 and external service/state dependencies.
 
