@@ -9,11 +9,41 @@
 - Implementation branch/worktree: create or confirm clean branch
   `codex/support-custom-workflow-steps-sdk` from `origin/main` before code
   changes.
+- Fresh-scan correction: the current branch contains generated-folder edits that
+  are not allowed in this PR. Treat any completed task that depended on
+  generated `src/groundx/types` or `src/groundx/workflows` edits as reopened
+  until the generated diffs are removed.
 - Commit checkpoints:
   1. failing generated-client serialization and extract YAML tests;
-  2. approved generated SDK surfaces;
+  2. generated-folder cleanup;
   3. handwritten extract YAML and persisted metadata;
-  4. X-Ray/readback parsing and full SDK verification.
+  4. X-Ray/readback parsing and full SDK verification;
+  5. post-Fern-release generated-client verification when the generated SDK
+     surfaces exist.
+
+## Corrective Tasks
+
+- [ ] Remove every manual diff under `src/groundx/types`.
+- [ ] Remove every manual diff under `src/groundx/workflows`.
+- [ ] Move any required type/schema work to
+      `/Users/benjaminfletcher/git/eyelevel-fern-config/fern/openapi.yml`.
+- [ ] Remove `src/groundx/extract` dependencies on new generated custom workflow
+      classes. Use plain dict/list normalization or existing released generated
+      types only.
+- [ ] Keep helper implementation under `src/groundx/extract/*` and
+      `src/groundx/ingest.py`.
+- [ ] Gate create/update helper behavior that needs generated workflow client
+      parameters until the Fern-generated SDK release provides them.
+- [ ] Update tests so this PR validates handwritten helper behavior without
+      requiring hand-created generated classes.
+- [ ] Run
+      `git diff --name-only origin/main...HEAD -- src/groundx/types src/groundx/workflows`
+      and confirm it prints nothing.
+- [ ] Run
+      `rg -n "from \\.\\.types|from groundx\\.types" src/groundx/extract`
+      and confirm no extract helper depends on new generated custom workflow
+      classes.
+- [ ] Re-run SDK OpenSpec, pytest, mypy, and full diff checks after cleanup.
 
 ## Tasks
 
@@ -50,8 +80,8 @@
       `test_document_preserves_fixed_and_custom_readback_fields`.
       Expected before implementation: custom output maps are unavailable while
       fixed fields still load.
-- [x] Consume generated SDK surfaces from the approved Fern/OpenAPI source path;
-      do not hand-edit generated files outside that path.
+- [ ] Consume generated SDK surfaces only through the approved Fern/OpenAPI
+      release path; do not hand-edit generated files in this PR.
 - [x] Implement extraction YAML parsing for workflow-level `workflow.template`,
       custom step definitions, `workflow_step`, and `workflow_output_key`.
 - [x] Implement persisted `workflow.extract.workflow` metadata for
@@ -70,6 +100,7 @@
 - [x] Run `poetry run pytest -rP -n auto tests/custom tests/extract`.
 - [x] Run `poetry run mypy .`.
 - [x] Run `poetry run pytest -rP -n auto .` before release readiness.
-- [x] Commit generated files separately from handwritten extract changes.
+- [ ] Confirm generated files are absent from this PR, or explicitly produced by
+      the approved Fern-generated release path.
 - [x] Adversarial review: confirm fixed workflows, old persisted extracts, and
       old X-Ray/readback fields still work and custom behavior is additive.

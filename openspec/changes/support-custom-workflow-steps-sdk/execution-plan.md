@@ -2,11 +2,26 @@
 
 ## Scope
 
-This repo owns generated Python SDK surfaces after the approved Fern/OpenAPI
-generation path and the handwritten `groundx.extract` YAML, persistence, and
-readback behavior. The central
+This repo owns handwritten `groundx.extract` YAML, persistence, convenience
+helpers, and readback behavior. API-shape types and generated workflow client
+surfaces belong to the upstream Fern/OpenAPI source and arrive in this repo only
+through the approved generation/release path. The central
 `openspec/changes/support-custom-workflow-steps/` folder remains a cross-repo
 coordination artifact; this folder is the repo-owned SDK implementation plan.
+
+## Fresh-Scan Correction
+
+The current implementation branch is not compliant because it contains manual
+changes under generated folders:
+
+- `src/groundx/types`
+- `src/groundx/workflows`
+
+Those changes will be overwritten by Fern and must be removed from this PR.
+The corresponding type definitions and workflow create/update fields must be
+declared in `eyelevel-fern-config/fern/openapi.yml`; Fern then regenerates the
+Python SDK classes and workflow client parameters. This PR may keep only
+handwritten helper logic in preserved files.
 
 ## Files
 
@@ -37,14 +52,15 @@ coordination artifact; this folder is the repo-owned SDK implementation plan.
 
 - Generated SDK files must come from the upstream Fern/OpenAPI source and the
   approved generation or release path.
-- Local generated output may be used for verification before public publishing.
+- Local generated output may be used for verification before public publishing,
+  but it must not be copied into this PR as hand-authored implementation.
 - Handwritten SDK commits must not directly edit generated files outside the
   approved generation path.
-- Local generation evidence: `fern generate --group python-sdk --local
-  --version 3.6.4 --no-require-env-vars` from
-  `/Users/benjaminfletcher/git/eyelevel-fern-config/fern` succeeded and wrote
-  non-release output to a temp directory before generated SDK files were copied
-  into this implementation worktree.
+- The approved source for new generated classes such as custom workflow step
+  models, route models, leaf-field models, and X-Ray response models is
+  `eyelevel-fern-config/fern/openapi.yml`.
+- Until the Fern-generated SDK release lands, handwritten helper code must not
+  depend on new generated classes that are absent from the released baseline.
 
 ## Expected Failing Tests
 
@@ -94,23 +110,42 @@ coordination artifact; this folder is the repo-owned SDK implementation plan.
 ## Implementation Steps
 
 1. Add the expected failing tests listed above without changing production code.
-2. Consume generated SDK surfaces from the approved Fern/OpenAPI branch or
-   approved local generation output.
-3. Add handwritten YAML parsing for `workflow.template`, custom step
+2. Remove every manual generated-folder edit from this branch.
+3. Keep the generated-client shape in Fern/OpenAPI, not in this SDK PR.
+4. Keep helper implementation in preserved handwritten files only:
+   `src/groundx/extract/*` and `src/groundx/ingest.py`.
+5. Replace extract-side imports of new generated classes with plain dict/list
+   normalization or existing released generated types only.
+6. Gate helper behavior that requires not-yet-generated workflow client
+   parameters until the Fern-generated SDK release provides those parameters.
+7. Add handwritten YAML parsing for `workflow.template`, custom step
    definitions, `workflow_step`, `workflow_output_key`, and explicit output
    route metadata.
-4. Add persisted extract metadata with `workflow.metadata_version: 1`,
+8. Add persisted extract metadata with `workflow.metadata_version: 1`,
    `custom_steps`, `output_routes`, `leaf_fields`, optional `field_counts`, and
    optional `schema_hash`.
-5. Enforce custom step identity, reserved metadata names, `slot` /
+9. Enforce custom step identity, reserved metadata names, `slot` /
    `workflow_step` conflict rejection, required template keys, route/leaf
    one-to-one integrity, repeated item wildcard paths, deterministic hash
    sorting, and the 20-field mirrored validation rule.
-6. Preserve legacy YAML and persisted extract behavior when custom workflow
+10. Preserve legacy YAML and persisted extract behavior when custom workflow
    metadata is absent.
-7. Add readback parsing for `customChunkOutputs`, `customSectionOutputs`, and
+11. Add readback parsing for `customChunkOutputs`, `customSectionOutputs`, and
    `customDocumentOutputs` without changing fixed readback field names.
-8. Commit generated files separately from handwritten extract changes.
+12. Do not commit generated files from this PR unless they are produced by the
+    approved Fern-generated release path.
+
+## Corrective Verification
+
+Before this PR can be considered ready, run:
+
+- `git diff --name-only origin/main...HEAD -- src/groundx/types src/groundx/workflows`
+  and confirm it prints nothing.
+- `rg -n "from \\.\\.types|from groundx\\.types" src/groundx/extract`
+  and confirm extract code does not import new custom workflow generated types
+  for helper behavior that must survive regeneration.
+- Confirm `eyelevel-fern-config/fern/openapi.yml` owns the public schema names
+  and workflow request/response fields.
 
 ## Verification Commands
 
