@@ -69,11 +69,41 @@ def _import_extraction_workflows() -> typing.Any:
         from .extract import workflows as extraction_workflows
     except ImportError as exc:
         raise ImportError(
-            "Extraction workflow helpers require the extract extra. "
-            "Install it with `pip install groundx[extract]`."
+            "Extraction workflow helpers require the extract extra. Install it with `pip install groundx[extract]`."
         ) from exc
 
     return extraction_workflows
+
+
+def _select_extraction_definition_loader_source(
+    *,
+    workflow_id: typing.Any,
+    path: typing.Any,
+    yaml_text: typing.Any,
+    mapping: typing.Any,
+    prepared: typing.Any,
+    mapping_kind: typing.Optional[str],
+    request_options: typing.Optional[RequestOptions],
+) -> str:
+    sources = {
+        "workflow_id": workflow_id,
+        "path": path,
+        "yaml_text": yaml_text,
+        "mapping": mapping,
+        "prepared": prepared,
+    }
+    selected = [name for name, value in sources.items() if value is not OMIT]
+    if len(selected) != 1:
+        source_names = ", ".join(sources.keys())
+        if not selected:
+            raise ValueError(f"expected exactly one source: {source_names}")
+        conflicts = ", ".join(selected)
+        raise ValueError(f"expected exactly one source from {source_names}; received {conflicts}")
+    if mapping_kind is not None and selected[0] != "mapping":
+        raise ValueError("mapping_kind is only valid when mapping is the selected source")
+    if request_options is not None and selected[0] != "workflow_id":
+        raise ValueError("request_options is only valid when workflow_id is selected")
+    return selected[0]
 
 
 def get_presigned_url(
@@ -147,9 +177,7 @@ def prep_documents(
 
 
 def split_doc(file: Path) -> typing.List[Path]:
-    if file.is_file() and (
-        file.suffix.lower() in ALLOWED_SUFFIXES or file.suffix.lower() in SUFFIX_ALIASES
-    ):
+    if file.is_file() and (file.suffix.lower() in ALLOWED_SUFFIXES or file.suffix.lower() in SUFFIX_ALIASES):
         if file.suffix.lower() in CSV_SPLITS:
             return CSVSplitter(filepath=file).split()
         elif file.suffix.lower() in TSV_SPLITS:
@@ -159,6 +187,81 @@ def split_doc(file: Path) -> typing.List[Path]:
 
 
 class GroundX(GroundXBase):
+    def load_extraction_definition(
+        self,
+        *,
+        workflow_id: typing.Any = OMIT,
+        path: typing.Any = OMIT,
+        yaml_text: typing.Any = OMIT,
+        mapping: typing.Any = OMIT,
+        prepared: typing.Any = OMIT,
+        mapping_kind: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.Any:
+        """
+        Load an extraction definition from one YAML source or an existing workflow ID.
+
+        Extraction workflow helpers require the extract extra:
+        `pip install groundx[extract]`.
+
+        Parameters
+        ----------
+        workflow_id : typing.Any
+            Existing GroundX workflow ID to load.
+        path : typing.Any
+            Path to an authored extraction YAML file. This is the common
+            application path.
+        yaml_text : typing.Any
+            Authored extraction YAML as a string.
+        mapping : typing.Any
+            Authored extraction YAML as a mapping, or an existing workflow
+            extract mapping when `mapping_kind="workflow_extract"` is set.
+        prepared : typing.Any
+            A `PreparedExtractionYaml` returned by `prepare_extraction_yaml`.
+        mapping_kind : typing.Optional[str]
+            Use `"workflow_extract"` only when `mapping` is an existing workflow
+            extract payload. Omit it for authored YAML-shaped mappings.
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration forwarded to the generated workflow
+            client. Valid only with `workflow_id`.
+
+        Returns
+        -------
+        typing.Any
+            An `ExtractionDefinition`.
+
+        Examples
+        --------
+        >>> definition = client.load_extraction_definition(path="statement.yaml")
+        >>> existing = client.load_extraction_definition(workflow_id="workflow-id")
+
+        Notes
+        -----
+        Pass exactly one source: `workflow_id`, `path`, `yaml_text`, `mapping`,
+        or `prepared`.
+        """
+        selected = _select_extraction_definition_loader_source(
+            workflow_id=workflow_id,
+            path=path,
+            yaml_text=yaml_text,
+            mapping=mapping,
+            prepared=prepared,
+            mapping_kind=mapping_kind,
+            request_options=request_options,
+        )
+        if selected == "workflow_id":
+            return self.load_extraction_definition_from_workflow(
+                typing.cast(str, workflow_id),
+                request_options=request_options,
+            )
+        return self.load_extraction_definition_from_yaml(
+            path=path,
+            yaml_text=yaml_text,
+            mapping=mapping,
+            prepared=prepared,
+            mapping_kind=mapping_kind,
+        )
+
     def load_extraction_definition_from_yaml(
         self,
         *,
@@ -200,6 +303,9 @@ class GroundX(GroundXBase):
         Examples
         --------
         >>> definition = client.load_extraction_definition_from_yaml(path="statement.yaml")
+
+        Prefer `load_extraction_definition(...)` for new code when the source
+        may be either YAML or an existing workflow ID.
         """
         extraction_workflows = _import_extraction_workflows()
         return extraction_workflows.load_extraction_definition_from_yaml(
@@ -240,6 +346,9 @@ class GroundX(GroundXBase):
         Examples
         --------
         >>> definition = client.load_extraction_definition_from_workflow("workflow-id")
+
+        Prefer `load_extraction_definition(workflow_id=...)` for new code when
+        the source may be either YAML or an existing workflow ID.
 
         Notes
         -----
@@ -313,9 +422,8 @@ class GroundX(GroundXBase):
 
         Examples
         --------
-        >>> definition = client.load_extraction_definition_from_yaml(path="statement.yaml")
         >>> workflow = client.create_extraction_workflow(
-        ...     definition=definition,
+        ...     path="statement.yaml",
         ...     name="statement extraction",
         ... )
         >>> client.workflows.add_to_id(id=bucket_id, workflow_id=workflow.workflow.workflow_id)
@@ -408,10 +516,9 @@ class GroundX(GroundXBase):
 
         Examples
         --------
-        >>> definition = client.load_extraction_definition_from_yaml(path="statement.yaml")
         >>> client.update_extraction_workflow(
         ...     "workflow-id",
-        ...     definition=definition,
+        ...     path="statement.yaml",
         ...     name="statement extraction",
         ... )
 
@@ -521,9 +628,7 @@ class GroundX(GroundXBase):
                 n = max(MIN_BATCH_SIZE, min(batch_size or MIN_BATCH_SIZE, max_n))
 
                 remote_batch: typing.List[IngestRemoteDocument] = []
-                ingest = IngestResponse(
-                    ingest=IngestStatus(process_id="", status="queued")
-                )
+                ingest = IngestResponse(ingest=IngestStatus(process_id="", status="queued"))
 
                 progress = float(len(remote_documents))
                 for rd in remote_documents:
@@ -562,12 +667,8 @@ class GroundX(GroundXBase):
                     fp = Path(os.path.expanduser(ld.file_path))
                     file_size = fp.stat().st_size
 
-                    if (current_batch_size + file_size > MAX_BATCH_SIZE_BYTES) or (
-                        len(local_batch) >= n
-                    ):
-                        up_docs, progress = self._process_local(
-                            local_batch, upload_api, progress, pbar
-                        )
+                    if (current_batch_size + file_size > MAX_BATCH_SIZE_BYTES) or (len(local_batch) >= n):
+                        up_docs, progress = self._process_local(local_batch, upload_api, progress, pbar)
 
                         ingest = self.documents.ingest_remote(
                             documents=up_docs,
@@ -584,9 +685,7 @@ class GroundX(GroundXBase):
                     current_batch_size += file_size
 
                 if local_batch:
-                    up_docs, progress = self._process_local(
-                        local_batch, upload_api, progress, pbar
-                    )
+                    up_docs, progress = self._process_local(local_batch, upload_api, progress, pbar)
 
                     ingest = self.documents.ingest_remote(
                         documents=up_docs,
@@ -705,9 +804,7 @@ class GroundX(GroundXBase):
             for file in files:
                 file_size = file.stat().st_size
 
-                if (current_batch_size + file_size > MAX_BATCH_SIZE_BYTES) or (
-                    len(current_batch) >= n
-                ):
+                if (current_batch_size + file_size > MAX_BATCH_SIZE_BYTES) or (len(current_batch) >= n):
                     self._upload_file_batch(
                         bucket_id,
                         current_batch,
@@ -767,9 +864,7 @@ class GroundX(GroundXBase):
             raise ValueError(f"Unsupported HTTP method: {method}")
 
         if upload_response.status_code not in (200, 201):
-            raise Exception(
-                f"Upload failed: {upload_response.status_code} - {upload_response.text}"
-            )
+            raise Exception(f"Upload failed: {upload_response.status_code} - {upload_response.text}")
 
         if "GX-HOSTED-URL" in headers:
             return headers["GX-HOSTED-URL"]
@@ -826,56 +921,30 @@ class GroundX(GroundXBase):
 
         while ingest.ingest.status not in ["complete", "error", "cancelled"]:
             time.sleep(3)
-            ingest = self.documents.get_processing_status_by_id(
-                ingest.ingest.process_id
-            )
+            ingest = self.documents.get_processing_status_by_id(ingest.ingest.process_id)
 
             if ingest.ingest.progress:
-                if (
-                    ingest.ingest.progress.processing
-                    and ingest.ingest.progress.processing.documents
-                ):
+                if ingest.ingest.progress.processing and ingest.ingest.progress.processing.documents:
                     for doc in ingest.ingest.progress.processing.documents:
-                        if (
-                            doc.status in ["complete", "error", "cancelled"]
-                            and doc.document_id not in completed_files
-                        ):
+                        if doc.status in ["complete", "error", "cancelled"] and doc.document_id not in completed_files:
                             pbar.update(0.75)
                             progress -= 0.75
                             completed_files.add(doc.document_id)
-                if (
-                    ingest.ingest.progress.complete
-                    and ingest.ingest.progress.complete.documents
-                ):
+                if ingest.ingest.progress.complete and ingest.ingest.progress.complete.documents:
                     for doc in ingest.ingest.progress.complete.documents:
-                        if (
-                            doc.status in ["complete", "error", "cancelled"]
-                            and doc.document_id not in completed_files
-                        ):
+                        if doc.status in ["complete", "error", "cancelled"] and doc.document_id not in completed_files:
                             pbar.update(0.75)
                             progress -= 0.75
                             completed_files.add(doc.document_id)
-                if (
-                    ingest.ingest.progress.cancelled
-                    and ingest.ingest.progress.cancelled.documents
-                ):
+                if ingest.ingest.progress.cancelled and ingest.ingest.progress.cancelled.documents:
                     for doc in ingest.ingest.progress.cancelled.documents:
-                        if (
-                            doc.status in ["complete", "error", "cancelled"]
-                            and doc.document_id not in completed_files
-                        ):
+                        if doc.status in ["complete", "error", "cancelled"] and doc.document_id not in completed_files:
                             pbar.update(0.75)
                             progress -= 0.75
                             completed_files.add(doc.document_id)
-                if (
-                    ingest.ingest.progress.errors
-                    and ingest.ingest.progress.errors.documents
-                ):
+                if ingest.ingest.progress.errors and ingest.ingest.progress.errors.documents:
                     for doc in ingest.ingest.progress.errors.documents:
-                        if (
-                            doc.status in ["complete", "error", "cancelled"]
-                            and doc.document_id not in completed_files
-                        ):
+                        if doc.status in ["complete", "error", "cancelled"] and doc.document_id not in completed_files:
                             pbar.update(0.75)
                             progress -= 0.75
                             completed_files.add(doc.document_id)
@@ -934,6 +1003,77 @@ class GroundX(GroundXBase):
 
 
 class AsyncGroundX(AsyncGroundXBase):
+    async def load_extraction_definition(
+        self,
+        *,
+        workflow_id: typing.Any = OMIT,
+        path: typing.Any = OMIT,
+        yaml_text: typing.Any = OMIT,
+        mapping: typing.Any = OMIT,
+        prepared: typing.Any = OMIT,
+        mapping_kind: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.Any:
+        """
+        Load an extraction definition from one YAML source or an existing workflow ID.
+
+        Parameters
+        ----------
+        workflow_id : typing.Any
+            Existing GroundX workflow ID to load.
+        path : typing.Any
+            Path to an authored extraction YAML file.
+        yaml_text : typing.Any
+            Authored extraction YAML as a string.
+        mapping : typing.Any
+            Authored extraction YAML as a mapping, or an existing workflow
+            extract mapping when `mapping_kind="workflow_extract"` is set.
+        prepared : typing.Any
+            A `PreparedExtractionYaml` returned by `prepare_extraction_yaml`.
+        mapping_kind : typing.Optional[str]
+            Use `"workflow_extract"` only when `mapping` is an existing workflow
+            extract payload.
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration forwarded to the generated workflow
+            client. Valid only with `workflow_id`.
+
+        Returns
+        -------
+        typing.Any
+            An `ExtractionDefinition`.
+
+        Examples
+        --------
+        >>> definition = await client.load_extraction_definition(path="statement.yaml")
+        >>> existing = await client.load_extraction_definition(workflow_id="workflow-id")
+
+        Notes
+        -----
+        Pass exactly one source: `workflow_id`, `path`, `yaml_text`, `mapping`,
+        or `prepared`.
+        """
+        selected = _select_extraction_definition_loader_source(
+            workflow_id=workflow_id,
+            path=path,
+            yaml_text=yaml_text,
+            mapping=mapping,
+            prepared=prepared,
+            mapping_kind=mapping_kind,
+            request_options=request_options,
+        )
+        if selected == "workflow_id":
+            return await self.load_extraction_definition_from_workflow(
+                typing.cast(str, workflow_id),
+                request_options=request_options,
+            )
+        return await self.load_extraction_definition_from_yaml(
+            path=path,
+            yaml_text=yaml_text,
+            mapping=mapping,
+            prepared=prepared,
+            mapping_kind=mapping_kind,
+        )
+
     async def load_extraction_definition_from_yaml(
         self,
         *,
@@ -969,6 +1109,9 @@ class AsyncGroundX(AsyncGroundXBase):
         Examples
         --------
         >>> definition = await client.load_extraction_definition_from_yaml(path="statement.yaml")
+
+        Prefer `load_extraction_definition(...)` for new code when the source
+        may be either YAML or an existing workflow ID.
         """
         extraction_workflows = _import_extraction_workflows()
         return extraction_workflows.load_extraction_definition_from_yaml(
@@ -1004,6 +1147,9 @@ class AsyncGroundX(AsyncGroundXBase):
         Examples
         --------
         >>> definition = await client.load_extraction_definition_from_workflow("workflow-id")
+
+        Prefer `load_extraction_definition(workflow_id=...)` for new code when
+        the source may be either YAML or an existing workflow ID.
         """
         extraction_workflows = _import_extraction_workflows()
         response = await self.workflows.get(
@@ -1069,9 +1215,8 @@ class AsyncGroundX(AsyncGroundXBase):
 
         Examples
         --------
-        >>> definition = await client.load_extraction_definition_from_yaml(path="statement.yaml")
         >>> workflow = await client.create_extraction_workflow(
-        ...     definition=definition,
+        ...     path="statement.yaml",
         ...     name="statement extraction",
         ... )
         """
@@ -1152,10 +1297,9 @@ class AsyncGroundX(AsyncGroundXBase):
 
         Examples
         --------
-        >>> definition = await client.load_extraction_definition_from_yaml(path="statement.yaml")
         >>> await client.update_extraction_workflow(
         ...     "workflow-id",
-        ...     definition=definition,
+        ...     path="statement.yaml",
         ...     name="statement extraction",
         ... )
 
@@ -1320,9 +1464,7 @@ class AsyncGroundX(AsyncGroundXBase):
             raise ValueError(f"Unsupported HTTP method: {method}")
 
         if upload_response.status_code not in (200, 201):
-            raise Exception(
-                f"Upload failed: {upload_response.status_code} - {upload_response.text}"
-            )
+            raise Exception(f"Upload failed: {upload_response.status_code} - {upload_response.text}")
 
         if "GX-HOSTED-URL" in headers:
             return headers["GX-HOSTED-URL"]

@@ -1,6 +1,6 @@
 import builtins
-import inspect
 import importlib
+import inspect
 import json
 import os
 import subprocess
@@ -58,6 +58,7 @@ def test_extraction_definition_is_exported_from_extract_module() -> None:
 
 def test_extraction_workflow_helpers_have_method_level_docstrings() -> None:
     for method_name in (
+        "load_extraction_definition",
         "load_extraction_definition_from_yaml",
         "load_extraction_definition_from_workflow",
         "create_extraction_workflow",
@@ -107,9 +108,7 @@ assert GroundX.__name__ == "GroundX"
 assert AsyncGroundX.__name__ == "AsyncGroundX"
 """
     env = dict(os.environ)
-    env["PYTHONPATH"] = os.pathsep.join(
-        filter(None, ["src", env.get("PYTHONPATH", "")])
-    )
+    env["PYTHONPATH"] = os.pathsep.join(filter(None, ["src", env.get("PYTHONPATH", "")]))
 
     result = subprocess.run(
         [sys.executable, "-c", code],

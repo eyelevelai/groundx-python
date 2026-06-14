@@ -50,31 +50,30 @@ Extraction workflow helpers require the extract extra:
 pip install "groundx[extract]"
 ```
 
-Load a YAML definition, then create or update a workflow from it:
+Create or update an extraction workflow directly from a YAML file:
 
 ```python
 from groundx import GroundX
 
 client = GroundX(api_key="YOUR_API_KEY")
 
-definition = client.load_extraction_definition_from_yaml(path="statement.yaml")
-
 workflow = client.create_extraction_workflow(
-    definition=definition,
+    path="statement.yaml",
     name="statement extraction",
 )
 
 client.update_extraction_workflow(
     workflow.workflow.workflow_id,
-    definition=definition,
+    path="statement.yaml",
     name="statement extraction",
 )
 ```
 
-You can also load a reusable extraction definition from an existing workflow:
+Load an extraction definition when you need to inspect or reuse settings:
 
 ```python
-definition = client.load_extraction_definition_from_workflow("workflow-id")
+definition = client.load_extraction_definition(path="statement.yaml")
+existing = client.load_extraction_definition(workflow_id="workflow-id")
 ```
 
 Workflow assignment is still explicit. After creating a workflow, assign it to a

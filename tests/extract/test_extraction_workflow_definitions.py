@@ -79,9 +79,7 @@ EXECUTION_ONLY_EXTRACT = {
                 "level": "chunk",
                 "output_map": "customChunkOutputs",
                 "output_key": "label",
-                "readback_path": (
-                    "/chunks/*/customChunkOutputs/line_item_labels/label"
-                ),
+                "readback_path": ("/chunks/*/customChunkOutputs/line_item_labels/label"),
             }
         ],
         "leaf_fields": [
@@ -184,9 +182,7 @@ def test_load_definition_from_yaml_path_preserves_template_and_prepared(
     path = tmp_path / "statement.yaml"
     path.write_text(CUSTOM_WORKFLOW_YAML)
 
-    definition = _client(RecordingWorkflows()).load_extraction_definition_from_yaml(
-        path=path
-    )
+    definition = _client(RecordingWorkflows()).load_extraction_definition_from_yaml(path=path)
 
     assert definition.prepared is not None
     assert definition.extract == definition.prepared.persisted_workflow_extract
@@ -199,15 +195,66 @@ def test_load_definition_from_yaml_path_preserves_template_and_prepared(
     assert definition.leaf_fields[0]["field_type"] == "str"
 
 
+def test_load_extraction_definition_uses_yaml_path(tmp_path: Path) -> None:
+    path = tmp_path / "statement.yaml"
+    path.write_text(CUSTOM_WORKFLOW_YAML)
+
+    definition = _client(RecordingWorkflows()).load_extraction_definition(path=path)
+
+    assert definition.prepared is not None
+    assert definition.template == {
+        "{{LANGUAGE}}": "English",
+        "{{LANGUAGE_UNKNOWN}}": "",
+    }
+    assert definition.custom_steps[0]["name"] == "line_item_labels"
+
+
+def test_load_extraction_definition_uses_workflow_id() -> None:
+    response = WorkflowResponse(
+        workflow=WorkflowDetail(
+            workflow_id="workflow-1",
+            extract=EXECUTION_ONLY_EXTRACT,
+            template={"{{LANGUAGE}}": "English", "{{LANGUAGE_UNKNOWN}}": ""},
+        )
+    )
+    workflows = RecordingWorkflows(response)
+    request_options: RequestOptions = {"timeout_in_seconds": 1}
+
+    definition = _client(workflows).load_extraction_definition(
+        workflow_id="workflow-1",
+        request_options=request_options,
+    )
+
+    assert workflows.calls == [("get", "workflow-1", request_options)]
+    assert definition.extract == EXECUTION_ONLY_EXTRACT
+    assert definition.template["{{LANGUAGE_UNKNOWN}}"] == ""
+
+
+def test_load_extraction_definition_rejects_multiple_sources(tmp_path: Path) -> None:
+    path = tmp_path / "statement.yaml"
+    path.write_text(CUSTOM_WORKFLOW_YAML)
+
+    with pytest.raises(ValueError, match="exactly one"):
+        _client(RecordingWorkflows()).load_extraction_definition()
+    with pytest.raises(ValueError, match="exactly one"):
+        _client(RecordingWorkflows()).load_extraction_definition(
+            workflow_id="workflow-1",
+            path=path,
+        )
+    with pytest.raises(ValueError, match="request_options"):
+        _client(RecordingWorkflows()).load_extraction_definition(
+            path=path,
+            request_options={"timeout_in_seconds": 1},
+        )
+
+
 def test_load_definition_from_mapping_defaults_to_authored_yaml() -> None:
     mapping = typing.cast(
         typing.Dict[str, typing.Any],
         yaml.safe_load(CUSTOM_WORKFLOW_YAML),
     )
 
-    definition = _client(RecordingWorkflows()).load_extraction_definition_from_yaml(
-        mapping=mapping
-    )
+    definition = _client(RecordingWorkflows()).load_extraction_definition_from_yaml(mapping=mapping)
 
     assert definition.prepared is not None
     assert definition.template["{{LANGUAGE}}"] == "English"
@@ -254,9 +301,7 @@ def test_template_values_must_be_strings() -> None:
     mapping["workflow"]["template"]["{{LANGUAGE}}"] = ["English"]
 
     with pytest.raises(ValueError, match=r"\{\{LANGUAGE\}\}"):
-        _client(RecordingWorkflows()).load_extraction_definition_from_yaml(
-            mapping=mapping
-        )
+        _client(RecordingWorkflows()).load_extraction_definition_from_yaml(mapping=mapping)
 
 
 def test_load_definition_from_workflow_preserves_top_level_workflow_fields() -> None:
@@ -269,54 +314,48 @@ def test_load_definition_from_workflow_preserves_top_level_workflow_fields() -> 
             custom_steps=typing.cast(
                 typing.Any,
                 [
-                {
-                    "name": "top_level_labels",
-                    "level": "chunk",
-                    "kind": "keys",
-                    "requiredTemplateKeys": ["{{LANGUAGE}}"],
-                }
+                    {
+                        "name": "top_level_labels",
+                        "level": "chunk",
+                        "kind": "keys",
+                        "requiredTemplateKeys": ["{{LANGUAGE}}"],
+                    }
                 ],
             ),
             output_routes=typing.cast(
                 typing.Any,
                 [
-                {
-                    "workflowGroup": "line_items",
-                    "workflowField": "description",
-                    "finalPath": "/line_items/description",
-                    "stepName": "top_level_labels",
-                    "level": "chunk",
-                    "outputMap": "customChunkOutputs",
-                    "outputKey": "label",
-                    "readbackPath": (
-                        "/chunks/*/customChunkOutputs/top_level_labels/label"
-                    ),
-                }
+                    {
+                        "workflowGroup": "line_items",
+                        "workflowField": "description",
+                        "finalPath": "/line_items/description",
+                        "stepName": "top_level_labels",
+                        "level": "chunk",
+                        "outputMap": "customChunkOutputs",
+                        "outputKey": "label",
+                        "readbackPath": ("/chunks/*/customChunkOutputs/top_level_labels/label"),
+                    }
                 ],
             ),
             leaf_fields=typing.cast(
                 typing.Any,
                 [
-                {
-                    "finalPath": "/line_items/description",
-                    "workflowGroup": "line_items",
-                    "workflowField": "description",
-                    "stepName": "top_level_labels",
-                    "level": "chunk",
-                    "outputKey": "label",
-                    "fieldType": "str",
-                    "isRepeated": False,
-                    "repetitionScope": "none",
-                }
+                    {
+                        "finalPath": "/line_items/description",
+                        "workflowGroup": "line_items",
+                        "workflowField": "description",
+                        "stepName": "top_level_labels",
+                        "level": "chunk",
+                        "outputKey": "label",
+                        "fieldType": "str",
+                        "isRepeated": False,
+                        "repetitionScope": "none",
+                    }
                 ],
             ),
             chunk_strategy="size",
             section_strategy="page",
-            steps=WorkflowSteps(
-                chunk_keys=WorkflowStep(
-                    all_=WorkflowStepConfig(includes={"text": True})
-                )
-            ),
+            steps=WorkflowSteps(chunk_keys=WorkflowStep(all_=WorkflowStepConfig(includes={"text": True}))),
         )
     )
     workflows = RecordingWorkflows(response)
@@ -334,9 +373,7 @@ def test_load_definition_from_workflow_preserves_top_level_workflow_fields() -> 
         "{{LANGUAGE_UNKNOWN}}": "",
     }
     assert _step_value(definition.custom_steps[0], "name") == "top_level_labels"
-    assert _step_value(definition.custom_steps[0], "required_template_keys") == [
-        "{{LANGUAGE}}"
-    ]
+    assert _step_value(definition.custom_steps[0], "required_template_keys") == ["{{LANGUAGE}}"]
     assert _step_value(definition.output_routes[0], "step_name") == "top_level_labels"
     assert _step_value(definition.output_routes[0], "output_key") == "label"
     assert _step_value(definition.leaf_fields[0], "step_name") == "top_level_labels"
@@ -347,21 +384,15 @@ def test_load_definition_from_workflow_preserves_top_level_workflow_fields() -> 
 
 
 def test_load_definition_from_workflow_requires_extract() -> None:
-    response = WorkflowResponse(
-        workflow=WorkflowDetail(workflow_id="workflow-1", name="workflow name")
-    )
+    response = WorkflowResponse(workflow=WorkflowDetail(workflow_id="workflow-1", name="workflow name"))
 
     with pytest.raises(ValueError, match="workflow-1"):
-        _client(RecordingWorkflows(response)).load_extraction_definition_from_workflow(
-            "workflow-1"
-        )
+        _client(RecordingWorkflows(response)).load_extraction_definition_from_workflow("workflow-1")
 
 
 def test_create_and_update_accept_exactly_one_source() -> None:
     client = _client(RecordingWorkflows())
-    definition = client.load_extraction_definition_from_yaml(
-        yaml_text=CUSTOM_WORKFLOW_YAML
-    )
+    definition = client.load_extraction_definition_from_yaml(yaml_text=CUSTOM_WORKFLOW_YAML)
 
     with pytest.raises(ValueError, match="exactly one"):
         client.create_extraction_workflow(name="statement extraction")
@@ -384,17 +415,23 @@ def test_create_and_update_forward_workflow_settings_and_request_options() -> No
     client = _client(workflows)
     request_options: RequestOptions = {"timeout_in_seconds": 1}
 
-    assert client.create_extraction_workflow(
-        yaml_text=CUSTOM_WORKFLOW_YAML,
-        name="statement extraction",
-        request_options=request_options,
-    ) == "created"
-    assert client.update_extraction_workflow(
-        "workflow-1",
-        yaml_text=CUSTOM_WORKFLOW_YAML,
-        name="statement extraction",
-        request_options=request_options,
-    ) == "updated"
+    assert (
+        client.create_extraction_workflow(
+            yaml_text=CUSTOM_WORKFLOW_YAML,
+            name="statement extraction",
+            request_options=request_options,
+        )
+        == "created"
+    )
+    assert (
+        client.update_extraction_workflow(
+            "workflow-1",
+            yaml_text=CUSTOM_WORKFLOW_YAML,
+            name="statement extraction",
+            request_options=request_options,
+        )
+        == "updated"
+    )
 
     create_kwargs = workflows.calls[0][1]
     update_kwargs = workflows.calls[1][2]
@@ -417,6 +454,37 @@ def test_create_and_update_forward_workflow_settings_and_request_options() -> No
     assert update_kwargs["extract"] == create_kwargs["extract"]
 
 
+def test_create_and_update_accept_yaml_path_shortcut(tmp_path: Path) -> None:
+    path = tmp_path / "statement.yaml"
+    path.write_text(CUSTOM_WORKFLOW_YAML)
+    workflows = RecordingWorkflows()
+    client = _client(workflows)
+
+    assert (
+        client.create_extraction_workflow(
+            path=path,
+            name="statement extraction",
+        )
+        == "created"
+    )
+    assert (
+        client.update_extraction_workflow(
+            "workflow-1",
+            path=path,
+            name="statement extraction",
+        )
+        == "updated"
+    )
+
+    create_kwargs = workflows.calls[0][1]
+    update_kwargs = workflows.calls[1][2]
+    assert create_kwargs["extract"] == update_kwargs["extract"]
+    assert create_kwargs["template"] == {
+        "{{LANGUAGE}}": "English",
+        "{{LANGUAGE_UNKNOWN}}": "",
+    }
+
+
 def test_create_requires_name_but_update_can_omit_name() -> None:
     workflows = RecordingWorkflows()
     client = _client(workflows)
@@ -424,10 +492,13 @@ def test_create_requires_name_but_update_can_omit_name() -> None:
     with pytest.raises(ValueError, match="name"):
         client.create_extraction_workflow(yaml_text=CUSTOM_WORKFLOW_YAML)
 
-    assert client.update_extraction_workflow(
-        "workflow-1",
-        yaml_text=CUSTOM_WORKFLOW_YAML,
-    ) == "updated"
+    assert (
+        client.update_extraction_workflow(
+            "workflow-1",
+            yaml_text=CUSTOM_WORKFLOW_YAML,
+        )
+        == "updated"
+    )
     assert "name" not in workflows.calls[0][2]
 
 
@@ -465,9 +536,8 @@ async def test_async_methods_match_sync_source_loading_and_forwarding() -> None:
     client = _async_client(workflows)
     request_options: RequestOptions = {"timeout_in_seconds": 1}
 
-    definition = await client.load_extraction_definition_from_yaml(
-        yaml_text=CUSTOM_WORKFLOW_YAML
-    )
+    definition = await client.load_extraction_definition_from_yaml(yaml_text=CUSTOM_WORKFLOW_YAML)
+    direct_definition = await client.load_extraction_definition(yaml_text=CUSTOM_WORKFLOW_YAML)
     from_workflow = await client.load_extraction_definition_from_workflow(
         "workflow-1",
         request_options=request_options,
@@ -489,3 +559,4 @@ async def test_async_methods_match_sync_source_loading_and_forwarding() -> None:
     assert workflows.calls[1][1]["request_options"] is request_options
     assert workflows.calls[2][2]["request_options"] is request_options
     assert workflows.calls[1][1]["template"]["{{LANGUAGE_UNKNOWN}}"] == ""
+    assert direct_definition.extract == definition.extract
