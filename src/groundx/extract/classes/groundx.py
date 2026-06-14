@@ -74,6 +74,8 @@ class Chunk(BaseModel):
     chunk: typing.Optional[str] = None
     chunkKeywords: typing.Optional[str] = None
     contentType: Annotated[typing.List[str], Field(default_factory=list)]
+    customChunkOutputs: typing.Optional[typing.Dict[str, typing.Dict[str, typing.Any]]] = None
+    customSectionOutputs: typing.Optional[typing.Dict[str, typing.Dict[str, typing.Any]]] = None
     fileKeywords: typing.Optional[str] = None
     fileSummary: typing.Optional[str] = None
     json_: typing.Optional[typing.List[typing.Any]] = Field(default=None, alias="json")
@@ -145,6 +147,7 @@ class DocumentPage(BaseModel):
 
 class XRayDocument(BaseModel):
     chunks: typing.List[Chunk]
+    customDocumentOutputs: typing.Optional[typing.Dict[str, typing.Dict[str, typing.Any]]] = None
     documentPages: Annotated[typing.List[DocumentPage], Field(default_factory=list)]
     sourceUrl: str
     fileKeywords: typing.Optional[str] = None
