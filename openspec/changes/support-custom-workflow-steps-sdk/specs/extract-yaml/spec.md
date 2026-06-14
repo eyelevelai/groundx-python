@@ -88,4 +88,3 @@ or verify executable-step field counts.
 - **WHEN** the SDK reloads the mapping
 - **THEN** reload fails clearly
 - **AND** the SDK does not silently drop custom step assignments
-

@@ -73,4 +73,3 @@
 - [ ] Commit generated files separately from handwritten extract changes.
 - [ ] Adversarial review: confirm fixed workflows, old persisted extracts, and
       old X-Ray/readback fields still work and custom behavior is additive.
-

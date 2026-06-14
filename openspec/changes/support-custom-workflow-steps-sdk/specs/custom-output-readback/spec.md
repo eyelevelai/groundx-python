@@ -31,4 +31,3 @@ from X-Ray/readback responses while preserving legacy fixed readback fields.
 - **WHEN** the SDK loads X-Ray/readback data
 - **THEN** the value is read from top-level `customDocumentOutputs`
 - **AND** it is not read from legacy top-level or per-chunk `fileSummary`
-

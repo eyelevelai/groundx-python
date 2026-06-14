@@ -34,4 +34,3 @@ generation path.
   approved generation or release path
 - **AND** handwritten extract implementation did not directly edit generated
   files outside that path
-

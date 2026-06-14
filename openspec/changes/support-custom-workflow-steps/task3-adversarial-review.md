@@ -16,8 +16,10 @@ plan is created or selected.
   `/Users/benjaminfletcher/git/groundx-python/openspec/changes/support-custom-workflow-steps/`
   folder remains a cross-repo coordination artifact, not the archiveable SDK
   implementation plan.
-- `internal-arcadia-agents` has only a non-implementation deferral stub outside
-  `openspec/changes/`.
+- `internal-arcadia-agents` keeps the future `reconcile_fields`, `qa_fields`,
+  and `save_fields` task-graph work in a non-implementation deferral stub
+  outside `openspec/changes/`, while current-wave metadata-backed custom X-Ray
+  reassembly is implemented in PR #66.
 - Every current-wave repo plan names files, failing tests, expected failures,
   implementation steps, verification commands, commit checkpoints, generated
   boundaries, branch/worktree state, and publish-last gates.

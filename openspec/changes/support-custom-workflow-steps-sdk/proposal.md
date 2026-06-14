@@ -32,4 +32,3 @@ persistence, and X-Ray/readback behavior.
 - This change is the repo-owned, archiveable Python SDK implementation plan.
 - No SDK implementation begins until a clean implementation branch/worktree is
   selected and the generated-file source path is confirmed.
-
