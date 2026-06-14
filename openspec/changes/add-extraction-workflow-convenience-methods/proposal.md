@@ -38,8 +38,8 @@ simply "load the extraction definition I should inspect or reuse."
   `GroundX.update_extraction_workflow(...)` in the hand-written Python SDK
   surface.
 - Add `GroundX.load_extraction_definition(...)` for loading an extraction
-  definition from exactly one source: workflow ID, YAML path, YAML text,
-  mapping, or an existing prepared object.
+  definition from a workflow ID or from one YAML/prepared source. When
+  `workflow_id` is provided, it takes precedence over YAML/prepared inputs.
 - Keep explicit alias methods
   `GroundX.load_extraction_definition_from_yaml(...)` and
   `GroundX.load_extraction_definition_from_workflow(...)` for callers who want

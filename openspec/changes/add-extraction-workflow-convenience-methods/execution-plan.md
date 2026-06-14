@@ -16,9 +16,10 @@ As of 2026-06-14:
 
 - Local SDK, Fern docs, harness, Arcadia, and ADP scan work is implemented.
 - Detached ADP support worktree was removed after scan-only verification.
-- Post-review API correction is in progress: common create/update examples are
-  path-first, and `load_extraction_definition(...)` is the promoted loader for
-  inspection/reuse/copy workflows.
+- Post-review API correction is complete: common create/update examples are
+  path-first, `load_extraction_definition(...)` uses workflow-ID precedence for
+  inspection/reuse/copy workflows, and create/update use `definition` before
+  YAML/prepared inputs.
 - Remaining gates are SDK publish, fresh published-package verification, and
   draft-only downstream docs/harness merge gates.
 
@@ -206,15 +207,12 @@ miss `.fernignore` protections, or hide conflicts until PR time.
     template:
       "{{LANGUAGE}}": English
       "{{LANGUAGE_UNKNOWN}}": ""
-      BILLING_HINT: Prefer line-item table values.
     custom_steps:
       - name: line_item_labels
         level: chunk
         kind: keys
         required_template_keys:
           - "{{LANGUAGE}}"
-          - "{{LANGUAGE_UNKNOWN}}"
-          - BILLING_HINT
   invoice:
     fields:
       invoice_number:
@@ -242,7 +240,7 @@ miss `.fernignore` protections, or hide conflicts until PR time.
       definition = client.load_extraction_definition_from_yaml(path=yaml_path)
 
       assert isinstance(definition, ExtractionDefinition)
-      assert definition.extract["workflow"]["template"]["BILLING_HINT"]
+      assert definition.extract["workflow"]["template"]["{{LANGUAGE}}"]
       assert definition.custom_steps[0]["name"] == "line_item_labels"
       assert definition.output_routes
       assert definition.leaf_fields
@@ -389,13 +387,13 @@ miss `.fernignore` protections, or hide conflicts until PR time.
           workflow=WorkflowDetail(
               workflow_id="wf-1",
               extract=prepared.persisted_workflow_extract,
-              template={"BILLING_HINT": "Prefer top-level template."},
+              template={"{{LANGUAGE}}": "French", "{{LANGUAGE_UNKNOWN}}": ""},
               custom_steps=[
                   {
                       "name": "top_level_labels",
                       "level": "chunk",
                       "kind": "keys",
-                      "required_template_keys": ["BILLING_HINT"],
+                      "required_template_keys": ["{{LANGUAGE}}"],
                   }
               ],
               output_routes=prepared.persisted_workflow_extract["workflow"][
@@ -412,7 +410,7 @@ miss `.fernignore` protections, or hide conflicts until PR time.
 
       definition = client.load_extraction_definition_from_workflow("wf-1")
 
-      assert definition.template == {"BILLING_HINT": "Prefer top-level template."}
+      assert definition.template == {"{{LANGUAGE}}": "French", "{{LANGUAGE_UNKNOWN}}": ""}
       assert definition.custom_steps[0]["name"] == "top_level_labels"
       assert definition.output_routes
       assert definition.leaf_fields
@@ -904,13 +902,20 @@ miss `.fernignore` protections, or hide conflicts until PR time.
 - [ ] Add source one-of tests for create/update:
 
   ```python
-  def test_create_extraction_workflow_requires_exactly_one_source(tmp_path: Path) -> None:
+  def test_create_extraction_workflow_uses_definition_before_yaml_sources(tmp_path: Path) -> None:
       from groundx import GroundX
 
       yaml_path = tmp_path / "statement.yaml"
       yaml_path.write_text(CUSTOM_WORKFLOW_YAML, encoding="utf-8")
       client = GroundX(api_key="test")
       definition = client.load_extraction_definition_from_yaml(path=yaml_path)
+
+      client.create_extraction_workflow(
+          definition=definition,
+          yaml_text="not: [valid",
+          name="statement extraction",
+      )
+      assert client.workflows.created["extract"] == definition.extract
 
       with pytest.raises(ValueError, match="exactly one"):
           client.create_extraction_workflow(name="statement extraction")
@@ -922,22 +927,8 @@ miss `.fernignore` protections, or hide conflicts until PR time.
               name="statement extraction",
           )
 
-      with pytest.raises(ValueError, match="exactly one"):
-          client.create_extraction_workflow(
-              definition=definition,
-              path=yaml_path,
-              name="statement extraction",
-          )
 
-      with pytest.raises(ValueError, match="mapping_kind"):
-          client.create_extraction_workflow(
-              definition=definition,
-              mapping_kind="workflow_extract",
-              name="statement extraction",
-          )
-
-
-  def test_update_extraction_workflow_requires_exactly_one_source(tmp_path: Path) -> None:
+  def test_update_extraction_workflow_uses_definition_before_yaml_sources(tmp_path: Path) -> None:
       from groundx import GroundX
 
       yaml_path = tmp_path / "statement.yaml"
@@ -945,22 +936,22 @@ miss `.fernignore` protections, or hide conflicts until PR time.
       client = GroundX(api_key="test")
       definition = client.load_extraction_definition_from_yaml(path=yaml_path)
 
+      client.update_extraction_workflow(
+          "wf-1",
+          definition=definition,
+          yaml_text="not: [valid",
+          name="statement extraction",
+      )
+      assert client.workflows.updated[1]["extract"] == definition.extract
+
       with pytest.raises(ValueError, match="exactly one"):
           client.update_extraction_workflow("wf-1", name="statement extraction")
 
       with pytest.raises(ValueError, match="exactly one"):
           client.update_extraction_workflow(
               "wf-1",
-              definition=definition,
+              path=yaml_path,
               prepared=definition.prepared,
-              name="statement extraction",
-          )
-
-      with pytest.raises(ValueError, match="mapping_kind"):
-          client.update_extraction_workflow(
-              "wf-1",
-              definition=definition,
-              mapping_kind="workflow_extract",
               name="statement extraction",
           )
   ```
@@ -1027,7 +1018,7 @@ miss `.fernignore` protections, or hide conflicts until PR time.
       asyncio.run(run())
 
 
-  def test_async_create_extraction_workflow_requires_exactly_one_source(
+  def test_async_create_extraction_workflow_uses_definition_before_yaml_sources(
       tmp_path: Path,
   ) -> None:
       from groundx import AsyncGroundX
@@ -1043,12 +1034,12 @@ miss `.fernignore` protections, or hide conflicts until PR time.
           with pytest.raises(ValueError, match="exactly one"):
               await client.create_extraction_workflow(name="statement extraction")
 
-          with pytest.raises(ValueError, match="exactly one"):
-              await client.create_extraction_workflow(
-                  definition=definition,
-                  path=yaml_path,
-                  name="statement extraction",
-              )
+          await client.create_extraction_workflow(
+              definition=definition,
+              yaml_text="not: [valid",
+              name="statement extraction",
+          )
+          assert client.workflows.created["extract"] == definition.extract
 
       asyncio.run(run())
   ```
@@ -1123,7 +1114,6 @@ miss `.fernignore` protections, or hide conflicts until PR time.
       assert body["customSteps"][0]["requiredTemplateKeys"] == [
           "{{LANGUAGE}}",
           "{{LANGUAGE_UNKNOWN}}",
-          "BILLING_HINT",
       ]
       assert body["outputRoutes"][0]["workflowGroup"] == "line_items"
       assert body["leafFields"][0]["finalPath"] == "/line_items/*/description"
@@ -1202,19 +1192,19 @@ miss `.fernignore` protections, or hide conflicts until PR time.
   - keep this helper private/internal and absent from promoted docs.
 
 - [ ] Add `GroundX.create_extraction_workflow(...)` in `src/groundx/ingest.py`.
-      It should resolve exactly one source into `ExtractionDefinition`, assemble
-      kwargs internally, pass optional `request_options`, and return
+      It should use `definition` before YAML/prepared sources, assemble kwargs
+      internally, pass optional `request_options`, and return
       `self.workflows.create(**kwargs)`.
 
 - [ ] Add `GroundX.update_extraction_workflow(...)` in `src/groundx/ingest.py`.
-      It should resolve exactly one source into `ExtractionDefinition`, assemble
-      kwargs internally, pass optional `request_options`, and return
+      It should use `definition` before YAML/prepared sources, assemble kwargs
+      internally, pass optional `request_options`, and return
       `self.workflows.update(id, **kwargs)`.
 
 - [ ] Use one shared source-selection helper for sync and async create/update.
-      It must validate exactly one of `definition`, `path`, `yaml_text`,
-      `mapping`, or `prepared`, and it must reject `mapping_kind` unless
-      `mapping` is the selected source.
+      It must use `definition` first; when `definition` is absent, it must
+      validate exactly one of `path`, `yaml_text`, `mapping`, or `prepared`, and
+      reject `mapping_kind` unless `mapping` is the selected source.
 
 - [ ] Add equivalent async methods on `AsyncGroundX`:
 

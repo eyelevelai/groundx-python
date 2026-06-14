@@ -12,10 +12,11 @@ Add a hand-written, high-level extraction definition layer in the Python SDK:
 - async parity on `AsyncGroundX`
 
 The consolidated load method returns an SDK-owned `ExtractionDefinition` object
-from exactly one source. The source-specific load methods remain available as
-explicit aliases. The create and update methods accept either an
-`ExtractionDefinition` or a YAML source, then delegate to the existing generated
-workflow create/update clients.
+from a workflow ID or from one YAML/prepared source. If `workflow_id` is set, it
+takes precedence over lower-priority YAML/prepared inputs. The source-specific
+load methods remain available as explicit aliases. The create and update
+methods accept either an `ExtractionDefinition` or a YAML/prepared source, then
+delegate to the existing generated workflow create/update clients.
 
 The generated Fern workflow client remains available for direct low-level use.
 `prepare_extraction_yaml(...)`, `load_from_yaml(...)`, `load_from_mapping(...)`,
@@ -58,10 +59,10 @@ The common YAML source is `path=...`, and public docs should show it directly
 on create/update for the one-shot create or update workflow. Callers use
 `ExtractionDefinition` when they need to inspect, reuse, or copy workflow
 settings, especially from an existing workflow ID. Advanced and test callers may
-pass `yaml_text`, `mapping`, or `prepared` explicitly. Create/update callers may pass
-exactly one of:
+pass `yaml_text`, `mapping`, or `prepared` explicitly. For create/update,
+`definition` takes precedence when supplied; otherwise callers pass exactly one
+of these YAML/prepared sources:
 
-- `definition`: an existing `ExtractionDefinition`.
 - `path`: local filesystem path to read as UTF-8 YAML.
 - `yaml_text`: raw YAML text.
 - `mapping`: an authored YAML-shaped mapping by default. Advanced callers may
@@ -70,9 +71,9 @@ exactly one of:
   load with `prepared=None` when authored YAML metadata is unavailable.
 - `prepared`: an existing `PreparedExtractionYaml`.
 
-Exactly one source is required for create/update and for the consolidated
-loader. The SDK does not silently prefer one source over another; zero or
-multiple sources raise `ValueError`. This avoids ambiguous behavior where a
+Without `definition`, exactly one YAML/prepared source is required for
+create/update. Without `workflow_id`, exactly one YAML/prepared source is
+required for the consolidated loader. This avoids ambiguous behavior where a
 string might be either raw YAML text or a filesystem path.
 
 ## Definition Contract
@@ -109,10 +110,10 @@ silently. Placeholder-style keys such as `{{LANGUAGE}}` and
 `{{LANGUAGE_UNKNOWN}}` are plain string keys and must be preserved exactly,
 including an empty string value for `{{LANGUAGE_UNKNOWN}}` when supplied.
 
-`load_extraction_definition(...)` is the promoted loader. It accepts exactly one
-of `workflow_id`, `path`, `yaml_text`, `mapping`, or `prepared`. It dispatches to
-the same source-specific behavior as the explicit alias methods and fails rather
-than choosing precedence when multiple sources are supplied.
+`load_extraction_definition(...)` is the promoted loader. When `workflow_id` is
+provided, it dispatches to the workflow loader before considering
+YAML/prepared inputs. Otherwise it accepts exactly one of `path`, `yaml_text`,
+`mapping`, or `prepared` and dispatches to the YAML/prepared loader.
 
 `load_extraction_definition_from_yaml(...)` prepares authored YAML through the
 existing `prepare_extraction_yaml(...)` path, then wraps the prepared result in
@@ -205,11 +206,11 @@ lost on the next Fern SDK release.
 
 ## Client Methods
 
-`GroundX.load_extraction_definition(...)` loads an `ExtractionDefinition` from
-exactly one source: `workflow_id`, `path`, `yaml_text`, `mapping`, or
-`prepared`. `workflow_id` uses the workflow loader behavior; the other sources
-use the YAML/prepared loader behavior. Passing zero or multiple sources raises a
-clear `ValueError` instead of applying precedence.
+`GroundX.load_extraction_definition(...)` loads an `ExtractionDefinition` from a
+workflow ID or from one YAML/prepared source. `workflow_id` uses the workflow
+loader behavior and takes precedence over `path`, `yaml_text`, `mapping`, or
+`prepared`. If `workflow_id` is absent, passing zero or multiple YAML/prepared
+sources raises a clear `ValueError`.
 
 `GroundX.load_extraction_definition_from_yaml(...)` loads authored YAML into
 `ExtractionDefinition`. It remains available as an explicit alias for YAML,
@@ -220,13 +221,15 @@ workflow and converts its persisted extraction config into
 `ExtractionDefinition`. It remains available as an explicit alias for workflow
 ID sources.
 
-`GroundX.create_extraction_workflow(...)` resolves exactly one source into an
-`ExtractionDefinition`, assembles generated workflow kwargs internally, and
-forwards them to `self.workflows.create(...)`.
+`GroundX.create_extraction_workflow(...)` resolves an `ExtractionDefinition` or
+one YAML/prepared source into workflow kwargs internally, then forwards them to
+`self.workflows.create(...)`. `definition` takes precedence over
+YAML/prepared inputs.
 
-`GroundX.update_extraction_workflow(id, ...)` resolves exactly one source into
-an `ExtractionDefinition`, assembles generated workflow kwargs internally, and
-forwards them to `self.workflows.update(id, ...)`.
+`GroundX.update_extraction_workflow(id, ...)` resolves an `ExtractionDefinition`
+or one YAML/prepared source into workflow kwargs internally, then forwards them
+to `self.workflows.update(id, ...)`. `definition` takes precedence over
+YAML/prepared inputs.
 
 Sync and async loader/create/update paths should use the same source-selection
 helper so `workflow_id`, `definition`, `path`, `yaml_text`, `mapping`,

@@ -41,10 +41,10 @@
 - [x] Add concrete async parity tests for the same client methods on
       `AsyncGroundX`, including awaited YAML loading, workflow-ID loading,
       create, update, and one-source validation failures.
-- [x] Add tests proving create/update accept exactly one source:
-      `definition`, `path`, `yaml_text`, `mapping`, or `prepared`. Include
-      conflicts that combine `definition` with another source and cases where
-      `mapping_kind` is provided without `mapping` as the selected source.
+- [x] Add tests proving create/update use `definition` before YAML/prepared
+      sources, and reject ambiguous YAML/prepared sources when `definition` is
+      absent. Include cases where `mapping_kind` is provided without `mapping`
+      as the selected source.
 - [x] Add tests proving `mapping` source handling is explicit for all supported
       shapes: authored YAML-shaped mapping by default, persisted workflow
       `extract` mapping with authored metadata only when
@@ -92,9 +92,9 @@
       `GroundX.load_extraction_definition_from_workflow(...)` in the
       hand-written SDK client subclass, not in generated Fern files.
 - [x] Implement `GroundX.load_extraction_definition(...)` as the promoted
-      consolidated loader. It must accept exactly one of `workflow_id`, `path`,
-      `yaml_text`, `mapping`, or `prepared`; it must fail clearly instead of
-      applying source precedence when multiple sources are supplied.
+      consolidated loader. It must use `workflow_id` before YAML/prepared
+      sources; when `workflow_id` is absent, it must accept exactly one of
+      `path`, `yaml_text`, `mapping`, or `prepared`.
 - [x] Use lazy imports from `src/groundx/ingest.py` into the extract workflow
       module so the base SDK remains usable without the `extract` extra.
 - [x] Implement `GroundX.create_extraction_workflow(...)` and

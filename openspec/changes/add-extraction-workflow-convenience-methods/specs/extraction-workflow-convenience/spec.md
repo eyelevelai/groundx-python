@@ -26,9 +26,10 @@ callers to work with generated workflow response internals.
 
 - **GIVEN** in-memory extraction YAML or a YAML-shaped mapping
 - **WHEN** a caller invokes `GroundX.load_extraction_definition(...)`
-  with exactly one explicit source argument
+  with exactly one YAML/prepared source argument and no `workflow_id`
 - **THEN** the SDK returns the same `ExtractionDefinition` shape
-- **AND** passing zero or multiple sources fails with a clear `ValueError`
+- **AND** passing zero or multiple YAML/prepared sources fails with a clear
+  `ValueError`
 - **AND** raw string YAML is passed through `yaml_text`, not ambiguously through
   a bare positional string
 - **AND** `mapping` defaults to authored YAML-shaped semantics
@@ -75,16 +76,18 @@ callers to work with generated workflow response internals.
 - **AND** `GroundX.load_extraction_definition_from_workflow(workflow_id)`
   remains available as an explicit source-specific alias
 
-#### Scenario: Consolidated loader rejects ambiguous sources
+#### Scenario: Consolidated loader applies workflow-ID precedence
 
 - **GIVEN** a caller wants to load an extraction definition
-- **WHEN** they provide zero sources or more than one of `workflow_id`, `path`,
-  `yaml_text`, `mapping`, or `prepared`
-- **THEN** `GroundX.load_extraction_definition(...)` fails with a clear
-  `ValueError`
-- **AND** the SDK does not silently prefer `workflow_id` over `path`, `path`
-  over `yaml_text`, or any other source precedence
-- **AND** `mapping_kind` is valid only when `mapping` is the selected source
+- **WHEN** they provide `workflow_id` plus any YAML/prepared source such as
+  `path`, `yaml_text`, `mapping`, or `prepared`
+- **THEN** `GroundX.load_extraction_definition(...)` loads from `workflow_id`
+- **AND** the SDK does not read or validate the lower-priority YAML/prepared
+  source
+- **AND** if `workflow_id` is absent, passing zero or multiple YAML/prepared
+  sources fails with a clear `ValueError`
+- **AND** `mapping_kind` is valid only when `mapping` is the selected
+  YAML/prepared source
 - **AND** `request_options` is valid only when `workflow_id` is the selected
   source
 
@@ -179,15 +182,18 @@ generated workflow client kwargs.
 - **THEN** the SDK internally loads an `ExtractionDefinition` from the YAML
 - **AND** performs the same update behavior as the definition-based path
 
-#### Scenario: Create/update source selection is explicit
+#### Scenario: Create/update source selection applies definition precedence
 
 - **GIVEN** a caller wants to create or update an extraction workflow
 - **WHEN** they provide source input
-- **THEN** exactly one of `definition`, `path`, `yaml_text`, `mapping`, or
-  `prepared` is required
-- **AND** passing zero or multiple sources fails clearly
-- **AND** `definition` cannot be combined with any YAML or prepared source
-- **AND** `mapping_kind` is valid only when `mapping` is the selected source
+- **THEN** `definition` takes precedence over `path`, `yaml_text`, `mapping`,
+  and `prepared`
+- **AND** if `definition` is absent, exactly one YAML/prepared source is
+  required
+- **AND** if `definition` is absent, passing zero or multiple YAML/prepared
+  sources fails clearly
+- **AND** `mapping_kind` is valid only when `mapping` is the selected
+  YAML/prepared source
 - **AND** generated workflow kwargs assembly remains internal SDK plumbing, not
   the promoted public technique
 
