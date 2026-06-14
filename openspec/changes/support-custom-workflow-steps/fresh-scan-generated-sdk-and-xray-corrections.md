@@ -91,18 +91,18 @@ contract and the documentation/implementation surfaces that must move together.
 
 ## Audit Status On 2026-06-14
 
-This audit checked the open PR branches named by the user plus the local
-Cashbot support worktree.
+This audit checked the open PR branches named by the user plus the Cashbot PR
+created from the support worktree.
 
 | Surface | Current Audit Result | Required Follow-Up |
 | --- | --- | --- |
-| OpenSpec plan PR #10 | Corrective plan recorded in this file and referenced from central `execution-plan.md` and `tasks.md`. | Push the plan commit to PR #10 after review. |
-| SDK helpers PR #11 | Not yet compliant. The branch still has diffs under `src/groundx/types` and `src/groundx/workflows`, and `src/groundx/extract/workflows.py` imports generated `WorkflowSteps`. | Remove generated-folder edits from the SDK PR, keep helper behavior in handwritten extract/ingest code, and update SDK OpenSpec/tasks accordingly. |
-| Fern docs PR #12 | OpenAPI and docs mention `customSteps`, `outputRoutes`, `leafFields`, `requiredTemplateKeys`, and X-Ray custom output maps. | Keep docs publish gated until runtime, SDK, harness, and ADP checks pass. |
-| Studio Harness PR #19 | Skill docs, compiler/readback helpers, validators, scanners, evals, and generated plugin mirrors reference `workflow_step`, `customSteps`, and custom X-Ray outputs. | Re-run harness gates after SDK cleanup because helper signatures may change. |
-| Arcadia PR #66 | Not yet compliant for this correction. `classes/statement.py` currently lists only legacy X-Ray attrs in `XRAY_REASSEMBLY_OUTPUT_ATTRS`; no `customChunkOutputs`, `customSectionOutputs`, or `customDocumentOutputs` hits were found. | Add custom X-Ray attrs and tests while preserving the existing deferral boundary for future `reconcile_fields`, `qa_fields`, and `save_fields`. |
-| ADP PR #1 | ADP docs/OpenSpec/YAML reference `workflow_step`, `workflow_output_key`, 20-field validation, and source-material decisions. | Re-run ADP compile/validation after SDK and harness fixes. |
-| Cashbot support worktree | Local branch `codex/support-custom-workflow-steps-runtime` has runtime, X-Ray, test, and OpenAPI mirror changes for custom output maps. | Push/open/update the Cashbot PR, confirm it targets the correct base branch, and re-run targeted Go/OpenAPI verification after SDK/Fern alignment. |
+| OpenSpec plan PR #10 | Corrective plan recorded in this file and central `execution-plan.md` / `tasks.md` updated with current pushed commit IDs and remaining release gates. | Push this plan commit to PR #10. |
+| SDK helpers PR #11 | Fixed at `46e06e4`. No diffs remain under `src/groundx/types` or `src/groundx/workflows`, and `src/groundx/extract/workflows.py` no longer imports generated workflow types. Full SDK pytest, mypy, OpenSpec, and `git diff --check` passed locally. | Merge after review; publish/regenerate generated clients only through the Fern/OpenAPI release path. |
+| Fern docs PR #12 | Clean at `5f9650d`. OpenAPI and docs mention `customSteps`, `outputRoutes`, `leafFields`, `requiredTemplateKeys`, and X-Ray custom output maps; the prior merge conflict is resolved. Local Fern/OpenSpec/YAML/diff checks passed. | Keep docs publish gated until runtime, SDK, harness, ADP, and published-artifact e2e checks pass. |
+| Studio Harness PR #19 | Revalidated at `64ee14f` after SDK cleanup. Skill docs, compiler/readback helpers, validators, scanners, evals, and generated plugin mirrors reference `workflow_step`, `customSteps`, and custom X-Ray outputs. Local Python, Node, mirror/version, OpenSpec, and diff checks passed. | GitHub marks the PR blocked by external review/check policy; no local validation blocker found. |
+| Arcadia PR #66 | Fixed at `edb9b33`. `classes/statement.py` reads `customChunkOutputs`, `customSectionOutputs`, and `customDocumentOutputs`; tests cover chunk, section, and document custom-output reassembly while preserving the future `reconcile_fields` / `qa_fields` / `save_fields` deferral. Full pytest passed locally. | Merge after review; keep the new custom field-action work in a separate follow-on plan. |
+| ADP PR #1 | Revalidated at `004f844` after SDK/harness fixes. ADP docs/OpenSpec/YAML reference `workflow_step`, `workflow_output_key`, 20-field validation, and source-material decisions; local compile and structural workflow validation passed with the corrected SDK/harness worktrees. | Merge after upstream runtime/SDK/harness/docs gates are ready; do not hardcode shared platform behavior in ADP. |
+| Cashbot PR #1493 | Open at `b74b135c6`, base `master`. Runtime, X-Ray, tests, and OpenAPI mirror changes for custom output maps are pushed. Targeted Go/OpenSpec/diff checks passed. | Merge/deploy this runtime/API guardrail before published-artifact e2e; full `go test ./...` remains blocked by existing repo-wide generated `version.go` and external service/state dependencies. |
 
 ## Release Gate
 

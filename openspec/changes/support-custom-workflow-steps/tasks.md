@@ -350,13 +350,14 @@ models/processors/X-Ray tests, Celery/pytest in Arcadia, Node harness scanners.
 
 **Repo:** `/Users/benjaminfletcher/git/cashbot-go`
 
-Status: completed in worktree
+Status: completed and pushed to PR #1493 in worktree
 `/Users/benjaminfletcher/git/cashbot-go-support-custom-workflow-steps` on
 branch `codex/support-custom-workflow-steps-runtime` and committed as
-`4e8b0ef6a`. The Fern mirror endpoint correction is committed in
-`eyelevel-fern-config` as `cf393f5`. Plan-specific targeted Go packages pass;
-`go test ./...` remains blocked by repo-wide generated `version.go`
-prerequisites and external service/state dependencies.
+`b74b135c6`, base `master`. The Fern mirror endpoint correction is committed in
+`eyelevel-fern-config` and merged into the current Fern PR head `5f9650d`.
+Plan-specific targeted Go packages, OpenSpec strict validation, and `git diff
+--check` pass. `go test ./...` remains blocked by repo-wide generated
+`version.go` prerequisites and external service/state dependencies.
 
 **Likely files:**
 
@@ -437,35 +438,34 @@ prerequisites and external service/state dependencies.
 - `tests/extract/classes/test_groundx.py`
 - `tests/extract/classes/test_document.py`
 
-Status: completed in isolated worktree
+Status: completed and pushed to PR #11 in isolated worktree
 `/Users/benjaminfletcher/git/groundx-python-support-custom-workflow-steps-sdk`
-on branch `codex/support-custom-workflow-steps-sdk`, final commit `cf85f52`.
-Generated SDK output was produced from the upstream Fern/OpenAPI source with
-`fern generate --group python-sdk --local --version 3.6.4
---no-require-env-vars` and committed separately from handwritten extract
-changes. Verification passed:
+on branch `codex/support-custom-workflow-steps-sdk`, final commit `46e06e4`.
+No implementation diffs remain under generated folders `src/groundx/types` or
+`src/groundx/workflows`. Handwritten helper behavior lives in
+`src/groundx/extract/*` and `src/groundx/ingest.py`; custom-step create/update
+helpers now raise a clear runtime gate until the Fern-generated workflow client
+accepts `custom_steps`, `output_routes`, and `leaf_fields`. Verification passed:
 
-- `poetry run pytest tests/custom/test_client.py tests/extract/prompt/test_manager.py tests/extract/prompt/test_persisted_workflow_extract.py -q`
-  (`68 passed, 5 subtests passed`)
-- `poetry run pytest tests/extract/classes/test_groundx.py tests/extract/classes/test_document.py -q`
-  (`20 passed`)
-- `poetry run pytest tests/extract -q`
-  (`111 passed, 1 skipped, 5 subtests passed`)
-- `poetry run pytest -rP -n auto tests/custom tests/extract`
-  (`114 passed, 1 skipped`)
-- `poetry run mypy .`
-  (`Success: no issues found in 219 source files`)
+- `poetry run pytest tests/custom/test_extraction_workflow_client_exports.py tests/extract/test_extraction_workflow_definitions.py -q`
+  (`21 passed`)
+- `poetry run pytest tests/custom tests/extract -q`
+  (`135 passed, 2 skipped, 5 subtests passed`)
+- `poetry run mypy src/groundx/extract/workflows.py src/groundx/ingest.py tests/extract/test_extraction_workflow_definitions.py tests/custom/test_extraction_workflow_client_exports.py`
+  (`Success: no issues found`)
 - `poetry run pytest -rP -n auto .`
-  (`180 passed, 4 skipped`)
+  (`204 passed, 2 skipped`)
+- `poetry run mypy .`
+  (`Success: no issues found`)
 - `OPENSPEC_TELEMETRY=0 npx @fission-ai/openspec@1.3.1 validate support-custom-workflow-steps-sdk --strict`
 - `git diff --check`
 
 - [x] Consume generated SDK surfaces from the upstream Fern/OpenAPI change through
       local verification output or the approved SDK release path; do not hand-edit
       generated files.
-- [x] Add generated-client serialization tests proving `WorkflowRequest`,
-      `WorkflowDetail`, and workflow create/update calls carry `template` and
-      custom step config.
+- [x] Add helper tests proving current create/update helpers pass the base YAML
+      path and raise a clear runtime gate for custom-step kwargs until the
+      generated client is released with the Fern/OpenAPI fields.
 - [x] Add hand-written extract tests for YAML custom step metadata.
 - [x] Add hand-written extract tests for invalid custom step names, duplicate
       names, fixed-step collisions, case normalization, reserved names, and
@@ -530,12 +530,19 @@ changes. Verification passed:
 - `docs/arcadia-yaml-classes/charge.md`
 - co-located tests in `prompts/`, `classes/`, and `testdata/`
 
-Status: current-wave deferral stub is complete at
+Status: current-wave deferral stub plus custom X-Ray reassembly support are
+complete in `internal-arcadia-agents` PR #66 on branch
+`codex/extraction-reassembly-metadata`, current head `edb9b33`. The deferral
+stub lives at
 `/Users/benjaminfletcher/git/internal-arcadia-agents/openspec/notes/support-custom-workflow-steps-deferral.md`.
-The remaining Task 7 items are intentionally follow-on work after central
-cleanup and closeout, not prerequisites for Task 8.
+The new `reconcile_fields`, `qa_fields`, and `save_fields` task graph remains
+intentionally follow-on work after central cleanup and closeout, not a
+prerequisite for Task 8.
 
 - [x] During this central plan, create only the deferral stub required by Task 3.
+- [x] During this central plan, add metadata-backed reassembly support for
+      `customChunkOutputs`, `customSectionOutputs`, and `customDocumentOutputs`
+      without changing the current Arcadia runtime graph.
 - [ ] After cleanup and closeout of this central planning change, create a new
       repo-owned plan for implementation.
 - [ ] The follow-on plan must preserve current reconcile/QA/save behavior except
@@ -552,14 +559,16 @@ cleanup and closeout, not prerequisites for Task 8.
 - [ ] The follow-on plan must include tests proving missing custom runtime
       metadata uses the current hardcoded workflow steps and current Celery
       graph.
-- [ ] The follow-on plan must include tests proving custom output route metadata
-      maps from `customChunkOutputs`, `customSectionOutputs`, or
-      `customDocumentOutputs` to the final JSON path during reassembly.
+- [x] Add current-wave tests proving custom output route metadata maps from
+      `customChunkOutputs`, `customSectionOutputs`, or `customDocumentOutputs`
+      to the final JSON path during reassembly.
 - [ ] The follow-on plan must preserve current statement/meter/charge
       relationship logic after reassembly.
-- [ ] Run `PYTHONPATH=$PWD pytest prompts classes -q`.
-- [ ] Adversarial review: confirm YAML cannot execute arbitrary code or bypass
-      final statement/meter/charge business logic.
+- [x] Run focused reassembly/metadata tests and full `PYTHONPATH=$PWD pytest`
+      (`191 passed, 1 skipped`).
+- [x] Adversarial review: confirm the current-wave change consumes explicit
+      custom X-Ray maps through route metadata and leaves the new field-action
+      runtime graph deferred.
 
 ## Task 8: Update groundx-studio-harness
 
@@ -586,13 +595,15 @@ cleanup and closeout, not prerequisites for Task 8.
 
 Status: completed in isolated worktree
 `/Users/benjaminfletcher/git/groundx-studio-harness-support-custom-workflow-steps`
-on branch `codex/support-custom-workflow-steps-harness`, commit `b5d8122`.
-Plugin payloads were mirrored to `plugins/groundx-studio-harness/` and
-`plugins/groundx-agent-harness/`; plugin version bumped to `2.1.6`.
-Verification passed:
+on branch `codex/support-custom-workflow-steps-harness`, current PR #19 head
+`64ee14f`. `groundx-studio-harness` is the source repo; `groundx-agent-harness`
+is generated mirror output only. Plugin payloads were mirrored to
+`plugins/groundx-studio-harness/` and `plugins/groundx-agent-harness/`; plugin
+version bumped to `2.1.6`. Verification was rerun after the SDK
+generated-folder cleanup and passed:
 
 - `python -m pytest skills/groundx-extraction-workflows/templates/test_compile_workflow.py skills/groundx-extraction-workflows/templates/test_validate_workflow_json.py skills/groundx-extraction-workflows/templates/test_xray_to_extract.py skills/groundx-extraction-workflows/templates/test_imports.py -q`
-  (`39 passed`)
+  (`40 passed`)
 - `node scripts/tests/test-groundx-extraction-workflows.mjs`
 - `node scripts/tests/test-evals.mjs`
 - `node scripts/sync-plugin.mjs --check`
@@ -652,7 +663,8 @@ Verification passed:
 
 Status: completed in isolated worktree
 `/Users/benjaminfletcher/git/adp-poc-support-custom-workflow-steps` on branch
-`codex/support-custom-workflow-steps-adp` as commit `004f844`. Verification:
+`codex/support-custom-workflow-steps-adp` as commit `004f844`. Verification was
+rerun after the SDK generated-folder cleanup and harness revalidation:
 
 - `python -m pytest tests/test_v1_schema_manifest.py -q` (`4 passed`)
 - `python -m pytest tests/test_convert_v1_schema_to_yaml.py tests/test_source_review_tools.py -q`
@@ -662,7 +674,7 @@ Status: completed in isolated worktree
   with
   `PYTHONPATH=/Users/benjaminfletcher/git/groundx-python-support-custom-workflow-steps-sdk/src`
 - Local workflow structural validation passed with the same SDK/harness
-  worktrees
+  worktrees (`OK /tmp/adp_401k_v1_workflow.json: structural validation passed`)
 - `OPENSPEC_TELEMETRY=0 npx @fission-ai/openspec@1.3.1 validate support-custom-workflow-steps --strict`
 - `git diff --check`
 
@@ -714,7 +726,9 @@ Status: partially executed and blocked. Evidence is recorded in
 - [ ] Confirm direct workflow create/update rejects spoofed, caller-only, or
       mismatched field-count metadata for an oversized custom step.
       Blocked: the deployed API accepted an oversized/spoofed custom-step
-      workflow and the test workflow was immediately deleted.
+      workflow and the test workflow was immediately deleted. This remains
+      blocked until the Cashbot runtime/API guardrail in PR #1493 is merged and
+      deployed.
 - [ ] Confirm Arcadia default path works for legacy YAML.
 - [x] Confirm Arcadia custom field-action implementation is deferred to the
       follow-on `reconcile_fields`/`qa_fields`/`save_fields` plan.

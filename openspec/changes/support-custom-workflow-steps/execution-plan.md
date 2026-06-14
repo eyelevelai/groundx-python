@@ -4,50 +4,57 @@ This chain is intentionally staged. Do not start implementation before Task 1
 and Task 2 produce a reviewed contract and Task 3 produces repo-specific
 implementation plans plus the `internal-arcadia-agents` deferral stub.
 
-Current status: Phase 0 discovery, contract, and repo-owned planning artifacts
-are complete. Task 4's Fern/OpenAPI schema checkpoint is committed in
-`eyelevel-fern-config` on branch `codex/support-custom-workflow-steps-fern`
-(`71b7585`), with a follow-up X-Ray response-schema mirror fix committed as
-`cf393f5`. Task 5's cashbot-go runtime/API checkpoint is committed on branch
-`codex/support-custom-workflow-steps-runtime` as `4e8b0ef6a`. Task 6's Python
-SDK checkpoint is committed in isolated worktree
-`/Users/benjaminfletcher/git/groundx-python-support-custom-workflow-steps-sdk`
-on branch `codex/support-custom-workflow-steps-sdk` as `cf85f52`, with full SDK
-pytest, mypy, OpenSpec, and `git diff --check` verification. Task 8's harness
-checkpoint is committed in isolated worktree
-`/Users/benjaminfletcher/git/groundx-studio-harness-support-custom-workflow-steps`
-on branch `codex/support-custom-workflow-steps-harness` as `b5d8122`, with
-Python template tests, Node skill/eval gates, plugin mirror/version checks,
-full `node scripts/validate.mjs`, OpenSpec, and `git diff --check`
-verification. The
-`internal-arcadia-agents` current-wave deferral stub is complete; the full
-Arcadia `reconcile_fields` / `qa_fields` / `save_fields` implementation plan is
-intentionally follow-on work after central cleanup and closeout. The
-source-backed trace is recorded in `chunk-keywords-trace.md`, repo-specific
-implementation planning blockers are recorded in `repo-plan-blockers.md`, and
-Task 9's public docs checkpoint is committed in `eyelevel-fern-config` on branch
-`codex/support-custom-workflow-steps-fern` as `c8074b8`, with `fern check`,
-docs-definition validation, OpenSpec strict validation, and `git diff --check`
-verification. Docs publishing remains gated on Fern org access and the
-published-artifact e2e phase. Task 10's ADP migration checkpoint is committed
-in isolated worktree
-`/Users/benjaminfletcher/git/adp-poc-support-custom-workflow-steps` on branch
-`codex/support-custom-workflow-steps-adp` as `004f844`, with ADP manifest,
-converter/source-review, local SDK/harness compile, workflow validation,
-OpenSpec strict validation, and `git diff --check` verification. Remaining
-current-wave execution is end-to-end validation and closeout. Task 11 has a
-partial e2e checkpoint in `task11-e2e-checkpoint.md`; release remains blocked
-because the deployed API accepted an oversized/spoofed custom-step workflow that
-should have been rejected by the Task 5 runtime/API validation.
+Current status: Phase 0 discovery, contract, repo-owned planning artifacts, and
+the fresh-scan generated-SDK/X-Ray corrections are complete. Task 4 and Task 9
+are in `eyelevel-fern-config` PR #12 on branch
+`codex/support-custom-workflow-steps-fern`, current head `5f9650d`; the merge
+conflict with `main` is resolved, the PR is clean, `fern check`, OpenSpec
+strict validation, YAML parsing, and `git diff --check` passed locally. Public
+docs publishing remains gated on Fern org access and the publish-last e2e phase.
 
-Fresh-scan correction: see
-`fresh-scan-generated-sdk-and-xray-corrections.md`. Before closeout, the plan
-must remove hand-written edits from generated `groundx-python` folders, confirm
-Cashbot emits the custom X-Ray output maps at runtime, and confirm Arcadia reads
-those custom X-Ray attrs in metadata-backed reassembly. The relevant docs,
-agent-facing guidance, OpenSpec files, OpenAPI mirrors, SDK helpers, harness
-skills, ADP migration artifacts, and implementations must be updated together or
-listed as blocked.
+Task 5 is in `cashbot-go` PR #1493 on branch
+`codex/support-custom-workflow-steps-runtime`, current head `b74b135c6`, base
+`master`. The runtime/API/X-Ray/OpenAPI mirror work is pushed, targeted Go and
+OpenSpec checks passed, and `go test ./...` remains blocked by repo-wide
+generated `version.go` prerequisites plus external service/state dependencies.
+
+Task 6 is in `groundx-python` PR #11 on branch
+`codex/support-custom-workflow-steps-sdk`, current head `46e06e4`. The helper
+implementation no longer changes generated folders under `src/groundx/types` or
+`src/groundx/workflows`; handwritten behavior lives under `src/groundx/extract`
+and `src/groundx/ingest.py`. Custom-step create/update helpers raise a clear
+runtime gate until the Fern-generated workflow client accepts the new custom
+fields. Full SDK pytest, mypy, OpenSpec strict validation, and `git diff
+--check` passed locally.
+
+Task 7 has two current-wave pieces in `internal-arcadia-agents` PR #66 on
+branch `codex/extraction-reassembly-metadata`, current head `edb9b33`: the
+follow-on `reconcile_fields` / `qa_fields` / `save_fields` deferral remains
+explicit, and metadata-backed reassembly now consumes
+`customChunkOutputs`, `customSectionOutputs`, and `customDocumentOutputs`.
+Focused tests and the full Arcadia pytest suite passed locally.
+
+Task 8 is in `groundx-studio-harness` PR #19 on branch
+`codex/support-custom-workflow-steps-harness`, current head `64ee14f`. Studio
+Harness remains the source repo; `groundx-agent-harness` is only the generated
+mirror output. Python template tests, Node skill/eval gates, plugin mirror and
+version checks, full `node scripts/validate.mjs`, OpenSpec strict validation,
+and `git diff --check` passed locally after the SDK generated-folder cleanup.
+GitHub still marks the PR blocked by external review/check policy, not by a
+local validation failure or merge conflict.
+
+Task 10 is in `adp-poc` PR #1 on branch
+`codex/support-custom-workflow-steps-adp`, current head `004f844`. ADP manifest,
+converter/source-review, local SDK/harness compile, structural workflow
+validation, OpenSpec strict validation, and `git diff --check` passed locally
+after the SDK and harness corrections.
+
+Remaining current-wave execution is live deployed-path end-to-end validation and
+closeout. Task 11 has a partial e2e checkpoint in `task11-e2e-checkpoint.md`;
+release remains blocked until the runtime/API custom-step guardrail is merged
+and deployed, then SDK/docs are published last, and the published-artifact e2e
+path proves workflow create/update, ingest, X-Ray readback, and final extract
+output on the deployed platform.
 
 Repo-owned Task 3 artifacts, in dependency order:
 
