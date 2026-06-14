@@ -34,6 +34,7 @@ if typing.TYPE_CHECKING:
         ContainerUploadSettings,
         GroundXSettings,
     )
+    from .workflows import ExtractionDefinition
 
 
 __all__ = [
@@ -46,6 +47,7 @@ __all__ = [
     "Document",
     "DocumentRequest",
     "Element",
+    "ExtractionDefinition",
     "ExtractedField",
     "FinalFieldPath",
     "GroundXDocument",
@@ -80,6 +82,7 @@ _EXPORT_MODULES = {
     "Document": ".classes",
     "DocumentRequest": ".classes",
     "Element": ".classes",
+    "ExtractionDefinition": ".workflows",
     "ExtractedField": ".classes",
     "FinalFieldPath": ".prompt.utility",
     "GroundXDocument": ".classes",

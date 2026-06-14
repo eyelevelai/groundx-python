@@ -591,14 +591,15 @@ def _normalize_template_key(raw: typing.Any, path: str) -> str:
         raise ValueError(f"Expected string template key at [{path}]")
 
     key = raw.strip()
+    validation_key = key
     if key.startswith("{{") and key.endswith("}}"):
-        key = key[2:-2].strip()
+        validation_key = key[2:-2].strip()
 
-    if not _TEMPLATE_KEY_RE.match(key):
+    if not _TEMPLATE_KEY_RE.match(validation_key):
         raise ValueError(f"invalid template key [{raw}]")
-    if key.startswith("GROUNDX_"):
+    if validation_key.startswith("GROUNDX_"):
         raise ValueError(f"reserved template key prefix [{raw}]")
-    if key in _CUSTOM_WORKFLOW_RESERVED_NAMES:
+    if validation_key in _CUSTOM_WORKFLOW_RESERVED_NAMES:
         raise ValueError(f"reserved template key [{raw}]")
 
     return key
@@ -643,7 +644,8 @@ def _normalize_required_template_keys(
 
     keys: typing.List[str] = []
     seen: typing.Set[str] = set()
-    for idx, raw_key in enumerate(value):
+    raw_keys = typing.cast(typing.List[typing.Any], value)
+    for idx, raw_key in enumerate(raw_keys):
         key = _normalize_template_key(raw_key, f"{path}[{idx}]")
         if key in seen:
             raise ValueError(f"duplicate required template key [{key}]")
@@ -689,7 +691,8 @@ def _normalize_custom_workflow_steps(
 
     steps: typing.List[typing.Dict[str, typing.Any]] = []
     by_name: typing.Dict[str, typing.Dict[str, typing.Any]] = {}
-    for idx, raw_step in enumerate(value):
+    raw_steps = typing.cast(typing.List[typing.Any], value)
+    for idx, raw_step in enumerate(raw_steps):
         path = f"{_CUSTOM_WORKFLOW_KEY}.custom_steps[{idx}]"
         step = _ensure_mapping(raw_step, path)
         name = step.get("name")
@@ -769,8 +772,10 @@ def _validate_output_key(value: typing.Any, path: str) -> str:
 
 def _field_type(field: typing.Dict[str, typing.Any]) -> str:
     prompt = field.get("prompt")
-    if isinstance(prompt, dict) and isinstance(prompt.get("type"), str):
-        return typing.cast(str, prompt["type"])
+    if isinstance(prompt, dict):
+        prompt_mapping = typing.cast(typing.Dict[str, typing.Any], prompt)
+        if isinstance(prompt_mapping.get("type"), str):
+            return typing.cast(str, prompt_mapping["type"])
 
     return "unknown"
 
@@ -954,7 +959,7 @@ def _normalize_custom_leaf(
 
     is_repeated = leaf.get("is_repeated")
     if not isinstance(is_repeated, bool):
-        raise ValueError(f"custom workflow leaf field is missing [is_repeated]")
+        raise ValueError("custom workflow leaf field is missing [is_repeated]")
     normalized["is_repeated"] = is_repeated
 
     segments = _parse_pointer_segments(normalized["final_path"], f"{path}.final_path")

@@ -1,28 +1,32 @@
-import json, os, shutil, requests, time, typing
+import json
+import os
+import shutil
+import time
+import typing
 from datetime import datetime, timezone
 from io import BytesIO
 from pathlib import Path
+from urllib.parse import urlparse
+
+import requests
+from ..prompt.manager import PromptManager
+from ..services.logger import Logger
+from ..services.upload import Upload
+from ..utility import clean_json
+from .element import Element
+from .field import ExtractedField
+from .groundx import GroundXDocument, XRayDocument
+from .group import Group
 from PIL import Image
 from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
-    model_validator,
     PrivateAttr,
     SerializeAsAny,
     ValidationInfo,
+    model_validator,
 )
-from urllib.parse import urlparse
-
-from .element import Element
-from .field import ExtractedField
-from .groundx import GroundXDocument, XRayDocument
-from .group import Group
-from ..prompt.manager import PromptManager
-from ..services.logger import Logger
-from ..services.upload import Upload
-from ..utility import clean_json
-
 
 DocT = typing.TypeVar("DocT", bound="Document")
 
@@ -383,7 +387,7 @@ class Document(Group):
 
     def load_custom_outputs(
         self,
-        custom_outputs: typing.Optional[typing.Dict[str, typing.Dict[str, typing.Any]]],
+        custom_outputs: typing.Optional[typing.Mapping[str, typing.Any]],
         source: str,
     ) -> None:
         if not custom_outputs:
@@ -393,7 +397,8 @@ class Document(Group):
             if not isinstance(outputs, dict):
                 continue
 
-            for output_key, value in outputs.items():
+            output_mapping = typing.cast(typing.Dict[str, typing.Any], outputs)
+            for output_key, value in output_mapping.items():
                 data: typing.Any = value
                 if isinstance(data, str):
                     try:
@@ -402,7 +407,8 @@ class Document(Group):
                         pass
 
                 if isinstance(data, dict):
-                    for key, nested_value in data.items():
+                    data_mapping = typing.cast(typing.Dict[str, typing.Any], data)
+                    for key, nested_value in data_mapping.items():
                         err = self.add(key, nested_value)
                         if err:
                             raise Exception(
