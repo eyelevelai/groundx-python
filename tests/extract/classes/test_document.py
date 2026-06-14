@@ -9,6 +9,7 @@ from unittest.mock import patch
 
 from groundx.extract.classes.document import Document, DocumentRequest
 from groundx.extract.classes.field import ExtractedField
+from groundx.extract.classes.groundx import XRayDocument
 from groundx.extract.classes.group import Group
 from groundx.extract.prompt.manager import PromptManager
 from ..prompt._fixtures import SAMPLE_YAML_1, SAMPLE_YAML_2, TestSource
@@ -234,6 +235,59 @@ class TestDocument(unittest.TestCase):
             ),
             doc.model_dump(serialize_as_any=True, exclude_none=True),
         )
+
+    def test_document_preserves_fixed_and_custom_readback_fields(self) -> None:
+        seen: typing.List[typing.Tuple[str, typing.Any]] = []
+
+        class CaptureDocument(Document):
+            def add(self, k: str, value: typing.Any) -> typing.Union[str, None]:
+                seen.append((k, value))
+                return None
+
+        source = TestSource(SAMPLE_YAML_1)
+        manager = PromptManager(cache_source=source, config_source=source)
+        xray = XRayDocument.model_validate(
+            {
+                "chunks": [
+                    {
+                        "chunkKeywords": '{"fixed_chunk":"yes"}',
+                        "sectionSummary": '{"fixed_section":"yes"}',
+                        "fileSummary": '{"fixed_file":"yes"}',
+                        "customChunkOutputs": {
+                            "line_item_labels": {
+                                "label": {"custom_chunk": "Water service"}
+                            }
+                        },
+                        "customSectionOutputs": {
+                            "section_codes": {
+                                "code": {"custom_section": "UTILITY"}
+                            }
+                        },
+                    }
+                ],
+                "customDocumentOutputs": {
+                    "document_flags": {
+                        "needs_review": {"custom_document": False}
+                    }
+                },
+                "documentPages": [],
+                "sourceUrl": "https://example.com/doc.pdf",
+            }
+        )
+
+        doc = CaptureDocument()
+        doc.load_xray(
+            req=_make_request(),
+            xray=xray,
+            prompt_manager=manager,
+        )
+
+        self.assertIn(("fixed_chunk", "yes"), seen)
+        self.assertIn(("fixed_section", "yes"), seen)
+        self.assertIn(("fixed_file", "yes"), seen)
+        self.assertIn(("custom_chunk", "Water service"), seen)
+        self.assertIn(("custom_section", "UTILITY"), seen)
+        self.assertIn(("custom_document", False), seen)
 
 
 class TestDocumentRequest(unittest.TestCase):
