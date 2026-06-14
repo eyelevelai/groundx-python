@@ -29,6 +29,27 @@ class FailingSource(TestSource):
         return None
 
 
+class FlakyCachedSource(TestSource):
+    def __init__(self, raw: str) -> None:
+        super().__init__(raw)
+        self.fetch_calls = 0
+        self.peek_calls = 0
+        self.fail_fetch = False
+        self.fail_peek = False
+
+    def fetch(self, workflow_id: str) -> typing.Tuple[str, str]:
+        self.fetch_calls += 1
+        if self.fail_fetch:
+            raise Exception(f"fetch unavailable [{workflow_id}]")
+        return super().fetch(workflow_id)
+
+    def peek(self, workflow_id: str) -> typing.Optional[str]:
+        self.peek_calls += 1
+        if self.fail_peek:
+            raise Exception(f"peek unavailable [{workflow_id}]")
+        return super().peek(workflow_id)
+
+
 CUSTOM_WORKFLOW_YAML = """
 workflow:
   template:
@@ -571,6 +592,33 @@ Special Instructions:
             provider.prompt.instructions,
             "Return the updated provider name.",
         )
+
+    def test_cached_workflow_survives_source_peek_failure(self) -> None:
+        source = FlakyCachedSource(SAMPLE_YAML_1)
+        manager = PromptManager(cache_source=source, config_source=source)
+        self.assertEqual(source.fetch_calls, 1)
+
+        source.fail_peek = True
+        source.fail_fetch = True
+
+        fields = manager.get_fields_for_workflow()
+
+        self.assertIn("statement", fields)
+        self.assertEqual(source.fetch_calls, 1)
+
+    def test_reload_if_changed_keeps_cache_when_source_peek_fails(self) -> None:
+        source = FlakyCachedSource(SAMPLE_YAML_1)
+        manager = PromptManager(cache_source=source, config_source=source)
+        self.assertEqual(source.fetch_calls, 1)
+
+        source.fail_peek = True
+        source.fail_fetch = True
+
+        manager.reload_if_changed()
+        fields = manager.get_fields_for_workflow()
+
+        self.assertIn("statement", fields)
+        self.assertEqual(source.fetch_calls, 1)
 
     def test_prepare_extraction_yaml_with_pseudo_groups(self) -> None:
         prepared = prepare_extraction_yaml(SAMPLE_YAML_PSEUDO_GROUPS)
