@@ -37,19 +37,21 @@ simply "load the extraction definition I should inspect or reuse."
 - Add `GroundX.create_extraction_workflow(...)` and
   `GroundX.update_extraction_workflow(...)` in the hand-written Python SDK
   surface.
-- Add `GroundX.load_extraction_definition_from_yaml(...)` for loading an
-  extraction definition from YAML path, YAML text, mapping, or an existing
-  prepared object.
-- Add `GroundX.load_extraction_definition_from_workflow(...)` for loading an
-  extraction definition from an existing workflow ID.
+- Add `GroundX.load_extraction_definition(...)` for loading an extraction
+  definition from exactly one source: workflow ID, YAML path, YAML text,
+  mapping, or an existing prepared object.
+- Keep explicit alias methods
+  `GroundX.load_extraction_definition_from_yaml(...)` and
+  `GroundX.load_extraction_definition_from_workflow(...)` for callers who want
+  source-specific names.
 - Add async parity on `AsyncGroundX`.
-- Document the promoted create, update, YAML-load, and workflow-ID-load methods
-  as first-class hand-written SDK helpers, matching the treatment of `ingest`
-  and `ingest_directories` rather than only showing them in a walkthrough
-  snippet.
-- Make the promoted YAML-load/create/update path path-first while still
-  supporting explicit YAML text, mapping, and already prepared inputs for tests
-  and advanced callers.
+- Document the promoted create, update, and load-definition methods as
+  first-class hand-written SDK helpers, matching the treatment of `ingest` and
+  `ingest_directories` rather than only showing them in a walkthrough snippet.
+- Make the promoted create/update path path-first: public docs and harness
+  examples should pass `path="statement.yaml"` directly to create/update. The
+  `ExtractionDefinition` object is for inspection, reuse, copying settings
+  from an existing workflow, and advanced callers.
 - Treat `mapping` input as authored YAML-shaped by default. Persisted or
   execution workflow `extract` mappings require an explicit advanced
   `mapping_kind="workflow_extract"` argument so the SDK never guesses between
@@ -73,8 +75,8 @@ simply "load the extraction definition I should inspect or reuse."
 - Hide generated `CustomWorkflowStep*`, route, and leaf-field classes from the
   normal extraction workflow creation path.
 - Update public docs and harness templates so they teach the one-call path
-  and promoted load-definition path instead of manual workflow metadata
-  assembly.
+  and promoted load-definition operations for reuse/inspection instead of
+  manual workflow metadata assembly.
 - Update the harness public extraction-doc source of truth so it no longer
   teaches `prepare_extraction_yaml(...)` as the primary public create/update
   path.

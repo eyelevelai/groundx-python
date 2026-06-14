@@ -4,15 +4,18 @@
 
 Add a hand-written, high-level extraction definition layer in the Python SDK:
 
+- `GroundX.load_extraction_definition(...)`
 - `GroundX.load_extraction_definition_from_yaml(...)`
 - `GroundX.load_extraction_definition_from_workflow(...)`
 - `GroundX.create_extraction_workflow(...)`
 - `GroundX.update_extraction_workflow(...)`
 - async parity on `AsyncGroundX`
 
-The load methods return an SDK-owned `ExtractionDefinition` object. The create
-and update methods accept either an `ExtractionDefinition` or a YAML source, then
-delegate to the existing generated workflow create/update clients.
+The consolidated load method returns an SDK-owned `ExtractionDefinition` object
+from exactly one source. The source-specific load methods remain available as
+explicit aliases. The create and update methods accept either an
+`ExtractionDefinition` or a YAML source, then delegate to the existing generated
+workflow create/update clients.
 
 The generated Fern workflow client remains available for direct low-level use.
 `prepare_extraction_yaml(...)`, `load_from_yaml(...)`, `load_from_mapping(...)`,
@@ -25,37 +28,37 @@ they are not the promoted path for humans, public docs, harnesses, or
 Promoted path from YAML:
 
 ```python
-definition = client.load_extraction_definition_from_yaml(path="statement.yaml")
-
 workflow = client.create_extraction_workflow(
-    definition=definition,
+    path="statement.yaml",
     name="statement extraction",
 )
 
 updated = client.update_extraction_workflow(
     "workflow-id",
-    definition=definition,
-    name="statement extraction",
-)
-```
-
-Promoted path from an existing workflow:
-
-```python
-definition = client.load_extraction_definition_from_workflow("workflow-id")
-```
-
-Shortcut path for callers that do not need to inspect the definition object:
-
-```python
-workflow = client.create_extraction_workflow(
     path="statement.yaml",
     name="statement extraction",
 )
 ```
 
-The common YAML source is `path=...`. Advanced and test callers may pass
-`yaml_text`, `mapping`, or `prepared` explicitly. Create/update callers may pass
+Promoted reusable definition path:
+
+```python
+definition = client.load_extraction_definition(path="statement.yaml")
+existing = client.load_extraction_definition(workflow_id="workflow-id")
+```
+
+Explicit alias paths for callers who want source-specific method names:
+
+```python
+definition = client.load_extraction_definition_from_yaml(path="statement.yaml")
+existing = client.load_extraction_definition_from_workflow("workflow-id")
+```
+
+The common YAML source is `path=...`, and public docs should show it directly
+on create/update for the one-shot create or update workflow. Callers use
+`ExtractionDefinition` when they need to inspect, reuse, or copy workflow
+settings, especially from an existing workflow ID. Advanced and test callers may
+pass `yaml_text`, `mapping`, or `prepared` explicitly. Create/update callers may pass
 exactly one of:
 
 - `definition`: an existing `ExtractionDefinition`.
@@ -67,8 +70,10 @@ exactly one of:
   load with `prepared=None` when authored YAML metadata is unavailable.
 - `prepared`: an existing `PreparedExtractionYaml`.
 
-Exactly one source is required for create/update. This avoids ambiguous behavior
-where a string might be either raw YAML text or a filesystem path.
+Exactly one source is required for create/update and for the consolidated
+loader. The SDK does not silently prefer one source over another; zero or
+multiple sources raise `ValueError`. This avoids ambiguous behavior where a
+string might be either raw YAML text or a filesystem path.
 
 ## Definition Contract
 
@@ -103,6 +108,11 @@ for this helper and should raise a clear `ValueError` rather than being coerced
 silently. Placeholder-style keys such as `{{LANGUAGE}}` and
 `{{LANGUAGE_UNKNOWN}}` are plain string keys and must be preserved exactly,
 including an empty string value for `{{LANGUAGE_UNKNOWN}}` when supplied.
+
+`load_extraction_definition(...)` is the promoted loader. It accepts exactly one
+of `workflow_id`, `path`, `yaml_text`, `mapping`, or `prepared`. It dispatches to
+the same source-specific behavior as the explicit alias methods and fails rather
+than choosing precedence when multiple sources are supplied.
 
 `load_extraction_definition_from_yaml(...)` prepares authored YAML through the
 existing `prepare_extraction_yaml(...)` path, then wraps the prepared result in
@@ -195,11 +205,20 @@ lost on the next Fern SDK release.
 
 ## Client Methods
 
+`GroundX.load_extraction_definition(...)` loads an `ExtractionDefinition` from
+exactly one source: `workflow_id`, `path`, `yaml_text`, `mapping`, or
+`prepared`. `workflow_id` uses the workflow loader behavior; the other sources
+use the YAML/prepared loader behavior. Passing zero or multiple sources raises a
+clear `ValueError` instead of applying precedence.
+
 `GroundX.load_extraction_definition_from_yaml(...)` loads authored YAML into
-`ExtractionDefinition`.
+`ExtractionDefinition`. It remains available as an explicit alias for YAML,
+mapping, and prepared-object sources.
 
 `GroundX.load_extraction_definition_from_workflow(id, ...)` fetches an existing
-workflow and converts its persisted extraction config into `ExtractionDefinition`.
+workflow and converts its persisted extraction config into
+`ExtractionDefinition`. It remains available as an explicit alias for workflow
+ID sources.
 
 `GroundX.create_extraction_workflow(...)` resolves exactly one source into an
 `ExtractionDefinition`, assembles generated workflow kwargs internally, and
@@ -209,10 +228,11 @@ forwards them to `self.workflows.create(...)`.
 an `ExtractionDefinition`, assembles generated workflow kwargs internally, and
 forwards them to `self.workflows.update(id, ...)`.
 
-Sync and async create/update paths should use the same source-selection helper
-so `definition`, `path`, `yaml_text`, `mapping`, `mapping_kind`, and `prepared`
-validation cannot drift. `mapping_kind` is valid only when `mapping` is the
-selected source.
+Sync and async loader/create/update paths should use the same source-selection
+helper so `workflow_id`, `definition`, `path`, `yaml_text`, `mapping`,
+`mapping_kind`, and `prepared` validation cannot drift. `mapping_kind` is valid
+only when `mapping` is the selected source. `request_options` is valid only
+when the selected loader source is `workflow_id`.
 
 Create/update methods return the normal generated `WorkflowResponse`. They do
 not return `PreparedExtractionYaml`; callers who need metadata inspection use
@@ -234,6 +254,7 @@ documented with the same level of prominence:
   values, sync examples, async examples where relevant, update semantics, and
   explicit bucket/account assignment follow-up.
 - Public Fern docs with method-level reference sections for
+  `client.load_extraction_definition(...)`,
   `client.load_extraction_definition_from_yaml(...)`,
   `client.load_extraction_definition_from_workflow(...)`,
   `client.create_extraction_workflow(...)`, and
@@ -243,10 +264,14 @@ documented with the same level of prominence:
 - Harness public extraction-doc guidance, especially
   `skills/groundx-extraction-workflows/references/public-docs.md`, must be
   updated from the old `prepare_extraction_yaml(...)` primary flow to the new
-  helper-backed public flow. Public prose should stay customer-readable; method
-  names may appear in signatures and code examples, but explanatory copy should
-  prefer "YAML", "workflow settings", and "JSON you want back" over internal
-  jargon when possible.
+  helper-backed public flow. The primary create/update examples should pass the
+  YAML path directly to `client.create_extraction_workflow(...)` and
+  `client.update_extraction_workflow(...)`; definition-loading examples should
+  be framed as inspection, reuse, or copy-from-existing-workflow operations.
+  Public prose should stay customer-readable; method names may appear in
+  signatures and code examples, but explanatory copy should prefer "YAML",
+  "workflow settings", and "JSON you want back" over internal jargon when
+  possible.
 - Extraction workflow guides that continue to show
   `client.workflows.add_to_id(...)` or `client.workflows.add_to_account(...)`
   after workflow creation because assignment is intentionally not implicit.
@@ -302,10 +327,10 @@ hand-written methods.
 
 `eyelevel-fern-config` updates public docs to replace the manual
 `prepare_extraction_yaml(...)` plus metadata-copying snippet with
-`client.load_extraction_definition_from_yaml(...)`,
-`client.create_extraction_workflow(definition=..., name=...)`, an update
-example, workflow-ID loading docs, and method-level documentation matching the
-existing hand-written SDK helpers.
+`client.create_extraction_workflow(path=..., name=...)`, an update example,
+`client.load_extraction_definition(...)` docs for YAML and workflow-ID sources,
+explicit alias docs, and method-level documentation matching the existing
+hand-written SDK helpers.
 
 `groundx-studio-harness` updates runtime/deploy templates to prefer the helper
 methods when installed, keeps `workflow_sdk_kwargs(...)` for offline compile

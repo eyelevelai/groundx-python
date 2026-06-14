@@ -33,6 +33,7 @@
       overwrite dirty files without explicit direction.
 - [x] In `groundx-python`, add failing tests for the public high-level API:
       `ExtractionDefinition`,
+      `client.load_extraction_definition(...)`,
       `client.load_extraction_definition_from_yaml(...)`,
       `client.load_extraction_definition_from_workflow(...)`,
       `client.create_extraction_workflow(...)`, and
@@ -90,6 +91,10 @@
 - [x] Implement `GroundX.load_extraction_definition_from_yaml(...)` and
       `GroundX.load_extraction_definition_from_workflow(...)` in the
       hand-written SDK client subclass, not in generated Fern files.
+- [x] Implement `GroundX.load_extraction_definition(...)` as the promoted
+      consolidated loader. It must accept exactly one of `workflow_id`, `path`,
+      `yaml_text`, `mapping`, or `prepared`; it must fail clearly instead of
+      applying source precedence when multiple sources are supplied.
 - [x] Use lazy imports from `src/groundx/ingest.py` into the extract workflow
       module so the base SDK remains usable without the `extract` extra.
 - [x] Implement `GroundX.create_extraction_workflow(...)` and
@@ -97,9 +102,11 @@
       `ExtractionDefinition` or YAML shortcut source and delegate to generated
       workflow create/update calls.
 - [x] Implement async parity on `AsyncGroundX`.
-- [x] Document all four promoted methods in the SDK with method docstrings and
-      README or reference coverage comparable to `ingest` and
-      `ingest_directories`.
+- [x] Document the promoted loader/create/update methods in the SDK with method
+      docstrings and README or reference coverage comparable to `ingest` and
+      `ingest_directories`. Public examples should show path-first
+      create/update; definition loading is for inspection, reuse, or copying
+      settings.
 - [x] Document that extraction definition methods require `groundx[extract]`,
       while importing and using the base SDK does not.
 - [x] Verify `prepare_extraction_yaml(...)`, `PreparedExtractionYaml`,
@@ -117,14 +124,15 @@
       docs or harness helper-preference PRs to merge.
 - [x] In `eyelevel-fern-config`, update
       `fern/pages/extract-data-from-documents.mdx` so the primary workflow
-      create and update examples load an extraction definition from YAML and use
-      the new create/update helpers.
+      create and update examples pass a YAML path directly to the new
+      create/update helpers.
 - [x] Add method-level public docs for
+      `client.load_extraction_definition(...)`,
       `client.load_extraction_definition_from_yaml(...)`,
       `client.load_extraction_definition_from_workflow(...)`,
       `client.create_extraction_workflow(...)`, and
       `client.update_extraction_workflow(...)`, including explicit workflow
-      assignment after create.
+      assignment after create and the exact-one-source rule for the loader.
 - [x] Keep Fern/OpenAPI schema names unchanged unless a separate schema-naming
       plan is created and approved.
 - [x] Validate Fern docs with the repo's docs checks.
@@ -136,11 +144,12 @@
 - [x] Keep `workflow_sdk_kwargs(...)` for offline compile artifacts and fallback
       until the minimum supported SDK version includes the helper methods.
 - [x] Update harness scanners, references, evals, and source surfaces so they
-      teach the first-class definition path as the preferred SDK path; refresh
-      generated plugin mirrors only through the repo-approved sync command.
+      teach path-first create/update as the preferred SDK path and definition
+      loading as the reuse/inspection path; refresh generated plugin mirrors
+      only through the repo-approved sync command.
 - [x] Update harness API-surface and Python SDK references that list
-      hand-written methods so the four promoted methods appear beside `ingest`
-      and `ingest_directories`.
+      hand-written methods so the promoted extraction workflow methods appear
+      beside `ingest` and `ingest_directories`.
 - [x] Update `skills/groundx-extraction-workflows/references/public-docs.md`
       so its public-doc flow prefers the new helper methods and no longer
       teaches `prepare_extraction_yaml(...)` as the primary public path.
@@ -197,11 +206,12 @@ Completed local implementation and verification:
   `git diff --check`.
 - Fern docs repo `/Users/benjaminfletcher/git/eyelevel-fern-config`:
   updated `fern/pages/extract-data-from-documents.mdx` to teach
-  `load_extraction_definition_from_yaml`, `create_extraction_workflow`,
-  `update_extraction_workflow`, and `load_extraction_definition_from_workflow`,
-  with method-level public docs covering parameters, returns, examples, extract
-  extra requirements, explicit workflow assignment after create, and full-update
-  semantics. Verification run: `fern check`, `git diff --check`.
+  path-first `create_extraction_workflow` and `update_extraction_workflow`,
+  plus `load_extraction_definition`, explicit YAML/workflow loader aliases, and
+  method-level public docs covering parameters, returns, examples, extract
+  extra requirements, exact-one-source validation, explicit workflow assignment
+  after create, and full-update semantics. Verification run: `fern check`,
+  `git diff --check`.
 - Harness repo
   `/Users/benjaminfletcher/git/groundx-studio-harness-support-custom-workflow-steps`:
   updated deploy/run/batch/prompt-manager templates to prefer helper methods
@@ -225,6 +235,15 @@ Completed local implementation and verification:
 
 Post-review fixes applied 2026-06-14:
 
+- Plan, SDK, docs, and harness guidance now promote
+  `client.create_extraction_workflow(path=...)` and
+  `client.update_extraction_workflow(id, path=...)` for the common YAML flow.
+  `client.load_extraction_definition(...)` is promoted for inspection, reuse,
+  and copying existing workflow settings, with explicit YAML/workflow aliases
+  retained for source-specific callers.
+- Arcadia now prefers `load_extraction_definition(prepared=...)` when the SDK
+  exposes it and falls back to `load_extraction_definition_from_yaml(prepared=...)`
+  for older SDKs.
 - Harness `run_extraction.py --reuse-workflow` now loads the existing extraction
   definition when the SDK helper is available, so X-Ray fallback keeps the
   workflow extract metadata and output routes.
@@ -237,7 +256,7 @@ Post-review fixes applied 2026-06-14:
   and update-semantics coverage, with a regression test enforcing those
   sections for the promoted helper methods.
 - Fern public docs now include method-level helper reference sections for the
-  four promoted extraction workflow helpers instead of only guide snippets.
+  promoted extraction workflow helpers instead of only guide snippets.
 - `execution-plan.md` now states that its detailed checkboxes are the original
   execution recipe and that this file is the authoritative current tracker.
 

@@ -16,12 +16,16 @@ As of 2026-06-14:
 
 - Local SDK, Fern docs, harness, Arcadia, and ADP scan work is implemented.
 - Detached ADP support worktree was removed after scan-only verification.
+- Post-review API correction is in progress: common create/update examples are
+  path-first, and `load_extraction_definition(...)` is the promoted loader for
+  inspection/reuse/copy workflows.
 - Remaining gates are SDK publish, fresh published-package verification, and
   draft-only downstream docs/harness merge gates.
 
-**Goal:** Give humans and automation four first-class SDK operations: load an
-extraction definition from YAML, load one from an existing workflow ID, create an
-extraction workflow, and update an extraction workflow.
+**Goal:** Give humans and automation first-class SDK operations to create or
+update extraction workflows directly from YAML, load an extraction definition
+from YAML or an existing workflow ID when inspection/reuse is needed, and keep
+explicit source-specific loader aliases for advanced callers.
 
 **Architecture:** Add an SDK-owned `ExtractionDefinition` object in the
 hand-written extract surface. Client methods load definitions from YAML or
@@ -1227,10 +1231,11 @@ miss `.fernignore` protections, or hide conflicts until PR time.
   workflow methods without `await`; the async tests above must fail if the
   generated async workflow client is not awaited.
 
-- [ ] Add docstrings for all eight client methods:
+- [ ] Add docstrings for all promoted client methods:
 
-  - sync and async YAML loaders;
-  - sync and async workflow-ID loaders;
+  - sync and async consolidated loaders;
+  - sync and async YAML loader aliases;
+  - sync and async workflow-ID loader aliases;
   - sync and async create helpers;
   - sync and async update helpers.
 
@@ -1243,7 +1248,7 @@ miss `.fernignore` protections, or hide conflicts until PR time.
       ExtractionDefinition` works.
 
 - [ ] Update `README.md` or the repo's hand-written SDK reference section so
-      the four promoted methods are listed beside `ingest` and
+      the promoted extraction workflow methods are listed beside `ingest` and
       `ingest_directories`.
 
 - [ ] Run:
@@ -1334,6 +1339,7 @@ allowed before this gate; public merge is not.
 
   for client_cls in (GroundX, AsyncGroundX):
       for name in (
+          "load_extraction_definition",
           "load_extraction_definition_from_yaml",
           "load_extraction_definition_from_workflow",
           "create_extraction_workflow",
@@ -1342,7 +1348,7 @@ allowed before this gate; public merge is not.
           assert callable(getattr(client_cls, name, None)), (client_cls, name)
 
   client = GroundX(api_key="test")
-  definition = client.load_extraction_definition_from_yaml(
+  definition = client.load_extraction_definition(
       yaml_text="""
   invoice:
     fields:
@@ -1357,7 +1363,7 @@ allowed before this gate; public merge is not.
   PY
   ```
 
-  Expected: the latest published `groundx[extract]` exposes the four helper
+  Expected: the latest published `groundx[extract]` exposes the promoted helper
   methods and can load authored YAML without a local checkout.
 
 - [ ] Record the published SDK version in the OpenSpec closeout notes before
@@ -1388,9 +1394,8 @@ allowed before this gate; public merge is not.
 
   client = GroundX(api_key=os.environ["GROUNDX_API_KEY"])
 
-  definition = client.load_extraction_definition_from_yaml(path="statement.yaml")
   workflow_response = client.create_extraction_workflow(
-      definition=definition,
+      path="statement.yaml",
       name="statement extraction",
   )
 
@@ -1404,10 +1409,9 @@ allowed before this gate; public merge is not.
 - [ ] Add the matching update example:
 
   ```python
-  definition = client.load_extraction_definition_from_yaml(path="statement.yaml")
   client.update_extraction_workflow(
       workflow_id,
-      definition=definition,
+      path="statement.yaml",
       name="statement extraction",
   )
   ```
@@ -1415,7 +1419,7 @@ allowed before this gate; public merge is not.
 - [ ] Add the workflow-ID load example:
 
   ```python
-  definition = client.load_extraction_definition_from_workflow(workflow_id)
+  definition = client.load_extraction_definition(workflow_id=workflow_id)
   ```
 
 - [ ] Keep an advanced note that `prepare_extraction_yaml(...)` returns
@@ -1425,7 +1429,7 @@ allowed before this gate; public merge is not.
       `definition.prepared is None` when the workflow does not preserve authored
       YAML metadata.
 
-- [ ] Add method-level public documentation for the four promoted methods with
+- [ ] Add method-level public documentation for the promoted helper methods with
       signatures, accepted source arguments, return values, sync examples, async
       examples, update semantics, explicit `groundx[extract]` dependency
       guidance, and explicit workflow assignment after create.
@@ -1451,8 +1455,8 @@ allowed before this gate; public merge is not.
     requires extract dependencies.
   - Confirm docs do not imply workflow-loaded definitions always have authored
     YAML metadata.
-  - Confirm the four methods are discoverable as first-class SDK helpers, not
-    only mentioned inside one extraction walkthrough.
+  - Confirm the promoted helper methods are discoverable as first-class SDK
+    helpers, not only mentioned inside one extraction walkthrough.
   - Confirm generated schema names remain untouched.
 
 ## Phase 3: Harness Templates And Skills
@@ -1502,6 +1506,7 @@ allowed before this gate; public merge is not.
           callable(getattr(gx, name, None))
           for name in (
               "load_extraction_definition_from_yaml",
+              "load_extraction_definition",
               "create_extraction_workflow",
               "update_extraction_workflow",
           )
@@ -1528,9 +1533,8 @@ allowed before this gate; public merge is not.
   workflow, metadata = build_workflow_artifacts(yaml_path, workflow_name)
   _validate_and_write_artifacts(workflow, metadata)
   if _client_has_extraction_workflow_helpers(gx):
-      definition = gx.load_extraction_definition_from_yaml(path=yaml_path)
       response = gx.create_extraction_workflow(
-          definition=definition,
+          path=yaml_path,
           name=workflow_name,
       )
   else:
@@ -1543,10 +1547,9 @@ allowed before this gate; public merge is not.
   workflow, metadata = build_workflow_artifacts(yaml_path, workflow_name)
   _validate_and_write_artifacts(workflow, metadata)
   if _client_has_extraction_workflow_helpers(gx):
-      definition = gx.load_extraction_definition_from_yaml(path=yaml_path)
       response = gx.update_extraction_workflow(
           workflow_id,
-          definition=definition,
+          path=yaml_path,
           name=workflow_name,
       )
   else:
@@ -1557,22 +1560,26 @@ allowed before this gate; public merge is not.
       `workflow_sdk_kwargs(...)` for fallback. Do not delete either in this
       plan.
 
-- [ ] Update harness references so the first-class definition path is preferred
-      and `workflow_sdk_kwargs(...)` is compatibility/offline support.
+- [ ] Update harness references so path-first create/update is preferred,
+      definition loading is the reuse/inspection path, and
+      `workflow_sdk_kwargs(...)` is compatibility/offline support.
 
 - [ ] Update `skills/groundx-extraction-workflows/references/public-docs.md`:
 
   - replace the old primary flow that says to use
     `prepare_extraction_yaml(...)` and pass prepared workflow groups;
-  - show the helper-backed public flow for creating and updating workflows;
+  - show the helper-backed public flow for creating and updating workflows
+    directly from a YAML path;
   - allow method names such as
-    `load_extraction_definition_from_yaml(...)` in code and method references;
+    `load_extraction_definition(...)` and explicit loader aliases in code and
+    method references;
   - keep explanatory prose customer-readable by preferring "YAML",
     "workflow settings", and "JSON you want back" over internal jargon.
 
 - [ ] Update harness GroundX API, GroundX Python, and architecture references
       that currently list `ingest` and `ingest_directories` as hand-written
-      Python SDK helpers so they also list the four promoted methods.
+      Python SDK helpers so they also list the promoted extraction workflow
+      methods.
 
 - [ ] Update harness evals and scanners so repeated invariants are machine
       checked where the repo already has a relevant gate:
@@ -1580,8 +1587,8 @@ allowed before this gate; public merge is not.
   - SDK-helper discoverability should be represented in `groundx-python` or
     architecture evals when those files already test hand-written helper
     routing.
-  - Extraction workflow template scanners should accept the first-class
-    definition path as preferred while keeping `workflow_sdk_kwargs(...)` as
+  - Extraction workflow template scanners should accept path-first
+    create/update as preferred while keeping `workflow_sdk_kwargs(...)` as
     compatibility/offline support.
   - Generated plugin mirrors must be refreshed with `node scripts/sync-plugin.mjs`
     after source files change; do not edit `plugins/` directly. After any sync,
@@ -1621,8 +1628,8 @@ allowed before this gate; public merge is not.
     artifacts before API calls.
   - Confirm scanners no longer require the old manual `workflow_sdk_kwargs`
     deployment path as the preferred path.
-  - Confirm SDK-surface references document the four methods like `ingest` and
-    `ingest_directories`.
+  - Confirm SDK-surface references document the promoted extraction workflow
+    methods like `ingest` and `ingest_directories`.
   - Confirm source-of-truth surfaces, evals/scanners, generated plugin mirrors,
     and version/changelog surfaces are consistent with the harness contributor
     contract.

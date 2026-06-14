@@ -9,8 +9,7 @@ callers to work with generated workflow response internals.
 #### Scenario: Load extraction definition from YAML path
 
 - **GIVEN** a local extraction YAML file
-- **WHEN** a caller invokes
-  `GroundX.load_extraction_definition_from_yaml(path=...)`
+- **WHEN** a caller invokes `GroundX.load_extraction_definition(path=...)`
 - **THEN** the SDK reads the file as UTF-8 YAML
 - **AND** prepares it through the same extraction YAML preparation path as
   `prepare_extraction_yaml(...)`
@@ -20,11 +19,13 @@ callers to work with generated workflow response internals.
   prepared metadata for advanced inspection
 - **AND** the base SDK package remains importable without loading optional
   extraction dependencies until this method is called
+- **AND** `GroundX.load_extraction_definition_from_yaml(path=...)` remains
+  available as an explicit source-specific alias
 
 #### Scenario: Load extraction definition from explicit YAML text or mapping
 
 - **GIVEN** in-memory extraction YAML or a YAML-shaped mapping
-- **WHEN** a caller invokes `GroundX.load_extraction_definition_from_yaml(...)`
+- **WHEN** a caller invokes `GroundX.load_extraction_definition(...)`
   with exactly one explicit source argument
 - **THEN** the SDK returns the same `ExtractionDefinition` shape
 - **AND** passing zero or multiple sources fails with a clear `ValueError`
@@ -35,7 +36,7 @@ callers to work with generated workflow response internals.
 #### Scenario: Load extraction definition from explicit workflow extract mapping
 
 - **GIVEN** a persisted or execution-only workflow `extract` mapping
-- **WHEN** a caller invokes `GroundX.load_extraction_definition_from_yaml(...)`
+- **WHEN** a caller invokes `GroundX.load_extraction_definition(...)`
   with `mapping=...` and `mapping_kind="workflow_extract"`
 - **THEN** the SDK treats the mapping as an existing workflow extract payload
 - **AND** preserves the extract mapping exactly
@@ -58,8 +59,7 @@ callers to work with generated workflow response internals.
 
 - **GIVEN** an existing GroundX workflow ID whose workflow contains extraction
   config
-- **WHEN** a caller invokes
-  `GroundX.load_extraction_definition_from_workflow(workflow_id)`
+- **WHEN** a caller invokes `GroundX.load_extraction_definition(workflow_id=...)`
 - **THEN** the SDK fetches the workflow through the generated workflow client
 - **AND** extracts the workflow `extract` mapping and workflow-level extraction
   settings
@@ -72,6 +72,21 @@ callers to work with generated workflow response internals.
   only when the corresponding top-level workflow response field is absent
 - **AND** if the workflow has no extraction config, the SDK raises a clear error
   naming the workflow ID
+- **AND** `GroundX.load_extraction_definition_from_workflow(workflow_id)`
+  remains available as an explicit source-specific alias
+
+#### Scenario: Consolidated loader rejects ambiguous sources
+
+- **GIVEN** a caller wants to load an extraction definition
+- **WHEN** they provide zero sources or more than one of `workflow_id`, `path`,
+  `yaml_text`, `mapping`, or `prepared`
+- **THEN** `GroundX.load_extraction_definition(...)` fails with a clear
+  `ValueError`
+- **AND** the SDK does not silently prefer `workflow_id` over `path`, `path`
+  over `yaml_text`, or any other source precedence
+- **AND** `mapping_kind` is valid only when `mapping` is the selected source
+- **AND** `request_options` is valid only when `workflow_id` is the selected
+  source
 
 #### Scenario: Workflow-loaded definition does not fake authored metadata
 
@@ -110,7 +125,8 @@ callers to work with generated workflow response internals.
 
 - **GIVEN** an async GroundX client
 - **WHEN** a caller invokes
-  `AsyncGroundX.load_extraction_definition_from_yaml(...)` or
+  `AsyncGroundX.load_extraction_definition(...)`,
+  `AsyncGroundX.load_extraction_definition_from_yaml(...)`, or
   `AsyncGroundX.load_extraction_definition_from_workflow(...)`
 - **THEN** the async methods accept the same source arguments as the sync
   methods
@@ -217,19 +233,22 @@ generated workflow client kwargs.
 - **AND** they await the generated async workflow create/update calls
 - **AND** they return the generated async `WorkflowResponse`
 
-### Requirement: Docs and harnesses prefer the definition path
+### Requirement: Docs and harnesses prefer path-first create/update
 
-Public documentation and harness templates SHALL teach the first-class
-definition loaders and workflow helpers as the primary SDK path once the SDK
-implementation exists, while preserving fallback paths for older SDKs and
-offline workflow JSON compilation.
+Public documentation and harness templates SHALL teach first-class workflow
+helpers as the primary SDK path once the SDK implementation exists. The common
+create/update flow passes a YAML path directly to create/update. Definition
+loading is promoted for inspection, reuse, and copying settings from an existing
+workflow while preserving fallback paths for older SDKs and offline workflow
+JSON compilation.
 
 #### Scenario: Methods are documented as hand-written SDK helpers
 
 - **GIVEN** the Python SDK ships hand-written helpers such as `ingest` and
   `ingest_directories`
 - **WHEN** extraction definition and workflow helpers are added
-- **THEN** `load_extraction_definition_from_yaml`,
+- **THEN** `load_extraction_definition`,
+  `load_extraction_definition_from_yaml`,
   `load_extraction_definition_from_workflow`, `create_extraction_workflow`, and
   `update_extraction_workflow` are documented with comparable method-level
   coverage
@@ -247,11 +266,12 @@ offline workflow JSON compilation.
 
 - **GIVEN** public extraction workflow docs
 - **WHEN** they show how to create or update a workflow from YAML
-- **THEN** the primary example loads an extraction definition from YAML and uses
-  `client.create_extraction_workflow(definition=..., name=...)`
+- **THEN** the primary example uses
+  `client.create_extraction_workflow(path=..., name=...)`
 - **AND** update examples use
-  `client.update_extraction_workflow(id, definition=..., name=...)`
-- **AND** shortcut examples may show `path=...` directly on create/update
+  `client.update_extraction_workflow(id, path=..., name=...)`
+- **AND** definition examples use `client.load_extraction_definition(...)` only
+  when the caller needs to inspect, reuse, or copy workflow settings
 - **AND** create examples keep the explicit workflow ID extraction and
   bucket/account assignment step
 - **AND** manual extraction of `persisted_workflow_extract["workflow"]` and
