@@ -7,7 +7,7 @@ implementation plans plus the `internal-arcadia-agents` deferral stub.
 Current status: Phase 0 discovery, contract, repo-owned planning artifacts, and
 the fresh-scan generated-SDK/X-Ray corrections are complete. Task 4 and Task 9
 are in `eyelevel-fern-config` PR #12 on branch
-`codex/support-custom-workflow-steps-fern`, current head `5f9650d`; the merge
+`codex/support-custom-workflow-steps-fern`, current head `60efc8b`; the merge
 conflict with `main` is resolved, the PR is clean, `fern check`, OpenSpec
 strict validation, YAML parsing, and `git diff --check` passed locally. Public
 docs publishing remains gated on Fern org access and the publish-last e2e phase.
@@ -18,13 +18,13 @@ Task 5 is in `cashbot-go` PR #1493 on branch
 `hotfix-search-dell`; the workflow-template hotfix and custom workflow-step
 runtime/API changes were merged, duplicate OpenAPI schema/property entries were
 removed, targeted Go and OpenSpec checks passed, and the branch now has a clean
-local merge simulation against `origin/hotfix-search-dell`. GitHub checks are
-rerunning after retarget; the remaining remote gates are CI completion and
-review. `go test ./...` remains blocked locally by repo-wide generated
-`version.go` prerequisites plus external service/state dependencies.
+local merge simulation against `origin/hotfix-search-dell`. GitHub checks pass
+after retarget; the remaining remote gate is review. `go test ./...` remains
+blocked locally by repo-wide generated `version.go` prerequisites plus external
+service/state dependencies.
 
 Task 6 is in `groundx-python` PR #11 on branch
-`codex/support-custom-workflow-steps-sdk`, current head `46e06e4`. The helper
+`codex/support-custom-workflow-steps-sdk`, current head `5cae434`. The helper
 implementation no longer changes generated folders under `src/groundx/types` or
 `src/groundx/workflows`; handwritten behavior lives under `src/groundx/extract`
 and `src/groundx/ingest.py`. Custom-step create/update helpers raise a clear
@@ -33,14 +33,14 @@ fields. Full SDK pytest, mypy, OpenSpec strict validation, and `git diff
 --check` passed locally.
 
 Task 7 has two current-wave pieces in `internal-arcadia-agents` PR #66 on
-branch `codex/extraction-reassembly-metadata`, current head `edb9b33`: the
+branch `codex/extraction-reassembly-metadata`, current head `e07f655`: the
 follow-on `reconcile_fields` / `qa_fields` / `save_fields` deferral remains
 explicit, and metadata-backed reassembly now consumes
 `customChunkOutputs`, `customSectionOutputs`, and `customDocumentOutputs`.
 Focused tests and the full Arcadia pytest suite passed locally.
 
 Task 8 is in `groundx-studio-harness` PR #19 on branch
-`codex/support-custom-workflow-steps-harness`, current head `64ee14f`. Studio
+`codex/support-custom-workflow-steps-harness`, current head `4d4caf4`. Studio
 Harness remains the source repo; `groundx-agent-harness` is only the generated
 mirror output. Python template tests, Node skill/eval gates, plugin mirror and
 version checks, full `node scripts/validate.mjs`, OpenSpec strict validation,
@@ -49,7 +49,7 @@ GitHub still marks the PR blocked by external review/check policy, not by a
 local validation failure or merge conflict.
 
 Task 10 is in `adp-poc` PR #1 on branch
-`codex/support-custom-workflow-steps-adp`, current head `004f844`. ADP manifest,
+`codex/support-custom-workflow-steps-adp`, current head `4e35397`. ADP manifest,
 converter/source-review, local SDK/harness compile, structural workflow
 validation, OpenSpec strict validation, and `git diff --check` passed locally
 after the SDK and harness corrections.
@@ -337,7 +337,7 @@ Review questions:
 
 Status: completed in isolated worktree
 `/Users/benjaminfletcher/git/adp-poc-support-custom-workflow-steps` on branch
-`codex/support-custom-workflow-steps-adp` as commit `004f844`.
+`codex/support-custom-workflow-steps-adp` as commit `4e35397`.
 
 1. ADP converter/YAML now use 13 custom chunk/instruct workflow steps.
 2. The 20-field executable-step rule is mirrored in ADP validation; the largest

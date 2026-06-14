@@ -356,14 +356,14 @@ Status: completed and pushed to PR #1493 in worktree
 branch `codex/support-custom-workflow-steps-runtime`, current head
 `c4e17a6cf`, base `hotfix-search-dell`. The Fern mirror endpoint correction is
 committed in `eyelevel-fern-config` and merged into the current Fern PR head
-`5f9650d`. Plan-specific targeted Go packages, OpenSpec strict validation,
+`60efc8b`. Plan-specific targeted Go packages, OpenSpec strict validation,
 `git diff --check`, and local merge simulation against
 `origin/hotfix-search-dell` pass. CI staticcheck initially failed on two S1011
 findings in `pkg/model/summarizer/custom_workflow.go`; rebased commit
 `f62b0e5c6` applies the variadic-append fix, and local package-level checks now
-pass. GitHub checks are rerunning after retarget; the remaining remote gates are
-CI completion and review. `go test ./...` remains blocked locally by repo-wide
-generated `version.go` prerequisites and external service/state dependencies.
+pass. GitHub checks pass after retarget; the remaining remote gate is review.
+`go test ./...` remains blocked locally by repo-wide generated `version.go`
+prerequisites and external service/state dependencies.
 
 **Likely files:**
 
@@ -446,7 +446,7 @@ generated `version.go` prerequisites and external service/state dependencies.
 
 Status: completed and pushed to PR #11 in isolated worktree
 `/Users/benjaminfletcher/git/groundx-python-support-custom-workflow-steps-sdk`
-on branch `codex/support-custom-workflow-steps-sdk`, final commit `46e06e4`.
+on branch `codex/support-custom-workflow-steps-sdk`, final commit `5cae434`.
 No implementation diffs remain under generated folders `src/groundx/types` or
 `src/groundx/workflows`. Handwritten helper behavior lives in
 `src/groundx/extract/*` and `src/groundx/ingest.py`; custom-step create/update
@@ -538,7 +538,7 @@ accepts `custom_steps`, `output_routes`, and `leaf_fields`. Verification passed:
 
 Status: current-wave deferral stub plus custom X-Ray reassembly support are
 complete in `internal-arcadia-agents` PR #66 on branch
-`codex/extraction-reassembly-metadata`, current head `edb9b33`. The deferral
+`codex/extraction-reassembly-metadata`, current head `e07f655`. The deferral
 stub lives at
 `/Users/benjaminfletcher/git/internal-arcadia-agents/openspec/notes/support-custom-workflow-steps-deferral.md`.
 The new `reconcile_fields`, `qa_fields`, and `save_fields` task graph remains
@@ -602,7 +602,7 @@ prerequisite for Task 8.
 Status: completed in isolated worktree
 `/Users/benjaminfletcher/git/groundx-studio-harness-support-custom-workflow-steps`
 on branch `codex/support-custom-workflow-steps-harness`, current PR #19 head
-`64ee14f`. `groundx-studio-harness` is the source repo; `groundx-agent-harness`
+`4d4caf4`. `groundx-studio-harness` is the source repo; `groundx-agent-harness`
 is generated mirror output only. Plugin payloads were mirrored to
 `plugins/groundx-studio-harness/` and `plugins/groundx-agent-harness/`; plugin
 version bumped to `2.1.6`. Verification was rerun after the SDK
@@ -669,7 +669,7 @@ generated-folder cleanup and passed:
 
 Status: completed in isolated worktree
 `/Users/benjaminfletcher/git/adp-poc-support-custom-workflow-steps` on branch
-`codex/support-custom-workflow-steps-adp` as commit `004f844`. Verification was
+`codex/support-custom-workflow-steps-adp` as commit `4e35397`. Verification was
 rerun after the SDK generated-folder cleanup and harness revalidation:
 
 - `python -m pytest tests/test_v1_schema_manifest.py -q` (`4 passed`)
