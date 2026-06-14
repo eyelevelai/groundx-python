@@ -31,4 +31,3 @@ requires a published SDK artifact.
 - **THEN** the release is recorded as failed
 - **AND** downstream dependency bumps and customer-facing closeout remain
   blocked until a corrective publication or approved replacement path passes
-
