@@ -4,5 +4,5 @@ import typing
 
 WorkflowTemplate = typing.Dict[str, str]
 """
-Workflow-level prompt template values used by workflow step prompts.
+Workflow-level prompt template values used by fixed and custom workflow step prompts.
 """

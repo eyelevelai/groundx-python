@@ -6,6 +6,9 @@ import pydantic
 import typing_extensions
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 from ..core.serialization import FieldMetadata
+from .custom_workflow_leaf_field import CustomWorkflowLeafField
+from .custom_workflow_output_route import CustomWorkflowOutputRoute
+from .custom_workflow_step import CustomWorkflowStep
 from .workflow_request_chunk_strategy import WorkflowRequestChunkStrategy
 from .workflow_request_section_strategy import WorkflowRequestSectionStrategy
 from .workflow_steps import WorkflowSteps
@@ -28,13 +31,37 @@ class WorkflowRequest(UniversalBaseModel):
     Extract agent definitions.
     """
 
+    template: typing.Optional[WorkflowTemplate] = None
     section_strategy: typing_extensions.Annotated[
         typing.Optional[WorkflowRequestSectionStrategy],
         FieldMetadata(alias="sectionStrategy"),
         pydantic.Field(alias="sectionStrategy"),
     ] = None
     steps: typing.Optional[WorkflowSteps] = None
-    template: typing.Optional[WorkflowTemplate] = None
+    custom_steps: typing_extensions.Annotated[
+        typing.Optional[typing.List[CustomWorkflowStep]],
+        FieldMetadata(alias="customSteps"),
+        pydantic.Field(
+            alias="customSteps",
+            description="Workflow-level custom extraction steps. Legacy fixed steps remain under steps.",
+        ),
+    ] = None
+    output_routes: typing_extensions.Annotated[
+        typing.Optional[typing.List[CustomWorkflowOutputRoute]],
+        FieldMetadata(alias="outputRoutes"),
+        pydantic.Field(
+            alias="outputRoutes",
+            description="Custom output routes. Each record must have exactly one matching leafFields record on finalPath, workflowGroup, workflowField, stepName, level, and outputKey.",
+        ),
+    ] = None
+    leaf_fields: typing_extensions.Annotated[
+        typing.Optional[typing.List[CustomWorkflowLeafField]],
+        FieldMetadata(alias="leafFields"),
+        pydantic.Field(
+            alias="leafFields",
+            description="Custom leaf-field metadata used to validate route integrity and executable-step field counts.",
+        ),
+    ] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
