@@ -746,8 +746,10 @@ Status: partially executed and blocked. Evidence is recorded in
       non-live substitute evidence approved to unblock release.
 - [ ] Adversarial review: confirm the test proves the deployed path, not only
       local compile. Current adversarial finding: custom-step execution and X-Ray
-      readback are deployed-path proven, but final extract still fails on a
-      deployed `statement`-root assumption and representative ADP ingest is
+      readback are deployed-path proven from the earlier synthetic run, but the
+      post-deploy rerun cannot reach processing because deployed ingest now
+      returns `Required attribute 'document.fileData' is missing or empty` for
+      the SDK upload/remote-ingest path. Representative ADP ingest is still
       blocked by subscription limits.
 
 ## Task 12: Closeout
