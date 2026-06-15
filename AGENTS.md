@@ -235,26 +235,6 @@ Most commits in this repo are `Release X.Y.Z` markers driven by SDK regeneration
 
 ---
 
-## 8. Spec-driven development (OpenSpec)
-
-Non-trivial changes to the hand-written layer start as an **OpenSpec** proposal, not as
-code. The spec is the durable record of *what* is changing and *why*, reviewed before
-implementation.
-
-- **Where specs live:** `openspec/changes/` (active proposals),
-  `openspec/changes/archive/` (completed), `openspec/specs/` (current canonical specs).
-- **Workflow:** propose the change → review the generated proposal, design, and tasks
-  → implement (test-first) → archive once merged. Run the OpenSpec CLI for the exact
-  propose/apply/archive commands available in this repo's toolchain.
-- `openspec/` is listed in `.fernignore`, so Fern regeneration never touches it.
-- **Scope:** OpenSpec changes in this repo target **only** the hand-written
-  `.fernignore` layer (`src/groundx/ingest.py`, `src/groundx/csv_splitter.py`,
-  `src/groundx/extract/`). API-surface changes belong upstream in
-  [`eyelevel-fern-config`](https://github.com/eyelevelai/eyelevel-fern-config) (see
-  [§3](#3-contributing-to-generated-code)), not here.
-
----
-
 ## 9. Workflow
 
 1. For a non-trivial change, propose an OpenSpec change first (see
@@ -312,3 +292,30 @@ https://pypi.org/project/groundx/.
 
 **License.** By contributing, you agree your contributions are licensed under the same
 MIT license as the project (see `LICENSE`).
+
+## OpenSpec
+
+OpenSpec manages the **documentation lifecycle** for this repo (proposal → specs → design →
+tasks). **Implementation** is done with **Superpowers** (brainstorm → plan → TDD → review →
+finish), which is ambient in the harness and triggers automatically. All spec work runs inside
+this repo on the feature branch.
+
+**Schema:** `spec-driven` (official)   **Role:** `library`   **Profile:** `core`   **Default command:** `/opsx:ff`
+
+Per-artifact content rules live in `openspec/config.yaml`. Inspect templates and runtime
+guidance with `openspec instructions <artifact>`.
+
+### Default slash command
+
+`/opsx:ff` — the recommended driver for this repo.
+- `/opsx:ff` — small, low-risk changes; all artifacts at once.
+- `/opsx:continue` — large or correctness-sensitive flows; one gated artifact at a time.
+- `/opsx:explore` — think first; useful when the approach is unclear.
+
+### Skills used by the artifacts
+
+- Open design questions in a proposal → `superpowers:brainstorming`.
+- Given/When/Then scenarios in specs → `superpowers:test-driven-development`.
+- Architectural decisions → `architectural-decision-records` skill; write ADRs to
+  `docs/adr/<LINEAR-TICKET>-<kebab>.md` (Linear ticket prefix mandatory). Cross-service
+  decisions live in the **producing** repo and are referenced from consumers' `design.md`.
