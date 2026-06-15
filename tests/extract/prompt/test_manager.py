@@ -29,6 +29,55 @@ class FailingSource(TestSource):
         return None
 
 
+class FlakyCachedSource(TestSource):
+    def __init__(self, raw: str) -> None:
+        super().__init__(raw)
+        self.fetch_calls = 0
+        self.peek_calls = 0
+        self.fail_fetch = False
+        self.fail_peek = False
+
+    def fetch(self, workflow_id: str) -> typing.Tuple[str, str]:
+        self.fetch_calls += 1
+        if self.fail_fetch:
+            raise Exception(f"fetch unavailable [{workflow_id}]")
+        return super().fetch(workflow_id)
+
+    def peek(self, workflow_id: str) -> typing.Optional[str]:
+        self.peek_calls += 1
+        if self.fail_peek:
+            raise Exception(f"peek unavailable [{workflow_id}]")
+        return super().peek(workflow_id)
+
+
+CUSTOM_WORKFLOW_YAML = """
+workflow:
+  template:
+    BILLING_HINT: Prefer values from the charge table.
+  custom_steps:
+    - name: line_item_labels
+      level: chunk
+      kind: keys
+      required_template_keys:
+        - BILLING_HINT
+      config:
+        all:
+          includes:
+            text: true
+
+line_items:
+  workflow_step: line_item_labels
+  fields:
+    description:
+      workflow_output_key: label
+      prompt:
+        identifiers:
+          - Description
+        instructions: Return the printed line-item description.
+        type: str
+"""
+
+
 class TestPromptManager(unittest.TestCase):
     def test_load_from_yaml_1(self) -> None:
         root = load_from_yaml(SAMPLE_YAML_1)
@@ -543,6 +592,33 @@ Special Instructions:
             provider.prompt.instructions,
             "Return the updated provider name.",
         )
+
+    def test_cached_workflow_survives_source_peek_failure(self) -> None:
+        source = FlakyCachedSource(SAMPLE_YAML_1)
+        manager = PromptManager(cache_source=source, config_source=source)
+        self.assertEqual(source.fetch_calls, 1)
+
+        source.fail_peek = True
+        source.fail_fetch = True
+
+        fields = manager.get_fields_for_workflow()
+
+        self.assertIn("statement", fields)
+        self.assertEqual(source.fetch_calls, 1)
+
+    def test_reload_if_changed_keeps_cache_when_source_peek_fails(self) -> None:
+        source = FlakyCachedSource(SAMPLE_YAML_1)
+        manager = PromptManager(cache_source=source, config_source=source)
+        self.assertEqual(source.fetch_calls, 1)
+
+        source.fail_peek = True
+        source.fail_fetch = True
+
+        manager.reload_if_changed()
+        fields = manager.get_fields_for_workflow()
+
+        self.assertIn("statement", fields)
+        self.assertEqual(source.fetch_calls, 1)
 
     def test_prepare_extraction_yaml_with_pseudo_groups(self) -> None:
         prepared = prepare_extraction_yaml(SAMPLE_YAML_PSEUDO_GROUPS)
@@ -1507,6 +1583,317 @@ _pseudo_groups:
             prepared.workflow_group_metadata,
             {"statement_identity": {"slot": ""}},
         )
+
+    def test_prepare_extraction_yaml_accepts_custom_workflow_steps(self) -> None:
+        prepared = prepare_extraction_yaml(CUSTOM_WORKFLOW_YAML)
+
+        self.assertNotIn("workflow", prepared.groups)
+        self.assertNotIn("workflow", prepared.workflow_groups)
+        self.assertIn("line_items", prepared.groups)
+        self.assertIn("description", prepared.groups["line_items"]["fields"])
+        self.assertNotIn("workflow_step", prepared.groups["line_items"])
+        self.assertNotIn(
+            "workflow_output_key",
+            prepared.groups["line_items"]["fields"]["description"],
+        )
+
+        workflow = prepared.persisted_workflow_extract["workflow"]
+        self.assertEqual(workflow["metadata_version"], 1)
+        self.assertEqual(
+            workflow["template"],
+            {"BILLING_HINT": "Prefer values from the charge table."},
+        )
+        self.assertEqual(
+            workflow["custom_steps"],
+            [
+                {
+                    "name": "line_item_labels",
+                    "level": "chunk",
+                    "kind": "keys",
+                    "required_template_keys": ["BILLING_HINT"],
+                    "config": {
+                        "all": {
+                            "includes": {"text": True},
+                        }
+                    },
+                }
+            ],
+        )
+        self.assertEqual(
+            workflow["output_routes"],
+            [
+                {
+                    "workflow_group": "line_items",
+                    "workflow_field": "description",
+                    "final_path": "/line_items/description",
+                    "step_name": "line_item_labels",
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": "label",
+                    "readback_path": (
+                        "/chunks/*/customChunkOutputs/line_item_labels/label"
+                    ),
+                }
+            ],
+        )
+        self.assertEqual(
+            workflow["leaf_fields"],
+            [
+                {
+                    "final_path": "/line_items/description",
+                    "workflow_group": "line_items",
+                    "workflow_field": "description",
+                    "step_name": "line_item_labels",
+                    "level": "chunk",
+                    "output_key": "label",
+                    "field_type": "str",
+                    "is_repeated": False,
+                    "repetition_scope": "none",
+                }
+            ],
+        )
+        self.assertEqual(workflow["field_counts"], {"line_item_labels": 1})
+        self.assertRegex(workflow["schema_hash"], r"^[0-9a-f]{64}$")
+
+    def test_prepare_extraction_yaml_routes_repeated_custom_fields_with_list_name(
+        self,
+    ) -> None:
+        prepared = prepare_extraction_yaml(
+            """
+workflow:
+  custom_steps:
+    - name: line_item_labels
+      level: chunk
+      kind: keys
+invoice:
+  workflow_step: line_item_labels
+  fields:
+    charges:
+      - fields:
+          description:
+            workflow_output_key: label
+            prompt:
+              instructions: Return the repeated charge description.
+              type: str
+"""
+        )
+
+        workflow = prepared.persisted_workflow_extract["workflow"]
+        self.assertEqual(
+            workflow["output_routes"][0]["final_path"],
+            "/invoice/charges/*/description",
+        )
+        self.assertEqual(
+            workflow["output_routes"][0]["workflow_field"],
+            "charges.description",
+        )
+        self.assertEqual(
+            workflow["leaf_fields"][0]["repetition_scope"],
+            "/invoice/charges/*",
+        )
+
+    def test_prepare_extraction_yaml_rejects_slot_and_workflow_step_conflict(
+        self,
+    ) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                """
+workflow:
+  custom_steps:
+    - name: line_item_labels
+      level: chunk
+      kind: keys
+line_items:
+  slot: chunk-keys
+  workflow_step: line_item_labels
+  fields:
+    description:
+      workflow_output_key: label
+      prompt:
+        instructions: Return the description.
+        type: str
+""",
+                workflow_group_metadata_keys={"slot"},
+            )
+
+        self.assertIn("slot", str(exc.exception))
+        self.assertIn("workflow_step", str(exc.exception))
+
+    def test_prepare_extraction_yaml_rejects_reserved_workflow_final_group(
+        self,
+    ) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                """
+workflow:
+  fields:
+    status:
+      prompt:
+        instructions: Return the workflow status.
+        type: str
+"""
+            )
+
+        self.assertIn("workflow", str(exc.exception))
+        self.assertIn("reserved", str(exc.exception).lower())
+
+    def test_prepare_extraction_yaml_rejects_invalid_custom_step_identity(
+        self,
+    ) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                CUSTOM_WORKFLOW_YAML.replace("line_item_labels", "line-item-labels")
+            )
+
+        self.assertIn("invalid custom step name", str(exc.exception))
+        self.assertIn("line-item-labels", str(exc.exception))
+
+    def test_prepare_extraction_yaml_rejects_case_normalized_step_name(
+        self,
+    ) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                CUSTOM_WORKFLOW_YAML.replace("line_item_labels", "LineItemLabels")
+            )
+
+        self.assertIn("invalid custom step name", str(exc.exception))
+        self.assertIn("LineItemLabels", str(exc.exception))
+
+    def test_prepare_extraction_yaml_rejects_duplicate_custom_step_name(
+        self,
+    ) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                """
+workflow:
+  custom_steps:
+    - name: line_item_labels
+      level: chunk
+      kind: keys
+    - name: line_item_labels
+      level: chunk
+      kind: keys
+line_items:
+  workflow_step: line_item_labels
+  fields:
+    description:
+      workflow_output_key: label
+      prompt:
+        instructions: Return the description.
+        type: str
+"""
+            )
+
+        self.assertIn("duplicate custom step name", str(exc.exception))
+        self.assertIn("line_item_labels", str(exc.exception))
+
+    def test_prepare_extraction_yaml_rejects_reserved_custom_step_name(
+        self,
+    ) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                CUSTOM_WORKFLOW_YAML.replace("line_item_labels", "chunk_keys")
+            )
+
+        self.assertIn("reserved custom step name", str(exc.exception))
+        self.assertIn("chunk_keys", str(exc.exception))
+
+    def test_prepare_extraction_yaml_rejects_missing_required_template_keys(
+        self,
+    ) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                CUSTOM_WORKFLOW_YAML.replace(
+                    "    BILLING_HINT: Prefer values from the charge table.\n", ""
+                )
+            )
+
+        self.assertIn("missing template key", str(exc.exception))
+        self.assertIn("BILLING_HINT", str(exc.exception))
+
+    def test_prepare_extraction_yaml_rejects_custom_step_over_20_fields(
+        self,
+    ) -> None:
+        fields = "\n".join(
+            f"""    field_{idx}:
+      workflow_output_key: label_{idx}
+      prompt:
+        instructions: Return field {idx}.
+        type: str"""
+            for idx in range(21)
+        )
+
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                f"""
+workflow:
+  custom_steps:
+    - name: overloaded_fields
+      level: chunk
+      kind: keys
+line_items:
+  workflow_step: overloaded_fields
+  fields:
+{fields}
+"""
+            )
+
+        self.assertIn("overloaded_fields", str(exc.exception))
+        self.assertIn("at most 20 fields", str(exc.exception))
+
+    def test_prepare_extraction_yaml_rejects_duplicate_output_destination(
+        self,
+    ) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                """
+workflow:
+  custom_steps:
+    - name: line_item_labels
+      level: chunk
+      kind: keys
+line_items:
+  workflow_step: line_item_labels
+  fields:
+    description:
+      workflow_output_key: label
+      prompt:
+        instructions: Return the description.
+        type: str
+    amount:
+      workflow_output_key: label
+      prompt:
+        instructions: Return the amount.
+        type: str
+"""
+            )
+
+        self.assertIn("duplicate output destination", str(exc.exception))
+        self.assertIn("line_item_labels.label", str(exc.exception))
+
+    def test_prepare_extraction_yaml_rejects_custom_step_without_routes(
+        self,
+    ) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                """
+workflow:
+  custom_steps:
+    - name: unrouted_fields
+      level: chunk
+      kind: keys
+invoice:
+  workflow_step: unrouted_fields
+  fields:
+    account_number:
+      prompt:
+        instructions: Return the account number.
+        type: str
+"""
+            )
+
+        self.assertIn("output routes", str(exc.exception))
+        self.assertIn("workflow_output_key", str(exc.exception))
 
     def test_get_prompt_1(self) -> None:
         tsts: typing.List[typing.Dict[str, typing.Any]] = [

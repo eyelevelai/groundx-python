@@ -42,6 +42,48 @@ client.ingest(
 )
 ```
 
+## Extraction Workflows
+
+Extraction workflow helpers require the extract extra:
+
+```sh
+pip install "groundx[extract]"
+```
+
+Create or update an extraction workflow directly from a YAML file:
+
+```python
+from groundx import GroundX
+
+client = GroundX(api_key="YOUR_API_KEY")
+
+workflow = client.create_extraction_workflow(
+    path="statement.yaml",
+    name="statement extraction",
+)
+
+client.update_extraction_workflow(
+    workflow.workflow.workflow_id,
+    path="statement.yaml",
+    name="statement extraction",
+)
+```
+
+Load an extraction definition when you need to inspect or reuse settings:
+
+```python
+definition = client.load_extraction_definition(path="statement.yaml")
+existing = client.load_extraction_definition(workflow_id="workflow-id")
+```
+
+If `workflow_id` is provided, the SDK loads from that workflow before considering
+YAML inputs. For create/update, pass `path=...` directly for the common case or
+pass `definition=...` when you already loaded one; `definition` takes precedence
+over YAML inputs.
+
+Workflow assignment is still explicit. After creating a workflow, assign it to a
+bucket, group, or account with the normal workflow API.
+
 ## Async Client
 
 The SDK also exports an `async` client so that you can make non-blocking calls to our API.
