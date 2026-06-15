@@ -802,6 +802,48 @@ _pseudo_groups:
             {"statement_identity": {"slot": "chunk-instruct"}},
         )
 
+    def test_prepare_extraction_yaml_rejects_unsupported_top_level_scalar_metadata(
+        self,
+    ) -> None:
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                """
+unsupported_policy_version: v1
+statement:
+  fields:
+    account_number:
+      prompt:
+        instructions: Return the account number.
+        type: str
+"""
+            )
+
+        message = str(exc.exception)
+        self.assertIn("unsupported top-level metadata [unsupported_policy_version]", message)
+        self.assertIn("top_level_metadata_keys", message)
+        self.assertIn("workflow metadata", message)
+
+    def test_prepare_extraction_yaml_accepts_supported_policy_version_metadata(
+        self,
+    ) -> None:
+        prepared = prepare_extraction_yaml(
+            """
+extraction_policy_version: v1
+statement:
+  fields:
+    account_number:
+      prompt:
+        instructions: Return the account number.
+        type: str
+"""
+        )
+
+        self.assertEqual(
+            prepared.top_level_metadata,
+            {"extraction_policy_version": "v1"},
+        )
+        self.assertIn("statement", prepared.groups)
+
     def test_prepare_extraction_yaml_identity_route_map_for_legacy_yaml(self) -> None:
         prepared = prepare_extraction_yaml(SAMPLE_YAML_1)
 

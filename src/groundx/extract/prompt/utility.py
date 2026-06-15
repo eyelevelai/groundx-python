@@ -29,6 +29,7 @@ _RESERVED_TOP_LEVEL_KEYS = {
     _PERSISTED_WORKFLOW_EXTRACT_KEY,
     _CUSTOM_WORKFLOW_KEY,
 }
+_SUPPORTED_TOP_LEVEL_METADATA_KEYS = {"extraction_policy_version"}
 _PSEUDO_GROUP_BODY_KEYS = {"prompt", "fields"}
 _PSEUDO_FIELD_KEYS = {"path"}
 _CUSTOM_STEP_NAME_RE = re.compile(r"^[a-z][a-z0-9_]{0,63}$")
@@ -276,6 +277,17 @@ def _ensure_mapping(value: typing.Any, path: str) -> typing.Dict[str, typing.Any
         raise ValueError(f"Expected mapping at [{path}], got {type(value)}")
 
     return typing.cast(typing.Dict[str, typing.Any], value)
+
+
+def _raise_unsupported_top_level_metadata(key: str) -> typing.NoReturn:
+    raise ValueError(
+        f"unsupported top-level metadata [{key}]; generic SDK top-level keys "
+        "must be extraction groups with mapping values, reserved SDK keys, or "
+        "supported SDK metadata keys. "
+        "If this key is domain-specific metadata, register it with "
+        "top_level_metadata_keys. Otherwise convert it to supported workflow "
+        "metadata before using the generic extraction workflow helpers."
+    )
 
 
 def _ensure_fields_mapping(
@@ -1439,7 +1451,8 @@ def prepare_extraction_yaml(
         ) and _is_custom_workflow_persisted_metadata(persisted_workflow):
             data[_CUSTOM_WORKFLOW_KEY] = _copy_mapping(persisted_workflow)
     custom_workflow_kind_and_input = _custom_workflow_input(data)
-    top_metadata_key_set = set(top_level_metadata_keys or [])
+    top_metadata_key_set = set(_SUPPORTED_TOP_LEVEL_METADATA_KEYS)
+    top_metadata_key_set.update(top_level_metadata_keys or [])
     final_metadata_key_set = set(final_group_metadata_keys or [])
     workflow_metadata_key_set = set(workflow_group_metadata_keys or [])
     effective_workflow_metadata_key_set = workflow_metadata_key_set | {
@@ -1471,6 +1484,8 @@ def prepare_extraction_yaml(
     final_group_metadata: typing.Dict[str, typing.Dict[str, typing.Any]] = {}
     final_workflow_metadata: typing.Dict[str, typing.Dict[str, typing.Any]] = {}
     for group_name, raw_group in raw_groups.items():
+        if not isinstance(raw_group, dict):
+            _raise_unsupported_top_level_metadata(group_name)
         group = _ensure_mapping(raw_group, group_name)
         group, final_metadata = _split_metadata(group, final_metadata_key_set)
         group, workflow_metadata = _split_metadata(

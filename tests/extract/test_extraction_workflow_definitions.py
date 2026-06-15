@@ -43,6 +43,26 @@ line_items:
         type: str
 """
 
+INVALID_TOP_LEVEL_METADATA_YAML = """
+unsupported_policy_version: v1
+statement:
+  fields:
+    account_number:
+      prompt:
+        instructions: Return the account number.
+        type: str
+"""
+
+POLICY_METADATA_YAML = """
+extraction_policy_version: v1
+statement:
+  fields:
+    account_number:
+      prompt:
+        instructions: Return the account number.
+        type: str
+"""
+
 
 EXECUTION_ONLY_EXTRACT = {
     "line_items": {
@@ -610,6 +630,103 @@ def test_create_and_update_accept_yaml_path_shortcut(tmp_path: Path) -> None:
     }
 
 
+def test_create_and_update_yaml_path_errors_include_source_context(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "statement.yaml"
+    path.write_text(INVALID_TOP_LEVEL_METADATA_YAML)
+    workflows = RecordingWorkflows()
+    client = _client(workflows)
+
+    with pytest.raises(ValueError) as create_exc:
+        client.create_extraction_workflow(
+            path=path,
+            name="statement extraction",
+        )
+
+    create_message = str(create_exc.value)
+    assert str(path) in create_message
+    assert "unsupported top-level metadata [unsupported_policy_version]" in create_message
+    assert "top_level_metadata_keys" in create_message
+
+    with pytest.raises(ValueError) as update_exc:
+        client.update_extraction_workflow(
+            "workflow-1",
+            path=path,
+            name="statement extraction",
+        )
+
+    update_message = str(update_exc.value)
+    assert str(path) in update_message
+    assert "unsupported top-level metadata [unsupported_policy_version]" in update_message
+    assert "top_level_metadata_keys" in update_message
+    assert workflows.calls == []
+
+
+@pytest.mark.asyncio
+async def test_async_create_and_update_yaml_path_accept_supported_policy_metadata(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "statement.yaml"
+    path.write_text(POLICY_METADATA_YAML)
+    workflows = AsyncRecordingWorkflows()
+    client = _async_client(workflows)
+
+    assert (
+        await client.create_extraction_workflow(
+            path=path,
+            name="statement extraction",
+        )
+        == "created"
+    )
+    assert (
+        await client.update_extraction_workflow(
+            "workflow-1",
+            path=path,
+            name="statement extraction",
+        )
+        == "updated"
+    )
+
+    create_extract = workflows.calls[0][1]["extract"]
+    update_extract = workflows.calls[1][2]["extract"]
+    assert create_extract == update_extract
+    assert (
+        create_extract["_groundx_persisted_extract"]["extraction_policy_version"]
+        == "v1"
+    )
+
+
+def test_create_and_update_yaml_path_accept_supported_policy_metadata(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "statement.yaml"
+    path.write_text(POLICY_METADATA_YAML)
+    workflows = RecordingWorkflows()
+    client = _client(workflows)
+
+    assert (
+        client.create_extraction_workflow(
+            path=path,
+            name="statement extraction",
+        )
+        == "created"
+    )
+    assert (
+        client.update_extraction_workflow(
+            "workflow-1",
+            path=path,
+            name="statement extraction",
+        )
+        == "updated"
+    )
+
+    create_extract = workflows.calls[0][1]["extract"]
+    update_extract = workflows.calls[1][2]["extract"]
+    assert create_extract == update_extract
+    assert create_extract["_groundx_persisted_extract"]["extraction_policy_version"] == "v1"
+
+
 def test_create_requires_name_but_update_can_omit_name() -> None:
     workflows = RecordingWorkflows()
     client = _client(workflows)
@@ -694,3 +811,37 @@ async def test_async_methods_match_sync_source_loading_and_forwarding() -> None:
     assert workflows.calls[2][1]["template"]["{{LANGUAGE_UNKNOWN}}"] == ""
     assert direct_definition.extract == definition.extract
     assert workflow_definition.extract == from_workflow.extract
+
+
+@pytest.mark.asyncio
+async def test_async_create_and_update_yaml_path_errors_include_source_context(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "statement.yaml"
+    path.write_text(INVALID_TOP_LEVEL_METADATA_YAML)
+    workflows = AsyncRecordingWorkflows()
+    client = _async_client(workflows)
+
+    with pytest.raises(ValueError) as create_exc:
+        await client.create_extraction_workflow(
+            path=path,
+            name="statement extraction",
+        )
+
+    create_message = str(create_exc.value)
+    assert str(path) in create_message
+    assert "unsupported top-level metadata [unsupported_policy_version]" in create_message
+    assert "top_level_metadata_keys" in create_message
+
+    with pytest.raises(ValueError) as update_exc:
+        await client.update_extraction_workflow(
+            "workflow-1",
+            path=path,
+            name="statement extraction",
+        )
+
+    update_message = str(update_exc.value)
+    assert str(path) in update_message
+    assert "unsupported top-level metadata [unsupported_policy_version]" in update_message
+    assert "top_level_metadata_keys" in update_message
+    assert workflows.calls == []

@@ -92,12 +92,19 @@ def load_extraction_definition_from_yaml(
         raise ValueError("mapping_kind is only valid when mapping is the selected source")
 
     if source_name == "path":
-        raw_yaml = Path(source_value).read_text(encoding="utf-8")
-        prepared_value = prepare_extraction_yaml(raw_yaml)
+        source_path = Path(source_value)
+        raw_yaml = source_path.read_text(encoding="utf-8")
+        prepared_value = _prepare_extraction_yaml_with_context(
+            raw_yaml,
+            f"path [{source_path}]",
+        )
         return _definition_from_prepared(prepared_value)
 
     if source_name == "yaml_text":
-        prepared_value = prepare_extraction_yaml(source_value)
+        prepared_value = _prepare_extraction_yaml_with_context(
+            source_value,
+            "yaml_text",
+        )
         return _definition_from_prepared(prepared_value)
 
     if source_name == "prepared":
@@ -121,7 +128,10 @@ def load_extraction_definition_from_yaml(
                 "mapping looks like an existing workflow extract; pass "
                 "mapping_kind='workflow_extract' to load it explicitly"
             )
-        prepared_value = prepare_extraction_yaml(mapping_value)
+        prepared_value = _prepare_extraction_yaml_with_context(
+            mapping_value,
+            "mapping",
+        )
         return _definition_from_prepared(prepared_value)
 
     raise AssertionError(f"unsupported source {source_name}")
@@ -344,6 +354,16 @@ def _prepared_from_workflow_extract(
     if _PERSISTED_WORKFLOW_EXTRACT_KEY not in extract:
         return None
     return prepare_extraction_yaml(extract)
+
+
+def _prepare_extraction_yaml_with_context(
+    source: typing.Union[str, typing.Mapping[str, typing.Any]],
+    context: str,
+) -> PreparedExtractionYaml:
+    try:
+        return prepare_extraction_yaml(source)
+    except ValueError as exc:
+        raise ValueError(f"failed to load extraction YAML from {context}: {exc}") from exc
 
 
 def _select_source(**sources: typing.Any) -> typing.Tuple[str, typing.Any]:
