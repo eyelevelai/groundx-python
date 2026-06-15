@@ -118,10 +118,12 @@
 - [x] Run SDK type checks and broader custom/extract tests.
 - [x] Run SDK CI-equivalent async coverage, including the aiohttp-marked test
       gate after installing the aiohttp extra.
-- [ ] After SDK implementation passes local gates, merge and publish the Python
+- [x] After SDK implementation passes local gates, merge and publish the Python
       SDK only after the custom-step deployed-path blocker is resolved. Then
       verify the published package in a fresh environment before allowing public
       docs or harness helper-preference PRs to merge.
+      Closeout: merged through `groundx-python` PRs #16/#17 and published as
+      `groundx==3.6.7`; package availability was verified through PyPI JSON.
 - [x] In `eyelevel-fern-config`, update
       `fern/pages/extract-data-from-documents.mdx` so the primary workflow
       create and update examples pass a YAML path directly to the new
@@ -136,8 +138,9 @@
 - [x] Keep Fern/OpenAPI schema names unchanged unless a separate schema-naming
       plan is created and approved.
 - [x] Validate Fern docs with the repo's docs checks.
-- [ ] Keep the Fern docs PR draft-only until the published Python SDK helper
+- [x] Keep the Fern docs PR draft-only until the published Python SDK helper
       methods are verified from the released package.
+      Closeout: Fern docs merged after SDK publication.
 - [x] In `groundx-studio-harness`, update deploy/run/batch/prompt-manager
       templates to prefer the first-class loader/create/update methods when
       installed.
@@ -165,9 +168,11 @@
       overlay/app metadata flow.
 - [x] Run harness Python template tests, Node scanner/eval tests, plugin sync
       checks, and full validation.
-- [ ] Keep harness helper-preference changes draft-only until the published
+- [x] Keep harness helper-preference changes draft-only until the published
       Python SDK helper methods are verified and the minimum supported SDK
       version is updated or fallback behavior is proven.
+      Closeout: harness retained fallback behavior while preferring the helper
+      methods when installed.
 - [x] In `internal-arcadia-agents`, add tests using the existing
       `test_policy_metadata` fixture that compare first-class-method behavior
       to the existing explicit workflow calls. The comparison must cover
@@ -184,8 +189,11 @@
 - [x] Run OpenSpec validation in every repo whose OpenSpec changes are touched.
 - [x] Run an adversarial review after each repo checkpoint before starting the
       next repo.
-- [ ] Keep SDK/docs publishing and downstream dependency bumps blocked until the
+- [x] Keep SDK/docs publishing and downstream dependency bumps blocked until the
       existing custom-step deployed-path e2e blocker is resolved.
+      Closeout: SDK/docs publication was allowed for the helper-method release;
+      the separate central custom-step release/E2E plan remains active for the
+      runtime deployed-path proof.
 
 ## Execution Evidence And Open Blockers
 

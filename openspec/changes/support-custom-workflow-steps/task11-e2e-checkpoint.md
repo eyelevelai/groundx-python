@@ -4,6 +4,9 @@
 
 Partially executed. Release remains blocked.
 
+Updated 2026-06-15 after cashbot-go `master` CI passed and
+`groundx==3.6.7` was published.
+
 ## Local Non-Live Evidence
 
 - Legacy YAML selected:
@@ -44,13 +47,27 @@ Using the unpublished local SDK against the deployed API:
     rejected this before save.
 - Cleanup verification found zero remaining workflows with prefix
   `codex-e2e-support-custom-workflow-steps-`.
+- Retest after deployment:
+  - Valid small custom-step workflow create/delete succeeded.
+    - Created workflow ID: `830592ad-32af-4a65-a43b-e03d1ceeebb3`
+    - Deleted successfully.
+  - Negative 159-field oversized/spoofed workflow did not save, but the API
+    disconnected without a response. That is not acceptable release evidence.
+  - Negative 21-field oversized/spoofed workflow returned HTTP 400, but the
+    message was `Required attribute 'workflow.outputRoutes' is missing or
+    empty` rather than a clear 20-field/custom-step guardrail error. That is
+    not acceptable release evidence.
+  - Cleanup verification again found zero remaining workflows with prefix
+    `codex-e2e-support-custom-workflow-steps-`.
 
 ## Blockers
 
-- The deployed API does not currently enforce the 20-field executable custom
-  step limit against canonical route/leaf metadata. Release e2e cannot pass
-  until the runtime/API branch containing that validation is deployed and this
-  negative live check rejects the oversized/spoofed request.
+- The deployed API no longer accepts the narrow invalid workflow, but the live
+  negative checks still do not prove the intended 20-field executable custom
+  step guardrail. One path disconnected without a response; the narrower path
+  returned an unrelated missing-route error. Release e2e cannot be closed until
+  the oversized/spoofed request fails with a clear custom-step field-count
+  validation error.
 - `FERN_TOKEN` / Fern org access and `NPM_TOKEN` are unavailable in the local
   environment, so docs publish and TypeScript package publish remain blocked.
 - Live representative document ingest/extract was not run because the deployed
@@ -59,7 +76,6 @@ Using the unpublished local SDK against the deployed API:
 
 ## Required Next Step
 
-Deploy or otherwise point e2e at the runtime/API artifact containing the
-Task 5 validation, provide the publish credentials/access needed by the
-publish-last gate, then rerun Task 11 from the live negative oversized-step
-check onward.
+Fix or verify the deployed runtime/API validation path so oversized/spoofed
+custom-step requests fail with the intended field-count error, then rerun Task
+11 from the live negative oversized-step check onward.
