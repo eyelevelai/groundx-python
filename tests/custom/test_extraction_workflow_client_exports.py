@@ -137,7 +137,7 @@ def test_extraction_methods_raise_install_hint_when_extract_extra_is_missing(
         client.load_extraction_definition_from_yaml(yaml_text=CUSTOM_WORKFLOW_YAML)
 
 
-def test_create_extraction_workflow_gates_custom_steps_until_generated_client_release() -> None:
+def test_create_extraction_workflow_sends_custom_steps_after_generated_client_release() -> None:
     captured: typing.List[httpx.Request] = []
 
     def handler(request: httpx.Request) -> httpx.Response:
@@ -158,10 +158,19 @@ def test_create_extraction_workflow_gates_custom_steps_until_generated_client_re
             base_url="https://api.test",
             httpx_client=httpx_client,
         )
-        with pytest.raises(RuntimeError, match="Regenerate and publish"):
-            client.create_extraction_workflow(
-                yaml_text=CUSTOM_WORKFLOW_YAML,
-                name="statement extraction",
-            )
+        client.create_extraction_workflow(
+            yaml_text=CUSTOM_WORKFLOW_YAML,
+            name="statement extraction",
+        )
 
-    assert captured == []
+    assert len(captured) == 1
+    payload = _request_json(captured[0])
+    assert payload["customSteps"][0]["name"] == "line_item_labels"
+    assert payload["customSteps"][0]["requiredTemplateKeys"] == ["{{LANGUAGE}}"]
+    assert payload["template"] == {
+        "{{LANGUAGE}}": "English",
+        "{{LANGUAGE_UNKNOWN}}": "",
+    }
+    assert payload["steps"]["chunk-keys"] is None
+    assert payload["outputRoutes"][0]["stepName"] == "line_item_labels"
+    assert payload["leafFields"][0]["stepName"] == "line_item_labels"
