@@ -15,6 +15,11 @@
   3. handwritten extract YAML and persisted metadata;
   4. X-Ray/readback parsing and full SDK verification.
 
+Closeout: this child SDK plan was superseded by the final single-PR helper
+implementation in `groundx-python` PRs #16/#17 and release `groundx==3.6.7`.
+The original unchecked items below are retained as historical planning context,
+not as remaining active work.
+
 ## Tasks
 
 - [ ] Create or select clean branch `codex/support-custom-workflow-steps-sdk`
