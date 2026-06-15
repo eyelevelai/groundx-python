@@ -5,7 +5,8 @@
 Partially executed. Release remains blocked.
 
 Updated 2026-06-15 after deployed runtime/API guardrail retests, live ingest
-attempts, a committed SDK payload fix, and a post-deploy ingest rerun.
+attempts, SDK payload/readback fixes, an Arcadia runtime guard fix, and a
+post-deploy ingest rerun.
 
 ## Local Non-Live Evidence
 
@@ -33,6 +34,12 @@ attempts, a committed SDK payload fix, and a post-deploy ingest rerun.
   is runtime-safe, keeps persisted `workflow.metadata_version: 1`, strips
   authoring-only custom-step keys, and still reloads from persisted route/leaf
   metadata.
+- Local SDK readback fix added regressions so routed custom X-Ray outputs load
+  into final YAML paths, including repeated custom outputs that should land in
+  one final row.
+- Local Arcadia runtime guard fix added a regression for custom workflows that
+  have no legacy `statement` group. Unknown flat outputs no longer crash
+  `Statement.add()` with `[latest.yaml] is missing a statement entry`.
 - Focused verification after the local SDK fix:
   `poetry run pytest tests/custom/test_extraction_workflow_client_exports.py tests/extract/test_extraction_workflow_definitions.py tests/extract/prompt/test_manager.py tests/extract/prompt/test_persisted_workflow_extract.py -q`
   passed with `93 passed, 5 subtests passed`.
@@ -152,24 +159,26 @@ Using the local SDK against the deployed API/runtime:
 ## Blockers
 
 - The SDK payload fix is committed and pushed in PR #19, but it is not merged or
-  released. Published-SDK E2E is still blocked on review, merge, and the next
-  `groundx-python` release.
+  released. The SDK readback fix is also pushed in PR #19. Published-SDK E2E is
+  still blocked on review, merge, and the next `groundx-python` release.
+- The Arcadia missing-`statement` guard is pushed in
+  `internal-arcadia-agents` PR #67, but it is not merged or deployed.
 - Live representative ADP ingest is blocked by the current account/subscription
   limit: even the smallest sanitized representative PDF attempted here failed as
   too large for the subscription level.
-- The deployed final-extract/layout path is still not generic. The corrected
-  no-`process_level` rerun reached processing and custom X-Ray readback worked,
-  but final layout/extract failed because the extract agent still expected a
-  `statement` root group.
+- The deployed final-extract/layout path has not been retested after the local
+  SDK and Arcadia fixes. The corrected no-`process_level` rerun reached
+  processing and custom X-Ray readback worked, but final layout/extract failed
+  on the then-deployed `statement` root assumption.
 - Local publish credentials such as Fern org access and NPM token are not
   available in this environment; any docs/SDK/TypeScript publish verification
   must be done through the maintainer-owned release path.
 
 ## Required Next Step
 
-Merge and release PR #19, then fix the deployed final-extract/layout
-`statement` assumption or explicitly accept custom X-Ray readback as substitute
-deployed-path evidence for this release. If representative ADP ingest remains
-subscription-blocked, use an explicitly approved small synthetic ADP PDF as the
-deployed-path substitute. Only archive the plan after the rerun either passes or
-release governance explicitly accepts substitute evidence.
+Merge and release PR #19, merge and deploy `internal-arcadia-agents` PR #67,
+then rerun the corrected `client.ingest(...)` deployed-path test with no
+`process_level`. If representative ADP ingest remains subscription-blocked, use
+an explicitly approved small synthetic ADP PDF as the deployed-path substitute.
+Only archive the plan after the rerun either passes or release governance
+explicitly accepts substitute evidence.
