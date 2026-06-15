@@ -125,7 +125,7 @@
   "originGitCommit": "f0151a00df5bafb2bbde7018796ce09eddd719e6",
   "originGitCommitIsDirty": false,
   "invokedBy": "ci",
-  "requestedVersion": "3.6.5",
+  "requestedVersion": "3.6.4",
   "ciProvider": "github",
-  "sdkVersion": "3.6.5"
+  "sdkVersion": "3.6.4"
 }
