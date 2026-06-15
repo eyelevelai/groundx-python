@@ -749,8 +749,11 @@ Status: partially executed and blocked. Evidence is recorded in
       readback are deployed-path proven. The corrected post-deploy rerun used
       `client.ingest(...)` without `process_level`, reached processing, and
       read custom outputs from X-Ray, but final layout/extract still failed on
-      the deployed `statement`-root assumption. Representative ADP ingest is
-      still blocked by subscription limits.
+      the then-deployed `statement`-root assumption. Local SDK route-readback
+      and Arcadia missing-`statement` guard fixes are pushed in PR #19 and
+      `internal-arcadia-agents` PR #67; final deployed rerun is pending after
+      merge/release/deploy. Representative ADP ingest is still blocked by
+      subscription limits.
 
 ## Task 12: Closeout
 
