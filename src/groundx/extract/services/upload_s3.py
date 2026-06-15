@@ -33,7 +33,7 @@ class S3Client:
 
             response = self.client.get_object(Bucket=s3_bucket, Key=s3_key)
 
-            return response.get("Body").read()
+            return self._read_body(response)
         except Exception as e:
             self.logger.error_msg(f"[{url}] exception: {e}")
             raise
@@ -50,12 +50,9 @@ class S3Client:
 
             response = self.client.get_object(Bucket=s3_bucket, Key=s3_key)
 
-            body = response.get("Body").read()
+            body = self._read_body(response)
 
-            return body, {
-                "ETag": response.get("ETag", ""),
-                "LastModified": str(response.get("LastModified").timestamp()),
-            }
+            return body, self._metadata_from_response(response)
 
         except Exception as e:
             self.logger.error_msg(f"[{url}] exception: {e}")
@@ -71,10 +68,7 @@ class S3Client:
 
             response = self.client.head_object(Bucket=s3_bucket, Key=s3_key)
 
-            return {
-                "ETag": response.get("ETag", ""),
-                "LastModified": str(response.get("LastModified").timestamp()),
-            }
+            return self._metadata_from_response(response)
         except Exception as e:
             self.logger.error_msg(f"[{url}] exception: {e}")
             raise
@@ -108,6 +102,37 @@ class S3Client:
             Body=data,
             ContentType=content_type,
         )
+
+    @staticmethod
+    def _read_body(response: typing.Dict[str, typing.Any]) -> bytes:
+        body = response.get("Body")
+        if body is None:
+            raise Exception("S3 response missing Body")
+
+        try:
+            return typing.cast(bytes, body.read())
+        finally:
+            close = getattr(body, "close", None)
+            if callable(close):
+                close()
+
+    @staticmethod
+    def _metadata_from_response(
+        response: typing.Dict[str, typing.Any]
+    ) -> typing.Dict[str, str]:
+        etag = response.get("ETag", "")
+        metadata: typing.Dict[str, str] = {
+            "ETag": str(etag) if etag is not None else ""
+        }
+
+        last_modified = response.get("LastModified")
+        if last_modified:
+            timestamp = getattr(last_modified, "timestamp", None)
+            metadata["LastModified"] = str(
+                timestamp() if callable(timestamp) else last_modified
+            )
+
+        return metadata
 
     def put_json_stream(
         self,
