@@ -120,23 +120,32 @@ Using the local SDK against the deployed API/runtime:
   - Final extract failed with `[latest.yaml] is missing a statement entry`.
   - Cleanup deleted the document, unassigned and deleted the workflow, deleted
     the bucket, and deleted the temporary PDF.
-- Post-deploy rerun after the final-extract `statement` path was reported
-  deployed did not reach document processing:
-  - The local branch payload check still passed:
+- Discarded invalid post-deploy rerun:
+  - The rerun incorrectly supplied `process_level="X-RAY"` on `Document(...)`.
+  - That value is invalid and not required for this workflow path, so the
+    resulting `document.fileData` / `document or documents` HTTP 400s are not
+    release blockers.
+- Corrected post-deploy rerun with `client.ingest(...)` and no `process_level`:
+  - Payload check passed before create:
     `_groundx_persisted_extract.workflow.metadata_version == 1` and the authored
     copy contained no `workflow_step` text.
-  - Standard `client.ingest(...)` with a normal one-page reportlab PDF uploaded
-    the file and then failed before processing with deployed HTTP 400:
-    `Required attribute 'document.fileData' is missing or empty`.
-  - Retrying with an explicit upload, a 12 second delay, and direct
-    `documents.ingest_remote(...)` failed with the same deployed HTTP 400.
-  - Generated `documents.ingest_local(...)` also did not provide a usable
-    workaround; the deployed API returned HTTP 400:
-    `Required attribute 'document or documents' is missing or empty`.
-  - Cleanup deleted each temporary bucket/workflow and temporary PDF.
+  - Workflow ID: `66f718a5-75cd-4292-ab5d-e833ecaa5349`
+  - Bucket ID: `29246`
+  - Process ID: `9d848a40-d7b9-4b13-8992-3d815d4c99c8`
+  - Document ID: `415a2fe4-daf7-4e9a-b1d4-31fb166d86a3`
+  - `client.ingest(...)` reached processing successfully.
+  - X-Ray readback via SDK succeeded.
+  - X-Ray contained two `customChunkOutputs` containers.
+  - First observed custom output:
+    `customChunkOutputs.adp_f10_employer_contributions_profit_sharing.f116_employer_profit_sharing_type`.
+  - Final document status was `error`.
+  - Final extract was unavailable; the document layout error was
+    `[latest.yaml] is missing a statement entry`.
+  - Cleanup deleted the document, unassigned and deleted the workflow, deleted
+    the bucket, and deleted the temporary PDF.
 - Cleanup verification found zero remaining buckets and zero remaining documents
   with the `codex-e2e-support-custom-workflow-steps-` prefix.
-- Post-deploy cleanup verification found zero remaining buckets, zero remaining
+- Corrected post-deploy cleanup verification found zero remaining buckets, zero remaining
   workflows, and zero remaining documents with the
   `codex-e2e-support-custom-workflow-steps-` prefix.
 
@@ -148,21 +157,19 @@ Using the local SDK against the deployed API/runtime:
 - Live representative ADP ingest is blocked by the current account/subscription
   limit: even the smallest sanitized representative PDF attempted here failed as
   too large for the subscription level.
-- The post-deploy rerun cannot verify whether the final-extract/layout
-  `statement` assumption is fixed, because ingest now fails before processing
-  with `Required attribute 'document.fileData' is missing or empty`.
-- The deployed ingest path used by the SDK helper appears incompatible with the
-  current API/runtime response path. `client.ingest(...)`,
-  `documents.ingest_remote(...)`, and generated `documents.ingest_local(...)`
-  all failed before processing a small PDF.
+- The deployed final-extract/layout path is still not generic. The corrected
+  no-`process_level` rerun reached processing and custom X-Ray readback worked,
+  but final layout/extract failed because the extract agent still expected a
+  `statement` root group.
 - Local publish credentials such as Fern org access and NPM token are not
   available in this environment; any docs/SDK/TypeScript publish verification
   must be done through the maintainer-owned release path.
 
 ## Required Next Step
 
-Merge and release PR #19, resolve the deployed ingest `document.fileData`
-failure, then rerun Task 11. If representative ADP ingest remains
+Merge and release PR #19, then fix the deployed final-extract/layout
+`statement` assumption or explicitly accept custom X-Ray readback as substitute
+deployed-path evidence for this release. If representative ADP ingest remains
 subscription-blocked, use an explicitly approved small synthetic ADP PDF as the
 deployed-path substitute. Only archive the plan after the rerun either passes or
 release governance explicitly accepts substitute evidence.
