@@ -9,6 +9,7 @@ from ..types.document_local_ingest_request import DocumentLocalIngestRequest
 from ..types.document_lookup_response import DocumentLookupResponse
 from ..types.document_response import DocumentResponse
 from ..types.document_update import DocumentUpdate
+from ..types.document_xray import DocumentXray
 from ..types.ingest_remote_document import IngestRemoteDocument
 from ..types.ingest_response import IngestResponse
 from ..types.processes_status_response import ProcessesStatusResponse
@@ -630,9 +631,7 @@ class DocumentsClient:
         _response = self._raw_client.get_extract(document_id, request_options=request_options)
         return _response.data
 
-    def get_xray(
-        self, document_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.Dict[str, typing.Any]:
+    def get_xray(self, document_id: str, *, request_options: typing.Optional[RequestOptions] = None) -> DocumentXray:
         """
         Look up X-Ray data for an existing document by documentId.
 
@@ -646,7 +645,7 @@ class DocumentsClient:
 
         Returns
         -------
-        typing.Dict[str, typing.Any]
+        DocumentXray
             Look up success
 
         Examples
@@ -1425,7 +1424,7 @@ class AsyncDocumentsClient:
 
     async def get_xray(
         self, document_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.Dict[str, typing.Any]:
+    ) -> DocumentXray:
         """
         Look up X-Ray data for an existing document by documentId.
 
@@ -1439,7 +1438,7 @@ class AsyncDocumentsClient:
 
         Returns
         -------
-        typing.Dict[str, typing.Any]
+        DocumentXray
             Look up success
 
         Examples

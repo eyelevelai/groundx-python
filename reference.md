@@ -1153,7 +1153,7 @@ client.documents.get_extract(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">get_xray</a>(...) -> typing.Dict[str, typing.Any]</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">get_xray</a>(...) -> DocumentXray</code></summary>
 <dl>
 <dd>
 
