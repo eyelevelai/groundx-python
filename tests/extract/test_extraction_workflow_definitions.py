@@ -178,6 +178,24 @@ def _model_to_alias_dict(value: typing.Any) -> typing.Dict[str, typing.Any]:
     )
 
 
+def _find_mapping_keys(
+    value: typing.Any,
+    keys: typing.Set[str],
+    path: str = "$",
+) -> typing.List[str]:
+    matches: typing.List[str] = []
+    if isinstance(value, dict):
+        for key, child in value.items():
+            child_path = f"{path}.{key}"
+            if key in keys:
+                matches.append(child_path)
+            matches.extend(_find_mapping_keys(child, keys, child_path))
+    elif isinstance(value, list):
+        for idx, child in enumerate(value):
+            matches.extend(_find_mapping_keys(child, keys, f"{path}[{idx}]"))
+    return matches
+
+
 def test_load_definition_from_yaml_path_preserves_template_and_prepared(
     tmp_path: Path,
 ) -> None:
@@ -195,6 +213,28 @@ def test_load_definition_from_yaml_path_preserves_template_and_prepared(
     assert definition.custom_steps[0]["name"] == "line_item_labels"
     assert definition.output_routes[0]["output_key"] == "label"
     assert definition.leaf_fields[0]["field_type"] == "str"
+
+
+def test_persisted_custom_workflow_authored_copy_is_runtime_safe() -> None:
+    prepared = prepare_extraction_yaml(CUSTOM_WORKFLOW_YAML)
+    persisted = prepared.persisted_workflow_extract
+    authored_copy = persisted["_groundx_persisted_extract"]
+
+    assert authored_copy["workflow"]["metadata_version"] == 1
+    assert _find_mapping_keys(
+        authored_copy,
+        {"workflow_step", "workflow_output_key"},
+    ) == []
+
+    reloaded = prepare_extraction_yaml(persisted)
+    standalone = prepare_extraction_yaml(authored_copy)
+
+    assert reloaded.persisted_workflow_extract["workflow"]["output_routes"] == (
+        persisted["workflow"]["output_routes"]
+    )
+    assert standalone.persisted_workflow_extract["workflow"]["leaf_fields"] == (
+        persisted["workflow"]["leaf_fields"]
+    )
 
 
 def test_load_extraction_definition_uses_yaml_path(tmp_path: Path) -> None:
