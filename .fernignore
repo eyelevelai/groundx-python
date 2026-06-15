@@ -7,4 +7,8 @@ src/groundx/test.py
 src/groundx/extract
 src/test.py
 tests/extract
+openspec
+pyrightconfig.json
+.vscode
 .gitignore
+.cgcignore
