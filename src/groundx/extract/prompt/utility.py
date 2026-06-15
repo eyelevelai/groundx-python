@@ -294,6 +294,36 @@ def _copy_mapping(value: typing.Dict[str, typing.Any]) -> typing.Dict[str, typin
     return copy.deepcopy(value)
 
 
+def _strip_custom_workflow_authoring_keys(value: typing.Any) -> None:
+    if isinstance(value, dict):
+        value.pop(_CUSTOM_WORKFLOW_GROUP_METADATA_KEY, None)
+        value.pop(_CUSTOM_WORKFLOW_FIELD_METADATA_KEY, None)
+        for key, child in value.items():
+            if key == "prompt":
+                continue
+            _strip_custom_workflow_authoring_keys(child)
+    elif isinstance(value, list):
+        for child in value:
+            _strip_custom_workflow_authoring_keys(child)
+
+
+def _runtime_safe_authored_extract(
+    authored_data: typing.Dict[str, typing.Any],
+    custom_workflow_metadata: typing.Optional[typing.Dict[str, typing.Any]],
+) -> typing.Dict[str, typing.Any]:
+    safe_authored_data = _copy_mapping(authored_data)
+    if not custom_workflow_metadata:
+        return safe_authored_data
+
+    safe_authored_data[_CUSTOM_WORKFLOW_KEY] = _copy_mapping(custom_workflow_metadata)
+    for key, value in safe_authored_data.items():
+        if key == _CUSTOM_WORKFLOW_KEY:
+            continue
+        _strip_custom_workflow_authoring_keys(value)
+
+    return safe_authored_data
+
+
 def _validate_prompt_shape(mapping: typing.Dict[str, typing.Any], path: str) -> None:
     if "prompt" not in mapping or mapping["prompt"] is None:
         return
@@ -1333,7 +1363,10 @@ def _persisted_workflow_extract(
         final_metadata_keys,
         workflow_metadata_keys,
     ):
-        persisted[_PERSISTED_WORKFLOW_EXTRACT_KEY] = _copy_mapping(authored_data)
+        persisted[_PERSISTED_WORKFLOW_EXTRACT_KEY] = _runtime_safe_authored_extract(
+            authored_data,
+            custom_workflow_metadata,
+        )
 
     return persisted
 
@@ -1393,12 +1426,18 @@ def prepare_extraction_yaml(
 ) -> PreparedExtractionYaml:
     data = _load_extraction_mapping(raw_yaml)
     if _PERSISTED_WORKFLOW_EXTRACT_KEY in data:
+        persisted_outer_data = _copy_mapping(data)
         data = _copy_mapping(
             _ensure_mapping(
                 data[_PERSISTED_WORKFLOW_EXTRACT_KEY],
                 _PERSISTED_WORKFLOW_EXTRACT_KEY,
             )
         )
+        persisted_workflow = persisted_outer_data.get(_CUSTOM_WORKFLOW_KEY)
+        if isinstance(
+            persisted_workflow, dict
+        ) and _is_custom_workflow_persisted_metadata(persisted_workflow):
+            data[_CUSTOM_WORKFLOW_KEY] = _copy_mapping(persisted_workflow)
     custom_workflow_kind_and_input = _custom_workflow_input(data)
     top_metadata_key_set = set(top_level_metadata_keys or [])
     final_metadata_key_set = set(final_group_metadata_keys or [])

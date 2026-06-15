@@ -17,6 +17,7 @@ from .element import Element
 from .field import ExtractedField
 from .groundx import GroundXDocument, XRayDocument
 from .group import Group
+from .prompt import Prompt
 from PIL import Image
 from pydantic import (
     BaseModel,
@@ -43,6 +44,13 @@ class Document(Group):
     _logger: typing.Optional[Logger] = PrivateAttr(default=None)
     _prompt_manager: typing.Optional[PromptManager] = PrivateAttr(default=None)
     _upload: typing.Optional[Upload] = PrivateAttr(default=None)
+    _custom_output_route_cache: typing.Dict[
+        typing.Tuple[str, str],
+        typing.Dict[
+            typing.Tuple[str, str],
+            typing.List[typing.Mapping[str, typing.Any]],
+        ],
+    ] = PrivateAttr(default_factory=dict)
 
     @model_validator(mode="after")
     def _inject_context(self, info: ValidationInfo) -> "Document":
@@ -393,10 +401,12 @@ class Document(Group):
         if not custom_outputs:
             return
 
+        route_index = self.custom_output_route_index(source)
         for step_name, outputs in custom_outputs.items():
             if not isinstance(outputs, dict):
                 continue
 
+            repeated_rows: typing.Dict[typing.Tuple[str, ...], Group] = {}
             output_mapping = typing.cast(typing.Dict[str, typing.Any], outputs)
             for output_key, value in output_mapping.items():
                 data: typing.Any = value
@@ -405,6 +415,19 @@ class Document(Group):
                         data = json.loads(clean_json(data))
                     except json.JSONDecodeError:
                         pass
+
+                routes = route_index.get((step_name, output_key), [])
+                if routes:
+                    for route in routes:
+                        err = self.add_custom_output_route(
+                            route, data, repeated_rows
+                        )
+                        if err:
+                            raise Exception(
+                                f"\n\ninit {source} error for "
+                                f"[{step_name}.{output_key}]:\n\t{err}\n"
+                            )
+                    continue
 
                 if isinstance(data, dict):
                     data_mapping = typing.cast(typing.Dict[str, typing.Any], data)
@@ -423,6 +446,226 @@ class Document(Group):
                         f"\n\ninit {source} error for "
                         f"[{step_name}.{output_key}]:\n\t{err}\n"
                     )
+
+            for container_path, row in repeated_rows.items():
+                err = self.append_repeated_final_row(container_path, row)
+                if err:
+                    raise Exception(
+                        f"\n\ninit {source} error for [{step_name}]:\n\t{err}\n"
+                    )
+
+    def custom_output_route_index(
+        self, source: str
+    ) -> typing.Dict[
+        typing.Tuple[str, str],
+        typing.List[typing.Mapping[str, typing.Any]],
+    ]:
+        workflow_id = self.workflow_id or ""
+        cache_key = (workflow_id, source)
+        if cache_key in self._custom_output_route_cache:
+            return self._custom_output_route_cache[cache_key]
+
+        route_index: typing.Dict[
+            typing.Tuple[str, str],
+            typing.List[typing.Mapping[str, typing.Any]],
+        ] = {}
+        if not self._prompt_manager:
+            self._custom_output_route_cache[cache_key] = route_index
+            return route_index
+
+        try:
+            extract = self._prompt_manager.persisted_workflow_extract_dict(
+                file_name=self.prompt_file_name,
+                workflow_id=self.workflow_id,
+            )
+        except Exception:
+            self._custom_output_route_cache[cache_key] = route_index
+            return route_index
+
+        workflow = extract.get("workflow")
+        if not isinstance(workflow, dict):
+            self._custom_output_route_cache[cache_key] = route_index
+            return route_index
+
+        routes = workflow.get("output_routes")
+        if not isinstance(routes, list):
+            self._custom_output_route_cache[cache_key] = route_index
+            return route_index
+
+        for route in routes:
+            if not isinstance(route, dict):
+                continue
+            if route.get("output_map") != source:
+                continue
+            step_name = route.get("step_name")
+            output_key = route.get("output_key")
+            if not isinstance(step_name, str) or not isinstance(output_key, str):
+                continue
+            route_index.setdefault((step_name, output_key), []).append(route)
+
+        self._custom_output_route_cache[cache_key] = route_index
+        return route_index
+
+    def add_custom_output_route(
+        self,
+        route: typing.Mapping[str, typing.Any],
+        value: typing.Any,
+        repeated_rows: typing.Optional[typing.Dict[typing.Tuple[str, ...], Group]] = None,
+    ) -> typing.Optional[str]:
+        final_path = route.get("final_path")
+        if not isinstance(final_path, str):
+            return "custom workflow output route is missing final_path"
+
+        try:
+            segments = decode_final_path(final_path)
+        except ValueError as e:
+            return str(e)
+
+        if len(segments) == 2:
+            group_name, field_name = segments
+            self.set_final_field(group_name, field_name, value)
+            return None
+
+        if "*" in segments:
+            return self.stage_repeated_final_field(segments, value, repeated_rows)
+
+        return f"unsupported custom workflow final path [{final_path}]"
+
+    def set_final_field(
+        self,
+        group_name: str,
+        field_name: str,
+        value: typing.Any,
+    ) -> None:
+        existing_group = self.fields.get(group_name)
+        if isinstance(existing_group, Group):
+            group = existing_group
+        else:
+            group = Group(prompt=self.final_group_prompt(group_name))
+
+        field = self.final_extracted_field(group_name, field_name, value)
+        existing_field = group.fields.get(field_name)
+        if isinstance(existing_field, ExtractedField):
+            try:
+                if existing_field.equal_to_value(value):
+                    self.set(group_name, group)
+                    return
+            except Exception:
+                pass
+            if value not in existing_field.conflicts:
+                existing_field.conflicts.append(value)
+            group.fields[field_name] = existing_field
+        else:
+            group.fields[field_name] = field
+
+        self.set(group_name, group)
+
+    def stage_repeated_final_field(
+        self,
+        segments: typing.Tuple[str, ...],
+        value: typing.Any,
+        repeated_rows: typing.Optional[typing.Dict[typing.Tuple[str, ...], Group]],
+    ) -> typing.Optional[str]:
+        if repeated_rows is None:
+            return f"unsupported custom workflow final path [/{'/'.join(segments)}]"
+        if segments.count("*") != 1:
+            return f"unsupported custom workflow final path [/{'/'.join(segments)}]"
+
+        star_idx = segments.index("*")
+        if star_idx == 0 or star_idx != len(segments) - 2:
+            return f"unsupported custom workflow final path [/{'/'.join(segments)}]"
+
+        container_path = segments[:star_idx]
+        field_name = segments[star_idx + 1]
+        row = repeated_rows.setdefault(
+            container_path,
+            Group(prompt=self.final_group_prompt(container_path[-1])),
+        )
+        row.fields[field_name] = self.final_extracted_field(
+            container_path[-1], field_name, value
+        )
+        return None
+
+    def append_repeated_final_row(
+        self, container_path: typing.Tuple[str, ...], row: Group
+    ) -> typing.Optional[str]:
+        if len(container_path) == 1:
+            group_name = container_path[0]
+            existing = self.fields.get(group_name)
+            rows = list(existing) if isinstance(existing, list) else []
+            rows.append(row)
+            self.set(group_name, rows)
+            return None
+
+        if len(container_path) == 2:
+            group_name, list_name = container_path
+            existing_group = self.fields.get(group_name)
+            if isinstance(existing_group, Group):
+                group = existing_group
+            else:
+                group = Group(prompt=self.final_group_prompt(group_name))
+
+            existing_rows = group.fields.get(list_name)
+            rows = list(existing_rows) if isinstance(existing_rows, list) else []
+            rows.append(row)
+            group.fields[list_name] = rows
+            self.set(group_name, group)
+            return None
+
+        return f"unsupported custom workflow repeated path [/{'/'.join(container_path)}/*]"
+
+    def final_extracted_field(
+        self,
+        group_name: str,
+        field_name: str,
+        value: typing.Any,
+    ) -> ExtractedField:
+        return ExtractedField(
+            prompt=self.final_field_prompt(group_name, field_name),
+            value=value,
+        )
+
+    def final_group_prompt(self, group_name: str) -> typing.Optional[Prompt]:
+        if not self._prompt_manager:
+            return None
+
+        try:
+            group = self._prompt_manager.get_fields_for_data_object(
+                file_name=self.prompt_file_name,
+                workflow_id=self.workflow_id,
+            ).get(group_name)
+        except Exception:
+            return None
+
+        if not isinstance(group, Group):
+            return None
+
+        return group.prompt
+
+    def final_field_prompt(
+        self,
+        group_name: str,
+        field_name: str,
+    ) -> typing.Optional[Prompt]:
+        if not self._prompt_manager:
+            return None
+
+        try:
+            group = self._prompt_manager.get_fields_for_data_object(
+                file_name=self.prompt_file_name,
+                workflow_id=self.workflow_id,
+            ).get(group_name)
+        except Exception:
+            return None
+
+        if not isinstance(group, Group):
+            return None
+
+        field = group.fields.get(field_name)
+        if not isinstance(field, ExtractedField):
+            return None
+
+        return field.prompt
 
     def add(self, k: str, value: typing.Any) -> typing.Union[str, None]:
         self.print("WARNING", "add is not implemented")
@@ -484,6 +727,20 @@ def _new_page_image_dict() -> typing.Dict[str, int]:
 
 def _new_page_images() -> typing.List[Image.Image]:
     return []
+
+
+def decode_final_path(final_path: str) -> typing.Tuple[str, ...]:
+    if not final_path.startswith("/"):
+        raise ValueError(f"invalid custom workflow final path [{final_path}]")
+
+    segments = tuple(
+        segment.replace("~1", "/").replace("~0", "~")
+        for segment in final_path.split("/")[1:]
+    )
+    if not segments or any(segment == "" for segment in segments):
+        raise ValueError(f"invalid custom workflow final path [{final_path}]")
+
+    return segments
 
 
 class DocumentRequest(BaseModel):
