@@ -5,7 +5,7 @@ the Python equivalent of [`groundx-typescript`](https://github.com/eyelevelai/gr
 
 This file is the canonical contribution guide for agents and humans working in this
 repo. Other agent-tool surfaces (Codex, Claude, Cursor, Replit, Gemini/Antigravity)
-should **route here** rather than duplicate rules — see [§9](#9-other-agent-surfaces).
+should **route here** rather than duplicate rules — see [§10](#10-other-agent-surfaces).
 
 ---
 
@@ -82,7 +82,12 @@ and editing it directly is futile. But `.fernignore` is authoritative — use it
 Generated code changes happen upstream, not here:
 
 - **API-shape changes** (new endpoints, fields, types) — change the upstream Fern API
-  definition. The SDK is regenerated from it and re-released.
+  definition, which lives in
+  [`eyelevel-fern-config`](https://github.com/eyelevelai/eyelevel-fern-config). That
+  repo holds the OpenAPI spec from which this SDK (and
+  [`groundx-typescript`](https://github.com/eyelevelai/groundx-typescript)) are
+  generated. The SDK is regenerated from it and re-released — do not hand-edit
+  generated code here to achieve an API-shape change.
 - **Generator behavior changes** (how every generated Python file looks — client class,
   error types, serialization, retry policy) — submit a PR to the
   [Fern repository](https://github.com/fern-api/fern), where the Python SDK generator
@@ -97,8 +102,9 @@ else in `tests/` is regenerated.
 
 To coordinate an upstream API change: external contributors should open a
 [GitHub issue](https://github.com/eyelevelai/groundx-python/issues) describing the
-needed shape change; a maintainer routes it to the appropriate Fern workspace.
-Internal contributors should use the team's existing project-tracking channel.
+needed shape change; a maintainer routes it to the
+[`eyelevel-fern-config`](https://github.com/eyelevelai/eyelevel-fern-config) repo.
+Internal contributors should track the change in Linear.
 
 ---
 
@@ -229,20 +235,39 @@ Most commits in this repo are `Release X.Y.Z` markers driven by SDK regeneration
 
 ---
 
-## 8. Workflow
+## 8. Spec-driven development (OpenSpec)
 
-1. Branch from `main` with a descriptive name.
-2. Make changes scoped to the right surface ([§3](#3-contributing-to-generated-code)
+Non-trivial changes to the hand-written layer start as an **OpenSpec** proposal, not as
+code. The spec is the durable record of *what* is changing and *why*, reviewed before
+implementation.
+
+- **Where specs live:** `openspec/changes/` (active proposals),
+  `openspec/changes/archive/` (completed), `openspec/specs/` (current canonical specs).
+- **Workflow:** propose the change → review the generated proposal, design, and tasks
+  → implement (test-first) → archive once merged. Run the OpenSpec CLI for the exact
+  propose/apply/archive commands available in this repo's toolchain.
+- `openspec/` is listed in `.fernignore`, so Fern regeneration never touches it.
+- **Scope:** OpenSpec changes in this repo target **only** the hand-written
+  `.fernignore` layer (`src/groundx/ingest.py`, `src/groundx/csv_splitter.py`,
+  `src/groundx/extract/`). API-surface changes belong upstream in
+  [`eyelevel-fern-config`](https://github.com/eyelevelai/eyelevel-fern-config) (see
+  [§3](#3-contributing-to-generated-code)), not here.
+
+---
+
+## 9. Workflow
+
+1. For a non-trivial change, propose an OpenSpec change first (see
+   [§8](#8-spec-driven-development-openspec)).
+2. Branch from `main` with a descriptive name.
+3. Make changes scoped to the right surface ([§3](#3-contributing-to-generated-code)
    for generated code, [§4](#4-the-extract-submodule) for extract, or other
    `.fernignore`-listed files).
-3. Run local gates before pushing:
-   ```sh
-   poetry run mypy .
-   poetry run pytest -rP -n auto .
-   ```
-4. Open a PR against `main`. CI runs `compile` (mypy) and `test` (pytest, both with and
+4. Run local gates before pushing — `poetry run mypy .` and
+   `poetry run pytest -rP -n auto .`. Both must pass.
+5. Open a PR against `main`. CI runs `compile` (mypy) and `test` (pytest, both with and
    without the aiohttp extra). Both must pass.
-5. After merge, a maintainer tags a release (see [§7](#7-release-flow)) to ship to PyPI.
+6. After merge, a maintainer tags a release (see [§7](#7-release-flow)) to ship to PyPI.
 
 **Commit messages.** Clear, descriptive, present tense. Reference the relevant issue
 or ticket ID in the subject when applicable.
@@ -254,7 +279,7 @@ rather than the whole tree.
 
 ---
 
-## 9. Other agent surfaces
+## 10. Other agent surfaces
 
 **Do not duplicate this file** into agent-specific variants (`CLAUDE.md`, `CURSOR.md`,
 `CODEX.md`, `.cursorrules`, `.replit`, `GEMINI.md`). Duplicated rules drift, then
@@ -266,7 +291,7 @@ pointer goes here.
 
 ---
 
-## 10. Boundaries
+## 11. Boundaries
 
 - ✅ **Always do:** run `poetry run mypy .` and `poetry run pytest -rP -n auto .` before pushing, read credentials from `os.environ`, edit code in paths listed in `.fernignore`
 - ⚠️ **Ask first** (open a GitHub issue): add a new optional dep to `groundx[extract]`, add a path to `.fernignore`, modify `.fern/metadata.json` or `ci.yml` non-trivially, add a CI job requiring shared GroundX credentials
@@ -274,7 +299,7 @@ pointer goes here.
 
 ---
 
-## 11. Questions, links, license
+## 12. Questions, links, license
 
 **Questions or issues?**
 - [Fern documentation](https://buildwithfern.com) (generator and customization model)
