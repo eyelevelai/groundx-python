@@ -4,15 +4,15 @@
 
 Partially executed. Release remains blocked.
 
-Updated 2026-06-15 after cashbot-go `master` CI passed and
-`groundx==3.6.7` was published.
+Updated 2026-06-15 after deployed runtime/API guardrail retests, live ingest
+attempts, and a local SDK payload fix.
 
 ## Local Non-Live Evidence
 
 - Legacy YAML selected:
-  `/Users/benjaminfletcher/git/groundx-studio-harness-support-custom-workflow-steps/skills/groundx-extraction-workflows/examples/insurance-claim/prompt.yaml`.
+  `/Users/benjaminfletcher/git/groundx-studio-harness/skills/groundx-extraction-workflows/examples/insurance-claim/prompt.yaml`.
 - Custom-step YAML selected:
-  `/Users/benjaminfletcher/git/adp-poc-support-custom-workflow-steps/workflows/adp_401k_v1/prompt.yaml`.
+  `/Users/benjaminfletcher/git/adp-poc/workflows/adp_401k_v1/prompt.yaml`.
 - Both compiled and passed structural validation through the unpublished local
   SDK/harness worktrees.
 - Legacy compiled workflow had no custom workflow metadata.
@@ -25,6 +25,17 @@ Updated 2026-06-15 after cashbot-go `master` CI passed and
 - The synthetic ADP final JSON did not leak the custom step name.
 - The Arcadia current-wave deferral stub remains in place at
   `/Users/benjaminfletcher/git/internal-arcadia-agents/openspec/notes/support-custom-workflow-steps-deferral.md`.
+- Live smoke found that the SDK persisted authored YAML copy carried
+  authoring-only `workflow_step` / `workflow_output_key` keys into
+  `_groundx_persisted_extract`, which made the deployed layout path fail with
+  `unsupported pseudo-group keys`.
+- Local SDK fix added a regression so custom workflow `_groundx_persisted_extract`
+  is runtime-safe, keeps persisted `workflow.metadata_version: 1`, strips
+  authoring-only custom-step keys, and still reloads from persisted route/leaf
+  metadata.
+- Focused verification after the local SDK fix:
+  `poetry run pytest tests/custom/test_extraction_workflow_client_exports.py tests/extract/test_extraction_workflow_definitions.py tests/extract/prompt/test_manager.py tests/extract/prompt/test_persisted_workflow_extract.py -q`
+  passed with `93 passed, 5 subtests passed`.
 
 ## Live Workflow API Evidence
 
@@ -59,23 +70,77 @@ Using the unpublished local SDK against the deployed API:
     not acceptable release evidence.
   - Cleanup verification again found zero remaining workflows with prefix
     `codex-e2e-support-custom-workflow-steps-`.
+- Retest after final deployed cashbot-go guardrail fix:
+  - Negative 21-field oversized/spoofed workflow create returned HTTP 400 with
+    message `Invalid attribute 'workflow.outputRoutes': custom step
+    adp_f1_employer_information has 21 fields; max is 20`.
+  - Negative 21-field oversized/spoofed workflow update returned HTTP 400 with
+    the same custom-step max-field message.
+  - The temporary valid workflow used for the update test was deleted.
+
+## Live Ingest Evidence
+
+Using the local SDK against the deployed API/runtime:
+
+- Representative ADP sanitized PDF attempted:
+  `/Users/benjaminfletcher/git/adp-poc/samples/sanitized/ePlan 2A.pdf`.
+  - Workflow ID: `29f0d030-b962-477d-8383-0a05f0ba96db`
+  - Bucket ID: `29238`
+  - Process ID: `0fe08fa0-430b-40c4-9a75-8a4ee9566eff`
+  - Document ID: `b68c67fd-02bc-41e0-ad7d-577cb7a75e98`
+  - Final document status: `error`
+  - Error: `file is too large to process for this subscription level`
+  - Cleanup deleted the document, unassigned and deleted the workflow, and
+    deleted the bucket.
+- Tiny synthetic one-page ADP-style PDF smoke before the local SDK payload fix:
+  - Workflow ID: `55828d2a-c0e8-409a-8742-b60c3df2cad5`
+  - Bucket ID: `29239`
+  - Process ID: `7295167c-46d7-45e0-a597-b8b3912e0277`
+  - Document ID: `505aa0b3-eacf-446e-8390-7100f1fb3f42`
+  - X-Ray contained `customChunkOutputs` from custom ADP steps.
+  - Final extract failed with `unsupported pseudo-group keys at
+    [_pseudo_groups.adp_f10_employer_contributions_profit_sharing]:
+    ['workflow_step']`.
+  - Cleanup deleted the document, unassigned and deleted the workflow, deleted
+    the bucket, and deleted the temporary PDF.
+- Tiny synthetic one-page ADP-style PDF smoke after the local SDK payload fix:
+  - Payload check passed before create:
+    `_groundx_persisted_extract.workflow.metadata_version == 1` and the authored
+    copy contained no `workflow_step` text.
+  - Workflow ID: `d240c6bf-4ed0-4cb8-a0de-0a8ebe603fb1`
+  - Bucket ID: `29240`
+  - Process ID: `fc5bab86-aaca-413d-a2a0-d82274b7dbd5`
+  - Document ID: `6fea60f4-682a-4af2-b214-d5cc0fb0cfdf`
+  - X-Ray readback via SDK succeeded.
+  - X-Ray contained two `customChunkOutputs` containers.
+  - First observed custom output:
+    `customChunkOutputs.adp_f10_employer_contributions_profit_sharing.f116_employer_profit_sharing_type`.
+  - Route metadata mapped it to final path
+    `/employer_contributions/employer_profit_sharing_type`.
+  - Final extract failed with `[latest.yaml] is missing a statement entry`.
+  - Cleanup deleted the document, unassigned and deleted the workflow, deleted
+    the bucket, and deleted the temporary PDF.
+- Cleanup verification found zero remaining buckets and zero remaining documents
+  with the `codex-e2e-support-custom-workflow-steps-` prefix.
 
 ## Blockers
 
-- The deployed API no longer accepts the narrow invalid workflow, but the live
-  negative checks still do not prove the intended 20-field executable custom
-  step guardrail. One path disconnected without a response; the narrower path
-  returned an unrelated missing-route error. Release e2e cannot be closed until
-  the oversized/spoofed request fails with a clear custom-step field-count
-  validation error.
-- `FERN_TOKEN` / Fern org access and `NPM_TOKEN` are unavailable in the local
-  environment, so docs publish and TypeScript package publish remain blocked.
-- Live representative document ingest/extract was not run because the deployed
-  oversized-step guardrail failed first. Running ingest before that guardrail is
-  fixed would not prove release readiness.
+- The SDK payload fix is local only. It must be committed, reviewed, merged, and
+  released before published-SDK E2E can pass.
+- Live representative ADP ingest is blocked by the current account/subscription
+  limit: even the smallest sanitized representative PDF attempted here failed as
+  too large for the subscription level.
+- The deployed final-extract/layout path is still not generic. After the SDK
+  payload fix, custom-step execution and X-Ray readback worked, but final extract
+  failed because the extract agent still expected a `statement` root group.
+- Local publish credentials such as Fern org access and NPM token are not
+  available in this environment; any docs/SDK/TypeScript publish verification
+  must be done through the maintainer-owned release path.
 
 ## Required Next Step
 
-Fix or verify the deployed runtime/API validation path so oversized/spoofed
-custom-step requests fail with the intended field-count error, then rerun Task
-11 from the live negative oversized-step check onward.
+Commit the local SDK payload fix, publish the next `groundx-python` release, and
+decide whether the final-extract `statement` assumption must be fixed now or
+whether X-Ray custom-output readback is the explicitly approved deployed-path
+substitute for this release. If final extract remains required, fix that deployed
+agent/layout path before rerunning Task 11.
