@@ -1,9 +1,9 @@
-import time, typing
+import time
+import typing
 
-from fastapi import Response
-
-from .logger import Logger
 from ..settings.settings import ContainerSettings
+from .logger import Logger
+from fastapi import Response
 
 latency_to = 60
 
@@ -178,8 +178,8 @@ class Status:
         key_worker_available = self.key_worker_available(id)
         current_available = self.client.get(key_worker_available)
         if current_available is None:
-            current_available = self.config.workers
-            self.set_value(key_worker_available, current_available, to)
+            available = self.config.workers
+            self.set_value(key_worker_available, available, to)
         else:
             self.set_value(
                 key_worker_available,
@@ -205,8 +205,8 @@ class Status:
         key_worker_available = self.key_worker_available(id)
         current_available = self.client.get(key_worker_available)
         if current_available is None:
-            current_available = self.config.workers - 1
-            self.set_value(key_worker_available, current_available, to)
+            available = self.config.workers - 1
+            self.set_value(key_worker_available, available, to)
         else:
             self.set_value(
                 key_worker_available,
