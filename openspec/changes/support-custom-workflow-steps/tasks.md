@@ -723,18 +723,16 @@ Status: partially executed and blocked. Evidence is recorded in
       are unavailable, record blocked-release status or the explicitly reviewed
       non-live substitute evidence approved by release governance.
 - [ ] Retrieve X-Ray and final extract output.
-- [ ] Confirm custom step outputs are visible in X-Ray under the chosen shape.
+- [x] Confirm custom step outputs are visible in X-Ray under the chosen shape.
 - [x] Confirm custom output route metadata maps the X-Ray/readback value to the
       expected final JSON field.
 - [x] Confirm final JSON uses only user-facing YAML group/value names.
-- [ ] Confirm old persisted workflow extracts and legacy YAML continue to load or
+- [x] Confirm old persisted workflow extracts and legacy YAML continue to load or
       fail with the documented compatibility behavior.
-- [ ] Confirm direct workflow create/update rejects spoofed, caller-only, or
+- [x] Confirm direct workflow create/update rejects spoofed, caller-only, or
       mismatched field-count metadata for an oversized custom step.
-      Blocked: the deployed API accepted an oversized/spoofed custom-step
-      workflow and the test workflow was immediately deleted. This remains
-      blocked until the Cashbot runtime/API guardrail in PR #1493 is merged and
-      deployed.
+      Verified after deployment: create and update both return HTTP 400 with the
+      clear `has 21 fields; max is 20` custom-step guardrail error.
 - [ ] Confirm Arcadia default path works for legacy YAML.
 - [x] Confirm Arcadia custom field-action implementation is deferred to the
       follow-on `reconcile_fields`/`qa_fields`/`save_fields` plan.
@@ -747,7 +745,15 @@ Status: partially executed and blocked. Evidence is recorded in
 - [ ] Confirm live deployed-path E2E passed, or record the explicitly reviewed
       non-live substitute evidence approved to unblock release.
 - [ ] Adversarial review: confirm the test proves the deployed path, not only
-      local compile.
+      local compile. Current adversarial finding: custom-step execution and X-Ray
+      readback are deployed-path proven. The corrected post-deploy rerun used
+      `client.ingest(...)` without `process_level`, reached processing, and
+      read custom outputs from X-Ray, but final layout/extract still failed on
+      the then-deployed `statement`-root assumption. Local SDK route-readback
+      and Arcadia missing-`statement` guard fixes are pushed in PR #19 and
+      `internal-arcadia-agents` PR #67; final deployed rerun is pending after
+      merge/release/deploy. Representative ADP ingest is still blocked by
+      subscription limits.
 
 ## Task 12: Closeout
 
