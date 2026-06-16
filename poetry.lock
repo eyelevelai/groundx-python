@@ -206,13 +206,13 @@ files = [
 
 [[package]]
 name = "anyio"
-version = "4.13.0"
+version = "4.14.0"
 description = "High-level concurrency and networking framework on top of asyncio or Trio"
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "anyio-4.13.0-py3-none-any.whl", hash = "sha256:08b310f9e24a9594186fd75b4f73f4a4152069e3853f1ed8bfbf58369f4ad708"},
-    {file = "anyio-4.13.0.tar.gz", hash = "sha256:334b70e641fd2221c1505b3890c69882fe4a2df910cba14d97019b90b24439dc"},
+    {file = "anyio-4.14.0-py3-none-any.whl", hash = "sha256:dd9b7a2a9799ed6552fde617b2c5df02b7fdd7d88392fc48101e51bae46164d9"},
+    {file = "anyio-4.14.0.tar.gz", hash = "sha256:b47c1f9ccf73e67021df785332508f99379c68fa7d0684e8e3492cb1d4b23f89"},
 ]
 
 [package.dependencies]
@@ -324,17 +324,17 @@ files = [
 
 [[package]]
 name = "boto3"
-version = "1.43.29"
+version = "1.43.30"
 description = "The AWS SDK for Python"
 optional = true
 python-versions = ">=3.10"
 files = [
-    {file = "boto3-1.43.29-py3-none-any.whl", hash = "sha256:77c27ada27cdbf619a3bbc41fa9e991caef818d3a2988cf92ea722e107d90108"},
-    {file = "boto3-1.43.29.tar.gz", hash = "sha256:354006c512cdb87ef8214a095f2ade961c8145734475cd7a7e6b39260ff5494a"},
+    {file = "boto3-1.43.30-py3-none-any.whl", hash = "sha256:89e982463d94773136ccf69be77cccd54ff1ce351a6aadd1d3437fcb693681b5"},
+    {file = "boto3-1.43.30.tar.gz", hash = "sha256:6b1ee360f363a457f67a8f5702f522043d8a32d67a97c362ad12075d8b5b531e"},
 ]
 
 [package.dependencies]
-botocore = ">=1.43.29,<1.44.0"
+botocore = ">=1.43.30,<1.44.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.18.0,<0.19.0"
 
@@ -343,13 +343,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.43.29"
+version = "1.43.30"
 description = "Low-level, data-driven core of boto 3."
 optional = true
 python-versions = ">=3.10"
 files = [
-    {file = "botocore-1.43.29-py3-none-any.whl", hash = "sha256:5d62f2a03ed279a50207ca2824e009313df15f082b6bb591a095a4f04c7faef3"},
-    {file = "botocore-1.43.29.tar.gz", hash = "sha256:dce39d33b707aa162aa3820975f99d7f8f746d46576169fb42ce4f2b3b56b261"},
+    {file = "botocore-1.43.30-py3-none-any.whl", hash = "sha256:26b1dded84d89b396180916f56900bd2ab1c0d545a66d1d2c3eeb40f772935b2"},
+    {file = "botocore-1.43.30.tar.gz", hash = "sha256:19ed560cb35ae43bf010d37da429a553c07063bf7efea0f2cb53be8a78d3e3d5"},
 ]
 
 [package.dependencies]
@@ -832,13 +832,13 @@ ssh = ["bcrypt (>=3.1.5)"]
 
 [[package]]
 name = "dateparser"
-version = "1.4.0"
+version = "1.4.1"
 description = "Date parsing library designed to parse dates from HTML pages"
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "dateparser-1.4.0-py3-none-any.whl", hash = "sha256:7902b8e85d603494bf70a5a0b1decdddb2270b9c6e6b2bc8a57b93476c0df378"},
-    {file = "dateparser-1.4.0.tar.gz", hash = "sha256:97a21840d5ecdf7630c584f673338a5afac5dfe84f647baf4d7e8df98f9354a4"},
+    {file = "dateparser-1.4.1-py3-none-any.whl", hash = "sha256:f25d4e051a84be27a35bd297e3e1dc59ff78373701b89be352ba80372d22d0d0"},
+    {file = "dateparser-1.4.1.tar.gz", hash = "sha256:f265df13c0380e2e07543ba74b67c0681aaa1096981ffcd35227e1aa0cb81c7c"},
 ]
 
 [package.dependencies]
@@ -849,7 +849,6 @@ tzlocal = ">=0.2"
 
 [package.extras]
 calendars = ["convertdate (>=2.2.1)", "hijridate"]
-fasttext = ["fasttext (>=0.9.1)", "numpy (>=1.22.0,<2)"]
 langdetect = ["langdetect (>=1.0.0)"]
 
 [[package]]
@@ -896,13 +895,13 @@ testing = ["hatch", "pre-commit", "pytest", "tox"]
 
 [[package]]
 name = "fastapi"
-version = "0.137.0"
+version = "0.137.1"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
 optional = true
 python-versions = ">=3.10"
 files = [
-    {file = "fastapi-0.137.0-py3-none-any.whl", hash = "sha256:6dcbde8d464f92117c1accb9e42720f8e423fa9b86cb563b1f5862f785a06498"},
-    {file = "fastapi-0.137.0.tar.gz", hash = "sha256:d0565d551f65a803ecff245390840867186f456ef98971f750724eed16e1541c"},
+    {file = "fastapi-0.137.1-py3-none-any.whl", hash = "sha256:64f6983c59e45c4b9fdc44e57cb8035c2451ee91ea8e8ec042aca37de7cf6b69"},
+    {file = "fastapi-0.137.1.tar.gz", hash = "sha256:822360704230d9533d8d9475399613525968aa2f0b5bd2a3ccc9f18c88fd541c"},
 ]
 
 [package.dependencies]
@@ -1167,13 +1166,13 @@ typing-extensions = ">=3.10.0"
 
 [[package]]
 name = "google-auth"
-version = "2.54.0"
+version = "2.55.0"
 description = "Google Authentication Library"
 optional = true
 python-versions = ">=3.10"
 files = [
-    {file = "google_auth-2.54.0-py3-none-any.whl", hash = "sha256:784e9837f92244141250470d47c893df50cbab485ce491aca5e9deb558ad2b48"},
-    {file = "google_auth-2.54.0.tar.gz", hash = "sha256:130f6fd5e3f497fdad897a23ed9489973437edf561238c4b92a4d02c435f8af9"},
+    {file = "google_auth-2.55.0-py3-none-any.whl", hash = "sha256:a17cef9dedf98c4ebae2fb0c48c8f75952c877cbc2efe09f329ef16c2783d88a"},
+    {file = "google_auth-2.55.0.tar.gz", hash = "sha256:fcd3a130f575fa36403d38774af1c64a4fbfbca09215f0589d2372b5119697cb"},
 ]
 
 [package.dependencies]
@@ -3328,13 +3327,13 @@ files = [
 
 [[package]]
 name = "types-boto3"
-version = "1.43.29"
-description = "Type annotations for boto3 1.43.29 generated with mypy-boto3-builder 8.12.0"
+version = "1.43.30"
+description = "Type annotations for boto3 1.43.30 generated with mypy-boto3-builder 8.12.0"
 optional = true
 python-versions = ">=3.9"
 files = [
-    {file = "types_boto3-1.43.29-py3-none-any.whl", hash = "sha256:ccb08e08da1274cac46e095c5d18f60482af734bdb91a0627fd88a924c549700"},
-    {file = "types_boto3-1.43.29.tar.gz", hash = "sha256:8ef885d4f3a88dc1cf88700adafb27ebf6e700e9ca4e2f8e950f560c1f7dd1d3"},
+    {file = "types_boto3-1.43.30-py3-none-any.whl", hash = "sha256:caed2df64ab3a77465b345a658a0d3843ed6fc6f89c0ff3fdaa0e35bc9002bb9"},
+    {file = "types_boto3-1.43.30.tar.gz", hash = "sha256:f4d9295a136325f5086f3967e33ec769555004b299bd11173875772393d5d907"},
 ]
 
 [package.dependencies]
@@ -3395,7 +3394,7 @@ bedrock-data-automation-runtime = ["types-boto3-bedrock-data-automation-runtime 
 bedrock-runtime = ["types-boto3-bedrock-runtime (>=1.43.0,<1.44.0)"]
 billing = ["types-boto3-billing (>=1.43.0,<1.44.0)"]
 billingconductor = ["types-boto3-billingconductor (>=1.43.0,<1.44.0)"]
-boto3 = ["boto3 (==1.43.29)"]
+boto3 = ["boto3 (==1.43.30)"]
 braket = ["types-boto3-braket (>=1.43.0,<1.44.0)"]
 budgets = ["types-boto3-budgets (>=1.43.0,<1.44.0)"]
 ce = ["types-boto3-ce (>=1.43.0,<1.44.0)"]
@@ -3894,20 +3893,21 @@ files = [
 
 [[package]]
 name = "tzlocal"
-version = "5.3.1"
+version = "5.4"
 description = "tzinfo object for the local timezone"
 optional = false
-python-versions = ">=3.9"
+python-versions = ">=3.10"
 files = [
-    {file = "tzlocal-5.3.1-py3-none-any.whl", hash = "sha256:eb1a66c3ef5847adf7a834f1be0800581b683b5608e74f86ecbcef8ab91bb85d"},
-    {file = "tzlocal-5.3.1.tar.gz", hash = "sha256:cceffc7edecefea1f595541dbd6e990cb1ea3d19bf01b2809f362a03dd7921fd"},
+    {file = "tzlocal-5.4-py3-none-any.whl", hash = "sha256:024d11221ff83453eae1f608f09b145b9779e1345d08c15404ce8ff7917cf629"},
+    {file = "tzlocal-5.4.tar.gz", hash = "sha256:41e1293f80d4b5ff38dff222601a8fbd06b4fdcaf25e224704047ad26a39af54"},
 ]
 
 [package.dependencies]
 tzdata = {version = "*", markers = "platform_system == \"Windows\""}
 
 [package.extras]
-devenv = ["check-manifest", "pytest (>=4.3)", "pytest-cov", "pytest-mock (>=3.3)", "zest.releaser"]
+devenv = ["zest.releaser"]
+testing = ["check_manifest", "pyroma", "pytest (>=4.3)", "pytest-cov", "pytest-mock (>=3.3)", "ruff"]
 
 [[package]]
 name = "uritemplate"
