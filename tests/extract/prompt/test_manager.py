@@ -51,6 +51,8 @@ class FlakyCachedSource(TestSource):
 
 
 CUSTOM_WORKFLOW_YAML = """
+extraction_policy_version: v1
+
 workflow:
   template:
     BILLING_HINT: Prefer values from the charge table.
@@ -427,7 +429,7 @@ Special Instructions:
             "_groundx_persisted_extract": {
                 "extraction_policy_version": "v1",
                 "statement": {
-                    "slot": "chunk-instruct",
+                    "workflow_step": "chunk-instruct",
                     "fields": {
                         "provider_name": {
                             "prompt": {
@@ -440,7 +442,7 @@ Special Instructions:
                 },
                 "_pseudo_groups": {
                     "statement_identity": {
-                        "slot": "chunk-instruct",
+                        "workflow_step": "chunk-instruct",
                         "fields": {
                             "provider_name": {
                                 "path": "/statement/provider_name",
@@ -474,7 +476,7 @@ Special Instructions:
             default_file_name="wf-1",
             default_workflow_id="wf-1",
             top_level_metadata_keys={"extraction_policy_version"},
-            workflow_group_metadata_keys={"slot"},
+            workflow_group_metadata_keys={"workflow_step"},
         )
 
         fields = manager.get_fields_for_workflow(workflow_id="wf-1")
@@ -564,9 +566,6 @@ Special Instructions:
             top_level_metadata_keys={"extraction_policy_version"},
         )
 
-        workflow_extract["_groundx_persisted_extract"][
-            "extraction_policy_version"
-        ] = "v2"
         workflow_extract["statement_identity"]["fields"]["provider_name"]["prompt"][
             "instructions"
         ] = "Return the updated provider name."
@@ -579,7 +578,7 @@ Special Instructions:
         self.assertGreaterEqual(workflows.requested_ids.count("wf-1"), 2)
         self.assertEqual(
             manager.top_level_metadata(workflow_id="wf-1"),
-            {"extraction_policy_version": "v2"},
+            {"extraction_policy_version": "v1"},
         )
         provider = manager.group_field(
             "statement_identity",
@@ -765,9 +764,10 @@ Special Instructions:
 
     def test_manager_exposes_prepared_metadata_surfaces(self) -> None:
         raw = """
-domain: invoice
+extraction_policy_version: v1
+
 statement:
-  slot: chunk-instruct
+  workflow_step: chunk-instruct
   unique_attrs:
     - account_number
   fields:
@@ -787,19 +787,18 @@ _pseudo_groups:
         manager = PromptManager(
             cache_source=source,
             config_source=source,
-            top_level_metadata_keys={"domain"},
             final_group_metadata_keys={"unique_attrs"},
-            workflow_group_metadata_keys={"slot"},
+            workflow_group_metadata_keys={"workflow_step"},
         )
 
-        self.assertEqual(manager.top_level_metadata(), {"domain": "invoice"})
+        self.assertEqual(manager.top_level_metadata(), {"extraction_policy_version": "v1"})
         self.assertEqual(
             manager.final_group_metadata(),
             {"statement": {"unique_attrs": ["account_number"]}},
         )
         self.assertEqual(
             manager.workflow_group_metadata(),
-            {"statement_identity": {"slot": "chunk-instruct"}},
+            {"statement_identity": {"workflow_step": "chunk-instruct"}},
         )
 
     def test_prepare_extraction_yaml_rejects_unsupported_top_level_scalar_metadata(
@@ -820,7 +819,6 @@ statement:
 
         message = str(exc.exception)
         self.assertIn("unsupported top-level metadata [unsupported_policy_version]", message)
-        self.assertIn("top_level_metadata_keys", message)
         self.assertIn("workflow metadata", message)
 
     def test_prepare_extraction_yaml_accepts_supported_policy_version_metadata(
@@ -830,6 +828,8 @@ statement:
             """
 extraction_policy_version: v1
 statement:
+  final_value_aliases:
+    account_number: account_number
   fields:
     account_number:
       prompt:
@@ -879,6 +879,8 @@ statement:
         with self.assertRaises(ValueError) as exc:
             prepare_extraction_yaml(
                 """
+extraction_policy_version: v1
+
 statement:
   fields:
     account_number:
@@ -905,6 +907,8 @@ _pseudo_groups:
         with self.assertRaises(ValueError) as exc:
             prepare_extraction_yaml(
                 """
+extraction_policy_version: v1
+
 statement:
   fields:
     account_number:
@@ -929,6 +933,8 @@ _pseudo_groups:
         with self.assertRaises(ValueError) as exc:
             prepare_extraction_yaml(
                 """
+extraction_policy_version: v1
+
 statement:
   fields:
     account_number:
@@ -955,6 +961,8 @@ _pseudo_groups:
         with self.assertRaises(ValueError) as exc:
             prepare_extraction_yaml(
                 """
+extraction_policy_version: v1
+
 statement:
   fields:
     account_number:
@@ -977,6 +985,8 @@ _pseudo_groups:
         with self.assertRaises(ValueError) as exc:
             prepare_extraction_yaml(
                 """
+extraction_policy_version: v1
+
 _defs:
   identity_fields:
     fields:
@@ -1024,6 +1034,8 @@ statement:
         with self.assertRaises(ValueError) as exc:
             prepare_extraction_yaml(
                 """
+extraction_policy_version: v1
+
 customer:
   fields:
     customer_name:
@@ -1055,6 +1067,8 @@ _pseudo_groups:
     def test_prepare_extraction_yaml_composes_defs_fields_only(self) -> None:
         prepared = prepare_extraction_yaml(
             """
+extraction_policy_version: v1
+
 _defs:
   identity_fields:
     fields:
@@ -1123,13 +1137,14 @@ _pseudo_groups:
     def test_prepare_extraction_yaml_separates_metadata_surfaces(self) -> None:
         prepared = prepare_extraction_yaml(
             """
-domain: invoice
+extraction_policy_version: v1
+
 statement:
-  slot: chunk-instruct
+  workflow_step: chunk-instruct
   unique_attrs:
     - account_number
-  pipeline:
-    reconcile: reconcile-statement
+  final_value_aliases:
+    account_number: account_number
   fields:
     account_number:
       prompt:
@@ -1149,42 +1164,46 @@ _pseudo_groups:
       account_number:
         path: /statement/account_number
   statement_totals:
-    slot: chunk-keys
+    workflow_step: chunk-keys
     fields:
       total_amount_due:
         path: /statement/total_amount_due
 """,
-            top_level_metadata_keys={"domain"},
-            final_group_metadata_keys={"unique_attrs", "pipeline"},
-            workflow_group_metadata_keys={"slot"},
+            final_group_metadata_keys={"unique_attrs", "final_value_aliases"},
+            workflow_group_metadata_keys={"workflow_step"},
         )
 
-        self.assertEqual(prepared.top_level_metadata, {"domain": "invoice"})
+        self.assertEqual(
+            prepared.top_level_metadata,
+            {"extraction_policy_version": "v1"},
+        )
         self.assertEqual(
             prepared.final_group_metadata,
             {
                 "statement": {
                     "unique_attrs": ["account_number"],
-                    "pipeline": {"reconcile": "reconcile-statement"},
+                    "final_value_aliases": {"account_number": "account_number"},
                 }
             },
         )
         self.assertEqual(
             prepared.workflow_group_metadata,
             {
-                "statement_identity": {"slot": "chunk-instruct"},
-                "statement_totals": {"slot": "chunk-keys"},
+                "statement_identity": {"workflow_step": "chunk-instruct"},
+                "statement_totals": {"workflow_step": "chunk-keys"},
             },
         )
-        self.assertNotIn("slot", prepared.groups["statement"])
+        self.assertNotIn("workflow_step", prepared.groups["statement"])
         self.assertNotIn("unique_attrs", prepared.workflow_groups["statement_identity"])
         self.assertFalse(hasattr(prepared, "pseudo_group_metadata"))
 
-    def test_prepare_extraction_yaml_resolves_slot_positive_cases(self) -> None:
+    def test_prepare_extraction_yaml_resolves_workflow_step_positive_cases(self) -> None:
         prepared = prepare_extraction_yaml(
             """
+extraction_policy_version: v1
+
 statement:
-  slot: chunk-instruct
+  workflow_step: chunk-instruct
   fields:
     account_number:
       prompt:
@@ -1199,7 +1218,7 @@ statement:
         instructions: Return the total amount due.
         type: float
 customer:
-  slot: chunk-summary
+  workflow_step: chunk-summary
   fields:
     customer_name:
       prompt:
@@ -1208,7 +1227,7 @@ customer:
         instructions: Return the customer name.
         type: str
 service_address:
-  slot: chunk-summary
+  workflow_step: chunk-summary
   fields:
     street:
       prompt:
@@ -1230,7 +1249,7 @@ _pseudo_groups:
       account_number:
         path: /statement/account_number
   statement_totals:
-    slot: chunk-keys
+    workflow_step: chunk-keys
     fields:
       total_amount_due:
         path: /statement/total_amount_due
@@ -1243,24 +1262,26 @@ _pseudo_groups:
       service_street:
         path: /service_address/street
 """,
-            workflow_group_metadata_keys={"slot"},
+            workflow_group_metadata_keys={"workflow_step"},
         )
 
         self.assertEqual(
             prepared.workflow_group_metadata,
             {
-                "statement_identity": {"slot": "chunk-instruct"},
-                "statement_totals": {"slot": "chunk-keys"},
-                "customer_packet": {"slot": "chunk-summary"},
+                "statement_identity": {"workflow_step": "chunk-instruct"},
+                "statement_totals": {"workflow_step": "chunk-keys"},
+                "customer_packet": {"workflow_step": "chunk-summary"},
             },
         )
 
-    def test_prepare_extraction_yaml_rejects_ambiguous_slot_inheritance(self) -> None:
+    def test_prepare_extraction_yaml_rejects_ambiguous_workflow_step_inheritance(self) -> None:
         with self.assertRaises(ValueError) as exc:
             prepare_extraction_yaml(
                 """
+extraction_policy_version: v1
+
 customer:
-  slot: chunk-instruct
+  workflow_step: chunk-instruct
   fields:
     customer_name:
       prompt:
@@ -1269,7 +1290,7 @@ customer:
         instructions: Return the customer name.
         type: str
 service_address:
-  slot: chunk-summary
+  workflow_step: chunk-summary
   fields:
     street:
       prompt:
@@ -1287,19 +1308,21 @@ _pseudo_groups:
       service_street:
         path: /service_address/street
 """,
-                workflow_group_metadata_keys={"slot"},
+                workflow_group_metadata_keys={"workflow_step"},
             )
 
-        self.assertIn("explicit [slot] is required", str(exc.exception))
+        self.assertIn("explicit [workflow_step] is required", str(exc.exception))
 
-    def test_prepare_extraction_yaml_rejects_partially_missing_slot_inheritance(
+    def test_prepare_extraction_yaml_rejects_partially_missing_workflow_step_inheritance(
         self,
     ) -> None:
         with self.assertRaises(ValueError) as exc:
             prepare_extraction_yaml(
                 """
+extraction_policy_version: v1
+
 customer:
-  slot: chunk-instruct
+  workflow_step: chunk-instruct
   fields:
     customer_name:
       prompt:
@@ -1325,10 +1348,10 @@ _pseudo_groups:
       service_street:
         path: /service_address/street
 """,
-                workflow_group_metadata_keys={"slot"},
+                workflow_group_metadata_keys={"workflow_step"},
             )
 
-        self.assertIn("explicit [slot] is required", str(exc.exception))
+        self.assertIn("explicit [workflow_step] is required", str(exc.exception))
 
     def test_prepare_extraction_yaml_preserves_ordinary_aliases_by_deep_copy(
         self,
@@ -1385,6 +1408,8 @@ statement: &statement
         with self.assertRaises(ValueError) as exc:
             prepare_extraction_yaml(
                 """
+extraction_policy_version: v1
+
 statement:
   fields:
     account_number:
@@ -1407,6 +1432,8 @@ _pseudo_groups:
         with self.assertRaises(ValueError) as exc:
             prepare_extraction_yaml(
                 """
+extraction_policy_version: v1
+
 statement:
   fields:
     account_number:
@@ -1469,6 +1496,8 @@ statement:
         with self.assertRaises(ValueError) as exc:
             prepare_extraction_yaml(
                 """
+extraction_policy_version: v1
+
 statement:
   fields:
     account_number:
@@ -1497,6 +1526,8 @@ _pseudo_groups:
         with self.assertRaises(ValueError) as exc:
             prepare_extraction_yaml(
                 """
+extraction_policy_version: v1
+
 statement:
   fields:
     account_number:
@@ -1568,13 +1599,15 @@ statement:
             str(exc.exception),
         )
 
-    def test_prepare_extraction_yaml_treats_pseudo_slot_null_as_unset(
+    def test_prepare_extraction_yaml_treats_pseudo_workflow_step_null_as_unset(
         self,
     ) -> None:
         prepared = prepare_extraction_yaml(
             """
+extraction_policy_version: v1
+
 statement:
-  slot: chunk-instruct
+  workflow_step: chunk-instruct
   fields:
     account_number:
       prompt:
@@ -1584,26 +1617,28 @@ statement:
         type: str
 _pseudo_groups:
   statement_identity:
-    slot:
+    workflow_step:
     fields:
       account_number:
         path: /statement/account_number
 """,
-            workflow_group_metadata_keys={"slot"},
+            workflow_group_metadata_keys={"workflow_step"},
         )
 
         self.assertEqual(
             prepared.workflow_group_metadata,
-            {"statement_identity": {"slot": "chunk-instruct"}},
+            {"statement_identity": {"workflow_step": "chunk-instruct"}},
         )
 
-    def test_prepare_extraction_yaml_preserves_empty_string_slot(
+    def test_prepare_extraction_yaml_preserves_empty_string_workflow_step(
         self,
     ) -> None:
         prepared = prepare_extraction_yaml(
             """
+extraction_policy_version: v1
+
 statement:
-  slot: chunk-instruct
+  workflow_step: chunk-instruct
   fields:
     account_number:
       prompt:
@@ -1613,17 +1648,17 @@ statement:
         type: str
 _pseudo_groups:
   statement_identity:
-    slot: ""
+    workflow_step: ""
     fields:
       account_number:
         path: /statement/account_number
 """,
-            workflow_group_metadata_keys={"slot"},
+            workflow_group_metadata_keys={"workflow_step"},
         )
 
         self.assertEqual(
             prepared.workflow_group_metadata,
-            {"statement_identity": {"slot": ""}},
+            {"statement_identity": {"workflow_step": ""}},
         )
 
     def test_prepare_extraction_yaml_accepts_custom_workflow_steps(self) -> None:
@@ -1702,6 +1737,8 @@ _pseudo_groups:
     ) -> None:
         prepared = prepare_extraction_yaml(
             """
+extraction_policy_version: v1
+
 workflow:
   custom_steps:
     - name: line_item_labels
@@ -1734,12 +1771,14 @@ invoice:
             "/invoice/charges/*",
         )
 
-    def test_prepare_extraction_yaml_rejects_slot_and_workflow_step_conflict(
+    def test_prepare_extraction_yaml_rejects_slot_metadata(
         self,
     ) -> None:
         with self.assertRaises(ValueError) as exc:
             prepare_extraction_yaml(
                 """
+extraction_policy_version: v1
+
 workflow:
   custom_steps:
     - name: line_item_labels
@@ -1755,7 +1794,7 @@ line_items:
         instructions: Return the description.
         type: str
 """,
-                workflow_group_metadata_keys={"slot"},
+                workflow_group_metadata_keys={"workflow_step"},
             )
 
         self.assertIn("slot", str(exc.exception))
@@ -1767,6 +1806,8 @@ line_items:
         with self.assertRaises(ValueError) as exc:
             prepare_extraction_yaml(
                 """
+extraction_policy_version: v1
+
 workflow:
   fields:
     status:
@@ -1807,6 +1848,8 @@ workflow:
         with self.assertRaises(ValueError) as exc:
             prepare_extraction_yaml(
                 """
+extraction_policy_version: v1
+
 workflow:
   custom_steps:
     - name: line_item_labels
@@ -1868,6 +1911,8 @@ line_items:
         with self.assertRaises(ValueError) as exc:
             prepare_extraction_yaml(
                 f"""
+extraction_policy_version: v1
+
 workflow:
   custom_steps:
     - name: overloaded_fields
@@ -1889,6 +1934,8 @@ line_items:
         with self.assertRaises(ValueError) as exc:
             prepare_extraction_yaml(
                 """
+extraction_policy_version: v1
+
 workflow:
   custom_steps:
     - name: line_item_labels
@@ -1919,6 +1966,8 @@ line_items:
         with self.assertRaises(ValueError) as exc:
             prepare_extraction_yaml(
                 """
+extraction_policy_version: v1
+
 workflow:
   custom_steps:
     - name: unrouted_fields
