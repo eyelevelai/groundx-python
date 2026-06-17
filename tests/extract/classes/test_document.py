@@ -20,6 +20,8 @@ from groundx.extract.classes.testing import TestXRay
 from groundx.extract.prompt.manager import PromptManager
 
 CUSTOM_WORKFLOW_YAML = """
+extraction_policy_version: v1
+
 workflow:
   custom_steps:
     - name: line_item_labels
@@ -40,6 +42,8 @@ line_items:
 
 
 CUSTOM_REPEATED_WORKFLOW_YAML = """
+extraction_policy_version: v1
+
 workflow:
   custom_steps:
     - name: charge_labels

@@ -31,7 +31,7 @@ FINAL_GROUP_METADATA_KEYS = {
     "passthrough_pair_attrs",
     "deregulation_status_values",
 }
-WORKFLOW_GROUP_METADATA_KEYS = {"slot"}
+WORKFLOW_GROUP_METADATA_KEYS = {"workflow_step"}
 
 
 def _custom_workflow_metadata() -> typing.Dict[str, typing.Any]:
@@ -100,7 +100,7 @@ POLICY_YAML = """
 extraction_policy_version: v1
 
 statement:
-  slot: chunk-instruct
+  workflow_step: chunk-instruct
   final_value_aliases:
     amount_due: total_due
   fill_rules:
@@ -132,7 +132,7 @@ statement:
         type: str
 
 meters:
-  slot: chunk-summary
+  workflow_step: chunk-summary
   always_check_attrs:
     - meter_number
   conflict_attrs:
@@ -171,7 +171,7 @@ meters:
         type: str
 
 charges:
-  slot: chunk-keys
+  workflow_step: chunk-keys
   always_check_attrs:
     - charge_description_as_printed
   match_attrs:
@@ -197,7 +197,7 @@ charges:
 
 _pseudo_groups:
   statement_identity:
-    slot: chunk-keys
+    workflow_step: chunk-keys
     fields:
       account_number:
         path: /statement/account_number
@@ -238,7 +238,7 @@ def test_persisted_workflow_extract_round_trips_authored_metadata() -> None:
         "charge_explanation"
     ]
     assert reloaded.workflow_group_metadata["statement_identity"] == {
-        "slot": "chunk-keys"
+        "workflow_step": "chunk-keys"
     }
     assert reloaded.workflow_field_paths["statement_identity"] == {
         "account_number": "/statement/account_number"

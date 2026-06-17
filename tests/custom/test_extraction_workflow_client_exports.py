@@ -13,6 +13,8 @@ import pytest
 from groundx import GroundX
 
 CUSTOM_WORKFLOW_YAML = """
+extraction_policy_version: v1
+
 workflow:
   template:
     "{{LANGUAGE}}": English

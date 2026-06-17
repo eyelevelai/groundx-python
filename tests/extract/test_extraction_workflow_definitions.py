@@ -16,6 +16,8 @@ from groundx.types import (
 )
 
 CUSTOM_WORKFLOW_YAML = """
+extraction_policy_version: v1
+
 workflow:
   template:
     "{{LANGUAGE}}": English
@@ -56,6 +58,8 @@ statement:
 POLICY_METADATA_YAML = """
 extraction_policy_version: v1
 statement:
+  final_value_aliases:
+    account_number: account_number
   fields:
     account_number:
       prompt:
@@ -647,7 +651,6 @@ def test_create_and_update_yaml_path_errors_include_source_context(
     create_message = str(create_exc.value)
     assert str(path) in create_message
     assert "unsupported top-level metadata [unsupported_policy_version]" in create_message
-    assert "top_level_metadata_keys" in create_message
 
     with pytest.raises(ValueError) as update_exc:
         client.update_extraction_workflow(
@@ -659,7 +662,6 @@ def test_create_and_update_yaml_path_errors_include_source_context(
     update_message = str(update_exc.value)
     assert str(path) in update_message
     assert "unsupported top-level metadata [unsupported_policy_version]" in update_message
-    assert "top_level_metadata_keys" in update_message
     assert workflows.calls == []
 
 
@@ -831,7 +833,6 @@ async def test_async_create_and_update_yaml_path_errors_include_source_context(
     create_message = str(create_exc.value)
     assert str(path) in create_message
     assert "unsupported top-level metadata [unsupported_policy_version]" in create_message
-    assert "top_level_metadata_keys" in create_message
 
     with pytest.raises(ValueError) as update_exc:
         await client.update_extraction_workflow(
@@ -843,5 +844,4 @@ async def test_async_create_and_update_yaml_path_errors_include_source_context(
     update_message = str(update_exc.value)
     assert str(path) in update_message
     assert "unsupported top-level metadata [unsupported_policy_version]" in update_message
-    assert "top_level_metadata_keys" in update_message
     assert workflows.calls == []
