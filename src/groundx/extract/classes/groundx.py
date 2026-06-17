@@ -70,6 +70,9 @@ json_fields: typing.List[str] = [
 
 
 class Chunk(BaseModel):
+    # AGE-148: tolerant reader — unknown X-Ray fields are retained, not dropped
+    model_config = ConfigDict(extra="allow", populate_by_name=True)
+
     boundingBoxes: Annotated[typing.List[BoundingBox], Field(default_factory=list)]
     chunk: typing.Optional[str] = None
     chunkKeywords: typing.Optional[str] = None
@@ -84,6 +87,9 @@ class Chunk(BaseModel):
     sectionSummary: typing.Optional[str] = None
     suggestedText: typing.Optional[str] = None
     text: typing.Optional[str] = None
+    # AGE-148: per-step custom X-Ray outputs
+    customChunkOutputs: typing.Optional[typing.Dict[str, typing.Any]] = None
+    customSectionOutputs: typing.Optional[typing.Dict[str, typing.Any]] = None
 
     @field_validator("boundingBoxes", mode="before")
     @classmethod
@@ -144,6 +150,9 @@ class DocumentPage(BaseModel):
 
 
 class XRayDocument(BaseModel):
+    # AGE-148: tolerant reader — unknown document-level X-Ray fields are retained
+    model_config = ConfigDict(extra="allow")
+
     chunks: typing.List[Chunk]
     documentPages: Annotated[typing.List[DocumentPage], Field(default_factory=list)]
     sourceUrl: str
@@ -152,6 +161,8 @@ class XRayDocument(BaseModel):
     fileType: typing.Optional[str] = None
     fileSummary: typing.Optional[str] = None
     language: typing.Optional[str] = None
+    # AGE-148: per-step custom document outputs
+    customDocumentOutputs: typing.Optional[typing.Dict[str, typing.Any]] = None
 
     @classmethod
     def download(

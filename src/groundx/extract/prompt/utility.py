@@ -1,6 +1,7 @@
 import collections.abc
 import copy
 import dataclasses
+import re
 import typing
 
 import yaml
@@ -10,9 +11,16 @@ from ..classes.group import Group
 from ..classes.prompt import Prompt
 
 _PERSISTED_WORKFLOW_EXTRACT_KEY = "_groundx_persisted_extract"
-_RESERVED_TOP_LEVEL_KEYS = {"_defs", "_pseudo_groups", _PERSISTED_WORKFLOW_EXTRACT_KEY}
+_CUSTOM_STEP_KEYS = {"_template", "_custom_steps", "_output_routes", "_leaf_fields"}
+_RESERVED_TOP_LEVEL_KEYS = (
+    {"_defs", "_pseudo_groups", _PERSISTED_WORKFLOW_EXTRACT_KEY} | _CUSTOM_STEP_KEYS
+)
 _PSEUDO_GROUP_BODY_KEYS = {"prompt", "fields"}
 _PSEUDO_FIELD_KEYS = {"path"}
+
+_VALID_CUSTOM_STEP_LEVELS = {"chunk", "section", "document"}
+_VALID_CUSTOM_STEP_KINDS = {"instruct", "keys", "summary"}
+_CUSTOM_STEP_NAME_PATTERN = re.compile(r"^[a-z][a-z0-9_]{0,63}$")
 
 
 def _metadata_factory() -> typing.Dict[str, typing.Any]:
@@ -68,6 +76,17 @@ class PreparedExtractionYaml:
     workflow_group_metadata: typing.Dict[
         str, typing.Dict[str, typing.Any]
     ] = dataclasses.field(default_factory=_nested_metadata_factory)
+    # AGE-148: custom-step authoring fields
+    custom_template: typing.Optional[typing.Dict[str, str]] = None
+    custom_steps: typing.List[typing.Dict[str, typing.Any]] = dataclasses.field(
+        default_factory=list
+    )
+    output_routes: typing.List[typing.Dict[str, typing.Any]] = dataclasses.field(
+        default_factory=list
+    )
+    leaf_fields: typing.List[typing.Dict[str, typing.Any]] = dataclasses.field(
+        default_factory=list
+    )
 
 
 def _decode_pointer_segment(segment: str, pointer: str) -> str:
@@ -503,6 +522,10 @@ def _has_declared_metadata(
     if any(key in data for key in top_metadata_keys):
         return True
 
+    # AGE-148: custom-step authoring keys also warrant persisting authored data
+    if any(key in data for key in _CUSTOM_STEP_KEYS):
+        return True
+
     group_metadata_keys = final_metadata_keys | workflow_metadata_keys
     for group_name, group_data in data.items():
         if group_name in _RESERVED_TOP_LEVEL_KEYS or group_name in top_metadata_keys:
@@ -581,6 +604,29 @@ def _resolve_pseudo_workflow_metadata(
     return resolved
 
 
+def _validate_custom_step(step: typing.Dict[str, typing.Any], idx: int) -> None:
+    """Validate a single _custom_steps entry.  Raises ValueError on any violation."""
+    name = step.get("name", "")
+    level = step.get("level", "")
+    kind = step.get("kind", "")
+
+    if not isinstance(name, str) or not _CUSTOM_STEP_NAME_PATTERN.match(name):
+        raise ValueError(
+            f"_custom_steps[{idx}] has invalid name {name!r}; "
+            "must match ^[a-z][a-z0-9_]{{0,63}}$"
+        )
+    if level not in _VALID_CUSTOM_STEP_LEVELS:
+        raise ValueError(
+            f"_custom_steps[{idx}] (name={name!r}) has invalid level {level!r}; "
+            f"must be one of {sorted(_VALID_CUSTOM_STEP_LEVELS)}"
+        )
+    if kind not in _VALID_CUSTOM_STEP_KINDS:
+        raise ValueError(
+            f"_custom_steps[{idx}] (name={name!r}) has invalid kind {kind!r}; "
+            f"must be one of {sorted(_VALID_CUSTOM_STEP_KINDS)}"
+        )
+
+
 def prepare_extraction_yaml(
     raw_yaml: typing.Union[str, typing.Mapping[str, typing.Any]],
     top_level_metadata_keys: typing.Optional[typing.Iterable[str]] = None,
@@ -609,6 +655,30 @@ def prepare_extraction_yaml(
     for key in top_metadata_key_set:
         if key in data:
             top_level_metadata[key] = data[key]
+
+    # AGE-148: extract and validate custom-step authoring keys
+    raw_custom_template = data.get("_template")
+    custom_template: typing.Optional[typing.Dict[str, str]] = (
+        copy.deepcopy(typing.cast(typing.Dict[str, str], raw_custom_template))
+        if raw_custom_template is not None
+        else None
+    )
+    raw_custom_steps = data.get("_custom_steps") or []
+    custom_steps: typing.List[typing.Dict[str, typing.Any]] = copy.deepcopy(
+        typing.cast(typing.List[typing.Dict[str, typing.Any]], raw_custom_steps)
+    )
+    for idx, step in enumerate(custom_steps):
+        _validate_custom_step(
+            typing.cast(typing.Dict[str, typing.Any], step), idx
+        )
+    raw_output_routes = data.get("_output_routes") or []
+    output_routes: typing.List[typing.Dict[str, typing.Any]] = copy.deepcopy(
+        typing.cast(typing.List[typing.Dict[str, typing.Any]], raw_output_routes)
+    )
+    raw_leaf_fields = data.get("_leaf_fields") or []
+    leaf_fields: typing.List[typing.Dict[str, typing.Any]] = copy.deepcopy(
+        typing.cast(typing.List[typing.Dict[str, typing.Any]], raw_leaf_fields)
+    )
 
     defs: typing.Dict[str, typing.Any] = {}
     if "_defs" in data:
@@ -774,6 +844,10 @@ def prepare_extraction_yaml(
             top_level_metadata=top_level_metadata,
             final_group_metadata=final_group_metadata,
             workflow_group_metadata=_copy_mapping(final_workflow_metadata),
+            custom_template=custom_template,
+            custom_steps=custom_steps,
+            output_routes=output_routes,
+            leaf_fields=leaf_fields,
         )
 
     residual_groups = _copy_mapping(groups)
@@ -808,6 +882,10 @@ def prepare_extraction_yaml(
         top_level_metadata=top_level_metadata,
         final_group_metadata=final_group_metadata,
         workflow_group_metadata=workflow_group_metadata,
+        custom_template=custom_template,
+        custom_steps=custom_steps,
+        output_routes=output_routes,
+        leaf_fields=leaf_fields,
     )
 
 

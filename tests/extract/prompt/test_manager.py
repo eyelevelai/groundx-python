@@ -1665,6 +1665,101 @@ Special Instructions:
         self.maxDiff = None
         self.assertEqual(js, ym)
 
+    # -----------------------------------------------------------------------
+    # AGE-148: custom_workflow_config accessor
+    # -----------------------------------------------------------------------
+
+    _CUSTOM_STEP_YAML = """
+_template:
+  chunk-instruct: my-template
+_custom_steps:
+  - name: adp_chunk_01
+    level: chunk
+    kind: instruct
+_output_routes:
+  - step: adp_chunk_01
+    field: plan_type
+_leaf_fields:
+  - step: adp_chunk_01
+    path: /adp_chunk/plan_type
+statement:
+  fields:
+    account_number:
+      prompt:
+        identifiers:
+          - Account Number
+        instructions: Return the account number.
+        type: str
+"""
+
+    def test_custom_workflow_config_returns_correct_keys_when_yaml_has_custom_steps(
+        self,
+    ) -> None:
+        """Task 4.3(a): custom_workflow_config() returns correct keys."""
+        source = TestSource(self._CUSTOM_STEP_YAML)
+        manager = PromptManager(cache_source=source, config_source=source)
+
+        config = manager.custom_workflow_config()
+
+        self.assertIn("template", config)
+        self.assertIn("customSteps", config)
+        self.assertIn("outputRoutes", config)
+        self.assertIn("leafFields", config)
+        self.assertEqual(config["template"], {"chunk-instruct": "my-template"})
+        self.assertEqual(
+            config["customSteps"],
+            [{"name": "adp_chunk_01", "level": "chunk", "kind": "instruct"}],
+        )
+
+    def test_custom_workflow_config_returns_empty_when_no_custom_steps(self) -> None:
+        """Task 4.3(b): custom_workflow_config() returns empty dict when no custom-step keys."""
+        source = TestSource(SAMPLE_YAML_1)
+        manager = PromptManager(cache_source=source, config_source=source)
+
+        config = manager.custom_workflow_config()
+
+        self.assertEqual(config, {})
+
+    def test_custom_workflow_config_round_trip_from_persisted_blob(self) -> None:
+        """Task 4.3(c): mapping round-trip: persisted extract blob with _custom_steps
+        restores the same customSteps in the config."""
+        import copy as _copy
+
+        source = TestSource(self._CUSTOM_STEP_YAML)
+        manager = PromptManager(cache_source=source, config_source=source)
+
+        # get the persisted blob (as if it came back from the workflow API)
+        persisted = manager.persisted_workflow_extract_dict()
+        round_tripped = json.loads(json.dumps(persisted))
+
+        # build a new manager from the round-tripped blob
+        source2 = TestSource.__new__(TestSource)
+        # bypass normal __init__ — feed the mapping directly
+        import types as _types
+        from groundx.extract.prompt.source import Source
+
+        class MappingSource(Source):
+            __test__ = False
+
+            def __init__(self, mapping: typing.Any) -> None:
+                self._mapping = mapping
+
+            def fetch(self, workflow_id: str) -> typing.Tuple[typing.Any, str]:
+                return self._mapping, "rt-1"
+
+            def peek(self, workflow_id: str) -> typing.Optional[str]:
+                return "rt-1"
+
+        src2 = MappingSource(round_tripped)
+        manager2 = PromptManager(cache_source=src2, config_source=src2)
+
+        config2 = manager2.custom_workflow_config()
+
+        self.assertEqual(
+            config2["customSteps"],
+            [{"name": "adp_chunk_01", "level": "chunk", "kind": "instruct"}],
+        )
+
 
 def check_value(
     key: str, mn: TestPromptManager, pmp: Prompt, expect: typing.Dict[str, typing.Any]

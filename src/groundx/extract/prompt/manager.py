@@ -59,6 +59,8 @@ class PromptManager:
         self._workflow_group_metadata: typing.Dict[
             str, typing.Dict[str, typing.Dict[str, typing.Any]]
         ] = {}
+        # AGE-148: cache for custom-step config dicts
+        self._prepared_custom_config: typing.Dict[str, typing.Dict[str, typing.Any]] = {}
         self._versions: typing.Dict[str, str] = {}
         self._cache_source: Source = cache_source
         self._config_source: Source = config_source
@@ -263,6 +265,17 @@ class PromptManager:
         self._final_group_metadata[workflow_id] = prepared.final_group_metadata
         self._workflow_group_metadata[workflow_id] = prepared.workflow_group_metadata
         self._versions[workflow_id] = version
+        # AGE-148: build and cache the custom-step config dict
+        custom_config: typing.Dict[str, typing.Any] = {}
+        if prepared.custom_template:
+            custom_config["template"] = copy.deepcopy(prepared.custom_template)
+        if prepared.custom_steps:
+            custom_config["customSteps"] = copy.deepcopy(prepared.custom_steps)
+        if prepared.output_routes:
+            custom_config["outputRoutes"] = copy.deepcopy(prepared.output_routes)
+        if prepared.leaf_fields:
+            custom_config["leafFields"] = copy.deepcopy(prepared.leaf_fields)
+        self._prepared_custom_config[workflow_id] = custom_config
 
     def _fetch_workflow_config(
         self, file_name: str, workflow_id: str
@@ -669,6 +682,17 @@ class PromptManager:
             self._final_group_metadata[workflow_id] = prepared.final_group_metadata
             self._workflow_group_metadata[workflow_id] = prepared.workflow_group_metadata
             self._versions[workflow_id] = version
+            # AGE-148: rebuild custom config on reload
+            custom_config: typing.Dict[str, typing.Any] = {}
+            if prepared.custom_template:
+                custom_config["template"] = copy.deepcopy(prepared.custom_template)
+            if prepared.custom_steps:
+                custom_config["customSteps"] = copy.deepcopy(prepared.custom_steps)
+            if prepared.output_routes:
+                custom_config["outputRoutes"] = copy.deepcopy(prepared.output_routes)
+            if prepared.leaf_fields:
+                custom_config["leafFields"] = copy.deepcopy(prepared.leaf_fields)
+            self._prepared_custom_config[workflow_id] = custom_config
 
     def workflow_extract_dict(
         self,
@@ -718,6 +742,22 @@ class PromptManager:
             )
 
         return copy.deepcopy(extract)
+
+    def custom_workflow_config(
+        self,
+        file_name: typing.Optional[str] = None,
+        workflow_id: typing.Optional[str] = None,
+    ) -> typing.Dict[str, typing.Any]:
+        """Return a deep copy of the custom-step config dict for the workflow.
+
+        The dict contains keys ``template``, ``customSteps``, ``outputRoutes``,
+        and ``leafFields`` (only those with non-falsy values are included).
+        Returns an empty dict when the workflow YAML has no custom-step keys.
+        """
+        workflow_id = self.workflow_id(workflow_id)
+        self.cache_workflow(self.file_name(file_name), workflow_id)
+        config = self._prepared_custom_config.get(workflow_id, {})
+        return copy.deepcopy(config)
 
     def top_level_metadata(
         self,

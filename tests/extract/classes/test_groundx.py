@@ -314,5 +314,114 @@ class TestGroundX(unittest.TestCase):
             self.assertEqual(page.pageUrl, "https://page.jpg")
 
 
+# ---------------------------------------------------------------------------
+# AGE-148: Chunk custom output fields + extra="allow"
+# ---------------------------------------------------------------------------
+
+
+class TestChunkCustomOutputs(unittest.TestCase):
+    def _base_chunk(self) -> typing.Dict[str, typing.Any]:
+        return {
+            "boundingBoxes": [],
+            "contentType": [],
+            "pageNumbers": [],
+        }
+
+    def test_custom_chunk_outputs_are_parsed(self) -> None:
+        """Task 5.1(a): customChunkOutputs round-trips through Chunk."""
+        data = {**self._base_chunk(), "customChunkOutputs": {"adp_chunk_01": {"plan_type": "401k"}}}
+        chunk = Chunk(**data)
+        self.assertEqual(chunk.customChunkOutputs, {"adp_chunk_01": {"plan_type": "401k"}})
+
+    def test_custom_section_outputs_are_parsed(self) -> None:
+        """Task 5.1(b): customSectionOutputs round-trips through Chunk."""
+        data = {**self._base_chunk(), "customSectionOutputs": {"adp_section_01": {"section_name": "Contributions"}}}
+        chunk = Chunk(**data)
+        self.assertEqual(chunk.customSectionOutputs, {"adp_section_01": {"section_name": "Contributions"}})
+
+    def test_chunk_without_custom_outputs_has_none_fields(self) -> None:
+        """Task 5.1(c): chunk without either key has both fields as None."""
+        chunk = Chunk(**self._base_chunk())
+        self.assertIsNone(chunk.customChunkOutputs)
+        self.assertIsNone(chunk.customSectionOutputs)
+
+    def test_chunk_with_unknown_field_does_not_raise(self) -> None:
+        """Task 5.1(d): unknown field does NOT raise ValidationError."""
+        data = {**self._base_chunk(), "futureField": "value"}
+        try:
+            chunk = Chunk(**data)
+        except ValidationError as exc:
+            self.fail(f"Chunk raised ValidationError on unknown field: {exc}")
+
+
+# ---------------------------------------------------------------------------
+# AGE-148: XRayDocument custom output fields + extra="allow"
+# ---------------------------------------------------------------------------
+
+
+class TestXRayDocumentCustomOutputs(unittest.TestCase):
+    def _base_xray(self) -> typing.Dict[str, typing.Any]:
+        return {
+            "chunks": [],
+            "documentPages": [],
+            "sourceUrl": "https://example.com/doc.pdf",
+        }
+
+    def test_custom_document_outputs_are_parsed(self) -> None:
+        """Task 6.1(a): customDocumentOutputs round-trips through XRayDocument."""
+        data = {**self._base_xray(), "customDocumentOutputs": {"adp_doc_01": {"plan_name": "ADP 401k"}}}
+        xray = XRayDocument(**data)
+        self.assertEqual(xray.customDocumentOutputs, {"adp_doc_01": {"plan_name": "ADP 401k"}})
+
+    def test_xray_without_custom_outputs_has_none_field(self) -> None:
+        """Task 6.1(b): XRayDocument without the key has customDocumentOutputs as None."""
+        xray = XRayDocument(**self._base_xray())
+        self.assertIsNone(xray.customDocumentOutputs)
+
+    def test_xray_with_unknown_field_does_not_raise(self) -> None:
+        """Task 6.1(c): unknown document-level field does NOT raise ValidationError."""
+        data = {**self._base_xray(), "newTopLevelField": "value"}
+        try:
+            XRayDocument(**data)
+        except ValidationError as exc:
+            self.fail(f"XRayDocument raised ValidationError on unknown field: {exc}")
+
+    def test_xray_download_exposes_custom_chunk_outputs(self) -> None:
+        """Task 6.1(d): XRayDocument.download returns model where chunk customChunkOutputs
+        is accessible when the X-Ray JSON contains it."""
+        from unittest.mock import patch
+
+        payload = {
+            "chunks": [
+                {
+                    "boundingBoxes": [],
+                    "contentType": [],
+                    "pageNumbers": [],
+                    "customChunkOutputs": {"my_step": {"result": 1}},
+                }
+            ],
+            "documentPages": [],
+            "sourceUrl": "https://example.com/doc.pdf",
+        }
+
+        class DummyResp:
+            def raise_for_status(self):
+                pass
+
+            def json(self):
+                return payload
+
+        from groundx.extract.classes.groundx import GroundXDocument
+        gx = GroundXDocument.model_validate(
+            {"base_url": "", "documentID": "D", "taskID": "T"}
+        )
+        with patch("requests.get", return_value=DummyResp()):
+            xdoc = XRayDocument.download(
+                gx, cache_dir=Path("./cache"), base="https://upload.test", is_test=True
+            )
+
+        self.assertEqual(xdoc.chunks[0].customChunkOutputs, {"my_step": {"result": 1}})
+
+
 if __name__ == "__main__":
     unittest.main()

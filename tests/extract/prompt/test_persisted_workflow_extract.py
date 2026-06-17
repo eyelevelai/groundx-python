@@ -229,3 +229,223 @@ def test_legacy_yaml_persisted_extract_is_execution_shaped() -> None:
             "service_address": "/meters/service_address",
         },
     }
+
+
+# ---------------------------------------------------------------------------
+# AGE-148: custom-step keys
+# ---------------------------------------------------------------------------
+
+CUSTOM_STEP_YAML = """
+_template:
+  chunk-instruct: my-instruct-template
+_custom_steps:
+  - name: adp_chunk_01
+    level: chunk
+    kind: instruct
+  - name: adp_section_01
+    level: section
+    kind: summary
+_output_routes:
+  - step: adp_chunk_01
+    field: plan_type
+_leaf_fields:
+  - step: adp_chunk_01
+    path: /adp_chunk/plan_type
+statement:
+  fields:
+    account_number:
+      prompt:
+        identifiers:
+          - Account Number
+        instructions: Return the account number.
+        type: str
+"""
+
+
+def test_custom_step_keys_populate_prepared_fields() -> None:
+    """Task 1.3(a): YAML with all four custom-step keys → fields populated."""
+    prepared = prepare_extraction_yaml(CUSTOM_STEP_YAML)
+
+    assert prepared.custom_template == {"chunk-instruct": "my-instruct-template"}
+    assert prepared.custom_steps == [
+        {"name": "adp_chunk_01", "level": "chunk", "kind": "instruct"},
+        {"name": "adp_section_01", "level": "section", "kind": "summary"},
+    ]
+    assert prepared.output_routes == [{"step": "adp_chunk_01", "field": "plan_type"}]
+    assert prepared.leaf_fields == [
+        {"step": "adp_chunk_01", "path": "/adp_chunk/plan_type"}
+    ]
+
+
+def test_yaml_without_custom_step_keys_produces_empty_fields() -> None:
+    """Task 1.3(b): YAML without custom-step keys → fields empty/None."""
+    prepared = prepare_extraction_yaml(SAMPLE_YAML_1)
+
+    assert prepared.custom_template is None
+    assert prepared.custom_steps == []
+    assert prepared.output_routes == []
+    assert prepared.leaf_fields == []
+
+
+def test_custom_step_keys_do_not_affect_existing_group_behavior() -> None:
+    """Task 1.3(c): existing group / workflow-group behavior unchanged."""
+    prepared_without = prepare_extraction_yaml(SAMPLE_YAML_1)
+    prepared_with = prepare_extraction_yaml(CUSTOM_STEP_YAML)
+
+    # groups in CUSTOM_STEP_YAML are just 'statement'
+    assert "statement" in prepared_with.groups
+    # groups in SAMPLE_YAML_1 are statement + meters
+    assert list(prepared_without.groups.keys()) == ["statement", "meters"]
+
+    # workflow_field_paths for common group is unchanged
+    assert prepared_without.workflow_field_paths["statement"] == {
+        "statement_date": "/statement/statement_date"
+    }
+    assert prepared_with.workflow_field_paths["statement"] == {
+        "account_number": "/statement/account_number"
+    }
+
+
+def test_custom_step_keys_round_trip_through_persisted_extract() -> None:
+    """Custom-step authoring metadata survives JSON round-trip."""
+    prepared = prepare_extraction_yaml(CUSTOM_STEP_YAML)
+
+    persisted = prepared.persisted_workflow_extract
+    round_tripped = json.loads(json.dumps(persisted))
+    reloaded = prepare_extraction_yaml(round_tripped)
+
+    assert reloaded.custom_template == prepared.custom_template
+    assert reloaded.custom_steps == prepared.custom_steps
+    assert reloaded.output_routes == prepared.output_routes
+    assert reloaded.leaf_fields == prepared.leaf_fields
+
+
+def test_custom_steps_not_exposed_as_workflow_groups() -> None:
+    """_custom_steps and sibling keys must NOT appear as workflow groups."""
+    prepared = prepare_extraction_yaml(CUSTOM_STEP_YAML)
+
+    for key in ("_template", "_custom_steps", "_output_routes", "_leaf_fields"):
+        assert key not in prepared.workflow_groups, (
+            f"{key} must not appear in workflow_groups"
+        )
+
+
+# ---------------------------------------------------------------------------
+# AGE-148: _validate_custom_step fail-fast validation
+# ---------------------------------------------------------------------------
+
+
+def test_invalid_step_name_with_space_raises_value_error() -> None:
+    """Task 3.1(a): name with a space raises ValueError."""
+    yaml_text = """
+_custom_steps:
+  - name: "bad name"
+    level: chunk
+    kind: instruct
+statement:
+  fields:
+    x:
+      prompt:
+        instructions: x
+        type: str
+"""
+    try:
+        prepare_extraction_yaml(yaml_text)
+        raise AssertionError("Expected ValueError was not raised")
+    except ValueError as exc:
+        assert "bad name" in str(exc) or "name" in str(exc)
+
+
+def test_invalid_level_raises_value_error() -> None:
+    """Task 3.1(b): level: 'paragraph' raises ValueError."""
+    yaml_text = """
+_custom_steps:
+  - name: adp_chunk_01
+    level: paragraph
+    kind: instruct
+statement:
+  fields:
+    x:
+      prompt:
+        instructions: x
+        type: str
+"""
+    try:
+        prepare_extraction_yaml(yaml_text)
+        raise AssertionError("Expected ValueError was not raised")
+    except ValueError as exc:
+        assert "paragraph" in str(exc) or "level" in str(exc)
+
+
+def test_invalid_kind_raises_value_error() -> None:
+    """Task 3.1(c): kind: 'embed' raises ValueError."""
+    yaml_text = """
+_custom_steps:
+  - name: adp_chunk_01
+    level: chunk
+    kind: embed
+statement:
+  fields:
+    x:
+      prompt:
+        instructions: x
+        type: str
+"""
+    try:
+        prepare_extraction_yaml(yaml_text)
+        raise AssertionError("Expected ValueError was not raised")
+    except ValueError as exc:
+        assert "embed" in str(exc) or "kind" in str(exc)
+
+
+def test_valid_custom_step_passes_validation() -> None:
+    """Task 3.1(d): valid step {name, level, kind} passes validation."""
+    yaml_text = """
+_custom_steps:
+  - name: adp_chunk_01
+    level: chunk
+    kind: instruct
+statement:
+  fields:
+    x:
+      prompt:
+        instructions: x
+        type: str
+"""
+    prepared = prepare_extraction_yaml(yaml_text)
+    assert prepared.custom_steps == [
+        {"name": "adp_chunk_01", "level": "chunk", "kind": "instruct"}
+    ]
+
+
+# ---------------------------------------------------------------------------
+# AGE-148: backward-compat regression test (task 7.2)
+# ---------------------------------------------------------------------------
+
+
+def test_legacy_yaml_produces_same_groups_and_field_paths() -> None:
+    """Task 7.2: legacy YAML (no custom-step keys) → same groups/paths/extract_dict."""
+    prepared = prepare_extraction_yaml(SAMPLE_YAML_1)
+
+    assert list(prepared.groups.keys()) == ["statement", "meters"]
+    assert prepared.workflow_field_paths == {
+        "statement": {"statement_date": "/statement/statement_date"},
+        "meters": {
+            "meter_number": "/meters/meter_number",
+            "service_address": "/meters/service_address",
+        },
+    }
+
+    # workflow_extract_dict comes from PromptManager; do a light check via persisted
+    source = TestSource(SAMPLE_YAML_1)
+    from groundx.extract.prompt.manager import PromptManager
+
+    manager = PromptManager(cache_source=source, config_source=source)
+    wfe = manager.workflow_extract_dict()
+    assert "statement" in wfe
+    assert "meters" in wfe
+    # custom-step keys are absent
+    assert prepared.custom_template is None
+    assert prepared.custom_steps == []
+    assert prepared.output_routes == []
+    assert prepared.leaf_fields == []
