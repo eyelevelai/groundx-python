@@ -91,6 +91,181 @@ def test_create_update_persist_agent_chain_only_inside_extract() -> None:
         )
 
 
+def test_agent_chain_rejects_map_shape() -> None:
+    raw = """
+extraction_policy_version: v1
+
+workflow:
+  custom_steps:
+    - name: statement_fields
+      level: chunk
+      kind: instruct
+  agent_chain:
+    parallel:
+      - group: statement
+        chain: [reconcile_statement, qa_statement]
+    then:
+      - save_statement
+
+statement:
+  workflow_step: statement_fields
+  fields:
+    account_number:
+      workflow_output_key: account_number
+      prompt:
+        instructions: Return the account number.
+        type: str
+"""
+
+    with pytest.raises(ValueError, match="workflow.agent_chain must be a list"):
+        prepare_extraction_yaml(raw)
+
+
+def test_agent_chain_rejects_chain_without_initial_parallel_stage() -> None:
+    raw = """
+extraction_policy_version: v1
+
+workflow:
+  custom_steps:
+    - name: statement_fields
+      level: chunk
+      kind: instruct
+  agent_chain:
+    - save_statement
+
+statement:
+  workflow_step: statement_fields
+  fields:
+    account_number:
+      workflow_output_key: account_number
+      prompt:
+        instructions: Return the account number.
+        type: str
+"""
+
+    with pytest.raises(
+        ValueError,
+        match="workflow.agent_chain must start with a parallel stage",
+    ):
+        prepare_extraction_yaml(raw)
+
+
+def test_agent_chain_rejects_unknown_group_and_task() -> None:
+    unknown_group = """
+extraction_policy_version: v1
+
+workflow:
+  custom_steps:
+    - name: statement_fields
+      level: chunk
+      kind: instruct
+  agent_chain:
+    - parallel:
+        - group: missing
+          chain: [reconcile_statement, qa_statement]
+    - save_statement
+
+statement:
+  workflow_step: statement_fields
+  fields:
+    account_number:
+      workflow_output_key: account_number
+      prompt:
+        instructions: Return the account number.
+        type: str
+"""
+
+    with pytest.raises(ValueError, match="missing.*is not a workflow group"):
+        prepare_extraction_yaml(unknown_group)
+
+    unknown_task = unknown_group.replace(
+        "reconcile_statement", "unknown_task"
+    ).replace("missing", "statement")
+    with pytest.raises(ValueError, match="unsupported task"):
+        prepare_extraction_yaml(unknown_task)
+
+
+def test_agent_chain_rejects_branch_save_plus_top_level_save() -> None:
+    raw = """
+extraction_policy_version: v1
+
+workflow:
+  custom_steps:
+    - name: statement_fields
+      level: chunk
+      kind: instruct
+  agent_chain:
+    - parallel:
+        - group: statement
+          chain: [reconcile_statement, qa_statement, save_statement]
+    - save_statement
+
+statement:
+  workflow_step: statement_fields
+  fields:
+    account_number:
+      workflow_output_key: account_number
+      prompt:
+        instructions: Return the account number.
+        type: str
+"""
+
+    with pytest.raises(
+        ValueError,
+        match="parallel branch save tasks cannot be combined",
+    ):
+        prepare_extraction_yaml(raw)
+
+
+def test_agent_chain_rejects_invalid_top_level_serial_task_pairs() -> None:
+    base = """
+extraction_policy_version: v1
+
+workflow:
+  custom_steps:
+    - name: statement_fields
+      level: chunk
+      kind: instruct
+  agent_chain:
+{agent_chain}
+
+statement:
+  workflow_step: statement_fields
+  fields:
+    account_number:
+      workflow_output_key: account_number
+      prompt:
+        instructions: Return the account number.
+        type: str
+"""
+    cases = [
+        """
+    - parallel:
+        - group: statement
+          chain: [reconcile_statement, qa_statement, save_statement]
+    - reconcile_charges
+""",
+        """
+    - parallel:
+        - group: statement
+          chain: [reconcile_statement, qa_statement, save_statement]
+    - reconcile_charges
+    - save_statement
+""",
+        """
+    - parallel:
+        - group: statement
+          chain: [reconcile_statement, qa_statement]
+    - save_statement
+    - reconcile_charges
+""",
+    ]
+
+    for agent_chain in cases:
+        with pytest.raises(ValueError, match="top-level agent task"):
+            prepare_extraction_yaml(base.format(agent_chain=agent_chain))
+
+
 def test_slot_and_domain_are_rejected_even_with_metadata_escape_hatches() -> None:
     raw = """
 domain: invoice

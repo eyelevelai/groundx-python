@@ -123,27 +123,27 @@
         }
       },
       "workflow": {
-        "agent_chain": {
-          "parallel": [
-            {
-              "chain": [
-                "reconcile_statement",
-                "qa_statement"
-              ],
-              "group": "statement_identity"
-            },
-            {
-              "chain": [
-                "reconcile_statement",
-                "qa_statement"
-              ],
-              "group": "statement_totals"
-            }
-          ],
-          "then": [
-            "save_statement"
-          ]
-        },
+        "agent_chain": [
+          {
+            "parallel": [
+              {
+                "chain": [
+                  "reconcile_statement",
+                  "qa_statement"
+                ],
+                "group": "statement_identity"
+              },
+              {
+                "chain": [
+                  "reconcile_statement",
+                  "qa_statement"
+                ],
+                "group": "statement_totals"
+              }
+            ]
+          },
+          "save_statement"
+        ],
         "custom_steps": [
           {
             "kind": "keys",
@@ -272,27 +272,27 @@
       }
     },
     "workflow": {
-      "agent_chain": {
-        "parallel": [
-          {
-            "chain": [
-              "reconcile_statement",
-              "qa_statement"
-            ],
-            "group": "statement_identity"
-          },
-          {
-            "chain": [
-              "reconcile_statement",
-              "qa_statement"
-            ],
-            "group": "statement_totals"
-          }
-        ],
-        "then": [
-          "save_statement"
-        ]
-      },
+      "agent_chain": [
+        {
+          "parallel": [
+            {
+              "chain": [
+                "reconcile_statement",
+                "qa_statement"
+              ],
+              "group": "statement_identity"
+            },
+            {
+              "chain": [
+                "reconcile_statement",
+                "qa_statement"
+              ],
+              "group": "statement_totals"
+            }
+          ]
+        },
+        "save_statement"
+      ],
       "custom_steps": [
         {
           "kind": "keys",
