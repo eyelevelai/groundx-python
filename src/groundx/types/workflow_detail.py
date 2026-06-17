@@ -10,6 +10,7 @@ from .workflow_detail_chunk_strategy import WorkflowDetailChunkStrategy
 from .workflow_detail_relationships import WorkflowDetailRelationships
 from .workflow_detail_section_strategy import WorkflowDetailSectionStrategy
 from .workflow_steps import WorkflowSteps
+from .workflow_template import WorkflowTemplate
 
 
 class WorkflowDetail(UniversalBaseModel):
@@ -58,6 +59,10 @@ class WorkflowDetail(UniversalBaseModel):
         FieldMetadata(alias="workflowId"),
         pydantic.Field(alias="workflowId", description="Unique system generated ID for the workflow"),
     ] = None
+    template: typing.Optional[WorkflowTemplate] = pydantic.Field(default=None)
+    """
+    A string-to-string map of prompt variable keys to their values, applied to the workflow's prompt templates.
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

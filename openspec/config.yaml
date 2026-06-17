@@ -75,27 +75,19 @@ context: |
 
 rules:
   proposal:
-    - State what the public package surface gains/changes and why; flag any breaking change
-      to the published API (semver impact)
-    - List downstream consumers (repos that import this package) affected
-    - For a Fern-generated repo: confirm the change targets the hand-written layer only
-      (paths on .fernignore). API-surface changes belong in the generation SOURCE repo, not here.
-    - If open design questions remain after consulting AGENTS.md and existing specs, use the
-      superpowers:brainstorming skill; otherwise note "none" in proposal.md
+    - "State what the public package surface gains/changes and why; flag any breaking change to the published API (semver impact)"
+    - "List downstream consumers (repos that import this package) affected"
+    - "For a Fern-generated repo: confirm the change targets the hand-written layer only (paths on .fernignore). API-surface changes belong in the generation SOURCE repo, not here."
+    - "If open design questions remain after consulting AGENTS.md and existing specs, use the superpowers:brainstorming skill; otherwise note \"none\" in proposal.md"
   specs:
-    - Use the superpowers:test-driven-development skill to derive testable Given/When/Then
-      scenarios; every requirement has at least one scenario
-    - Specify the public function/class contract (inputs, outputs, raised errors, nullability)
-    - Cover error paths and edge cases, not just the happy path
+    - "Use the superpowers:test-driven-development skill to derive testable Given/When/Then scenarios; every requirement has at least one scenario"
+    - "Specify the public function/class contract (inputs, outputs, raised errors, nullability)"
+    - "Cover error paths and edge cases, not just the happy path"
   design:
-    - Only required for non-trivial additions; keep minimal otherwise
-    - For a Fern repo, state explicitly which .fernignore paths the change lives under and
-      confirm openspec/ remains on .fernignore (survives regeneration)
-    - When a decision warrants an ADR, use the architectural-decision-records skill and write
-      it to docs/adr/<LINEAR-TICKET>-<kebab>.md (Linear ticket prefix mandatory). Reference
-      the ADR filename inline in design.md.
+    - "Only required for non-trivial additions; keep minimal otherwise"
+    - "For a Fern repo, state explicitly which .fernignore paths the change lives under and confirm openspec/ remains on .fernignore (survives regeneration)"
+    - "When a decision warrants an ADR, use the architectural-decision-records skill and write it to docs/adr/<LINEAR-TICKET>-<kebab>.md (Linear ticket prefix mandatory). Reference the ADR filename inline in design.md."
   tasks:
-    - Implementation runs through the ambient Superpowers loop (brainstorm → plan → TDD →
-      review → finish) — do not restate it; list only the artifact-specific work
-    - Include tests for the hand-written layer (the part with no generated coverage)
-    - Note any consumer that must bump its dependency pin on release
+    - "Implementation runs through the ambient Superpowers loop (brainstorm → plan → TDD → review → finish) — do not restate it; list only the artifact-specific work"
+    - "Include tests for the hand-written layer (the part with no generated coverage)"
+    - "Note any consumer that must bump its dependency pin on release"

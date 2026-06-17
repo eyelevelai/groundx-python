@@ -144,6 +144,48 @@ client = GroundX(
 )
 ```
 
+## Workflow Template
+
+The `template` field on `WorkflowRequest` and `WorkflowDetail` lets you pass a string-to-string
+map of prompt variable keys to their values. The field is optional — omitting it leaves the
+template configuration unset on the workflow.
+
+**Create a workflow with a template:**
+
+```python
+from groundx import GroundX
+
+client = GroundX(
+    api_key="YOUR_API_KEY",
+)
+
+response = client.workflows.create(
+    name="my-workflow",
+    template={
+        "prompt_lang": "en",
+        "tone": "formal",
+    },
+)
+
+# The template is accessible on the returned WorkflowDetail
+print(response.workflow.template)
+# {"prompt_lang": "en", "tone": "formal"}
+```
+
+**Update a workflow's template (per-key overlay):**
+
+```python
+response = client.workflows.update(
+    id="wf-id",
+    template={"tone": "neutral"},
+)
+# Passes {"tone": "neutral"} to the backend, which applies a per-key overlay.
+# Omitting template entirely preserves the existing stored template keys unchanged.
+```
+
+The `template` value is a `dict[str, str]` — both keys and values must be strings.
+Omitting `template` or passing `template=None` is valid and leaves the field unset.
+
 ## Contributing
 
 While we value open-source contributions to this SDK, this library is generated programmatically.
