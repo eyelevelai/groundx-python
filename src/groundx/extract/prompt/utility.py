@@ -18,6 +18,7 @@ _CUSTOM_WORKFLOW_GROUP_METADATA_KEY = "workflow_step"
 _CUSTOM_WORKFLOW_FIELD_METADATA_KEY = "workflow_output_key"
 _CUSTOM_WORKFLOW_METADATA_VERSION = 1
 _CUSTOM_WORKFLOW_MAX_FIELDS = 20
+_CUSTOM_WORKFLOW_AGENT_CHAIN_KEY = "agent_chain"
 _CUSTOM_WORKFLOW_OUTPUT_MAPS = {
     "chunk": "customChunkOutputs",
     "section": "customSectionOutputs",
@@ -29,7 +30,30 @@ _RESERVED_TOP_LEVEL_KEYS = {
     _PERSISTED_WORKFLOW_EXTRACT_KEY,
     _CUSTOM_WORKFLOW_KEY,
 }
-_SUPPORTED_TOP_LEVEL_METADATA_KEYS = {"extraction_policy_version"}
+_EXTRACTION_POLICY_VERSION_KEY = "extraction_policy_version"
+_SUPPORTED_TOP_LEVEL_METADATA_KEYS = {_EXTRACTION_POLICY_VERSION_KEY}
+_SUPPORTED_FINAL_GROUP_METADATA_KEYS = {
+    "always_check_attrs",
+    "conflict_attrs",
+    "deregulation_status_values",
+    "equivalent_service_types",
+    "exclude_dict_attrs",
+    "explanation_attrs",
+    "fill_rules",
+    "final_value_aliases",
+    "match_attrs",
+    "not_required_service_types",
+    "partial_pair_attrs",
+    "passthrough",
+    "passthrough_attrs",
+    "passthrough_pair_attrs",
+    "remaining_attrs",
+    "required_any_attrs",
+    "required_attrs",
+    "unique_attrs",
+}
+_UNSUPPORTED_TOP_LEVEL_KEYS = {"domain"}
+_UNSUPPORTED_WORKFLOW_GROUP_KEYS = {"slot"}
 _PSEUDO_GROUP_BODY_KEYS = {"prompt", "fields"}
 _PSEUDO_FIELD_KEYS = {"path"}
 _CUSTOM_STEP_NAME_RE = re.compile(r"^[a-z][a-z0-9_]{0,63}$")
@@ -99,11 +123,16 @@ _CUSTOM_WORKFLOW_RESERVED_NAMES = {
     "sect-keys",
     "sect-summary",
 }
-_CUSTOM_WORKFLOW_AUTHORING_KEYS = {"template", "custom_steps"}
+_CUSTOM_WORKFLOW_AUTHORING_KEYS = {
+    "template",
+    "custom_steps",
+    _CUSTOM_WORKFLOW_AGENT_CHAIN_KEY,
+}
 _CUSTOM_WORKFLOW_PERSISTED_KEYS = {
     "metadata_version",
     "template",
     "custom_steps",
+    _CUSTOM_WORKFLOW_AGENT_CHAIN_KEY,
     "output_routes",
     "leaf_fields",
     "field_counts",
@@ -283,11 +312,73 @@ def _raise_unsupported_top_level_metadata(key: str) -> typing.NoReturn:
     raise ValueError(
         f"unsupported top-level metadata [{key}]; generic SDK top-level keys "
         "must be extraction groups with mapping values, reserved SDK keys, or "
-        "supported SDK metadata keys. "
-        "If this key is domain-specific metadata, register it with "
-        "top_level_metadata_keys. Otherwise convert it to supported workflow "
+        "supported SDK metadata keys. Convert it to supported workflow "
         "metadata before using the generic extraction workflow helpers."
     )
+
+
+def _reject_unsupported_authored_keys(data: typing.Dict[str, typing.Any]) -> None:
+    for key in _UNSUPPORTED_TOP_LEVEL_KEYS:
+        if key in data:
+            raise ValueError(
+                f"top-level [{key}] is not supported in extraction YAML; "
+                "use extraction_policy_version: v1 with workflow metadata, or "
+                "pure legacy statement/meters/charges YAML"
+            )
+
+
+def _reject_unsupported_workflow_group_keys(
+    mapping: typing.Dict[str, typing.Any],
+    path: str,
+) -> None:
+    for key in _UNSUPPORTED_WORKFLOW_GROUP_KEYS:
+        if key in mapping:
+            raise ValueError(
+                f"[{key}] is not supported at [{path}]; use group-level "
+                f"[{_CUSTOM_WORKFLOW_GROUP_METADATA_KEY}] in "
+                "extraction_policy_version: v1 YAML"
+            )
+
+
+def _validate_policy_version(
+    data: typing.Dict[str, typing.Any],
+    has_new_yaml_features: bool,
+    *,
+    has_persisted_workflow_metadata: bool = False,
+) -> None:
+    has_version = _EXTRACTION_POLICY_VERSION_KEY in data
+    if has_persisted_workflow_metadata:
+        if has_version and data.get(_EXTRACTION_POLICY_VERSION_KEY) != "v1":
+            raise ValueError("extraction_policy_version must be v1")
+        return
+
+    if has_new_yaml_features:
+        if data.get(_EXTRACTION_POLICY_VERSION_KEY) != "v1":
+            raise ValueError(
+                "new extraction workflow YAML must set "
+                "extraction_policy_version: v1"
+            )
+        return
+
+    if has_version:
+        raise ValueError(
+            "pure legacy extraction YAML must not declare "
+            "extraction_policy_version"
+        )
+
+
+def _has_supported_policy_metadata(data: typing.Dict[str, typing.Any]) -> bool:
+    for key, value in data.items():
+        if key in _RESERVED_TOP_LEVEL_KEYS or key in _SUPPORTED_TOP_LEVEL_METADATA_KEYS:
+            continue
+        if isinstance(value, dict) and set(value) & _SUPPORTED_FINAL_GROUP_METADATA_KEYS:
+            return True
+    return False
+
+
+def _has_persisted_workflow_metadata(data: typing.Dict[str, typing.Any]) -> bool:
+    workflow = data.get(_CUSTOM_WORKFLOW_KEY)
+    return isinstance(workflow, dict) and "metadata_version" in workflow
 
 
 def _ensure_fields_mapping(
@@ -666,6 +757,15 @@ def _normalize_workflow_template(value: typing.Any) -> typing.Dict[str, str]:
         normalized[key] = raw_value
 
     return normalized
+
+
+def _normalize_agent_chain(value: typing.Any) -> typing.Optional[typing.Any]:
+    if value is None:
+        return None
+    if not isinstance(value, (dict, list)):
+        raise ValueError(f"{_CUSTOM_WORKFLOW_KEY}.agent_chain must be a mapping or list")
+
+    return copy.deepcopy(value)
 
 
 def _valid_custom_workflow_kind(level: str, kind: str) -> bool:
@@ -1148,6 +1248,11 @@ def _normalize_persisted_custom_workflow_metadata(
         metadata["template"] = template
     if field_counts:
         metadata["field_counts"] = field_counts
+    agent_chain = _normalize_agent_chain(
+        workflow.get(_CUSTOM_WORKFLOW_AGENT_CHAIN_KEY)
+    )
+    if agent_chain is not None:
+        metadata[_CUSTOM_WORKFLOW_AGENT_CHAIN_KEY] = agent_chain
 
     schema_hash = _custom_workflow_schema_hash(metadata)
     caller_schema_hash = workflow.get("schema_hash")
@@ -1177,9 +1282,10 @@ def _collect_custom_workflow_routes(
             field_items = typing.cast(typing.List[typing.Any], field_value)
             for item in field_items:
                 item_mapping = _ensure_mapping(item, field_path)
-                nested_step = item_mapping.pop(
-                    _CUSTOM_WORKFLOW_GROUP_METADATA_KEY, step_name
-                )
+                if _CUSTOM_WORKFLOW_GROUP_METADATA_KEY in item_mapping:
+                    raise ValueError(
+                        f"field-level workflow_step is not supported at [{field_path}]"
+                    )
                 if "fields" in item_mapping:
                     item_fields = _ensure_fields_mapping(
                         item_mapping.get("fields"), f"{field_path}.fields"
@@ -1187,7 +1293,7 @@ def _collect_custom_workflow_routes(
                     nested_routes, nested_leaves = _collect_custom_workflow_routes(
                         item_fields,
                         group_name,
-                        typing.cast(typing.Optional[str], nested_step),
+                        step_name,
                         steps_by_name,
                         (*prefix, field_name, "*"),
                     )
@@ -1199,18 +1305,21 @@ def _collect_custom_workflow_routes(
             continue
 
         field_mapping = typing.cast(typing.Dict[str, typing.Any], field_value)
-        nested_step = field_mapping.pop(_CUSTOM_WORKFLOW_GROUP_METADATA_KEY, step_name)
+        if _CUSTOM_WORKFLOW_GROUP_METADATA_KEY in field_mapping:
+            raise ValueError(
+                f"field-level workflow_step is not supported at [{field_path}]"
+            )
         output_key_raw = field_mapping.pop(_CUSTOM_WORKFLOW_FIELD_METADATA_KEY, None)
         if output_key_raw is not None:
-            if not nested_step:
+            if not step_name:
                 raise ValueError(
                     f"field [{field_path}] declares workflow_output_key without workflow_step"
                 )
-            if not isinstance(nested_step, str):
+            if not isinstance(step_name, str):
                 raise ValueError(f"workflow_step for [{field_path}] must be a string")
-            step = steps_by_name.get(nested_step)
+            step = steps_by_name.get(step_name)
             if step is None:
-                raise ValueError(f"unknown custom step [{nested_step}]")
+                raise ValueError(f"unknown custom step [{step_name}]")
             output_key = _validate_output_key(
                 output_key_raw,
                 f"{field_path}.{_CUSTOM_WORKFLOW_FIELD_METADATA_KEY}",
@@ -1223,19 +1332,19 @@ def _collect_custom_workflow_routes(
                 "workflow_group": group_name,
                 "workflow_field": workflow_field,
                 "final_path": final_path,
-                "step_name": nested_step,
+                "step_name": step_name,
                 "level": level,
                 "output_map": _custom_workflow_output_map(level),
                 "output_key": output_key,
                 "readback_path": _custom_workflow_readback_path(
-                    level, nested_step, output_key
+                    level, step_name, output_key
                 ),
             }
             leaf = {
                 "final_path": final_path,
                 "workflow_group": group_name,
                 "workflow_field": workflow_field,
-                "step_name": nested_step,
+                "step_name": step_name,
                 "level": level,
                 "output_key": output_key,
                 "field_type": _field_type(field_mapping),
@@ -1252,7 +1361,7 @@ def _collect_custom_workflow_routes(
             nested_routes, nested_leaves = _collect_custom_workflow_routes(
                 nested_fields,
                 group_name,
-                typing.cast(typing.Optional[str], nested_step),
+                step_name,
                 steps_by_name,
                 (*prefix, field_name),
             )
@@ -1262,7 +1371,7 @@ def _collect_custom_workflow_routes(
             nested_routes, nested_leaves = _collect_custom_workflow_routes(
                 field_mapping,
                 group_name,
-                typing.cast(typing.Optional[str], nested_step),
+                step_name,
                 steps_by_name,
                 (*prefix, field_name),
             )
@@ -1272,10 +1381,85 @@ def _collect_custom_workflow_routes(
     return routes, leaves
 
 
+def _collect_pseudo_custom_workflow_routes(
+    group_name: str,
+    group: typing.Dict[str, typing.Any],
+    step_name: typing.Optional[str],
+    steps_by_name: typing.Dict[str, typing.Dict[str, typing.Any]],
+    workflow_field_paths: typing.Dict[str, str],
+) -> typing.Tuple[
+    typing.List[typing.Dict[str, typing.Any]],
+    typing.List[typing.Dict[str, typing.Any]],
+]:
+    if not step_name:
+        return [], []
+    if not isinstance(step_name, str):
+        raise ValueError(f"workflow_step for pseudo group [{group_name}] must be a string")
+    step = steps_by_name.get(step_name)
+    if step is None:
+        raise ValueError(f"unknown custom step [{step_name}]")
+
+    routes: typing.List[typing.Dict[str, typing.Any]] = []
+    leaves: typing.List[typing.Dict[str, typing.Any]] = []
+    fields = _ensure_fields_mapping(group.get("fields"), f"{group_name}.fields")
+    for workflow_field, field_value in fields.items():
+        field_path = f"{group_name}.{workflow_field}"
+        if not isinstance(field_value, dict):
+            continue
+        field_mapping = typing.cast(typing.Dict[str, typing.Any], field_value)
+        if _CUSTOM_WORKFLOW_GROUP_METADATA_KEY in field_mapping:
+            raise ValueError(
+                f"field-level workflow_step is not supported at [{field_path}]"
+            )
+        if _CUSTOM_WORKFLOW_FIELD_METADATA_KEY in field_mapping:
+            raise ValueError(
+                f"pseudo-routed field [{field_path}] cannot declare "
+                f"{_CUSTOM_WORKFLOW_FIELD_METADATA_KEY}; use the pseudo field key"
+            )
+        output_key = _validate_output_key(workflow_field, field_path)
+        final_path = workflow_field_paths.get(workflow_field)
+        if final_path is None:
+            raise ValueError(
+                f"pseudo group [{group_name}] has no final path for [{workflow_field}]"
+            )
+        level = typing.cast(str, step["level"])
+        route = {
+            "workflow_group": group_name,
+            "workflow_field": workflow_field,
+            "final_path": final_path,
+            "step_name": step_name,
+            "level": level,
+            "output_map": _custom_workflow_output_map(level),
+            "output_key": output_key,
+            "readback_path": _custom_workflow_readback_path(
+                level, step_name, output_key
+            ),
+        }
+        leaf = {
+            "final_path": final_path,
+            "workflow_group": group_name,
+            "workflow_field": workflow_field,
+            "step_name": step_name,
+            "level": level,
+            "output_key": output_key,
+            "field_type": _field_type(field_mapping),
+            "is_repeated": "*" in _parse_pointer_segments(final_path, field_path),
+            "repetition_scope": _repetition_scope(
+                _parse_pointer_segments(final_path, field_path)
+            ),
+        }
+        routes.append(route)
+        leaves.append(leaf)
+
+    return routes, leaves
+
+
 def _build_authored_custom_workflow_metadata(
     workflow: typing.Dict[str, typing.Any],
-    groups: typing.Dict[str, typing.Dict[str, typing.Any]],
-    final_workflow_metadata: typing.Dict[str, typing.Dict[str, typing.Any]],
+    workflow_groups: typing.Dict[str, typing.Dict[str, typing.Any]],
+    workflow_group_metadata: typing.Dict[str, typing.Dict[str, typing.Any]],
+    workflow_field_paths: typing.Dict[str, typing.Dict[str, str]],
+    pseudo_group_names: typing.Set[str],
 ) -> typing.Dict[str, typing.Any]:
     template = _normalize_workflow_template(workflow.get("template"))
     custom_steps, steps_by_name = _normalize_custom_workflow_steps(
@@ -1286,17 +1470,28 @@ def _build_authored_custom_workflow_metadata(
 
     routes: typing.List[typing.Dict[str, typing.Any]] = []
     leaves: typing.List[typing.Dict[str, typing.Any]] = []
-    for group_name, group in groups.items():
-        group_step = final_workflow_metadata.get(group_name, {}).get(
+    for group_name, group in workflow_groups.items():
+        group_step = workflow_group_metadata.get(group_name, {}).get(
             _CUSTOM_WORKFLOW_GROUP_METADATA_KEY
         )
+        if group_step and group_step not in steps_by_name:
+            raise ValueError(f"unknown custom step [{group_step}]")
         fields = _ensure_fields_mapping(group.get("fields"), f"{group_name}.fields")
-        group_routes, group_leaves = _collect_custom_workflow_routes(
-            fields,
-            group_name,
-            typing.cast(typing.Optional[str], group_step),
-            steps_by_name,
-        )
+        if group_name in pseudo_group_names:
+            group_routes, group_leaves = _collect_pseudo_custom_workflow_routes(
+                group_name,
+                group,
+                typing.cast(typing.Optional[str], group_step),
+                steps_by_name,
+                workflow_field_paths.get(group_name, {}),
+            )
+        else:
+            group_routes, group_leaves = _collect_custom_workflow_routes(
+                fields,
+                group_name,
+                typing.cast(typing.Optional[str], group_step),
+                steps_by_name,
+            )
         routes.extend(group_routes)
         leaves.extend(group_leaves)
 
@@ -1316,6 +1511,11 @@ def _build_authored_custom_workflow_metadata(
         metadata["template"] = template
     if field_counts:
         metadata["field_counts"] = field_counts
+    agent_chain = _normalize_agent_chain(
+        workflow.get(_CUSTOM_WORKFLOW_AGENT_CHAIN_KEY)
+    )
+    if agent_chain is not None:
+        metadata[_CUSTOM_WORKFLOW_AGENT_CHAIN_KEY] = agent_chain
     metadata["schema_hash"] = _custom_workflow_schema_hash(metadata)
     return metadata
 
@@ -1451,9 +1651,25 @@ def prepare_extraction_yaml(
         ) and _is_custom_workflow_persisted_metadata(persisted_workflow):
             data[_CUSTOM_WORKFLOW_KEY] = _copy_mapping(persisted_workflow)
     custom_workflow_kind_and_input = _custom_workflow_input(data)
+    is_persisted_custom_workflow = (
+        custom_workflow_kind_and_input is not None
+        and custom_workflow_kind_and_input[0] == "persisted"
+    )
+    _reject_unsupported_authored_keys(data)
+    has_persisted_workflow_metadata = _has_persisted_workflow_metadata(data)
+    _validate_policy_version(
+        data,
+        bool(
+            (custom_workflow_kind_and_input and not is_persisted_custom_workflow)
+            or "_pseudo_groups" in data
+            or _has_supported_policy_metadata(data)
+        ),
+        has_persisted_workflow_metadata=has_persisted_workflow_metadata,
+    )
     top_metadata_key_set = set(_SUPPORTED_TOP_LEVEL_METADATA_KEYS)
     top_metadata_key_set.update(top_level_metadata_keys or [])
-    final_metadata_key_set = set(final_group_metadata_keys or [])
+    final_metadata_key_set = set(_SUPPORTED_FINAL_GROUP_METADATA_KEYS)
+    final_metadata_key_set.update(final_group_metadata_keys or [])
     workflow_metadata_key_set = set(workflow_group_metadata_keys or [])
     effective_workflow_metadata_key_set = workflow_metadata_key_set | {
         _CUSTOM_WORKFLOW_GROUP_METADATA_KEY
@@ -1487,15 +1703,11 @@ def prepare_extraction_yaml(
         if not isinstance(raw_group, dict):
             _raise_unsupported_top_level_metadata(group_name)
         group = _ensure_mapping(raw_group, group_name)
+        _reject_unsupported_workflow_group_keys(group, group_name)
         group, final_metadata = _split_metadata(group, final_metadata_key_set)
         group, workflow_metadata = _split_metadata(
             group, effective_workflow_metadata_key_set
         )
-        if "slot" in workflow_metadata and _CUSTOM_WORKFLOW_GROUP_METADATA_KEY in workflow_metadata:
-            raise ValueError(
-                f"group [{group_name}] cannot declare both [slot] and "
-                f"[{_CUSTOM_WORKFLOW_GROUP_METADATA_KEY}]"
-            )
         group = _compose_group_fields(group_name, group, defs)
         _validate_group_shape(group, group_name)
         groups[group_name] = group
@@ -1506,6 +1718,7 @@ def prepare_extraction_yaml(
             final_workflow_metadata[group_name] = workflow_metadata
 
     custom_workflow_metadata: typing.Optional[typing.Dict[str, typing.Any]] = None
+    custom_workflow_authoring_input: typing.Optional[typing.Dict[str, typing.Any]] = None
     if custom_workflow_kind_and_input:
         custom_workflow_kind, custom_workflow_input = custom_workflow_kind_and_input
         if custom_workflow_kind == "persisted":
@@ -1513,11 +1726,7 @@ def prepare_extraction_yaml(
                 custom_workflow_input
             )
         else:
-            custom_workflow_metadata = _build_authored_custom_workflow_metadata(
-                custom_workflow_input,
-                groups,
-                final_workflow_metadata,
-            )
+            custom_workflow_authoring_input = custom_workflow_input
 
     raw_pseudo_groups: typing.Dict[str, typing.Any] = {}
     if "_pseudo_groups" in data:
@@ -1536,6 +1745,10 @@ def prepare_extraction_yaml(
 
         pseudo_group = _ensure_mapping(
             raw_pseudo_group, f"_pseudo_groups.{pseudo_group_name}"
+        )
+        _reject_unsupported_workflow_group_keys(
+            pseudo_group,
+            f"_pseudo_groups.{pseudo_group_name}",
         )
         pseudo_group, explicit_workflow_metadata = _split_metadata(
             pseudo_group, effective_workflow_metadata_key_set
@@ -1567,6 +1780,10 @@ def prepare_extraction_yaml(
         ] = {}
 
         for workflow_field_name, raw_pseudo_field in pseudo_fields.items():
+            _validate_output_key(
+                workflow_field_name,
+                f"_pseudo_groups.{pseudo_group_name}.fields.{workflow_field_name}",
+            )
             pseudo_field = _ensure_mapping(
                 raw_pseudo_field,
                 f"_pseudo_groups.{pseudo_group_name}.fields.{workflow_field_name}",
@@ -1600,6 +1817,11 @@ def prepare_extraction_yaml(
                 groups,
                 final_field_path,
             )
+            if _CUSTOM_WORKFLOW_FIELD_METADATA_KEY in final_field:
+                raise ValueError(
+                    f"pseudo-routed final field [{final_pointer}] cannot declare "
+                    f"{_CUSTOM_WORKFLOW_FIELD_METADATA_KEY}; use the pseudo field key"
+                )
             routed_final_paths[final_pointer] = final_field_path
             parent_paths.add(parent_path)
             parent_groups[parent_path] = parent_group
@@ -1643,6 +1865,17 @@ def prepare_extraction_yaml(
     if not pseudo_groups:
         workflow_groups = _copy_mapping(groups)
         workflow_field_paths = _build_identity_route_map(groups)
+        workflow_group_metadata = _copy_mapping(final_workflow_metadata)
+        if custom_workflow_authoring_input is not None:
+            custom_workflow_metadata = _build_authored_custom_workflow_metadata(
+                custom_workflow_authoring_input,
+                workflow_groups,
+                workflow_group_metadata,
+                workflow_field_paths,
+                set(),
+            )
+            _strip_custom_workflow_authoring_keys(groups)
+            _strip_custom_workflow_authoring_keys(workflow_groups)
         _apply_custom_workflow_field_paths(
             workflow_field_paths,
             custom_workflow_metadata,
@@ -1662,7 +1895,7 @@ def prepare_extraction_yaml(
             ),
             top_level_metadata=top_level_metadata,
             final_group_metadata=final_group_metadata,
-            workflow_group_metadata=_copy_mapping(final_workflow_metadata),
+            workflow_group_metadata=workflow_group_metadata,
         )
 
     residual_groups = _copy_mapping(groups)
@@ -1685,6 +1918,20 @@ def prepare_extraction_yaml(
         workflow_field_paths,
         custom_workflow_metadata,
     )
+    if custom_workflow_authoring_input is not None:
+        custom_workflow_metadata = _build_authored_custom_workflow_metadata(
+            custom_workflow_authoring_input,
+            workflow_groups,
+            workflow_group_metadata,
+            workflow_field_paths,
+            set(pseudo_groups.keys()),
+        )
+        _strip_custom_workflow_authoring_keys(groups)
+        _strip_custom_workflow_authoring_keys(workflow_groups)
+        _apply_custom_workflow_field_paths(
+            workflow_field_paths,
+            custom_workflow_metadata,
+        )
 
     return PreparedExtractionYaml(
         groups=groups,

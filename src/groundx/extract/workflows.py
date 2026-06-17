@@ -12,6 +12,7 @@ _WORKFLOW_METADATA_KEY = "workflow"
 _WORKFLOW_EXTRACT_MAPPING_KIND = "workflow_extract"
 _AUTHORED_YAML_MAPPING_KIND = "authored_yaml"
 _PERSISTED_WORKFLOW_METADATA_KEYS = {
+    "agent_chain",
     "metadata_version",
     "output_routes",
     "leaf_fields",
