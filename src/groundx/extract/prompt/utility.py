@@ -805,6 +805,7 @@ def _validate_agent_chain(
 
     has_save = False
     serial_start_index = 1
+    covered_groups: typing.Set[str] = set()
     for stage_index, raw_stage in enumerate(raw_chain):
         if isinstance(raw_stage, str):
             _validate_agent_chain_task(
@@ -849,6 +850,7 @@ def _validate_agent_chain(
                 raise ValueError(f"{path}.group must be a non-empty string")
             if group not in workflow_groups:
                 raise ValueError(f"{path}.group [{group}] is not a workflow group")
+            covered_groups.add(group)
 
             chain = raw_branch["chain"]
             if not isinstance(chain, list) or not chain:
@@ -902,6 +904,12 @@ def _validate_agent_chain(
     if not has_save:
         raise ValueError(f"{_CUSTOM_WORKFLOW_KEY}.agent_chain must include a save task")
     _validate_agent_chain_serial_tasks(raw_chain, serial_start_index)
+    _validate_agent_chain_group_coverage(
+        raw_chain,
+        workflow_groups,
+        covered_groups,
+        serial_start_index,
+    )
 
 
 def _validate_agent_chain_serial_tasks(
@@ -934,6 +942,35 @@ def _validate_agent_chain_serial_tasks(
                 f"matching save task [{expected_save}]"
             )
         stage_index += 2
+
+
+def _validate_agent_chain_group_coverage(
+    raw_chain: typing.List[typing.Any],
+    workflow_groups: typing.Set[str],
+    branch_covered_groups: typing.Set[str],
+    serial_start_index: int,
+) -> None:
+    covered_groups = set(branch_covered_groups)
+    stage_index = serial_start_index
+    while stage_index < len(raw_chain):
+        raw_stage = raw_chain[stage_index]
+        if (
+            isinstance(raw_stage, str)
+            and raw_stage in _CUSTOM_WORKFLOW_AGENT_CHAIN_AGENT_TASKS
+        ):
+            suffix = _agent_chain_task_suffix(raw_stage)
+            if suffix in workflow_groups:
+                covered_groups.add(suffix)
+            stage_index += 2
+            continue
+        stage_index += 1
+
+    missing_groups = sorted(workflow_groups - covered_groups)
+    if missing_groups:
+        raise ValueError(
+            f"{_CUSTOM_WORKFLOW_KEY}.agent_chain does not cover workflow groups "
+            f"[{', '.join(missing_groups)}]"
+        )
 
 
 def _validate_agent_chain_task(task: typing.Any, path: str) -> str:
@@ -1710,7 +1747,7 @@ def _build_authored_custom_workflow_metadata(
         metadata["field_counts"] = field_counts
     agent_chain = _normalize_agent_chain(
         workflow.get(_CUSTOM_WORKFLOW_AGENT_CHAIN_KEY),
-        set(workflow_groups.keys()),
+        {route["workflow_group"] for route in routes},
     )
     if agent_chain is not None:
         metadata[_CUSTOM_WORKFLOW_AGENT_CHAIN_KEY] = agent_chain
