@@ -324,32 +324,32 @@ files = [
 
 [[package]]
 name = "boto3"
-version = "1.43.30"
+version = "1.43.31"
 description = "The AWS SDK for Python"
 optional = true
 python-versions = ">=3.10"
 files = [
-    {file = "boto3-1.43.30-py3-none-any.whl", hash = "sha256:89e982463d94773136ccf69be77cccd54ff1ce351a6aadd1d3437fcb693681b5"},
-    {file = "boto3-1.43.30.tar.gz", hash = "sha256:6b1ee360f363a457f67a8f5702f522043d8a32d67a97c362ad12075d8b5b531e"},
+    {file = "boto3-1.43.31-py3-none-any.whl", hash = "sha256:69c5521ad864f33d4d53b0e18a3927697f4558210693b1cb4dd97da959d1f7b9"},
+    {file = "boto3-1.43.31.tar.gz", hash = "sha256:8165b79c02955affbe4b4e9aa7c560684d0d4d86b4b9de66a37b45eb79fc4b69"},
 ]
 
 [package.dependencies]
-botocore = ">=1.43.30,<1.44.0"
+botocore = ">=1.43.31,<1.44.0"
 jmespath = ">=0.7.1,<2.0.0"
-s3transfer = ">=0.18.0,<0.19.0"
+s3transfer = ">=0.19.0,<0.20.0"
 
 [package.extras]
 crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.43.30"
+version = "1.43.31"
 description = "Low-level, data-driven core of boto 3."
 optional = true
 python-versions = ">=3.10"
 files = [
-    {file = "botocore-1.43.30-py3-none-any.whl", hash = "sha256:26b1dded84d89b396180916f56900bd2ab1c0d545a66d1d2c3eeb40f772935b2"},
-    {file = "botocore-1.43.30.tar.gz", hash = "sha256:19ed560cb35ae43bf010d37da429a553c07063bf7efea0f2cb53be8a78d3e3d5"},
+    {file = "botocore-1.43.31-py3-none-any.whl", hash = "sha256:4c51c63f39515fc1a2b8e3e2c29e452009c988ba55ad489251658fdd3aedad6e"},
+    {file = "botocore-1.43.31.tar.gz", hash = "sha256:c249625faaa353c5b4004043706a394a4f3bcd3643e242f6b01fff6dc70e988b"},
 ]
 
 [package.dependencies]
@@ -1068,13 +1068,13 @@ files = [
 
 [[package]]
 name = "fsspec"
-version = "2026.4.0"
+version = "2026.6.0"
 description = "File-system specification"
 optional = true
 python-versions = ">=3.10"
 files = [
-    {file = "fsspec-2026.4.0-py3-none-any.whl", hash = "sha256:11ef7bb35dab8a394fde6e608221d5cf3e8499401c249bebaeaad760a1a8dec2"},
-    {file = "fsspec-2026.4.0.tar.gz", hash = "sha256:301d8ac70ae90ef3ad05dcf94d6c3754a097f9b5fe4667d2787aa359ec7df7e4"},
+    {file = "fsspec-2026.6.0-py3-none-any.whl", hash = "sha256:02e0b71817df9b2169dc30a16832045764def1191b43dcff5bb85bdee212d2a1"},
+    {file = "fsspec-2026.6.0.tar.gz", hash = "sha256:f5bac145310fe30e16e1471bd6840b2d990d609e872251d7e674241822abf01a"},
 ]
 
 [package.extras]
@@ -1102,7 +1102,7 @@ smb = ["smbprotocol"]
 ssh = ["paramiko"]
 test = ["aiohttp (!=4.0.0a0,!=4.0.0a1)", "numpy", "pytest", "pytest-asyncio (!=0.22.0)", "pytest-benchmark", "pytest-cov", "pytest-mock", "pytest-recording", "pytest-rerunfailures", "requests"]
 test-downstream = ["aiobotocore (>=2.5.4,<3.0.0)", "dask[dataframe,test]", "moto[server] (>4,<5)", "pytest-timeout", "xarray"]
-test-full = ["adlfs", "aiohttp (!=4.0.0a0,!=4.0.0a1)", "backports-zstd", "cloudpickle", "dask", "distributed", "dropbox", "dropboxdrivefs", "fastparquet", "fusepy", "gcsfs", "jinja2", "kerchunk", "libarchive-c", "lz4", "notebook", "numpy", "ocifs", "pandas (<3.0.0)", "panel", "paramiko", "pyarrow", "pyarrow (>=1)", "pyftpdlib", "pygit2", "pytest", "pytest-asyncio (!=0.22.0)", "pytest-benchmark", "pytest-cov", "pytest-mock", "pytest-recording", "pytest-rerunfailures", "python-snappy", "requests", "smbprotocol", "tqdm", "urllib3", "zarr", "zstandard"]
+test-full = ["adlfs", "aiohttp (!=4.0.0a0,!=4.0.0a1)", "backports-zstd", "cloudpickle", "dask", "distributed", "dropbox", "dropboxdrivefs", "fastparquet", "fusepy", "gcsfs", "jinja2", "kerchunk", "libarchive-c", "lz4", "notebook", "numpy", "ocifs", "pandas (<3.0.0)", "panel", "paramiko", "pyarrow", "pyarrow (>=1)", "pyftpdlib", "pygit2", "pytest", "pytest-asyncio (!=0.22.0)", "pytest-benchmark", "pytest-cov", "pytest-mock", "pytest-recording", "pytest-rerunfailures", "python-snappy", "requests", "smbprotocol", "tqdm", "urllib3", "zarr (<3.2.0)", "zstandard"]
 tqdm = ["tqdm"]
 
 [[package]]
@@ -2106,13 +2106,13 @@ signedtoken = ["cryptography (>=3.0.0)", "pyjwt (>=2.0.0,<3)"]
 
 [[package]]
 name = "openai"
-version = "2.41.1"
+version = "2.42.0"
 description = "The official Python library for the openai API"
 optional = true
 python-versions = ">=3.9"
 files = [
-    {file = "openai-2.41.1-py3-none-any.whl", hash = "sha256:a939565f350cb7443cb843b801b88c716ac8024b492fb94ca269d5f6b1bbefd6"},
-    {file = "openai-2.41.1.tar.gz", hash = "sha256:23d617a0432457ad844973bee8f540be9da90894f7c5686852d2d365da058f57"},
+    {file = "openai-2.42.0-py3-none-any.whl", hash = "sha256:8cd46b1877cfd4aea7ade9474940cc4f78dbd41cce3893de11c12510d0b70caf"},
+    {file = "openai-2.42.0.tar.gz", hash = "sha256:5263ee2868608571499df225471770238c8f3ff1ac296874bfc096bbabb6da3a"},
 ]
 
 [package.dependencies]
@@ -3112,13 +3112,13 @@ files = [
 
 [[package]]
 name = "s3transfer"
-version = "0.18.0"
+version = "0.19.0"
 description = "An Amazon S3 Transfer Manager"
 optional = true
 python-versions = ">=3.10"
 files = [
-    {file = "s3transfer-0.18.0-py3-none-any.whl", hash = "sha256:239c13b09e65ad0346e1be7348b8a202dcad44ac7ea7c6eb858fc881dce739b6"},
-    {file = "s3transfer-0.18.0.tar.gz", hash = "sha256:3760b8b7ec1315da54048b2d626276732bee4300d054d492d4e1d43e20d4ecbd"},
+    {file = "s3transfer-0.19.0-py3-none-any.whl", hash = "sha256:777cc2415536f1debadb5c2ef7779275d0fc0fe0e042411cdd6caebeb2685262"},
+    {file = "s3transfer-0.19.0.tar.gz", hash = "sha256:ce436931687addc4c1712d52d40b32f53e88315723f107ffa20ba82b05a0f685"},
 ]
 
 [package.dependencies]
@@ -3327,13 +3327,13 @@ files = [
 
 [[package]]
 name = "types-boto3"
-version = "1.43.30"
-description = "Type annotations for boto3 1.43.30 generated with mypy-boto3-builder 8.12.0"
+version = "1.43.31"
+description = "Type annotations for boto3 1.43.31 generated with mypy-boto3-builder 8.12.0"
 optional = true
 python-versions = ">=3.9"
 files = [
-    {file = "types_boto3-1.43.30-py3-none-any.whl", hash = "sha256:caed2df64ab3a77465b345a658a0d3843ed6fc6f89c0ff3fdaa0e35bc9002bb9"},
-    {file = "types_boto3-1.43.30.tar.gz", hash = "sha256:f4d9295a136325f5086f3967e33ec769555004b299bd11173875772393d5d907"},
+    {file = "types_boto3-1.43.31-py3-none-any.whl", hash = "sha256:71e861f53208940aae527d6885dd217909a1712bac4020ab47ce3b380aa914d8"},
+    {file = "types_boto3-1.43.31.tar.gz", hash = "sha256:7454aabcab568cc96f06cb1b3ca2879e0169e0ef80c1b000940397c2c81ab2a8"},
 ]
 
 [package.dependencies]
@@ -3394,7 +3394,7 @@ bedrock-data-automation-runtime = ["types-boto3-bedrock-data-automation-runtime 
 bedrock-runtime = ["types-boto3-bedrock-runtime (>=1.43.0,<1.44.0)"]
 billing = ["types-boto3-billing (>=1.43.0,<1.44.0)"]
 billingconductor = ["types-boto3-billingconductor (>=1.43.0,<1.44.0)"]
-boto3 = ["boto3 (==1.43.30)"]
+boto3 = ["boto3 (==1.43.31)"]
 braket = ["types-boto3-braket (>=1.43.0,<1.44.0)"]
 budgets = ["types-boto3-budgets (>=1.43.0,<1.44.0)"]
 ce = ["types-boto3-ce (>=1.43.0,<1.44.0)"]
@@ -3893,13 +3893,13 @@ files = [
 
 [[package]]
 name = "tzlocal"
-version = "5.4"
+version = "5.4.3"
 description = "tzinfo object for the local timezone"
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "tzlocal-5.4-py3-none-any.whl", hash = "sha256:024d11221ff83453eae1f608f09b145b9779e1345d08c15404ce8ff7917cf629"},
-    {file = "tzlocal-5.4.tar.gz", hash = "sha256:41e1293f80d4b5ff38dff222601a8fbd06b4fdcaf25e224704047ad26a39af54"},
+    {file = "tzlocal-5.4.3-py3-none-any.whl", hash = "sha256:24ce97bb58e2a973f7640ec2553ab4e6f6d5a0d0d1aa9dc43bca21d89e1feb82"},
+    {file = "tzlocal-5.4.3.tar.gz", hash = "sha256:3a8c9bc18cf47e1dcde252ea0e6a72a6cde320a400b6ac6db1f1f8cccd553c00"},
 ]
 
 [package.dependencies]
