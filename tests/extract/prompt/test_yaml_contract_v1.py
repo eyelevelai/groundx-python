@@ -266,6 +266,60 @@ statement:
             prepare_extraction_yaml(base.format(agent_chain=agent_chain))
 
 
+def test_agent_chain_rejects_unscheduled_workflow_groups() -> None:
+    raw = """
+extraction_policy_version: v1
+
+workflow:
+  custom_steps:
+    - name: statement_fields
+      level: chunk
+      kind: instruct
+    - name: meter_fields
+      level: chunk
+      kind: summary
+    - name: charge_fields
+      level: chunk
+      kind: keys
+  agent_chain:
+    - parallel:
+        - group: statement
+          chain: [reconcile_statement, qa_statement]
+    - save_statement
+
+statement:
+  workflow_step: statement_fields
+  fields:
+    account_number:
+      workflow_output_key: account_number
+      prompt:
+        instructions: Return the account number.
+        type: str
+meters:
+  workflow_step: meter_fields
+  fields:
+    meter_number:
+      workflow_output_key: meter_number
+      prompt:
+        instructions: Return the meter number.
+        type: str
+charges:
+  workflow_step: charge_fields
+  fields:
+    charge_amount:
+      workflow_output_key: charge_amount
+      prompt:
+        instructions: Return the charge amount.
+        type: float
+"""
+
+    with pytest.raises(
+        ValueError,
+        match="does not cover workflow groups .*charges.*meters",
+    ):
+        prepare_extraction_yaml(raw)
+
+
 def test_slot_and_domain_are_rejected_even_with_metadata_escape_hatches() -> None:
     raw = """
 domain: invoice
