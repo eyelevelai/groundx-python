@@ -14,17 +14,16 @@ workflow:
       level: chunk
       kind: instruct
   agent_chain:
-    parallel:
-      - group: statement_identity
-        chain:
-          - reconcile_statement
-          - qa_statement
-      - group: statement_totals
-        chain:
-          - reconcile_statement
-          - qa_statement
-    then:
-      - save_statement
+    - parallel:
+        - group: statement_identity
+          chain:
+            - reconcile_statement
+            - qa_statement
+        - group: statement_totals
+          chain:
+            - reconcile_statement
+            - qa_statement
+    - save_statement
 
 _defs:
   identity_fields:

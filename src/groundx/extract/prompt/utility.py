@@ -24,6 +24,25 @@ _CUSTOM_WORKFLOW_OUTPUT_MAPS = {
     "section": "customSectionOutputs",
     "document": "customDocumentOutputs",
 }
+_CUSTOM_WORKFLOW_AGENT_CHAIN_AGENT_TASKS = frozenset(
+    {
+        "reconcile_charges",
+        "reconcile_meters",
+        "reconcile_statement",
+        "qa_meters",
+        "qa_statement",
+    }
+)
+_CUSTOM_WORKFLOW_AGENT_CHAIN_SAVE_TASKS = frozenset(
+    {
+        "save_charges",
+        "save_meters",
+        "save_statement",
+    }
+)
+_CUSTOM_WORKFLOW_AGENT_CHAIN_SUPPORTED_TASKS = (
+    _CUSTOM_WORKFLOW_AGENT_CHAIN_AGENT_TASKS | _CUSTOM_WORKFLOW_AGENT_CHAIN_SAVE_TASKS
+)
 _RESERVED_TOP_LEVEL_KEYS = {
     "_defs",
     "_pseudo_groups",
@@ -759,13 +778,190 @@ def _normalize_workflow_template(value: typing.Any) -> typing.Dict[str, str]:
     return normalized
 
 
-def _normalize_agent_chain(value: typing.Any) -> typing.Optional[typing.Any]:
+def _normalize_agent_chain(
+    value: typing.Any,
+    workflow_groups: typing.Optional[typing.Set[str]] = None,
+) -> typing.Optional[typing.Any]:
     if value is None:
         return None
-    if not isinstance(value, (dict, list)):
-        raise ValueError(f"{_CUSTOM_WORKFLOW_KEY}.agent_chain must be a mapping or list")
+    if not isinstance(value, list):
+        raise ValueError(f"{_CUSTOM_WORKFLOW_KEY}.agent_chain must be a list")
+    if not value:
+        raise ValueError(f"{_CUSTOM_WORKFLOW_KEY}.agent_chain must be a non-empty list")
 
+    _validate_agent_chain(value, workflow_groups or set())
     return copy.deepcopy(value)
+
+
+def _validate_agent_chain(
+    raw_chain: typing.List[typing.Any],
+    workflow_groups: typing.Set[str],
+) -> None:
+    first_stage = raw_chain[0]
+    if not isinstance(first_stage, dict) or set(first_stage.keys()) != {"parallel"}:
+        raise ValueError(
+            f"{_CUSTOM_WORKFLOW_KEY}.agent_chain must start with a parallel stage"
+        )
+
+    has_save = False
+    serial_start_index = 1
+    for stage_index, raw_stage in enumerate(raw_chain):
+        if isinstance(raw_stage, str):
+            _validate_agent_chain_task(
+                raw_stage,
+                f"{_CUSTOM_WORKFLOW_KEY}.agent_chain[{stage_index}]",
+            )
+            if raw_stage in _CUSTOM_WORKFLOW_AGENT_CHAIN_SAVE_TASKS:
+                has_save = True
+            continue
+
+        if not isinstance(raw_stage, dict) or set(raw_stage.keys()) != {"parallel"}:
+            raise ValueError(
+                f"{_CUSTOM_WORKFLOW_KEY}.agent_chain stages must be task strings or "
+                "{parallel: [...]}"
+            )
+        if stage_index != 0:
+            raise ValueError(
+                "workflow.agent_chain parallel stages after the first stage are not supported"
+            )
+
+        raw_branches = raw_stage["parallel"]
+        if not isinstance(raw_branches, list) or not raw_branches:
+            raise ValueError(
+                f"{_CUSTOM_WORKFLOW_KEY}.agent_chain parallel stage must have branches"
+            )
+
+        branch_terminal_saves: typing.List[bool] = []
+        branch_suffixes: typing.List[str] = []
+
+        for branch_index, raw_branch in enumerate(raw_branches):
+            path = (
+                f"{_CUSTOM_WORKFLOW_KEY}.agent_chain"
+                f"[{stage_index}].parallel[{branch_index}]"
+            )
+            if not isinstance(raw_branch, dict):
+                raise ValueError(f"{path} must be a mapping")
+            if set(raw_branch.keys()) != {"group", "chain"}:
+                raise ValueError(f"{path} must contain only group and chain")
+
+            group = raw_branch["group"]
+            if not isinstance(group, str) or not group:
+                raise ValueError(f"{path}.group must be a non-empty string")
+            if group not in workflow_groups:
+                raise ValueError(f"{path}.group [{group}] is not a workflow group")
+
+            chain = raw_branch["chain"]
+            if not isinstance(chain, list) or not chain:
+                raise ValueError(f"{path}.chain must be a non-empty list")
+            parsed_chain = [
+                _validate_agent_chain_task(task, f"{path}.chain")
+                for task in chain
+            ]
+            if any(
+                task in _CUSTOM_WORKFLOW_AGENT_CHAIN_SAVE_TASKS
+                for task in parsed_chain[:-1]
+            ):
+                raise ValueError(f"{path}.chain save task must be last")
+            suffixes = {_agent_chain_task_suffix(task) for task in parsed_chain}
+            if len(suffixes) != 1:
+                raise ValueError(f"{path}.chain must use one processing suffix")
+            branch_suffixes.append(suffixes.pop())
+            branch_terminal_saves.append(
+                parsed_chain[-1] in _CUSTOM_WORKFLOW_AGENT_CHAIN_SAVE_TASKS
+            )
+
+        terminal_save = _agent_chain_following_save_task(raw_chain, stage_index)
+        if any(branch_terminal_saves):
+            has_save = True
+            serial_start_index = stage_index + 1
+            if terminal_save is not None:
+                raise ValueError(
+                    "workflow.agent_chain parallel branch save tasks cannot be "
+                    "combined with a following top-level save task"
+                )
+            if not all(branch_terminal_saves):
+                raise ValueError(
+                    "workflow.agent_chain parallel branches must either all end in "
+                    "save tasks or all use the following top-level save task"
+                )
+        elif terminal_save is None:
+            raise ValueError(
+                "workflow.agent_chain parallel branches must end in a save task or "
+                "be followed by one top-level save task"
+            )
+        else:
+            serial_start_index = stage_index + 2
+            terminal_suffix = _agent_chain_task_suffix(terminal_save)
+            for suffix in branch_suffixes:
+                if suffix != terminal_suffix:
+                    raise ValueError(
+                        "workflow.agent_chain parallel branch processing suffix "
+                        "must match following save task"
+                    )
+
+    if not has_save:
+        raise ValueError(f"{_CUSTOM_WORKFLOW_KEY}.agent_chain must include a save task")
+    _validate_agent_chain_serial_tasks(raw_chain, serial_start_index)
+
+
+def _validate_agent_chain_serial_tasks(
+    raw_chain: typing.List[typing.Any],
+    start_index: int,
+) -> None:
+    stage_index = start_index
+    while stage_index < len(raw_chain):
+        path = f"{_CUSTOM_WORKFLOW_KEY}.agent_chain[{stage_index}]"
+        task = _validate_agent_chain_task(raw_chain[stage_index], path)
+        if task in _CUSTOM_WORKFLOW_AGENT_CHAIN_SAVE_TASKS:
+            raise ValueError(
+                f"{path} top-level save task [{task}] must follow a matching "
+                "top-level agent task"
+            )
+
+        expected_save = f"save_{_agent_chain_task_suffix(task)}"
+        next_index = stage_index + 1
+        if next_index >= len(raw_chain):
+            raise ValueError(
+                f"{path} top-level agent task [{task}] must be followed by "
+                f"matching save task [{expected_save}]"
+            )
+
+        next_path = f"{_CUSTOM_WORKFLOW_KEY}.agent_chain[{next_index}]"
+        next_task = _validate_agent_chain_task(raw_chain[next_index], next_path)
+        if next_task != expected_save:
+            raise ValueError(
+                f"{path} top-level agent task [{task}] must be followed by "
+                f"matching save task [{expected_save}]"
+            )
+        stage_index += 2
+
+
+def _validate_agent_chain_task(task: typing.Any, path: str) -> str:
+    if not isinstance(task, str) or not task:
+        raise ValueError(f"{path} task must be a non-empty string")
+    if task not in _CUSTOM_WORKFLOW_AGENT_CHAIN_SUPPORTED_TASKS:
+        raise ValueError(f"{path} contains unsupported task [{task}]")
+    return task
+
+
+def _agent_chain_following_save_task(
+    raw_chain: typing.List[typing.Any],
+    stage_index: int,
+) -> typing.Optional[str]:
+    next_index = stage_index + 1
+    if next_index >= len(raw_chain):
+        return None
+    raw_next = raw_chain[next_index]
+    if (
+        isinstance(raw_next, str)
+        and raw_next in _CUSTOM_WORKFLOW_AGENT_CHAIN_SAVE_TASKS
+    ):
+        return raw_next
+    return None
+
+
+def _agent_chain_task_suffix(task: str) -> str:
+    return task.rsplit("_", 1)[-1]
 
 
 def _valid_custom_workflow_kind(level: str, kind: str) -> bool:
@@ -1249,7 +1445,8 @@ def _normalize_persisted_custom_workflow_metadata(
     if field_counts:
         metadata["field_counts"] = field_counts
     agent_chain = _normalize_agent_chain(
-        workflow.get(_CUSTOM_WORKFLOW_AGENT_CHAIN_KEY)
+        workflow.get(_CUSTOM_WORKFLOW_AGENT_CHAIN_KEY),
+        {route["workflow_group"] for route in routes},
     )
     if agent_chain is not None:
         metadata[_CUSTOM_WORKFLOW_AGENT_CHAIN_KEY] = agent_chain
@@ -1512,7 +1709,8 @@ def _build_authored_custom_workflow_metadata(
     if field_counts:
         metadata["field_counts"] = field_counts
     agent_chain = _normalize_agent_chain(
-        workflow.get(_CUSTOM_WORKFLOW_AGENT_CHAIN_KEY)
+        workflow.get(_CUSTOM_WORKFLOW_AGENT_CHAIN_KEY),
+        set(workflow_groups.keys()),
     )
     if agent_chain is not None:
         metadata[_CUSTOM_WORKFLOW_AGENT_CHAIN_KEY] = agent_chain
