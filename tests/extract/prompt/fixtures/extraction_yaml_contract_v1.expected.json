@@ -1,0 +1,486 @@
+{
+  "final_group_metadata": {
+    "statement": {
+      "explanation_attrs": [
+        "statement_explanation"
+      ],
+      "final_value_aliases": {
+        "total_amount_due": "amount_due"
+      }
+    }
+  },
+  "groups": {
+    "statement": {
+      "fields": {
+        "account_number": {
+          "prompt": {
+            "description": "Account number printed on the statement.",
+            "identifiers": [
+              "Account Number"
+            ],
+            "instructions": "Return the account number exactly as printed.",
+            "type": "str"
+          }
+        },
+        "late_fee": {
+          "prompt": {
+            "description": "Late fee.",
+            "identifiers": [
+              "Late Fee"
+            ],
+            "instructions": "Return the late fee as a number.",
+            "type": "float"
+          }
+        },
+        "total_amount_due": {
+          "prompt": {
+            "description": "Total amount due.",
+            "identifiers": [
+              "Total Amount Due"
+            ],
+            "instructions": "Return the total amount due as a number.",
+            "type": "float"
+          }
+        }
+      },
+      "prompt": {
+        "instructions": "Extract statement fields."
+      }
+    }
+  },
+  "persisted_workflow_extract": {
+    "_groundx_persisted_extract": {
+      "_defs": {
+        "identity_fields": {
+          "fields": {
+            "account_number": {
+              "prompt": {
+                "description": "Account number printed on the statement.",
+                "identifiers": [
+                  "Account Number"
+                ],
+                "instructions": "Return the account number exactly as printed.",
+                "type": "str"
+              }
+            }
+          }
+        }
+      },
+      "_pseudo_groups": {
+        "statement_identity": {
+          "fields": {
+            "account_number": {
+              "path": "/statement/account_number"
+            }
+          }
+        },
+        "statement_totals": {
+          "fields": {
+            "total_amount_due": {
+              "path": "/statement/total_amount_due"
+            }
+          },
+          "prompt": {
+            "instructions": "Extract only statement total fields."
+          }
+        }
+      },
+      "extraction_policy_version": "v1",
+      "statement": {
+        "explanation_attrs": [
+          "statement_explanation"
+        ],
+        "fields": {
+          "late_fee": {
+            "prompt": {
+              "description": "Late fee.",
+              "identifiers": [
+                "Late Fee"
+              ],
+              "instructions": "Return the late fee as a number.",
+              "type": "float"
+            }
+          },
+          "total_amount_due": {
+            "prompt": {
+              "description": "Total amount due.",
+              "identifiers": [
+                "Total Amount Due"
+              ],
+              "instructions": "Return the total amount due as a number.",
+              "type": "float"
+            }
+          }
+        },
+        "final_value_aliases": {
+          "total_amount_due": "amount_due"
+        },
+        "include": [
+          "identity_fields"
+        ],
+        "prompt": {
+          "instructions": "Extract statement fields."
+        }
+      },
+      "workflow": {
+        "agent_chain": [
+          {
+            "parallel": [
+              {
+                "chain": [
+                  "reconcile_statement",
+                  "qa_statement"
+                ],
+                "group": "statement_identity"
+              },
+              {
+                "chain": [
+                  "reconcile_statement",
+                  "qa_statement"
+                ],
+                "group": "statement_totals"
+              }
+            ]
+          },
+          "save_statement"
+        ],
+        "custom_steps": [
+          {
+            "kind": "keys",
+            "level": "chunk",
+            "name": "statement_identity_fields",
+            "required_template_keys": [
+              "{{LANGUAGE}}"
+            ]
+          },
+          {
+            "kind": "instruct",
+            "level": "chunk",
+            "name": "statement_total_fields"
+          }
+        ],
+        "field_counts": {
+          "statement_identity_fields": 1,
+          "statement_total_fields": 1
+        },
+        "leaf_fields": [
+          {
+            "field_type": "str",
+            "final_path": "/statement/account_number",
+            "is_repeated": false,
+            "level": "chunk",
+            "output_key": "account_number",
+            "repetition_scope": "none",
+            "step_name": "statement_identity_fields",
+            "workflow_field": "account_number",
+            "workflow_group": "statement_identity"
+          },
+          {
+            "field_type": "float",
+            "final_path": "/statement/total_amount_due",
+            "is_repeated": false,
+            "level": "chunk",
+            "output_key": "total_amount_due",
+            "repetition_scope": "none",
+            "step_name": "statement_total_fields",
+            "workflow_field": "total_amount_due",
+            "workflow_group": "statement_totals"
+          }
+        ],
+        "metadata_version": 1,
+        "output_routes": [
+          {
+            "final_path": "/statement/account_number",
+            "level": "chunk",
+            "output_key": "account_number",
+            "output_map": "customChunkOutputs",
+            "readback_path": "/chunks/*/customChunkOutputs/statement_identity_fields/account_number",
+            "step_name": "statement_identity_fields",
+            "workflow_field": "account_number",
+            "workflow_group": "statement_identity"
+          },
+          {
+            "final_path": "/statement/total_amount_due",
+            "level": "chunk",
+            "output_key": "total_amount_due",
+            "output_map": "customChunkOutputs",
+            "readback_path": "/chunks/*/customChunkOutputs/statement_total_fields/total_amount_due",
+            "step_name": "statement_total_fields",
+            "workflow_field": "total_amount_due",
+            "workflow_group": "statement_totals"
+          }
+        ],
+        "schema_hash": "04a77e329e4aae879257af53f91985548198935b0f0c83071c348bdc7267e9cb",
+        "template": {
+          "{{LANGUAGE_UNKNOWN}}": "",
+          "{{LANGUAGE}}": "English"
+        }
+      }
+    },
+    "statement": {
+      "fields": {
+        "late_fee": {
+          "prompt": {
+            "description": "Late fee.",
+            "identifiers": [
+              "Late Fee"
+            ],
+            "instructions": "Return the late fee as a number.",
+            "type": "float"
+          }
+        }
+      },
+      "prompt": {
+        "instructions": "Extract statement fields."
+      }
+    },
+    "statement_identity": {
+      "fields": {
+        "account_number": {
+          "prompt": {
+            "attr_name": "account_number",
+            "description": "Account number printed on the statement.",
+            "identifiers": [
+              "Account Number"
+            ],
+            "instructions": "Return the account number exactly as printed.",
+            "type": "str"
+          }
+        }
+      },
+      "prompt": {
+        "attr_name": "statement_identity",
+        "instructions": "Extract statement fields."
+      }
+    },
+    "statement_totals": {
+      "fields": {
+        "total_amount_due": {
+          "prompt": {
+            "attr_name": "total_amount_due",
+            "description": "Total amount due.",
+            "identifiers": [
+              "Total Amount Due"
+            ],
+            "instructions": "Return the total amount due as a number.",
+            "type": "float"
+          }
+        }
+      },
+      "prompt": {
+        "instructions": "Extract only statement total fields."
+      }
+    },
+    "workflow": {
+      "agent_chain": [
+        {
+          "parallel": [
+            {
+              "chain": [
+                "reconcile_statement",
+                "qa_statement"
+              ],
+              "group": "statement_identity"
+            },
+            {
+              "chain": [
+                "reconcile_statement",
+                "qa_statement"
+              ],
+              "group": "statement_totals"
+            }
+          ]
+        },
+        "save_statement"
+      ],
+      "custom_steps": [
+        {
+          "kind": "keys",
+          "level": "chunk",
+          "name": "statement_identity_fields",
+          "required_template_keys": [
+            "{{LANGUAGE}}"
+          ]
+        },
+        {
+          "kind": "instruct",
+          "level": "chunk",
+          "name": "statement_total_fields"
+        }
+      ],
+      "field_counts": {
+        "statement_identity_fields": 1,
+        "statement_total_fields": 1
+      },
+      "leaf_fields": [
+        {
+          "field_type": "str",
+          "final_path": "/statement/account_number",
+          "is_repeated": false,
+          "level": "chunk",
+          "output_key": "account_number",
+          "repetition_scope": "none",
+          "step_name": "statement_identity_fields",
+          "workflow_field": "account_number",
+          "workflow_group": "statement_identity"
+        },
+        {
+          "field_type": "float",
+          "final_path": "/statement/total_amount_due",
+          "is_repeated": false,
+          "level": "chunk",
+          "output_key": "total_amount_due",
+          "repetition_scope": "none",
+          "step_name": "statement_total_fields",
+          "workflow_field": "total_amount_due",
+          "workflow_group": "statement_totals"
+        }
+      ],
+      "metadata_version": 1,
+      "output_routes": [
+        {
+          "final_path": "/statement/account_number",
+          "level": "chunk",
+          "output_key": "account_number",
+          "output_map": "customChunkOutputs",
+          "readback_path": "/chunks/*/customChunkOutputs/statement_identity_fields/account_number",
+          "step_name": "statement_identity_fields",
+          "workflow_field": "account_number",
+          "workflow_group": "statement_identity"
+        },
+        {
+          "final_path": "/statement/total_amount_due",
+          "level": "chunk",
+          "output_key": "total_amount_due",
+          "output_map": "customChunkOutputs",
+          "readback_path": "/chunks/*/customChunkOutputs/statement_total_fields/total_amount_due",
+          "step_name": "statement_total_fields",
+          "workflow_field": "total_amount_due",
+          "workflow_group": "statement_totals"
+        }
+      ],
+      "schema_hash": "04a77e329e4aae879257af53f91985548198935b0f0c83071c348bdc7267e9cb",
+      "template": {
+        "{{LANGUAGE_UNKNOWN}}": "",
+        "{{LANGUAGE}}": "English"
+      }
+    }
+  },
+  "pseudo_groups": {
+    "statement_identity": {
+      "fields": {
+        "account_number": {
+          "prompt": {
+            "attr_name": "account_number",
+            "description": "Account number printed on the statement.",
+            "identifiers": [
+              "Account Number"
+            ],
+            "instructions": "Return the account number exactly as printed.",
+            "type": "str"
+          }
+        }
+      },
+      "prompt": {
+        "attr_name": "statement_identity",
+        "instructions": "Extract statement fields."
+      }
+    },
+    "statement_totals": {
+      "fields": {
+        "total_amount_due": {
+          "prompt": {
+            "attr_name": "total_amount_due",
+            "description": "Total amount due.",
+            "identifiers": [
+              "Total Amount Due"
+            ],
+            "instructions": "Return the total amount due as a number.",
+            "type": "float"
+          }
+        }
+      },
+      "prompt": {
+        "instructions": "Extract only statement total fields."
+      }
+    }
+  },
+  "top_level_metadata": {
+    "extraction_policy_version": "v1"
+  },
+  "workflow_field_paths": {
+    "statement": {
+      "late_fee": "/statement/late_fee"
+    },
+    "statement_identity": {
+      "account_number": "/statement/account_number"
+    },
+    "statement_totals": {
+      "total_amount_due": "/statement/total_amount_due"
+    }
+  },
+  "workflow_group_metadata": {
+    "statement_identity": {
+      "workflow_step": "statement_identity_fields"
+    },
+    "statement_totals": {
+      "workflow_step": "statement_total_fields"
+    }
+  },
+  "workflow_groups": {
+    "statement": {
+      "fields": {
+        "late_fee": {
+          "prompt": {
+            "description": "Late fee.",
+            "identifiers": [
+              "Late Fee"
+            ],
+            "instructions": "Return the late fee as a number.",
+            "type": "float"
+          }
+        }
+      },
+      "prompt": {
+        "instructions": "Extract statement fields."
+      }
+    },
+    "statement_identity": {
+      "fields": {
+        "account_number": {
+          "prompt": {
+            "attr_name": "account_number",
+            "description": "Account number printed on the statement.",
+            "identifiers": [
+              "Account Number"
+            ],
+            "instructions": "Return the account number exactly as printed.",
+            "type": "str"
+          }
+        }
+      },
+      "prompt": {
+        "attr_name": "statement_identity",
+        "instructions": "Extract statement fields."
+      }
+    },
+    "statement_totals": {
+      "fields": {
+        "total_amount_due": {
+          "prompt": {
+            "attr_name": "total_amount_due",
+            "description": "Total amount due.",
+            "identifiers": [
+              "Total Amount Due"
+            ],
+            "instructions": "Return the total amount due as a number.",
+            "type": "float"
+          }
+        }
+      },
+      "prompt": {
+        "instructions": "Extract only statement total fields."
+      }
+    }
+  }
+}

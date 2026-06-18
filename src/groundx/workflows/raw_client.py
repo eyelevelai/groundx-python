@@ -11,11 +11,15 @@ from ..core.parse_error import ParsingError
 from ..core.pydantic_utilities import parse_obj_as
 from ..core.request_options import RequestOptions
 from ..core.serialization import convert_and_respect_annotation_metadata
+from ..types.custom_workflow_leaf_field import CustomWorkflowLeafField
+from ..types.custom_workflow_output_route import CustomWorkflowOutputRoute
+from ..types.custom_workflow_step import CustomWorkflowStep
 from ..types.message_response import MessageResponse
 from ..types.workflow_request_chunk_strategy import WorkflowRequestChunkStrategy
 from ..types.workflow_request_section_strategy import WorkflowRequestSectionStrategy
 from ..types.workflow_response import WorkflowResponse
 from ..types.workflow_steps import WorkflowSteps
+from ..types.workflow_template import WorkflowTemplate
 from ..types.workflows_response import WorkflowsResponse
 from .types.workflows_get_request_id import WorkflowsGetRequestId
 from pydantic import ValidationError
@@ -72,8 +76,12 @@ class RawWorkflowsClient:
         chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
         extract: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
+        template: typing.Optional[WorkflowTemplate] = OMIT,
         section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
+        custom_steps: typing.Optional[typing.Sequence[CustomWorkflowStep]] = OMIT,
+        output_routes: typing.Optional[typing.Sequence[CustomWorkflowOutputRoute]] = OMIT,
+        leaf_fields: typing.Optional[typing.Sequence[CustomWorkflowLeafField]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[WorkflowResponse]:
         """
@@ -89,9 +97,20 @@ class RawWorkflowsClient:
         extract : typing.Optional[typing.Dict[str, typing.Any]]
             Extract agent definitions.
 
+        template : typing.Optional[WorkflowTemplate]
+
         section_strategy : typing.Optional[WorkflowRequestSectionStrategy]
 
         steps : typing.Optional[WorkflowSteps]
+
+        custom_steps : typing.Optional[typing.Sequence[CustomWorkflowStep]]
+            Workflow-level custom extraction steps. Legacy fixed steps remain under steps.
+
+        output_routes : typing.Optional[typing.Sequence[CustomWorkflowOutputRoute]]
+            Custom output routes. Each record must have exactly one matching leafFields record on finalPath, workflowGroup, workflowField, stepName, level, and outputKey.
+
+        leaf_fields : typing.Optional[typing.Sequence[CustomWorkflowLeafField]]
+            Custom leaf-field metadata used to validate route integrity and executable-step field counts.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -108,9 +127,19 @@ class RawWorkflowsClient:
                 "chunkStrategy": chunk_strategy,
                 "name": name,
                 "extract": extract,
+                "template": template,
                 "sectionStrategy": section_strategy,
                 "steps": convert_and_respect_annotation_metadata(
                     object_=steps, annotation=WorkflowSteps, direction="write"
+                ),
+                "customSteps": convert_and_respect_annotation_metadata(
+                    object_=custom_steps, annotation=typing.Sequence[CustomWorkflowStep], direction="write"
+                ),
+                "outputRoutes": convert_and_respect_annotation_metadata(
+                    object_=output_routes, annotation=typing.Sequence[CustomWorkflowOutputRoute], direction="write"
+                ),
+                "leafFields": convert_and_respect_annotation_metadata(
+                    object_=leaf_fields, annotation=typing.Sequence[CustomWorkflowLeafField], direction="write"
                 ),
             },
             request_options=request_options,
@@ -403,8 +432,12 @@ class RawWorkflowsClient:
         chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
         extract: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
+        template: typing.Optional[WorkflowTemplate] = OMIT,
         section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
+        custom_steps: typing.Optional[typing.Sequence[CustomWorkflowStep]] = OMIT,
+        output_routes: typing.Optional[typing.Sequence[CustomWorkflowOutputRoute]] = OMIT,
+        leaf_fields: typing.Optional[typing.Sequence[CustomWorkflowLeafField]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[WorkflowResponse]:
         """
@@ -423,9 +456,20 @@ class RawWorkflowsClient:
         extract : typing.Optional[typing.Dict[str, typing.Any]]
             Extract agent definitions.
 
+        template : typing.Optional[WorkflowTemplate]
+
         section_strategy : typing.Optional[WorkflowRequestSectionStrategy]
 
         steps : typing.Optional[WorkflowSteps]
+
+        custom_steps : typing.Optional[typing.Sequence[CustomWorkflowStep]]
+            Workflow-level custom extraction steps. Legacy fixed steps remain under steps.
+
+        output_routes : typing.Optional[typing.Sequence[CustomWorkflowOutputRoute]]
+            Custom output routes. Each record must have exactly one matching leafFields record on finalPath, workflowGroup, workflowField, stepName, level, and outputKey.
+
+        leaf_fields : typing.Optional[typing.Sequence[CustomWorkflowLeafField]]
+            Custom leaf-field metadata used to validate route integrity and executable-step field counts.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -442,9 +486,19 @@ class RawWorkflowsClient:
                 "chunkStrategy": chunk_strategy,
                 "name": name,
                 "extract": extract,
+                "template": template,
                 "sectionStrategy": section_strategy,
                 "steps": convert_and_respect_annotation_metadata(
                     object_=steps, annotation=WorkflowSteps, direction="write"
+                ),
+                "customSteps": convert_and_respect_annotation_metadata(
+                    object_=custom_steps, annotation=typing.Sequence[CustomWorkflowStep], direction="write"
+                ),
+                "outputRoutes": convert_and_respect_annotation_metadata(
+                    object_=output_routes, annotation=typing.Sequence[CustomWorkflowOutputRoute], direction="write"
+                ),
+                "leafFields": convert_and_respect_annotation_metadata(
+                    object_=leaf_fields, annotation=typing.Sequence[CustomWorkflowLeafField], direction="write"
                 ),
             },
             request_options=request_options,
@@ -563,8 +617,12 @@ class AsyncRawWorkflowsClient:
         chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
         extract: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
+        template: typing.Optional[WorkflowTemplate] = OMIT,
         section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
+        custom_steps: typing.Optional[typing.Sequence[CustomWorkflowStep]] = OMIT,
+        output_routes: typing.Optional[typing.Sequence[CustomWorkflowOutputRoute]] = OMIT,
+        leaf_fields: typing.Optional[typing.Sequence[CustomWorkflowLeafField]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[WorkflowResponse]:
         """
@@ -580,9 +638,20 @@ class AsyncRawWorkflowsClient:
         extract : typing.Optional[typing.Dict[str, typing.Any]]
             Extract agent definitions.
 
+        template : typing.Optional[WorkflowTemplate]
+
         section_strategy : typing.Optional[WorkflowRequestSectionStrategy]
 
         steps : typing.Optional[WorkflowSteps]
+
+        custom_steps : typing.Optional[typing.Sequence[CustomWorkflowStep]]
+            Workflow-level custom extraction steps. Legacy fixed steps remain under steps.
+
+        output_routes : typing.Optional[typing.Sequence[CustomWorkflowOutputRoute]]
+            Custom output routes. Each record must have exactly one matching leafFields record on finalPath, workflowGroup, workflowField, stepName, level, and outputKey.
+
+        leaf_fields : typing.Optional[typing.Sequence[CustomWorkflowLeafField]]
+            Custom leaf-field metadata used to validate route integrity and executable-step field counts.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -599,9 +668,19 @@ class AsyncRawWorkflowsClient:
                 "chunkStrategy": chunk_strategy,
                 "name": name,
                 "extract": extract,
+                "template": template,
                 "sectionStrategy": section_strategy,
                 "steps": convert_and_respect_annotation_metadata(
                     object_=steps, annotation=WorkflowSteps, direction="write"
+                ),
+                "customSteps": convert_and_respect_annotation_metadata(
+                    object_=custom_steps, annotation=typing.Sequence[CustomWorkflowStep], direction="write"
+                ),
+                "outputRoutes": convert_and_respect_annotation_metadata(
+                    object_=output_routes, annotation=typing.Sequence[CustomWorkflowOutputRoute], direction="write"
+                ),
+                "leafFields": convert_and_respect_annotation_metadata(
+                    object_=leaf_fields, annotation=typing.Sequence[CustomWorkflowLeafField], direction="write"
                 ),
             },
             request_options=request_options,
@@ -896,8 +975,12 @@ class AsyncRawWorkflowsClient:
         chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
         extract: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
+        template: typing.Optional[WorkflowTemplate] = OMIT,
         section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
+        custom_steps: typing.Optional[typing.Sequence[CustomWorkflowStep]] = OMIT,
+        output_routes: typing.Optional[typing.Sequence[CustomWorkflowOutputRoute]] = OMIT,
+        leaf_fields: typing.Optional[typing.Sequence[CustomWorkflowLeafField]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[WorkflowResponse]:
         """
@@ -916,9 +999,20 @@ class AsyncRawWorkflowsClient:
         extract : typing.Optional[typing.Dict[str, typing.Any]]
             Extract agent definitions.
 
+        template : typing.Optional[WorkflowTemplate]
+
         section_strategy : typing.Optional[WorkflowRequestSectionStrategy]
 
         steps : typing.Optional[WorkflowSteps]
+
+        custom_steps : typing.Optional[typing.Sequence[CustomWorkflowStep]]
+            Workflow-level custom extraction steps. Legacy fixed steps remain under steps.
+
+        output_routes : typing.Optional[typing.Sequence[CustomWorkflowOutputRoute]]
+            Custom output routes. Each record must have exactly one matching leafFields record on finalPath, workflowGroup, workflowField, stepName, level, and outputKey.
+
+        leaf_fields : typing.Optional[typing.Sequence[CustomWorkflowLeafField]]
+            Custom leaf-field metadata used to validate route integrity and executable-step field counts.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -935,9 +1029,19 @@ class AsyncRawWorkflowsClient:
                 "chunkStrategy": chunk_strategy,
                 "name": name,
                 "extract": extract,
+                "template": template,
                 "sectionStrategy": section_strategy,
                 "steps": convert_and_respect_annotation_metadata(
                     object_=steps, annotation=WorkflowSteps, direction="write"
+                ),
+                "customSteps": convert_and_respect_annotation_metadata(
+                    object_=custom_steps, annotation=typing.Sequence[CustomWorkflowStep], direction="write"
+                ),
+                "outputRoutes": convert_and_respect_annotation_metadata(
+                    object_=output_routes, annotation=typing.Sequence[CustomWorkflowOutputRoute], direction="write"
+                ),
+                "leafFields": convert_and_respect_annotation_metadata(
+                    object_=leaf_fields, annotation=typing.Sequence[CustomWorkflowLeafField], direction="write"
                 ),
             },
             request_options=request_options,

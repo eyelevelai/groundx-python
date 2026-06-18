@@ -6,6 +6,7 @@ src/groundx/csv_splitter.py
 src/groundx/test.py
 src/groundx/extract
 src/test.py
+tests/custom
 tests/extract
 openspec
 pyrightconfig.json

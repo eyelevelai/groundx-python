@@ -4,11 +4,15 @@ import typing
 
 from ..core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ..core.request_options import RequestOptions
+from ..types.custom_workflow_leaf_field import CustomWorkflowLeafField
+from ..types.custom_workflow_output_route import CustomWorkflowOutputRoute
+from ..types.custom_workflow_step import CustomWorkflowStep
 from ..types.message_response import MessageResponse
 from ..types.workflow_request_chunk_strategy import WorkflowRequestChunkStrategy
 from ..types.workflow_request_section_strategy import WorkflowRequestSectionStrategy
 from ..types.workflow_response import WorkflowResponse
 from ..types.workflow_steps import WorkflowSteps
+from ..types.workflow_template import WorkflowTemplate
 from ..types.workflows_response import WorkflowsResponse
 from .raw_client import AsyncRawWorkflowsClient, RawWorkflowsClient
 from .types.workflows_get_request_id import WorkflowsGetRequestId
@@ -64,8 +68,12 @@ class WorkflowsClient:
         chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
         extract: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
+        template: typing.Optional[WorkflowTemplate] = OMIT,
         section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
+        custom_steps: typing.Optional[typing.Sequence[CustomWorkflowStep]] = OMIT,
+        output_routes: typing.Optional[typing.Sequence[CustomWorkflowOutputRoute]] = OMIT,
+        leaf_fields: typing.Optional[typing.Sequence[CustomWorkflowLeafField]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> WorkflowResponse:
         """
@@ -81,9 +89,20 @@ class WorkflowsClient:
         extract : typing.Optional[typing.Dict[str, typing.Any]]
             Extract agent definitions.
 
+        template : typing.Optional[WorkflowTemplate]
+
         section_strategy : typing.Optional[WorkflowRequestSectionStrategy]
 
         steps : typing.Optional[WorkflowSteps]
+
+        custom_steps : typing.Optional[typing.Sequence[CustomWorkflowStep]]
+            Workflow-level custom extraction steps. Legacy fixed steps remain under steps.
+
+        output_routes : typing.Optional[typing.Sequence[CustomWorkflowOutputRoute]]
+            Custom output routes. Each record must have exactly one matching leafFields record on finalPath, workflowGroup, workflowField, stepName, level, and outputKey.
+
+        leaf_fields : typing.Optional[typing.Sequence[CustomWorkflowLeafField]]
+            Custom leaf-field metadata used to validate route integrity and executable-step field counts.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -106,8 +125,12 @@ class WorkflowsClient:
             chunk_strategy=chunk_strategy,
             name=name,
             extract=extract,
+            template=template,
             section_strategy=section_strategy,
             steps=steps,
+            custom_steps=custom_steps,
+            output_routes=output_routes,
+            leaf_fields=leaf_fields,
             request_options=request_options,
         )
         return _response.data
@@ -305,8 +328,12 @@ class WorkflowsClient:
         chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
         extract: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
+        template: typing.Optional[WorkflowTemplate] = OMIT,
         section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
+        custom_steps: typing.Optional[typing.Sequence[CustomWorkflowStep]] = OMIT,
+        output_routes: typing.Optional[typing.Sequence[CustomWorkflowOutputRoute]] = OMIT,
+        leaf_fields: typing.Optional[typing.Sequence[CustomWorkflowLeafField]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> WorkflowResponse:
         """
@@ -325,9 +352,20 @@ class WorkflowsClient:
         extract : typing.Optional[typing.Dict[str, typing.Any]]
             Extract agent definitions.
 
+        template : typing.Optional[WorkflowTemplate]
+
         section_strategy : typing.Optional[WorkflowRequestSectionStrategy]
 
         steps : typing.Optional[WorkflowSteps]
+
+        custom_steps : typing.Optional[typing.Sequence[CustomWorkflowStep]]
+            Workflow-level custom extraction steps. Legacy fixed steps remain under steps.
+
+        output_routes : typing.Optional[typing.Sequence[CustomWorkflowOutputRoute]]
+            Custom output routes. Each record must have exactly one matching leafFields record on finalPath, workflowGroup, workflowField, stepName, level, and outputKey.
+
+        leaf_fields : typing.Optional[typing.Sequence[CustomWorkflowLeafField]]
+            Custom leaf-field metadata used to validate route integrity and executable-step field counts.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -353,8 +391,12 @@ class WorkflowsClient:
             chunk_strategy=chunk_strategy,
             name=name,
             extract=extract,
+            template=template,
             section_strategy=section_strategy,
             steps=steps,
+            custom_steps=custom_steps,
+            output_routes=output_routes,
+            leaf_fields=leaf_fields,
             request_options=request_options,
         )
         return _response.data
@@ -446,8 +488,12 @@ class AsyncWorkflowsClient:
         chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
         extract: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
+        template: typing.Optional[WorkflowTemplate] = OMIT,
         section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
+        custom_steps: typing.Optional[typing.Sequence[CustomWorkflowStep]] = OMIT,
+        output_routes: typing.Optional[typing.Sequence[CustomWorkflowOutputRoute]] = OMIT,
+        leaf_fields: typing.Optional[typing.Sequence[CustomWorkflowLeafField]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> WorkflowResponse:
         """
@@ -463,9 +509,20 @@ class AsyncWorkflowsClient:
         extract : typing.Optional[typing.Dict[str, typing.Any]]
             Extract agent definitions.
 
+        template : typing.Optional[WorkflowTemplate]
+
         section_strategy : typing.Optional[WorkflowRequestSectionStrategy]
 
         steps : typing.Optional[WorkflowSteps]
+
+        custom_steps : typing.Optional[typing.Sequence[CustomWorkflowStep]]
+            Workflow-level custom extraction steps. Legacy fixed steps remain under steps.
+
+        output_routes : typing.Optional[typing.Sequence[CustomWorkflowOutputRoute]]
+            Custom output routes. Each record must have exactly one matching leafFields record on finalPath, workflowGroup, workflowField, stepName, level, and outputKey.
+
+        leaf_fields : typing.Optional[typing.Sequence[CustomWorkflowLeafField]]
+            Custom leaf-field metadata used to validate route integrity and executable-step field counts.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -496,8 +553,12 @@ class AsyncWorkflowsClient:
             chunk_strategy=chunk_strategy,
             name=name,
             extract=extract,
+            template=template,
             section_strategy=section_strategy,
             steps=steps,
+            custom_steps=custom_steps,
+            output_routes=output_routes,
+            leaf_fields=leaf_fields,
             request_options=request_options,
         )
         return _response.data
@@ -745,8 +806,12 @@ class AsyncWorkflowsClient:
         chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
         extract: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
+        template: typing.Optional[WorkflowTemplate] = OMIT,
         section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
         steps: typing.Optional[WorkflowSteps] = OMIT,
+        custom_steps: typing.Optional[typing.Sequence[CustomWorkflowStep]] = OMIT,
+        output_routes: typing.Optional[typing.Sequence[CustomWorkflowOutputRoute]] = OMIT,
+        leaf_fields: typing.Optional[typing.Sequence[CustomWorkflowLeafField]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> WorkflowResponse:
         """
@@ -765,9 +830,20 @@ class AsyncWorkflowsClient:
         extract : typing.Optional[typing.Dict[str, typing.Any]]
             Extract agent definitions.
 
+        template : typing.Optional[WorkflowTemplate]
+
         section_strategy : typing.Optional[WorkflowRequestSectionStrategy]
 
         steps : typing.Optional[WorkflowSteps]
+
+        custom_steps : typing.Optional[typing.Sequence[CustomWorkflowStep]]
+            Workflow-level custom extraction steps. Legacy fixed steps remain under steps.
+
+        output_routes : typing.Optional[typing.Sequence[CustomWorkflowOutputRoute]]
+            Custom output routes. Each record must have exactly one matching leafFields record on finalPath, workflowGroup, workflowField, stepName, level, and outputKey.
+
+        leaf_fields : typing.Optional[typing.Sequence[CustomWorkflowLeafField]]
+            Custom leaf-field metadata used to validate route integrity and executable-step field counts.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -801,8 +877,12 @@ class AsyncWorkflowsClient:
             chunk_strategy=chunk_strategy,
             name=name,
             extract=extract,
+            template=template,
             section_strategy=section_strategy,
             steps=steps,
+            custom_steps=custom_steps,
+            output_routes=output_routes,
+            leaf_fields=leaf_fields,
             request_options=request_options,
         )
         return _response.data
