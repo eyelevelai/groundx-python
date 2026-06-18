@@ -324,17 +324,17 @@ files = [
 
 [[package]]
 name = "boto3"
-version = "1.43.32"
+version = "1.43.33"
 description = "The AWS SDK for Python"
 optional = true
 python-versions = ">=3.10"
 files = [
-    {file = "boto3-1.43.32-py3-none-any.whl", hash = "sha256:a3d7d7a9489c18cc9c806aca9be689677779d17ddbf919fe300146576c1bdee2"},
-    {file = "boto3-1.43.32.tar.gz", hash = "sha256:15544d42af8aa8f775ea636f77c9c97fbc90ff28c0e5a0d1d47c8acd9f5b1982"},
+    {file = "boto3-1.43.33-py3-none-any.whl", hash = "sha256:97b563127f7678ad20249f9bf99877b7a3a78f6fcdcf222c6e25d27d4406ce0d"},
+    {file = "boto3-1.43.33.tar.gz", hash = "sha256:da6e400b2d11eb041fbbb2743ef3ffe6540889676ffdff0e628628e9b4f04cde"},
 ]
 
 [package.dependencies]
-botocore = ">=1.43.32,<1.44.0"
+botocore = ">=1.43.33,<1.44.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.19.0,<0.20.0"
 
@@ -343,13 +343,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.43.32"
+version = "1.43.33"
 description = "Low-level, data-driven core of boto 3."
 optional = true
 python-versions = ">=3.10"
 files = [
-    {file = "botocore-1.43.32-py3-none-any.whl", hash = "sha256:429796537fde1301df90d394808985d88cd51b36a6e769e5c12f6a6877605428"},
-    {file = "botocore-1.43.32.tar.gz", hash = "sha256:88ed52268b8f7e8ff8f9df5adbbf61e5bbb5dc618ee50de4346cabe93a482792"},
+    {file = "botocore-1.43.33-py3-none-any.whl", hash = "sha256:4292bb2cc645e5cb404515c54b5b164563f2b4218c52aeee3f1ce851724e177a"},
+    {file = "botocore-1.43.33.tar.gz", hash = "sha256:74b3d5626ebeb2677fac1ca12ac975faf328e54349ceb4dcda17f50674d5b9b4"},
 ]
 
 [package.dependencies]
@@ -895,13 +895,13 @@ testing = ["hatch", "pre-commit", "pytest", "tox"]
 
 [[package]]
 name = "fastapi"
-version = "0.137.1"
+version = "0.137.2"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
 optional = true
 python-versions = ">=3.10"
 files = [
-    {file = "fastapi-0.137.1-py3-none-any.whl", hash = "sha256:64f6983c59e45c4b9fdc44e57cb8035c2451ee91ea8e8ec042aca37de7cf6b69"},
-    {file = "fastapi-0.137.1.tar.gz", hash = "sha256:822360704230d9533d8d9475399613525968aa2f0b5bd2a3ccc9f18c88fd541c"},
+    {file = "fastapi-0.137.2-py3-none-any.whl", hash = "sha256:791d36261e916a98b25ac85ee591bc3db159394070f6d3d096d94fb378f60ce2"},
+    {file = "fastapi-0.137.2.tar.gz", hash = "sha256:b9d893bebc97dcfbdcb1917e88a292d062844ea19445a5fa4f7eb28c4baea9e3"},
 ]
 
 [package.dependencies]
@@ -1476,13 +1476,13 @@ httpx = ">=0.27.0"
 
 [[package]]
 name = "huggingface-hub"
-version = "1.19.0"
+version = "1.20.0"
 description = "Client library to download and publish models, datasets and other repos on the huggingface.co hub"
 optional = true
 python-versions = ">=3.10.0"
 files = [
-    {file = "huggingface_hub-1.19.0-py3-none-any.whl", hash = "sha256:1dc72e1f6b4d6df6b30eb72e57d00514ef453d660f04af2b87f0e67267f31ee0"},
-    {file = "huggingface_hub-1.19.0.tar.gz", hash = "sha256:fd771622182d40977272a923953ee3b1b13538f9f8a7f5d78398f10af0f1c0bd"},
+    {file = "huggingface_hub-1.20.0-py3-none-any.whl", hash = "sha256:56df2af3a2a1162469e2e7ab09777aaa359ee080b5395d60e9afac78bc5950ed"},
+    {file = "huggingface_hub-1.20.0.tar.gz", hash = "sha256:8dae0cdaef71fef5f96dc4f0ba47d050c6cef42739f097b858157c092a7a3cab"},
 ]
 
 [package.dependencies]
@@ -3326,13 +3326,13 @@ files = [
 
 [[package]]
 name = "types-boto3"
-version = "1.43.32"
-description = "Type annotations for boto3 1.43.32 generated with mypy-boto3-builder 8.12.0"
+version = "1.43.33"
+description = "Type annotations for boto3 1.43.33 generated with mypy-boto3-builder 8.12.0"
 optional = true
 python-versions = ">=3.9"
 files = [
-    {file = "types_boto3-1.43.32-py3-none-any.whl", hash = "sha256:febd8ac45968b29010323cbb2057afe7b7e2a3fc8cf42a1c86516b42bd2a3354"},
-    {file = "types_boto3-1.43.32.tar.gz", hash = "sha256:2a41a59b2aac7565fd2545a7442a1c9cdf05d595b0a7721bce03d87635a43e3d"},
+    {file = "types_boto3-1.43.33-py3-none-any.whl", hash = "sha256:e09423cbd95458b73c11453161dc9d6ed2978363235cb4c961bf747283427713"},
+    {file = "types_boto3-1.43.33.tar.gz", hash = "sha256:9d7d625c9fa96627faadd92f88ea8755cb3dd0133d7a000f53f7bbd56c3ab801"},
 ]
 
 [package.dependencies]
@@ -3393,7 +3393,7 @@ bedrock-data-automation-runtime = ["types-boto3-bedrock-data-automation-runtime 
 bedrock-runtime = ["types-boto3-bedrock-runtime (>=1.43.0,<1.44.0)"]
 billing = ["types-boto3-billing (>=1.43.0,<1.44.0)"]
 billingconductor = ["types-boto3-billingconductor (>=1.43.0,<1.44.0)"]
-boto3 = ["boto3 (==1.43.32)"]
+boto3 = ["boto3 (==1.43.33)"]
 braket = ["types-boto3-braket (>=1.43.0,<1.44.0)"]
 budgets = ["types-boto3-budgets (>=1.43.0,<1.44.0)"]
 ce = ["types-boto3-ce (>=1.43.0,<1.44.0)"]
