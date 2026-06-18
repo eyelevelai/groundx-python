@@ -1,0 +1,77 @@
+extraction_policy_version: v1
+
+workflow:
+  template:
+    "{{LANGUAGE}}": English
+    "{{LANGUAGE_UNKNOWN}}": ""
+  custom_steps:
+    - name: statement_identity_fields
+      level: chunk
+      kind: keys
+      required_template_keys:
+        - "{{LANGUAGE}}"
+    - name: statement_total_fields
+      level: chunk
+      kind: instruct
+  agent_chain:
+    - parallel:
+        - group: statement_identity
+          chain:
+            - reconcile_statement
+            - qa_statement
+        - group: statement_totals
+          chain:
+            - reconcile_statement
+            - qa_statement
+    - save_statement
+
+_defs:
+  identity_fields:
+    fields:
+      account_number:
+        prompt:
+          description: Account number printed on the statement.
+          identifiers:
+            - Account Number
+          instructions: Return the account number exactly as printed.
+          type: str
+
+statement:
+  prompt:
+    instructions: Extract statement fields.
+  final_value_aliases:
+    total_amount_due: amount_due
+  explanation_attrs:
+    - statement_explanation
+  include:
+    - identity_fields
+  fields:
+    total_amount_due:
+      prompt:
+        description: Total amount due.
+        identifiers:
+          - Total Amount Due
+        instructions: Return the total amount due as a number.
+        type: float
+    late_fee:
+      prompt:
+        description: Late fee.
+        identifiers:
+          - Late Fee
+        instructions: Return the late fee as a number.
+        type: float
+
+_pseudo_groups:
+  statement_identity:
+    workflow_step: statement_identity_fields
+    fields:
+      account_number:
+        path: /statement/account_number
+
+  statement_totals:
+    workflow_step: statement_total_fields
+    prompt:
+      instructions: Extract only statement total fields.
+    fields:
+      total_amount_due:
+        path: /statement/total_amount_due

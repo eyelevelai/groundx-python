@@ -212,26 +212,18 @@ class PromptManager:
 
     def cache_workflow(self, file_name: str, workflow_id: str) -> None:
         if workflow_id in self._cache:
-            version: typing.Optional[str] = None
-            try:
-                version = self._config_source.peek(workflow_id)
-            except Exception as e:
-                self.logger.debug_msg(
-                    f"_config_source.peek exception [{e}]",
-                    workflow_id=workflow_id,
-                )
-
-            if not version:
-                self.logger.debug_msg(
-                    f"_config_source.peek failed\ntrying _cache_source [{file_name}.yaml]...",
-                    workflow_id=workflow_id,
-                )
-                version = self._cache_source.peek(file_name)
+            version, peek_failed = self._peek_workflow_version(file_name, workflow_id)
             if (
                 version
                 and workflow_id in self._versions
                 and self._versions.get(workflow_id) == version
             ):
+                return
+            if not version and peek_failed and workflow_id in self._versions:
+                self.logger.debug_msg(
+                    "workflow version peek unavailable; using cached workflow",
+                    workflow_id=workflow_id,
+                )
                 return
             if version and workflow_id in self._versions:
                 self.logger.info_msg(
@@ -263,6 +255,36 @@ class PromptManager:
         self._final_group_metadata[workflow_id] = prepared.final_group_metadata
         self._workflow_group_metadata[workflow_id] = prepared.workflow_group_metadata
         self._versions[workflow_id] = version
+
+    def _peek_workflow_version(
+        self, file_name: str, workflow_id: str
+    ) -> typing.Tuple[typing.Optional[str], bool]:
+        version: typing.Optional[str] = None
+        peek_failed = False
+        try:
+            version = self._config_source.peek(workflow_id)
+        except Exception as e:
+            peek_failed = True
+            self.logger.debug_msg(
+                f"_config_source.peek exception [{e}]",
+                workflow_id=workflow_id,
+            )
+
+        if not version:
+            self.logger.debug_msg(
+                f"_config_source.peek failed\ntrying _cache_source [{file_name}.yaml]...",
+                workflow_id=workflow_id,
+            )
+            try:
+                version = self._cache_source.peek(file_name)
+            except Exception as e:
+                peek_failed = True
+                self.logger.debug_msg(
+                    f"_cache_source.peek exception [{e}]",
+                    workflow_id=workflow_id,
+                )
+
+        return version, peek_failed
 
     def _fetch_workflow_config(
         self, file_name: str, workflow_id: str
@@ -634,25 +656,17 @@ class PromptManager:
     def reload_if_changed(self, workflow_id: typing.Optional[str] = None) -> None:
         workflow_id = self.workflow_id(workflow_id)
 
-        current_version: typing.Optional[str] = None
-        try:
-            current_version = self._config_source.peek(workflow_id)
-        except Exception as e:
+        previous_version = self._versions.get(workflow_id)
+        current_version, peek_failed = self._peek_workflow_version(
+            self.file_name(None), workflow_id
+        )
+
+        if previous_version and not current_version and peek_failed:
             self.logger.debug_msg(
-                f"_config_source.peek exception [{e}]",
+                "workflow version peek unavailable; keeping cached workflow",
                 workflow_id=workflow_id,
             )
-
-        if not current_version:
-            try:
-                current_version = self._cache_source.peek(self.file_name(None))
-            except Exception as e:
-                self.logger.debug_msg(
-                    f"_cache_source.peek exception [{e}]",
-                    workflow_id=workflow_id,
-                )
-
-        previous_version = self._versions.get(workflow_id)
+            return
 
         if not previous_version or current_version != previous_version:
             raw, version = self._fetch_workflow_config(

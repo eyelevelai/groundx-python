@@ -82,6 +82,8 @@ statement:
 """
 
 SAMPLE_YAML_PSEUDO_GROUPS = """
+extraction_policy_version: v1
+
 statement:
   prompt:
     instructions: Extract statement-level fields for the final statement object.

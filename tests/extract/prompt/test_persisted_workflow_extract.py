@@ -2,6 +2,8 @@ import copy
 import json
 import typing
 
+import pytest
+
 from groundx.extract import prepare_extraction_yaml
 from groundx.extract.prompt.manager import PromptManager
 from groundx.types.workflow_request import WorkflowRequest
@@ -29,14 +31,76 @@ FINAL_GROUP_METADATA_KEYS = {
     "passthrough_pair_attrs",
     "deregulation_status_values",
 }
-WORKFLOW_GROUP_METADATA_KEYS = {"slot"}
+WORKFLOW_GROUP_METADATA_KEYS = {"workflow_step"}
+
+
+def _custom_workflow_metadata() -> typing.Dict[str, typing.Any]:
+    return {
+        "metadata_version": 1,
+        "template": {
+            "BILLING_HINT": "Prefer values from the charge table.",
+        },
+        "custom_steps": [
+            {
+                "name": "line_item_labels",
+                "level": "chunk",
+                "kind": "keys",
+                "required_template_keys": ["BILLING_HINT"],
+            }
+        ],
+        "output_routes": [
+            {
+                "workflow_group": "line_items",
+                "workflow_field": "description",
+                "final_path": "/line_items/*/description",
+                "step_name": "line_item_labels",
+                "level": "chunk",
+                "output_map": "customChunkOutputs",
+                "output_key": "label",
+                "readback_path": (
+                    "/chunks/*/customChunkOutputs/line_item_labels/label"
+                ),
+            }
+        ],
+        "leaf_fields": [
+            {
+                "final_path": "/line_items/*/description",
+                "workflow_group": "line_items",
+                "workflow_field": "description",
+                "step_name": "line_item_labels",
+                "level": "chunk",
+                "output_key": "label",
+                "field_type": "str",
+                "is_repeated": True,
+                "repetition_scope": "/line_items/*",
+            }
+        ],
+        "field_counts": {"line_item_labels": 1},
+    }
+
+
+def _persisted_custom_workflow_extract() -> typing.Dict[str, typing.Any]:
+    return {
+        "line_items": {
+            "fields": {
+                "description": {
+                    "prompt": {
+                        "identifiers": ["Description"],
+                        "instructions": "Return the line item description.",
+                        "type": "str",
+                    }
+                }
+            }
+        },
+        "workflow": _custom_workflow_metadata(),
+    }
 
 
 POLICY_YAML = """
 extraction_policy_version: v1
 
 statement:
-  slot: chunk-instruct
+  workflow_step: chunk-instruct
   final_value_aliases:
     amount_due: total_due
   fill_rules:
@@ -68,7 +132,7 @@ statement:
         type: str
 
 meters:
-  slot: chunk-summary
+  workflow_step: chunk-summary
   always_check_attrs:
     - meter_number
   conflict_attrs:
@@ -107,7 +171,7 @@ meters:
         type: str
 
 charges:
-  slot: chunk-keys
+  workflow_step: chunk-keys
   always_check_attrs:
     - charge_description_as_printed
   match_attrs:
@@ -133,7 +197,7 @@ charges:
 
 _pseudo_groups:
   statement_identity:
-    slot: chunk-keys
+    workflow_step: chunk-keys
     fields:
       account_number:
         path: /statement/account_number
@@ -174,7 +238,7 @@ def test_persisted_workflow_extract_round_trips_authored_metadata() -> None:
         "charge_explanation"
     ]
     assert reloaded.workflow_group_metadata["statement_identity"] == {
-        "slot": "chunk-keys"
+        "workflow_step": "chunk-keys"
     }
     assert reloaded.workflow_field_paths["statement_identity"] == {
         "account_number": "/statement/account_number"
@@ -229,3 +293,78 @@ def test_legacy_yaml_persisted_extract_is_execution_shaped() -> None:
             "service_address": "/meters/service_address",
         },
     }
+
+
+def test_persisted_custom_workflow_extract_round_trips_routes_and_leaf_fields() -> None:
+    persisted = _persisted_custom_workflow_extract()
+    round_tripped = json.loads(json.dumps(persisted))
+
+    reloaded = prepare_extraction_yaml(round_tripped)
+    workflow = reloaded.persisted_workflow_extract["workflow"]
+
+    assert workflow["metadata_version"] == 1
+    assert workflow["custom_steps"] == persisted["workflow"]["custom_steps"]
+    assert workflow["output_routes"] == persisted["workflow"]["output_routes"]
+    assert workflow["leaf_fields"] == persisted["workflow"]["leaf_fields"]
+    assert workflow["leaf_fields"][0]["final_path"] == "/line_items/*/description"
+    assert workflow["leaf_fields"][0]["repetition_scope"] == "/line_items/*"
+    assert reloaded.workflow_field_paths["line_items"]["description"] == (
+        "/line_items/*/description"
+    )
+
+
+def test_persisted_custom_workflow_extract_rejects_unknown_version() -> None:
+    persisted = _persisted_custom_workflow_extract()
+    persisted["workflow"]["metadata_version"] = 2
+
+    with pytest.raises(ValueError, match="metadata_version"):
+        prepare_extraction_yaml(persisted)
+
+
+def test_persisted_custom_workflow_extract_rejects_missing_version() -> None:
+    persisted = _persisted_custom_workflow_extract()
+    del persisted["workflow"]["metadata_version"]
+
+    with pytest.raises(ValueError, match="metadata_version"):
+        prepare_extraction_yaml(persisted)
+
+
+def test_persisted_custom_workflow_extract_rejects_route_leaf_mismatch() -> None:
+    persisted = _persisted_custom_workflow_extract()
+    persisted["workflow"]["leaf_fields"][0]["final_path"] = "/line_items/*/amount"
+
+    with pytest.raises(ValueError, match="route.*leaf|leaf.*route"):
+        prepare_extraction_yaml(persisted)
+
+
+def test_persisted_custom_workflow_extract_rejects_field_count_mismatch() -> None:
+    persisted = _persisted_custom_workflow_extract()
+    persisted["workflow"]["field_counts"] = {"line_item_labels": 2}
+
+    with pytest.raises(ValueError, match="field_counts"):
+        prepare_extraction_yaml(persisted)
+
+
+def test_persisted_custom_workflow_extract_hash_is_deterministic() -> None:
+    first = _persisted_custom_workflow_extract()
+    second = _persisted_custom_workflow_extract()
+    second["workflow"]["template"] = {
+        "BILLING_HINT": "Template values are ignored by hash",
+    }
+    second["workflow"]["custom_steps"][0]["required_template_keys"] = list(
+        reversed(second["workflow"]["custom_steps"][0]["required_template_keys"])
+    )
+    second["workflow"]["output_routes"] = list(
+        reversed(second["workflow"]["output_routes"])
+    )
+    second["workflow"]["leaf_fields"] = list(reversed(second["workflow"]["leaf_fields"]))
+
+    first_hash = prepare_extraction_yaml(first).persisted_workflow_extract["workflow"][
+        "schema_hash"
+    ]
+    second_hash = prepare_extraction_yaml(second).persisted_workflow_extract["workflow"][
+        "schema_hash"
+    ]
+
+    assert first_hash == second_hash
+    assert len(first_hash) == 64

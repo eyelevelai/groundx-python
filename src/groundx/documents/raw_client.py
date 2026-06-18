@@ -18,6 +18,7 @@ from ..types.document_local_ingest_request import DocumentLocalIngestRequest
 from ..types.document_lookup_response import DocumentLookupResponse
 from ..types.document_response import DocumentResponse
 from ..types.document_update import DocumentUpdate
+from ..types.document_xray import DocumentXray
 from ..types.ingest_remote_document import IngestRemoteDocument
 from ..types.ingest_response import IngestResponse
 from ..types.processes_status_response import ProcessesStatusResponse
@@ -1007,7 +1008,7 @@ class RawDocumentsClient:
 
     def get_xray(
         self, document_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> HttpResponse[typing.Dict[str, typing.Any]]:
+    ) -> HttpResponse[DocumentXray]:
         """
         Look up X-Ray data for an existing document by documentId.
 
@@ -1021,7 +1022,7 @@ class RawDocumentsClient:
 
         Returns
         -------
-        HttpResponse[typing.Dict[str, typing.Any]]
+        HttpResponse[DocumentXray]
             Look up success
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -1032,9 +1033,9 @@ class RawDocumentsClient:
         try:
             if 200 <= _response.status_code < 300:
                 _data = typing.cast(
-                    typing.Dict[str, typing.Any],
+                    DocumentXray,
                     parse_obj_as(
-                        type_=typing.Dict[str, typing.Any],  # type: ignore
+                        type_=DocumentXray,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -2101,7 +2102,7 @@ class AsyncRawDocumentsClient:
 
     async def get_xray(
         self, document_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> AsyncHttpResponse[typing.Dict[str, typing.Any]]:
+    ) -> AsyncHttpResponse[DocumentXray]:
         """
         Look up X-Ray data for an existing document by documentId.
 
@@ -2115,7 +2116,7 @@ class AsyncRawDocumentsClient:
 
         Returns
         -------
-        AsyncHttpResponse[typing.Dict[str, typing.Any]]
+        AsyncHttpResponse[DocumentXray]
             Look up success
         """
         _response = await self._client_wrapper.httpx_client.request(
@@ -2126,9 +2127,9 @@ class AsyncRawDocumentsClient:
         try:
             if 200 <= _response.status_code < 300:
                 _data = typing.cast(
-                    typing.Dict[str, typing.Any],
+                    DocumentXray,
                     parse_obj_as(
-                        type_=typing.Dict[str, typing.Any],  # type: ignore
+                        type_=DocumentXray,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
