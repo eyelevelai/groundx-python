@@ -1896,7 +1896,7 @@ line_items:
         self.assertIn("missing template key", str(exc.exception))
         self.assertIn("BILLING_HINT", str(exc.exception))
 
-    def test_prepare_extraction_yaml_rejects_custom_step_over_20_fields(
+    def test_prepare_extraction_yaml_allows_custom_step_with_30_fields(
         self,
     ) -> None:
         fields = "\n".join(
@@ -1905,7 +1905,40 @@ line_items:
       prompt:
         instructions: Return field {idx}.
         type: str"""
-            for idx in range(21)
+            for idx in range(30)
+        )
+
+        prepared = prepare_extraction_yaml(
+            f"""
+extraction_policy_version: v1
+
+workflow:
+  custom_steps:
+    - name: grouped_fields
+      level: chunk
+      kind: keys
+line_items:
+  workflow_step: grouped_fields
+  fields:
+{fields}
+"""
+        )
+
+        self.assertEqual(
+            prepared.persisted_workflow_extract["workflow"]["field_counts"],
+            {"grouped_fields": 30},
+        )
+
+    def test_prepare_extraction_yaml_rejects_custom_step_over_30_fields(
+        self,
+    ) -> None:
+        fields = "\n".join(
+            f"""    field_{idx}:
+      workflow_output_key: label_{idx}
+      prompt:
+        instructions: Return field {idx}.
+        type: str"""
+            for idx in range(31)
         )
 
         with self.assertRaises(ValueError) as exc:
@@ -1926,7 +1959,7 @@ line_items:
             )
 
         self.assertIn("overloaded_fields", str(exc.exception))
-        self.assertIn("at most 20 fields", str(exc.exception))
+        self.assertIn("at most 30 fields", str(exc.exception))
 
     def test_prepare_extraction_yaml_rejects_duplicate_output_destination(
         self,

@@ -3,7 +3,7 @@ import typing
 
 import httpx
 
-from groundx import GroundX
+from groundx import GroundX, WorkflowStep, WorkflowSteps
 from groundx.types import WorkflowDetail, WorkflowRequest
 
 
@@ -76,6 +76,45 @@ def test_workflow_update_serializes_template() -> None:
     assert captured[0].url.path == "/v1/workflow/workflow-1"
     assert _request_json(captured[0]) == {
         "template": {"statement_hint": "Prefer account summary values."}
+    }
+
+
+def test_workflow_update_preserves_explicit_null_step_configs() -> None:
+    captured: typing.List[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        captured.append(request)
+        return httpx.Response(
+            200,
+            json={
+                "workflow": {
+                    "workflowId": "workflow-1",
+                }
+            },
+        )
+
+    with httpx.Client(transport=httpx.MockTransport(handler)) as httpx_client:
+        client = GroundX(api_key="test-key", base_url="https://api.test", httpx_client=httpx_client)
+        client.workflows.update(
+            "workflow-1",
+            steps=WorkflowSteps(
+                chunk_instruct=WorkflowStep(
+                    figure=None,
+                    table_figure=None,
+                ),
+            ),
+        )
+
+    assert len(captured) == 1
+    assert captured[0].method == "PUT"
+    assert captured[0].url.path == "/v1/workflow/workflow-1"
+    assert _request_json(captured[0]) == {
+        "steps": {
+            "chunk-instruct": {
+                "figure": None,
+                "table-figure": None,
+            }
+        }
     }
 
 
