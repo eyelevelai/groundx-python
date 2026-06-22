@@ -1,0 +1,73 @@
+# service.yaml — OWNED BY groundx-python, committed at repo root.
+# Conforms to service.schema v1.0.0. Aggregated by engineering-context.
+apiVersion: v1
+
+repo:
+  name: groundx-python
+  workspace: groundx
+  role: library
+  description: Official Python SDK for the GroundX API — ingestion, search, extraction.
+  package: groundx                    # PyPI
+  version: 3.5.8
+
+stack:
+  language: python
+  language_version: ">=3.10"
+  package_manager: poetry
+  key_runtime: [httpx, pydantic, requests]
+
+dependencies:
+  internal: []                        # leaf — imports no other groundx repo
+  external:
+    - name: groundx-api
+      kind: http-api
+      endpoint_config: src/groundx/environment.py
+      auth: x-api-key
+      contract:
+        schematized: false
+        wire_contract_location: Fern-generated from the GroundX API definition
+      note: workspace gravitational center; owned by none of the 9 repos
+    - name: groundx-upload-service
+      kind: object-store
+      endpoint_config: "ingest.py (upload_api; default api.eyelevel.ai/upload/file)"
+      auth: presigned-url
+      note: SEPARATE from groundx-api, configured independently; local file bytes go here
+
+generates: []
+
+contracts:
+  - kind: python-package
+    surface: GroundX / AsyncGroundX     # re-exported from ingest.py, not generated client.py
+    schematized: false
+    note: neighbours IMPORT the package — they do not read source
+
+agent_boundaries:
+  - zone: codegen (Fern)
+    rule: generated files are agent-off-limits; only the .fernignore allowlist is agent-authorable
+    gate: Fern regeneration overwrites anything outside the allowlist
+    editable_allowlist:
+      - README.md
+      - AGENTS.md
+      - src/groundx/ingest.py
+      - src/groundx/csv_splitter.py
+      - src/groundx/test.py
+      - src/groundx/extract/
+      - src/test.py
+      - tests/extract/
+      - .gitignore
+
+quality_gates:
+  - "mypy . (strict — CI compile gate)"
+  - "pytest -n auto"
+
+conversion:
+  status: onboarded
+  onboarded_at: 2026-06-07
+  architecture_notes: ARCHITECTURE_NOTES.md
+  agents_md: exists                   # review/upgrade, not author
+  ai_first_readiness: MED
+  upstream_to_convert_first: []       # leaf — convert FIRST
+  known_gaps:
+    - hand-written layer (ingest.py, extract/) has NO tests; mypy is the only automated gate
+    - async _upload_file is blocking (uses requests.put) — confirm intent vs tech debt
+    - the extract/ subsystem (consumed by internal-arcadia-agents) is the least-tested, highest-value surface
