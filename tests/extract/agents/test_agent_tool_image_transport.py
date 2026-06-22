@@ -142,6 +142,24 @@ def test_agent_tool_data_url_transport_keeps_inline_image_path() -> None:
     assert not any(item.get("type") == "image_url" for item in content)
 
 
+def test_agent_tool_data_url_transport_uses_inline_image_url_blocks() -> None:
+    agent, model = build_agent()
+    data_url = "data:image/jpeg;base64,/9j/test"
+
+    result = agent.process(
+        "read this",
+        images=[],
+        image_urls=[data_url],
+        image_transport="data_url",
+    )
+
+    assert result == {"ok": True}
+    content = last_user_content(model)
+    assert {"type": "image_url", "image_url": {"url": data_url}} in content
+    assert not any(item.get("type") == "image" for item in content)
+    assert data_url not in json.dumps(agent.memory.get_full_steps())
+
+
 def test_agent_tool_remote_url_provider_rejection_is_not_silently_retried_inline() -> None:
     agent = AgentTool(
         AgentSettings(api_key="test-key", model_id="test-model", max_steps=1),
@@ -164,7 +182,7 @@ def test_agent_tool_rejects_unsupported_or_mixed_image_transports() -> None:
     with pytest.raises(ValueError, match="unsupported image_transport"):
         agent.process("read this", images=[], image_transport="auto")
 
-    with pytest.raises(ValueError, match="image_urls require image_transport='remote_url'"):
+    with pytest.raises(ValueError, match="image_urls require image_transport='data_url' or 'remote_url'"):
         agent.process("read this", images=[], image_urls=["https://example.com/a.png"])
 
     with pytest.raises(ValueError, match="remote_url transport does not accept PIL images"):

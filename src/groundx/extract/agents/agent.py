@@ -267,10 +267,11 @@ class AgentTool(ToolCallingAgent):
             image_urls=image_urls,
             image_transport=selected_image_transport,
         )
-        if transport == "remote_url":
-            res = self._run_with_remote_image_urls(
+        if transport in {"data_url", "remote_url"} and image_urls:
+            res = self._run_with_image_urls(
                 conflict + prompt_suffix,
                 list(image_urls or []),
+                image_transport=transport,
             )
         else:
             res = super().run(  # pyright: ignore[reportUnknownMemberType]
@@ -301,10 +302,12 @@ class AgentTool(ToolCallingAgent):
                 image_transport=transport,
             )
 
-    def _run_with_remote_image_urls(
+    def _run_with_image_urls(
         self,
         task: str,
         image_urls: typing.List[str],
+        *,
+        image_transport: str,
     ) -> typing.Any:
         self.task = task
         self.interrupt_switch = False
@@ -319,7 +322,7 @@ class AgentTool(ToolCallingAgent):
             try:
                 steps = list(self._run_stream(task=self.task, max_steps=self.max_steps, images=None))
             except Exception as exc:
-                raise RuntimeError(f"remote_url image transport failed: {exc}") from exc
+                raise RuntimeError(f"{image_transport} image transport failed: {exc}") from exc
             assert isinstance(steps[-1], FinalAnswerStep)
             return steps[-1].output
         finally:
@@ -337,8 +340,10 @@ class AgentTool(ToolCallingAgent):
                 "unsupported image_transport "
                 f"[{image_transport}]; expected one of {sorted(SUPPORTED_IMAGE_TRANSPORTS)}"
             )
-        if image_urls and image_transport != "remote_url":
-            raise ValueError("image_urls require image_transport='remote_url'")
+        if image_urls and image_transport not in {"data_url", "remote_url"}:
+            raise ValueError("image_urls require image_transport='data_url' or 'remote_url'")
+        if image_transport == "data_url" and image_urls and images:
+            raise ValueError("data_url transport does not accept PIL images when image_urls are provided")
         if image_transport == "remote_url":
             if images:
                 raise ValueError("remote_url transport does not accept PIL images")
