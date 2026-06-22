@@ -3,12 +3,16 @@ import json
 import typing
 
 import pytest
-from smolagents.models import (
-    ChatMessage,
-    ChatMessageToolCall,
-    ChatMessageToolCallFunction,
-    MessageRole,
-)
+
+try:
+    from smolagents.models import (
+        ChatMessage,
+        ChatMessageToolCall,
+        ChatMessageToolCallFunction,
+        MessageRole,
+    )
+except ModuleNotFoundError:
+    pytest.skip("smolagents extra is not installed", allow_module_level=True)
 
 from groundx.extract.agents.agent import AgentTool
 from groundx.extract.services.logger import Logger
