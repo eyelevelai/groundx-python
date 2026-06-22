@@ -32,6 +32,7 @@ class TestAgentSettings(unittest.TestCase):
                 "expect": {
                     "api_base": None,
                     "api_key": Exception,
+                    "image_transport": "pil",
                     "max_steps": 7,
                     "model_id": "gpt-5-mini",
                 },
@@ -40,11 +41,13 @@ class TestAgentSettings(unittest.TestCase):
                 "api_base": "http://test.com",
                 "api_key": "mykey",
                 "api_key_env_val": "val",
+                "image_transport": "remote_url",
                 "max_steps": 4,
                 "model_id": "gpt-5",
                 "expect": {
                     "api_base": "http://test.com",
                     "api_key": "mykey",
+                    "image_transport": "remote_url",
                     "max_steps": 4,
                     "model_id": "gpt-5",
                 },
@@ -54,6 +57,7 @@ class TestAgentSettings(unittest.TestCase):
                 "expect": {
                     "api_base": None,
                     "api_key": "val",
+                    "image_transport": "pil",
                     "max_steps": 7,
                     "model_id": "gpt-5-mini",
                 },
@@ -70,6 +74,8 @@ class TestAgentSettings(unittest.TestCase):
                 input["api_key"] = tst["api_key"]
             if "api_key_env_val" in tst:
                 os.environ.update({GX_AGENT_KEY: tst["api_key_env_val"]})
+            if "image_transport" in tst:
+                input["image_transport"] = tst["image_transport"]
             if "max_steps" in tst:
                 input["max_steps"] = tst["max_steps"]
             if "model_id" in tst:
@@ -87,6 +93,10 @@ class TestAgentSettings(unittest.TestCase):
                 self.assertEqual(settings.get_api_key(), tst["expect"]["api_key"])
 
             self.assertEqual(settings.max_steps, tst["expect"]["max_steps"])
+
+            self.assertEqual(
+                settings.image_transport, tst["expect"]["image_transport"]
+            )
 
             self.assertEqual(settings.model_id, tst["expect"]["model_id"])
 
