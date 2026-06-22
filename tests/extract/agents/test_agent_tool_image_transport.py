@@ -3,7 +3,6 @@ import json
 import typing
 
 import pytest
-from PIL import Image
 from smolagents.models import (
     ChatMessage,
     ChatMessageToolCall,
@@ -76,8 +75,9 @@ def last_user_content(model: CapturingModel) -> typing.List[typing.Dict[str, typ
 
 
 def test_agent_tool_preserves_existing_pil_image_process_path() -> None:
+    image_module = pytest.importorskip("PIL.Image")
     agent, model = build_agent()
-    image = Image.new("RGB", (2, 2), "white")
+    image = image_module.new("RGB", (2, 2), "white")
 
     result = agent.process("read this", images=[image])
 
@@ -126,8 +126,9 @@ def test_agent_tool_uses_agent_settings_image_transport_default() -> None:
 
 
 def test_agent_tool_data_url_transport_keeps_inline_image_path() -> None:
+    image_module = pytest.importorskip("PIL.Image")
     agent, model = build_agent()
-    image = Image.new("RGB", (2, 2), "white")
+    image = image_module.new("RGB", (2, 2), "white")
 
     result = agent.process("read this", images=[image], image_transport="data_url")
 
@@ -155,7 +156,6 @@ def test_agent_tool_remote_url_provider_rejection_is_not_silently_retried_inline
 
 def test_agent_tool_rejects_unsupported_or_mixed_image_transports() -> None:
     agent, _ = build_agent()
-    image = Image.new("RGB", (2, 2), "white")
 
     with pytest.raises(ValueError, match="unsupported image_transport"):
         agent.process("read this", images=[], image_transport="auto")
@@ -166,7 +166,7 @@ def test_agent_tool_rejects_unsupported_or_mixed_image_transports() -> None:
     with pytest.raises(ValueError, match="remote_url transport does not accept PIL images"):
         agent.process(
             "read this",
-            images=[image],
+            images=[typing.cast(typing.Any, object())],
             image_urls=["https://example.com/a.png"],
             image_transport="remote_url",
         )
