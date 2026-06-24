@@ -62,6 +62,10 @@ SUFFIX_ALIASES = {
 MAX_BATCH_SIZE = 50
 MIN_BATCH_SIZE = 1
 MAX_BATCH_SIZE_BYTES = 50 * 1024 * 1024
+UPLOAD_REQUEST_TIMEOUT_SECONDS = 60
+UPLOAD_RETRY_ATTEMPTS = 3
+UPLOAD_RETRY_BACKOFF_SECONDS = 0.5
+HOSTED_URL_HEADER = "gx-hosted-url"
 
 
 def _import_extraction_workflows() -> typing.Any:
@@ -129,6 +133,73 @@ def strip_query_params(
     clean_url = urlunparse((parsed.scheme, parsed.netloc, parsed.path, "", "", ""))
 
     return clean_url
+
+
+def _first_header_value(value: typing.Any) -> typing.Optional[str]:
+    if isinstance(value, list) and value:
+        first = value[0]
+        return first if isinstance(first, str) else None
+    if isinstance(value, str):
+        return value
+    return None
+
+
+def _header_value(
+    headers: typing.Mapping[str, typing.Any],
+    name: str,
+) -> typing.Optional[str]:
+    for key, value in headers.items():
+        if key.lower() != name.lower():
+            continue
+        return _first_header_value(value)
+    return None
+
+
+def _upload_headers_from_presign(
+    headers: typing.Any,
+) -> typing.Tuple[typing.Dict[str, str], typing.Optional[str]]:
+    upload_headers: typing.Dict[str, str] = {}
+    hosted_url: typing.Optional[str] = None
+
+    if not isinstance(headers, dict):
+        return upload_headers, hosted_url
+
+    for key, value in headers.items():
+        if not isinstance(key, str):
+            continue
+
+        parsed_value = _first_header_value(value)
+        if parsed_value is None:
+            continue
+
+        if key.lower() == HOSTED_URL_HEADER:
+            hosted_url = parsed_value
+            continue
+
+        upload_headers[key] = parsed_value
+
+    return upload_headers, hosted_url
+
+
+def _put_upload_file(
+    upload_url: str,
+    file_data: bytes,
+    headers: typing.Dict[str, str],
+) -> requests.Response:
+    for attempt in range(UPLOAD_RETRY_ATTEMPTS):
+        try:
+            return requests.put(
+                upload_url,
+                data=file_data,
+                headers=headers,
+                timeout=UPLOAD_REQUEST_TIMEOUT_SECONDS,
+            )
+        except requests.RequestException:
+            if attempt == UPLOAD_RETRY_ATTEMPTS - 1:
+                raise
+            time.sleep(UPLOAD_RETRY_BACKOFF_SECONDS * (attempt + 1))
+
+    raise RuntimeError("upload retry loop exited unexpectedly")
 
 
 def prep_documents(
@@ -863,13 +934,8 @@ class GroundX(GroundXBase):
         presigned_info = get_presigned_url(endpoint, file_name, file_extension)
 
         upload_url = presigned_info["URL"]
-        hd = presigned_info.get("Header", {})
+        headers, hosted_url = _upload_headers_from_presign(presigned_info.get("Header", {}))
         method = presigned_info.get("Method", "PUT").upper()
-
-        headers: typing.Dict[str, typing.Any] = {}
-        for key, value in hd.items():
-            if isinstance(value, list):
-                headers[key.upper()] = value[0]
 
         try:
             with open(file_path, "rb") as f:
@@ -878,15 +944,19 @@ class GroundX(GroundXBase):
             raise ValueError(f"Error reading file {file_path}: {e}")
 
         if method == "PUT":
-            upload_response = requests.put(upload_url, data=file_data, headers=headers)
+            upload_response = _put_upload_file(upload_url, file_data, headers)
         else:
             raise ValueError(f"Unsupported HTTP method: {method}")
 
         if upload_response.status_code not in (200, 201):
             raise Exception(f"Upload failed: {upload_response.status_code} - {upload_response.text}")
 
-        if "GX-HOSTED-URL" in headers:
-            return headers["GX-HOSTED-URL"]
+        response_hosted_url = _header_value(upload_response.headers, HOSTED_URL_HEADER)
+        if response_hosted_url is not None:
+            return response_hosted_url
+
+        if hosted_url is not None:
+            return hosted_url
 
         return strip_query_params(upload_url)
 
@@ -1479,13 +1549,8 @@ class AsyncGroundX(AsyncGroundXBase):
         presigned_info = get_presigned_url(endpoint, file_name, file_extension)
 
         upload_url = presigned_info["URL"]
-        hd = presigned_info.get("Header", {})
+        headers, hosted_url = _upload_headers_from_presign(presigned_info.get("Header", {}))
         method = presigned_info.get("Method", "PUT").upper()
-
-        headers: typing.Dict[str, typing.Any] = {}
-        for key, value in hd.items():
-            if isinstance(value, list):
-                headers[key.upper()] = value[0]
 
         try:
             with open(file_path, "rb") as f:
@@ -1494,14 +1559,18 @@ class AsyncGroundX(AsyncGroundXBase):
             raise ValueError(f"Error reading file {file_path}: {e}")
 
         if method == "PUT":
-            upload_response = requests.put(upload_url, data=file_data, headers=headers)
+            upload_response = _put_upload_file(upload_url, file_data, headers)
         else:
             raise ValueError(f"Unsupported HTTP method: {method}")
 
         if upload_response.status_code not in (200, 201):
             raise Exception(f"Upload failed: {upload_response.status_code} - {upload_response.text}")
 
-        if "GX-HOSTED-URL" in headers:
-            return headers["GX-HOSTED-URL"]
+        response_hosted_url = _header_value(upload_response.headers, HOSTED_URL_HEADER)
+        if response_hosted_url is not None:
+            return response_hosted_url
+
+        if hosted_url is not None:
+            return hosted_url
 
         return strip_query_params(upload_url)
