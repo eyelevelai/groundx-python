@@ -1,11 +1,13 @@
 import typing
 
 from ..classes.api import ErrorResponse
-from ..classes.document import DocumentRequest
 from ..classes.groundx import GroundXResponse
 
+if typing.TYPE_CHECKING:
+    from ..classes.document import DocumentRequest
 
-def error_response(req: DocumentRequest, msg: str) -> typing.Dict[str, typing.Any]:
+
+def error_response(req: "DocumentRequest", msg: str) -> typing.Dict[str, typing.Any]:
     return fatal_error_response(
         document_id=req.document_id,
         task_id=req.task_id,
@@ -35,7 +37,7 @@ def fatal_error_response(
 
 
 def success_response(
-    req: DocumentRequest, result_url: str
+    req: "DocumentRequest", result_url: str
 ) -> typing.Dict[str, typing.Any]:
     return GroundXResponse(
         code=200,
