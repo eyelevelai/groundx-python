@@ -2,15 +2,17 @@ import copy
 import dataclasses
 import inspect
 import typing
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 from .prompt import PreparedExtractionYaml, prepare_extraction_yaml
 
 _PERSISTED_WORKFLOW_EXTRACT_KEY = "_groundx_persisted_extract"
 _WORKFLOW_METADATA_KEY = "workflow"
+_WORKFLOW_METADATA_VERSION = 1
 _WORKFLOW_EXTRACT_MAPPING_KIND = "workflow_extract"
 _AUTHORED_YAML_MAPPING_KIND = "authored_yaml"
+_AUTHORING_ONLY_WORKFLOW_KEYS = {"workflow_step", "workflow_output_key"}
 _PERSISTED_WORKFLOW_METADATA_KEYS = {
     "agent_chain",
     "metadata_version",
@@ -329,10 +331,11 @@ def _definition_from_workflow_extract(
     extract: typing.Mapping[str, typing.Any],
 ) -> ExtractionDefinition:
     extract_mapping = _deepcopy_mapping(extract)
+    prepared = _validate_workflow_extract_mapping(extract_mapping)
     metadata = _workflow_metadata(extract_mapping)
     return ExtractionDefinition(
         extract=extract_mapping,
-        prepared=_prepared_from_workflow_extract(extract_mapping),
+        prepared=prepared,
         template=_normalize_template(metadata.get("template")),
         custom_steps=_plain_metadata_sequence(
             metadata.get("custom_steps"),
@@ -355,6 +358,134 @@ def _prepared_from_workflow_extract(
     if _PERSISTED_WORKFLOW_EXTRACT_KEY not in extract:
         return None
     return prepare_extraction_yaml(extract)
+
+
+def _validate_workflow_extract_mapping(
+    extract: typing.Mapping[str, typing.Any],
+) -> typing.Optional[PreparedExtractionYaml]:
+    authoring_paths = _find_authoring_only_workflow_keys(extract)
+    if authoring_paths:
+        preview = ", ".join(authoring_paths[:3])
+        raise ValueError(
+            "workflow_extract contains authoring-only workflow metadata "
+            f"at {preview}; load authored YAML without mapping_kind or persist a "
+            "workflow extract with workflow.metadata_version"
+        )
+
+    metadata = _workflow_metadata(extract)
+    has_workflow_metadata = bool(set(metadata.keys()) & _PERSISTED_WORKFLOW_METADATA_KEYS)
+    if not has_workflow_metadata:
+        return _prepared_from_workflow_extract(extract)
+
+    if metadata.get("metadata_version") != _WORKFLOW_METADATA_VERSION:
+        raise ValueError("unsupported custom workflow metadata_version")
+
+    prepared = prepare_extraction_yaml(extract)
+    _validate_workflow_metadata_references(extract, metadata)
+    if _PERSISTED_WORKFLOW_EXTRACT_KEY in extract:
+        return prepared
+    return None
+
+
+def _find_authoring_only_workflow_keys(
+    value: typing.Any,
+    *,
+    path: str = "$",
+    parent_key: typing.Optional[str] = None,
+) -> typing.List[str]:
+    if not isinstance(value, Mapping):
+        return []
+
+    paths: typing.List[str] = []
+    mapping = typing.cast(typing.Mapping[str, typing.Any], value)
+    for key, child in mapping.items():
+        if path == "$" and key in {
+            _PERSISTED_WORKFLOW_EXTRACT_KEY,
+            _WORKFLOW_METADATA_KEY,
+        }:
+            continue
+
+        child_path = f"{path}.{key}"
+        is_name_position = parent_key == "fields"
+        if (
+            isinstance(key, str)
+            and key in _AUTHORING_ONLY_WORKFLOW_KEYS
+            and not is_name_position
+        ):
+            paths.append(child_path)
+
+        paths.extend(
+            _find_authoring_only_workflow_keys(
+                child,
+                path=child_path,
+                parent_key=key if isinstance(key, str) else None,
+            )
+        )
+
+    return paths
+
+
+def _validate_workflow_metadata_references(
+    extract: typing.Mapping[str, typing.Any],
+    metadata: typing.Mapping[str, typing.Any],
+) -> None:
+    for metadata_key in ("output_routes", "leaf_fields"):
+        entries = metadata.get(metadata_key)
+        if entries is None:
+            continue
+        if not isinstance(entries, Sequence) or isinstance(entries, (str, bytes)):
+            raise ValueError(f"workflow.{metadata_key} must be a list")
+        for idx, entry in enumerate(entries):
+            if not isinstance(entry, Mapping):
+                raise ValueError(f"workflow.{metadata_key}[{idx}] must be a mapping")
+            entry_mapping = typing.cast(typing.Mapping[str, typing.Any], entry)
+            group_name = entry_mapping.get("workflow_group")
+            field_name = entry_mapping.get("workflow_field")
+            if not isinstance(group_name, str) or group_name == "":
+                raise ValueError(f"workflow.{metadata_key}[{idx}] is missing workflow_group")
+            if not isinstance(field_name, str) or field_name == "":
+                raise ValueError(f"workflow.{metadata_key}[{idx}] is missing workflow_field")
+            if not _workflow_field_exists(extract, group_name, field_name):
+                raise ValueError(
+                    f"workflow.{metadata_key}[{idx}] references missing "
+                    f"workflow field [{group_name}.{field_name}]"
+                )
+
+
+def _workflow_field_exists(
+    extract: typing.Mapping[str, typing.Any],
+    group_name: str,
+    workflow_field: str,
+) -> bool:
+    group = extract.get(group_name)
+    if not isinstance(group, Mapping):
+        return False
+
+    fields = group.get("fields")
+    if not isinstance(fields, Mapping):
+        return False
+
+    current: typing.Any = fields
+    parts = workflow_field.split(".")
+    for idx, part in enumerate(parts):
+        if not isinstance(current, Mapping) or part not in current:
+            return False
+        value = current[part]
+        if idx == len(parts) - 1:
+            return True
+        if isinstance(value, list):
+            if not value:
+                return False
+            value = value[0]
+        if isinstance(value, Mapping) and isinstance(value.get("fields"), Mapping):
+            current = value["fields"]
+            continue
+        if isinstance(value, Mapping):
+            current = value
+            continue
+        return False
+
+    return False
 
 
 def _prepare_extraction_yaml_with_context(
