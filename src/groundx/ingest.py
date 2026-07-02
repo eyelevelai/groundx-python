@@ -382,6 +382,10 @@ class GroundX(GroundXBase):
 
         Prefer `load_extraction_definition(...)` for new code when the source
         may be either YAML or an existing workflow ID.
+        Authored YAML may be pure legacy or explicitly marked v1 YAML. Existing
+        workflow extract mappings must use `mapping_kind="workflow_extract"`;
+        mixed payloads that leak authoring-only workflow metadata into
+        execution extracts are rejected.
         """
         extraction_workflows = _import_extraction_workflows()
         return extraction_workflows.load_extraction_definition_from_yaml(
@@ -612,6 +616,9 @@ class GroundX(GroundXBase):
         If `definition` is provided, it takes precedence over YAML/prepared
         inputs. Otherwise pass exactly one of `path`, `yaml_text`, `mapping`, or
         `prepared`.
+        The SDK validates only the supplied definition shape here. Stored-state
+        downgrade protection is enforced server-side by the workflow API; this
+        helper does not perform a hidden `workflows.get(...)` preflight read.
         """
         extraction_workflows = _import_extraction_workflows()
         resolved = extraction_workflows.resolve_extraction_definition_source(
@@ -1202,6 +1209,10 @@ class AsyncGroundX(AsyncGroundXBase):
 
         Prefer `load_extraction_definition(...)` for new code when the source
         may be either YAML or an existing workflow ID.
+        Authored YAML may be pure legacy or explicitly marked v1 YAML. Existing
+        workflow extract mappings must use `mapping_kind="workflow_extract"`;
+        mixed payloads that leak authoring-only workflow metadata into
+        execution extracts are rejected.
         """
         extraction_workflows = _import_extraction_workflows()
         return extraction_workflows.load_extraction_definition_from_yaml(
@@ -1407,6 +1418,9 @@ class AsyncGroundX(AsyncGroundXBase):
         `definition` is provided, it takes precedence over YAML/prepared inputs.
         Otherwise pass exactly one of `path`, `yaml_text`, `mapping`, or
         `prepared`.
+        The SDK validates only the supplied definition shape here. Stored-state
+        downgrade protection is enforced server-side by the workflow API; this
+        helper does not perform a hidden `workflows.get(...)` preflight read.
         """
         extraction_workflows = _import_extraction_workflows()
         resolved = extraction_workflows.resolve_extraction_definition_source(

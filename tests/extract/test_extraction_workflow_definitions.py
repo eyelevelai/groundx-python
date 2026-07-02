@@ -1,8 +1,11 @@
+import copy
+import inspect
 import typing
 from pathlib import Path
 
 import pytest
 import yaml
+from .prompt._fixtures import SAMPLE_YAML_1
 
 from groundx import AsyncGroundX, GroundX
 from groundx.core.request_options import RequestOptions
@@ -397,6 +400,60 @@ def test_workflow_extract_without_authored_metadata_returns_no_prepared() -> Non
     assert definition.custom_steps[0]["name"] == "line_item_labels"
 
 
+def test_workflow_extract_rejects_custom_metadata_without_version() -> None:
+    mapping = typing.cast(
+        typing.Dict[str, typing.Any],
+        yaml.safe_load(CUSTOM_WORKFLOW_YAML),
+    )
+    extract = prepare_extraction_yaml(mapping).persisted_workflow_extract
+    del extract["workflow"]["metadata_version"]
+
+    with pytest.raises(ValueError, match="metadata_version"):
+        _client(RecordingWorkflows()).load_extraction_definition_from_yaml(
+            mapping=extract,
+            mapping_kind="workflow_extract",
+        )
+
+
+def test_workflow_extract_rejects_authoring_markers_without_metadata() -> None:
+    extract = {
+        "line_items": {
+            "workflow_step": "line_item_labels",
+            "fields": {
+                "description": {
+                    "workflow_output_key": "label",
+                    "prompt": {
+                        "instructions": "Return the printed line-item description.",
+                        "type": "str",
+                    },
+                }
+            },
+        }
+    }
+
+    with pytest.raises(ValueError, match="authoring-only"):
+        _client(RecordingWorkflows()).load_extraction_definition_from_yaml(
+            mapping=extract,
+            mapping_kind="workflow_extract",
+        )
+
+
+def test_workflow_extract_rejects_route_to_missing_group() -> None:
+    extract = typing.cast(
+        typing.Dict[str, typing.Any],
+        copy.deepcopy(EXECUTION_ONLY_EXTRACT),
+    )
+    workflow = typing.cast(typing.Dict[str, typing.Any], extract["workflow"])
+    workflow["output_routes"][0]["workflow_group"] = "missing_items"
+    workflow["leaf_fields"][0]["workflow_group"] = "missing_items"
+
+    with pytest.raises(ValueError, match="missing_items"):
+        _client(RecordingWorkflows()).load_extraction_definition_from_yaml(
+            mapping=extract,
+            mapping_kind="workflow_extract",
+        )
+
+
 def test_template_values_must_be_strings() -> None:
     mapping = typing.cast(
         typing.Dict[str, typing.Any],
@@ -727,6 +784,40 @@ def test_create_and_update_yaml_path_accept_supported_policy_metadata(
     update_extract = workflows.calls[1][2]["extract"]
     assert create_extract == update_extract
     assert create_extract["_groundx_persisted_extract"]["extraction_policy_version"] == "v1"
+
+
+def test_create_and_update_accept_legacy_yaml_without_preflight() -> None:
+    workflows = RecordingWorkflows()
+    client = _client(workflows)
+
+    assert (
+        client.create_extraction_workflow(
+            yaml_text=SAMPLE_YAML_1,
+            name="legacy extraction",
+        )
+        == "created"
+    )
+    assert (
+        client.update_extraction_workflow(
+            "workflow-1",
+            yaml_text=SAMPLE_YAML_1,
+        )
+        == "updated"
+    )
+
+    assert [call[0] for call in workflows.calls] == ["create", "update"]
+    create_extract = workflows.calls[0][1]["extract"]
+    update_extract = workflows.calls[1][2]["extract"]
+    assert "workflow" not in create_extract
+    assert "_groundx_persisted_extract" not in create_extract
+    assert update_extract == create_extract
+
+
+def test_update_helper_exposes_no_client_side_downgrade_option() -> None:
+    signature = inspect.signature(GroundX.update_extraction_workflow)
+
+    assert "allow_legacy_downgrade" not in signature.parameters
+    assert "existing_workflow" not in signature.parameters
 
 
 def test_create_requires_name_but_update_can_omit_name() -> None:
