@@ -34,7 +34,8 @@ class TestAgentSettings(unittest.TestCase):
                     "api_key": Exception,
                     "image_transport": "pil",
                     "max_steps": 7,
-                    "model_id": "gpt-5-mini",
+                    "model_id": "gpt-5.4-mini",
+                    "reasoning_effort": None,
                 },
             },
             {
@@ -59,7 +60,8 @@ class TestAgentSettings(unittest.TestCase):
                     "api_key": "val",
                     "image_transport": "pil",
                     "max_steps": 7,
-                    "model_id": "gpt-5-mini",
+                    "model_id": "gpt-5.4-mini",
+                    "reasoning_effort": None,
                 },
             },
         ]
@@ -99,6 +101,11 @@ class TestAgentSettings(unittest.TestCase):
             )
 
             self.assertEqual(settings.model_id, tst["expect"]["model_id"])
+
+            if "reasoning_effort" in tst["expect"]:
+                self.assertEqual(
+                    settings.reasoning_effort, tst["expect"]["reasoning_effort"]
+                )
 
 
 class TestContainerUploadSettings(unittest.TestCase):

@@ -313,6 +313,142 @@ def test_persisted_custom_workflow_extract_round_trips_routes_and_leaf_fields() 
     )
 
 
+def test_authored_output_relationships_persist_in_workflow_metadata() -> None:
+    raw = """
+extraction_policy_version: v1
+workflow:
+  custom_steps:
+    - name: account_rows
+      level: chunk
+      kind: summary
+    - name: transaction_rows
+      level: chunk
+      kind: keys
+  output_relationships:
+    - parent_group: accounts
+      child_group: transactions
+      parent_output_field: transactions
+      match_attrs: [account_id]
+      unmatched_child_group: unmatched_transactions
+
+accounts:
+  workflow_step: account_rows
+  fields:
+    account_id:
+      workflow_output_key: account_id
+      prompt:
+        instructions: Return the account id.
+        type: str
+
+transactions:
+  workflow_step: transaction_rows
+  fields:
+    account_id:
+      workflow_output_key: account_id
+      prompt:
+        instructions: Return the account id.
+        type: str
+    amount:
+      workflow_output_key: amount
+      prompt:
+        instructions: Return the transaction amount.
+        type: float
+"""
+
+    prepared = prepare_extraction_yaml(raw)
+    relationship = prepared.persisted_workflow_extract["workflow"][
+        "output_relationships"
+    ][0]
+
+    assert relationship == {
+        "parent_group": "accounts",
+        "child_group": "transactions",
+        "parent_output_field": "transactions",
+        "match_attrs": ["account_id"],
+        "unmatched_child_group": "unmatched_transactions",
+    }
+
+
+def test_final_group_relationship_metadata_converts_when_parent_is_explicit() -> None:
+    raw = """
+extraction_policy_version: v1
+workflow:
+  custom_steps:
+    - name: account_rows
+      level: chunk
+      kind: summary
+    - name: transaction_rows
+      level: chunk
+      kind: keys
+
+accounts:
+  workflow_step: account_rows
+  fields:
+    account_id:
+      workflow_output_key: account_id
+      prompt:
+        instructions: Return the account id.
+        type: str
+
+transactions:
+  workflow_step: transaction_rows
+  match_attrs: [account_id]
+  passthrough:
+    from: accounts
+    fields: [billing_period]
+  fields:
+    account_id:
+      workflow_output_key: account_id
+      prompt:
+        instructions: Return the account id.
+        type: str
+    amount:
+      workflow_output_key: amount
+      prompt:
+        instructions: Return the transaction amount.
+        type: float
+"""
+
+    prepared = prepare_extraction_yaml(raw)
+
+    assert prepared.persisted_workflow_extract["workflow"][
+        "output_relationships"
+    ] == [
+        {
+            "parent_group": "accounts",
+            "child_group": "transactions",
+            "parent_output_field": "transactions",
+            "match_attrs": ["account_id"],
+            "unmatched_child_group": "transactions",
+        }
+    ]
+
+
+def test_final_group_match_attrs_without_parent_does_not_guess_relationship() -> None:
+    raw = """
+extraction_policy_version: v1
+workflow:
+  custom_steps:
+    - name: transaction_rows
+      level: chunk
+      kind: keys
+
+transactions:
+  workflow_step: transaction_rows
+  match_attrs: [account_id]
+  fields:
+    account_id:
+      workflow_output_key: account_id
+      prompt:
+        instructions: Return the account id.
+        type: str
+"""
+
+    prepared = prepare_extraction_yaml(raw)
+
+    assert "output_relationships" not in prepared.persisted_workflow_extract["workflow"]
+
+
 def test_persisted_custom_workflow_extract_rejects_unknown_version() -> None:
     persisted = _persisted_custom_workflow_extract()
     persisted["workflow"]["metadata_version"] = 2
