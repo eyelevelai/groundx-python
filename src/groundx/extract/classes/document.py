@@ -9,6 +9,11 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 import requests
+from ..custom_outputs import (
+    custom_output_payload_identity,
+    custom_output_route_values,
+    custom_output_section_identity,
+)
 from ..prompt.manager import PromptManager
 from ..services.logger import Logger
 from ..services.upload import Upload
@@ -285,6 +290,8 @@ class Document(Group):
 
         self.source_url = xray.sourceUrl
 
+        seen_section_output_payloads: typing.Set[str] = set()
+        seen_document_output_payloads: typing.Set[str] = set()
         for chunk in xray.chunks:
             stxt = chunk.sectionSummary or "{}"
             stxt = clean_json(stxt)
@@ -382,15 +389,34 @@ class Document(Group):
                 getattr(chunk, "customChunkOutputs", None),
                 "customChunkOutputs",
             )
-            self.load_custom_outputs(
-                getattr(chunk, "customSectionOutputs", None),
-                "customSectionOutputs",
-            )
+            section_outputs = getattr(chunk, "customSectionOutputs", None)
+            section_output_identity = custom_output_section_identity(chunk)
+            if section_outputs and section_output_identity not in seen_section_output_payloads:
+                seen_section_output_payloads.add(section_output_identity)
+                self.load_custom_outputs(
+                    section_outputs,
+                    "customSectionOutputs",
+                )
+            document_outputs = getattr(chunk, "customDocumentOutputs", None)
+            if document_outputs:
+                document_output_identity = custom_output_payload_identity(
+                    document_outputs
+                )
+                if document_output_identity not in seen_document_output_payloads:
+                    seen_document_output_payloads.add(document_output_identity)
+                    self.load_custom_outputs(
+                        document_outputs,
+                        "customDocumentOutputs",
+                    )
 
-        self.load_custom_outputs(
-            getattr(xray, "customDocumentOutputs", None),
-            "customDocumentOutputs",
-        )
+        document_outputs = getattr(xray, "customDocumentOutputs", None)
+        if document_outputs:
+            document_output_identity = custom_output_payload_identity(document_outputs)
+            if document_output_identity not in seen_document_output_payloads:
+                self.load_custom_outputs(
+                    document_outputs,
+                    "customDocumentOutputs",
+                )
         self.finalize_init()
 
     def load_custom_outputs(
@@ -403,31 +429,60 @@ class Document(Group):
 
         route_index = self.custom_output_route_index(source)
         for step_name, outputs in custom_outputs.items():
-            if not isinstance(outputs, dict):
+            if not isinstance(outputs, (dict, list)):
                 continue
 
-            repeated_rows: typing.Dict[typing.Tuple[str, ...], Group] = {}
-            output_mapping = typing.cast(typing.Dict[str, typing.Any], outputs)
+            repeated_rows: typing.Dict[
+                typing.Tuple[typing.Tuple[str, ...], int],
+                Group,
+            ] = {}
+            output_mapping = (
+                typing.cast(typing.Dict[str, typing.Any], outputs)
+                if isinstance(outputs, dict)
+                else {}
+            )
+            step_routes: typing.List[typing.Mapping[str, typing.Any]] = []
+            for (route_step_name, _output_key), routes in route_index.items():
+                if route_step_name == step_name:
+                    step_routes.extend(routes)
+            routed_output_keys = {
+                output_key
+                for (_route_step_name, output_key), _routes in route_index.items()
+                if _route_step_name == step_name
+            }
+
+            for route in step_routes:
+                route_output_key = route.get("output_key")
+                for route_value in custom_output_route_values(custom_outputs, route):
+                    routed_data: typing.Any = route_value.value
+                    if isinstance(routed_data, str):
+                        try:
+                            routed_data = json.loads(clean_json(routed_data))
+                        except json.JSONDecodeError:
+                            pass
+                    err = self.add_custom_output_route(
+                        route,
+                        routed_data,
+                        repeated_rows,
+                        record_index=route_value.record_index or 0,
+                    )
+                    if err:
+                        raise Exception(
+                            f"\n\ninit {source} error for "
+                            f"[{step_name}.{route_output_key}]:\n\t{err}\n"
+                        )
+
             for output_key, value in output_mapping.items():
+                if output_key == "_records":
+                    continue
+                if output_key in routed_output_keys:
+                    continue
                 data: typing.Any = value
                 if isinstance(data, str):
                     try:
                         data = json.loads(clean_json(data))
                     except json.JSONDecodeError:
                         pass
-
-                routes = route_index.get((step_name, output_key), [])
-                if routes:
-                    for route in routes:
-                        err = self.add_custom_output_route(
-                            route, data, repeated_rows
-                        )
-                        if err:
-                            raise Exception(
-                                f"\n\ninit {source} error for "
-                                f"[{step_name}.{output_key}]:\n\t{err}\n"
-                            )
-                    continue
 
                 if isinstance(data, dict):
                     data_mapping = typing.cast(typing.Dict[str, typing.Any], data)
@@ -447,7 +502,8 @@ class Document(Group):
                         f"[{step_name}.{output_key}]:\n\t{err}\n"
                     )
 
-            for container_path, row in repeated_rows.items():
+            for container_path, _record_index in sorted(repeated_rows):
+                row = repeated_rows[(container_path, _record_index)]
                 err = self.append_repeated_final_row(container_path, row)
                 if err:
                     raise Exception(
@@ -510,7 +566,10 @@ class Document(Group):
         self,
         route: typing.Mapping[str, typing.Any],
         value: typing.Any,
-        repeated_rows: typing.Optional[typing.Dict[typing.Tuple[str, ...], Group]] = None,
+        repeated_rows: typing.Optional[
+            typing.Dict[typing.Tuple[typing.Tuple[str, ...], int], Group]
+        ] = None,
+        record_index: int = 0,
     ) -> typing.Optional[str]:
         final_path = route.get("final_path")
         if not isinstance(final_path, str):
@@ -527,7 +586,12 @@ class Document(Group):
             return None
 
         if "*" in segments:
-            return self.stage_repeated_final_field(segments, value, repeated_rows)
+            return self.stage_repeated_final_field(
+                segments,
+                value,
+                repeated_rows,
+                record_index=record_index,
+            )
 
         return f"unsupported custom workflow final path [{final_path}]"
 
@@ -564,7 +628,10 @@ class Document(Group):
         self,
         segments: typing.Tuple[str, ...],
         value: typing.Any,
-        repeated_rows: typing.Optional[typing.Dict[typing.Tuple[str, ...], Group]],
+        repeated_rows: typing.Optional[
+            typing.Dict[typing.Tuple[typing.Tuple[str, ...], int], Group]
+        ],
+        record_index: int = 0,
     ) -> typing.Optional[str]:
         if repeated_rows is None:
             return f"unsupported custom workflow final path [/{'/'.join(segments)}]"
@@ -578,7 +645,7 @@ class Document(Group):
         container_path = segments[:star_idx]
         field_name = segments[star_idx + 1]
         row = repeated_rows.setdefault(
-            container_path,
+            (container_path, record_index),
             Group(prompt=self.final_group_prompt(container_path[-1])),
         )
         row.fields[field_name] = self.final_extracted_field(
