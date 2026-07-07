@@ -19,6 +19,13 @@ if typing.TYPE_CHECKING:
         TestXRay,
         XRayDocument,
     )
+    from .custom_outputs import (
+        CustomOutputDiagnostic,
+        CustomOutputReassemblyResult,
+        CustomOutputSourceProvenance,
+        reassemble_custom_outputs,
+        reassemble_custom_outputs_from_xray,
+    )
     from .prompt import (
         FinalFieldPath,
         ObjectStore,
@@ -44,6 +51,9 @@ __all__ = [
     "AgentTool",
     "ContainerSettings",
     "ContainerUploadSettings",
+    "CustomOutputDiagnostic",
+    "CustomOutputReassemblyResult",
+    "CustomOutputSourceProvenance",
     "Document",
     "DocumentRequest",
     "Element",
@@ -70,6 +80,8 @@ __all__ = [
     "Upload",
     "XRayDocument",
     "prepare_extraction_yaml",
+    "reassemble_custom_outputs",
+    "reassemble_custom_outputs_from_xray",
 ]
 
 _EXPORT_MODULES = {
@@ -79,6 +91,9 @@ _EXPORT_MODULES = {
     "AgentTool": ".agents",
     "ContainerSettings": ".settings",
     "ContainerUploadSettings": ".settings",
+    "CustomOutputDiagnostic": ".custom_outputs",
+    "CustomOutputReassemblyResult": ".custom_outputs",
+    "CustomOutputSourceProvenance": ".custom_outputs",
     "Document": ".classes",
     "DocumentRequest": ".classes",
     "Element": ".classes",
@@ -105,6 +120,8 @@ _EXPORT_MODULES = {
     "Upload": ".services",
     "XRayDocument": ".classes",
     "prepare_extraction_yaml": ".prompt.utility",
+    "reassemble_custom_outputs": ".custom_outputs",
+    "reassemble_custom_outputs_from_xray": ".custom_outputs",
 }
 
 
