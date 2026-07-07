@@ -41,8 +41,8 @@ class AgentSettings(BaseModel):
         "typing",
     ]
     max_steps: int = 7
-    model_id: str = "gpt-5-mini"
-    reasoning_effort: typing.Optional[str] = "medium"
+    model_id: str = "gpt-5.4-mini"
+    reasoning_effort: typing.Optional[str] = None
     image_transport: str = "pil"
     model_kwargs: typing.Optional[typing.Dict[str, typing.Any]] = None
 

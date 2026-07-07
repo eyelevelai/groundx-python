@@ -68,6 +68,60 @@ invoice:
 """
 
 
+CUSTOM_REPEATED_SECTION_WORKFLOW_YAML = """
+extraction_policy_version: v1
+
+workflow:
+  custom_steps:
+    - name: section_charge_labels
+      level: section
+      kind: summary
+
+invoice:
+  workflow_step: section_charge_labels
+  fields:
+    charges:
+      - fields:
+          description:
+            workflow_output_key: charge_description
+            prompt:
+              instructions: Return the repeated charge description.
+              type: str
+          amount:
+            workflow_output_key: charge_amount
+            prompt:
+              instructions: Return the repeated charge amount.
+              type: float
+"""
+
+
+CUSTOM_REPEATED_DOCUMENT_WORKFLOW_YAML = """
+extraction_policy_version: v1
+
+workflow:
+  custom_steps:
+    - name: document_charge_labels
+      level: document
+      kind: summary
+
+invoice:
+  workflow_step: document_charge_labels
+  fields:
+    charges:
+      - fields:
+          description:
+            workflow_output_key: charge_description
+            prompt:
+              instructions: Return the repeated charge description.
+              type: str
+          amount:
+            workflow_output_key: charge_amount
+            prompt:
+              instructions: Return the repeated charge amount.
+              type: float
+"""
+
+
 def DR(**data: typing.Any) -> DocumentRequest:
     return DocumentRequest.model_validate(data)
 
@@ -391,6 +445,244 @@ class TestDocument(unittest.TestCase):
                             }
                         },
                     }
+                ],
+                "documentPages": [],
+                "sourceUrl": "https://example.com/doc.pdf",
+            }
+        )
+
+        doc = Document()
+        doc.load_xray(
+            req=_make_request(),
+            xray=xray,
+            prompt_manager=manager,
+        )
+
+        invoice = doc.fields["invoice"]
+        self.assertIsInstance(invoice, Group)
+        if isinstance(invoice, Group):
+            charges = invoice.fields["charges"]
+            self.assertIsInstance(charges, list)
+            if isinstance(charges, list):
+                self.assertEqual(len(charges), 1)
+                charge = charges[0]
+                self.assertIsInstance(charge, Group)
+                if isinstance(charge, Group):
+                    self.assertEqual(
+                        charge.fields["description"],
+                        ExtractedField(value="Water service"),
+                    )
+                    self.assertEqual(
+                        charge.fields["amount"],
+                        ExtractedField(value=12.34),
+                    )
+
+    def test_document_routes_direct_list_custom_outputs_to_rows(self) -> None:
+        source = TestSource(CUSTOM_REPEATED_WORKFLOW_YAML)
+        manager = PromptManager(cache_source=source, config_source=source)
+        xray = XRayDocument.model_validate(
+            {
+                "chunks": [
+                    {
+                        "customChunkOutputs": {
+                            "charge_labels": [
+                                {
+                                    "charge_description": "Water service",
+                                    "charge_amount": 12.34,
+                                },
+                                {
+                                    "charge_description": "Sewer service",
+                                    "charge_amount": 5.67,
+                                },
+                            ]
+                        },
+                    }
+                ],
+                "documentPages": [],
+                "sourceUrl": "https://example.com/doc.pdf",
+            }
+        )
+
+        doc = Document()
+        doc.load_xray(
+            req=_make_request(),
+            xray=xray,
+            prompt_manager=manager,
+        )
+
+        invoice = doc.fields["invoice"]
+        self.assertIsInstance(invoice, Group)
+        if isinstance(invoice, Group):
+            charges = invoice.fields["charges"]
+            self.assertIsInstance(charges, list)
+            if isinstance(charges, list):
+                self.assertEqual(len(charges), 2)
+                first = charges[0]
+                second = charges[1]
+                self.assertIsInstance(first, Group)
+                self.assertIsInstance(second, Group)
+                if isinstance(first, Group) and isinstance(second, Group):
+                    self.assertEqual(
+                        first.fields["description"],
+                        ExtractedField(value="Water service"),
+                    )
+                    self.assertEqual(
+                        first.fields["amount"],
+                        ExtractedField(value=12.34),
+                    )
+                    self.assertEqual(
+                        second.fields["description"],
+                        ExtractedField(value="Sewer service"),
+                    )
+                    self.assertEqual(
+                        second.fields["amount"],
+                        ExtractedField(value=5.67),
+                    )
+
+    def test_document_routes_records_wrapped_custom_outputs_to_rows(self) -> None:
+        source = TestSource(CUSTOM_REPEATED_WORKFLOW_YAML)
+        manager = PromptManager(cache_source=source, config_source=source)
+        xray = XRayDocument.model_validate(
+            {
+                "chunks": [
+                    {
+                        "customChunkOutputs": {
+                            "charge_labels": {
+                                "_records": [
+                                    {
+                                        "charge_description": "Water service",
+                                        "charge_amount": 12.34,
+                                    },
+                                    {
+                                        "charge_description": "Sewer service",
+                                        "charge_amount": 5.67,
+                                    },
+                                ]
+                            }
+                        },
+                    }
+                ],
+                "documentPages": [],
+                "sourceUrl": "https://example.com/doc.pdf",
+            }
+        )
+
+        doc = Document()
+        doc.load_xray(
+            req=_make_request(),
+            xray=xray,
+            prompt_manager=manager,
+        )
+
+        invoice = doc.fields["invoice"]
+        self.assertIsInstance(invoice, Group)
+        if isinstance(invoice, Group):
+            charges = invoice.fields["charges"]
+            self.assertIsInstance(charges, list)
+            if isinstance(charges, list):
+                self.assertEqual(len(charges), 2)
+                first = charges[0]
+                second = charges[1]
+                self.assertIsInstance(first, Group)
+                self.assertIsInstance(second, Group)
+                if isinstance(first, Group) and isinstance(second, Group):
+                    self.assertEqual(
+                        first.fields["description"],
+                        ExtractedField(value="Water service"),
+                    )
+                    self.assertEqual(
+                        first.fields["amount"],
+                        ExtractedField(value=12.34),
+                    )
+                    self.assertEqual(
+                        second.fields["description"],
+                        ExtractedField(value="Sewer service"),
+                    )
+                    self.assertEqual(
+                        second.fields["amount"],
+                        ExtractedField(value=5.67),
+                    )
+
+    def test_document_dedupes_section_records_copied_to_multiple_chunks(self) -> None:
+        source = TestSource(CUSTOM_REPEATED_SECTION_WORKFLOW_YAML)
+        manager = PromptManager(cache_source=source, config_source=source)
+        copied_section_outputs = {
+            "section_charge_labels": {
+                "_records": [
+                    {
+                        "charge_description": "Water service",
+                        "charge_amount": 12.34,
+                    },
+                ]
+            }
+        }
+        xray = XRayDocument.model_validate(
+            {
+                "chunks": [
+                    {
+                        "chunkId": "chunk-1",
+                        "customSectionOutputs": copied_section_outputs,
+                    },
+                    {
+                        "chunkId": "chunk-2",
+                        "customSectionOutputs": copied_section_outputs,
+                    },
+                ],
+                "documentPages": [],
+                "sourceUrl": "https://example.com/doc.pdf",
+            }
+        )
+
+        doc = Document()
+        doc.load_xray(
+            req=_make_request(),
+            xray=xray,
+            prompt_manager=manager,
+        )
+
+        invoice = doc.fields["invoice"]
+        self.assertIsInstance(invoice, Group)
+        if isinstance(invoice, Group):
+            charges = invoice.fields["charges"]
+            self.assertIsInstance(charges, list)
+            if isinstance(charges, list):
+                self.assertEqual(len(charges), 1)
+                charge = charges[0]
+                self.assertIsInstance(charge, Group)
+                if isinstance(charge, Group):
+                    self.assertEqual(
+                        charge.fields["description"],
+                        ExtractedField(value="Water service"),
+                    )
+                    self.assertEqual(
+                        charge.fields["amount"],
+                        ExtractedField(value=12.34),
+                    )
+
+    def test_document_routes_document_outputs_copied_to_chunks_once(self) -> None:
+        source = TestSource(CUSTOM_REPEATED_DOCUMENT_WORKFLOW_YAML)
+        manager = PromptManager(cache_source=source, config_source=source)
+        copied_document_outputs = {
+            "document_charge_labels": {
+                "_records": [
+                    {
+                        "charge_description": "Water service",
+                        "charge_amount": 12.34,
+                    },
+                ]
+            }
+        }
+        xray = XRayDocument.model_validate(
+            {
+                "chunks": [
+                    {
+                        "chunkId": "chunk-1",
+                        "customDocumentOutputs": copied_document_outputs,
+                    },
+                    {
+                        "chunkId": "chunk-2",
+                        "customDocumentOutputs": copied_document_outputs,
+                    },
                 ],
                 "documentPages": [],
                 "sourceUrl": "https://example.com/doc.pdf",

@@ -28,6 +28,21 @@ if typing.TYPE_CHECKING:
     from PIL.Image import Image
 
 
+def build_openai_server_model(settings: AgentSettings) -> OpenAIServerModel:
+    model_kwargs: typing.Dict[str, typing.Any] = {
+        "model_id": settings.model_id,
+        "api_base": settings.api_base,
+        "api_key": settings.get_api_key(),
+    }
+    if settings.reasoning_effort:
+        model_kwargs["reasoning_effort"] = settings.reasoning_effort
+
+    if settings.model_kwargs:
+        return OpenAIServerModel(**model_kwargs, **settings.model_kwargs)
+
+    return OpenAIServerModel(**model_kwargs)
+
+
 prompt_suffix = """
 Return only your response using the `final_answer` tool format:
 
@@ -134,21 +149,7 @@ class AgentCode(CodeAgent):
         if tools is None:
             tools = []
 
-        if settings.model_kwargs:
-            model = OpenAIServerModel(
-                model_id=settings.model_id,
-                api_base=settings.api_base,
-                api_key=settings.get_api_key(),
-                reasoning_effort=settings.reasoning_effort,
-                **settings.model_kwargs,
-            )
-        else:
-            model = OpenAIServerModel(
-                model_id=settings.model_id,
-                api_base=settings.api_base,
-                api_key=settings.get_api_key(),
-                reasoning_effort=settings.reasoning_effort,
-            )
+        model = build_openai_server_model(settings)
 
         super().__init__(  # pyright: ignore[reportUnknownMemberType]
             name=name,
@@ -209,35 +210,7 @@ class AgentTool(ToolCallingAgent):
         if tools is None:
             tools = []
 
-        if settings.model_kwargs:
-            if settings.reasoning_effort:
-                model = OpenAIServerModel(
-                    model_id=settings.model_id,
-                    api_base=settings.api_base,
-                    api_key=settings.get_api_key(),
-                    reasoning_effort=settings.reasoning_effort,
-                    **settings.model_kwargs,
-                )
-            else:
-                model = OpenAIServerModel(
-                    model_id=settings.model_id,
-                    api_base=settings.api_base,
-                    api_key=settings.get_api_key(),
-                    **settings.model_kwargs,
-                )
-        elif settings.reasoning_effort:
-            model = OpenAIServerModel(
-                model_id=settings.model_id,
-                api_base=settings.api_base,
-                api_key=settings.get_api_key(),
-                reasoning_effort=settings.reasoning_effort,
-            )
-        else:
-            model = OpenAIServerModel(
-                model_id=settings.model_id,
-                api_base=settings.api_base,
-                api_key=settings.get_api_key(),
-            )
+        model = build_openai_server_model(settings)
 
         super().__init__(  # pyright: ignore[reportUnknownMemberType]
             name=name,

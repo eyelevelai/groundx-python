@@ -86,6 +86,8 @@ _CUSTOM_WORKFLOW_RESERVED_NAMES = {
     "runtime",
     "output_routes",
     "outputRoutes",
+    "output_relationships",
+    "outputRelationships",
     "leaf_fields",
     "leafFields",
     "field_counts",
@@ -146,12 +148,14 @@ _CUSTOM_WORKFLOW_AUTHORING_KEYS = {
     "template",
     "custom_steps",
     _CUSTOM_WORKFLOW_AGENT_CHAIN_KEY,
+    "output_relationships",
 }
 _CUSTOM_WORKFLOW_PERSISTED_KEYS = {
     "metadata_version",
     "template",
     "custom_steps",
     _CUSTOM_WORKFLOW_AGENT_CHAIN_KEY,
+    "output_relationships",
     "output_routes",
     "leaf_fields",
     "field_counts",
@@ -1206,6 +1210,18 @@ def _custom_route_leaf_match_key(item: typing.Dict[str, typing.Any]) -> str:
     )
 
 
+def _custom_relationship_identity(relationship: typing.Dict[str, typing.Any]) -> str:
+    return "\x00".join(
+        [
+            relationship["parent_group"],
+            relationship["child_group"],
+            relationship["parent_output_field"],
+            ",".join(relationship["match_attrs"]),
+            relationship.get("unmatched_child_group", ""),
+        ]
+    )
+
+
 def _custom_workflow_schema_hash(
     metadata: typing.Dict[str, typing.Any]
 ) -> str:
@@ -1248,10 +1264,25 @@ def _custom_workflow_schema_hash(
         }
         for leaf in metadata.get("leaf_fields", [])
     ]
+    relationships = [
+        {
+            "parent_group": relationship["parent_group"],
+            "child_group": relationship["child_group"],
+            "parent_output_field": relationship["parent_output_field"],
+            "match_attrs": list(relationship["match_attrs"]),
+            **(
+                {"unmatched_child_group": relationship["unmatched_child_group"]}
+                if relationship.get("unmatched_child_group")
+                else {}
+            ),
+        }
+        for relationship in metadata.get("output_relationships", [])
+    ]
 
     steps.sort(key=lambda step: step["name"])
     routes.sort(key=_custom_route_identity)
     leaves.sort(key=_custom_leaf_identity)
+    relationships.sort(key=_custom_relationship_identity)
 
     payload: typing.Dict[str, typing.Any] = {
         "metadata_version": metadata.get(
@@ -1264,6 +1295,8 @@ def _custom_workflow_schema_hash(
         payload["output_routes"] = routes
     if leaves:
         payload["leaf_fields"] = leaves
+    if relationships:
+        payload["output_relationships"] = relationships
 
     encoded = json.dumps(payload, separators=(",", ":")).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
@@ -1352,6 +1385,91 @@ def _normalize_custom_leaf(
         raise ValueError("non-repeated leaf field cannot set repetition_scope")
 
     return normalized
+
+
+def _normalize_custom_relationship(
+    value: typing.Any,
+    idx: int,
+) -> typing.Dict[str, typing.Any]:
+    path = f"{_CUSTOM_WORKFLOW_KEY}.output_relationships[{idx}]"
+    relationship = _ensure_mapping(value, path)
+    normalized: typing.Dict[str, typing.Any] = {}
+    for key in ("parent_group", "child_group", "parent_output_field"):
+        raw_value = relationship.get(key)
+        if not isinstance(raw_value, str) or raw_value == "":
+            raise ValueError(f"custom workflow relationship is missing [{key}]")
+        normalized[key] = raw_value
+
+    match_attrs_raw = relationship.get("match_attrs")
+    if not isinstance(match_attrs_raw, list) or not match_attrs_raw:
+        raise ValueError("custom workflow relationship is missing [match_attrs]")
+    match_attrs: typing.List[str] = []
+    for attr_idx, attr_raw in enumerate(match_attrs_raw):
+        if not isinstance(attr_raw, str) or attr_raw == "":
+            raise ValueError(
+                "custom workflow relationship match_attrs "
+                f"[{idx}][{attr_idx}] must be a non-empty string"
+            )
+        match_attrs.append(attr_raw)
+    normalized["match_attrs"] = match_attrs
+
+    unmatched_raw = relationship.get("unmatched_child_group")
+    if unmatched_raw is not None:
+        if not isinstance(unmatched_raw, str) or unmatched_raw == "":
+            raise ValueError(
+                "custom workflow relationship unmatched_child_group must be a "
+                "non-empty string"
+            )
+        normalized["unmatched_child_group"] = unmatched_raw
+
+    return normalized
+
+
+def _normalize_custom_relationships(
+    value: typing.Any,
+) -> typing.List[typing.Dict[str, typing.Any]]:
+    if value is None:
+        return []
+    if not isinstance(value, list):
+        raise ValueError(f"Expected list at [{_CUSTOM_WORKFLOW_KEY}.output_relationships]")
+
+    return [
+        _normalize_custom_relationship(relationship, idx)
+        for idx, relationship in enumerate(value)
+    ]
+
+
+def _relationships_from_final_group_metadata(
+    final_group_metadata: typing.Mapping[str, typing.Mapping[str, typing.Any]],
+) -> typing.List[typing.Dict[str, typing.Any]]:
+    relationships: typing.List[typing.Dict[str, typing.Any]] = []
+    for group_name, metadata in final_group_metadata.items():
+        match_attrs = metadata.get("match_attrs")
+        if not isinstance(match_attrs, list) or not match_attrs:
+            continue
+
+        passthrough = metadata.get("passthrough")
+        if not isinstance(passthrough, dict):
+            continue
+
+        parent_group = passthrough.get("from")
+        if not isinstance(parent_group, str) or parent_group == "":
+            continue
+
+        relationships.append(
+            {
+                "parent_group": parent_group,
+                "child_group": group_name,
+                "parent_output_field": group_name,
+                "match_attrs": copy.deepcopy(match_attrs),
+                "unmatched_child_group": group_name,
+            }
+        )
+
+    return [
+        _normalize_custom_relationship(relationship, idx)
+        for idx, relationship in enumerate(relationships)
+    ]
 
 
 def _validate_custom_workflow_routes_and_leaves(
@@ -1460,6 +1578,9 @@ def _normalize_persisted_custom_workflow_metadata(
         _normalize_custom_leaf(leaf, idx, steps_by_name)
         for idx, leaf in enumerate(workflow.get("leaf_fields") or [])
     ]
+    relationships = _normalize_custom_relationships(
+        workflow.get("output_relationships")
+    )
     if custom_steps and (not routes or not leaves):
         raise ValueError(
             "custom workflow steps require output routes and leaf fields; "
@@ -1477,6 +1598,8 @@ def _normalize_persisted_custom_workflow_metadata(
         "output_routes": routes,
         "leaf_fields": leaves,
     }
+    if relationships:
+        metadata["output_relationships"] = relationships
     if template:
         metadata["template"] = template
     if field_counts:
@@ -1694,6 +1817,7 @@ def _build_authored_custom_workflow_metadata(
     workflow_group_metadata: typing.Dict[str, typing.Dict[str, typing.Any]],
     workflow_field_paths: typing.Dict[str, typing.Dict[str, str]],
     pseudo_group_names: typing.Set[str],
+    final_group_metadata: typing.Mapping[str, typing.Mapping[str, typing.Any]],
 ) -> typing.Dict[str, typing.Any]:
     template = _normalize_workflow_template(workflow.get("template"))
     custom_steps, steps_by_name = _normalize_custom_workflow_steps(
@@ -1735,12 +1859,19 @@ def _build_authored_custom_workflow_metadata(
             "add workflow_output_key metadata to routed fields"
         )
     field_counts = _validate_custom_workflow_routes_and_leaves(routes, leaves)
+    relationships = _normalize_custom_relationships(
+        workflow.get("output_relationships")
+    )
+    if not relationships:
+        relationships = _relationships_from_final_group_metadata(final_group_metadata)
     metadata: typing.Dict[str, typing.Any] = {
         "metadata_version": _CUSTOM_WORKFLOW_METADATA_VERSION,
         "custom_steps": custom_steps,
         "output_routes": routes,
         "leaf_fields": leaves,
     }
+    if relationships:
+        metadata["output_relationships"] = relationships
     if template:
         metadata["template"] = template
     if field_counts:
@@ -2108,6 +2239,7 @@ def prepare_extraction_yaml(
                 workflow_group_metadata,
                 workflow_field_paths,
                 set(),
+                final_group_metadata,
             )
             _strip_custom_workflow_authoring_keys(groups)
             _strip_custom_workflow_authoring_keys(workflow_groups)
@@ -2160,6 +2292,7 @@ def prepare_extraction_yaml(
             workflow_group_metadata,
             workflow_field_paths,
             set(pseudo_groups.keys()),
+            final_group_metadata,
         )
         _strip_custom_workflow_authoring_keys(groups)
         _strip_custom_workflow_authoring_keys(workflow_groups)
