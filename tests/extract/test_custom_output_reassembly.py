@@ -576,3 +576,71 @@ def test_reassembly_reports_source_provenance_for_routed_outputs() -> None:
             "page_numbers": (2,),
         },
     ]
+
+
+def test_ambiguous_relationship_match_is_warning_and_routes_unmatched() -> None:
+    """Ambiguity is a HANDLED data condition (child -> unmatched group,
+    rendered account-level), not a fatal error. Live prod failure 2026-07-08:
+    a real utility bill produced charges matching multiple meters; the default
+    severity="error" failed the entire document even though the algorithm had
+    already routed every ambiguous child safely."""
+    workflow_extract = {
+        "workflow": {
+            "custom_steps": [
+                {"name": "account_rows", "level": "chunk", "kind": "keys"},
+                {"name": "transaction_rows", "level": "chunk", "kind": "keys"},
+            ],
+            "output_routes": [
+                {
+                    "workflow_group": "accounts",
+                    "workflow_field": "account_id",
+                    "final_path": "/accounts/account_id",
+                    "step_name": "account_rows",
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": "account_id",
+                },
+                {
+                    "workflow_group": "transactions",
+                    "workflow_field": "account_id",
+                    "final_path": "/transactions/account_id",
+                    "step_name": "transaction_rows",
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": "account_id",
+                },
+            ],
+            "output_relationships": [
+                {
+                    "parent_group": "accounts",
+                    "child_group": "transactions",
+                    "parent_output_field": "transactions",
+                    "match_attrs": ["account_id"],
+                    "unmatched_child_group": "transactions",
+                }
+            ],
+        }
+    }
+    xray = {
+        "chunks": [
+            {
+                "customChunkOutputs": {
+                    "account_rows": {
+                        # duplicate account_id -> any child matches BOTH parents
+                        "_records": [{"account_id": "A-1"}, {"account_id": "A-1"}]
+                    },
+                    "transaction_rows": {"_records": [{"account_id": "A-1"}]},
+                }
+            }
+        ]
+    }
+
+    result = reassemble_custom_outputs_from_xray(xray, workflow_extract=workflow_extract)
+
+    assert len(result.diagnostics) == 1
+    diagnostic = result.diagnostics[0]
+    assert diagnostic.code == "ambiguous_relationship_match"
+    assert diagnostic.severity == "warning"
+    # the ambiguous child is routed to the unmatched group, parents intact
+    assert result.final_output["transactions"] == [{"account_id": "A-1"}]
+    assert [a["account_id"] for a in result.final_output["accounts"]] == ["A-1", "A-1"]
