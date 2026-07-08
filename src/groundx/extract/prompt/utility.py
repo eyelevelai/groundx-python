@@ -1611,11 +1611,13 @@ def _normalize_persisted_custom_workflow_metadata(
     if agent_chain is not None:
         metadata[_CUSTOM_WORKFLOW_AGENT_CHAIN_KEY] = agent_chain
 
-    schema_hash = _custom_workflow_schema_hash(metadata)
-    caller_schema_hash = workflow.get("schema_hash")
-    if caller_schema_hash is not None and caller_schema_hash != schema_hash:
-        raise ValueError("caller schema_hash does not match route metadata")
-    metadata["schema_hash"] = schema_hash
+    # Readers never verify writer hashes: the stored schema_hash was computed by
+    # the WRITER's canonicalization over the WRITER's structures; recomputing here
+    # over re-normalized structures is guaranteed to diverge across dialects
+    # (proven live 2026-07-08: harness-dialect stores hard-failed every load).
+    # Integrity at read time is the structural validation above; the hash carried
+    # forward is this reader's canonical recompute, for downstream use only.
+    metadata["schema_hash"] = _custom_workflow_schema_hash(metadata)
 
     return metadata
 
@@ -1890,6 +1892,12 @@ def _apply_custom_workflow_field_paths(
     workflow_field_paths: typing.Dict[str, typing.Dict[str, str]],
     custom_workflow_metadata: typing.Optional[typing.Dict[str, typing.Any]],
 ) -> None:
+    # final_path is copied VERBATIM on purpose: `*` tokens are load-bearing for
+    # the SDK's own row routing (field-level lists like /group/list_field/*/sub
+    # — see test_prepare_extraction_yaml_routes_repeated_custom_fields_with_list_name).
+    # Consumers with a narrower path contract (the Arcadia reassembly parser
+    # requires 2-segment group/field pointers) normalize at THEIR export
+    # boundary when building reassembly metadata — never here.
     if not custom_workflow_metadata:
         return
 
