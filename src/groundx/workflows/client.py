@@ -15,6 +15,7 @@ from ..types.workflow_steps import WorkflowSteps
 from ..types.workflow_template import WorkflowTemplate
 from ..types.workflows_response import WorkflowsResponse
 from .raw_client import AsyncRawWorkflowsClient, RawWorkflowsClient
+from .types.workflows_get_request_format import WorkflowsGetRequestFormat
 from .types.workflows_get_request_id import WorkflowsGetRequestId
 
 # this is used as the default value for optional parameters
@@ -67,6 +68,7 @@ class WorkflowsClient:
         *,
         chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
+        yaml: typing.Optional[str] = OMIT,
         extract: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         template: typing.Optional[WorkflowTemplate] = OMIT,
         section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
@@ -85,6 +87,9 @@ class WorkflowsClient:
 
         name : typing.Optional[str]
             The name of the workflow being created.
+
+        yaml : typing.Optional[str]
+            Authored workflow YAML source. When set, the server compiles it into the canonical workflow structures (steps, prompts, routes) — the other definition fields (extract, customSteps, outputRoutes, leafFields, steps) are derived from it and must be omitted. An extraction-definition-only YAML (groups + field prompts, no workflow block) has its workflow definitions scaffolded server-side.
 
         extract : typing.Optional[typing.Dict[str, typing.Any]]
             Extract agent definitions.
@@ -124,6 +129,85 @@ class WorkflowsClient:
         _response = self._raw_client.create(
             chunk_strategy=chunk_strategy,
             name=name,
+            yaml=yaml,
+            extract=extract,
+            template=template,
+            section_strategy=section_strategy,
+            steps=steps,
+            custom_steps=custom_steps,
+            output_routes=output_routes,
+            leaf_fields=leaf_fields,
+            request_options=request_options,
+        )
+        return _response.data
+
+    def validate(
+        self,
+        *,
+        chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
+        name: typing.Optional[str] = OMIT,
+        yaml: typing.Optional[str] = OMIT,
+        extract: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
+        template: typing.Optional[WorkflowTemplate] = OMIT,
+        section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
+        steps: typing.Optional[WorkflowSteps] = OMIT,
+        custom_steps: typing.Optional[typing.Sequence[CustomWorkflowStep]] = OMIT,
+        output_routes: typing.Optional[typing.Sequence[CustomWorkflowOutputRoute]] = OMIT,
+        leaf_fields: typing.Optional[typing.Sequence[CustomWorkflowLeafField]] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> WorkflowResponse:
+        """
+        Validate a workflow definition without creating or modifying anything — a distinct operation from create/update. Accepts the same request body as workflow create, including the `yaml` field (authored workflow YAML source, compiled server-side). Returns the compiled workflow; validation failures return the same structured errors as create.
+
+        Parameters
+        ----------
+        chunk_strategy : typing.Optional[WorkflowRequestChunkStrategy]
+
+        name : typing.Optional[str]
+            The name of the workflow being created.
+
+        yaml : typing.Optional[str]
+            Authored workflow YAML source. When set, the server compiles it into the canonical workflow structures (steps, prompts, routes) — the other definition fields (extract, customSteps, outputRoutes, leafFields, steps) are derived from it and must be omitted. An extraction-definition-only YAML (groups + field prompts, no workflow block) has its workflow definitions scaffolded server-side.
+
+        extract : typing.Optional[typing.Dict[str, typing.Any]]
+            Extract agent definitions.
+
+        template : typing.Optional[WorkflowTemplate]
+
+        section_strategy : typing.Optional[WorkflowRequestSectionStrategy]
+
+        steps : typing.Optional[WorkflowSteps]
+
+        custom_steps : typing.Optional[typing.Sequence[CustomWorkflowStep]]
+            Workflow-level custom extraction steps. Legacy fixed steps remain under steps.
+
+        output_routes : typing.Optional[typing.Sequence[CustomWorkflowOutputRoute]]
+            Custom output routes. Each record must have exactly one matching leafFields record on finalPath, workflowGroup, workflowField, stepName, level, and outputKey.
+
+        leaf_fields : typing.Optional[typing.Sequence[CustomWorkflowLeafField]]
+            Custom leaf-field metadata used to validate route integrity and executable-step field counts.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        WorkflowResponse
+            Validation success
+
+        Examples
+        --------
+        from groundx import GroundX
+
+        client = GroundX(
+            api_key="YOUR_API_KEY",
+        )
+        client.workflows.validate()
+        """
+        _response = self._raw_client.validate(
+            chunk_strategy=chunk_strategy,
+            name=name,
+            yaml=yaml,
             extract=extract,
             template=template,
             section_strategy=section_strategy,
@@ -289,7 +373,11 @@ class WorkflowsClient:
         return _response.data
 
     def get(
-        self, id: WorkflowsGetRequestId, *, request_options: typing.Optional[RequestOptions] = None
+        self,
+        id: WorkflowsGetRequestId,
+        *,
+        format: typing.Optional[WorkflowsGetRequestFormat] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> WorkflowResponse:
         """
         look up a specific workflow by groupId, bucketId, or workflowId.
@@ -298,6 +386,9 @@ class WorkflowsClient:
         ----------
         id : WorkflowsGetRequestId
             The id of the group, bucket, or workflow to look up.
+
+        format : typing.Optional[WorkflowsGetRequestFormat]
+            Response format. `yaml` returns the stored authored workflow YAML source verbatim (absent for workflows created via compiled JSON).
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -316,9 +407,10 @@ class WorkflowsClient:
         )
         client.workflows.get(
             id=1,
+            format="json",
         )
         """
-        _response = self._raw_client.get(id, request_options=request_options)
+        _response = self._raw_client.get(id, format=format, request_options=request_options)
         return _response.data
 
     def update(
@@ -327,6 +419,7 @@ class WorkflowsClient:
         *,
         chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
+        yaml: typing.Optional[str] = OMIT,
         extract: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         template: typing.Optional[WorkflowTemplate] = OMIT,
         section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
@@ -348,6 +441,9 @@ class WorkflowsClient:
 
         name : typing.Optional[str]
             The name of the workflow being created.
+
+        yaml : typing.Optional[str]
+            Authored workflow YAML source. When set, the server compiles it into the canonical workflow structures (steps, prompts, routes) — the other definition fields (extract, customSteps, outputRoutes, leafFields, steps) are derived from it and must be omitted. An extraction-definition-only YAML (groups + field prompts, no workflow block) has its workflow definitions scaffolded server-side.
 
         extract : typing.Optional[typing.Dict[str, typing.Any]]
             Extract agent definitions.
@@ -390,6 +486,7 @@ class WorkflowsClient:
             id,
             chunk_strategy=chunk_strategy,
             name=name,
+            yaml=yaml,
             extract=extract,
             template=template,
             section_strategy=section_strategy,
@@ -487,6 +584,7 @@ class AsyncWorkflowsClient:
         *,
         chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
+        yaml: typing.Optional[str] = OMIT,
         extract: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         template: typing.Optional[WorkflowTemplate] = OMIT,
         section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
@@ -505,6 +603,9 @@ class AsyncWorkflowsClient:
 
         name : typing.Optional[str]
             The name of the workflow being created.
+
+        yaml : typing.Optional[str]
+            Authored workflow YAML source. When set, the server compiles it into the canonical workflow structures (steps, prompts, routes) — the other definition fields (extract, customSteps, outputRoutes, leafFields, steps) are derived from it and must be omitted. An extraction-definition-only YAML (groups + field prompts, no workflow block) has its workflow definitions scaffolded server-side.
 
         extract : typing.Optional[typing.Dict[str, typing.Any]]
             Extract agent definitions.
@@ -552,6 +653,93 @@ class AsyncWorkflowsClient:
         _response = await self._raw_client.create(
             chunk_strategy=chunk_strategy,
             name=name,
+            yaml=yaml,
+            extract=extract,
+            template=template,
+            section_strategy=section_strategy,
+            steps=steps,
+            custom_steps=custom_steps,
+            output_routes=output_routes,
+            leaf_fields=leaf_fields,
+            request_options=request_options,
+        )
+        return _response.data
+
+    async def validate(
+        self,
+        *,
+        chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
+        name: typing.Optional[str] = OMIT,
+        yaml: typing.Optional[str] = OMIT,
+        extract: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
+        template: typing.Optional[WorkflowTemplate] = OMIT,
+        section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
+        steps: typing.Optional[WorkflowSteps] = OMIT,
+        custom_steps: typing.Optional[typing.Sequence[CustomWorkflowStep]] = OMIT,
+        output_routes: typing.Optional[typing.Sequence[CustomWorkflowOutputRoute]] = OMIT,
+        leaf_fields: typing.Optional[typing.Sequence[CustomWorkflowLeafField]] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> WorkflowResponse:
+        """
+        Validate a workflow definition without creating or modifying anything — a distinct operation from create/update. Accepts the same request body as workflow create, including the `yaml` field (authored workflow YAML source, compiled server-side). Returns the compiled workflow; validation failures return the same structured errors as create.
+
+        Parameters
+        ----------
+        chunk_strategy : typing.Optional[WorkflowRequestChunkStrategy]
+
+        name : typing.Optional[str]
+            The name of the workflow being created.
+
+        yaml : typing.Optional[str]
+            Authored workflow YAML source. When set, the server compiles it into the canonical workflow structures (steps, prompts, routes) — the other definition fields (extract, customSteps, outputRoutes, leafFields, steps) are derived from it and must be omitted. An extraction-definition-only YAML (groups + field prompts, no workflow block) has its workflow definitions scaffolded server-side.
+
+        extract : typing.Optional[typing.Dict[str, typing.Any]]
+            Extract agent definitions.
+
+        template : typing.Optional[WorkflowTemplate]
+
+        section_strategy : typing.Optional[WorkflowRequestSectionStrategy]
+
+        steps : typing.Optional[WorkflowSteps]
+
+        custom_steps : typing.Optional[typing.Sequence[CustomWorkflowStep]]
+            Workflow-level custom extraction steps. Legacy fixed steps remain under steps.
+
+        output_routes : typing.Optional[typing.Sequence[CustomWorkflowOutputRoute]]
+            Custom output routes. Each record must have exactly one matching leafFields record on finalPath, workflowGroup, workflowField, stepName, level, and outputKey.
+
+        leaf_fields : typing.Optional[typing.Sequence[CustomWorkflowLeafField]]
+            Custom leaf-field metadata used to validate route integrity and executable-step field counts.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        WorkflowResponse
+            Validation success
+
+        Examples
+        --------
+        import asyncio
+
+        from groundx import AsyncGroundX
+
+        client = AsyncGroundX(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.workflows.validate()
+
+
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.validate(
+            chunk_strategy=chunk_strategy,
+            name=name,
+            yaml=yaml,
             extract=extract,
             template=template,
             section_strategy=section_strategy,
@@ -759,7 +947,11 @@ class AsyncWorkflowsClient:
         return _response.data
 
     async def get(
-        self, id: WorkflowsGetRequestId, *, request_options: typing.Optional[RequestOptions] = None
+        self,
+        id: WorkflowsGetRequestId,
+        *,
+        format: typing.Optional[WorkflowsGetRequestFormat] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> WorkflowResponse:
         """
         look up a specific workflow by groupId, bucketId, or workflowId.
@@ -768,6 +960,9 @@ class AsyncWorkflowsClient:
         ----------
         id : WorkflowsGetRequestId
             The id of the group, bucket, or workflow to look up.
+
+        format : typing.Optional[WorkflowsGetRequestFormat]
+            Response format. `yaml` returns the stored authored workflow YAML source verbatim (absent for workflows created via compiled JSON).
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -791,12 +986,13 @@ class AsyncWorkflowsClient:
         async def main() -> None:
             await client.workflows.get(
                 id=1,
+                format="json",
             )
 
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.get(id, request_options=request_options)
+        _response = await self._raw_client.get(id, format=format, request_options=request_options)
         return _response.data
 
     async def update(
@@ -805,6 +1001,7 @@ class AsyncWorkflowsClient:
         *,
         chunk_strategy: typing.Optional[WorkflowRequestChunkStrategy] = OMIT,
         name: typing.Optional[str] = OMIT,
+        yaml: typing.Optional[str] = OMIT,
         extract: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         template: typing.Optional[WorkflowTemplate] = OMIT,
         section_strategy: typing.Optional[WorkflowRequestSectionStrategy] = OMIT,
@@ -826,6 +1023,9 @@ class AsyncWorkflowsClient:
 
         name : typing.Optional[str]
             The name of the workflow being created.
+
+        yaml : typing.Optional[str]
+            Authored workflow YAML source. When set, the server compiles it into the canonical workflow structures (steps, prompts, routes) — the other definition fields (extract, customSteps, outputRoutes, leafFields, steps) are derived from it and must be omitted. An extraction-definition-only YAML (groups + field prompts, no workflow block) has its workflow definitions scaffolded server-side.
 
         extract : typing.Optional[typing.Dict[str, typing.Any]]
             Extract agent definitions.
@@ -876,6 +1076,7 @@ class AsyncWorkflowsClient:
             id,
             chunk_strategy=chunk_strategy,
             name=name,
+            yaml=yaml,
             extract=extract,
             template=template,
             section_strategy=section_strategy,

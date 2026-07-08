@@ -2639,6 +2639,77 @@ client.workflows.create()
 </dl>
 </details>
 
+<details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">validate</a>(...) -> WorkflowResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Validate a workflow definition without creating or modifying anything — a distinct operation from create/update. Accepts the same request body as workflow create, including the `yaml` field (authored workflow YAML source, compiled server-side). Returns the compiled workflow; validation failures return the same structured errors as create.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from groundx import GroundX
+from groundx.environment import GroundXEnvironment
+
+client = GroundX(
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
+)
+
+client.workflows.validate()
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**request:** `WorkflowRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.workflows.<a href="src/groundx/workflows/client.py">get_account</a>() -> WorkflowResponse</code></summary>
 <dl>
 <dd>
@@ -3030,6 +3101,7 @@ client = GroundX(
 
 client.workflows.get(
     id=1,
+    format="json",
 )
 
 ```
@@ -3047,6 +3119,14 @@ client.workflows.get(
 <dd>
 
 **id:** `WorkflowsGetRequestId` — The id of the group, bucket, or workflow to look up.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**format:** `typing.Optional[WorkflowsGetRequestFormat]` — Response format. `yaml` returns the stored authored workflow YAML source verbatim (absent for workflows created via compiled JSON).
     
 </dd>
 </dl>

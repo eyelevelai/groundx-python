@@ -6,8 +6,12 @@ import typing
 from importlib import import_module
 
 if typing.TYPE_CHECKING:
+    from .workflows_get_request_format import WorkflowsGetRequestFormat
     from .workflows_get_request_id import WorkflowsGetRequestId
-_dynamic_imports: typing.Dict[str, str] = {"WorkflowsGetRequestId": ".workflows_get_request_id"}
+_dynamic_imports: typing.Dict[str, str] = {
+    "WorkflowsGetRequestFormat": ".workflows_get_request_format",
+    "WorkflowsGetRequestId": ".workflows_get_request_id",
+}
 
 
 def __getattr__(attr_name: str) -> typing.Any:
@@ -31,4 +35,4 @@ def __dir__():
     return sorted(lazy_attrs)
 
 
-__all__ = ["WorkflowsGetRequestId"]
+__all__ = ["WorkflowsGetRequestFormat", "WorkflowsGetRequestId"]
