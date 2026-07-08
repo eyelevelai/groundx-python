@@ -26,6 +26,11 @@ class WorkflowRequest(UniversalBaseModel):
     The name of the workflow being created.
     """
 
+    yaml: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Authored workflow YAML source. When set, the server compiles it into the canonical workflow structures (steps, prompts, routes) — the other definition fields (extract, customSteps, outputRoutes, leafFields, steps) are derived from it and must be omitted. An extraction-definition-only YAML (groups + field prompts, no workflow block) has its workflow definitions scaffolded server-side.
+    """
+
     extract: typing.Optional[typing.Dict[str, typing.Any]] = pydantic.Field(default=None)
     """
     Extract agent definitions.

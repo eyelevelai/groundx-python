@@ -104,7 +104,7 @@ if typing.TYPE_CHECKING:
     from .ingest import AsyncGroundX, GroundX
     from .search import SearchContentRequestId
     from .version import __version__
-    from .workflows import WorkflowsGetRequestId
+    from .workflows import WorkflowsGetRequestFormat, WorkflowsGetRequestId
 _dynamic_imports: typing.Dict[str, str] = {
     "ApiKeyDetail": ".types",
     "ApiKeyRequest": ".types",
@@ -202,6 +202,7 @@ _dynamic_imports: typing.Dict[str, str] = {
     "WorkflowStepConfigField": ".types",
     "WorkflowSteps": ".types",
     "WorkflowTemplate": ".types",
+    "WorkflowsGetRequestFormat": ".workflows",
     "WorkflowsGetRequestId": ".workflows",
     "WorkflowsResponse": ".types",
     "__version__": ".version",
@@ -334,6 +335,7 @@ __all__ = [
     "WorkflowStepConfigField",
     "WorkflowSteps",
     "WorkflowTemplate",
+    "WorkflowsGetRequestFormat",
     "WorkflowsGetRequestId",
     "WorkflowsResponse",
     "__version__",
