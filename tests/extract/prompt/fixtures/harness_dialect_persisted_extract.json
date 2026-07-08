@@ -1,0 +1,305 @@
+{
+ "widget_summary": {
+  "fields": {
+   "widget_code": {
+    "prompt": {
+     "instructions": "Synthetic instruction text for the widget code.",
+     "type": "str"
+    }
+   },
+   "widget_color": {
+    "prompt": {
+     "instructions": "Synthetic instruction text for the widget color.",
+     "type": "str"
+    }
+   }
+  }
+ },
+ "gadget_rows": {
+  "fields": {
+   "gadget_id": {
+    "prompt": {
+     "instructions": "Synthetic instruction text for the gadget id.",
+     "type": "str"
+    }
+   },
+   "gadget_weight": {
+    "prompt": {
+     "instructions": "Synthetic instruction text for the gadget weight.",
+     "type": "str"
+    }
+   }
+  }
+ },
+ "workflow": {
+  "metadata_version": 1,
+  "custom_steps": [
+   {
+    "name": "widget_summary_fields",
+    "level": "chunk",
+    "kind": "instruct"
+   },
+   {
+    "name": "gadget_row_fields",
+    "level": "chunk",
+    "kind": "keys"
+   }
+  ],
+  "output_routes": [
+   {
+    "workflow_group": "widget_summary",
+    "workflow_field": "widget_code",
+    "final_path": "/widget_summary/widget_code",
+    "step_name": "widget_summary_fields",
+    "level": "chunk",
+    "output_map": "customChunkOutputs",
+    "output_key": "widget_code",
+    "readback_path": "/chunks/*/customChunkOutputs/widget_summary_fields/widget_code"
+   },
+   {
+    "workflow_group": "widget_summary",
+    "workflow_field": "widget_color",
+    "final_path": "/widget_summary/widget_color",
+    "step_name": "widget_summary_fields",
+    "level": "chunk",
+    "output_map": "customChunkOutputs",
+    "output_key": "widget_color",
+    "readback_path": "/chunks/*/customChunkOutputs/widget_summary_fields/widget_color"
+   },
+   {
+    "workflow_group": "gadget_rows",
+    "workflow_field": "gadget_id",
+    "final_path": "/gadget_rows/*/gadget_id",
+    "step_name": "gadget_row_fields",
+    "level": "chunk",
+    "output_map": "customChunkOutputs",
+    "output_key": "gadget_id",
+    "readback_path": "/chunks/*/customChunkOutputs/gadget_row_fields/gadget_id"
+   },
+   {
+    "workflow_group": "gadget_rows",
+    "workflow_field": "gadget_weight",
+    "final_path": "/gadget_rows/*/gadget_weight",
+    "step_name": "gadget_row_fields",
+    "level": "chunk",
+    "output_map": "customChunkOutputs",
+    "output_key": "gadget_weight",
+    "readback_path": "/chunks/*/customChunkOutputs/gadget_row_fields/gadget_weight"
+   }
+  ],
+  "leaf_fields": [
+   {
+    "final_path": "/widget_summary/widget_code",
+    "workflow_group": "widget_summary",
+    "workflow_field": "widget_code",
+    "step_name": "widget_summary_fields",
+    "level": "chunk",
+    "output_key": "widget_code",
+    "field_type": "str",
+    "is_repeated": false,
+    "repetition_scope": "none"
+   },
+   {
+    "final_path": "/widget_summary/widget_color",
+    "workflow_group": "widget_summary",
+    "workflow_field": "widget_color",
+    "step_name": "widget_summary_fields",
+    "level": "chunk",
+    "output_key": "widget_color",
+    "field_type": "str",
+    "is_repeated": false,
+    "repetition_scope": "none"
+   },
+   {
+    "final_path": "/gadget_rows/*/gadget_id",
+    "workflow_group": "gadget_rows",
+    "workflow_field": "gadget_id",
+    "step_name": "gadget_row_fields",
+    "level": "chunk",
+    "output_key": "gadget_id",
+    "field_type": "str",
+    "is_repeated": true,
+    "repetition_scope": "item"
+   },
+   {
+    "final_path": "/gadget_rows/*/gadget_weight",
+    "workflow_group": "gadget_rows",
+    "workflow_field": "gadget_weight",
+    "step_name": "gadget_row_fields",
+    "level": "chunk",
+    "output_key": "gadget_weight",
+    "field_type": "str",
+    "is_repeated": true,
+    "repetition_scope": "item"
+   }
+  ],
+  "field_counts": {
+   "gadget_row_fields": 2,
+   "widget_summary_fields": 2
+  },
+  "schema_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+  "agent_chain": [
+   {
+    "parallel": [
+     {
+      "chain": [
+       "reconcile_statement",
+       "save_statement"
+      ],
+      "group": "widget_summary"
+     },
+     {
+      "chain": [
+       "reconcile_meters",
+       "save_meters"
+      ],
+      "group": "gadget_rows"
+     }
+    ]
+   }
+  ]
+ },
+ "_groundx_persisted_extract": {
+  "extraction_policy_version": "v1",
+  "workflow": {
+   "metadata_version": 1,
+   "custom_steps": [
+    {
+     "name": "widget_summary_fields",
+     "level": "chunk",
+     "kind": "instruct"
+    },
+    {
+     "name": "gadget_row_fields",
+     "level": "chunk",
+     "kind": "keys"
+    }
+   ],
+   "output_routes": [
+    {
+     "workflow_group": "widget_summary",
+     "workflow_field": "widget_code",
+     "final_path": "/widget_summary/widget_code",
+     "step_name": "widget_summary_fields",
+     "level": "chunk",
+     "output_map": "customChunkOutputs",
+     "output_key": "widget_code",
+     "readback_path": "/chunks/*/customChunkOutputs/widget_summary_fields/widget_code"
+    },
+    {
+     "workflow_group": "widget_summary",
+     "workflow_field": "widget_color",
+     "final_path": "/widget_summary/widget_color",
+     "step_name": "widget_summary_fields",
+     "level": "chunk",
+     "output_map": "customChunkOutputs",
+     "output_key": "widget_color",
+     "readback_path": "/chunks/*/customChunkOutputs/widget_summary_fields/widget_color"
+    },
+    {
+     "workflow_group": "gadget_rows",
+     "workflow_field": "gadget_id",
+     "final_path": "/gadget_rows/gadget_id",
+     "step_name": "gadget_row_fields",
+     "level": "chunk",
+     "output_map": "customChunkOutputs",
+     "output_key": "gadget_id",
+     "readback_path": "/chunks/*/customChunkOutputs/gadget_row_fields/gadget_id"
+    },
+    {
+     "workflow_group": "gadget_rows",
+     "workflow_field": "gadget_weight",
+     "final_path": "/gadget_rows/gadget_weight",
+     "step_name": "gadget_row_fields",
+     "level": "chunk",
+     "output_map": "customChunkOutputs",
+     "output_key": "gadget_weight",
+     "readback_path": "/chunks/*/customChunkOutputs/gadget_row_fields/gadget_weight"
+    }
+   ],
+   "leaf_fields": [
+    {
+     "final_path": "/widget_summary/widget_code",
+     "workflow_group": "widget_summary",
+     "workflow_field": "widget_code",
+     "step_name": "widget_summary_fields",
+     "level": "chunk",
+     "output_key": "widget_code",
+     "field_type": "str",
+     "is_repeated": false,
+     "repetition_scope": "none"
+    },
+    {
+     "final_path": "/widget_summary/widget_color",
+     "workflow_group": "widget_summary",
+     "workflow_field": "widget_color",
+     "step_name": "widget_summary_fields",
+     "level": "chunk",
+     "output_key": "widget_color",
+     "field_type": "str",
+     "is_repeated": false,
+     "repetition_scope": "none"
+    },
+    {
+     "final_path": "/gadget_rows/gadget_id",
+     "workflow_group": "gadget_rows",
+     "workflow_field": "gadget_id",
+     "step_name": "gadget_row_fields",
+     "level": "chunk",
+     "output_key": "gadget_id",
+     "field_type": "str",
+     "is_repeated": false,
+     "repetition_scope": "none"
+    },
+    {
+     "final_path": "/gadget_rows/gadget_weight",
+     "workflow_group": "gadget_rows",
+     "workflow_field": "gadget_weight",
+     "step_name": "gadget_row_fields",
+     "level": "chunk",
+     "output_key": "gadget_weight",
+     "field_type": "str",
+     "is_repeated": false,
+     "repetition_scope": "none"
+    }
+   ],
+   "field_counts": {
+    "gadget_row_fields": 2,
+    "widget_summary_fields": 2
+   },
+   "schema_hash": "b887988dbf6d84d4cf3a106e1e24af1bd4735e6ccaf9008a78b63b5590c23ee1"
+  },
+  "widget_summary": {
+   "fields": {
+    "widget_code": {
+     "prompt": {
+      "instructions": "Synthetic instruction text for the widget code.",
+      "type": "str"
+     }
+    },
+    "widget_color": {
+     "prompt": {
+      "instructions": "Synthetic instruction text for the widget color.",
+      "type": "str"
+     }
+    }
+   }
+  },
+  "gadget_rows": {
+   "fields": {
+    "gadget_id": {
+     "prompt": {
+      "instructions": "Synthetic instruction text for the gadget id.",
+      "type": "str"
+     }
+    },
+    "gadget_weight": {
+     "prompt": {
+      "instructions": "Synthetic instruction text for the gadget weight.",
+      "type": "str"
+     }
+    }
+   }
+  }
+ }
+}
