@@ -60,6 +60,15 @@ class _RouteContainer:
 
 _REPEATED_STEP_KINDS = {"keys", "summary"}
 _EXTRACTED_FIELD_VALUE_KEYS = {"value", "confidence", "conflicts", "qa"}
+_GET_ALIASES = {
+    "chunkId": ("chunk_id",),
+    "customChunkOutputs": ("custom_chunk_outputs",),
+    "customDocumentOutputs": ("custom_document_outputs",),
+    "customSectionOutputs": ("custom_section_outputs",),
+    "documentPages": ("document_pages",),
+    "pageNumbers": ("page_numbers",),
+    "sectionId": ("section_id",),
+}
 
 
 def reassemble_custom_outputs_from_xray(
@@ -428,10 +437,16 @@ def _page_numbers(value: typing.Any) -> typing.Tuple[int, ...]:
 
 
 def _get(value: typing.Any, key: str) -> typing.Any:
-    if isinstance(value, typing.Mapping):
-        raw_value = value.get(key)
-    else:
-        raw_value = getattr(value, key, None)
+    raw_value = None
+    sentinel = object()
+    for candidate in (key, *_GET_ALIASES.get(key, ())):
+        if isinstance(value, typing.Mapping):
+            candidate_value = value.get(candidate, sentinel)
+        else:
+            candidate_value = getattr(value, candidate, sentinel)
+        if candidate_value is not sentinel:
+            raw_value = candidate_value
+            break
     if isinstance(raw_value, str):
         try:
             parsed_value = json.loads(clean_json(raw_value))
@@ -798,6 +813,11 @@ def _apply_relationships(
                 )
             )
             continue
+
+        if parent_group not in result:
+            result[parent_group] = []
+        if child_group not in result:
+            result[child_group] = []
 
         parent_records = result.get(parent_group)
         child_records = result.get(child_group)

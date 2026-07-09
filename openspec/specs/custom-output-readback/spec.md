@@ -26,6 +26,16 @@ generic repeated-output container when route metadata is present.
 - **WHEN** the SDK loads the custom output
 - **THEN** both the scalar field and repeated records are present in final output.
 
+#### Scenario: SDK typed X-Ray aliases remain routable
+
+- **GIVEN** a typed SDK `DocumentXray` object exposes custom output maps with
+  snake_case aliases such as `custom_chunk_outputs`
+- **AND** route metadata still names the canonical wire map such as
+  `customChunkOutputs`
+- **WHEN** the SDK reassembles custom output
+- **THEN** it reads the typed SDK aliases as the same custom output source
+- **AND** the routed values are present in final output.
+
 #### Scenario: Repeated routes prefer records-wrapped rows
 
 - **GIVEN** a `keys` or `summary` custom step output contains both `_records[]`
@@ -162,6 +172,14 @@ metadata rather than hardcoded final group names.
 - **WHEN** the SDK applies relationship metadata
 - **THEN** the child record remains in the configured unmatched child group.
 
+#### Scenario: Missing relationship list groups become empty lists
+
+- **GIVEN** relationship metadata declares parent and child list groups
+- **AND** custom output produces no non-empty records for one or both groups
+- **WHEN** the SDK applies relationship metadata
+- **THEN** the absent relationship groups are treated as empty lists
+- **AND** no invalid relationship output diagnostic is emitted.
+
 #### Scenario: Ambiguous child matches fail clearly
 
 - **GIVEN** one child record matches more than one parent record
@@ -290,4 +308,3 @@ adding `_records[]` and top-level repeated final-group support.
 - **AND** route metadata maps that output key to a scalar final path
 - **WHEN** the SDK loads custom outputs
 - **THEN** the scalar final field is preserved.
-

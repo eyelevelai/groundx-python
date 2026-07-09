@@ -275,6 +275,120 @@ def test_exposes_workflow_output_before_final_routing() -> None:
     }
 
 
+def test_reads_sdk_typed_snake_case_custom_output_maps() -> None:
+    workflow_extract = {
+        "workflow": {
+            "custom_steps": [
+                {"name": "statement_fields", "level": "chunk", "kind": "instruct"},
+            ],
+            "output_routes": [
+                {
+                    "workflow_group": "statement",
+                    "workflow_field": "account_number",
+                    "final_path": "/statement/account_number",
+                    "step_name": "statement_fields",
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": "account_number",
+                },
+            ],
+        }
+    }
+    xray = {
+        "chunks": [
+            {
+                # SDK DocumentXray objects dump aliases as snake_case.
+                "custom_chunk_outputs": {
+                    "statement_fields": {"account_number": "A-123"}
+                },
+            }
+        ]
+    }
+
+    result = reassemble_custom_outputs_from_xray(
+        xray,
+        workflow_extract=workflow_extract,
+    )
+
+    assert result.diagnostics == []
+    assert result.final_output == {"statement": {"account_number": "A-123"}}
+    assert result.workflow_output == {"statement": {"account_number": "A-123"}}
+
+
+def test_missing_relationship_list_groups_are_empty_lists() -> None:
+    workflow_extract = {
+        "workflow": {
+            "custom_steps": [
+                {"name": "statement_fields", "level": "chunk", "kind": "instruct"},
+                {"name": "meter_fields", "level": "chunk", "kind": "summary"},
+                {"name": "charge_fields", "level": "chunk", "kind": "keys"},
+            ],
+            "output_routes": [
+                {
+                    "workflow_group": "statement",
+                    "workflow_field": "account_number",
+                    "final_path": "/statement/account_number",
+                    "step_name": "statement_fields",
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": "account_number",
+                },
+                {
+                    "workflow_group": "meters",
+                    "workflow_field": "meter_number",
+                    "final_path": "/meters/meter_number",
+                    "step_name": "meter_fields",
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": "meter_number",
+                },
+                {
+                    "workflow_group": "charges",
+                    "workflow_field": "charge_amount",
+                    "final_path": "/charges/charge_amount",
+                    "step_name": "charge_fields",
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": "charge_amount",
+                },
+            ],
+            "output_relationships": [
+                {
+                    "parent_group": "meters",
+                    "child_group": "charges",
+                    "parent_output_field": "charges",
+                    "match_attrs": ["meter_number"],
+                    "unmatched_child_group": "charges",
+                }
+            ],
+        }
+    }
+    xray = {
+        "chunks": [
+            {
+                "customChunkOutputs": {
+                    "statement_fields": {"account_number": "A-123"},
+                    "meter_fields": {"meter_number": ""},
+                    "charge_fields": {"charge_amount": ""},
+                }
+            }
+        ]
+    }
+
+    result = reassemble_custom_outputs_from_xray(
+        xray,
+        workflow_extract=workflow_extract,
+    )
+
+    assert result.diagnostics == []
+    assert result.final_output == {
+        "statement": {"account_number": "A-123"},
+        "meters": [],
+        "charges": [],
+    }
+    assert result.relationship_output == result.final_output
+
+
 def test_records_wrapper_preserves_direct_outputs_next_to_records() -> None:
     workflow_extract = {
         "workflow": {
