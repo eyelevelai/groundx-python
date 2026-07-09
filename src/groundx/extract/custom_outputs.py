@@ -834,6 +834,13 @@ def _apply_relationships(
                             f"relationship {rel_name} child record {child_index} "
                             "matches more than one parent"
                         ),
+                        # Ambiguity is a HANDLED data condition: the child is
+                        # routed to the unmatched group (rendered account-level
+                        # per the relationship algorithm), so it must not fail
+                        # the document. Live prod 2026-07-08: a real utility
+                        # bill whose meters share match-attr values failed
+                        # entirely under the default severity="error".
+                        severity="warning",
                         relationship=rel_name,
                         child_record_index=child_index,
                     )
