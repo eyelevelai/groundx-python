@@ -492,6 +492,7 @@ class RawWorkflowsClient:
         id: WorkflowsGetRequestId,
         *,
         format: typing.Optional[WorkflowsGetRequestFormat] = None,
+        metadata_only: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[WorkflowResponse]:
         """
@@ -504,6 +505,9 @@ class RawWorkflowsClient:
 
         format : typing.Optional[WorkflowsGetRequestFormat]
             Response format. `yaml` returns the stored authored workflow YAML source verbatim (absent for workflows created via compiled JSON).
+
+        metadata_only : typing.Optional[bool]
+            When true, return workflow metadata such as workflowId and updatedAt without returning the workflow extract/settings body.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -518,6 +522,7 @@ class RawWorkflowsClient:
             method="GET",
             params={
                 "format": format,
+                "metadataOnly": metadata_only,
             },
             request_options=request_options,
         )
@@ -1154,6 +1159,7 @@ class AsyncRawWorkflowsClient:
         id: WorkflowsGetRequestId,
         *,
         format: typing.Optional[WorkflowsGetRequestFormat] = None,
+        metadata_only: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[WorkflowResponse]:
         """
@@ -1166,6 +1172,9 @@ class AsyncRawWorkflowsClient:
 
         format : typing.Optional[WorkflowsGetRequestFormat]
             Response format. `yaml` returns the stored authored workflow YAML source verbatim (absent for workflows created via compiled JSON).
+
+        metadata_only : typing.Optional[bool]
+            When true, return workflow metadata such as workflowId and updatedAt without returning the workflow extract/settings body.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1180,6 +1189,7 @@ class AsyncRawWorkflowsClient:
             method="GET",
             params={
                 "format": format,
+                "metadataOnly": metadata_only,
             },
             request_options=request_options,
         )

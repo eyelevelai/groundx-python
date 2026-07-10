@@ -3102,6 +3102,7 @@ client = GroundX(
 client.workflows.get(
     id=1,
     format="json",
+    metadata_only=True,
 )
 
 ```
@@ -3127,6 +3128,14 @@ client.workflows.get(
 <dd>
 
 **format:** `typing.Optional[WorkflowsGetRequestFormat]` — Response format. `yaml` returns the stored authored workflow YAML source verbatim (absent for workflows created via compiled JSON).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata_only:** `typing.Optional[bool]` — When true, return workflow metadata such as workflowId and updatedAt without returning the workflow extract/settings body.
     
 </dd>
 </dl>

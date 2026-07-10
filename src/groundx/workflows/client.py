@@ -377,6 +377,7 @@ class WorkflowsClient:
         id: WorkflowsGetRequestId,
         *,
         format: typing.Optional[WorkflowsGetRequestFormat] = None,
+        metadata_only: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> WorkflowResponse:
         """
@@ -389,6 +390,9 @@ class WorkflowsClient:
 
         format : typing.Optional[WorkflowsGetRequestFormat]
             Response format. `yaml` returns the stored authored workflow YAML source verbatim (absent for workflows created via compiled JSON).
+
+        metadata_only : typing.Optional[bool]
+            When true, return workflow metadata such as workflowId and updatedAt without returning the workflow extract/settings body.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -408,9 +412,12 @@ class WorkflowsClient:
         client.workflows.get(
             id=1,
             format="json",
+            metadata_only=True,
         )
         """
-        _response = self._raw_client.get(id, format=format, request_options=request_options)
+        _response = self._raw_client.get(
+            id, format=format, metadata_only=metadata_only, request_options=request_options
+        )
         return _response.data
 
     def update(
@@ -951,6 +958,7 @@ class AsyncWorkflowsClient:
         id: WorkflowsGetRequestId,
         *,
         format: typing.Optional[WorkflowsGetRequestFormat] = None,
+        metadata_only: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> WorkflowResponse:
         """
@@ -963,6 +971,9 @@ class AsyncWorkflowsClient:
 
         format : typing.Optional[WorkflowsGetRequestFormat]
             Response format. `yaml` returns the stored authored workflow YAML source verbatim (absent for workflows created via compiled JSON).
+
+        metadata_only : typing.Optional[bool]
+            When true, return workflow metadata such as workflowId and updatedAt without returning the workflow extract/settings body.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -987,12 +998,15 @@ class AsyncWorkflowsClient:
             await client.workflows.get(
                 id=1,
                 format="json",
+                metadata_only=True,
             )
 
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.get(id, format=format, request_options=request_options)
+        _response = await self._raw_client.get(
+            id, format=format, metadata_only=metadata_only, request_options=request_options
+        )
         return _response.data
 
     async def update(
