@@ -834,7 +834,11 @@ def _apply_relationships(
             )
             continue
 
-        parent_list = typing.cast(typing.List[typing.Dict[str, typing.Any]], parent_records)
+        parent_list = _dedupe_relationship_parents(
+            typing.cast(typing.List[typing.Dict[str, typing.Any]], parent_records),
+            typing.cast(typing.List[str], match_attrs),
+        )
+        result[parent_group] = parent_list
         child_list = typing.cast(typing.List[typing.Dict[str, typing.Any]], child_records)
         for parent in parent_list:
             parent.setdefault(parent_output_field, [])
@@ -881,6 +885,50 @@ def _apply_relationships(
             result.setdefault(unmatched_child_group, [])
 
     return result, diagnostics
+
+
+def _dedupe_relationship_parents(
+    parent_list: typing.List[typing.Dict[str, typing.Any]],
+    match_attrs: typing.Sequence[str],
+) -> typing.List[typing.Dict[str, typing.Any]]:
+    deduped: typing.List[typing.Dict[str, typing.Any]] = []
+    by_key: typing.Dict[
+        typing.Tuple[typing.Tuple[str, typing.Any], ...],
+        typing.Dict[str, typing.Any],
+    ] = {}
+    for parent in parent_list:
+        parent_key = _match_key(parent, match_attrs)
+        if not parent_key:
+            deduped.append(parent)
+            continue
+        existing = by_key.get(parent_key)
+        if existing is None:
+            by_key[parent_key] = parent
+            deduped.append(parent)
+            continue
+        _merge_relationship_parent(existing, parent)
+    return deduped
+
+
+def _merge_relationship_parent(
+    target: typing.Dict[str, typing.Any],
+    source: typing.Mapping[str, typing.Any],
+) -> None:
+    for key, value in source.items():
+        if key not in target or _match_value_absent(target.get(key)):
+            target[key] = copy.deepcopy(value)
+            continue
+        target_value = target.get(key)
+        if isinstance(target_value, dict) and isinstance(value, typing.Mapping):
+            _merge_relationship_parent(
+                target_value,
+                typing.cast(typing.Mapping[str, typing.Any], value),
+            )
+            continue
+        if isinstance(target_value, list) and isinstance(value, list):
+            for item in value:
+                if item not in target_value:
+                    target_value.append(copy.deepcopy(item))
 
 
 def _relationship_application_order(

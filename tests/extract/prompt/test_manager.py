@@ -1771,6 +1771,64 @@ invoice:
             "/invoice/charges/*",
         )
 
+    def test_prepare_extraction_yaml_routes_direct_statement_role_fields_to_root(
+        self,
+    ) -> None:
+        prepared = prepare_extraction_yaml(
+            """
+extraction_policy_version: v1
+
+workflow:
+  custom_steps:
+    - name: generic_step_a
+      level: chunk
+      kind: instruct
+    - name: generic_step_b
+      level: chunk
+      kind: keys
+  agent_chain:
+    - parallel:
+        - group: generic_group_a
+          chain: [reconcile_statement, qa_statement, save_statement]
+        - group: generic_group_b
+          chain: [reconcile_meters, qa_meters, save_meters]
+
+generic_group_a:
+  workflow_step: generic_step_a
+  final_value_aliases:
+    generic_attr_01: generic_attr_99
+  fields:
+    generic_attr_01:
+      workflow_output_key: generic_attr_01
+      prompt:
+        instructions: Return the account identifier.
+        type: str
+
+generic_group_b:
+  workflow_step: generic_step_b
+  fields:
+    generic_attr_15:
+      workflow_output_key: generic_attr_15
+      prompt:
+        instructions: Return the meter identifier.
+        type: str
+"""
+        )
+
+        workflow = prepared.persisted_workflow_extract["workflow"]
+        paths_by_group = {
+            (route["workflow_group"], route["workflow_field"]): route["final_path"]
+            for route in workflow["output_routes"]
+        }
+        self.assertEqual(
+            paths_by_group[("generic_group_a", "generic_attr_01")],
+            "/generic_attr_01",
+        )
+        self.assertEqual(
+            paths_by_group[("generic_group_b", "generic_attr_15")],
+            "/generic_group_b/generic_attr_15",
+        )
+
     def test_prepare_extraction_yaml_rejects_slot_metadata(
         self,
     ) -> None:

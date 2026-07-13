@@ -1,0 +1,48 @@
+{
+  "artifacts": {
+    "handoff": {
+      "sha256": "792ebba0faad4e144ce96de810af109e9edb59e467a476ba68c1a03bdd82857d"
+    },
+    "previous_extract_chain": {
+      "sha256": "0ec89f6883745e054cc2f9ce2344e6c67685577df4df5dd9290bcf27b971afd5"
+    }
+  },
+  "assertions": {
+    "consumes_internal_extract_chain_handoff": true,
+    "handoff_written_for_save_callback": true,
+    "has_no_error_diagnostics": true,
+    "shape_contract_passed": true
+  },
+  "input_from": "internal_arcadia_extract_chain",
+  "input_sha256": "0ec89f6883745e054cc2f9ce2344e6c67685577df4df5dd9290bcf27b971afd5",
+  "output": {
+    "diagnostic_count": 0,
+    "final_output_sha256": "3ba15fd161a0e83600b8c7fa0ae5a1e168d40b93e0887d7aa1f4665f1fd12f4d",
+    "relationship_output_sha256": "3ba15fd161a0e83600b8c7fa0ae5a1e168d40b93e0887d7aa1f4665f1fd12f4d",
+    "source_provenance_count": 460,
+    "workflow_output_sha256": "f38d29f3ac8a5d5b15043041b006812502076ec2675f248a430f844b317377ee"
+  },
+  "output_for": "internal_arcadia_save_callback",
+  "request": {
+    "callbackURL": "https://api.groundx.ai/callback/layout",
+    "documentID": "aac63247-1613-4507-be26-4d8a04b60072",
+    "fileName": "arcadia.pdf",
+    "modelID": 30296,
+    "processorID": 134,
+    "taskID": "aa797958-a229-4059-b2c8-3078e2451c05",
+    "workflowID": "generic_v1-product-path",
+    "workflowSchemaHash": "66b0e276d5996122e278951cf52009cd5b9e2891dfff9f15c13bc21696edcf14",
+    "workflowVersion": "2026-07-12T22:34:02Z"
+  },
+  "shape_assertions": {
+    "every_parent_has_child_rows": true,
+    "has_account_level_child_rows": true,
+    "has_expected_parent_count": true,
+    "has_no_error_diagnostics": true,
+    "has_relationship_output": true,
+    "has_statement_fields": true
+  },
+  "stage": "groundx_python_sdk_reassembly",
+  "surface": "generic_v1",
+  "workflow_schema_hash": "66b0e276d5996122e278951cf52009cd5b9e2891dfff9f15c13bc21696edcf14"
+}

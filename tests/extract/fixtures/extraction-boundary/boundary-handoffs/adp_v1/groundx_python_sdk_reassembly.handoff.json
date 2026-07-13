@@ -1,0 +1,1972 @@
+{
+  "diagnostics": [],
+  "final_output": {
+    "automatic_enrollment": {
+      "auto_escalation_pct": "adp_v1_auto_escalation_pct_1",
+      "automatic_enrollment_type": "adp_v1_automatic_enrollment_type_1",
+      "default_enrollment_pct": "adp_v1_default_enrollment_pct_1",
+      "eligible_employees": "adp_v1_eligible_employees_1",
+      "eligible_employees_other_specify": "adp_v1_eligible_employees_other_specify_1",
+      "escalation_timing": "adp_v1_escalation_timing_1",
+      "escalation_timing_other_specify": "adp_v1_escalation_timing_other_specify_1",
+      "maximum_auto_enrollment_pct": "adp_v1_maximum_auto_enrollment_pct_1",
+      "permissible_withdrawal_window": "adp_v1_permissible_withdrawal_window_1",
+      "qaca_eaca_effective_date": "2026-01-01"
+    },
+    "compensation": {
+      "compensation_definition": "adp_v1_compensation_definition_1",
+      "compensation_excluded_all": "adp_v1_compensation_excluded_all_1",
+      "compensation_excluded_all_other_specify": "adp_v1_compensation_excluded_all_other_specify_1",
+      "compensation_excluded_deferrals": "adp_v1_compensation_excluded_deferrals_1",
+      "compensation_excluded_deferrals_other_specify": "adp_v1_compensation_excluded_deferrals_other_specify_1",
+      "compensation_excluded_match": "adp_v1_compensation_excluded_match_1",
+      "compensation_excluded_match_other_specify": "adp_v1_compensation_excluded_match_other_specify_1",
+      "compensation_excluded_nec": "adp_v1_compensation_excluded_nec_1",
+      "compensation_excluded_nec_other_specify": "adp_v1_compensation_excluded_nec_other_specify_1",
+      "compensation_for_initial_year": "adp_v1_compensation_for_initial_year_1",
+      "compensation_for_initial_year_other_specify": "adp_v1_compensation_for_initial_year_other_specify_1"
+    },
+    "eligibility_requirements": {
+      "after_tax_contributions": "adp_v1_after_tax_contributions_1",
+      "age_requirement": "adp_v1_age_requirement_1",
+      "age_requirement_other_specify": "adp_v1_age_requirement_other_specify_1",
+      "deferral_age_requirement": "adp_v1_deferral_age_requirement_1",
+      "deferral_age_requirement_other_specify": "adp_v1_deferral_age_requirement_other_specify_1",
+      "deferral_entry_date": "2026-01-01",
+      "deferral_service_requirement": "adp_v1_deferral_service_requirement_1",
+      "entry_date": "2026-01-01",
+      "entry_date_other_specify": "2026-01-01",
+      "excluded_employees_all_contributions": "adp_v1_excluded_employees_all_contributions_1",
+      "excluded_employees_all_contributions_other_specify": "adp_v1_excluded_employees_all_contributions_other_specify_1",
+      "hours_requirement": "adp_v1_hours_requirement_1",
+      "hours_requirement_other_specify": "adp_v1_hours_requirement_other_specify_1",
+      "matching_age_requirement": "adp_v1_matching_age_requirement_1",
+      "matching_entry_date": "2026-01-01",
+      "matching_service_requirement": "adp_v1_matching_service_requirement_1",
+      "nec_age_requirement": "adp_v1_nec_age_requirement_1",
+      "nec_entry_date": "2026-01-01",
+      "nec_service_requirement": "adp_v1_nec_service_requirement_1",
+      "predecessor_service": "adp_v1_predecessor_service_1",
+      "rollover_contributions": "adp_v1_rollover_contributions_1",
+      "separate_eligibility_for_employer_contributions": "adp_v1_separate_eligibility_for_employer_contributions_1",
+      "service_requirement": "adp_v1_service_requirement_1",
+      "service_requirement_other_specify": "adp_v1_service_requirement_other_specify_1",
+      "simple_401k_contributions": "adp_v1_simple_401k_contributions_1",
+      "upto_tax_contribution_pct": "adp_v1_upto_tax_contribution_pct_1"
+    },
+    "employee_contributions": {
+      "after_tax_voluntary_contributions": "adp_v1_after_tax_voluntary_contributions_1",
+      "contribution_limit": "adp_v1_contribution_limit_1",
+      "contribution_limit_other_specify": "adp_v1_contribution_limit_other_specify_1",
+      "contribution_method": "adp_v1_contribution_method_1",
+      "deferral_change_frequency": "adp_v1_deferral_change_frequency_1",
+      "deferral_change_frequency_other_specify": "adp_v1_deferral_change_frequency_other_specify_1",
+      "roth_elective_deferrals": "adp_v1_roth_elective_deferrals_1"
+    },
+    "employer_contributions": {
+      "employer_match_allocation_conditions": "adp_v1_employer_match_allocation_conditions_1",
+      "employer_match_eligible_employees": "adp_v1_employer_match_eligible_employees_1",
+      "employer_match_eligible_employees_other_specify": "adp_v1_employer_match_eligible_employees_other_specify_1",
+      "employer_match_formula_1": "adp_v1_employer_match_formula_1_1",
+      "employer_match_formula_2": "adp_v1_employer_match_formula_2_1",
+      "employer_match_timing": "adp_v1_employer_match_timing_1",
+      "employer_match_true_up": "adp_v1_employer_match_true_up_1",
+      "employer_match_type": "adp_v1_employer_match_type_1",
+      "employer_profit_sharing_allocation_conditions": "adp_v1_employer_profit_sharing_allocation_conditions_1",
+      "employer_profit_sharing_allocation_method": "adp_v1_employer_profit_sharing_allocation_method_1",
+      "employer_profit_sharing_allocation_method_other_specify": "adp_v1_employer_profit_sharing_allocation_method_other_specify_1",
+      "employer_profit_sharing_eligible_employees": "adp_v1_employer_profit_sharing_eligible_employees_1",
+      "employer_profit_sharing_timing": "adp_v1_employer_profit_sharing_timing_1",
+      "employer_profit_sharing_type": "adp_v1_employer_profit_sharing_type_1",
+      "safe_harbor_annual_true_up": "adp_v1_safe_harbor_annual_true_up_1",
+      "safe_harbor_eligible_employees": "adp_v1_safe_harbor_eligible_employees_1",
+      "safe_harbor_eligible_employees_other_specify": "adp_v1_safe_harbor_eligible_employees_other_specify_1",
+      "safe_harbor_nonelective_pct": "adp_v1_safe_harbor_nonelective_pct_1",
+      "safe_harbor_timing_of_contribution": "adp_v1_safe_harbor_timing_of_contribution_1",
+      "safe_harbor_type": "adp_v1_safe_harbor_type_1"
+    },
+    "employer_information": {
+      "address_city": "adp_v1_address_city_1",
+      "address_state": "adp_v1_address_state_1",
+      "address_street": "adp_v1_address_street_1",
+      "address_zip": "adp_v1_address_zip_1",
+      "affiliated_employer_group_type": "adp_v1_affiliated_employer_group_type_1",
+      "affiliated_employers": "adp_v1_affiliated_employers_1",
+      "employer_fiscal_year_ends": "2026-01-01",
+      "employer_name": "adp_v1_employer_name_1",
+      "multiple_employer_plan": "adp_v1_multiple_employer_plan_1",
+      "participating_employers": "adp_v1_participating_employers_1",
+      "tax_identification_number": "adp_v1_tax_identification_number_1",
+      "telephone": "adp_v1_telephone_1",
+      "type_of_entity": "adp_v1_type_of_entity_1",
+      "type_of_entity_llc_subtype": "adp_v1_type_of_entity_llc_subtype_1",
+      "type_of_entity_other_specify": "adp_v1_type_of_entity_other_specify_1"
+    },
+    "miscellaneous_plan_provisions": {
+      "adp_acp_test_year": "adp_v1_adp_acp_test_year_1",
+      "auto_enrollment_exemption": "adp_v1_auto_enrollment_exemption_1",
+      "auto_enrollment_exemption_other_specify": "adp_v1_auto_enrollment_exemption_other_specify_1",
+      "disability_definition": "adp_v1_disability_definition_1",
+      "disability_definition_other_specify": "adp_v1_disability_definition_other_specify_1",
+      "hce_definition_top_paid_group_election": "adp_v1_hce_definition_top_paid_group_election_1",
+      "in_plan_roth_rollovers": "adp_v1_in_plan_roth_rollovers_1",
+      "life_insurance": "adp_v1_life_insurance_1",
+      "life_insurance_other_specify": "adp_v1_life_insurance_other_specify_1",
+      "money_purchase_plan": "adp_v1_money_purchase_plan_1",
+      "money_purchase_plan_other_specify": "adp_v1_money_purchase_plan_other_specify_1",
+      "other_plans_annual_additions": "adp_v1_other_plans_annual_additions_1",
+      "other_plans_annual_additions_other_specify": "adp_v1_other_plans_annual_additions_other_specify_1",
+      "special_effective_dates": "2026-01-01",
+      "top_heavy_elections": "adp_v1_top_heavy_elections_1",
+      "top_heavy_elections_other_specify": "adp_v1_top_heavy_elections_other_specify_1"
+    },
+    "pes_setup": {
+      "flat_dollar_contributions": "adp_v1_flat_dollar_contributions_1",
+      "flat_dollar_contributions_other_specify": "adp_v1_flat_dollar_contributions_other_specify_1",
+      "js_flag": "adp_v1_js_flag_1",
+      "prior_money_source_subject_to_vesting": "adp_v1_prior_money_source_subject_to_vesting_1",
+      "prior_money_source_subject_to_vesting_other_specify": "adp_v1_prior_money_source_subject_to_vesting_other_specify_1"
+    },
+    "plan_information": {
+      "administrators_info": "adp_v1_administrators_info_1",
+      "administrators_info_other_specify": "adp_v1_administrators_info_other_specify_1",
+      "oe_date": "2026-01-01",
+      "plan_name": "adp_v1_plan_name_1",
+      "plan_number": "adp_v1_plan_number_1",
+      "plan_number_other_specify": "adp_v1_plan_number_other_specify_1",
+      "plan_status": "adp_v1_plan_status_1",
+      "plan_year": "adp_v1_plan_year_1",
+      "plan_year_end_date": "2026-01-01",
+      "plan_year_other_specify": "adp_v1_plan_year_other_specify_1",
+      "restatement_effective_date": "2026-01-01",
+      "type_of_plan": "adp_v1_type_of_plan_1",
+      "valuation_date": "2026-01-01",
+      "valuation_date_other_specify": "2026-01-01"
+    },
+    "vesting_and_retirement_ages": {
+      "100_pct_vesting_at_early_retirement": "adp_v1_field_100_pct_vesting_at_early_retirement_1",
+      "early_retirement_age": "adp_v1_early_retirement_age_1",
+      "early_retirement_age_other_specify": "adp_v1_early_retirement_age_other_specify_1",
+      "early_retirement_service_requirement": "adp_v1_early_retirement_service_requirement_1",
+      "employer_match_vesting": "adp_v1_employer_match_vesting_1",
+      "employer_match_vesting_other_specify": "adp_v1_employer_match_vesting_other_specify_1",
+      "employer_match_vesting_schedule": "adp_v1_employer_match_vesting_schedule_1",
+      "employer_profit_sharing_vesting": "adp_v1_employer_profit_sharing_vesting_1",
+      "employer_profit_sharing_vesting_other_specify": "adp_v1_employer_profit_sharing_vesting_other_specify_1",
+      "employer_profit_sharing_vesting_schedule": "adp_v1_employer_profit_sharing_vesting_schedule_1",
+      "forfeiture_use": "adp_v1_forfeiture_use_1",
+      "normal_retirement_age": "adp_v1_normal_retirement_age_1",
+      "normal_retirement_age_other_specify": "adp_v1_normal_retirement_age_other_specify_1",
+      "normal_retirement_service_requirement": "adp_v1_normal_retirement_service_requirement_1",
+      "safe_harbor_vesting": "adp_v1_safe_harbor_vesting_1",
+      "safe_harbor_vesting_other_specify": "adp_v1_safe_harbor_vesting_other_specify_1",
+      "vesting_period_calculation": "adp_v1_vesting_period_calculation_1",
+      "vesting_service": "adp_v1_vesting_service_1"
+    },
+    "withdrawals_and_distributions": {
+      "hardship_distributions": "adp_v1_hardship_distributions_1",
+      "hardship_distributions_money_source_restrictions": "adp_v1_hardship_distributions_money_source_restrictions_1",
+      "hardship_distributions_vesting_requirement": "adp_v1_hardship_distributions_vesting_requirement_1",
+      "hardship_distributions_vesting_requirement_other_specify": "adp_v1_hardship_distributions_vesting_requirement_other_specify_1",
+      "in_service_withdrawals": "adp_v1_in_service_withdrawals_1",
+      "in_service_withdrawals_age": "adp_v1_in_service_withdrawals_age_1",
+      "in_service_withdrawals_age_other_specify": "adp_v1_in_service_withdrawals_age_other_specify_1",
+      "in_service_withdrawals_money_source_restrictions": "adp_v1_in_service_withdrawals_money_source_restrictions_1",
+      "in_service_withdrawals_money_source_restrictions_other_specify": "adp_v1_in_service_withdrawals_money_source_restrictions_other_specify_1",
+      "in_service_withdrawals_service_requirement": "adp_v1_in_service_withdrawals_service_requirement_1",
+      "in_service_withdrawals_service_requirement_other_specify": "adp_v1_in_service_withdrawals_service_requirement_other_specify_1",
+      "in_service_withdrawals_vesting_requirement": "adp_v1_in_service_withdrawals_vesting_requirement_1",
+      "in_service_withdrawals_vesting_requirement_other_specify": "adp_v1_in_service_withdrawals_vesting_requirement_other_specify_1",
+      "loans": "adp_v1_loans_1",
+      "payment_options": "adp_v1_payment_options_1",
+      "withdrawals_from_rollover": "adp_v1_withdrawals_from_rollover_1",
+      "withdrawals_from_rollover_other_specify": "adp_v1_withdrawals_from_rollover_other_specify_1"
+    }
+  },
+  "input_from": "internal_arcadia_extract_chain",
+  "input_sha256": "33cc0b91c973820b6673f579d09aa989dedf15c07c756ba4f0f9b107ea1f6519",
+  "output_for": "internal_arcadia_save_callback",
+  "relationship_output": null,
+  "request": {
+    "callbackURL": "https://api.groundx.ai/callback/layout",
+    "documentID": "17c6a87d-3d01-4da0-b2ab-990680a86836",
+    "fileName": "adp.pdf",
+    "modelID": 30297,
+    "processorID": 134,
+    "taskID": "f16808b7-2c43-4920-b101-b052805b3b54",
+    "workflowID": "adp_v1-product-path",
+    "workflowSchemaHash": "440d6a1064202a8a2e1fcff746dcc7b132d0e1117b0ab1212da3cee07dc28725",
+    "workflowVersion": "2026-07-12T22:34:03Z"
+  },
+  "schema_version": "groundx-python-sdk-reassembly-handoff-v1",
+  "source_provenance": [
+    {
+      "final_path": "/employer_information/employer_name",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "employer_name",
+      "workflow_group": "adp_f1_employer_and_plan_information"
+    },
+    {
+      "final_path": "/employer_information/address_street",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "address_street",
+      "workflow_group": "adp_f1_employer_and_plan_information"
+    },
+    {
+      "final_path": "/employer_information/address_city",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "address_city",
+      "workflow_group": "adp_f1_employer_and_plan_information"
+    },
+    {
+      "final_path": "/employer_information/address_state",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "address_state",
+      "workflow_group": "adp_f1_employer_and_plan_information"
+    },
+    {
+      "final_path": "/employer_information/address_zip",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "address_zip",
+      "workflow_group": "adp_f1_employer_and_plan_information"
+    },
+    {
+      "final_path": "/employer_information/telephone",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "telephone",
+      "workflow_group": "adp_f1_employer_and_plan_information"
+    },
+    {
+      "final_path": "/employer_information/tax_identification_number",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "tax_identification_number",
+      "workflow_group": "adp_f1_employer_and_plan_information"
+    },
+    {
+      "final_path": "/employer_information/employer_fiscal_year_ends",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "employer_fiscal_year_ends",
+      "workflow_group": "adp_f1_employer_and_plan_information"
+    },
+    {
+      "final_path": "/employer_information/type_of_entity",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "type_of_entity",
+      "workflow_group": "adp_f1_employer_and_plan_information"
+    },
+    {
+      "final_path": "/employer_information/type_of_entity_llc_subtype",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "type_of_entity_llc_subtype",
+      "workflow_group": "adp_f1_employer_and_plan_information"
+    },
+    {
+      "final_path": "/employer_information/type_of_entity_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "type_of_entity_other_specify",
+      "workflow_group": "adp_f1_employer_and_plan_information"
+    },
+    {
+      "final_path": "/employer_information/affiliated_employers",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "affiliated_employers",
+      "workflow_group": "adp_f1_employer_and_plan_information"
+    },
+    {
+      "final_path": "/employer_information/affiliated_employer_group_type",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "affiliated_employer_group_type",
+      "workflow_group": "adp_f1_employer_and_plan_information"
+    },
+    {
+      "final_path": "/employer_information/participating_employers",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "participating_employers",
+      "workflow_group": "adp_f1_employer_and_plan_information"
+    },
+    {
+      "final_path": "/employer_information/multiple_employer_plan",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "multiple_employer_plan",
+      "workflow_group": "adp_f1_employer_and_plan_information"
+    },
+    {
+      "final_path": "/plan_information/plan_name",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "plan_name",
+      "workflow_group": "adp_f1_employer_and_plan_information"
+    },
+    {
+      "final_path": "/plan_information/plan_status",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "plan_status",
+      "workflow_group": "adp_f1_employer_and_plan_information"
+    },
+    {
+      "final_path": "/plan_information/oe_date",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "oe_date",
+      "workflow_group": "adp_f1_employer_and_plan_information"
+    },
+    {
+      "final_path": "/plan_information/restatement_effective_date",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "restatement_effective_date",
+      "workflow_group": "adp_f1_employer_and_plan_information"
+    },
+    {
+      "final_path": "/plan_information/plan_year",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "plan_year",
+      "workflow_group": "adp_f1_employer_and_plan_information"
+    },
+    {
+      "final_path": "/plan_information/plan_year_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "plan_year_other_specify",
+      "workflow_group": "adp_f1_employer_and_plan_information"
+    },
+    {
+      "final_path": "/plan_information/plan_year_end_date",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "plan_year_end_date",
+      "workflow_group": "adp_f1_employer_and_plan_information"
+    },
+    {
+      "final_path": "/plan_information/valuation_date",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "valuation_date",
+      "workflow_group": "adp_f1_employer_and_plan_information"
+    },
+    {
+      "final_path": "/plan_information/valuation_date_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "valuation_date_other_specify",
+      "workflow_group": "adp_f1_employer_and_plan_information"
+    },
+    {
+      "final_path": "/plan_information/plan_number",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "plan_number",
+      "workflow_group": "adp_f1_employer_and_plan_information"
+    },
+    {
+      "final_path": "/plan_information/plan_number_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "plan_number_other_specify",
+      "workflow_group": "adp_f1_employer_and_plan_information"
+    },
+    {
+      "final_path": "/plan_information/administrators_info",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "administrators_info",
+      "workflow_group": "adp_f1_employer_and_plan_information"
+    },
+    {
+      "final_path": "/plan_information/administrators_info_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "administrators_info_other_specify",
+      "workflow_group": "adp_f1_employer_and_plan_information"
+    },
+    {
+      "final_path": "/plan_information/type_of_plan",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "type_of_plan",
+      "workflow_group": "adp_f1_employer_and_plan_information"
+    },
+    {
+      "final_path": "/eligibility_requirements/excluded_employees_all_contributions",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "excluded_employees_all_contributions",
+      "workflow_group": "adp_f2_eligibility_requirements"
+    },
+    {
+      "final_path": "/eligibility_requirements/excluded_employees_all_contributions_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "excluded_employees_all_contributions_other_specify",
+      "workflow_group": "adp_f2_eligibility_requirements"
+    },
+    {
+      "final_path": "/eligibility_requirements/separate_eligibility_for_employer_contributions",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "separate_eligibility_for_employer_contributions",
+      "workflow_group": "adp_f2_eligibility_requirements"
+    },
+    {
+      "final_path": "/eligibility_requirements/age_requirement",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "age_requirement",
+      "workflow_group": "adp_f2_eligibility_requirements"
+    },
+    {
+      "final_path": "/eligibility_requirements/age_requirement_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "age_requirement_other_specify",
+      "workflow_group": "adp_f2_eligibility_requirements"
+    },
+    {
+      "final_path": "/eligibility_requirements/service_requirement",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "service_requirement",
+      "workflow_group": "adp_f2_eligibility_requirements"
+    },
+    {
+      "final_path": "/eligibility_requirements/service_requirement_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "service_requirement_other_specify",
+      "workflow_group": "adp_f2_eligibility_requirements"
+    },
+    {
+      "final_path": "/eligibility_requirements/hours_requirement",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "hours_requirement",
+      "workflow_group": "adp_f2_eligibility_requirements"
+    },
+    {
+      "final_path": "/eligibility_requirements/hours_requirement_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "hours_requirement_other_specify",
+      "workflow_group": "adp_f2_eligibility_requirements"
+    },
+    {
+      "final_path": "/eligibility_requirements/entry_date",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "entry_date",
+      "workflow_group": "adp_f2_eligibility_requirements"
+    },
+    {
+      "final_path": "/eligibility_requirements/entry_date_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "entry_date_other_specify",
+      "workflow_group": "adp_f2_eligibility_requirements"
+    },
+    {
+      "final_path": "/eligibility_requirements/deferral_age_requirement",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "deferral_age_requirement",
+      "workflow_group": "adp_f2_eligibility_requirements"
+    },
+    {
+      "final_path": "/eligibility_requirements/deferral_age_requirement_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "deferral_age_requirement_other_specify",
+      "workflow_group": "adp_f2_eligibility_requirements"
+    },
+    {
+      "final_path": "/eligibility_requirements/deferral_service_requirement",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "deferral_service_requirement",
+      "workflow_group": "adp_f2_eligibility_requirements"
+    },
+    {
+      "final_path": "/eligibility_requirements/deferral_entry_date",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "deferral_entry_date",
+      "workflow_group": "adp_f2_eligibility_requirements"
+    },
+    {
+      "final_path": "/eligibility_requirements/matching_age_requirement",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "matching_age_requirement",
+      "workflow_group": "adp_f2_eligibility_requirements"
+    },
+    {
+      "final_path": "/eligibility_requirements/matching_service_requirement",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "matching_service_requirement",
+      "workflow_group": "adp_f2_eligibility_requirements"
+    },
+    {
+      "final_path": "/eligibility_requirements/matching_entry_date",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "matching_entry_date",
+      "workflow_group": "adp_f2_eligibility_requirements"
+    },
+    {
+      "final_path": "/eligibility_requirements/nec_age_requirement",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "nec_age_requirement",
+      "workflow_group": "adp_f2_eligibility_requirements"
+    },
+    {
+      "final_path": "/eligibility_requirements/nec_service_requirement",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "nec_service_requirement",
+      "workflow_group": "adp_f2_eligibility_requirements"
+    },
+    {
+      "final_path": "/eligibility_requirements/nec_entry_date",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "nec_entry_date",
+      "workflow_group": "adp_f2_eligibility_requirements"
+    },
+    {
+      "final_path": "/eligibility_requirements/predecessor_service",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "predecessor_service",
+      "workflow_group": "adp_f2_eligibility_requirements"
+    },
+    {
+      "final_path": "/eligibility_requirements/rollover_contributions",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "rollover_contributions",
+      "workflow_group": "adp_f2_eligibility_requirements"
+    },
+    {
+      "final_path": "/eligibility_requirements/after_tax_contributions",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "after_tax_contributions",
+      "workflow_group": "adp_f2_eligibility_requirements"
+    },
+    {
+      "final_path": "/eligibility_requirements/upto_tax_contribution_pct",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "upto_tax_contribution_pct",
+      "workflow_group": "adp_f2_eligibility_requirements"
+    },
+    {
+      "final_path": "/eligibility_requirements/simple_401k_contributions",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "simple_401k_contributions",
+      "workflow_group": "adp_f2_eligibility_requirements"
+    },
+    {
+      "final_path": "/vesting_and_retirement_ages/safe_harbor_vesting",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "safe_harbor_vesting",
+      "workflow_group": "adp_f3_vesting_compensation"
+    },
+    {
+      "final_path": "/vesting_and_retirement_ages/safe_harbor_vesting_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "safe_harbor_vesting_other_specify",
+      "workflow_group": "adp_f3_vesting_compensation"
+    },
+    {
+      "final_path": "/vesting_and_retirement_ages/employer_match_vesting",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "employer_match_vesting",
+      "workflow_group": "adp_f3_vesting_compensation"
+    },
+    {
+      "final_path": "/vesting_and_retirement_ages/employer_match_vesting_schedule",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "employer_match_vesting_schedule",
+      "workflow_group": "adp_f3_vesting_compensation"
+    },
+    {
+      "final_path": "/vesting_and_retirement_ages/employer_match_vesting_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "employer_match_vesting_other_specify",
+      "workflow_group": "adp_f3_vesting_compensation"
+    },
+    {
+      "final_path": "/vesting_and_retirement_ages/employer_profit_sharing_vesting",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "employer_profit_sharing_vesting",
+      "workflow_group": "adp_f3_vesting_compensation"
+    },
+    {
+      "final_path": "/vesting_and_retirement_ages/employer_profit_sharing_vesting_schedule",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "employer_profit_sharing_vesting_schedule",
+      "workflow_group": "adp_f3_vesting_compensation"
+    },
+    {
+      "final_path": "/vesting_and_retirement_ages/employer_profit_sharing_vesting_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "employer_profit_sharing_vesting_other_specify",
+      "workflow_group": "adp_f3_vesting_compensation"
+    },
+    {
+      "final_path": "/vesting_and_retirement_ages/vesting_service",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "vesting_service",
+      "workflow_group": "adp_f3_vesting_compensation"
+    },
+    {
+      "final_path": "/vesting_and_retirement_ages/vesting_period_calculation",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "vesting_period_calculation",
+      "workflow_group": "adp_f3_vesting_compensation"
+    },
+    {
+      "final_path": "/vesting_and_retirement_ages/forfeiture_use",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "forfeiture_use",
+      "workflow_group": "adp_f3_vesting_compensation"
+    },
+    {
+      "final_path": "/vesting_and_retirement_ages/normal_retirement_age",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "normal_retirement_age",
+      "workflow_group": "adp_f3_vesting_compensation"
+    },
+    {
+      "final_path": "/vesting_and_retirement_ages/normal_retirement_age_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "normal_retirement_age_other_specify",
+      "workflow_group": "adp_f3_vesting_compensation"
+    },
+    {
+      "final_path": "/vesting_and_retirement_ages/normal_retirement_service_requirement",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "normal_retirement_service_requirement",
+      "workflow_group": "adp_f3_vesting_compensation"
+    },
+    {
+      "final_path": "/vesting_and_retirement_ages/early_retirement_age",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "early_retirement_age",
+      "workflow_group": "adp_f3_vesting_compensation"
+    },
+    {
+      "final_path": "/vesting_and_retirement_ages/early_retirement_age_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "early_retirement_age_other_specify",
+      "workflow_group": "adp_f3_vesting_compensation"
+    },
+    {
+      "final_path": "/vesting_and_retirement_ages/early_retirement_service_requirement",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "early_retirement_service_requirement",
+      "workflow_group": "adp_f3_vesting_compensation"
+    },
+    {
+      "final_path": "/vesting_and_retirement_ages/100_pct_vesting_at_early_retirement",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "field_100_pct_vesting_at_early_retirement",
+      "workflow_group": "adp_f3_vesting_compensation"
+    },
+    {
+      "final_path": "/compensation/compensation_definition",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "compensation_definition",
+      "workflow_group": "adp_f3_vesting_compensation"
+    },
+    {
+      "final_path": "/compensation/compensation_for_initial_year",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "compensation_for_initial_year",
+      "workflow_group": "adp_f3_vesting_compensation"
+    },
+    {
+      "final_path": "/compensation/compensation_for_initial_year_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "compensation_for_initial_year_other_specify",
+      "workflow_group": "adp_f3_vesting_compensation"
+    },
+    {
+      "final_path": "/compensation/compensation_excluded_all",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "compensation_excluded_all",
+      "workflow_group": "adp_f3_vesting_compensation"
+    },
+    {
+      "final_path": "/compensation/compensation_excluded_all_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "compensation_excluded_all_other_specify",
+      "workflow_group": "adp_f3_vesting_compensation"
+    },
+    {
+      "final_path": "/compensation/compensation_excluded_deferrals",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "compensation_excluded_deferrals",
+      "workflow_group": "adp_f3_vesting_compensation"
+    },
+    {
+      "final_path": "/compensation/compensation_excluded_deferrals_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "compensation_excluded_deferrals_other_specify",
+      "workflow_group": "adp_f3_vesting_compensation"
+    },
+    {
+      "final_path": "/compensation/compensation_excluded_match",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "compensation_excluded_match",
+      "workflow_group": "adp_f3_vesting_compensation"
+    },
+    {
+      "final_path": "/compensation/compensation_excluded_match_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "compensation_excluded_match_other_specify",
+      "workflow_group": "adp_f3_vesting_compensation"
+    },
+    {
+      "final_path": "/compensation/compensation_excluded_nec",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "compensation_excluded_nec",
+      "workflow_group": "adp_f3_vesting_compensation"
+    },
+    {
+      "final_path": "/compensation/compensation_excluded_nec_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "compensation_excluded_nec_other_specify",
+      "workflow_group": "adp_f3_vesting_compensation"
+    },
+    {
+      "final_path": "/employee_contributions/contribution_limit",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "contribution_limit",
+      "workflow_group": "adp_f4_employee_contributions_and_automatic_enrollment"
+    },
+    {
+      "final_path": "/employee_contributions/contribution_limit_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "contribution_limit_other_specify",
+      "workflow_group": "adp_f4_employee_contributions_and_automatic_enrollment"
+    },
+    {
+      "final_path": "/employee_contributions/contribution_method",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "contribution_method",
+      "workflow_group": "adp_f4_employee_contributions_and_automatic_enrollment"
+    },
+    {
+      "final_path": "/employee_contributions/deferral_change_frequency",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "deferral_change_frequency",
+      "workflow_group": "adp_f4_employee_contributions_and_automatic_enrollment"
+    },
+    {
+      "final_path": "/employee_contributions/deferral_change_frequency_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "deferral_change_frequency_other_specify",
+      "workflow_group": "adp_f4_employee_contributions_and_automatic_enrollment"
+    },
+    {
+      "final_path": "/employee_contributions/roth_elective_deferrals",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "roth_elective_deferrals",
+      "workflow_group": "adp_f4_employee_contributions_and_automatic_enrollment"
+    },
+    {
+      "final_path": "/employee_contributions/after_tax_voluntary_contributions",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "after_tax_voluntary_contributions",
+      "workflow_group": "adp_f4_employee_contributions_and_automatic_enrollment"
+    },
+    {
+      "final_path": "/automatic_enrollment/automatic_enrollment_type",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "automatic_enrollment_type",
+      "workflow_group": "adp_f4_employee_contributions_and_automatic_enrollment"
+    },
+    {
+      "final_path": "/automatic_enrollment/qaca_eaca_effective_date",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "qaca_eaca_effective_date",
+      "workflow_group": "adp_f4_employee_contributions_and_automatic_enrollment"
+    },
+    {
+      "final_path": "/automatic_enrollment/default_enrollment_pct",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "default_enrollment_pct",
+      "workflow_group": "adp_f4_employee_contributions_and_automatic_enrollment"
+    },
+    {
+      "final_path": "/automatic_enrollment/auto_escalation_pct",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "auto_escalation_pct",
+      "workflow_group": "adp_f4_employee_contributions_and_automatic_enrollment"
+    },
+    {
+      "final_path": "/automatic_enrollment/maximum_auto_enrollment_pct",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "maximum_auto_enrollment_pct",
+      "workflow_group": "adp_f4_employee_contributions_and_automatic_enrollment"
+    },
+    {
+      "final_path": "/automatic_enrollment/escalation_timing",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "escalation_timing",
+      "workflow_group": "adp_f4_employee_contributions_and_automatic_enrollment"
+    },
+    {
+      "final_path": "/automatic_enrollment/escalation_timing_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "escalation_timing_other_specify",
+      "workflow_group": "adp_f4_employee_contributions_and_automatic_enrollment"
+    },
+    {
+      "final_path": "/automatic_enrollment/permissible_withdrawal_window",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "permissible_withdrawal_window",
+      "workflow_group": "adp_f4_employee_contributions_and_automatic_enrollment"
+    },
+    {
+      "final_path": "/automatic_enrollment/eligible_employees",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "eligible_employees",
+      "workflow_group": "adp_f4_employee_contributions_and_automatic_enrollment"
+    },
+    {
+      "final_path": "/automatic_enrollment/eligible_employees_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "eligible_employees_other_specify",
+      "workflow_group": "adp_f4_employee_contributions_and_automatic_enrollment"
+    },
+    {
+      "final_path": "/employer_contributions/safe_harbor_type",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "safe_harbor_type",
+      "workflow_group": "adp_f5_employer_contributions"
+    },
+    {
+      "final_path": "/employer_contributions/safe_harbor_nonelective_pct",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "safe_harbor_nonelective_pct",
+      "workflow_group": "adp_f5_employer_contributions"
+    },
+    {
+      "final_path": "/employer_contributions/safe_harbor_timing_of_contribution",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "safe_harbor_timing_of_contribution",
+      "workflow_group": "adp_f5_employer_contributions"
+    },
+    {
+      "final_path": "/employer_contributions/safe_harbor_annual_true_up",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "safe_harbor_annual_true_up",
+      "workflow_group": "adp_f5_employer_contributions"
+    },
+    {
+      "final_path": "/employer_contributions/safe_harbor_eligible_employees",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "safe_harbor_eligible_employees",
+      "workflow_group": "adp_f5_employer_contributions"
+    },
+    {
+      "final_path": "/employer_contributions/safe_harbor_eligible_employees_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "safe_harbor_eligible_employees_other_specify",
+      "workflow_group": "adp_f5_employer_contributions"
+    },
+    {
+      "final_path": "/employer_contributions/employer_match_type",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "employer_match_type",
+      "workflow_group": "adp_f5_employer_contributions"
+    },
+    {
+      "final_path": "/employer_contributions/employer_match_formula_1",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "employer_match_formula_1",
+      "workflow_group": "adp_f5_employer_contributions"
+    },
+    {
+      "final_path": "/employer_contributions/employer_match_formula_2",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "employer_match_formula_2",
+      "workflow_group": "adp_f5_employer_contributions"
+    },
+    {
+      "final_path": "/employer_contributions/employer_match_timing",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "employer_match_timing",
+      "workflow_group": "adp_f5_employer_contributions"
+    },
+    {
+      "final_path": "/employer_contributions/employer_match_true_up",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "employer_match_true_up",
+      "workflow_group": "adp_f5_employer_contributions"
+    },
+    {
+      "final_path": "/employer_contributions/employer_match_allocation_conditions",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "employer_match_allocation_conditions",
+      "workflow_group": "adp_f5_employer_contributions"
+    },
+    {
+      "final_path": "/employer_contributions/employer_match_eligible_employees",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "employer_match_eligible_employees",
+      "workflow_group": "adp_f5_employer_contributions"
+    },
+    {
+      "final_path": "/employer_contributions/employer_match_eligible_employees_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "employer_match_eligible_employees_other_specify",
+      "workflow_group": "adp_f5_employer_contributions"
+    },
+    {
+      "final_path": "/employer_contributions/employer_profit_sharing_type",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "employer_profit_sharing_type",
+      "workflow_group": "adp_f5_employer_contributions"
+    },
+    {
+      "final_path": "/employer_contributions/employer_profit_sharing_allocation_method",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "employer_profit_sharing_allocation_method",
+      "workflow_group": "adp_f5_employer_contributions"
+    },
+    {
+      "final_path": "/employer_contributions/employer_profit_sharing_allocation_method_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "employer_profit_sharing_allocation_method_other_specify",
+      "workflow_group": "adp_f5_employer_contributions"
+    },
+    {
+      "final_path": "/employer_contributions/employer_profit_sharing_timing",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "employer_profit_sharing_timing",
+      "workflow_group": "adp_f5_employer_contributions"
+    },
+    {
+      "final_path": "/employer_contributions/employer_profit_sharing_allocation_conditions",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "employer_profit_sharing_allocation_conditions",
+      "workflow_group": "adp_f5_employer_contributions"
+    },
+    {
+      "final_path": "/employer_contributions/employer_profit_sharing_eligible_employees",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "employer_profit_sharing_eligible_employees",
+      "workflow_group": "adp_f5_employer_contributions"
+    },
+    {
+      "final_path": "/withdrawals_and_distributions/payment_options",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "payment_options",
+      "workflow_group": "adp_f6_withdrawals_and_distributions"
+    },
+    {
+      "final_path": "/withdrawals_and_distributions/in_service_withdrawals",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "in_service_withdrawals",
+      "workflow_group": "adp_f6_withdrawals_and_distributions"
+    },
+    {
+      "final_path": "/withdrawals_and_distributions/in_service_withdrawals_age",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "in_service_withdrawals_age",
+      "workflow_group": "adp_f6_withdrawals_and_distributions"
+    },
+    {
+      "final_path": "/withdrawals_and_distributions/in_service_withdrawals_age_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "in_service_withdrawals_age_other_specify",
+      "workflow_group": "adp_f6_withdrawals_and_distributions"
+    },
+    {
+      "final_path": "/withdrawals_and_distributions/in_service_withdrawals_service_requirement",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "in_service_withdrawals_service_requirement",
+      "workflow_group": "adp_f6_withdrawals_and_distributions"
+    },
+    {
+      "final_path": "/withdrawals_and_distributions/in_service_withdrawals_service_requirement_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "in_service_withdrawals_service_requirement_other_specify",
+      "workflow_group": "adp_f6_withdrawals_and_distributions"
+    },
+    {
+      "final_path": "/withdrawals_and_distributions/in_service_withdrawals_vesting_requirement",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "in_service_withdrawals_vesting_requirement",
+      "workflow_group": "adp_f6_withdrawals_and_distributions"
+    },
+    {
+      "final_path": "/withdrawals_and_distributions/in_service_withdrawals_vesting_requirement_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "in_service_withdrawals_vesting_requirement_other_specify",
+      "workflow_group": "adp_f6_withdrawals_and_distributions"
+    },
+    {
+      "final_path": "/withdrawals_and_distributions/in_service_withdrawals_money_source_restrictions",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "in_service_withdrawals_money_source_restrictions",
+      "workflow_group": "adp_f6_withdrawals_and_distributions"
+    },
+    {
+      "final_path": "/withdrawals_and_distributions/in_service_withdrawals_money_source_restrictions_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "in_service_withdrawals_money_source_restrictions_other_specify",
+      "workflow_group": "adp_f6_withdrawals_and_distributions"
+    },
+    {
+      "final_path": "/withdrawals_and_distributions/hardship_distributions",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "hardship_distributions",
+      "workflow_group": "adp_f6_withdrawals_and_distributions"
+    },
+    {
+      "final_path": "/withdrawals_and_distributions/hardship_distributions_vesting_requirement",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "hardship_distributions_vesting_requirement",
+      "workflow_group": "adp_f6_withdrawals_and_distributions"
+    },
+    {
+      "final_path": "/withdrawals_and_distributions/hardship_distributions_vesting_requirement_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "hardship_distributions_vesting_requirement_other_specify",
+      "workflow_group": "adp_f6_withdrawals_and_distributions"
+    },
+    {
+      "final_path": "/withdrawals_and_distributions/hardship_distributions_money_source_restrictions",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "hardship_distributions_money_source_restrictions",
+      "workflow_group": "adp_f6_withdrawals_and_distributions"
+    },
+    {
+      "final_path": "/withdrawals_and_distributions/withdrawals_from_rollover",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "withdrawals_from_rollover",
+      "workflow_group": "adp_f6_withdrawals_and_distributions"
+    },
+    {
+      "final_path": "/withdrawals_and_distributions/withdrawals_from_rollover_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "withdrawals_from_rollover_other_specify",
+      "workflow_group": "adp_f6_withdrawals_and_distributions"
+    },
+    {
+      "final_path": "/withdrawals_and_distributions/loans",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "loans",
+      "workflow_group": "adp_f6_withdrawals_and_distributions"
+    },
+    {
+      "final_path": "/miscellaneous_plan_provisions/other_plans_annual_additions",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "other_plans_annual_additions",
+      "workflow_group": "adp_f7_miscellaneous_plan_provisions_and_pes_setup"
+    },
+    {
+      "final_path": "/miscellaneous_plan_provisions/other_plans_annual_additions_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "other_plans_annual_additions_other_specify",
+      "workflow_group": "adp_f7_miscellaneous_plan_provisions_and_pes_setup"
+    },
+    {
+      "final_path": "/miscellaneous_plan_provisions/top_heavy_elections",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "top_heavy_elections",
+      "workflow_group": "adp_f7_miscellaneous_plan_provisions_and_pes_setup"
+    },
+    {
+      "final_path": "/miscellaneous_plan_provisions/top_heavy_elections_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "top_heavy_elections_other_specify",
+      "workflow_group": "adp_f7_miscellaneous_plan_provisions_and_pes_setup"
+    },
+    {
+      "final_path": "/miscellaneous_plan_provisions/in_plan_roth_rollovers",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "in_plan_roth_rollovers",
+      "workflow_group": "adp_f7_miscellaneous_plan_provisions_and_pes_setup"
+    },
+    {
+      "final_path": "/miscellaneous_plan_provisions/hce_definition_top_paid_group_election",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "hce_definition_top_paid_group_election",
+      "workflow_group": "adp_f7_miscellaneous_plan_provisions_and_pes_setup"
+    },
+    {
+      "final_path": "/miscellaneous_plan_provisions/adp_acp_test_year",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "adp_acp_test_year",
+      "workflow_group": "adp_f7_miscellaneous_plan_provisions_and_pes_setup"
+    },
+    {
+      "final_path": "/miscellaneous_plan_provisions/disability_definition",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "disability_definition",
+      "workflow_group": "adp_f7_miscellaneous_plan_provisions_and_pes_setup"
+    },
+    {
+      "final_path": "/miscellaneous_plan_provisions/disability_definition_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "disability_definition_other_specify",
+      "workflow_group": "adp_f7_miscellaneous_plan_provisions_and_pes_setup"
+    },
+    {
+      "final_path": "/miscellaneous_plan_provisions/life_insurance",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "life_insurance",
+      "workflow_group": "adp_f7_miscellaneous_plan_provisions_and_pes_setup"
+    },
+    {
+      "final_path": "/miscellaneous_plan_provisions/life_insurance_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "life_insurance_other_specify",
+      "workflow_group": "adp_f7_miscellaneous_plan_provisions_and_pes_setup"
+    },
+    {
+      "final_path": "/miscellaneous_plan_provisions/money_purchase_plan",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "money_purchase_plan",
+      "workflow_group": "adp_f7_miscellaneous_plan_provisions_and_pes_setup"
+    },
+    {
+      "final_path": "/miscellaneous_plan_provisions/money_purchase_plan_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "money_purchase_plan_other_specify",
+      "workflow_group": "adp_f7_miscellaneous_plan_provisions_and_pes_setup"
+    },
+    {
+      "final_path": "/miscellaneous_plan_provisions/special_effective_dates",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "special_effective_dates",
+      "workflow_group": "adp_f7_miscellaneous_plan_provisions_and_pes_setup"
+    },
+    {
+      "final_path": "/miscellaneous_plan_provisions/auto_enrollment_exemption",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "auto_enrollment_exemption",
+      "workflow_group": "adp_f7_miscellaneous_plan_provisions_and_pes_setup"
+    },
+    {
+      "final_path": "/miscellaneous_plan_provisions/auto_enrollment_exemption_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "auto_enrollment_exemption_other_specify",
+      "workflow_group": "adp_f7_miscellaneous_plan_provisions_and_pes_setup"
+    },
+    {
+      "final_path": "/pes_setup/js_flag",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "js_flag",
+      "workflow_group": "adp_f7_miscellaneous_plan_provisions_and_pes_setup"
+    },
+    {
+      "final_path": "/pes_setup/flat_dollar_contributions",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "flat_dollar_contributions",
+      "workflow_group": "adp_f7_miscellaneous_plan_provisions_and_pes_setup"
+    },
+    {
+      "final_path": "/pes_setup/flat_dollar_contributions_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "flat_dollar_contributions_other_specify",
+      "workflow_group": "adp_f7_miscellaneous_plan_provisions_and_pes_setup"
+    },
+    {
+      "final_path": "/pes_setup/prior_money_source_subject_to_vesting",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "prior_money_source_subject_to_vesting",
+      "workflow_group": "adp_f7_miscellaneous_plan_provisions_and_pes_setup"
+    },
+    {
+      "final_path": "/pes_setup/prior_money_source_subject_to_vesting_other_specify",
+      "output_source": "customSectionOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "prior_money_source_subject_to_vesting_other_specify",
+      "workflow_group": "adp_f7_miscellaneous_plan_provisions_and_pes_setup"
+    }
+  ],
+  "stage": "groundx_python_sdk_reassembly",
+  "surface": "adp_v1",
+  "workflow_output": {
+    "adp_f1_employer_and_plan_information": {
+      "address_city": "adp_v1_address_city_1",
+      "address_state": "adp_v1_address_state_1",
+      "address_street": "adp_v1_address_street_1",
+      "address_zip": "adp_v1_address_zip_1",
+      "administrators_info": "adp_v1_administrators_info_1",
+      "administrators_info_other_specify": "adp_v1_administrators_info_other_specify_1",
+      "affiliated_employer_group_type": "adp_v1_affiliated_employer_group_type_1",
+      "affiliated_employers": "adp_v1_affiliated_employers_1",
+      "employer_fiscal_year_ends": "2026-01-01",
+      "employer_name": "adp_v1_employer_name_1",
+      "multiple_employer_plan": "adp_v1_multiple_employer_plan_1",
+      "oe_date": "2026-01-01",
+      "participating_employers": "adp_v1_participating_employers_1",
+      "plan_name": "adp_v1_plan_name_1",
+      "plan_number": "adp_v1_plan_number_1",
+      "plan_number_other_specify": "adp_v1_plan_number_other_specify_1",
+      "plan_status": "adp_v1_plan_status_1",
+      "plan_year": "adp_v1_plan_year_1",
+      "plan_year_end_date": "2026-01-01",
+      "plan_year_other_specify": "adp_v1_plan_year_other_specify_1",
+      "restatement_effective_date": "2026-01-01",
+      "tax_identification_number": "adp_v1_tax_identification_number_1",
+      "telephone": "adp_v1_telephone_1",
+      "type_of_entity": "adp_v1_type_of_entity_1",
+      "type_of_entity_llc_subtype": "adp_v1_type_of_entity_llc_subtype_1",
+      "type_of_entity_other_specify": "adp_v1_type_of_entity_other_specify_1",
+      "type_of_plan": "adp_v1_type_of_plan_1",
+      "valuation_date": "2026-01-01",
+      "valuation_date_other_specify": "2026-01-01"
+    },
+    "adp_f2_eligibility_requirements": {
+      "after_tax_contributions": "adp_v1_after_tax_contributions_1",
+      "age_requirement": "adp_v1_age_requirement_1",
+      "age_requirement_other_specify": "adp_v1_age_requirement_other_specify_1",
+      "deferral_age_requirement": "adp_v1_deferral_age_requirement_1",
+      "deferral_age_requirement_other_specify": "adp_v1_deferral_age_requirement_other_specify_1",
+      "deferral_entry_date": "2026-01-01",
+      "deferral_service_requirement": "adp_v1_deferral_service_requirement_1",
+      "entry_date": "2026-01-01",
+      "entry_date_other_specify": "2026-01-01",
+      "excluded_employees_all_contributions": "adp_v1_excluded_employees_all_contributions_1",
+      "excluded_employees_all_contributions_other_specify": "adp_v1_excluded_employees_all_contributions_other_specify_1",
+      "hours_requirement": "adp_v1_hours_requirement_1",
+      "hours_requirement_other_specify": "adp_v1_hours_requirement_other_specify_1",
+      "matching_age_requirement": "adp_v1_matching_age_requirement_1",
+      "matching_entry_date": "2026-01-01",
+      "matching_service_requirement": "adp_v1_matching_service_requirement_1",
+      "nec_age_requirement": "adp_v1_nec_age_requirement_1",
+      "nec_entry_date": "2026-01-01",
+      "nec_service_requirement": "adp_v1_nec_service_requirement_1",
+      "predecessor_service": "adp_v1_predecessor_service_1",
+      "rollover_contributions": "adp_v1_rollover_contributions_1",
+      "separate_eligibility_for_employer_contributions": "adp_v1_separate_eligibility_for_employer_contributions_1",
+      "service_requirement": "adp_v1_service_requirement_1",
+      "service_requirement_other_specify": "adp_v1_service_requirement_other_specify_1",
+      "simple_401k_contributions": "adp_v1_simple_401k_contributions_1",
+      "upto_tax_contribution_pct": "adp_v1_upto_tax_contribution_pct_1"
+    },
+    "adp_f3_vesting_compensation": {
+      "compensation_definition": "adp_v1_compensation_definition_1",
+      "compensation_excluded_all": "adp_v1_compensation_excluded_all_1",
+      "compensation_excluded_all_other_specify": "adp_v1_compensation_excluded_all_other_specify_1",
+      "compensation_excluded_deferrals": "adp_v1_compensation_excluded_deferrals_1",
+      "compensation_excluded_deferrals_other_specify": "adp_v1_compensation_excluded_deferrals_other_specify_1",
+      "compensation_excluded_match": "adp_v1_compensation_excluded_match_1",
+      "compensation_excluded_match_other_specify": "adp_v1_compensation_excluded_match_other_specify_1",
+      "compensation_excluded_nec": "adp_v1_compensation_excluded_nec_1",
+      "compensation_excluded_nec_other_specify": "adp_v1_compensation_excluded_nec_other_specify_1",
+      "compensation_for_initial_year": "adp_v1_compensation_for_initial_year_1",
+      "compensation_for_initial_year_other_specify": "adp_v1_compensation_for_initial_year_other_specify_1",
+      "early_retirement_age": "adp_v1_early_retirement_age_1",
+      "early_retirement_age_other_specify": "adp_v1_early_retirement_age_other_specify_1",
+      "early_retirement_service_requirement": "adp_v1_early_retirement_service_requirement_1",
+      "employer_match_vesting": "adp_v1_employer_match_vesting_1",
+      "employer_match_vesting_other_specify": "adp_v1_employer_match_vesting_other_specify_1",
+      "employer_match_vesting_schedule": "adp_v1_employer_match_vesting_schedule_1",
+      "employer_profit_sharing_vesting": "adp_v1_employer_profit_sharing_vesting_1",
+      "employer_profit_sharing_vesting_other_specify": "adp_v1_employer_profit_sharing_vesting_other_specify_1",
+      "employer_profit_sharing_vesting_schedule": "adp_v1_employer_profit_sharing_vesting_schedule_1",
+      "field_100_pct_vesting_at_early_retirement": "adp_v1_field_100_pct_vesting_at_early_retirement_1",
+      "forfeiture_use": "adp_v1_forfeiture_use_1",
+      "normal_retirement_age": "adp_v1_normal_retirement_age_1",
+      "normal_retirement_age_other_specify": "adp_v1_normal_retirement_age_other_specify_1",
+      "normal_retirement_service_requirement": "adp_v1_normal_retirement_service_requirement_1",
+      "safe_harbor_vesting": "adp_v1_safe_harbor_vesting_1",
+      "safe_harbor_vesting_other_specify": "adp_v1_safe_harbor_vesting_other_specify_1",
+      "vesting_period_calculation": "adp_v1_vesting_period_calculation_1",
+      "vesting_service": "adp_v1_vesting_service_1"
+    },
+    "adp_f4_employee_contributions_and_automatic_enrollment": {
+      "after_tax_voluntary_contributions": "adp_v1_after_tax_voluntary_contributions_1",
+      "auto_escalation_pct": "adp_v1_auto_escalation_pct_1",
+      "automatic_enrollment_type": "adp_v1_automatic_enrollment_type_1",
+      "contribution_limit": "adp_v1_contribution_limit_1",
+      "contribution_limit_other_specify": "adp_v1_contribution_limit_other_specify_1",
+      "contribution_method": "adp_v1_contribution_method_1",
+      "default_enrollment_pct": "adp_v1_default_enrollment_pct_1",
+      "deferral_change_frequency": "adp_v1_deferral_change_frequency_1",
+      "deferral_change_frequency_other_specify": "adp_v1_deferral_change_frequency_other_specify_1",
+      "eligible_employees": "adp_v1_eligible_employees_1",
+      "eligible_employees_other_specify": "adp_v1_eligible_employees_other_specify_1",
+      "escalation_timing": "adp_v1_escalation_timing_1",
+      "escalation_timing_other_specify": "adp_v1_escalation_timing_other_specify_1",
+      "maximum_auto_enrollment_pct": "adp_v1_maximum_auto_enrollment_pct_1",
+      "permissible_withdrawal_window": "adp_v1_permissible_withdrawal_window_1",
+      "qaca_eaca_effective_date": "2026-01-01",
+      "roth_elective_deferrals": "adp_v1_roth_elective_deferrals_1"
+    },
+    "adp_f5_employer_contributions": {
+      "employer_match_allocation_conditions": "adp_v1_employer_match_allocation_conditions_1",
+      "employer_match_eligible_employees": "adp_v1_employer_match_eligible_employees_1",
+      "employer_match_eligible_employees_other_specify": "adp_v1_employer_match_eligible_employees_other_specify_1",
+      "employer_match_formula_1": "adp_v1_employer_match_formula_1_1",
+      "employer_match_formula_2": "adp_v1_employer_match_formula_2_1",
+      "employer_match_timing": "adp_v1_employer_match_timing_1",
+      "employer_match_true_up": "adp_v1_employer_match_true_up_1",
+      "employer_match_type": "adp_v1_employer_match_type_1",
+      "employer_profit_sharing_allocation_conditions": "adp_v1_employer_profit_sharing_allocation_conditions_1",
+      "employer_profit_sharing_allocation_method": "adp_v1_employer_profit_sharing_allocation_method_1",
+      "employer_profit_sharing_allocation_method_other_specify": "adp_v1_employer_profit_sharing_allocation_method_other_specify_1",
+      "employer_profit_sharing_eligible_employees": "adp_v1_employer_profit_sharing_eligible_employees_1",
+      "employer_profit_sharing_timing": "adp_v1_employer_profit_sharing_timing_1",
+      "employer_profit_sharing_type": "adp_v1_employer_profit_sharing_type_1",
+      "safe_harbor_annual_true_up": "adp_v1_safe_harbor_annual_true_up_1",
+      "safe_harbor_eligible_employees": "adp_v1_safe_harbor_eligible_employees_1",
+      "safe_harbor_eligible_employees_other_specify": "adp_v1_safe_harbor_eligible_employees_other_specify_1",
+      "safe_harbor_nonelective_pct": "adp_v1_safe_harbor_nonelective_pct_1",
+      "safe_harbor_timing_of_contribution": "adp_v1_safe_harbor_timing_of_contribution_1",
+      "safe_harbor_type": "adp_v1_safe_harbor_type_1"
+    },
+    "adp_f6_withdrawals_and_distributions": {
+      "hardship_distributions": "adp_v1_hardship_distributions_1",
+      "hardship_distributions_money_source_restrictions": "adp_v1_hardship_distributions_money_source_restrictions_1",
+      "hardship_distributions_vesting_requirement": "adp_v1_hardship_distributions_vesting_requirement_1",
+      "hardship_distributions_vesting_requirement_other_specify": "adp_v1_hardship_distributions_vesting_requirement_other_specify_1",
+      "in_service_withdrawals": "adp_v1_in_service_withdrawals_1",
+      "in_service_withdrawals_age": "adp_v1_in_service_withdrawals_age_1",
+      "in_service_withdrawals_age_other_specify": "adp_v1_in_service_withdrawals_age_other_specify_1",
+      "in_service_withdrawals_money_source_restrictions": "adp_v1_in_service_withdrawals_money_source_restrictions_1",
+      "in_service_withdrawals_money_source_restrictions_other_specify": "adp_v1_in_service_withdrawals_money_source_restrictions_other_specify_1",
+      "in_service_withdrawals_service_requirement": "adp_v1_in_service_withdrawals_service_requirement_1",
+      "in_service_withdrawals_service_requirement_other_specify": "adp_v1_in_service_withdrawals_service_requirement_other_specify_1",
+      "in_service_withdrawals_vesting_requirement": "adp_v1_in_service_withdrawals_vesting_requirement_1",
+      "in_service_withdrawals_vesting_requirement_other_specify": "adp_v1_in_service_withdrawals_vesting_requirement_other_specify_1",
+      "loans": "adp_v1_loans_1",
+      "payment_options": "adp_v1_payment_options_1",
+      "withdrawals_from_rollover": "adp_v1_withdrawals_from_rollover_1",
+      "withdrawals_from_rollover_other_specify": "adp_v1_withdrawals_from_rollover_other_specify_1"
+    },
+    "adp_f7_miscellaneous_plan_provisions_and_pes_setup": {
+      "adp_acp_test_year": "adp_v1_adp_acp_test_year_1",
+      "auto_enrollment_exemption": "adp_v1_auto_enrollment_exemption_1",
+      "auto_enrollment_exemption_other_specify": "adp_v1_auto_enrollment_exemption_other_specify_1",
+      "disability_definition": "adp_v1_disability_definition_1",
+      "disability_definition_other_specify": "adp_v1_disability_definition_other_specify_1",
+      "flat_dollar_contributions": "adp_v1_flat_dollar_contributions_1",
+      "flat_dollar_contributions_other_specify": "adp_v1_flat_dollar_contributions_other_specify_1",
+      "hce_definition_top_paid_group_election": "adp_v1_hce_definition_top_paid_group_election_1",
+      "in_plan_roth_rollovers": "adp_v1_in_plan_roth_rollovers_1",
+      "js_flag": "adp_v1_js_flag_1",
+      "life_insurance": "adp_v1_life_insurance_1",
+      "life_insurance_other_specify": "adp_v1_life_insurance_other_specify_1",
+      "money_purchase_plan": "adp_v1_money_purchase_plan_1",
+      "money_purchase_plan_other_specify": "adp_v1_money_purchase_plan_other_specify_1",
+      "other_plans_annual_additions": "adp_v1_other_plans_annual_additions_1",
+      "other_plans_annual_additions_other_specify": "adp_v1_other_plans_annual_additions_other_specify_1",
+      "prior_money_source_subject_to_vesting": "adp_v1_prior_money_source_subject_to_vesting_1",
+      "prior_money_source_subject_to_vesting_other_specify": "adp_v1_prior_money_source_subject_to_vesting_other_specify_1",
+      "special_effective_dates": "2026-01-01",
+      "top_heavy_elections": "adp_v1_top_heavy_elections_1",
+      "top_heavy_elections_other_specify": "adp_v1_top_heavy_elections_other_specify_1"
+    }
+  },
+  "workflow_schema_hash": "440d6a1064202a8a2e1fcff746dcc7b132d0e1117b0ab1212da3cee07dc28725"
+}

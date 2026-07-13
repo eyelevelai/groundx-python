@@ -1,0 +1,45 @@
+{
+  "artifacts": {
+    "handoff": {
+      "sha256": "df130063b94892fcddd2101175a3f1132d66976bb46dcf2ab0370be7a05afd30"
+    },
+    "previous_extract_chain": {
+      "sha256": "33cc0b91c973820b6673f579d09aa989dedf15c07c756ba4f0f9b107ea1f6519"
+    }
+  },
+  "assertions": {
+    "consumes_internal_extract_chain_handoff": true,
+    "handoff_written_for_save_callback": true,
+    "has_no_error_diagnostics": true,
+    "shape_contract_passed": true
+  },
+  "input_from": "internal_arcadia_extract_chain",
+  "input_sha256": "33cc0b91c973820b6673f579d09aa989dedf15c07c756ba4f0f9b107ea1f6519",
+  "output": {
+    "diagnostic_count": 0,
+    "final_output_sha256": "aab5547154bdde263b7d38bec776ec0e571d01f7d28492288560fe49273b9cac",
+    "relationship_output_sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+    "source_provenance_count": 159,
+    "workflow_output_sha256": "e5f70fe87f1a03640ee1e532f9987e51724e16c11cb4a440a9aa9a5b8b5e1213"
+  },
+  "output_for": "internal_arcadia_save_callback",
+  "request": {
+    "callbackURL": "https://api.groundx.ai/callback/layout",
+    "documentID": "17c6a87d-3d01-4da0-b2ab-990680a86836",
+    "fileName": "adp.pdf",
+    "modelID": 30297,
+    "processorID": 134,
+    "taskID": "f16808b7-2c43-4920-b101-b052805b3b54",
+    "workflowID": "adp_v1-product-path",
+    "workflowSchemaHash": "440d6a1064202a8a2e1fcff746dcc7b132d0e1117b0ab1212da3cee07dc28725",
+    "workflowVersion": "2026-07-12T22:34:03Z"
+  },
+  "shape_assertions": {
+    "has_extracted_fields": true,
+    "has_no_error_diagnostics": true,
+    "has_statement_groups": true
+  },
+  "stage": "groundx_python_sdk_reassembly",
+  "surface": "adp_v1",
+  "workflow_schema_hash": "440d6a1064202a8a2e1fcff746dcc7b132d0e1117b0ab1212da3cee07dc28725"
+}

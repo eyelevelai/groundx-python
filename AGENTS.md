@@ -152,6 +152,17 @@ coordinate the upstream Fern metadata/config change and regenerate the SDK. Do n
 **No live network in unit tests.** Mock S3, Google Sheets, Redis, OpenAI, etc. Live
 integration tests follow the policy in [§6](#6-credentials-and-live-tests).
 
+**Extraction boundary evidence.** For the private four-case extraction certification
+chain, `groundx-python` owns the SDK reassembly boundary. Reassembly tests must consume
+the extract-stage X-Ray/custom-output packet plus compiled workflow metadata and emit
+`workflow_output`, `relationship_output`, `final_output`, diagnostics, and source
+provenance for the save/callback boundary. Unit fixtures under `tests/extract/` count
+as protected-case evidence only when they consume the previous boundary artifact,
+compare actual output to a frozen reviewed expected output, write a machine-readable
+diff, preserve hash lineage, and assert the functional output shape. Do not count a
+synthetic local fixture as protected-case evidence unless it is the allowed fake
+agent/model output emitted by the immediately previous boundary.
+
 **Where extract tests live.** Extract unit tests live under `tests/extract/`, mirroring
 the source structure (e.g. `tests/extract/classes/test_group.py` tests
 `src/groundx/extract/classes/group.py`). They use `unittest.TestCase` and import extract

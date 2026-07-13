@@ -1,5 +1,10 @@
-import inspect, json, logging, logging.config, typing
+import inspect
+import json
+import logging
+import logging.config
+import typing
 
+from .http import bounded_post
 from .logging_cfg import logging_config
 
 
@@ -65,14 +70,12 @@ class Logger:
         req: typing.Optional[typing.Dict[str, typing.Any]],
         msg: str,
     ) -> None:
-        import requests
-
         self.error_msg(msg)
 
         if req is None or callback_url == "":
             return
 
-        requests.post(
+        bounded_post(
             callback_url,
             json=req,
             headers={"X-API-Key": api_key},
@@ -84,14 +87,12 @@ class Logger:
         callback_url: str,
         req: typing.Dict[str, typing.Any],
     ):
-        import requests
-
         if callback_url == "":
             return
 
         self.info_msg("calling back to [%s]" % (callback_url))
 
-        requests.post(
+        bounded_post(
             callback_url,
             json=req,
             headers={"X-API-Key": api_key},
