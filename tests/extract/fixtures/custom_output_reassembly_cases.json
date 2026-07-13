@@ -1,0 +1,534 @@
+{
+  "cases": [
+    {
+      "id": "arcadia-legacy",
+      "workflow_extract": {
+        "workflow": {
+          "custom_steps": [
+            {"name": "statement_fields", "level": "chunk", "kind": "instruct"},
+            {"name": "meter_fields", "level": "chunk", "kind": "summary"},
+            {"name": "charge_fields", "level": "chunk", "kind": "keys"}
+          ],
+          "output_routes": [
+            {
+              "workflow_group": "statement",
+              "workflow_field": "account_number",
+              "final_path": "/account_number",
+              "step_name": "statement_fields",
+              "level": "chunk",
+              "output_map": "customChunkOutputs",
+              "output_key": "account_number"
+            },
+            {
+              "workflow_group": "meters",
+              "workflow_field": "meter_number",
+              "final_path": "/meters/meter_number",
+              "step_name": "meter_fields",
+              "level": "chunk",
+              "output_map": "customChunkOutputs",
+              "output_key": "meter_number"
+            },
+            {
+              "workflow_group": "meters",
+              "workflow_field": "service_address",
+              "final_path": "/meters/service_address",
+              "step_name": "meter_fields",
+              "level": "chunk",
+              "output_map": "customChunkOutputs",
+              "output_key": "service_address"
+            },
+            {
+              "workflow_group": "charges",
+              "workflow_field": "meter_number",
+              "final_path": "/charges/meter_number",
+              "step_name": "charge_fields",
+              "level": "chunk",
+              "output_map": "customChunkOutputs",
+              "output_key": "meter_number"
+            },
+            {
+              "workflow_group": "charges",
+              "workflow_field": "charge_amount",
+              "final_path": "/charges/charge_amount",
+              "step_name": "charge_fields",
+              "level": "chunk",
+              "output_map": "customChunkOutputs",
+              "output_key": "charge_amount"
+            }
+          ],
+          "output_relationships": [
+            {
+              "parent_group": "meters",
+              "child_group": "charges",
+              "parent_output_field": "charges",
+              "match_attrs": ["meter_number"],
+              "unmatched_child_group": "account_charges"
+            }
+          ]
+        }
+      },
+      "xray": {
+        "chunks": [
+          {
+            "chunkId": "legacy-chunk-1",
+            "pageNumbers": [1],
+            "customChunkOutputs": {
+              "statement_fields": {"account_number": "A-100"},
+              "meter_fields": {
+                "_records": [
+                  {"meter_number": "M-1"},
+                  {"meter_number": "m-1", "service_address": "100 Main"}
+                ]
+              },
+              "charge_fields": {
+                "_records": [
+                  {"meter_number": "M-1", "charge_amount": "42.00"}
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "expected": {
+        "workflow_output": {
+          "statement": {"account_number": "A-100"},
+          "meters": [
+            {"meter_number": "M-1"},
+            {"meter_number": "m-1", "service_address": "100 Main"}
+          ],
+          "charges": [{"meter_number": "M-1", "charge_amount": "42.00"}]
+        },
+        "relationship_output": {
+          "account_number": "A-100",
+          "meters": [
+            {
+              "meter_number": "M-1",
+              "service_address": "100 Main",
+              "charges": [{"meter_number": "M-1", "charge_amount": "42.00"}]
+            }
+          ],
+          "account_charges": []
+        },
+        "final_output": {
+          "account_number": "A-100",
+          "meters": [
+            {
+              "meter_number": "M-1",
+              "service_address": "100 Main",
+              "charges": [{"meter_number": "M-1", "charge_amount": "42.00"}]
+            }
+          ],
+          "account_charges": []
+        },
+        "diagnostics": [],
+        "source_provenance": [
+          {
+            "output_source": "customChunkOutputs",
+            "workflow_group": "statement",
+            "workflow_field": "account_number",
+            "final_path": "/account_number",
+            "record_index": null,
+            "page_numbers": [1]
+          },
+          {
+            "output_source": "customChunkOutputs",
+            "workflow_group": "meters",
+            "workflow_field": "meter_number",
+            "final_path": "/meters/meter_number",
+            "record_index": 0,
+            "page_numbers": [1]
+          },
+          {
+            "output_source": "customChunkOutputs",
+            "workflow_group": "meters",
+            "workflow_field": "meter_number",
+            "final_path": "/meters/meter_number",
+            "record_index": 1,
+            "page_numbers": [1]
+          },
+          {
+            "output_source": "customChunkOutputs",
+            "workflow_group": "meters",
+            "workflow_field": "service_address",
+            "final_path": "/meters/service_address",
+            "record_index": 1,
+            "page_numbers": [1]
+          },
+          {
+            "output_source": "customChunkOutputs",
+            "workflow_group": "charges",
+            "workflow_field": "meter_number",
+            "final_path": "/charges/meter_number",
+            "record_index": 0,
+            "page_numbers": [1]
+          },
+          {
+            "output_source": "customChunkOutputs",
+            "workflow_group": "charges",
+            "workflow_field": "charge_amount",
+            "final_path": "/charges/charge_amount",
+            "record_index": 0,
+            "page_numbers": [1]
+          }
+        ]
+      }
+    },
+    {
+      "id": "arcadia-v1",
+      "workflow_extract": {
+        "workflow": {
+          "custom_steps": [
+            {"name": "statement_fields", "level": "chunk", "kind": "instruct"},
+            {"name": "meter_fields", "level": "chunk", "kind": "summary"},
+            {"name": "charge_fields", "level": "chunk", "kind": "keys"}
+          ],
+          "output_routes": [
+            {
+              "workflow_group": "statement",
+              "workflow_field": "invoice_number",
+              "final_path": "/invoice_number",
+              "step_name": "statement_fields",
+              "level": "chunk",
+              "output_map": "customChunkOutputs",
+              "output_key": "invoice_number"
+            },
+            {
+              "workflow_group": "meters",
+              "workflow_field": "meter_number",
+              "final_path": "/meters/meter_number",
+              "step_name": "meter_fields",
+              "level": "chunk",
+              "output_map": "customChunkOutputs",
+              "output_key": "meter_number"
+            },
+            {
+              "workflow_group": "charges",
+              "workflow_field": "meter_number",
+              "final_path": "/charges/meter_number",
+              "step_name": "charge_fields",
+              "level": "chunk",
+              "output_map": "customChunkOutputs",
+              "output_key": "meter_number"
+            },
+            {
+              "workflow_group": "charges",
+              "workflow_field": "charge_description",
+              "final_path": "/charges/charge_description",
+              "step_name": "charge_fields",
+              "level": "chunk",
+              "output_map": "customChunkOutputs",
+              "output_key": "charge_description"
+            }
+          ],
+          "output_relationships": [
+            {
+              "parent_group": "meters",
+              "child_group": "charges",
+              "parent_output_field": "charges",
+              "match_attrs": ["meter_number"],
+              "unmatched_child_group": "account_charges"
+            }
+          ]
+        }
+      },
+      "xray": {
+        "chunks": [
+          {
+            "chunkId": "v1-chunk-1",
+            "pageNumbers": [2],
+            "customChunkOutputs": {
+              "statement_fields": {"invoice_number": "INV-9"},
+              "meter_fields": {"_records": [{"meter_number": "M-7"}, {"meter_number": "M-7"}]},
+              "charge_fields": {"_records": [{"meter_number": "m-7", "charge_description": "Energy"}]}
+            }
+          }
+        ]
+      },
+      "expected": {
+        "workflow_output": {
+          "statement": {"invoice_number": "INV-9"},
+          "meters": [{"meter_number": "M-7"}, {"meter_number": "M-7"}],
+          "charges": [{"meter_number": "m-7", "charge_description": "Energy"}]
+        },
+        "relationship_output": {
+          "invoice_number": "INV-9",
+          "meters": [
+            {"meter_number": "M-7", "charges": [{"meter_number": "m-7", "charge_description": "Energy"}]}
+          ],
+          "account_charges": []
+        },
+        "final_output": {
+          "invoice_number": "INV-9",
+          "meters": [
+            {"meter_number": "M-7", "charges": [{"meter_number": "m-7", "charge_description": "Energy"}]}
+          ],
+          "account_charges": []
+        },
+        "diagnostics": [],
+        "source_provenance": [
+          {
+            "output_source": "customChunkOutputs",
+            "workflow_group": "statement",
+            "workflow_field": "invoice_number",
+            "final_path": "/invoice_number",
+            "record_index": null,
+            "page_numbers": [2]
+          },
+          {
+            "output_source": "customChunkOutputs",
+            "workflow_group": "meters",
+            "workflow_field": "meter_number",
+            "final_path": "/meters/meter_number",
+            "record_index": 0,
+            "page_numbers": [2]
+          },
+          {
+            "output_source": "customChunkOutputs",
+            "workflow_group": "meters",
+            "workflow_field": "meter_number",
+            "final_path": "/meters/meter_number",
+            "record_index": 1,
+            "page_numbers": [2]
+          },
+          {
+            "output_source": "customChunkOutputs",
+            "workflow_group": "charges",
+            "workflow_field": "meter_number",
+            "final_path": "/charges/meter_number",
+            "record_index": 0,
+            "page_numbers": [2]
+          },
+          {
+            "output_source": "customChunkOutputs",
+            "workflow_group": "charges",
+            "workflow_field": "charge_description",
+            "final_path": "/charges/charge_description",
+            "record_index": 0,
+            "page_numbers": [2]
+          }
+        ]
+      }
+    },
+    {
+      "id": "generic-v1",
+      "workflow_extract": {
+        "workflow": {
+          "custom_steps": [
+            {"name": "generic_step_a", "level": "chunk", "kind": "instruct"},
+            {"name": "generic_step_b", "level": "chunk", "kind": "summary"},
+            {"name": "generic_step_c", "level": "chunk", "kind": "keys"}
+          ],
+          "output_routes": [
+            {
+              "workflow_group": "generic_group_a",
+              "workflow_field": "generic_attr_01",
+              "final_path": "/generic_attr_01",
+              "step_name": "generic_step_a",
+              "level": "chunk",
+              "output_map": "customChunkOutputs",
+              "output_key": "generic_attr_01"
+            },
+            {
+              "workflow_group": "generic_group_b",
+              "workflow_field": "generic_attr_15",
+              "final_path": "/generic_group_b/generic_attr_15",
+              "step_name": "generic_step_b",
+              "level": "chunk",
+              "output_map": "customChunkOutputs",
+              "output_key": "generic_attr_15"
+            },
+            {
+              "workflow_group": "generic_group_c",
+              "workflow_field": "generic_attr_15",
+              "final_path": "/generic_group_c/generic_attr_15",
+              "step_name": "generic_step_c",
+              "level": "chunk",
+              "output_map": "customChunkOutputs",
+              "output_key": "generic_attr_15"
+            },
+            {
+              "workflow_group": "generic_group_c",
+              "workflow_field": "generic_attr_29",
+              "final_path": "/generic_group_c/generic_attr_29",
+              "step_name": "generic_step_c",
+              "level": "chunk",
+              "output_map": "customChunkOutputs",
+              "output_key": "generic_attr_29"
+            }
+          ],
+          "output_relationships": [
+            {
+              "parent_group": "generic_group_b",
+              "child_group": "generic_group_c",
+              "parent_output_field": "generic_group_c",
+              "match_attrs": ["generic_attr_15"],
+              "unmatched_child_group": "generic_group_c"
+            }
+          ]
+        }
+      },
+      "xray": {
+        "chunks": [
+          {
+            "chunkId": "generic-chunk-1",
+            "pageNumbers": [3],
+            "customChunkOutputs": {
+              "generic_step_a": {"generic_attr_01": "A-100"},
+              "generic_step_b": {"_records": [{"generic_attr_15": "M-1"}, {"generic_attr_15": "m-1"}]},
+              "generic_step_c": {"_records": [{"generic_attr_15": "M-1", "generic_attr_29": "42.00"}]}
+            }
+          }
+        ]
+      },
+      "expected": {
+        "workflow_output": {
+          "generic_group_a": {"generic_attr_01": "A-100"},
+          "generic_group_b": [{"generic_attr_15": "M-1"}, {"generic_attr_15": "m-1"}],
+          "generic_group_c": [{"generic_attr_15": "M-1", "generic_attr_29": "42.00"}]
+        },
+        "relationship_output": {
+          "generic_attr_01": "A-100",
+          "generic_group_b": [
+            {"generic_attr_15": "M-1", "generic_group_c": [{"generic_attr_15": "M-1", "generic_attr_29": "42.00"}]}
+          ],
+          "generic_group_c": []
+        },
+        "final_output": {
+          "generic_attr_01": "A-100",
+          "generic_group_b": [
+            {"generic_attr_15": "M-1", "generic_group_c": [{"generic_attr_15": "M-1", "generic_attr_29": "42.00"}]}
+          ],
+          "generic_group_c": []
+        },
+        "diagnostics": [],
+        "source_provenance": [
+          {
+            "output_source": "customChunkOutputs",
+            "workflow_group": "generic_group_a",
+            "workflow_field": "generic_attr_01",
+            "final_path": "/generic_attr_01",
+            "record_index": null,
+            "page_numbers": [3]
+          },
+          {
+            "output_source": "customChunkOutputs",
+            "workflow_group": "generic_group_b",
+            "workflow_field": "generic_attr_15",
+            "final_path": "/generic_group_b/generic_attr_15",
+            "record_index": 0,
+            "page_numbers": [3]
+          },
+          {
+            "output_source": "customChunkOutputs",
+            "workflow_group": "generic_group_b",
+            "workflow_field": "generic_attr_15",
+            "final_path": "/generic_group_b/generic_attr_15",
+            "record_index": 1,
+            "page_numbers": [3]
+          },
+          {
+            "output_source": "customChunkOutputs",
+            "workflow_group": "generic_group_c",
+            "workflow_field": "generic_attr_15",
+            "final_path": "/generic_group_c/generic_attr_15",
+            "record_index": 0,
+            "page_numbers": [3]
+          },
+          {
+            "output_source": "customChunkOutputs",
+            "workflow_group": "generic_group_c",
+            "workflow_field": "generic_attr_29",
+            "final_path": "/generic_group_c/generic_attr_29",
+            "record_index": 0,
+            "page_numbers": [3]
+          }
+        ]
+      }
+    },
+    {
+      "id": "adp-v1",
+      "workflow_extract": {
+        "workflow": {
+          "custom_steps": [
+            {"name": "eligibility_fields", "level": "section", "kind": "instruct"},
+            {"name": "compensation_fields", "level": "section", "kind": "instruct"}
+          ],
+          "output_routes": [
+            {
+              "workflow_group": "adp_f3_eligibility",
+              "workflow_field": "minimum_age",
+              "final_path": "/minimum_age",
+              "step_name": "eligibility_fields",
+              "level": "section",
+              "output_map": "customSectionOutputs",
+              "output_key": "minimum_age"
+            },
+            {
+              "workflow_group": "adp_f5_compensation",
+              "workflow_field": "compensation_definition",
+              "final_path": "/compensation_definition",
+              "step_name": "compensation_fields",
+              "level": "section",
+              "output_map": "customSectionOutputs",
+              "output_key": "compensation_definition"
+            }
+          ]
+        }
+      },
+      "xray": {
+        "chunks": [
+          {
+            "chunkId": "adp-section-1",
+            "sectionId": "section-eligibility",
+            "pageNumbers": [12],
+            "customSectionOutputs": {
+              "eligibility_fields": {
+                "minimum_age": {"value": "Age 21", "_raw_text": "Age 21", "_confidence": 0.91}
+              }
+            }
+          },
+          {
+            "chunkId": "adp-section-2",
+            "sectionId": "section-compensation",
+            "pageNumbers": [17],
+            "customSectionOutputs": {
+              "compensation_fields": {
+                "compensation_definition": {"value": "W-2 Compensation", "_raw_text": "W-2 Compensation", "_confidence": 0.88}
+              }
+            }
+          }
+        ]
+      },
+      "expected": {
+        "workflow_output": {
+          "adp_f3_eligibility": {"minimum_age": {"value": "Age 21", "_raw_text": "Age 21", "_confidence": 0.91}},
+          "adp_f5_compensation": {"compensation_definition": {"value": "W-2 Compensation", "_raw_text": "W-2 Compensation", "_confidence": 0.88}}
+        },
+        "relationship_output": null,
+        "final_output": {
+          "minimum_age": {"value": "Age 21", "_raw_text": "Age 21", "_confidence": 0.91},
+          "compensation_definition": {"value": "W-2 Compensation", "_raw_text": "W-2 Compensation", "_confidence": 0.88}
+        },
+        "diagnostics": [],
+        "source_provenance": [
+          {
+            "output_source": "customSectionOutputs",
+            "workflow_group": "adp_f3_eligibility",
+            "workflow_field": "minimum_age",
+            "final_path": "/minimum_age",
+            "record_index": null,
+            "page_numbers": [12]
+          },
+          {
+            "output_source": "customSectionOutputs",
+            "workflow_group": "adp_f5_compensation",
+            "workflow_field": "compensation_definition",
+            "final_path": "/compensation_definition",
+            "record_index": null,
+            "page_numbers": [17]
+          }
+        ]
+      }
+    }
+  ]
+}
