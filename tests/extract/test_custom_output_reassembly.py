@@ -1,5 +1,31 @@
+import json
+import pathlib
+
+import pytest
+
 from groundx.extract import reassemble_custom_outputs
 from groundx.extract.custom_outputs import reassemble_custom_outputs_from_xray
+
+FIXTURE_DIR = pathlib.Path(__file__).parent / "fixtures"
+
+
+def _custom_output_reassembly_cases() -> list[dict]:
+    fixture = FIXTURE_DIR / "custom_output_reassembly_cases.json"
+    return json.loads(fixture.read_text())["cases"]
+
+
+def _provenance_dicts(result) -> list[dict]:
+    return [
+        {
+            "output_source": provenance.output_source,
+            "workflow_group": provenance.workflow_group,
+            "workflow_field": provenance.workflow_field,
+            "final_path": provenance.final_path,
+            "record_index": provenance.record_index,
+            "page_numbers": list(provenance.page_numbers),
+        }
+        for provenance in result.source_provenance
+    ]
 
 
 def test_reassemble_custom_outputs_public_alias() -> None:
@@ -8,6 +34,23 @@ def test_reassemble_custom_outputs_public_alias() -> None:
     assert result.final_output == {}
     assert result.relationship_output is None
     assert result.diagnostics == []
+
+
+@pytest.mark.parametrize("case", _custom_output_reassembly_cases(), ids=lambda case: case["id"])
+def test_certification_fixture_reassembles_custom_outputs(case: dict) -> None:
+    result = reassemble_custom_outputs_from_xray(
+        case["xray"],
+        workflow_extract=case["workflow_extract"],
+    )
+
+    expected = case["expected"]
+    assert result.workflow_output == expected["workflow_output"]
+    assert result.relationship_output == expected["relationship_output"]
+    assert result.final_output == expected["final_output"]
+    assert [diagnostic.code for diagnostic in result.diagnostics] == expected[
+        "diagnostics"
+    ]
+    assert _provenance_dicts(result) == expected["source_provenance"]
 
 
 def test_reassembles_records_wrapper_to_final_relationship_output() -> None:
@@ -692,12 +735,7 @@ def test_reassembly_reports_source_provenance_for_routed_outputs() -> None:
     ]
 
 
-def test_ambiguous_relationship_match_is_warning_and_routes_unmatched() -> None:
-    """Ambiguity is a HANDLED data condition (child -> unmatched group,
-    rendered account-level), not a fatal error. Live prod failure 2026-07-08:
-    a real utility bill produced charges matching multiple meters; the default
-    severity="error" failed the entire document even though the algorithm had
-    already routed every ambiguous child safely."""
+def test_duplicate_parent_keys_do_not_make_relationship_child_ambiguous() -> None:
     workflow_extract = {
         "workflow": {
             "custom_steps": [
@@ -723,6 +761,15 @@ def test_ambiguous_relationship_match_is_warning_and_routes_unmatched() -> None:
                     "output_map": "customChunkOutputs",
                     "output_key": "account_id",
                 },
+                {
+                    "workflow_group": "transactions",
+                    "workflow_field": "amount",
+                    "final_path": "/transactions/amount",
+                    "step_name": "transaction_rows",
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": "amount",
+                },
             ],
             "output_relationships": [
                 {
@@ -740,10 +787,14 @@ def test_ambiguous_relationship_match_is_warning_and_routes_unmatched() -> None:
             {
                 "customChunkOutputs": {
                     "account_rows": {
-                        # duplicate account_id -> any child matches BOTH parents
-                        "_records": [{"account_id": "A-1"}, {"account_id": "A-1"}]
+                        "_records": [
+                            {"account_id": "A-1"},
+                            {"account_id": "A-1"},
+                        ]
                     },
-                    "transaction_rows": {"_records": [{"account_id": "A-1"}]},
+                    "transaction_rows": {
+                        "_records": [{"account_id": "a-1", "amount": 10}]
+                    },
                 }
             }
         ]
@@ -751,10 +802,13 @@ def test_ambiguous_relationship_match_is_warning_and_routes_unmatched() -> None:
 
     result = reassemble_custom_outputs_from_xray(xray, workflow_extract=workflow_extract)
 
-    assert len(result.diagnostics) == 1
-    diagnostic = result.diagnostics[0]
-    assert diagnostic.code == "ambiguous_relationship_match"
-    assert diagnostic.severity == "warning"
-    # the ambiguous child is routed to the unmatched group, parents intact
-    assert result.final_output["transactions"] == [{"account_id": "A-1"}]
-    assert [a["account_id"] for a in result.final_output["accounts"]] == ["A-1", "A-1"]
+    assert result.diagnostics == []
+    assert result.final_output == {
+        "accounts": [
+            {
+                "account_id": "A-1",
+                "transactions": [{"account_id": "a-1", "amount": 10}],
+            }
+        ],
+        "transactions": [],
+    }

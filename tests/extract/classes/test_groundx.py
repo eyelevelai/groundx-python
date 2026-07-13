@@ -1,15 +1,17 @@
-import requests, typing, unittest
+import typing
+import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+import requests
 from pydantic import ValidationError
 
 from groundx.extract.classes.groundx import (
+    BoundingBox,
+    Chunk,
+    DocumentPage,
     GroundXDocument,
     XRayDocument,
-    Chunk,
-    BoundingBox,
-    DocumentPage,
 )
 
 
@@ -61,6 +63,31 @@ class TestGroundX(unittest.TestCase):
             self.assertEqual(xdoc.chunks, [])
             self.assertEqual(xdoc.documentPages, [])
             self.assertEqual(xdoc.sourceUrl, payload["sourceUrl"])
+
+    def test_download_uses_bounded_http_timeout(self):
+        payload: typing.Dict[str, typing.Any] = {
+            "chunks": [],
+            "documentPages": [],
+            "sourceUrl": "https://example.com/foo.pdf",
+        }
+        dummy = self.make_dummy_response(payload=payload, status_ok=True)
+        with patch("requests.get", return_value=dummy) as get:
+            gx = GD(base_url="", documentID="D", taskID="T")
+            _download_xray(gx)
+
+        self.assertEqual(get.call_args.kwargs["timeout"], (5.0, 30.0))
+
+    def test_download_timeout_is_bounded(self):
+        with (
+            patch("requests.get", side_effect=requests.Timeout("stalled")) as get,
+            patch("groundx.extract.services.http.time.sleep"),
+        ):
+            gx = GD(base_url="", documentID="D", taskID="T")
+            with self.assertRaises(RuntimeError) as cm:
+                _download_xray(gx)
+
+        self.assertEqual(get.call_count, 2)
+        self.assertIn("after 2 attempts", str(cm.exception))
 
     def test_download_request_exception(self):
         with patch("requests.get", side_effect=requests.RequestException("no network")):

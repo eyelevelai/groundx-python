@@ -1,20 +1,19 @@
 import json
 import os
 import shutil
-import time
 import typing
 from datetime import datetime, timezone
 from io import BytesIO
 from pathlib import Path
 from urllib.parse import urlparse
 
-import requests
 from ..custom_outputs import (
     custom_output_payload_identity,
     custom_output_route_values,
     custom_output_section_identity,
 )
 from ..prompt.manager import PromptManager
+from ..services.http import BoundedRequestTimeout, bounded_get
 from ..services.logger import Logger
 from ..services.upload import Upload
 from ..utility import clean_json
@@ -976,23 +975,26 @@ class DocumentRequest(BaseModel):
 
             try:
                 self.print("WARN", f"[{attempt}] downloading [{page}]")
-                resp = requests.get(page)
+                resp = bounded_get(
+                    page,
+                    operation="page image",
+                    sleep_between_attempts=should_sleep,
+                )
                 resp.raise_for_status()
                 img = Image.open(BytesIO(resp.content))
                 if img:
                     self.page_image_dict[page] = len(self.page_images)
                     self.page_images.append(img)
                     pageImages.append(img)
+            except BoundedRequestTimeout as e:
+                self.print(
+                    "ERROR", f"[{attempt}] Failed to load image from {page}: {e}"
+                )
+                raise RuntimeError(str(e)) from e
             except Exception as e:
                 self.print(
                     "ERROR", f"[{attempt}] Failed to load image from {page}: {e}"
                 )
-                if attempt < 2:
-                    if should_sleep:
-                        time.sleep(2 * attempt + 1)
-                    return self.load_images(
-                        imgs, upload, attempt + 1, should_sleep=should_sleep
-                    )
 
         return pageImages
 

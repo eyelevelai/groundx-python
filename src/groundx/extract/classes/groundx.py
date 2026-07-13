@@ -1,10 +1,12 @@
-import json, requests, typing
+import json
+import typing
 from pathlib import Path
 
+import requests
+from ..services.http import bounded_get
+from ..services.upload import Upload
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from typing_extensions import Annotated
-
-from ..services.upload import Upload
 
 
 class GroundXDocument(BaseModel):
@@ -195,10 +197,12 @@ class XRayDocument(BaseModel):
 
         url = gx_doc.xray_url(base=base)
         try:
-            resp = requests.get(url)
+            resp = bounded_get(url, operation="X-ray JSON")
             resp.raise_for_status()
         except requests.RequestException as e:
             raise RuntimeError(f"Error fetching X-ray JSON from {url}: {e}")
+        except RuntimeError as e:
+            raise RuntimeError(f"Error fetching X-ray JSON from {url}: {e}") from e
 
         try:
             payload = resp.json()

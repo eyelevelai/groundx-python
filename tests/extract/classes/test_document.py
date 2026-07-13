@@ -2,6 +2,7 @@ import typing
 import unittest
 
 import pytest
+import requests
 
 pytest.importorskip("PIL")
 
@@ -760,6 +761,40 @@ class TestDocumentRequest(unittest.TestCase):
             for img in st.page_images:
                 self.assertIsInstance(img, Image.Image)
                 self.assertEqual(img.size, (10, 10))
+
+    def test_load_images_uses_bounded_http_timeout(self) -> None:
+        urls = ["http://example.com/page1.png"]
+
+        red_img = Image.new("RGB", (10, 10), color="red")
+        buf = BytesIO()
+        red_img.save(buf, format="PNG")
+        img_bytes = buf.getvalue()
+
+        class TestResp:
+            content = img_bytes
+
+            def raise_for_status(self) -> None:
+                pass
+
+        with patch("requests.get", return_value=TestResp()) as get:
+            st = _make_request()
+            st.load_images(urls)
+
+        self.assertEqual(get.call_args.kwargs["timeout"], (5.0, 30.0))
+
+    def test_load_images_timeout_is_bounded(self) -> None:
+        urls = ["http://example.com/page1.png"]
+
+        with (
+            patch("requests.get", side_effect=requests.Timeout("stalled")) as get,
+            patch("groundx.extract.services.http.time.sleep"),
+        ):
+            st = _make_request()
+            with self.assertRaises(RuntimeError) as cm:
+                st.load_images(urls)
+
+        self.assertEqual(get.call_count, 2)
+        self.assertIn("after 2 attempts", str(cm.exception))
 
     def test_load_images_error(self) -> None:
         urls = ["http://example.com/page1.png", "http://example.com/page2.png"]
