@@ -1628,6 +1628,7 @@ def _collect_custom_workflow_routes(
     step_name: typing.Optional[str],
     steps_by_name: typing.Dict[str, typing.Dict[str, typing.Any]],
     prefix: typing.Tuple[str, ...] = (),
+    document_root: bool = False,
 ) -> typing.Tuple[
     typing.List[typing.Dict[str, typing.Any]],
     typing.List[typing.Dict[str, typing.Any]],
@@ -1655,6 +1656,7 @@ def _collect_custom_workflow_routes(
                         step_name,
                         steps_by_name,
                         (*prefix, field_name, "*"),
+                        document_root,
                     )
                     routes.extend(nested_routes)
                     leaves.extend(nested_leaves)
@@ -1683,7 +1685,11 @@ def _collect_custom_workflow_routes(
                 output_key_raw,
                 f"{field_path}.{_CUSTOM_WORKFLOW_FIELD_METADATA_KEY}",
             )
-            segments = (group_name, *prefix, field_name)
+            segments = (
+                (*prefix, field_name)
+                if document_root
+                else (group_name, *prefix, field_name)
+            )
             final_path = _encode_pointer(segments)
             level = typing.cast(str, step["level"])
             workflow_field = _custom_workflow_field_name(prefix, field_name)
@@ -1723,6 +1729,7 @@ def _collect_custom_workflow_routes(
                 step_name,
                 steps_by_name,
                 (*prefix, field_name),
+                document_root,
             )
             routes.extend(nested_routes)
             leaves.extend(nested_leaves)
@@ -1733,11 +1740,52 @@ def _collect_custom_workflow_routes(
                 step_name,
                 steps_by_name,
                 (*prefix, field_name),
+                document_root,
             )
             routes.extend(nested_routes)
             leaves.extend(nested_leaves)
 
     return routes, leaves
+
+
+def _agent_chain_group_roles(raw_chain: typing.Any) -> typing.Dict[str, str]:
+    roles: typing.Dict[str, str] = {}
+    if not isinstance(raw_chain, list):
+        return roles
+
+    for raw_stage in raw_chain:
+        if not isinstance(raw_stage, dict) or set(raw_stage.keys()) != {"parallel"}:
+            continue
+        raw_branches = raw_stage["parallel"]
+        if not isinstance(raw_branches, list):
+            continue
+        for raw_branch in raw_branches:
+            if not isinstance(raw_branch, dict):
+                continue
+            group = raw_branch.get("group")
+            chain = raw_branch.get("chain")
+            if not isinstance(group, str) or not isinstance(chain, list):
+                continue
+            suffixes = {
+                _agent_chain_task_suffix(task)
+                for task in chain
+                if isinstance(task, str)
+                and task in _CUSTOM_WORKFLOW_AGENT_CHAIN_SUPPORTED_TASKS
+            }
+            if len(suffixes) == 1:
+                roles[group] = next(iter(suffixes))
+    return roles
+
+
+def _is_document_root_statement_group(
+    group_metadata: typing.Mapping[str, typing.Any],
+    group_role: typing.Optional[str],
+) -> bool:
+    if group_role != "statement":
+        return False
+    return isinstance(group_metadata.get("final_value_aliases"), dict) or isinstance(
+        group_metadata.get("fill_rules"), list
+    )
 
 
 def _collect_pseudo_custom_workflow_routes(
@@ -1830,6 +1878,9 @@ def _build_authored_custom_workflow_metadata(
 
     routes: typing.List[typing.Dict[str, typing.Any]] = []
     leaves: typing.List[typing.Dict[str, typing.Any]] = []
+    agent_chain_group_roles = _agent_chain_group_roles(
+        workflow.get(_CUSTOM_WORKFLOW_AGENT_CHAIN_KEY)
+    )
     for group_name, group in workflow_groups.items():
         group_step = workflow_group_metadata.get(group_name, {}).get(
             _CUSTOM_WORKFLOW_GROUP_METADATA_KEY
@@ -1846,11 +1897,16 @@ def _build_authored_custom_workflow_metadata(
                 workflow_field_paths.get(group_name, {}),
             )
         else:
+            document_root = _is_document_root_statement_group(
+                final_group_metadata.get(group_name, {}),
+                agent_chain_group_roles.get(group_name),
+            )
             group_routes, group_leaves = _collect_custom_workflow_routes(
                 fields,
                 group_name,
                 typing.cast(typing.Optional[str], group_step),
                 steps_by_name,
+                document_root=document_root,
             )
         routes.extend(group_routes)
         leaves.extend(group_leaves)
