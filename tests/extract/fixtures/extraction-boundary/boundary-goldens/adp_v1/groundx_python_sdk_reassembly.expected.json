@@ -1,10 +1,10 @@
 {
   "artifacts": {
     "handoff": {
-      "sha256": "df130063b94892fcddd2101175a3f1132d66976bb46dcf2ab0370be7a05afd30"
+      "sha256": "ccf1259e35fe31b302dc6654ba6cbb6224bd4c080345252f0d9992b787b55358"
     },
     "previous_extract_chain": {
-      "sha256": "33cc0b91c973820b6673f579d09aa989dedf15c07c756ba4f0f9b107ea1f6519"
+      "sha256": "3b30f080a3e2ba33bcf5890502b9928fa410551fdfdceac429a5ed93669d3e90"
     }
   },
   "assertions": {
@@ -13,14 +13,27 @@
     "has_no_error_diagnostics": true,
     "shape_contract_passed": true
   },
+  "certification_eligible": true,
+  "evidence_level": "reviewed_deterministic_model_fixture",
   "input_from": "internal_arcadia_extract_chain",
-  "input_sha256": "33cc0b91c973820b6673f579d09aa989dedf15c07c756ba4f0f9b107ea1f6519",
+  "input_sha256": "3b30f080a3e2ba33bcf5890502b9928fa410551fdfdceac429a5ed93669d3e90",
+  "model_fixture": {
+    "path": "testdata/extraction-boundary/model-fixtures/adp_v1/extract_model_outputs.json",
+    "schema_version": "internal-arcadia-extract-model-output-fixture-v1",
+    "sha256": "17ce38bb2fa46049f60d85a754401d821c53170a34e842c75483bcf4c6adb6de",
+    "source": {
+      "document_file_name": "adp.pdf",
+      "kind": "reviewed_deterministic_model_output_fixture",
+      "workflow_id": "adp_v1-product-path",
+      "workflow_version": "2026-07-12T22:34:03Z"
+    }
+  },
   "output": {
     "diagnostic_count": 0,
-    "final_output_sha256": "aab5547154bdde263b7d38bec776ec0e571d01f7d28492288560fe49273b9cac",
+    "final_output_sha256": "a3023d604347f1e4083f04bbd09325f5728661a86f7d762904fca16e09d84871",
     "relationship_output_sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
     "source_provenance_count": 159,
-    "workflow_output_sha256": "e5f70fe87f1a03640ee1e532f9987e51724e16c11cb4a440a9aa9a5b8b5e1213"
+    "workflow_output_sha256": "5367ab012fc5be558f0eb5bb5d32a059dbb11afb11a138cf842b4300593ba3de"
   },
   "output_for": "internal_arcadia_save_callback",
   "request": {

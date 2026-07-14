@@ -1,10 +1,19 @@
 {
-  "fake_agent_data": {
-    "allowed_boundary": "internal_arcadia_extract_chain",
-    "method": "deterministic_from_cashbot_deployed_output_routes"
-  },
+  "certification_eligible": true,
+  "evidence_level": "reviewed_deterministic_model_fixture",
   "input_from": "internal_arcadia_download_workflow_load",
   "input_sha256": "28c810096775784006862674f48ad6ac52d7b4bf8da4f8b755976e55352c5cd3",
+  "model_fixture": {
+    "path": "testdata/extraction-boundary/model-fixtures/arcadia_v1/extract_model_outputs.json",
+    "schema_version": "internal-arcadia-extract-model-output-fixture-v1",
+    "sha256": "8291671f5b8ea4d17a0b974ae4efa1620bf49ff6561e27638b522f8c38eff900",
+    "source": {
+      "document_file_name": "arcadia.pdf",
+      "kind": "reviewed_deterministic_model_output_fixture",
+      "workflow_id": "arcadia_v1-product-path",
+      "workflow_version": "2026-07-12T22:34:01Z"
+    }
+  },
   "output_for": "groundx_python_sdk_reassembly",
   "request": {
     "callbackURL": "https://api.groundx.ai/callback/layout",
@@ -3106,591 +3115,591 @@
               {
                 "charge_amount": 100.25,
                 "charge_amount_currency": 100.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_1",
-                "meter_number": "meter_number_parent_1",
-                "provider_name": "provider_name_parent_1",
-                "service_type": "service_type_parent_1"
+                "charge_description_as_printed": "Line item charge 001",
+                "meter_number": "MTR-001",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 101.25,
                 "charge_amount_currency": 101.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_2",
-                "meter_number": "meter_number_parent_2",
-                "provider_name": "provider_name_parent_2",
-                "service_type": "service_type_parent_2"
+                "charge_description_as_printed": "Line item charge 002",
+                "meter_number": "MTR-002",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 102.25,
                 "charge_amount_currency": 102.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_3",
-                "meter_number": "meter_number_parent_3",
-                "provider_name": "provider_name_parent_3",
-                "service_type": "service_type_parent_3"
+                "charge_description_as_printed": "Line item charge 003",
+                "meter_number": "MTR-003",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 103.25,
                 "charge_amount_currency": 103.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_4",
-                "meter_number": "meter_number_parent_4",
-                "provider_name": "provider_name_parent_4",
-                "service_type": "service_type_parent_4"
+                "charge_description_as_printed": "Line item charge 004",
+                "meter_number": "MTR-004",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 104.25,
                 "charge_amount_currency": 104.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_5",
-                "meter_number": "meter_number_parent_5",
-                "provider_name": "provider_name_parent_5",
-                "service_type": "service_type_parent_5"
+                "charge_description_as_printed": "Line item charge 005",
+                "meter_number": "MTR-005",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 105.25,
                 "charge_amount_currency": 105.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_6",
-                "meter_number": "meter_number_parent_6",
-                "provider_name": "provider_name_parent_6",
-                "service_type": "service_type_parent_6"
+                "charge_description_as_printed": "Line item charge 006",
+                "meter_number": "MTR-006",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 106.25,
                 "charge_amount_currency": 106.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_7",
-                "meter_number": "meter_number_parent_7",
-                "provider_name": "provider_name_parent_7",
-                "service_type": "service_type_parent_7"
+                "charge_description_as_printed": "Line item charge 007",
+                "meter_number": "MTR-007",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 107.25,
                 "charge_amount_currency": 107.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_8",
-                "meter_number": "meter_number_parent_8",
-                "provider_name": "provider_name_parent_8",
-                "service_type": "service_type_parent_8"
+                "charge_description_as_printed": "Line item charge 008",
+                "meter_number": "MTR-008",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 108.25,
                 "charge_amount_currency": 108.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_9",
-                "meter_number": "meter_number_parent_1",
-                "provider_name": "provider_name_parent_1",
-                "service_type": "service_type_parent_1"
+                "charge_description_as_printed": "Line item charge 009",
+                "meter_number": "MTR-001",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 109.25,
                 "charge_amount_currency": 109.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_10",
-                "meter_number": "meter_number_parent_2",
-                "provider_name": "provider_name_parent_2",
-                "service_type": "service_type_parent_2"
+                "charge_description_as_printed": "Line item charge 010",
+                "meter_number": "MTR-002",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 110.25,
                 "charge_amount_currency": 110.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_11",
-                "meter_number": "meter_number_parent_3",
-                "provider_name": "provider_name_parent_3",
-                "service_type": "service_type_parent_3"
+                "charge_description_as_printed": "Line item charge 011",
+                "meter_number": "MTR-003",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 111.25,
                 "charge_amount_currency": 111.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_12",
-                "meter_number": "meter_number_parent_4",
-                "provider_name": "provider_name_parent_4",
-                "service_type": "service_type_parent_4"
+                "charge_description_as_printed": "Line item charge 012",
+                "meter_number": "MTR-004",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 112.25,
                 "charge_amount_currency": 112.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_13",
-                "meter_number": "meter_number_parent_5",
-                "provider_name": "provider_name_parent_5",
-                "service_type": "service_type_parent_5"
+                "charge_description_as_printed": "Line item charge 013",
+                "meter_number": "MTR-005",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 113.25,
                 "charge_amount_currency": 113.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_14",
-                "meter_number": "meter_number_parent_6",
-                "provider_name": "provider_name_parent_6",
-                "service_type": "service_type_parent_6"
+                "charge_description_as_printed": "Line item charge 014",
+                "meter_number": "MTR-006",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 114.25,
                 "charge_amount_currency": 114.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_15",
-                "meter_number": "meter_number_parent_7",
-                "provider_name": "provider_name_parent_7",
-                "service_type": "service_type_parent_7"
+                "charge_description_as_printed": "Line item charge 015",
+                "meter_number": "MTR-007",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 115.25,
                 "charge_amount_currency": 115.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_16",
-                "meter_number": "meter_number_parent_8",
-                "provider_name": "provider_name_parent_8",
-                "service_type": "service_type_parent_8"
+                "charge_description_as_printed": "Line item charge 016",
+                "meter_number": "MTR-008",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 116.25,
                 "charge_amount_currency": 116.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_17",
-                "meter_number": "meter_number_parent_1",
-                "provider_name": "provider_name_parent_1",
-                "service_type": "service_type_parent_1"
+                "charge_description_as_printed": "Line item charge 017",
+                "meter_number": "MTR-001",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 117.25,
                 "charge_amount_currency": 117.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_18",
-                "meter_number": "meter_number_parent_2",
-                "provider_name": "provider_name_parent_2",
-                "service_type": "service_type_parent_2"
+                "charge_description_as_printed": "Line item charge 018",
+                "meter_number": "MTR-002",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 118.25,
                 "charge_amount_currency": 118.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_19",
-                "meter_number": "meter_number_parent_3",
-                "provider_name": "provider_name_parent_3",
-                "service_type": "service_type_parent_3"
+                "charge_description_as_printed": "Line item charge 019",
+                "meter_number": "MTR-003",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 119.25,
                 "charge_amount_currency": 119.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_20",
-                "meter_number": "meter_number_parent_4",
-                "provider_name": "provider_name_parent_4",
-                "service_type": "service_type_parent_4"
+                "charge_description_as_printed": "Line item charge 020",
+                "meter_number": "MTR-004",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 120.25,
                 "charge_amount_currency": 120.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_21",
-                "meter_number": "meter_number_parent_5",
-                "provider_name": "provider_name_parent_5",
-                "service_type": "service_type_parent_5"
+                "charge_description_as_printed": "Line item charge 021",
+                "meter_number": "MTR-005",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 121.25,
                 "charge_amount_currency": 121.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_22",
-                "meter_number": "meter_number_parent_6",
-                "provider_name": "provider_name_parent_6",
-                "service_type": "service_type_parent_6"
+                "charge_description_as_printed": "Line item charge 022",
+                "meter_number": "MTR-006",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 122.25,
                 "charge_amount_currency": 122.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_23",
-                "meter_number": "meter_number_parent_7",
-                "provider_name": "provider_name_parent_7",
-                "service_type": "service_type_parent_7"
+                "charge_description_as_printed": "Line item charge 023",
+                "meter_number": "MTR-007",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 123.25,
                 "charge_amount_currency": 123.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_24",
-                "meter_number": "meter_number_parent_8",
-                "provider_name": "provider_name_parent_8",
-                "service_type": "service_type_parent_8"
+                "charge_description_as_printed": "Line item charge 024",
+                "meter_number": "MTR-008",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 124.25,
                 "charge_amount_currency": 124.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_25",
-                "meter_number": "meter_number_parent_1",
-                "provider_name": "provider_name_parent_1",
-                "service_type": "service_type_parent_1"
+                "charge_description_as_printed": "Line item charge 025",
+                "meter_number": "MTR-001",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 125.25,
                 "charge_amount_currency": 125.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_26",
-                "meter_number": "meter_number_parent_2",
-                "provider_name": "provider_name_parent_2",
-                "service_type": "service_type_parent_2"
+                "charge_description_as_printed": "Line item charge 026",
+                "meter_number": "MTR-002",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 126.25,
                 "charge_amount_currency": 126.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_27",
-                "meter_number": "meter_number_parent_3",
-                "provider_name": "provider_name_parent_3",
-                "service_type": "service_type_parent_3"
+                "charge_description_as_printed": "Line item charge 027",
+                "meter_number": "MTR-003",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 127.25,
                 "charge_amount_currency": 127.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_28",
-                "meter_number": "meter_number_parent_4",
-                "provider_name": "provider_name_parent_4",
-                "service_type": "service_type_parent_4"
+                "charge_description_as_printed": "Line item charge 028",
+                "meter_number": "MTR-004",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 128.25,
                 "charge_amount_currency": 128.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_29",
-                "meter_number": "meter_number_parent_5",
-                "provider_name": "provider_name_parent_5",
-                "service_type": "service_type_parent_5"
+                "charge_description_as_printed": "Line item charge 029",
+                "meter_number": "MTR-005",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 129.25,
                 "charge_amount_currency": 129.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_30",
-                "meter_number": "meter_number_parent_6",
-                "provider_name": "provider_name_parent_6",
-                "service_type": "service_type_parent_6"
+                "charge_description_as_printed": "Line item charge 030",
+                "meter_number": "MTR-006",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 130.25,
                 "charge_amount_currency": 130.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_31",
-                "meter_number": "meter_number_parent_7",
-                "provider_name": "provider_name_parent_7",
-                "service_type": "service_type_parent_7"
+                "charge_description_as_printed": "Line item charge 031",
+                "meter_number": "MTR-007",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 131.25,
                 "charge_amount_currency": 131.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_32",
-                "meter_number": "meter_number_parent_8",
-                "provider_name": "provider_name_parent_8",
-                "service_type": "service_type_parent_8"
+                "charge_description_as_printed": "Line item charge 032",
+                "meter_number": "MTR-008",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 132.25,
                 "charge_amount_currency": 132.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_33",
-                "meter_number": "meter_number_parent_1",
-                "provider_name": "provider_name_parent_1",
-                "service_type": "service_type_parent_1"
+                "charge_description_as_printed": "Line item charge 033",
+                "meter_number": "MTR-001",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 133.25,
                 "charge_amount_currency": 133.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_34",
-                "meter_number": "meter_number_parent_2",
-                "provider_name": "provider_name_parent_2",
-                "service_type": "service_type_parent_2"
+                "charge_description_as_printed": "Line item charge 034",
+                "meter_number": "MTR-002",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 134.25,
                 "charge_amount_currency": 134.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_35",
-                "meter_number": "meter_number_parent_3",
-                "provider_name": "provider_name_parent_3",
-                "service_type": "service_type_parent_3"
+                "charge_description_as_printed": "Line item charge 035",
+                "meter_number": "MTR-003",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 135.25,
                 "charge_amount_currency": 135.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_36",
-                "meter_number": "meter_number_parent_4",
-                "provider_name": "provider_name_parent_4",
-                "service_type": "service_type_parent_4"
+                "charge_description_as_printed": "Line item charge 036",
+                "meter_number": "MTR-004",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 136.25,
                 "charge_amount_currency": 136.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_37",
-                "meter_number": "meter_number_parent_5",
-                "provider_name": "provider_name_parent_5",
-                "service_type": "service_type_parent_5"
+                "charge_description_as_printed": "Line item charge 037",
+                "meter_number": "MTR-005",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 137.25,
                 "charge_amount_currency": 137.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_38",
-                "meter_number": "meter_number_parent_6",
-                "provider_name": "provider_name_parent_6",
-                "service_type": "service_type_parent_6"
+                "charge_description_as_printed": "Line item charge 038",
+                "meter_number": "MTR-006",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 138.25,
                 "charge_amount_currency": 138.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_39",
-                "meter_number": "meter_number_parent_7",
-                "provider_name": "provider_name_parent_7",
-                "service_type": "service_type_parent_7"
+                "charge_description_as_printed": "Line item charge 039",
+                "meter_number": "MTR-007",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 139.25,
                 "charge_amount_currency": 139.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_40",
-                "meter_number": "meter_number_parent_8",
-                "provider_name": "provider_name_parent_8",
-                "service_type": "service_type_parent_8"
+                "charge_description_as_printed": "Line item charge 040",
+                "meter_number": "MTR-008",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 140.25,
                 "charge_amount_currency": 140.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_41",
-                "meter_number": "meter_number_parent_1",
-                "provider_name": "provider_name_parent_1",
-                "service_type": "service_type_parent_1"
+                "charge_description_as_printed": "Line item charge 041",
+                "meter_number": "MTR-001",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 141.25,
                 "charge_amount_currency": 141.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_42",
-                "meter_number": "meter_number_parent_2",
-                "provider_name": "provider_name_parent_2",
-                "service_type": "service_type_parent_2"
+                "charge_description_as_printed": "Line item charge 042",
+                "meter_number": "MTR-002",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 142.25,
                 "charge_amount_currency": 142.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_43",
-                "meter_number": "meter_number_parent_3",
-                "provider_name": "provider_name_parent_3",
-                "service_type": "service_type_parent_3"
+                "charge_description_as_printed": "Line item charge 043",
+                "meter_number": "MTR-003",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 143.25,
                 "charge_amount_currency": 143.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_44",
-                "meter_number": "meter_number_parent_4",
-                "provider_name": "provider_name_parent_4",
-                "service_type": "service_type_parent_4"
+                "charge_description_as_printed": "Line item charge 044",
+                "meter_number": "MTR-004",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 144.25,
                 "charge_amount_currency": 144.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_45",
-                "meter_number": "meter_number_parent_5",
-                "provider_name": "provider_name_parent_5",
-                "service_type": "service_type_parent_5"
+                "charge_description_as_printed": "Line item charge 045",
+                "meter_number": "MTR-005",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 145.25,
                 "charge_amount_currency": 145.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_46",
-                "meter_number": "meter_number_parent_6",
-                "provider_name": "provider_name_parent_6",
-                "service_type": "service_type_parent_6"
+                "charge_description_as_printed": "Line item charge 046",
+                "meter_number": "MTR-006",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 146.25,
                 "charge_amount_currency": 146.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_47",
-                "meter_number": "meter_number_parent_7",
-                "provider_name": "provider_name_parent_7",
-                "service_type": "service_type_parent_7"
+                "charge_description_as_printed": "Line item charge 047",
+                "meter_number": "MTR-007",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 147.25,
                 "charge_amount_currency": 147.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_48",
-                "meter_number": "meter_number_parent_8",
-                "provider_name": "provider_name_parent_8",
-                "service_type": "service_type_parent_8"
+                "charge_description_as_printed": "Line item charge 048",
+                "meter_number": "MTR-008",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 148.25,
                 "charge_amount_currency": 148.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_49",
-                "meter_number": "meter_number_parent_1",
-                "provider_name": "provider_name_parent_1",
-                "service_type": "service_type_parent_1"
+                "charge_description_as_printed": "Line item charge 049",
+                "meter_number": "MTR-001",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 149.25,
                 "charge_amount_currency": 149.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_50",
-                "meter_number": "meter_number_parent_2",
-                "provider_name": "provider_name_parent_2",
-                "service_type": "service_type_parent_2"
+                "charge_description_as_printed": "Line item charge 050",
+                "meter_number": "MTR-002",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 150.25,
                 "charge_amount_currency": 150.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_51",
-                "meter_number": "meter_number_parent_3",
-                "provider_name": "provider_name_parent_3",
-                "service_type": "service_type_parent_3"
+                "charge_description_as_printed": "Line item charge 051",
+                "meter_number": "MTR-003",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 151.25,
                 "charge_amount_currency": 151.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_52",
-                "meter_number": "meter_number_parent_4",
-                "provider_name": "provider_name_parent_4",
-                "service_type": "service_type_parent_4"
+                "charge_description_as_printed": "Line item charge 052",
+                "meter_number": "MTR-004",
+                "provider_name": "Utility Provider A",
+                "service_type": "Electric Service"
               },
               {
                 "charge_amount": 152.25,
                 "charge_amount_currency": 152.25,
-                "charge_description_as_printed": "arcadia_v1_charge_description_as_printed_53",
-                "meter_number": "meter_number_account_level",
-                "provider_name": "provider_name_account_level",
-                "service_type": "service_type_account_level"
+                "charge_description_as_printed": "Line item charge 053",
+                "meter_number": "MTR-ACCOUNT",
+                "provider_name": "Account Provider",
+                "service_type": "Account Service"
               }
             ]
           },
           "meter_fields": {
             "_records": [
               {
-                "deregulation_status": "arcadia_v1_deregulation_status_1",
+                "deregulation_status": "Reviewed sample value 001",
                 "measurement_period_end_date": "2026-01-01",
                 "measurement_period_start_date": "2026-01-01",
-                "meter_creation_explanation": "arcadia_v1_meter_creation_explanation_1",
-                "meter_number": "meter_number_parent_1",
-                "pass_through_provider_account_number": "arcadia_v1_pass_through_provider_account_number_1",
-                "pass_through_provider_name": "arcadia_v1_pass_through_provider_name_1",
-                "point_of_delivery_id": "arcadia_v1_point_of_delivery_id_1",
-                "power_factor_percentage": "arcadia_v1_power_factor_percentage_1",
-                "provider_name": "provider_name_parent_1",
-                "recipient_name": "arcadia_v1_recipient_name_1",
-                "service_address": "arcadia_v1_service_address_1",
-                "service_type": "service_type_parent_1",
-                "tariff_name_as_printed": "arcadia_v1_tariff_name_as_printed_1",
-                "units_of_measurement": "arcadia_v1_units_of_measurement_1",
+                "meter_creation_explanation": "Reviewed sample value 001",
+                "meter_number": "MTR-001",
+                "pass_through_provider_account_number": "ACCT-0001",
+                "pass_through_provider_name": "Utility Provider A",
+                "point_of_delivery_id": "Reviewed sample value 001",
+                "power_factor_percentage": "Reviewed sample value 001",
+                "provider_name": "Utility Provider A",
+                "recipient_name": "Reviewed sample value 001",
+                "service_address": "Reviewed sample value 001",
+                "service_type": "Electric Service",
+                "tariff_name_as_printed": "Reviewed sample value 001",
+                "units_of_measurement": "Reviewed sample value 001",
                 "usage_value": 100.25
               },
               {
-                "deregulation_status": "arcadia_v1_deregulation_status_2",
+                "deregulation_status": "Reviewed sample value 002",
                 "measurement_period_end_date": "2026-01-02",
                 "measurement_period_start_date": "2026-01-02",
-                "meter_creation_explanation": "arcadia_v1_meter_creation_explanation_2",
-                "meter_number": "meter_number_parent_2",
-                "pass_through_provider_account_number": "arcadia_v1_pass_through_provider_account_number_2",
-                "pass_through_provider_name": "arcadia_v1_pass_through_provider_name_2",
-                "point_of_delivery_id": "arcadia_v1_point_of_delivery_id_2",
-                "power_factor_percentage": "arcadia_v1_power_factor_percentage_2",
-                "provider_name": "provider_name_parent_2",
-                "recipient_name": "arcadia_v1_recipient_name_2",
-                "service_address": "arcadia_v1_service_address_2",
-                "service_type": "service_type_parent_2",
-                "tariff_name_as_printed": "arcadia_v1_tariff_name_as_printed_2",
-                "units_of_measurement": "arcadia_v1_units_of_measurement_2",
+                "meter_creation_explanation": "Reviewed sample value 002",
+                "meter_number": "MTR-002",
+                "pass_through_provider_account_number": "ACCT-0002",
+                "pass_through_provider_name": "Utility Provider A",
+                "point_of_delivery_id": "Reviewed sample value 002",
+                "power_factor_percentage": "Reviewed sample value 002",
+                "provider_name": "Utility Provider A",
+                "recipient_name": "Reviewed sample value 002",
+                "service_address": "Reviewed sample value 002",
+                "service_type": "Electric Service",
+                "tariff_name_as_printed": "Reviewed sample value 002",
+                "units_of_measurement": "Reviewed sample value 002",
                 "usage_value": 101.25
               },
               {
-                "deregulation_status": "arcadia_v1_deregulation_status_3",
+                "deregulation_status": "Reviewed sample value 003",
                 "measurement_period_end_date": "2026-01-03",
                 "measurement_period_start_date": "2026-01-03",
-                "meter_creation_explanation": "arcadia_v1_meter_creation_explanation_3",
-                "meter_number": "meter_number_parent_3",
-                "pass_through_provider_account_number": "arcadia_v1_pass_through_provider_account_number_3",
-                "pass_through_provider_name": "arcadia_v1_pass_through_provider_name_3",
-                "point_of_delivery_id": "arcadia_v1_point_of_delivery_id_3",
-                "power_factor_percentage": "arcadia_v1_power_factor_percentage_3",
-                "provider_name": "provider_name_parent_3",
-                "recipient_name": "arcadia_v1_recipient_name_3",
-                "service_address": "arcadia_v1_service_address_3",
-                "service_type": "service_type_parent_3",
-                "tariff_name_as_printed": "arcadia_v1_tariff_name_as_printed_3",
-                "units_of_measurement": "arcadia_v1_units_of_measurement_3",
+                "meter_creation_explanation": "Reviewed sample value 003",
+                "meter_number": "MTR-003",
+                "pass_through_provider_account_number": "ACCT-0003",
+                "pass_through_provider_name": "Utility Provider A",
+                "point_of_delivery_id": "Reviewed sample value 003",
+                "power_factor_percentage": "Reviewed sample value 003",
+                "provider_name": "Utility Provider A",
+                "recipient_name": "Reviewed sample value 003",
+                "service_address": "Reviewed sample value 003",
+                "service_type": "Electric Service",
+                "tariff_name_as_printed": "Reviewed sample value 003",
+                "units_of_measurement": "Reviewed sample value 003",
                 "usage_value": 102.25
               },
               {
-                "deregulation_status": "arcadia_v1_deregulation_status_4",
+                "deregulation_status": "Reviewed sample value 004",
                 "measurement_period_end_date": "2026-01-04",
                 "measurement_period_start_date": "2026-01-04",
-                "meter_creation_explanation": "arcadia_v1_meter_creation_explanation_4",
-                "meter_number": "meter_number_parent_4",
-                "pass_through_provider_account_number": "arcadia_v1_pass_through_provider_account_number_4",
-                "pass_through_provider_name": "arcadia_v1_pass_through_provider_name_4",
-                "point_of_delivery_id": "arcadia_v1_point_of_delivery_id_4",
-                "power_factor_percentage": "arcadia_v1_power_factor_percentage_4",
-                "provider_name": "provider_name_parent_4",
-                "recipient_name": "arcadia_v1_recipient_name_4",
-                "service_address": "arcadia_v1_service_address_4",
-                "service_type": "service_type_parent_4",
-                "tariff_name_as_printed": "arcadia_v1_tariff_name_as_printed_4",
-                "units_of_measurement": "arcadia_v1_units_of_measurement_4",
+                "meter_creation_explanation": "Reviewed sample value 004",
+                "meter_number": "MTR-004",
+                "pass_through_provider_account_number": "ACCT-0004",
+                "pass_through_provider_name": "Utility Provider A",
+                "point_of_delivery_id": "Reviewed sample value 004",
+                "power_factor_percentage": "Reviewed sample value 004",
+                "provider_name": "Utility Provider A",
+                "recipient_name": "Reviewed sample value 004",
+                "service_address": "Reviewed sample value 004",
+                "service_type": "Electric Service",
+                "tariff_name_as_printed": "Reviewed sample value 004",
+                "units_of_measurement": "Reviewed sample value 004",
                 "usage_value": 103.25
               },
               {
-                "deregulation_status": "arcadia_v1_deregulation_status_5",
+                "deregulation_status": "Reviewed sample value 005",
                 "measurement_period_end_date": "2026-01-05",
                 "measurement_period_start_date": "2026-01-05",
-                "meter_creation_explanation": "arcadia_v1_meter_creation_explanation_5",
-                "meter_number": "meter_number_parent_5",
-                "pass_through_provider_account_number": "arcadia_v1_pass_through_provider_account_number_5",
-                "pass_through_provider_name": "arcadia_v1_pass_through_provider_name_5",
-                "point_of_delivery_id": "arcadia_v1_point_of_delivery_id_5",
-                "power_factor_percentage": "arcadia_v1_power_factor_percentage_5",
-                "provider_name": "provider_name_parent_5",
-                "recipient_name": "arcadia_v1_recipient_name_5",
-                "service_address": "arcadia_v1_service_address_5",
-                "service_type": "service_type_parent_5",
-                "tariff_name_as_printed": "arcadia_v1_tariff_name_as_printed_5",
-                "units_of_measurement": "arcadia_v1_units_of_measurement_5",
+                "meter_creation_explanation": "Reviewed sample value 005",
+                "meter_number": "MTR-005",
+                "pass_through_provider_account_number": "ACCT-0005",
+                "pass_through_provider_name": "Utility Provider A",
+                "point_of_delivery_id": "Reviewed sample value 005",
+                "power_factor_percentage": "Reviewed sample value 005",
+                "provider_name": "Utility Provider A",
+                "recipient_name": "Reviewed sample value 005",
+                "service_address": "Reviewed sample value 005",
+                "service_type": "Electric Service",
+                "tariff_name_as_printed": "Reviewed sample value 005",
+                "units_of_measurement": "Reviewed sample value 005",
                 "usage_value": 104.25
               },
               {
-                "deregulation_status": "arcadia_v1_deregulation_status_6",
+                "deregulation_status": "Reviewed sample value 006",
                 "measurement_period_end_date": "2026-01-06",
                 "measurement_period_start_date": "2026-01-06",
-                "meter_creation_explanation": "arcadia_v1_meter_creation_explanation_6",
-                "meter_number": "meter_number_parent_6",
-                "pass_through_provider_account_number": "arcadia_v1_pass_through_provider_account_number_6",
-                "pass_through_provider_name": "arcadia_v1_pass_through_provider_name_6",
-                "point_of_delivery_id": "arcadia_v1_point_of_delivery_id_6",
-                "power_factor_percentage": "arcadia_v1_power_factor_percentage_6",
-                "provider_name": "provider_name_parent_6",
-                "recipient_name": "arcadia_v1_recipient_name_6",
-                "service_address": "arcadia_v1_service_address_6",
-                "service_type": "service_type_parent_6",
-                "tariff_name_as_printed": "arcadia_v1_tariff_name_as_printed_6",
-                "units_of_measurement": "arcadia_v1_units_of_measurement_6",
+                "meter_creation_explanation": "Reviewed sample value 006",
+                "meter_number": "MTR-006",
+                "pass_through_provider_account_number": "ACCT-0006",
+                "pass_through_provider_name": "Utility Provider A",
+                "point_of_delivery_id": "Reviewed sample value 006",
+                "power_factor_percentage": "Reviewed sample value 006",
+                "provider_name": "Utility Provider A",
+                "recipient_name": "Reviewed sample value 006",
+                "service_address": "Reviewed sample value 006",
+                "service_type": "Electric Service",
+                "tariff_name_as_printed": "Reviewed sample value 006",
+                "units_of_measurement": "Reviewed sample value 006",
                 "usage_value": 105.25
               },
               {
-                "deregulation_status": "arcadia_v1_deregulation_status_7",
+                "deregulation_status": "Reviewed sample value 007",
                 "measurement_period_end_date": "2026-01-07",
                 "measurement_period_start_date": "2026-01-07",
-                "meter_creation_explanation": "arcadia_v1_meter_creation_explanation_7",
-                "meter_number": "meter_number_parent_7",
-                "pass_through_provider_account_number": "arcadia_v1_pass_through_provider_account_number_7",
-                "pass_through_provider_name": "arcadia_v1_pass_through_provider_name_7",
-                "point_of_delivery_id": "arcadia_v1_point_of_delivery_id_7",
-                "power_factor_percentage": "arcadia_v1_power_factor_percentage_7",
-                "provider_name": "provider_name_parent_7",
-                "recipient_name": "arcadia_v1_recipient_name_7",
-                "service_address": "arcadia_v1_service_address_7",
-                "service_type": "service_type_parent_7",
-                "tariff_name_as_printed": "arcadia_v1_tariff_name_as_printed_7",
-                "units_of_measurement": "arcadia_v1_units_of_measurement_7",
+                "meter_creation_explanation": "Reviewed sample value 007",
+                "meter_number": "MTR-007",
+                "pass_through_provider_account_number": "ACCT-0007",
+                "pass_through_provider_name": "Utility Provider A",
+                "point_of_delivery_id": "Reviewed sample value 007",
+                "power_factor_percentage": "Reviewed sample value 007",
+                "provider_name": "Utility Provider A",
+                "recipient_name": "Reviewed sample value 007",
+                "service_address": "Reviewed sample value 007",
+                "service_type": "Electric Service",
+                "tariff_name_as_printed": "Reviewed sample value 007",
+                "units_of_measurement": "Reviewed sample value 007",
                 "usage_value": 106.25
               },
               {
-                "deregulation_status": "arcadia_v1_deregulation_status_8",
+                "deregulation_status": "Reviewed sample value 008",
                 "measurement_period_end_date": "2026-01-08",
                 "measurement_period_start_date": "2026-01-08",
-                "meter_creation_explanation": "arcadia_v1_meter_creation_explanation_8",
-                "meter_number": "meter_number_parent_8",
-                "pass_through_provider_account_number": "arcadia_v1_pass_through_provider_account_number_8",
-                "pass_through_provider_name": "arcadia_v1_pass_through_provider_name_8",
-                "point_of_delivery_id": "arcadia_v1_point_of_delivery_id_8",
-                "power_factor_percentage": "arcadia_v1_power_factor_percentage_8",
-                "provider_name": "provider_name_parent_8",
-                "recipient_name": "arcadia_v1_recipient_name_8",
-                "service_address": "arcadia_v1_service_address_8",
-                "service_type": "service_type_parent_8",
-                "tariff_name_as_printed": "arcadia_v1_tariff_name_as_printed_8",
-                "units_of_measurement": "arcadia_v1_units_of_measurement_8",
+                "meter_creation_explanation": "Reviewed sample value 008",
+                "meter_number": "MTR-008",
+                "pass_through_provider_account_number": "ACCT-0008",
+                "pass_through_provider_name": "Utility Provider A",
+                "point_of_delivery_id": "Reviewed sample value 008",
+                "power_factor_percentage": "Reviewed sample value 008",
+                "provider_name": "Utility Provider A",
+                "recipient_name": "Reviewed sample value 008",
+                "service_address": "Reviewed sample value 008",
+                "service_type": "Electric Service",
+                "tariff_name_as_printed": "Reviewed sample value 008",
+                "units_of_measurement": "Reviewed sample value 008",
                 "usage_value": 107.25
               }
             ]
           },
           "statement_fields": {
-            "account_number": "arcadia_v1_account_number_1",
+            "account_number": "ACCT-0001",
             "amount_due": 100.25,
             "amount_due_currency": 100.25,
             "due_date": "2026-01-01",
-            "invoice_number": "arcadia_v1_invoice_number_1",
-            "provider_name": "arcadia_v1_provider_name_1",
-            "recipient_name": "arcadia_v1_recipient_name_1",
-            "service_address": "arcadia_v1_service_address_1",
-            "source_modality": "arcadia_v1_source_modality_1",
+            "invoice_number": "INV-0001",
+            "provider_name": "Utility Provider A",
+            "recipient_name": "Reviewed sample value 001",
+            "service_address": "Reviewed sample value 001",
+            "source_modality": "Reviewed sample value 001",
             "statement_date": "2026-01-01",
             "statement_period_end_date": "2026-01-01",
             "statement_period_start_date": "2026-01-01",
-            "statement_type": "arcadia_v1_statement_type_1",
+            "statement_type": "Reviewed sample value 001",
             "total_billing_amount": 100.25
           }
         },
@@ -3707,6 +3716,6 @@
         "pageNumber": 1
       }
     ],
-    "sourceUrl": "boundary://arcadia_v1"
+    "sourceUrl": "fixture://internal-arcadia-agents/extraction-boundary/arcadia_v1"
   }
 }

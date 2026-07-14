@@ -1,10 +1,10 @@
 {
   "artifacts": {
     "handoff": {
-      "sha256": "792ebba0faad4e144ce96de810af109e9edb59e467a476ba68c1a03bdd82857d"
+      "sha256": "0cf83fcf3b438caa5deb753ecd8fb7429541869086832b416d27e9c752ee48fe"
     },
     "previous_extract_chain": {
-      "sha256": "0ec89f6883745e054cc2f9ce2344e6c67685577df4df5dd9290bcf27b971afd5"
+      "sha256": "b7cba8049859c61b6699f43d8f0949c6986f367b31d1555c34adf22e03e456b3"
     }
   },
   "assertions": {
@@ -13,14 +13,27 @@
     "has_no_error_diagnostics": true,
     "shape_contract_passed": true
   },
+  "certification_eligible": true,
+  "evidence_level": "reviewed_deterministic_model_fixture",
   "input_from": "internal_arcadia_extract_chain",
-  "input_sha256": "0ec89f6883745e054cc2f9ce2344e6c67685577df4df5dd9290bcf27b971afd5",
+  "input_sha256": "b7cba8049859c61b6699f43d8f0949c6986f367b31d1555c34adf22e03e456b3",
+  "model_fixture": {
+    "path": "testdata/extraction-boundary/model-fixtures/generic_v1/extract_model_outputs.json",
+    "schema_version": "internal-arcadia-extract-model-output-fixture-v1",
+    "sha256": "be08cec381e630869d0e7923d6e02fd7043db42410117863795c6ed1cd48de69",
+    "source": {
+      "document_file_name": "arcadia.pdf",
+      "kind": "reviewed_deterministic_model_output_fixture",
+      "workflow_id": "generic_v1-product-path",
+      "workflow_version": "2026-07-12T22:34:02Z"
+    }
+  },
   "output": {
     "diagnostic_count": 0,
-    "final_output_sha256": "3ba15fd161a0e83600b8c7fa0ae5a1e168d40b93e0887d7aa1f4665f1fd12f4d",
-    "relationship_output_sha256": "3ba15fd161a0e83600b8c7fa0ae5a1e168d40b93e0887d7aa1f4665f1fd12f4d",
+    "final_output_sha256": "9b7727b1d873c6fb8f5de8b619dc1d3ae0d6a3b53820ea0af526aee935e99216",
+    "relationship_output_sha256": "9b7727b1d873c6fb8f5de8b619dc1d3ae0d6a3b53820ea0af526aee935e99216",
     "source_provenance_count": 460,
-    "workflow_output_sha256": "f38d29f3ac8a5d5b15043041b006812502076ec2675f248a430f844b317377ee"
+    "workflow_output_sha256": "7c134983c9d3057b2cd28d559e275e30ffcb7206606417303e467b67370c3fbb"
   },
   "output_for": "internal_arcadia_save_callback",
   "request": {
