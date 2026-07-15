@@ -163,6 +163,13 @@ diff, preserve hash lineage, and assert the functional output shape. Do not coun
 synthetic local fixture as protected-case evidence unless it is the allowed fake
 agent/model output emitted by the immediately previous boundary.
 
+Repo-local proof for the SDK reassembly boundary:
+
+```sh
+poetry run pytest -q tests/extract/test_custom_output_reassembly.py tests/extract/test_extraction_boundary_reassembly.py
+poetry run ruff check src/groundx/extract/custom_outputs.py tests/extract/test_custom_output_reassembly.py
+```
+
 **Where extract tests live.** Extract unit tests live under `tests/extract/`, mirroring
 the source structure (e.g. `tests/extract/classes/test_group.py` tests
 `src/groundx/extract/classes/group.py`). They use `unittest.TestCase` and import extract
