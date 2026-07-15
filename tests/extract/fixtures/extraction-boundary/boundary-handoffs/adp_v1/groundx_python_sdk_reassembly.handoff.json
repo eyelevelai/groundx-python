@@ -1,190 +1,869 @@
 {
+  "certification_eligible": true,
   "diagnostics": [],
+  "evidence_level": "reviewed_deterministic_model_fixture",
   "final_output": {
     "automatic_enrollment": {
-      "auto_escalation_pct": "adp_v1_auto_escalation_pct_1",
-      "automatic_enrollment_type": "adp_v1_automatic_enrollment_type_1",
-      "default_enrollment_pct": "adp_v1_default_enrollment_pct_1",
-      "eligible_employees": "adp_v1_eligible_employees_1",
-      "eligible_employees_other_specify": "adp_v1_eligible_employees_other_specify_1",
-      "escalation_timing": "adp_v1_escalation_timing_1",
-      "escalation_timing_other_specify": "adp_v1_escalation_timing_other_specify_1",
-      "maximum_auto_enrollment_pct": "adp_v1_maximum_auto_enrollment_pct_1",
-      "permissible_withdrawal_window": "adp_v1_permissible_withdrawal_window_1",
-      "qaca_eaca_effective_date": "2026-01-01"
+      "auto_escalation_pct": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": 0.01
+      },
+      "automatic_enrollment_type": {
+        "_confidence": "green",
+        "_raw_text": "Option 2: Yes, for Employees who meet the eligibility requirements in Section Two, Part A of the Adoption Agreement on or after the Effective Date.",
+        "value": "EACA Automatic Enrollment"
+      },
+      "default_enrollment_pct": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": 0.03
+      },
+      "eligible_employees": {
+        "_confidence": "green",
+        "_raw_text": "Option 2: Yes, for Employees who meet the eligibility requirements in Section Two, Part A of the Adoption Agreement on or after the Effective Date.",
+        "value": "Newly Eligible"
+      },
+      "eligible_employees_other_specify": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "Employees who are not automatically enrolled under items 10 or 11 above"
+      },
+      "escalation_timing": {
+        "_confidence": "green",
+        "_raw_text": "Timing of Automatic Elective Deferral Increases; Option 1: First day of each Plan Year.",
+        "value": "First day of each succeeding plan year"
+      },
+      "escalation_timing_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "maximum_auto_enrollment_pct": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": 0.1
+      },
+      "permissible_withdrawal_window": {
+        "_confidence": "green",
+        "_raw_text": "Option 3: 90 days following the date the first automatic contribution was made.",
+        "value": "Permitted within 90 days of participant's automatic enrollment"
+      },
+      "qaca_eaca_effective_date": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "04/08/2020"
+      }
     },
     "compensation": {
-      "compensation_definition": "adp_v1_compensation_definition_1",
-      "compensation_excluded_all": "adp_v1_compensation_excluded_all_1",
-      "compensation_excluded_all_other_specify": "adp_v1_compensation_excluded_all_other_specify_1",
-      "compensation_excluded_deferrals": "adp_v1_compensation_excluded_deferrals_1",
-      "compensation_excluded_deferrals_other_specify": "adp_v1_compensation_excluded_deferrals_other_specify_1",
-      "compensation_excluded_match": "adp_v1_compensation_excluded_match_1",
-      "compensation_excluded_match_other_specify": "adp_v1_compensation_excluded_match_other_specify_1",
-      "compensation_excluded_nec": "adp_v1_compensation_excluded_nec_1",
-      "compensation_excluded_nec_other_specify": "adp_v1_compensation_excluded_nec_other_specify_1",
-      "compensation_for_initial_year": "adp_v1_compensation_for_initial_year_1",
-      "compensation_for_initial_year_other_specify": "adp_v1_compensation_for_initial_year_other_specify_1"
+      "compensation_definition": {
+        "_confidence": "green",
+        "_raw_text": "Will Compensation include Employer Contributions made pursuant to a salary reduction agreement that are not includible in the gross income of the Employee under Code sections 125, 132(f)(4), 402(e)(3), 408(k), 403(b), 414(h), and 457? Elective Deferrals: Yes. Matching Contributions: Yes. Employer Profit Sharing Contributions: Yes.",
+        "value": "W2 Compensation"
+      },
+      "compensation_excluded_all": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": [
+          {
+            "_raw_text": "SECTION FOUR: VESTING AND FORFEITURES",
+            "value": "N/A"
+          }
+        ]
+      },
+      "compensation_excluded_all_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "compensation_excluded_deferrals": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": [
+          {
+            "_raw_text": "No compensation exclusion table is shown on this page.",
+            "value": "N/A"
+          }
+        ]
+      },
+      "compensation_excluded_deferrals_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "compensation_excluded_match": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": [
+          {
+            "_raw_text": "SECTION FOUR: VESTING AND FORFEITURES",
+            "value": "N/A"
+          }
+        ]
+      },
+      "compensation_excluded_match_other_specify": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "Forfeitures of Matching Contributions may be used to pay appropriate Plan expenses, to reduce Employer Contributions (other than Elective Deferrals), or as an Employer Profit Sharing Contribution allocation in the ratio that each Participant's Compensation for the Plan Year bears to the total Compensation of all Participants for such Plan Year (or any combination of the foregoing)"
+      },
+      "compensation_excluded_nec": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": [
+          {
+            "_raw_text": "No compensation exclusion table is shown on this page.",
+            "value": "N/A"
+          }
+        ]
+      },
+      "compensation_excluded_nec_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "compensation_for_initial_year": {
+        "_confidence": "green",
+        "_raw_text": "Part A. Elective Deferrals - Limits on Elective Deferrals - compensation reduced by the amount described below. Such amount will be contributed to the Plan by the Employer on behalf of the Contributing Participant. Option 1 selected.",
+        "value": "Compensation from entry date"
+      },
+      "compensation_for_initial_year_other_specify": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "April 8th"
+      }
     },
     "eligibility_requirements": {
-      "after_tax_contributions": "adp_v1_after_tax_contributions_1",
-      "age_requirement": "adp_v1_age_requirement_1",
-      "age_requirement_other_specify": "adp_v1_age_requirement_other_specify_1",
-      "deferral_age_requirement": "adp_v1_deferral_age_requirement_1",
-      "deferral_age_requirement_other_specify": "adp_v1_deferral_age_requirement_other_specify_1",
-      "deferral_entry_date": "2026-01-01",
-      "deferral_service_requirement": "adp_v1_deferral_service_requirement_1",
-      "entry_date": "2026-01-01",
-      "entry_date_other_specify": "2026-01-01",
-      "excluded_employees_all_contributions": "adp_v1_excluded_employees_all_contributions_1",
-      "excluded_employees_all_contributions_other_specify": "adp_v1_excluded_employees_all_contributions_other_specify_1",
-      "hours_requirement": "adp_v1_hours_requirement_1",
-      "hours_requirement_other_specify": "adp_v1_hours_requirement_other_specify_1",
-      "matching_age_requirement": "adp_v1_matching_age_requirement_1",
-      "matching_entry_date": "2026-01-01",
-      "matching_service_requirement": "adp_v1_matching_service_requirement_1",
-      "nec_age_requirement": "adp_v1_nec_age_requirement_1",
-      "nec_entry_date": "2026-01-01",
-      "nec_service_requirement": "adp_v1_nec_service_requirement_1",
-      "predecessor_service": "adp_v1_predecessor_service_1",
-      "rollover_contributions": "adp_v1_rollover_contributions_1",
-      "separate_eligibility_for_employer_contributions": "adp_v1_separate_eligibility_for_employer_contributions_1",
-      "service_requirement": "adp_v1_service_requirement_1",
-      "service_requirement_other_specify": "adp_v1_service_requirement_other_specify_1",
-      "simple_401k_contributions": "adp_v1_simple_401k_contributions_1",
-      "upto_tax_contribution_pct": "adp_v1_upto_tax_contribution_pct_1"
+      "after_tax_contributions": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "false"
+      },
+      "age_requirement": {
+        "_confidence": "yellow",
+        "_raw_text": "Age and eligibility service requirements listed above; page shows the general eligibility section but no separate age option selected on this page image, and the page context indicates the standard age requirement applies.",
+        "value": "Age 21"
+      },
+      "age_requirement_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "deferral_age_requirement": {
+        "_confidence": "green",
+        "_raw_text": "age requirement not shown on provided page",
+        "value": "Age 21"
+      },
+      "deferral_age_requirement_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "deferral_entry_date": {
+        "_confidence": "green",
+        "_raw_text": "Part E. Eligibility Computation Period. Option 1: Each Plan Year commencing with the Plan Year beginning during their initial Eligibility Computation Period.",
+        "value": "Monthly"
+      },
+      "deferral_service_requirement": {
+        "_confidence": "green",
+        "_raw_text": "After completing 1 Year of Eligibility Service (Period of Service, if applicable). Pre-Tax Elective Deferrals. Roth Elective Deferrals. Matching Contributions. Employer Profit Sharing Contributions. Safe Harbor/QACA Safe Harbor Contributions. Qualified Nonelective Contributions.",
+        "value": "Same as All Contributions"
+      },
+      "entry_date": {
+        "_confidence": "green",
+        "_raw_text": "Part E. Eligibility Computation Period - Option 1 checked: Each Plan Year commencing with the Plan Year beginning during their initial Eligibility Computation Period.",
+        "value": "Monthly"
+      },
+      "entry_date_other_specify": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "The Plan Year"
+      },
+      "excluded_employees_all_contributions": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "[{\"value\":\"No exclusions\",\"_raw_text\":\"No exclusions apply\"}]"
+      },
+      "excluded_employees_all_contributions_other_specify": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "An Employee as the result of a transaction described in Code section 410(b)(6)(C)"
+      },
+      "hours_requirement": {
+        "_confidence": "green",
+        "_raw_text": "Service Requirement. The Participant completes at least (complete one): (not more than 1,000) Hours of Service during the Plan Year, if the Hours of Service method of determining service applies; or (not more than 12) months of service if the Elapsed Time method of determining service applies.",
+        "value": "1000 Hours"
+      },
+      "hours_requirement_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "matching_age_requirement": {
+        "_confidence": "green",
+        "_raw_text": "Matching Contributions.",
+        "value": "Same as Deferral"
+      },
+      "matching_entry_date": {
+        "_confidence": "green",
+        "_raw_text": "Employer matching eligibility follows the same Section Two eligibility requirements as elective deferrals",
+        "value": "Same as Deferral"
+      },
+      "matching_service_requirement": {
+        "_confidence": "green",
+        "_raw_text": "Service for purposes of determining if a Participant is a Qualifying Participant or Qualifying Contributing Participant (and therefore eligible to receive an Employer Contribution) will be determined on the basis of (select one): Option 2: Hours of Service ... Suboption (a): Actual hours for which an Employee is paid or entitled to payment.",
+        "value": "Same as Deferral"
+      },
+      "nec_age_requirement": {
+        "_confidence": "green",
+        "_raw_text": "Qualified Nonelective Contributions.",
+        "value": "Same as Deferral"
+      },
+      "nec_entry_date": {
+        "_confidence": "green",
+        "_raw_text": "Qualified Nonelective Contribution Formula - Yes selected; no separate employer-contribution eligibility requirements shown on this page",
+        "value": "Same as Deferral"
+      },
+      "nec_service_requirement": {
+        "_confidence": "green",
+        "_raw_text": "Service for purposes of determining if a Participant is a Qualifying Participant or Qualifying Contributing Participant (and therefore eligible to receive an Employer Contribution) will be determined on the basis of (select one): Option 2: Hours of Service ... Suboption (a): Actual hours for which an Employee is paid or entitled to payment.",
+        "value": "Same as Deferral"
+      },
+      "predecessor_service": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "{\"value\":\"N/A\",\"_raw_text\":\"Years of Vesting Service (Periods of Service, if applicable) before the Employer maintained this Plan or a predecessor plan.\"}"
+      },
+      "rollover_contributions": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "false"
+      },
+      "separate_eligibility_for_employer_contributions": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "false"
+      },
+      "service_requirement": {
+        "_confidence": "green",
+        "_raw_text": "Service Requirement. The Participant completes at least (complete one): (not more than 1,000) Hours of Service during the Plan Year, if the Hours of Service method of determining service applies; or (not more than 12) months of service if the Elapsed Time method of determining service applies.",
+        "value": "1 Year"
+      },
+      "service_requirement_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "simple_401k_contributions": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "false"
+      },
+      "upto_tax_contribution_pct": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      }
     },
     "employee_contributions": {
-      "after_tax_voluntary_contributions": "adp_v1_after_tax_voluntary_contributions_1",
-      "contribution_limit": "adp_v1_contribution_limit_1",
-      "contribution_limit_other_specify": "adp_v1_contribution_limit_other_specify_1",
-      "contribution_method": "adp_v1_contribution_method_1",
-      "deferral_change_frequency": "adp_v1_deferral_change_frequency_1",
-      "deferral_change_frequency_other_specify": "adp_v1_deferral_change_frequency_other_specify_1",
-      "roth_elective_deferrals": "adp_v1_roth_elective_deferrals_1"
+      "after_tax_voluntary_contributions": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "false"
+      },
+      "contribution_limit": {
+        "_confidence": "green",
+        "_raw_text": "An amount equal to a percentage of the Contributing Participant's Compensation from 0 percent to 92 percent in increments of 1 percent.",
+        "value": "Other"
+      },
+      "contribution_limit_other_specify": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "0 percent to 92 percent"
+      },
+      "contribution_method": {
+        "_confidence": "green",
+        "_raw_text": "The following percentage or amount of each Employee's Compensation will be automatically withheld each payroll and contributed to the Plan as an Elective Deferral; Option 1: 3 percent.",
+        "value": "% of Compensation Only"
+      },
+      "deferral_change_frequency": {
+        "_confidence": "green",
+        "_raw_text": "The Plan may provide that an Eligible Employee's affirmative salary reduction agreement election expires annually.",
+        "value": "Annual"
+      },
+      "deferral_change_frequency_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "roth_elective_deferrals": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "true"
+      }
     },
     "employer_contributions": {
-      "employer_match_allocation_conditions": "adp_v1_employer_match_allocation_conditions_1",
-      "employer_match_eligible_employees": "adp_v1_employer_match_eligible_employees_1",
-      "employer_match_eligible_employees_other_specify": "adp_v1_employer_match_eligible_employees_other_specify_1",
-      "employer_match_formula_1": "adp_v1_employer_match_formula_1_1",
-      "employer_match_formula_2": "adp_v1_employer_match_formula_2_1",
-      "employer_match_timing": "adp_v1_employer_match_timing_1",
-      "employer_match_true_up": "adp_v1_employer_match_true_up_1",
-      "employer_match_type": "adp_v1_employer_match_type_1",
-      "employer_profit_sharing_allocation_conditions": "adp_v1_employer_profit_sharing_allocation_conditions_1",
-      "employer_profit_sharing_allocation_method": "adp_v1_employer_profit_sharing_allocation_method_1",
-      "employer_profit_sharing_allocation_method_other_specify": "adp_v1_employer_profit_sharing_allocation_method_other_specify_1",
-      "employer_profit_sharing_eligible_employees": "adp_v1_employer_profit_sharing_eligible_employees_1",
-      "employer_profit_sharing_timing": "adp_v1_employer_profit_sharing_timing_1",
-      "employer_profit_sharing_type": "adp_v1_employer_profit_sharing_type_1",
-      "safe_harbor_annual_true_up": "adp_v1_safe_harbor_annual_true_up_1",
-      "safe_harbor_eligible_employees": "adp_v1_safe_harbor_eligible_employees_1",
-      "safe_harbor_eligible_employees_other_specify": "adp_v1_safe_harbor_eligible_employees_other_specify_1",
-      "safe_harbor_nonelective_pct": "adp_v1_safe_harbor_nonelective_pct_1",
-      "safe_harbor_timing_of_contribution": "adp_v1_safe_harbor_timing_of_contribution_1",
-      "safe_harbor_type": "adp_v1_safe_harbor_type_1"
+      "employer_match_allocation_conditions": {
+        "_confidence": "green",
+        "_raw_text": "No separate matching contribution allocation conditions are shown on this page; the page only shows distribution eligibility for matching contributions.",
+        "value": "None - All eligible participants receive Match"
+      },
+      "employer_match_eligible_employees": {
+        "_confidence": "green",
+        "_raw_text": "Qualified Matching Contributions, if made to the Plan, will be made with respect to Pre-Tax Elective Deferrals, Roth Elective Deferrals, and Nondeductible Employee Contributions; no participant-class limitation to NHCEs is selected.",
+        "value": "Allocated to all eligible employees meeting age/service requirement"
+      },
+      "employer_match_eligible_employees_other_specify": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "Qualifying Contributing Participant"
+      },
+      "employer_match_formula_1": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "Pre-Tax Elective Deferrals"
+      },
+      "employer_match_formula_2": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "Roth Elective Deferrals"
+      },
+      "employer_match_timing": {
+        "_confidence": "green",
+        "_raw_text": "NOTE: If no option is selected, Option 5 will apply. If Matching Contributions are made more frequently than the Matching Contribution Computation Period, the Employer will re-calculate the Matching Contribution based on the Compensation earned, and Elective Deferrals ... over the entire Matching Contribution Computation Period.",
+        "value": "Annually"
+      },
+      "employer_match_true_up": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "true"
+      },
+      "employer_match_type": {
+        "_confidence": "green",
+        "_raw_text": "Such amount, if any, as determined by the Employer in its sole discretion, equal to that percentage of the Elective Deferrals ... sufficient to cause the Plan to satisfy either the Actual Deferral Percentage test ... or the Actual Contribution Percentage test ...",
+        "value": "Discretionary Match"
+      },
+      "employer_profit_sharing_allocation_conditions": {
+        "_confidence": "green",
+        "_raw_text": "No separate employer profit sharing allocation conditions are shown on the provided page; the page only shows Qualified Nonelective Contributions conditions, not Employer Profit Sharing Contributions conditions.",
+        "value": "None - All eligible participants receive NEC"
+      },
+      "employer_profit_sharing_allocation_method": {
+        "_confidence": "green",
+        "_raw_text": "Allocation of Qualified Nonelective Contributions ... Option 1: Pro Rata. In the ratio that each Qualifying Participant's Compensation for the applicable Plan Year bears to the total Compensation of all Qualifying Participants for such Plan Year.",
+        "value": "Pro-Rata"
+      },
+      "employer_profit_sharing_allocation_method_other_specify": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "Age and/or service weighted formula"
+      },
+      "employer_profit_sharing_eligible_employees": {
+        "_confidence": "green",
+        "_raw_text": "Option 1: Allocated to the Individual Accounts of the Participants specified below in the manner described in Plan Section 3.04(B) (for Employer Profit Sharing Contributions). The Participants entitled to receive allocations of such Forfeitures will be (select one): Suboption (a): Qualifying Participants as defined for Employer Profit Sharing Contributions... Suboption (b): All Participants.",
+        "value": "Allocated to all eligible employees meeting age/service requirement"
+      },
+      "employer_profit_sharing_timing": {
+        "_confidence": "green",
+        "_raw_text": "For each Plan Year the Employer may contribute an amount to be determined from year to year.",
+        "value": "Annually"
+      },
+      "employer_profit_sharing_type": {
+        "_confidence": "green",
+        "_raw_text": "Employer Prevailing Wage Contributions to Participants who are Highly Compensated Employees\nWill Participants who are Highly Compensated Employees be entitled to Employer Prevailing Wage Contributions under the Plan (select one)?\nOption 1:\nOption 2:\nYes .\nNo.",
+        "value": "Discretionary"
+      },
+      "safe_harbor_annual_true_up": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "safe_harbor_eligible_employees": {
+        "_confidence": "green",
+        "_raw_text": "Participants Entitled to Receive Safe Harbor CODA Contributions: Option 2: All Eligible Employees.",
+        "value": "Allocated to all eligible employees meeting age/service requirement"
+      },
+      "safe_harbor_eligible_employees_other_specify": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "Participants Entitled to Receive Safe Harbor CODA Contributions"
+      },
+      "safe_harbor_nonelective_pct": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "safe_harbor_timing_of_contribution": {
+        "_confidence": "green",
+        "_raw_text": "Application of Safe Harbor CODA: No",
+        "value": "Not Applicable"
+      },
+      "safe_harbor_type": {
+        "_confidence": "green",
+        "_raw_text": "Option 2: Not applicable. The Employer will not make a QACA ACP Test Safe Harbor Matching Contribution unless necessary to do so in order to timely allocate Forfeitures.",
+        "value": "Not Applicable"
+      }
     },
     "employer_information": {
-      "address_city": "adp_v1_address_city_1",
-      "address_state": "adp_v1_address_state_1",
-      "address_street": "adp_v1_address_street_1",
-      "address_zip": "adp_v1_address_zip_1",
-      "affiliated_employer_group_type": "adp_v1_affiliated_employer_group_type_1",
-      "affiliated_employers": "adp_v1_affiliated_employers_1",
-      "employer_fiscal_year_ends": "2026-01-01",
-      "employer_name": "adp_v1_employer_name_1",
-      "multiple_employer_plan": "adp_v1_multiple_employer_plan_1",
-      "participating_employers": "adp_v1_participating_employers_1",
-      "tax_identification_number": "adp_v1_tax_identification_number_1",
-      "telephone": "adp_v1_telephone_1",
-      "type_of_entity": "adp_v1_type_of_entity_1",
-      "type_of_entity_llc_subtype": "adp_v1_type_of_entity_llc_subtype_1",
-      "type_of_entity_other_specify": "adp_v1_type_of_entity_other_specify_1"
+      "address_city": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "Broomfield"
+      },
+      "address_state": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "CO"
+      },
+      "address_street": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "8525 W 100th Ave"
+      },
+      "address_zip": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "80021-4932"
+      },
+      "affiliated_employer_group_type": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "[{\"value\":\"Controlled Group\",\"_raw_text\":\"controlled group of corporations\"},{\"value\":\"Affiliated Service Group\",\"_raw_text\":\"affiliated service group\"}]"
+      },
+      "affiliated_employers": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "true"
+      },
+      "employer_fiscal_year_ends": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "12/31"
+      },
+      "employer_name": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "Z&N Coffeehouse Companies Inc"
+      },
+      "multiple_employer_plan": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "false"
+      },
+      "participating_employers": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "false"
+      },
+      "tax_identification_number": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "82-2713261"
+      },
+      "telephone": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "303-709-2228"
+      },
+      "type_of_entity": {
+        "_confidence": "green",
+        "_raw_text": "Type of Business (select one): ... S Corporation",
+        "value": "S Corporation"
+      },
+      "type_of_entity_llc_subtype": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "type_of_entity_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      }
     },
     "miscellaneous_plan_provisions": {
-      "adp_acp_test_year": "adp_v1_adp_acp_test_year_1",
-      "auto_enrollment_exemption": "adp_v1_auto_enrollment_exemption_1",
-      "auto_enrollment_exemption_other_specify": "adp_v1_auto_enrollment_exemption_other_specify_1",
-      "disability_definition": "adp_v1_disability_definition_1",
-      "disability_definition_other_specify": "adp_v1_disability_definition_other_specify_1",
-      "hce_definition_top_paid_group_election": "adp_v1_hce_definition_top_paid_group_election_1",
-      "in_plan_roth_rollovers": "adp_v1_in_plan_roth_rollovers_1",
-      "life_insurance": "adp_v1_life_insurance_1",
-      "life_insurance_other_specify": "adp_v1_life_insurance_other_specify_1",
-      "money_purchase_plan": "adp_v1_money_purchase_plan_1",
-      "money_purchase_plan_other_specify": "adp_v1_money_purchase_plan_other_specify_1",
-      "other_plans_annual_additions": "adp_v1_other_plans_annual_additions_1",
-      "other_plans_annual_additions_other_specify": "adp_v1_other_plans_annual_additions_other_specify_1",
-      "special_effective_dates": "2026-01-01",
-      "top_heavy_elections": "adp_v1_top_heavy_elections_1",
-      "top_heavy_elections_other_specify": "adp_v1_top_heavy_elections_other_specify_1"
+      "adp_acp_test_year": {
+        "_confidence": "green",
+        "_raw_text": "Participant direction option selected for Elective Deferrals will apply to Qualified Nonelective Contributions, Qualified Matching Contributions, ADP Test Safe Harbor Contributions, QACA ADP Test Safe Harbor Contributions, and Employer Prevailing Wage Contributions designated as Qualified Nonelective Contributions, as applicable. The Participant direction option selected for Matching Contributions will apply to ACP Test Safe Harbor Contributions and QACA ACP Test Safe Harbor Contributions, as applicable.",
+        "value": "Current year testing"
+      },
+      "auto_enrollment_exemption": {
+        "_confidence": "green",
+        "_raw_text": "Will the automatic Elective Deferral enrollment provisions apply? Option 2: Yes, the Eligible Automatic Contribution Arrangement (EACA) provisions in Plan Section 3.01(E)(2) will apply.",
+        "value": "No"
+      },
+      "auto_enrollment_exemption_other_specify": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "Employees who are not Contributing Participants (e.g., are deferring zero-percent)"
+      },
+      "disability_definition": {
+        "_confidence": "green",
+        "_raw_text": "Option 1: The inability to engage in any substantial, gainful activity by reason of any medically determinable physical or mental impairment that can be expected to result in death or which has lasted or can be expected to last for a continuous period of not less than 12 months.",
+        "value": "Inability to engage in any substantial gainful activity by reason of any medically determined physical or mental impairment that can be expected to result in death or which has lasted or can be expected to last for a period of not less than 12 months"
+      },
+      "disability_definition_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "hce_definition_top_paid_group_election": {
+        "_confidence": "green",
+        "_raw_text": "Option 2: No.",
+        "value": "Top paid group election does not apply"
+      },
+      "in_plan_roth_rollovers": {
+        "_confidence": "green",
+        "_raw_text": "Indirect In-Plan Roth Rollovers: Option 2 No. Direct In-Plan Roth Rollover section shows no selected option; if no option is selected, Option 2 applies. Indirect In-Plan Roth Rollovers: Option 2 No.",
+        "value": "Not permitted"
+      },
+      "life_insurance": {
+        "_confidence": "green",
+        "_raw_text": "Will life insurance investments be permitted under the Plan? Option 2: No.",
+        "value": "No evidence of illiquid assets in current plan doc"
+      },
+      "life_insurance_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "money_purchase_plan": {
+        "_confidence": "green",
+        "_raw_text": "Pages covering deemed IRA deposits, SIMPLE 401(k), in-plan Roth rollover, prior-money-source setup, transfer, rollover, or plan-source account elections count as source/account context for this field.",
+        "value": "No evidence of Money Purchase Plan assets"
+      },
+      "money_purchase_plan_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "other_plans_annual_additions": {
+        "_confidence": "green",
+        "_raw_text": "QACA Safe Harbor Contributions will be made on behalf of each Eligible Employee who is a non-Highly Compensated Employee / All Eligible Employees.",
+        "value": "No indication that company sponsors any other retirement plans"
+      },
+      "other_plans_annual_additions_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "special_effective_dates": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "05/15/2024"
+      },
+      "top_heavy_elections": {
+        "_confidence": "green",
+        "_raw_text": "Option 1: To this Plan; Suboption (a): The top-heavy minimum will offset Employer Profit Sharing Contributions, if any, made pursuant to Part D above. Option 1 selected for participants entitled to receive minimum allocation: Participants who are not Key Employees.",
+        "value": "Top Heavy contributions to eligible Non-Key employees employed on last day of plan year"
+      },
+      "top_heavy_elections_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      }
     },
     "pes_setup": {
-      "flat_dollar_contributions": "adp_v1_flat_dollar_contributions_1",
-      "flat_dollar_contributions_other_specify": "adp_v1_flat_dollar_contributions_other_specify_1",
-      "js_flag": "adp_v1_js_flag_1",
-      "prior_money_source_subject_to_vesting": "adp_v1_prior_money_source_subject_to_vesting_1",
-      "prior_money_source_subject_to_vesting_other_specify": "adp_v1_prior_money_source_subject_to_vesting_other_specify_1"
+      "flat_dollar_contributions": {
+        "_confidence": "green",
+        "_raw_text": "Option 6: Discretionary Match by Location or Business Classification. Option 7: Other fixed percentage of each Qualifying Contributing Participant's Elective Deferrals (and/or Nondeductible Employee Contributions, if applicable).",
+        "value": "Not Applicable"
+      },
+      "flat_dollar_contributions_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "js_flag": {
+        "_confidence": "green",
+        "_raw_text": "No annuity contracts or protected in-service distribution provisions are evidenced on the provided page; Part M is In-Plan Roth Rollover and the visible provisions are Deemed IRA Contribution deposits, SIMPLE 401(k) Provisions, and Benefit Accrual in the Case of Death or Disability Resulting from Qualified Military Service.",
+        "value": "IX - Annuities do not apply and protected in-service distributions do not apply"
+      },
+      "prior_money_source_subject_to_vesting": {
+        "_confidence": "green",
+        "_raw_text": "Option 1 selected for vesting schedule for Employer Profit Sharing Contributions; 100% vested after less than one year and at all service points",
+        "value": "100% Immediate"
+      },
+      "prior_money_source_subject_to_vesting_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      }
     },
     "plan_information": {
-      "administrators_info": "adp_v1_administrators_info_1",
-      "administrators_info_other_specify": "adp_v1_administrators_info_other_specify_1",
-      "oe_date": "2026-01-01",
-      "plan_name": "adp_v1_plan_name_1",
-      "plan_number": "adp_v1_plan_number_1",
-      "plan_number_other_specify": "adp_v1_plan_number_other_specify_1",
-      "plan_status": "adp_v1_plan_status_1",
-      "plan_year": "adp_v1_plan_year_1",
-      "plan_year_end_date": "2026-01-01",
-      "plan_year_other_specify": "adp_v1_plan_year_other_specify_1",
-      "restatement_effective_date": "2026-01-01",
-      "type_of_plan": "adp_v1_type_of_plan_1",
-      "valuation_date": "2026-01-01",
-      "valuation_date_other_specify": "2026-01-01"
+      "administrators_info": {
+        "_confidence": "green",
+        "_raw_text": "Check here and provide the applicable information below if someone other than the Adopting Employer will be the Plan Administrator.",
+        "value": "Employer"
+      },
+      "administrators_info_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "oe_date": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "05/15/2024"
+      },
+      "plan_name": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "Z&N Coffeehouse Companies Inc 401(k) Profit Sharing Plan and Trust"
+      },
+      "plan_number": {
+        "_confidence": "green",
+        "_raw_text": "Plan Sequence Number 001",
+        "value": "001"
+      },
+      "plan_number_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "plan_status": {
+        "_confidence": "green",
+        "_raw_text": "Option 2: The later of April 1 of the calendar year following the calendar year in which a Participant attains age 70\\u00bd or retires except that distributions to a five-percent owner must commence by April 1 of the calendar year following the calendar year in which the Participant attains age 70\\u00bd.",
+        "value": "Amendment & Restatement"
+      },
+      "plan_year": {
+        "_confidence": "green",
+        "_raw_text": "Adopting Employer's Tax Year End 12/31",
+        "value": "Calendar Year"
+      },
+      "plan_year_end_date": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "12/31"
+      },
+      "plan_year_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "restatement_effective_date": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "05/15/2024"
+      },
+      "type_of_plan": {
+        "_confidence": "green",
+        "_raw_text": "This Adoption Agreement may be used only in conjunction with Basic Plan Document #01.",
+        "value": "401(k) Plan"
+      },
+      "valuation_date": {
+        "_confidence": "green",
+        "_raw_text": "Option 3: \u25a1 The last day of the Plan Year within which the Participant (or Beneficiary of a deceased Participant) requests a distribution.",
+        "value": "Last day of each Plan Year"
+      },
+      "valuation_date_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      }
     },
     "vesting_and_retirement_ages": {
-      "100_pct_vesting_at_early_retirement": "adp_v1_field_100_pct_vesting_at_early_retirement_1",
-      "early_retirement_age": "adp_v1_early_retirement_age_1",
-      "early_retirement_age_other_specify": "adp_v1_early_retirement_age_other_specify_1",
-      "early_retirement_service_requirement": "adp_v1_early_retirement_service_requirement_1",
-      "employer_match_vesting": "adp_v1_employer_match_vesting_1",
-      "employer_match_vesting_other_specify": "adp_v1_employer_match_vesting_other_specify_1",
-      "employer_match_vesting_schedule": "adp_v1_employer_match_vesting_schedule_1",
-      "employer_profit_sharing_vesting": "adp_v1_employer_profit_sharing_vesting_1",
-      "employer_profit_sharing_vesting_other_specify": "adp_v1_employer_profit_sharing_vesting_other_specify_1",
-      "employer_profit_sharing_vesting_schedule": "adp_v1_employer_profit_sharing_vesting_schedule_1",
-      "forfeiture_use": "adp_v1_forfeiture_use_1",
-      "normal_retirement_age": "adp_v1_normal_retirement_age_1",
-      "normal_retirement_age_other_specify": "adp_v1_normal_retirement_age_other_specify_1",
-      "normal_retirement_service_requirement": "adp_v1_normal_retirement_service_requirement_1",
-      "safe_harbor_vesting": "adp_v1_safe_harbor_vesting_1",
-      "safe_harbor_vesting_other_specify": "adp_v1_safe_harbor_vesting_other_specify_1",
-      "vesting_period_calculation": "adp_v1_vesting_period_calculation_1",
-      "vesting_service": "adp_v1_vesting_service_1"
+      "100_pct_vesting_at_early_retirement": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "early_retirement_age": {
+        "_confidence": "green",
+        "_raw_text": "Part H. Fully Vested Under Certain Circumstances. 3. The Employee satisfies the conditions for Early Retirement Age (if applicable). Yes / No selected: No.",
+        "value": "Not Applicable"
+      },
+      "early_retirement_age_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "early_retirement_service_requirement": {
+        "_confidence": "green",
+        "_raw_text": "Part H. Fully Vested Under Certain Circumstances ... The Employee satisfies the conditions for Early Retirement Age (if applicable). No.",
+        "value": "Not Applicable"
+      },
+      "employer_match_vesting": {
+        "_confidence": "green",
+        "_raw_text": "Part B. Matching Contributions. 1. Authorization of Matching Contributions. Will the Employer make Matching Contributions to the Plan on behalf of a Qualifying Contributing Participant? Option 1: Yes, with respect to the following types of contributions: Pre-Tax Elective Deferrals; Roth Elective Deferrals.",
+        "value": "100% immediate"
+      },
+      "employer_match_vesting_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "employer_match_vesting_schedule": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "employer_profit_sharing_vesting": {
+        "_confidence": "green",
+        "_raw_text": "The election for Pre-Tax Elective Deferrals will also apply to Qualified Nonelective Contributions, Qualified Matching Contributions, ADP Test Safe Harbor Contributions, and QACA ADP Test Safe Harbor Contributions (if applicable).",
+        "value": "100% immediate"
+      },
+      "employer_profit_sharing_vesting_other_specify": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "Discretionary Formula"
+      },
+      "employer_profit_sharing_vesting_schedule": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "[{\"years_of_service\":\"1\",\"vesting_percentage\":\"0%\"},{\"years_of_service\":\"2\",\"vesting_percentage\":\"0%\"},{\"years_of_service\":\"3\",\"vesting_percentage\":\"0%\"},{\"years_of_service\":\"4\",\"vesting_percentage\":\"0%\"},{\"years_of_service\":\"5\",\"vesting_percentage\":\"0%\"},{\"years_of_service\":\"6\",\"vesting_percentage\":\"100%\"}]"
+      },
+      "forfeiture_use": {
+        "_confidence": "green",
+        "_raw_text": "Part J. Allocation of Forfeitures of Matching Contributions: Option 3 checked, Other. Forfeitures of Matching Contributions may be used to pay appropriate Plan expenses, to reduce Employer Contributions (other than Elective Deferrals), or as an Employer Profit Sharing Contribution allocation in the ratio that each Participant's Compensation for the Plan Year bears to the total Compensation of all Participants for such Plan Year (or any combination of the foregoing). Part K. Allocation of Forfeitures of Excess Aggregate Contributions: Option 3 checked, Other. Forfeitures of Excess Aggregate Contributions may be used to pay appropriate Plan expenses, to reduce Employer Contributions (other than Elective Deferrals), or as an Employer Profit Sharing Contribution allocation in the ratio that each Participant's Compensation for the Plan Year bears to the total Compensation of all Participants for such Plan Year (or any combination of the foregoing).",
+        "value": "Used to reduce employer contribution OR Allocated to eligible Participants"
+      },
+      "normal_retirement_age": {
+        "_confidence": "yellow",
+        "_raw_text": "No retirement age selection visible on provided page; inferred from absent evidence not used",
+        "value": "Age 65"
+      },
+      "normal_retirement_age_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "normal_retirement_service_requirement": {
+        "_confidence": "green",
+        "_raw_text": "Employee Has Not Reached Normal Retirement Age ... Yes, with respect to the following contributions. (Select all that apply.) Matching Contributions (if applicable). Employer Profit Sharing Contributions (if applicable).",
+        "value": "Not Applicable"
+      },
+      "safe_harbor_vesting": {
+        "_confidence": "green",
+        "_raw_text": "The election for Pre-Tax Elective Deferrals will also apply to Qualified Nonelective Contributions, Qualified Matching Contributions, ADP Test Safe Harbor Contributions, and QACA ADP Test Safe Harbor Contributions (if applicable).",
+        "value": "N/A"
+      },
+      "safe_harbor_vesting_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "vesting_period_calculation": {
+        "_confidence": "green",
+        "_raw_text": "Part D. Service Required for Eligibility Purposes Option 2: Not applicable. The Elapsed Time method of determining service applies or no eligibility service is required.\nPart E. Eligibility Computation Period Option 1: Each Plan Year commencing with the Plan Year beginning during their initial Eligibility Computation Period.",
+        "value": "N/A: 100% vesting"
+      },
+      "vesting_service": {
+        "_confidence": "green",
+        "_raw_text": "Option 2: Not applicable. The Employer will not make a QACA ACP Test Safe Harbor Matching Contribution unless necessary to do so in order to timely allocate Forfeitures. Option 1: Yes, with respect to the following types of contributions (select all that apply): Pre-Tax Elective Deferrals. Roth Elective Deferrals.",
+        "value": "N/A: 100% vesting"
+      }
     },
     "withdrawals_and_distributions": {
-      "hardship_distributions": "adp_v1_hardship_distributions_1",
-      "hardship_distributions_money_source_restrictions": "adp_v1_hardship_distributions_money_source_restrictions_1",
-      "hardship_distributions_vesting_requirement": "adp_v1_hardship_distributions_vesting_requirement_1",
-      "hardship_distributions_vesting_requirement_other_specify": "adp_v1_hardship_distributions_vesting_requirement_other_specify_1",
-      "in_service_withdrawals": "adp_v1_in_service_withdrawals_1",
-      "in_service_withdrawals_age": "adp_v1_in_service_withdrawals_age_1",
-      "in_service_withdrawals_age_other_specify": "adp_v1_in_service_withdrawals_age_other_specify_1",
-      "in_service_withdrawals_money_source_restrictions": "adp_v1_in_service_withdrawals_money_source_restrictions_1",
-      "in_service_withdrawals_money_source_restrictions_other_specify": "adp_v1_in_service_withdrawals_money_source_restrictions_other_specify_1",
-      "in_service_withdrawals_service_requirement": "adp_v1_in_service_withdrawals_service_requirement_1",
-      "in_service_withdrawals_service_requirement_other_specify": "adp_v1_in_service_withdrawals_service_requirement_other_specify_1",
-      "in_service_withdrawals_vesting_requirement": "adp_v1_in_service_withdrawals_vesting_requirement_1",
-      "in_service_withdrawals_vesting_requirement_other_specify": "adp_v1_in_service_withdrawals_vesting_requirement_other_specify_1",
-      "loans": "adp_v1_loans_1",
-      "payment_options": "adp_v1_payment_options_1",
-      "withdrawals_from_rollover": "adp_v1_withdrawals_from_rollover_1",
-      "withdrawals_from_rollover_other_specify": "adp_v1_withdrawals_from_rollover_other_specify_1"
+      "hardship_distributions": {
+        "_confidence": "green",
+        "_raw_text": "Suboption (b): The safe harbor definition of hardship distribution described in Plan Section 5.01(C)(2)(b) will apply with respect to the following types of contributions, except that an Employee\u2019s Elective Deferrals (and Nondeductible Employee Contributions, if applicable) will not be suspended for six months (select all that apply): Matching Contributions. Employer Profit Sharing Contributions.\nHardship Availability Due to Beneficiary Hardship ... Option 1: Yes.",
+        "value": "Permitted"
+      },
+      "hardship_distributions_money_source_restrictions": {
+        "_confidence": "green",
+        "_raw_text": "Elective Deferrals. Matching Contributions. Employer Profit Sharing Contributions. Suboption (b): The safe harbor definition of hardship distribution described in Plan Section 5.01(C)(2)(b) will apply with respect to the following types of contributions, except that an Employee\u2019s Elective Deferrals (and Nondeductible Employee Contributions, if applicable) will not be suspended for six months. Matching Contributions. Employer Profit Sharing Contributions.",
+        "value": "Permitted from all contribution sources"
+      },
+      "hardship_distributions_vesting_requirement": {
+        "_confidence": "green",
+        "_raw_text": "Suboption (b): The safe harbor definition of hardship distribution described in Plan Section 5.01(C)(2)(b) will apply with respect to the following types of contributions, except that an Employee\u2019s Elective Deferrals (and Nondeductible Employee Contributions, if applicable) will not be suspended for six months (select all that apply): Matching Contributions. Employer Profit Sharing Contributions.",
+        "value": "None - available for vested balance"
+      },
+      "hardship_distributions_vesting_requirement_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "in_service_withdrawals": {
+        "_confidence": "green",
+        "_raw_text": "In-Service Availability for Elective Deferrals In General: Option 1 Yes, if he or she has attained age 59.5; Pre-Tax Elective Deferrals; Roth Elective Deferrals. In-Service Availability for Elective Deferrals Due to Deemed Severance from Employment: Option 1 Yes. In-Service Availability for Employer Contributions: Option 1 Yes, with respect to Matching Contributions; Employer Profit Sharing Contributions.",
+        "value": "Permitted"
+      },
+      "in_service_withdrawals_age": {
+        "_confidence": "green",
+        "_raw_text": "Option 1: Yes, if he or she has attained age 59.5.",
+        "value": "Age 59.5"
+      },
+      "in_service_withdrawals_age_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "in_service_withdrawals_money_source_restrictions": {
+        "_confidence": "green",
+        "_raw_text": "Permissible Withdrawals of EACA or QACA Elective Deferrals\nWill a Participant be entitled to request a distribution of their Individual Account attributable to Elective Deferrals and the earnings attributable to such Elective Deferrals",
+        "value": "Permitted only from employee contributions"
+      },
+      "in_service_withdrawals_money_source_restrictions_other_specify": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "Available for Matching Contributions and Employer Profit Sharing Contributions"
+      },
+      "in_service_withdrawals_service_requirement": {
+        "_confidence": "green",
+        "_raw_text": "Will an Employee who has not reached Normal Retirement Age be entitled to request a distribution of their Individual Account attributable to the following types of contributions upon incurring a Termination of Employment? Option 1: Yes, with respect to the following contributions. Matching Contributions. Employer Profit Sharing Contributions.",
+        "value": "N/A"
+      },
+      "in_service_withdrawals_service_requirement_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "in_service_withdrawals_vesting_requirement": {
+        "_confidence": "green",
+        "_raw_text": "Suboption (b): The safe harbor definition of hardship distribution described in Plan Section 5.01(C)(2)(b) will apply with respect to the following types of contributions, except that an Employee\u2019s Elective Deferrals (and Nondeductible Employee Contributions, if applicable) will not be suspended for six months. Matching Contributions. Employer Profit Sharing Contributions.",
+        "value": "Requires 100% vesting of employer contribution"
+      },
+      "in_service_withdrawals_vesting_requirement_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "loans": {
+        "_confidence": "green",
+        "_raw_text": "May an outstanding loan amount be included in a Direct In-Plan Roth Rollover (select one)? Option 1 Yes. Option 2 No. No option selected.",
+        "value": "Loans permitted but number of outstanding loans not indicated"
+      },
+      "payment_options": {
+        "_confidence": "green",
+        "_raw_text": "Distribution options selected for Pre-Tax Elective Deferrals will apply ... Cashout Level for Terminated Participants ... Option 1: \u2611 $5,000. ... Rollover contributions included in determining the value ... Option 1: \u2611 Yes. ... Option 1: \u2611 Yes, with respect to the following contributions. (Select all that apply.) Matching Contributions (if applicable). Employer Profit Sharing Contributions (if applicable).",
+        "value": "Lump Sum and Installments in cash"
+      },
+      "withdrawals_from_rollover": {
+        "_confidence": "green",
+        "_raw_text": "Option 1: Yes. Indirect Rollovers of pre-tax Eligible Rollover Distributions from a qualified plan described in Code section 401(a) or 403(a), an annuity contract described in Code section 403(b), and an eligible plan under Code section 457(b) ... Option 1: Yes.",
+        "value": "Permitted at any time"
+      },
+      "withdrawals_from_rollover_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      }
     }
   },
   "input_from": "internal_arcadia_extract_chain",
-  "input_sha256": "33cc0b91c973820b6673f579d09aa989dedf15c07c756ba4f0f9b107ea1f6519",
+  "input_sha256": "01760933b0cd9469cd4bdb70c66b31d830da98e1f8fbbb0af88aa3dfda28b04b",
+  "model_fixture": {
+    "path": "testdata/extraction-boundary/model-fixtures/adp_v1/extract_model_outputs.json",
+    "schema_version": "internal-arcadia-boundary-model-fixture-v1",
+    "sha256": "a20e9ee968a84eff81de7f3d9885ad39fef8eb11825e576fdaede139e7dc5eb7",
+    "source": {
+      "covered_route_count": 159,
+      "document_file_name": "adp.pdf",
+      "expected_answer_sha256": "450e3ac1f00d31781f029ec2b2897de6e94152efd696fc7e148813314789633c",
+      "expected_answer_url": "https://cdn.eyelevel.ai/internal-harness/e2e-extract/adp-extract.json",
+      "kind": "reviewed_expected_answer_shape_stress_projection",
+      "projection_notes": [
+        "Values come from the reviewed expected answer where present.",
+        "Blank statement scalars are filled so final-output shape gates can assert field presence.",
+        "Utility child rows are expanded from reviewed rows to exercise the 50+ charge shape.",
+        "One unmatched utility child row is added when the reviewed expected answer has no account-level charge."
+      ],
+      "record_counts_by_group": {},
+      "workflow_id": "adp_v1-product-path",
+      "workflow_version": "2026-07-12T22:34:03Z"
+    }
+  },
   "output_for": "internal_arcadia_save_callback",
   "relationship_output": null,
   "request": {
@@ -1795,177 +2474,833 @@
   "surface": "adp_v1",
   "workflow_output": {
     "adp_f1_employer_and_plan_information": {
-      "address_city": "adp_v1_address_city_1",
-      "address_state": "adp_v1_address_state_1",
-      "address_street": "adp_v1_address_street_1",
-      "address_zip": "adp_v1_address_zip_1",
-      "administrators_info": "adp_v1_administrators_info_1",
-      "administrators_info_other_specify": "adp_v1_administrators_info_other_specify_1",
-      "affiliated_employer_group_type": "adp_v1_affiliated_employer_group_type_1",
-      "affiliated_employers": "adp_v1_affiliated_employers_1",
-      "employer_fiscal_year_ends": "2026-01-01",
-      "employer_name": "adp_v1_employer_name_1",
-      "multiple_employer_plan": "adp_v1_multiple_employer_plan_1",
-      "oe_date": "2026-01-01",
-      "participating_employers": "adp_v1_participating_employers_1",
-      "plan_name": "adp_v1_plan_name_1",
-      "plan_number": "adp_v1_plan_number_1",
-      "plan_number_other_specify": "adp_v1_plan_number_other_specify_1",
-      "plan_status": "adp_v1_plan_status_1",
-      "plan_year": "adp_v1_plan_year_1",
-      "plan_year_end_date": "2026-01-01",
-      "plan_year_other_specify": "adp_v1_plan_year_other_specify_1",
-      "restatement_effective_date": "2026-01-01",
-      "tax_identification_number": "adp_v1_tax_identification_number_1",
-      "telephone": "adp_v1_telephone_1",
-      "type_of_entity": "adp_v1_type_of_entity_1",
-      "type_of_entity_llc_subtype": "adp_v1_type_of_entity_llc_subtype_1",
-      "type_of_entity_other_specify": "adp_v1_type_of_entity_other_specify_1",
-      "type_of_plan": "adp_v1_type_of_plan_1",
-      "valuation_date": "2026-01-01",
-      "valuation_date_other_specify": "2026-01-01"
+      "address_city": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "Broomfield"
+      },
+      "address_state": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "CO"
+      },
+      "address_street": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "8525 W 100th Ave"
+      },
+      "address_zip": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "80021-4932"
+      },
+      "administrators_info": {
+        "_confidence": "green",
+        "_raw_text": "Check here and provide the applicable information below if someone other than the Adopting Employer will be the Plan Administrator.",
+        "value": "Employer"
+      },
+      "administrators_info_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "affiliated_employer_group_type": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "[{\"value\":\"Controlled Group\",\"_raw_text\":\"controlled group of corporations\"},{\"value\":\"Affiliated Service Group\",\"_raw_text\":\"affiliated service group\"}]"
+      },
+      "affiliated_employers": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "true"
+      },
+      "employer_fiscal_year_ends": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "12/31"
+      },
+      "employer_name": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "Z&N Coffeehouse Companies Inc"
+      },
+      "multiple_employer_plan": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "false"
+      },
+      "oe_date": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "05/15/2024"
+      },
+      "participating_employers": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "false"
+      },
+      "plan_name": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "Z&N Coffeehouse Companies Inc 401(k) Profit Sharing Plan and Trust"
+      },
+      "plan_number": {
+        "_confidence": "green",
+        "_raw_text": "Plan Sequence Number 001",
+        "value": "001"
+      },
+      "plan_number_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "plan_status": {
+        "_confidence": "green",
+        "_raw_text": "Option 2: The later of April 1 of the calendar year following the calendar year in which a Participant attains age 70\\u00bd or retires except that distributions to a five-percent owner must commence by April 1 of the calendar year following the calendar year in which the Participant attains age 70\\u00bd.",
+        "value": "Amendment & Restatement"
+      },
+      "plan_year": {
+        "_confidence": "green",
+        "_raw_text": "Adopting Employer's Tax Year End 12/31",
+        "value": "Calendar Year"
+      },
+      "plan_year_end_date": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "12/31"
+      },
+      "plan_year_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "restatement_effective_date": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "05/15/2024"
+      },
+      "tax_identification_number": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "82-2713261"
+      },
+      "telephone": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "303-709-2228"
+      },
+      "type_of_entity": {
+        "_confidence": "green",
+        "_raw_text": "Type of Business (select one): ... S Corporation",
+        "value": "S Corporation"
+      },
+      "type_of_entity_llc_subtype": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "type_of_entity_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "type_of_plan": {
+        "_confidence": "green",
+        "_raw_text": "This Adoption Agreement may be used only in conjunction with Basic Plan Document #01.",
+        "value": "401(k) Plan"
+      },
+      "valuation_date": {
+        "_confidence": "green",
+        "_raw_text": "Option 3: \u25a1 The last day of the Plan Year within which the Participant (or Beneficiary of a deceased Participant) requests a distribution.",
+        "value": "Last day of each Plan Year"
+      },
+      "valuation_date_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      }
     },
     "adp_f2_eligibility_requirements": {
-      "after_tax_contributions": "adp_v1_after_tax_contributions_1",
-      "age_requirement": "adp_v1_age_requirement_1",
-      "age_requirement_other_specify": "adp_v1_age_requirement_other_specify_1",
-      "deferral_age_requirement": "adp_v1_deferral_age_requirement_1",
-      "deferral_age_requirement_other_specify": "adp_v1_deferral_age_requirement_other_specify_1",
-      "deferral_entry_date": "2026-01-01",
-      "deferral_service_requirement": "adp_v1_deferral_service_requirement_1",
-      "entry_date": "2026-01-01",
-      "entry_date_other_specify": "2026-01-01",
-      "excluded_employees_all_contributions": "adp_v1_excluded_employees_all_contributions_1",
-      "excluded_employees_all_contributions_other_specify": "adp_v1_excluded_employees_all_contributions_other_specify_1",
-      "hours_requirement": "adp_v1_hours_requirement_1",
-      "hours_requirement_other_specify": "adp_v1_hours_requirement_other_specify_1",
-      "matching_age_requirement": "adp_v1_matching_age_requirement_1",
-      "matching_entry_date": "2026-01-01",
-      "matching_service_requirement": "adp_v1_matching_service_requirement_1",
-      "nec_age_requirement": "adp_v1_nec_age_requirement_1",
-      "nec_entry_date": "2026-01-01",
-      "nec_service_requirement": "adp_v1_nec_service_requirement_1",
-      "predecessor_service": "adp_v1_predecessor_service_1",
-      "rollover_contributions": "adp_v1_rollover_contributions_1",
-      "separate_eligibility_for_employer_contributions": "adp_v1_separate_eligibility_for_employer_contributions_1",
-      "service_requirement": "adp_v1_service_requirement_1",
-      "service_requirement_other_specify": "adp_v1_service_requirement_other_specify_1",
-      "simple_401k_contributions": "adp_v1_simple_401k_contributions_1",
-      "upto_tax_contribution_pct": "adp_v1_upto_tax_contribution_pct_1"
+      "after_tax_contributions": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "false"
+      },
+      "age_requirement": {
+        "_confidence": "yellow",
+        "_raw_text": "Age and eligibility service requirements listed above; page shows the general eligibility section but no separate age option selected on this page image, and the page context indicates the standard age requirement applies.",
+        "value": "Age 21"
+      },
+      "age_requirement_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "deferral_age_requirement": {
+        "_confidence": "green",
+        "_raw_text": "age requirement not shown on provided page",
+        "value": "Age 21"
+      },
+      "deferral_age_requirement_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "deferral_entry_date": {
+        "_confidence": "green",
+        "_raw_text": "Part E. Eligibility Computation Period. Option 1: Each Plan Year commencing with the Plan Year beginning during their initial Eligibility Computation Period.",
+        "value": "Monthly"
+      },
+      "deferral_service_requirement": {
+        "_confidence": "green",
+        "_raw_text": "After completing 1 Year of Eligibility Service (Period of Service, if applicable). Pre-Tax Elective Deferrals. Roth Elective Deferrals. Matching Contributions. Employer Profit Sharing Contributions. Safe Harbor/QACA Safe Harbor Contributions. Qualified Nonelective Contributions.",
+        "value": "Same as All Contributions"
+      },
+      "entry_date": {
+        "_confidence": "green",
+        "_raw_text": "Part E. Eligibility Computation Period - Option 1 checked: Each Plan Year commencing with the Plan Year beginning during their initial Eligibility Computation Period.",
+        "value": "Monthly"
+      },
+      "entry_date_other_specify": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "The Plan Year"
+      },
+      "excluded_employees_all_contributions": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "[{\"value\":\"No exclusions\",\"_raw_text\":\"No exclusions apply\"}]"
+      },
+      "excluded_employees_all_contributions_other_specify": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "An Employee as the result of a transaction described in Code section 410(b)(6)(C)"
+      },
+      "hours_requirement": {
+        "_confidence": "green",
+        "_raw_text": "Service Requirement. The Participant completes at least (complete one): (not more than 1,000) Hours of Service during the Plan Year, if the Hours of Service method of determining service applies; or (not more than 12) months of service if the Elapsed Time method of determining service applies.",
+        "value": "1000 Hours"
+      },
+      "hours_requirement_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "matching_age_requirement": {
+        "_confidence": "green",
+        "_raw_text": "Matching Contributions.",
+        "value": "Same as Deferral"
+      },
+      "matching_entry_date": {
+        "_confidence": "green",
+        "_raw_text": "Employer matching eligibility follows the same Section Two eligibility requirements as elective deferrals",
+        "value": "Same as Deferral"
+      },
+      "matching_service_requirement": {
+        "_confidence": "green",
+        "_raw_text": "Service for purposes of determining if a Participant is a Qualifying Participant or Qualifying Contributing Participant (and therefore eligible to receive an Employer Contribution) will be determined on the basis of (select one): Option 2: Hours of Service ... Suboption (a): Actual hours for which an Employee is paid or entitled to payment.",
+        "value": "Same as Deferral"
+      },
+      "nec_age_requirement": {
+        "_confidence": "green",
+        "_raw_text": "Qualified Nonelective Contributions.",
+        "value": "Same as Deferral"
+      },
+      "nec_entry_date": {
+        "_confidence": "green",
+        "_raw_text": "Qualified Nonelective Contribution Formula - Yes selected; no separate employer-contribution eligibility requirements shown on this page",
+        "value": "Same as Deferral"
+      },
+      "nec_service_requirement": {
+        "_confidence": "green",
+        "_raw_text": "Service for purposes of determining if a Participant is a Qualifying Participant or Qualifying Contributing Participant (and therefore eligible to receive an Employer Contribution) will be determined on the basis of (select one): Option 2: Hours of Service ... Suboption (a): Actual hours for which an Employee is paid or entitled to payment.",
+        "value": "Same as Deferral"
+      },
+      "predecessor_service": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "{\"value\":\"N/A\",\"_raw_text\":\"Years of Vesting Service (Periods of Service, if applicable) before the Employer maintained this Plan or a predecessor plan.\"}"
+      },
+      "rollover_contributions": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "false"
+      },
+      "separate_eligibility_for_employer_contributions": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "false"
+      },
+      "service_requirement": {
+        "_confidence": "green",
+        "_raw_text": "Service Requirement. The Participant completes at least (complete one): (not more than 1,000) Hours of Service during the Plan Year, if the Hours of Service method of determining service applies; or (not more than 12) months of service if the Elapsed Time method of determining service applies.",
+        "value": "1 Year"
+      },
+      "service_requirement_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "simple_401k_contributions": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "false"
+      },
+      "upto_tax_contribution_pct": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      }
     },
     "adp_f3_vesting_compensation": {
-      "compensation_definition": "adp_v1_compensation_definition_1",
-      "compensation_excluded_all": "adp_v1_compensation_excluded_all_1",
-      "compensation_excluded_all_other_specify": "adp_v1_compensation_excluded_all_other_specify_1",
-      "compensation_excluded_deferrals": "adp_v1_compensation_excluded_deferrals_1",
-      "compensation_excluded_deferrals_other_specify": "adp_v1_compensation_excluded_deferrals_other_specify_1",
-      "compensation_excluded_match": "adp_v1_compensation_excluded_match_1",
-      "compensation_excluded_match_other_specify": "adp_v1_compensation_excluded_match_other_specify_1",
-      "compensation_excluded_nec": "adp_v1_compensation_excluded_nec_1",
-      "compensation_excluded_nec_other_specify": "adp_v1_compensation_excluded_nec_other_specify_1",
-      "compensation_for_initial_year": "adp_v1_compensation_for_initial_year_1",
-      "compensation_for_initial_year_other_specify": "adp_v1_compensation_for_initial_year_other_specify_1",
-      "early_retirement_age": "adp_v1_early_retirement_age_1",
-      "early_retirement_age_other_specify": "adp_v1_early_retirement_age_other_specify_1",
-      "early_retirement_service_requirement": "adp_v1_early_retirement_service_requirement_1",
-      "employer_match_vesting": "adp_v1_employer_match_vesting_1",
-      "employer_match_vesting_other_specify": "adp_v1_employer_match_vesting_other_specify_1",
-      "employer_match_vesting_schedule": "adp_v1_employer_match_vesting_schedule_1",
-      "employer_profit_sharing_vesting": "adp_v1_employer_profit_sharing_vesting_1",
-      "employer_profit_sharing_vesting_other_specify": "adp_v1_employer_profit_sharing_vesting_other_specify_1",
-      "employer_profit_sharing_vesting_schedule": "adp_v1_employer_profit_sharing_vesting_schedule_1",
-      "field_100_pct_vesting_at_early_retirement": "adp_v1_field_100_pct_vesting_at_early_retirement_1",
-      "forfeiture_use": "adp_v1_forfeiture_use_1",
-      "normal_retirement_age": "adp_v1_normal_retirement_age_1",
-      "normal_retirement_age_other_specify": "adp_v1_normal_retirement_age_other_specify_1",
-      "normal_retirement_service_requirement": "adp_v1_normal_retirement_service_requirement_1",
-      "safe_harbor_vesting": "adp_v1_safe_harbor_vesting_1",
-      "safe_harbor_vesting_other_specify": "adp_v1_safe_harbor_vesting_other_specify_1",
-      "vesting_period_calculation": "adp_v1_vesting_period_calculation_1",
-      "vesting_service": "adp_v1_vesting_service_1"
+      "compensation_definition": {
+        "_confidence": "green",
+        "_raw_text": "Will Compensation include Employer Contributions made pursuant to a salary reduction agreement that are not includible in the gross income of the Employee under Code sections 125, 132(f)(4), 402(e)(3), 408(k), 403(b), 414(h), and 457? Elective Deferrals: Yes. Matching Contributions: Yes. Employer Profit Sharing Contributions: Yes.",
+        "value": "W2 Compensation"
+      },
+      "compensation_excluded_all": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": [
+          {
+            "_raw_text": "SECTION FOUR: VESTING AND FORFEITURES",
+            "value": "N/A"
+          }
+        ]
+      },
+      "compensation_excluded_all_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "compensation_excluded_deferrals": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": [
+          {
+            "_raw_text": "No compensation exclusion table is shown on this page.",
+            "value": "N/A"
+          }
+        ]
+      },
+      "compensation_excluded_deferrals_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "compensation_excluded_match": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": [
+          {
+            "_raw_text": "SECTION FOUR: VESTING AND FORFEITURES",
+            "value": "N/A"
+          }
+        ]
+      },
+      "compensation_excluded_match_other_specify": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "Forfeitures of Matching Contributions may be used to pay appropriate Plan expenses, to reduce Employer Contributions (other than Elective Deferrals), or as an Employer Profit Sharing Contribution allocation in the ratio that each Participant's Compensation for the Plan Year bears to the total Compensation of all Participants for such Plan Year (or any combination of the foregoing)"
+      },
+      "compensation_excluded_nec": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": [
+          {
+            "_raw_text": "No compensation exclusion table is shown on this page.",
+            "value": "N/A"
+          }
+        ]
+      },
+      "compensation_excluded_nec_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "compensation_for_initial_year": {
+        "_confidence": "green",
+        "_raw_text": "Part A. Elective Deferrals - Limits on Elective Deferrals - compensation reduced by the amount described below. Such amount will be contributed to the Plan by the Employer on behalf of the Contributing Participant. Option 1 selected.",
+        "value": "Compensation from entry date"
+      },
+      "compensation_for_initial_year_other_specify": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "April 8th"
+      },
+      "early_retirement_age": {
+        "_confidence": "green",
+        "_raw_text": "Part H. Fully Vested Under Certain Circumstances. 3. The Employee satisfies the conditions for Early Retirement Age (if applicable). Yes / No selected: No.",
+        "value": "Not Applicable"
+      },
+      "early_retirement_age_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "early_retirement_service_requirement": {
+        "_confidence": "green",
+        "_raw_text": "Part H. Fully Vested Under Certain Circumstances ... The Employee satisfies the conditions for Early Retirement Age (if applicable). No.",
+        "value": "Not Applicable"
+      },
+      "employer_match_vesting": {
+        "_confidence": "green",
+        "_raw_text": "Part B. Matching Contributions. 1. Authorization of Matching Contributions. Will the Employer make Matching Contributions to the Plan on behalf of a Qualifying Contributing Participant? Option 1: Yes, with respect to the following types of contributions: Pre-Tax Elective Deferrals; Roth Elective Deferrals.",
+        "value": "100% immediate"
+      },
+      "employer_match_vesting_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "employer_match_vesting_schedule": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "employer_profit_sharing_vesting": {
+        "_confidence": "green",
+        "_raw_text": "The election for Pre-Tax Elective Deferrals will also apply to Qualified Nonelective Contributions, Qualified Matching Contributions, ADP Test Safe Harbor Contributions, and QACA ADP Test Safe Harbor Contributions (if applicable).",
+        "value": "100% immediate"
+      },
+      "employer_profit_sharing_vesting_other_specify": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "Discretionary Formula"
+      },
+      "employer_profit_sharing_vesting_schedule": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "[{\"years_of_service\":\"1\",\"vesting_percentage\":\"0%\"},{\"years_of_service\":\"2\",\"vesting_percentage\":\"0%\"},{\"years_of_service\":\"3\",\"vesting_percentage\":\"0%\"},{\"years_of_service\":\"4\",\"vesting_percentage\":\"0%\"},{\"years_of_service\":\"5\",\"vesting_percentage\":\"0%\"},{\"years_of_service\":\"6\",\"vesting_percentage\":\"100%\"}]"
+      },
+      "field_100_pct_vesting_at_early_retirement": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "forfeiture_use": {
+        "_confidence": "green",
+        "_raw_text": "Part J. Allocation of Forfeitures of Matching Contributions: Option 3 checked, Other. Forfeitures of Matching Contributions may be used to pay appropriate Plan expenses, to reduce Employer Contributions (other than Elective Deferrals), or as an Employer Profit Sharing Contribution allocation in the ratio that each Participant's Compensation for the Plan Year bears to the total Compensation of all Participants for such Plan Year (or any combination of the foregoing). Part K. Allocation of Forfeitures of Excess Aggregate Contributions: Option 3 checked, Other. Forfeitures of Excess Aggregate Contributions may be used to pay appropriate Plan expenses, to reduce Employer Contributions (other than Elective Deferrals), or as an Employer Profit Sharing Contribution allocation in the ratio that each Participant's Compensation for the Plan Year bears to the total Compensation of all Participants for such Plan Year (or any combination of the foregoing).",
+        "value": "Used to reduce employer contribution OR Allocated to eligible Participants"
+      },
+      "normal_retirement_age": {
+        "_confidence": "yellow",
+        "_raw_text": "No retirement age selection visible on provided page; inferred from absent evidence not used",
+        "value": "Age 65"
+      },
+      "normal_retirement_age_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "normal_retirement_service_requirement": {
+        "_confidence": "green",
+        "_raw_text": "Employee Has Not Reached Normal Retirement Age ... Yes, with respect to the following contributions. (Select all that apply.) Matching Contributions (if applicable). Employer Profit Sharing Contributions (if applicable).",
+        "value": "Not Applicable"
+      },
+      "safe_harbor_vesting": {
+        "_confidence": "green",
+        "_raw_text": "The election for Pre-Tax Elective Deferrals will also apply to Qualified Nonelective Contributions, Qualified Matching Contributions, ADP Test Safe Harbor Contributions, and QACA ADP Test Safe Harbor Contributions (if applicable).",
+        "value": "N/A"
+      },
+      "safe_harbor_vesting_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "vesting_period_calculation": {
+        "_confidence": "green",
+        "_raw_text": "Part D. Service Required for Eligibility Purposes Option 2: Not applicable. The Elapsed Time method of determining service applies or no eligibility service is required.\nPart E. Eligibility Computation Period Option 1: Each Plan Year commencing with the Plan Year beginning during their initial Eligibility Computation Period.",
+        "value": "N/A: 100% vesting"
+      },
+      "vesting_service": {
+        "_confidence": "green",
+        "_raw_text": "Option 2: Not applicable. The Employer will not make a QACA ACP Test Safe Harbor Matching Contribution unless necessary to do so in order to timely allocate Forfeitures. Option 1: Yes, with respect to the following types of contributions (select all that apply): Pre-Tax Elective Deferrals. Roth Elective Deferrals.",
+        "value": "N/A: 100% vesting"
+      }
     },
     "adp_f4_employee_contributions_and_automatic_enrollment": {
-      "after_tax_voluntary_contributions": "adp_v1_after_tax_voluntary_contributions_1",
-      "auto_escalation_pct": "adp_v1_auto_escalation_pct_1",
-      "automatic_enrollment_type": "adp_v1_automatic_enrollment_type_1",
-      "contribution_limit": "adp_v1_contribution_limit_1",
-      "contribution_limit_other_specify": "adp_v1_contribution_limit_other_specify_1",
-      "contribution_method": "adp_v1_contribution_method_1",
-      "default_enrollment_pct": "adp_v1_default_enrollment_pct_1",
-      "deferral_change_frequency": "adp_v1_deferral_change_frequency_1",
-      "deferral_change_frequency_other_specify": "adp_v1_deferral_change_frequency_other_specify_1",
-      "eligible_employees": "adp_v1_eligible_employees_1",
-      "eligible_employees_other_specify": "adp_v1_eligible_employees_other_specify_1",
-      "escalation_timing": "adp_v1_escalation_timing_1",
-      "escalation_timing_other_specify": "adp_v1_escalation_timing_other_specify_1",
-      "maximum_auto_enrollment_pct": "adp_v1_maximum_auto_enrollment_pct_1",
-      "permissible_withdrawal_window": "adp_v1_permissible_withdrawal_window_1",
-      "qaca_eaca_effective_date": "2026-01-01",
-      "roth_elective_deferrals": "adp_v1_roth_elective_deferrals_1"
+      "after_tax_voluntary_contributions": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "false"
+      },
+      "auto_escalation_pct": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": 0.01
+      },
+      "automatic_enrollment_type": {
+        "_confidence": "green",
+        "_raw_text": "Option 2: Yes, for Employees who meet the eligibility requirements in Section Two, Part A of the Adoption Agreement on or after the Effective Date.",
+        "value": "EACA Automatic Enrollment"
+      },
+      "contribution_limit": {
+        "_confidence": "green",
+        "_raw_text": "An amount equal to a percentage of the Contributing Participant's Compensation from 0 percent to 92 percent in increments of 1 percent.",
+        "value": "Other"
+      },
+      "contribution_limit_other_specify": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "0 percent to 92 percent"
+      },
+      "contribution_method": {
+        "_confidence": "green",
+        "_raw_text": "The following percentage or amount of each Employee's Compensation will be automatically withheld each payroll and contributed to the Plan as an Elective Deferral; Option 1: 3 percent.",
+        "value": "% of Compensation Only"
+      },
+      "default_enrollment_pct": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": 0.03
+      },
+      "deferral_change_frequency": {
+        "_confidence": "green",
+        "_raw_text": "The Plan may provide that an Eligible Employee's affirmative salary reduction agreement election expires annually.",
+        "value": "Annual"
+      },
+      "deferral_change_frequency_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "eligible_employees": {
+        "_confidence": "green",
+        "_raw_text": "Option 2: Yes, for Employees who meet the eligibility requirements in Section Two, Part A of the Adoption Agreement on or after the Effective Date.",
+        "value": "Newly Eligible"
+      },
+      "eligible_employees_other_specify": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "Employees who are not automatically enrolled under items 10 or 11 above"
+      },
+      "escalation_timing": {
+        "_confidence": "green",
+        "_raw_text": "Timing of Automatic Elective Deferral Increases; Option 1: First day of each Plan Year.",
+        "value": "First day of each succeeding plan year"
+      },
+      "escalation_timing_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "maximum_auto_enrollment_pct": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": 0.1
+      },
+      "permissible_withdrawal_window": {
+        "_confidence": "green",
+        "_raw_text": "Option 3: 90 days following the date the first automatic contribution was made.",
+        "value": "Permitted within 90 days of participant's automatic enrollment"
+      },
+      "qaca_eaca_effective_date": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "04/08/2020"
+      },
+      "roth_elective_deferrals": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "true"
+      }
     },
     "adp_f5_employer_contributions": {
-      "employer_match_allocation_conditions": "adp_v1_employer_match_allocation_conditions_1",
-      "employer_match_eligible_employees": "adp_v1_employer_match_eligible_employees_1",
-      "employer_match_eligible_employees_other_specify": "adp_v1_employer_match_eligible_employees_other_specify_1",
-      "employer_match_formula_1": "adp_v1_employer_match_formula_1_1",
-      "employer_match_formula_2": "adp_v1_employer_match_formula_2_1",
-      "employer_match_timing": "adp_v1_employer_match_timing_1",
-      "employer_match_true_up": "adp_v1_employer_match_true_up_1",
-      "employer_match_type": "adp_v1_employer_match_type_1",
-      "employer_profit_sharing_allocation_conditions": "adp_v1_employer_profit_sharing_allocation_conditions_1",
-      "employer_profit_sharing_allocation_method": "adp_v1_employer_profit_sharing_allocation_method_1",
-      "employer_profit_sharing_allocation_method_other_specify": "adp_v1_employer_profit_sharing_allocation_method_other_specify_1",
-      "employer_profit_sharing_eligible_employees": "adp_v1_employer_profit_sharing_eligible_employees_1",
-      "employer_profit_sharing_timing": "adp_v1_employer_profit_sharing_timing_1",
-      "employer_profit_sharing_type": "adp_v1_employer_profit_sharing_type_1",
-      "safe_harbor_annual_true_up": "adp_v1_safe_harbor_annual_true_up_1",
-      "safe_harbor_eligible_employees": "adp_v1_safe_harbor_eligible_employees_1",
-      "safe_harbor_eligible_employees_other_specify": "adp_v1_safe_harbor_eligible_employees_other_specify_1",
-      "safe_harbor_nonelective_pct": "adp_v1_safe_harbor_nonelective_pct_1",
-      "safe_harbor_timing_of_contribution": "adp_v1_safe_harbor_timing_of_contribution_1",
-      "safe_harbor_type": "adp_v1_safe_harbor_type_1"
+      "employer_match_allocation_conditions": {
+        "_confidence": "green",
+        "_raw_text": "No separate matching contribution allocation conditions are shown on this page; the page only shows distribution eligibility for matching contributions.",
+        "value": "None - All eligible participants receive Match"
+      },
+      "employer_match_eligible_employees": {
+        "_confidence": "green",
+        "_raw_text": "Qualified Matching Contributions, if made to the Plan, will be made with respect to Pre-Tax Elective Deferrals, Roth Elective Deferrals, and Nondeductible Employee Contributions; no participant-class limitation to NHCEs is selected.",
+        "value": "Allocated to all eligible employees meeting age/service requirement"
+      },
+      "employer_match_eligible_employees_other_specify": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "Qualifying Contributing Participant"
+      },
+      "employer_match_formula_1": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "Pre-Tax Elective Deferrals"
+      },
+      "employer_match_formula_2": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "Roth Elective Deferrals"
+      },
+      "employer_match_timing": {
+        "_confidence": "green",
+        "_raw_text": "NOTE: If no option is selected, Option 5 will apply. If Matching Contributions are made more frequently than the Matching Contribution Computation Period, the Employer will re-calculate the Matching Contribution based on the Compensation earned, and Elective Deferrals ... over the entire Matching Contribution Computation Period.",
+        "value": "Annually"
+      },
+      "employer_match_true_up": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "true"
+      },
+      "employer_match_type": {
+        "_confidence": "green",
+        "_raw_text": "Such amount, if any, as determined by the Employer in its sole discretion, equal to that percentage of the Elective Deferrals ... sufficient to cause the Plan to satisfy either the Actual Deferral Percentage test ... or the Actual Contribution Percentage test ...",
+        "value": "Discretionary Match"
+      },
+      "employer_profit_sharing_allocation_conditions": {
+        "_confidence": "green",
+        "_raw_text": "No separate employer profit sharing allocation conditions are shown on the provided page; the page only shows Qualified Nonelective Contributions conditions, not Employer Profit Sharing Contributions conditions.",
+        "value": "None - All eligible participants receive NEC"
+      },
+      "employer_profit_sharing_allocation_method": {
+        "_confidence": "green",
+        "_raw_text": "Allocation of Qualified Nonelective Contributions ... Option 1: Pro Rata. In the ratio that each Qualifying Participant's Compensation for the applicable Plan Year bears to the total Compensation of all Qualifying Participants for such Plan Year.",
+        "value": "Pro-Rata"
+      },
+      "employer_profit_sharing_allocation_method_other_specify": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "Age and/or service weighted formula"
+      },
+      "employer_profit_sharing_eligible_employees": {
+        "_confidence": "green",
+        "_raw_text": "Option 1: Allocated to the Individual Accounts of the Participants specified below in the manner described in Plan Section 3.04(B) (for Employer Profit Sharing Contributions). The Participants entitled to receive allocations of such Forfeitures will be (select one): Suboption (a): Qualifying Participants as defined for Employer Profit Sharing Contributions... Suboption (b): All Participants.",
+        "value": "Allocated to all eligible employees meeting age/service requirement"
+      },
+      "employer_profit_sharing_timing": {
+        "_confidence": "green",
+        "_raw_text": "For each Plan Year the Employer may contribute an amount to be determined from year to year.",
+        "value": "Annually"
+      },
+      "employer_profit_sharing_type": {
+        "_confidence": "green",
+        "_raw_text": "Employer Prevailing Wage Contributions to Participants who are Highly Compensated Employees\nWill Participants who are Highly Compensated Employees be entitled to Employer Prevailing Wage Contributions under the Plan (select one)?\nOption 1:\nOption 2:\nYes .\nNo.",
+        "value": "Discretionary"
+      },
+      "safe_harbor_annual_true_up": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "safe_harbor_eligible_employees": {
+        "_confidence": "green",
+        "_raw_text": "Participants Entitled to Receive Safe Harbor CODA Contributions: Option 2: All Eligible Employees.",
+        "value": "Allocated to all eligible employees meeting age/service requirement"
+      },
+      "safe_harbor_eligible_employees_other_specify": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "Participants Entitled to Receive Safe Harbor CODA Contributions"
+      },
+      "safe_harbor_nonelective_pct": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "safe_harbor_timing_of_contribution": {
+        "_confidence": "green",
+        "_raw_text": "Application of Safe Harbor CODA: No",
+        "value": "Not Applicable"
+      },
+      "safe_harbor_type": {
+        "_confidence": "green",
+        "_raw_text": "Option 2: Not applicable. The Employer will not make a QACA ACP Test Safe Harbor Matching Contribution unless necessary to do so in order to timely allocate Forfeitures.",
+        "value": "Not Applicable"
+      }
     },
     "adp_f6_withdrawals_and_distributions": {
-      "hardship_distributions": "adp_v1_hardship_distributions_1",
-      "hardship_distributions_money_source_restrictions": "adp_v1_hardship_distributions_money_source_restrictions_1",
-      "hardship_distributions_vesting_requirement": "adp_v1_hardship_distributions_vesting_requirement_1",
-      "hardship_distributions_vesting_requirement_other_specify": "adp_v1_hardship_distributions_vesting_requirement_other_specify_1",
-      "in_service_withdrawals": "adp_v1_in_service_withdrawals_1",
-      "in_service_withdrawals_age": "adp_v1_in_service_withdrawals_age_1",
-      "in_service_withdrawals_age_other_specify": "adp_v1_in_service_withdrawals_age_other_specify_1",
-      "in_service_withdrawals_money_source_restrictions": "adp_v1_in_service_withdrawals_money_source_restrictions_1",
-      "in_service_withdrawals_money_source_restrictions_other_specify": "adp_v1_in_service_withdrawals_money_source_restrictions_other_specify_1",
-      "in_service_withdrawals_service_requirement": "adp_v1_in_service_withdrawals_service_requirement_1",
-      "in_service_withdrawals_service_requirement_other_specify": "adp_v1_in_service_withdrawals_service_requirement_other_specify_1",
-      "in_service_withdrawals_vesting_requirement": "adp_v1_in_service_withdrawals_vesting_requirement_1",
-      "in_service_withdrawals_vesting_requirement_other_specify": "adp_v1_in_service_withdrawals_vesting_requirement_other_specify_1",
-      "loans": "adp_v1_loans_1",
-      "payment_options": "adp_v1_payment_options_1",
-      "withdrawals_from_rollover": "adp_v1_withdrawals_from_rollover_1",
-      "withdrawals_from_rollover_other_specify": "adp_v1_withdrawals_from_rollover_other_specify_1"
+      "hardship_distributions": {
+        "_confidence": "green",
+        "_raw_text": "Suboption (b): The safe harbor definition of hardship distribution described in Plan Section 5.01(C)(2)(b) will apply with respect to the following types of contributions, except that an Employee\u2019s Elective Deferrals (and Nondeductible Employee Contributions, if applicable) will not be suspended for six months (select all that apply): Matching Contributions. Employer Profit Sharing Contributions.\nHardship Availability Due to Beneficiary Hardship ... Option 1: Yes.",
+        "value": "Permitted"
+      },
+      "hardship_distributions_money_source_restrictions": {
+        "_confidence": "green",
+        "_raw_text": "Elective Deferrals. Matching Contributions. Employer Profit Sharing Contributions. Suboption (b): The safe harbor definition of hardship distribution described in Plan Section 5.01(C)(2)(b) will apply with respect to the following types of contributions, except that an Employee\u2019s Elective Deferrals (and Nondeductible Employee Contributions, if applicable) will not be suspended for six months. Matching Contributions. Employer Profit Sharing Contributions.",
+        "value": "Permitted from all contribution sources"
+      },
+      "hardship_distributions_vesting_requirement": {
+        "_confidence": "green",
+        "_raw_text": "Suboption (b): The safe harbor definition of hardship distribution described in Plan Section 5.01(C)(2)(b) will apply with respect to the following types of contributions, except that an Employee\u2019s Elective Deferrals (and Nondeductible Employee Contributions, if applicable) will not be suspended for six months (select all that apply): Matching Contributions. Employer Profit Sharing Contributions.",
+        "value": "None - available for vested balance"
+      },
+      "hardship_distributions_vesting_requirement_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "in_service_withdrawals": {
+        "_confidence": "green",
+        "_raw_text": "In-Service Availability for Elective Deferrals In General: Option 1 Yes, if he or she has attained age 59.5; Pre-Tax Elective Deferrals; Roth Elective Deferrals. In-Service Availability for Elective Deferrals Due to Deemed Severance from Employment: Option 1 Yes. In-Service Availability for Employer Contributions: Option 1 Yes, with respect to Matching Contributions; Employer Profit Sharing Contributions.",
+        "value": "Permitted"
+      },
+      "in_service_withdrawals_age": {
+        "_confidence": "green",
+        "_raw_text": "Option 1: Yes, if he or she has attained age 59.5.",
+        "value": "Age 59.5"
+      },
+      "in_service_withdrawals_age_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "in_service_withdrawals_money_source_restrictions": {
+        "_confidence": "green",
+        "_raw_text": "Permissible Withdrawals of EACA or QACA Elective Deferrals\nWill a Participant be entitled to request a distribution of their Individual Account attributable to Elective Deferrals and the earnings attributable to such Elective Deferrals",
+        "value": "Permitted only from employee contributions"
+      },
+      "in_service_withdrawals_money_source_restrictions_other_specify": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "Available for Matching Contributions and Employer Profit Sharing Contributions"
+      },
+      "in_service_withdrawals_service_requirement": {
+        "_confidence": "green",
+        "_raw_text": "Will an Employee who has not reached Normal Retirement Age be entitled to request a distribution of their Individual Account attributable to the following types of contributions upon incurring a Termination of Employment? Option 1: Yes, with respect to the following contributions. Matching Contributions. Employer Profit Sharing Contributions.",
+        "value": "N/A"
+      },
+      "in_service_withdrawals_service_requirement_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "in_service_withdrawals_vesting_requirement": {
+        "_confidence": "green",
+        "_raw_text": "Suboption (b): The safe harbor definition of hardship distribution described in Plan Section 5.01(C)(2)(b) will apply with respect to the following types of contributions, except that an Employee\u2019s Elective Deferrals (and Nondeductible Employee Contributions, if applicable) will not be suspended for six months. Matching Contributions. Employer Profit Sharing Contributions.",
+        "value": "Requires 100% vesting of employer contribution"
+      },
+      "in_service_withdrawals_vesting_requirement_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "loans": {
+        "_confidence": "green",
+        "_raw_text": "May an outstanding loan amount be included in a Direct In-Plan Roth Rollover (select one)? Option 1 Yes. Option 2 No. No option selected.",
+        "value": "Loans permitted but number of outstanding loans not indicated"
+      },
+      "payment_options": {
+        "_confidence": "green",
+        "_raw_text": "Distribution options selected for Pre-Tax Elective Deferrals will apply ... Cashout Level for Terminated Participants ... Option 1: \u2611 $5,000. ... Rollover contributions included in determining the value ... Option 1: \u2611 Yes. ... Option 1: \u2611 Yes, with respect to the following contributions. (Select all that apply.) Matching Contributions (if applicable). Employer Profit Sharing Contributions (if applicable).",
+        "value": "Lump Sum and Installments in cash"
+      },
+      "withdrawals_from_rollover": {
+        "_confidence": "green",
+        "_raw_text": "Option 1: Yes. Indirect Rollovers of pre-tax Eligible Rollover Distributions from a qualified plan described in Code section 401(a) or 403(a), an annuity contract described in Code section 403(b), and an eligible plan under Code section 457(b) ... Option 1: Yes.",
+        "value": "Permitted at any time"
+      },
+      "withdrawals_from_rollover_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      }
     },
     "adp_f7_miscellaneous_plan_provisions_and_pes_setup": {
-      "adp_acp_test_year": "adp_v1_adp_acp_test_year_1",
-      "auto_enrollment_exemption": "adp_v1_auto_enrollment_exemption_1",
-      "auto_enrollment_exemption_other_specify": "adp_v1_auto_enrollment_exemption_other_specify_1",
-      "disability_definition": "adp_v1_disability_definition_1",
-      "disability_definition_other_specify": "adp_v1_disability_definition_other_specify_1",
-      "flat_dollar_contributions": "adp_v1_flat_dollar_contributions_1",
-      "flat_dollar_contributions_other_specify": "adp_v1_flat_dollar_contributions_other_specify_1",
-      "hce_definition_top_paid_group_election": "adp_v1_hce_definition_top_paid_group_election_1",
-      "in_plan_roth_rollovers": "adp_v1_in_plan_roth_rollovers_1",
-      "js_flag": "adp_v1_js_flag_1",
-      "life_insurance": "adp_v1_life_insurance_1",
-      "life_insurance_other_specify": "adp_v1_life_insurance_other_specify_1",
-      "money_purchase_plan": "adp_v1_money_purchase_plan_1",
-      "money_purchase_plan_other_specify": "adp_v1_money_purchase_plan_other_specify_1",
-      "other_plans_annual_additions": "adp_v1_other_plans_annual_additions_1",
-      "other_plans_annual_additions_other_specify": "adp_v1_other_plans_annual_additions_other_specify_1",
-      "prior_money_source_subject_to_vesting": "adp_v1_prior_money_source_subject_to_vesting_1",
-      "prior_money_source_subject_to_vesting_other_specify": "adp_v1_prior_money_source_subject_to_vesting_other_specify_1",
-      "special_effective_dates": "2026-01-01",
-      "top_heavy_elections": "adp_v1_top_heavy_elections_1",
-      "top_heavy_elections_other_specify": "adp_v1_top_heavy_elections_other_specify_1"
+      "adp_acp_test_year": {
+        "_confidence": "green",
+        "_raw_text": "Participant direction option selected for Elective Deferrals will apply to Qualified Nonelective Contributions, Qualified Matching Contributions, ADP Test Safe Harbor Contributions, QACA ADP Test Safe Harbor Contributions, and Employer Prevailing Wage Contributions designated as Qualified Nonelective Contributions, as applicable. The Participant direction option selected for Matching Contributions will apply to ACP Test Safe Harbor Contributions and QACA ACP Test Safe Harbor Contributions, as applicable.",
+        "value": "Current year testing"
+      },
+      "auto_enrollment_exemption": {
+        "_confidence": "green",
+        "_raw_text": "Will the automatic Elective Deferral enrollment provisions apply? Option 2: Yes, the Eligible Automatic Contribution Arrangement (EACA) provisions in Plan Section 3.01(E)(2) will apply.",
+        "value": "No"
+      },
+      "auto_enrollment_exemption_other_specify": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "Employees who are not Contributing Participants (e.g., are deferring zero-percent)"
+      },
+      "disability_definition": {
+        "_confidence": "green",
+        "_raw_text": "Option 1: The inability to engage in any substantial, gainful activity by reason of any medically determinable physical or mental impairment that can be expected to result in death or which has lasted or can be expected to last for a continuous period of not less than 12 months.",
+        "value": "Inability to engage in any substantial gainful activity by reason of any medically determined physical or mental impairment that can be expected to result in death or which has lasted or can be expected to last for a period of not less than 12 months"
+      },
+      "disability_definition_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "flat_dollar_contributions": {
+        "_confidence": "green",
+        "_raw_text": "Option 6: Discretionary Match by Location or Business Classification. Option 7: Other fixed percentage of each Qualifying Contributing Participant's Elective Deferrals (and/or Nondeductible Employee Contributions, if applicable).",
+        "value": "Not Applicable"
+      },
+      "flat_dollar_contributions_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "hce_definition_top_paid_group_election": {
+        "_confidence": "green",
+        "_raw_text": "Option 2: No.",
+        "value": "Top paid group election does not apply"
+      },
+      "in_plan_roth_rollovers": {
+        "_confidence": "green",
+        "_raw_text": "Indirect In-Plan Roth Rollovers: Option 2 No. Direct In-Plan Roth Rollover section shows no selected option; if no option is selected, Option 2 applies. Indirect In-Plan Roth Rollovers: Option 2 No.",
+        "value": "Not permitted"
+      },
+      "js_flag": {
+        "_confidence": "green",
+        "_raw_text": "No annuity contracts or protected in-service distribution provisions are evidenced on the provided page; Part M is In-Plan Roth Rollover and the visible provisions are Deemed IRA Contribution deposits, SIMPLE 401(k) Provisions, and Benefit Accrual in the Case of Death or Disability Resulting from Qualified Military Service.",
+        "value": "IX - Annuities do not apply and protected in-service distributions do not apply"
+      },
+      "life_insurance": {
+        "_confidence": "green",
+        "_raw_text": "Will life insurance investments be permitted under the Plan? Option 2: No.",
+        "value": "No evidence of illiquid assets in current plan doc"
+      },
+      "life_insurance_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "money_purchase_plan": {
+        "_confidence": "green",
+        "_raw_text": "Pages covering deemed IRA deposits, SIMPLE 401(k), in-plan Roth rollover, prior-money-source setup, transfer, rollover, or plan-source account elections count as source/account context for this field.",
+        "value": "No evidence of Money Purchase Plan assets"
+      },
+      "money_purchase_plan_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "other_plans_annual_additions": {
+        "_confidence": "green",
+        "_raw_text": "QACA Safe Harbor Contributions will be made on behalf of each Eligible Employee who is a non-Highly Compensated Employee / All Eligible Employees.",
+        "value": "No indication that company sponsors any other retirement plans"
+      },
+      "other_plans_annual_additions_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "prior_money_source_subject_to_vesting": {
+        "_confidence": "green",
+        "_raw_text": "Option 1 selected for vesting schedule for Employer Profit Sharing Contributions; 100% vested after less than one year and at all service points",
+        "value": "100% Immediate"
+      },
+      "prior_money_source_subject_to_vesting_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      },
+      "special_effective_dates": {
+        "_confidence": "yellow",
+        "_raw_text": null,
+        "value": "05/15/2024"
+      },
+      "top_heavy_elections": {
+        "_confidence": "green",
+        "_raw_text": "Option 1: To this Plan; Suboption (a): The top-heavy minimum will offset Employer Profit Sharing Contributions, if any, made pursuant to Part D above. Option 1 selected for participants entitled to receive minimum allocation: Participants who are not Key Employees.",
+        "value": "Top Heavy contributions to eligible Non-Key employees employed on last day of plan year"
+      },
+      "top_heavy_elections_other_specify": {
+        "_confidence": "red",
+        "_raw_text": null,
+        "value": null
+      }
     }
   },
   "workflow_schema_hash": "440d6a1064202a8a2e1fcff746dcc7b132d0e1117b0ab1212da3cee07dc28725"

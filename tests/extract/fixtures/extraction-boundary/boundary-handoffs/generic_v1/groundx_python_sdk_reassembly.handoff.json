@@ -1,1213 +1,989 @@
 {
+  "certification_eligible": true,
   "diagnostics": [],
+  "evidence_level": "reviewed_deterministic_model_fixture",
   "final_output": {
-    "generic_attr_01": "generic_v1_generic_attr_01_1",
-    "generic_attr_02": "generic_v1_generic_attr_02_1",
-    "generic_attr_03": "generic_v1_generic_attr_03_1",
-    "generic_attr_04": "generic_v1_generic_attr_04_1",
-    "generic_attr_05": "generic_v1_generic_attr_05_1",
-    "generic_attr_06": "generic_v1_generic_attr_06_1",
-    "generic_attr_07": "generic_v1_generic_attr_07_1",
-    "generic_attr_08": "generic_v1_generic_attr_08_1",
-    "generic_attr_09": "generic_v1_generic_attr_09_1",
-    "generic_attr_10": "generic_v1_generic_attr_10_1",
-    "generic_attr_11": "generic_v1_generic_attr_11_1",
-    "generic_attr_12": "generic_v1_generic_attr_12_1",
-    "generic_attr_13": "generic_v1_generic_attr_13_1",
-    "generic_attr_14": "generic_v1_generic_attr_14_1",
+    "generic_attr_01": "blank reviewed expected value for generic_attr_01",
+    "generic_attr_02": 7613.2,
+    "generic_attr_03": "currency_dollars",
+    "generic_attr_04": "2025-07-30",
+    "generic_attr_05": "10295809",
+    "generic_attr_06": "blank reviewed expected value for generic_attr_06",
+    "generic_attr_07": "blank reviewed expected value for generic_attr_07",
+    "generic_attr_08": "City of Windom",
+    "generic_attr_09": "KWIK TRIP (1147)",
+    "generic_attr_10": "Direct",
+    "generic_attr_11": "statement_type_bill",
+    "generic_attr_12": "blank reviewed expected value for generic_attr_12",
+    "generic_attr_13": "2025-07-08",
+    "generic_attr_14": 7613.2,
     "generic_group_b": [
       {
-        "generic_attr_08": "generic_attr_08_parent_1",
-        "generic_attr_09": "generic_v1_generic_attr_09_1",
-        "generic_attr_12": "generic_v1_generic_attr_12_1",
-        "generic_attr_15": "generic_v1_generic_attr_15_1",
-        "generic_attr_16": "generic_v1_generic_attr_16_1",
-        "generic_attr_17": "generic_v1_generic_attr_17_1",
-        "generic_attr_18": "generic_attr_18_parent_1",
-        "generic_attr_19": "generic_v1_generic_attr_19_1",
-        "generic_attr_20": "generic_v1_generic_attr_20_1",
-        "generic_attr_21": "generic_v1_generic_attr_21_1",
-        "generic_attr_22": "generic_v1_generic_attr_22_1",
-        "generic_attr_23": "generic_attr_23_parent_1",
-        "generic_attr_24": "generic_v1_generic_attr_24_1",
-        "generic_attr_25": "generic_v1_generic_attr_25_1",
-        "generic_attr_26": "generic_v1_generic_attr_26_1",
-        "generic_attr_27": "generic_v1_generic_attr_27_1",
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "70182657",
+        "generic_attr_23": "electric",
+        "generic_attr_24": "Industrial Electric",
+        "generic_attr_25": "kWh",
+        "generic_attr_26": 60960.0,
         "generic_group_c": [
           {
-            "generic_attr_08": "generic_attr_08_parent_1",
-            "generic_attr_18": "generic_attr_18_parent_1",
-            "generic_attr_23": "generic_attr_23_parent_1",
-            "generic_attr_28": "generic_v1_generic_attr_28_1",
-            "generic_attr_29": "generic_v1_generic_attr_29_1",
-            "generic_attr_30": "generic_v1_generic_attr_30_1"
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 55.0,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Industrial Energy Electric"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_1",
-            "generic_attr_18": "generic_attr_18_parent_1",
-            "generic_attr_23": "generic_attr_23_parent_1",
-            "generic_attr_28": "generic_v1_generic_attr_28_9",
-            "generic_attr_29": "generic_v1_generic_attr_29_9",
-            "generic_attr_30": "generic_v1_generic_attr_30_9"
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 2560.32,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Consumption"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_1",
-            "generic_attr_18": "generic_attr_18_parent_1",
-            "generic_attr_23": "generic_attr_23_parent_1",
-            "generic_attr_28": "generic_v1_generic_attr_28_17",
-            "generic_attr_29": "generic_v1_generic_attr_29_17",
-            "generic_attr_30": "generic_v1_generic_attr_30_17"
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 2218.75,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Demand"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_1",
-            "generic_attr_18": "generic_attr_18_parent_1",
-            "generic_attr_23": "generic_attr_23_parent_1",
-            "generic_attr_28": "generic_v1_generic_attr_28_25",
-            "generic_attr_29": "generic_v1_generic_attr_29_25",
-            "generic_attr_30": "generic_v1_generic_attr_30_25"
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 106.68,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Power Cost Adjustment - $.00175wh (S)"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_1",
-            "generic_attr_18": "generic_attr_18_parent_1",
-            "generic_attr_23": "generic_attr_23_parent_1",
-            "generic_attr_28": "generic_v1_generic_attr_28_33",
-            "generic_attr_29": "generic_v1_generic_attr_29_33",
-            "generic_attr_30": "generic_v1_generic_attr_30_33"
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 2.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN Sales Tax"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_1",
-            "generic_attr_18": "generic_attr_18_parent_1",
-            "generic_attr_23": "generic_attr_23_parent_1",
-            "generic_attr_28": "generic_v1_generic_attr_28_41",
-            "generic_attr_29": "generic_v1_generic_attr_29_41",
-            "generic_attr_30": "generic_v1_generic_attr_30_41"
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 249.74,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN State Tax on Usage"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_1",
-            "generic_attr_18": "generic_attr_18_parent_1",
-            "generic_attr_23": "generic_attr_23_parent_1",
-            "generic_attr_28": "generic_v1_generic_attr_28_49",
-            "generic_attr_29": "generic_v1_generic_attr_29_49",
-            "generic_attr_30": "generic_v1_generic_attr_30_49"
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 55.0,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Industrial Energy Electric"
+          },
+          {
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 2560.32,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Consumption"
+          },
+          {
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 2218.75,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Demand"
+          },
+          {
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 106.68,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Power Cost Adjustment - $.00175wh (S)"
+          },
+          {
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 2.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN Sales Tax"
+          },
+          {
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 249.74,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN State Tax on Usage"
           }
         ]
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_2",
-        "generic_attr_09": "generic_v1_generic_attr_09_2",
-        "generic_attr_12": "generic_v1_generic_attr_12_2",
-        "generic_attr_15": "generic_v1_generic_attr_15_2",
-        "generic_attr_16": "generic_v1_generic_attr_16_2",
-        "generic_attr_17": "generic_v1_generic_attr_17_2",
-        "generic_attr_18": "generic_attr_18_parent_2",
-        "generic_attr_19": "generic_v1_generic_attr_19_2",
-        "generic_attr_20": "generic_v1_generic_attr_20_2",
-        "generic_attr_21": "generic_v1_generic_attr_21_2",
-        "generic_attr_22": "generic_v1_generic_attr_22_2",
-        "generic_attr_23": "generic_attr_23_parent_2",
-        "generic_attr_24": "generic_v1_generic_attr_24_2",
-        "generic_attr_25": "generic_v1_generic_attr_25_2",
-        "generic_attr_26": "generic_v1_generic_attr_26_2",
-        "generic_attr_27": "generic_v1_generic_attr_27_2",
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "89321458",
+        "generic_attr_23": "water",
+        "generic_attr_24": "Commercial Water",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 42303.0,
         "generic_group_c": [
           {
-            "generic_attr_08": "generic_attr_08_parent_2",
-            "generic_attr_18": "generic_attr_18_parent_2",
-            "generic_attr_23": "generic_attr_23_parent_2",
-            "generic_attr_28": "generic_v1_generic_attr_28_2",
-            "generic_attr_29": "generic_v1_generic_attr_29_2",
-            "generic_attr_30": "generic_v1_generic_attr_30_2"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "water",
+            "generic_attr_28": 18.43,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water Minimum Charge"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_2",
-            "generic_attr_18": "generic_attr_18_parent_2",
-            "generic_attr_23": "generic_attr_23_parent_2",
-            "generic_attr_28": "generic_v1_generic_attr_28_10",
-            "generic_attr_29": "generic_v1_generic_attr_29_10",
-            "generic_attr_30": "generic_v1_generic_attr_30_10"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "water",
+            "generic_attr_28": 223.32,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_2",
-            "generic_attr_18": "generic_attr_18_parent_2",
-            "generic_attr_23": "generic_attr_23_parent_2",
-            "generic_attr_28": "generic_v1_generic_attr_28_18",
-            "generic_attr_29": "generic_v1_generic_attr_29_18",
-            "generic_attr_30": "generic_v1_generic_attr_30_18"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "water",
+            "generic_attr_28": 0.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "State Water Surcharge"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_2",
-            "generic_attr_18": "generic_attr_18_parent_2",
-            "generic_attr_23": "generic_attr_23_parent_2",
-            "generic_attr_28": "generic_v1_generic_attr_28_26",
-            "generic_attr_29": "generic_v1_generic_attr_29_26",
-            "generic_attr_30": "generic_v1_generic_attr_30_26"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "water",
+            "generic_attr_28": 18.43,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water Minimum Charge"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_2",
-            "generic_attr_18": "generic_attr_18_parent_2",
-            "generic_attr_23": "generic_attr_23_parent_2",
-            "generic_attr_28": "generic_v1_generic_attr_28_34",
-            "generic_attr_29": "generic_v1_generic_attr_29_34",
-            "generic_attr_30": "generic_v1_generic_attr_30_34"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "water",
+            "generic_attr_28": 223.32,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_2",
-            "generic_attr_18": "generic_attr_18_parent_2",
-            "generic_attr_23": "generic_attr_23_parent_2",
-            "generic_attr_28": "generic_v1_generic_attr_28_42",
-            "generic_attr_29": "generic_v1_generic_attr_29_42",
-            "generic_attr_30": "generic_v1_generic_attr_30_42"
-          },
-          {
-            "generic_attr_08": "generic_attr_08_parent_2",
-            "generic_attr_18": "generic_attr_18_parent_2",
-            "generic_attr_23": "generic_attr_23_parent_2",
-            "generic_attr_28": "generic_v1_generic_attr_28_50",
-            "generic_attr_29": "generic_v1_generic_attr_29_50",
-            "generic_attr_30": "generic_v1_generic_attr_30_50"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "water",
+            "generic_attr_28": 0.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "State Water Surcharge"
           }
         ]
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_3",
-        "generic_attr_09": "generic_v1_generic_attr_09_3",
-        "generic_attr_12": "generic_v1_generic_attr_12_3",
-        "generic_attr_15": "generic_v1_generic_attr_15_3",
-        "generic_attr_16": "generic_v1_generic_attr_16_3",
-        "generic_attr_17": "generic_v1_generic_attr_17_3",
-        "generic_attr_18": "generic_attr_18_parent_3",
-        "generic_attr_19": "generic_v1_generic_attr_19_3",
-        "generic_attr_20": "generic_v1_generic_attr_20_3",
-        "generic_attr_21": "generic_v1_generic_attr_21_3",
-        "generic_attr_22": "generic_v1_generic_attr_22_3",
-        "generic_attr_23": "generic_attr_23_parent_3",
-        "generic_attr_24": "generic_v1_generic_attr_24_3",
-        "generic_attr_25": "generic_v1_generic_attr_25_3",
-        "generic_attr_26": "generic_v1_generic_attr_26_3",
-        "generic_attr_27": "generic_v1_generic_attr_27_3",
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "89321458",
+        "generic_attr_23": "sewer",
+        "generic_attr_24": "Commercial Sewer",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 42303.0,
         "generic_group_c": [
           {
-            "generic_attr_08": "generic_attr_08_parent_3",
-            "generic_attr_18": "generic_attr_18_parent_3",
-            "generic_attr_23": "generic_attr_23_parent_3",
-            "generic_attr_28": "generic_v1_generic_attr_28_3",
-            "generic_attr_29": "generic_v1_generic_attr_29_3",
-            "generic_attr_30": "generic_v1_generic_attr_30_3"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 40.61,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer Minimum Charge"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_3",
-            "generic_attr_18": "generic_attr_18_parent_3",
-            "generic_attr_23": "generic_attr_23_parent_3",
-            "generic_attr_28": "generic_v1_generic_attr_28_11",
-            "generic_attr_29": "generic_v1_generic_attr_29_11",
-            "generic_attr_30": "generic_v1_generic_attr_30_11"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 275.39,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_3",
-            "generic_attr_18": "generic_attr_18_parent_3",
-            "generic_attr_23": "generic_attr_23_parent_3",
-            "generic_attr_28": "generic_v1_generic_attr_28_19",
-            "generic_attr_29": "generic_v1_generic_attr_29_19",
-            "generic_attr_30": "generic_v1_generic_attr_30_19"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 40.61,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer Minimum Charge"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_3",
-            "generic_attr_18": "generic_attr_18_parent_3",
-            "generic_attr_23": "generic_attr_23_parent_3",
-            "generic_attr_28": "generic_v1_generic_attr_28_27",
-            "generic_attr_29": "generic_v1_generic_attr_29_27",
-            "generic_attr_30": "generic_v1_generic_attr_30_27"
-          },
-          {
-            "generic_attr_08": "generic_attr_08_parent_3",
-            "generic_attr_18": "generic_attr_18_parent_3",
-            "generic_attr_23": "generic_attr_23_parent_3",
-            "generic_attr_28": "generic_v1_generic_attr_28_35",
-            "generic_attr_29": "generic_v1_generic_attr_29_35",
-            "generic_attr_30": "generic_v1_generic_attr_30_35"
-          },
-          {
-            "generic_attr_08": "generic_attr_08_parent_3",
-            "generic_attr_18": "generic_attr_18_parent_3",
-            "generic_attr_23": "generic_attr_23_parent_3",
-            "generic_attr_28": "generic_v1_generic_attr_28_43",
-            "generic_attr_29": "generic_v1_generic_attr_29_43",
-            "generic_attr_30": "generic_v1_generic_attr_30_43"
-          },
-          {
-            "generic_attr_08": "generic_attr_08_parent_3",
-            "generic_attr_18": "generic_attr_18_parent_3",
-            "generic_attr_23": "generic_attr_23_parent_3",
-            "generic_attr_28": "generic_v1_generic_attr_28_51",
-            "generic_attr_29": "generic_v1_generic_attr_29_51",
-            "generic_attr_30": "generic_v1_generic_attr_30_51"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 275.39,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer"
           }
         ]
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_4",
-        "generic_attr_09": "generic_v1_generic_attr_09_4",
-        "generic_attr_12": "generic_v1_generic_attr_12_4",
-        "generic_attr_15": "generic_v1_generic_attr_15_4",
-        "generic_attr_16": "generic_v1_generic_attr_16_4",
-        "generic_attr_17": "generic_v1_generic_attr_17_4",
-        "generic_attr_18": "generic_attr_18_parent_4",
-        "generic_attr_19": "generic_v1_generic_attr_19_4",
-        "generic_attr_20": "generic_v1_generic_attr_20_4",
-        "generic_attr_21": "generic_v1_generic_attr_21_4",
-        "generic_attr_22": "generic_v1_generic_attr_22_4",
-        "generic_attr_23": "generic_attr_23_parent_4",
-        "generic_attr_24": "generic_v1_generic_attr_24_4",
-        "generic_attr_25": "generic_v1_generic_attr_25_4",
-        "generic_attr_26": "generic_v1_generic_attr_26_4",
-        "generic_attr_27": "generic_v1_generic_attr_27_4",
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "89321459",
+        "generic_attr_23": "water",
+        "generic_attr_24": "Commercial Water",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 40356.0,
         "generic_group_c": [
           {
-            "generic_attr_08": "generic_attr_08_parent_4",
-            "generic_attr_18": "generic_attr_18_parent_4",
-            "generic_attr_23": "generic_attr_23_parent_4",
-            "generic_attr_28": "generic_v1_generic_attr_28_4",
-            "generic_attr_29": "generic_v1_generic_attr_29_4",
-            "generic_attr_30": "generic_v1_generic_attr_30_4"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "water",
+            "generic_attr_28": 18.43,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water Minimum Charge"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_4",
-            "generic_attr_18": "generic_attr_18_parent_4",
-            "generic_attr_23": "generic_attr_23_parent_4",
-            "generic_attr_28": "generic_v1_generic_attr_28_12",
-            "generic_attr_29": "generic_v1_generic_attr_29_12",
-            "generic_attr_30": "generic_v1_generic_attr_30_12"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "water",
+            "generic_attr_28": 212.19,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_4",
-            "generic_attr_18": "generic_attr_18_parent_4",
-            "generic_attr_23": "generic_attr_23_parent_4",
-            "generic_attr_28": "generic_v1_generic_attr_28_20",
-            "generic_attr_29": "generic_v1_generic_attr_29_20",
-            "generic_attr_30": "generic_v1_generic_attr_30_20"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "water",
+            "generic_attr_28": 0.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "State Water Surcharge"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_4",
-            "generic_attr_18": "generic_attr_18_parent_4",
-            "generic_attr_23": "generic_attr_23_parent_4",
-            "generic_attr_28": "generic_v1_generic_attr_28_28",
-            "generic_attr_29": "generic_v1_generic_attr_29_28",
-            "generic_attr_30": "generic_v1_generic_attr_30_28"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "water",
+            "generic_attr_28": 18.43,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water Minimum Charge"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_4",
-            "generic_attr_18": "generic_attr_18_parent_4",
-            "generic_attr_23": "generic_attr_23_parent_4",
-            "generic_attr_28": "generic_v1_generic_attr_28_36",
-            "generic_attr_29": "generic_v1_generic_attr_29_36",
-            "generic_attr_30": "generic_v1_generic_attr_30_36"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "water",
+            "generic_attr_28": 212.19,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_4",
-            "generic_attr_18": "generic_attr_18_parent_4",
-            "generic_attr_23": "generic_attr_23_parent_4",
-            "generic_attr_28": "generic_v1_generic_attr_28_44",
-            "generic_attr_29": "generic_v1_generic_attr_29_44",
-            "generic_attr_30": "generic_v1_generic_attr_30_44"
-          },
-          {
-            "generic_attr_08": "generic_attr_08_parent_4",
-            "generic_attr_18": "generic_attr_18_parent_4",
-            "generic_attr_23": "generic_attr_23_parent_4",
-            "generic_attr_28": "generic_v1_generic_attr_28_52",
-            "generic_attr_29": "generic_v1_generic_attr_29_52",
-            "generic_attr_30": "generic_v1_generic_attr_30_52"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "water",
+            "generic_attr_28": 0.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "State Water Surcharge"
           }
         ]
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_5",
-        "generic_attr_09": "generic_v1_generic_attr_09_5",
-        "generic_attr_12": "generic_v1_generic_attr_12_5",
-        "generic_attr_15": "generic_v1_generic_attr_15_5",
-        "generic_attr_16": "generic_v1_generic_attr_16_5",
-        "generic_attr_17": "generic_v1_generic_attr_17_5",
-        "generic_attr_18": "generic_attr_18_parent_5",
-        "generic_attr_19": "generic_v1_generic_attr_19_5",
-        "generic_attr_20": "generic_v1_generic_attr_20_5",
-        "generic_attr_21": "generic_v1_generic_attr_21_5",
-        "generic_attr_22": "generic_v1_generic_attr_22_5",
-        "generic_attr_23": "generic_attr_23_parent_5",
-        "generic_attr_24": "generic_v1_generic_attr_24_5",
-        "generic_attr_25": "generic_v1_generic_attr_25_5",
-        "generic_attr_26": "generic_v1_generic_attr_26_5",
-        "generic_attr_27": "generic_v1_generic_attr_27_5",
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "89321459",
+        "generic_attr_23": "sewer",
+        "generic_attr_24": "Commercial Sewer",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 40356.0,
         "generic_group_c": [
           {
-            "generic_attr_08": "generic_attr_08_parent_5",
-            "generic_attr_18": "generic_attr_18_parent_5",
-            "generic_attr_23": "generic_attr_23_parent_5",
-            "generic_attr_28": "generic_v1_generic_attr_28_5",
-            "generic_attr_29": "generic_v1_generic_attr_29_5",
-            "generic_attr_30": "generic_v1_generic_attr_30_5"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 40.61,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer Minimum Charge"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_5",
-            "generic_attr_18": "generic_attr_18_parent_5",
-            "generic_attr_23": "generic_attr_23_parent_5",
-            "generic_attr_28": "generic_v1_generic_attr_28_13",
-            "generic_attr_29": "generic_v1_generic_attr_29_13",
-            "generic_attr_30": "generic_v1_generic_attr_30_13"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 262.71,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_5",
-            "generic_attr_18": "generic_attr_18_parent_5",
-            "generic_attr_23": "generic_attr_23_parent_5",
-            "generic_attr_28": "generic_v1_generic_attr_28_21",
-            "generic_attr_29": "generic_v1_generic_attr_29_21",
-            "generic_attr_30": "generic_v1_generic_attr_30_21"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 40.61,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer Minimum Charge"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_5",
-            "generic_attr_18": "generic_attr_18_parent_5",
-            "generic_attr_23": "generic_attr_23_parent_5",
-            "generic_attr_28": "generic_v1_generic_attr_28_29",
-            "generic_attr_29": "generic_v1_generic_attr_29_29",
-            "generic_attr_30": "generic_v1_generic_attr_30_29"
-          },
-          {
-            "generic_attr_08": "generic_attr_08_parent_5",
-            "generic_attr_18": "generic_attr_18_parent_5",
-            "generic_attr_23": "generic_attr_23_parent_5",
-            "generic_attr_28": "generic_v1_generic_attr_28_37",
-            "generic_attr_29": "generic_v1_generic_attr_29_37",
-            "generic_attr_30": "generic_v1_generic_attr_30_37"
-          },
-          {
-            "generic_attr_08": "generic_attr_08_parent_5",
-            "generic_attr_18": "generic_attr_18_parent_5",
-            "generic_attr_23": "generic_attr_23_parent_5",
-            "generic_attr_28": "generic_v1_generic_attr_28_45",
-            "generic_attr_29": "generic_v1_generic_attr_29_45",
-            "generic_attr_30": "generic_v1_generic_attr_30_45"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 262.71,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer"
           }
         ]
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_6",
-        "generic_attr_09": "generic_v1_generic_attr_09_6",
-        "generic_attr_12": "generic_v1_generic_attr_12_6",
-        "generic_attr_15": "generic_v1_generic_attr_15_6",
-        "generic_attr_16": "generic_v1_generic_attr_16_6",
-        "generic_attr_17": "generic_v1_generic_attr_17_6",
-        "generic_attr_18": "generic_attr_18_parent_6",
-        "generic_attr_19": "generic_v1_generic_attr_19_6",
-        "generic_attr_20": "generic_v1_generic_attr_20_6",
-        "generic_attr_21": "generic_v1_generic_attr_21_6",
-        "generic_attr_22": "generic_v1_generic_attr_22_6",
-        "generic_attr_23": "generic_attr_23_parent_6",
-        "generic_attr_24": "generic_v1_generic_attr_24_6",
-        "generic_attr_25": "generic_v1_generic_attr_25_6",
-        "generic_attr_26": "generic_v1_generic_attr_26_6",
-        "generic_attr_27": "generic_v1_generic_attr_27_6",
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "91496724",
+        "generic_attr_23": "irrigation",
+        "generic_attr_24": "Commercial Water",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 96600.0,
         "generic_group_c": [
           {
-            "generic_attr_08": "generic_attr_08_parent_6",
-            "generic_attr_18": "generic_attr_18_parent_6",
-            "generic_attr_23": "generic_attr_23_parent_6",
-            "generic_attr_28": "generic_v1_generic_attr_28_6",
-            "generic_attr_29": "generic_v1_generic_attr_29_6",
-            "generic_attr_30": "generic_v1_generic_attr_30_6"
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 18.43,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water Minimum Charge"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_6",
-            "generic_attr_18": "generic_attr_18_parent_6",
-            "generic_attr_23": "generic_attr_23_parent_6",
-            "generic_attr_28": "generic_v1_generic_attr_28_14",
-            "generic_attr_29": "generic_v1_generic_attr_29_14",
-            "generic_attr_30": "generic_v1_generic_attr_30_14"
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 533.9,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_6",
-            "generic_attr_18": "generic_attr_18_parent_6",
-            "generic_attr_23": "generic_attr_23_parent_6",
-            "generic_attr_28": "generic_v1_generic_attr_28_22",
-            "generic_attr_29": "generic_v1_generic_attr_29_22",
-            "generic_attr_30": "generic_v1_generic_attr_30_22"
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 1.27,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN Sales Tax"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_6",
-            "generic_attr_18": "generic_attr_18_parent_6",
-            "generic_attr_23": "generic_attr_23_parent_6",
-            "generic_attr_28": "generic_v1_generic_attr_28_30",
-            "generic_attr_29": "generic_v1_generic_attr_29_30",
-            "generic_attr_30": "generic_v1_generic_attr_30_30"
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 36.71,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN State Tax on Usage"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_6",
-            "generic_attr_18": "generic_attr_18_parent_6",
-            "generic_attr_23": "generic_attr_23_parent_6",
-            "generic_attr_28": "generic_v1_generic_attr_28_38",
-            "generic_attr_29": "generic_v1_generic_attr_29_38",
-            "generic_attr_30": "generic_v1_generic_attr_30_38"
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 0.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "State Water Surcharge"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_6",
-            "generic_attr_18": "generic_attr_18_parent_6",
-            "generic_attr_23": "generic_attr_23_parent_6",
-            "generic_attr_28": "generic_v1_generic_attr_28_46",
-            "generic_attr_29": "generic_v1_generic_attr_29_46",
-            "generic_attr_30": "generic_v1_generic_attr_30_46"
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 18.43,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water Minimum Charge"
+          },
+          {
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 533.9,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water"
+          },
+          {
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 1.27,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN Sales Tax"
+          },
+          {
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 36.71,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN State Tax on Usage"
+          },
+          {
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 0.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "State Water Surcharge"
           }
         ]
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_7",
-        "generic_attr_09": "generic_v1_generic_attr_09_7",
-        "generic_attr_12": "generic_v1_generic_attr_12_7",
-        "generic_attr_15": "generic_v1_generic_attr_15_7",
-        "generic_attr_16": "generic_v1_generic_attr_16_7",
-        "generic_attr_17": "generic_v1_generic_attr_17_7",
-        "generic_attr_18": "generic_attr_18_parent_7",
-        "generic_attr_19": "generic_v1_generic_attr_19_7",
-        "generic_attr_20": "generic_v1_generic_attr_20_7",
-        "generic_attr_21": "generic_v1_generic_attr_21_7",
-        "generic_attr_22": "generic_v1_generic_attr_22_7",
-        "generic_attr_23": "generic_attr_23_parent_7",
-        "generic_attr_24": "generic_v1_generic_attr_24_7",
-        "generic_attr_25": "generic_v1_generic_attr_25_7",
-        "generic_attr_26": "generic_v1_generic_attr_26_7",
-        "generic_attr_27": "generic_v1_generic_attr_27_7",
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "91496726",
+        "generic_attr_23": "water",
+        "generic_attr_24": "Commercial Water",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 55000.0,
         "generic_group_c": [
           {
-            "generic_attr_08": "generic_attr_08_parent_7",
-            "generic_attr_18": "generic_attr_18_parent_7",
-            "generic_attr_23": "generic_attr_23_parent_7",
-            "generic_attr_28": "generic_v1_generic_attr_28_7",
-            "generic_attr_29": "generic_v1_generic_attr_29_7",
-            "generic_attr_30": "generic_v1_generic_attr_30_7"
+            "generic_attr_18": "91496726",
+            "generic_attr_23": "water",
+            "generic_attr_28": 18.43,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water Minimum Charge"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_7",
-            "generic_attr_18": "generic_attr_18_parent_7",
-            "generic_attr_23": "generic_attr_23_parent_7",
-            "generic_attr_28": "generic_v1_generic_attr_28_15",
-            "generic_attr_29": "generic_v1_generic_attr_29_15",
-            "generic_attr_30": "generic_v1_generic_attr_30_15"
+            "generic_attr_18": "91496726",
+            "generic_attr_23": "water",
+            "generic_attr_28": 295.95,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_7",
-            "generic_attr_18": "generic_attr_18_parent_7",
-            "generic_attr_23": "generic_attr_23_parent_7",
-            "generic_attr_28": "generic_v1_generic_attr_28_23",
-            "generic_attr_29": "generic_v1_generic_attr_29_23",
-            "generic_attr_30": "generic_v1_generic_attr_30_23"
+            "generic_attr_18": "91496726",
+            "generic_attr_23": "water",
+            "generic_attr_28": 20.35,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN State Tax on Usage"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_7",
-            "generic_attr_18": "generic_attr_18_parent_7",
-            "generic_attr_23": "generic_attr_23_parent_7",
-            "generic_attr_28": "generic_v1_generic_attr_28_31",
-            "generic_attr_29": "generic_v1_generic_attr_29_31",
-            "generic_attr_30": "generic_v1_generic_attr_30_31"
+            "generic_attr_18": "91496726",
+            "generic_attr_23": "water",
+            "generic_attr_28": 1.27,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN Sales Tax"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_7",
-            "generic_attr_18": "generic_attr_18_parent_7",
-            "generic_attr_23": "generic_attr_23_parent_7",
-            "generic_attr_28": "generic_v1_generic_attr_28_39",
-            "generic_attr_29": "generic_v1_generic_attr_29_39",
-            "generic_attr_30": "generic_v1_generic_attr_30_39"
+            "generic_attr_18": "91496726",
+            "generic_attr_23": "water",
+            "generic_attr_28": 0.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "State Water Surcharge"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_7",
-            "generic_attr_18": "generic_attr_18_parent_7",
-            "generic_attr_23": "generic_attr_23_parent_7",
-            "generic_attr_28": "generic_v1_generic_attr_28_47",
-            "generic_attr_29": "generic_v1_generic_attr_29_47",
-            "generic_attr_30": "generic_v1_generic_attr_30_47"
+            "generic_attr_18": "91496726",
+            "generic_attr_23": "water",
+            "generic_attr_28": 18.43,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water Minimum Charge"
           }
         ]
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_8",
-        "generic_attr_09": "generic_v1_generic_attr_09_8",
-        "generic_attr_12": "generic_v1_generic_attr_12_8",
-        "generic_attr_15": "generic_v1_generic_attr_15_8",
-        "generic_attr_16": "generic_v1_generic_attr_16_8",
-        "generic_attr_17": "generic_v1_generic_attr_17_8",
-        "generic_attr_18": "generic_attr_18_parent_8",
-        "generic_attr_19": "generic_v1_generic_attr_19_8",
-        "generic_attr_20": "generic_v1_generic_attr_20_8",
-        "generic_attr_21": "generic_v1_generic_attr_21_8",
-        "generic_attr_22": "generic_v1_generic_attr_22_8",
-        "generic_attr_23": "generic_attr_23_parent_8",
-        "generic_attr_24": "generic_v1_generic_attr_24_8",
-        "generic_attr_25": "generic_v1_generic_attr_25_8",
-        "generic_attr_26": "generic_v1_generic_attr_26_8",
-        "generic_attr_27": "generic_v1_generic_attr_27_8",
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "91496726",
+        "generic_attr_23": "sewer",
+        "generic_attr_24": "Commercial Sewer",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 55000.0,
         "generic_group_c": [
           {
-            "generic_attr_08": "generic_attr_08_parent_8",
-            "generic_attr_18": "generic_attr_18_parent_8",
-            "generic_attr_23": "generic_attr_23_parent_8",
-            "generic_attr_28": "generic_v1_generic_attr_28_8",
-            "generic_attr_29": "generic_v1_generic_attr_29_8",
-            "generic_attr_30": "generic_v1_generic_attr_30_8"
+            "generic_attr_18": "91496726",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 40.61,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer Minimum Charge"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_8",
-            "generic_attr_18": "generic_attr_18_parent_8",
-            "generic_attr_23": "generic_attr_23_parent_8",
-            "generic_attr_28": "generic_v1_generic_attr_28_16",
-            "generic_attr_29": "generic_v1_generic_attr_29_16",
-            "generic_attr_30": "generic_v1_generic_attr_30_16"
-          },
-          {
-            "generic_attr_08": "generic_attr_08_parent_8",
-            "generic_attr_18": "generic_attr_18_parent_8",
-            "generic_attr_23": "generic_attr_23_parent_8",
-            "generic_attr_28": "generic_v1_generic_attr_28_24",
-            "generic_attr_29": "generic_v1_generic_attr_29_24",
-            "generic_attr_30": "generic_v1_generic_attr_30_24"
-          },
-          {
-            "generic_attr_08": "generic_attr_08_parent_8",
-            "generic_attr_18": "generic_attr_18_parent_8",
-            "generic_attr_23": "generic_attr_23_parent_8",
-            "generic_attr_28": "generic_v1_generic_attr_28_32",
-            "generic_attr_29": "generic_v1_generic_attr_29_32",
-            "generic_attr_30": "generic_v1_generic_attr_30_32"
-          },
-          {
-            "generic_attr_08": "generic_attr_08_parent_8",
-            "generic_attr_18": "generic_attr_18_parent_8",
-            "generic_attr_23": "generic_attr_23_parent_8",
-            "generic_attr_28": "generic_v1_generic_attr_28_40",
-            "generic_attr_29": "generic_v1_generic_attr_29_40",
-            "generic_attr_30": "generic_v1_generic_attr_30_40"
-          },
-          {
-            "generic_attr_08": "generic_attr_08_parent_8",
-            "generic_attr_18": "generic_attr_18_parent_8",
-            "generic_attr_23": "generic_attr_23_parent_8",
-            "generic_attr_28": "generic_v1_generic_attr_28_48",
-            "generic_attr_29": "generic_v1_generic_attr_29_48",
-            "generic_attr_30": "generic_v1_generic_attr_30_48"
+            "generic_attr_18": "91496726",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 358.05,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer"
           }
         ]
       }
     ],
     "generic_group_c": [
       {
-        "generic_attr_08": "generic_attr_08_account_level",
-        "generic_attr_18": "generic_attr_18_account_level",
-        "generic_attr_23": "generic_attr_23_account_level",
-        "generic_attr_28": "generic_v1_generic_attr_28_53",
-        "generic_attr_29": "generic_v1_generic_attr_29_53",
-        "generic_attr_30": "generic_v1_generic_attr_30_53"
+        "generic_attr_28": 55.0,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Industrial Energy Electric"
       }
     ]
   },
   "input_from": "internal_arcadia_extract_chain",
-  "input_sha256": "0ec89f6883745e054cc2f9ce2344e6c67685577df4df5dd9290bcf27b971afd5",
+  "input_sha256": "f37bb47e0cb9d3cf7050d2c7301ce6dd4ef964fb6fcf79e4b4b9887c2746c5a4",
+  "model_fixture": {
+    "path": "testdata/extraction-boundary/model-fixtures/generic_v1/extract_model_outputs.json",
+    "schema_version": "internal-arcadia-boundary-model-fixture-v1",
+    "sha256": "07ac056f1628d1add21a1cfc33c5026dcf793c7a0dcb66c1835261b1be928355",
+    "source": {
+      "covered_route_count": 36,
+      "document_file_name": "arcadia.pdf",
+      "expected_answer_sha256": "a4a3ee0c4dc9f7519f50c3c4f57b5e49a37de8d2cc74e47bf63218aff5b51ec4",
+      "expected_answer_url": "https://cdn.eyelevel.ai/internal-harness/e2e-extract/generic-v1-extract.json",
+      "kind": "reviewed_expected_answer_shape_stress_projection",
+      "projection_notes": [
+        "Values come from the reviewed expected answer where present.",
+        "Blank statement scalars are filled so final-output shape gates can assert field presence.",
+        "Utility child rows are expanded from reviewed rows to exercise the 50+ charge shape.",
+        "One unmatched utility child row is added when the reviewed expected answer has no account-level charge."
+      ],
+      "record_counts_by_group": {
+        "generic_group_b": 8,
+        "generic_group_c": 51
+      },
+      "workflow_id": "generic_v1-product-path",
+      "workflow_version": "2026-07-12T22:34:02Z"
+    }
+  },
   "output_for": "internal_arcadia_save_callback",
   "relationship_output": {
-    "generic_attr_01": "generic_v1_generic_attr_01_1",
-    "generic_attr_02": "generic_v1_generic_attr_02_1",
-    "generic_attr_03": "generic_v1_generic_attr_03_1",
-    "generic_attr_04": "generic_v1_generic_attr_04_1",
-    "generic_attr_05": "generic_v1_generic_attr_05_1",
-    "generic_attr_06": "generic_v1_generic_attr_06_1",
-    "generic_attr_07": "generic_v1_generic_attr_07_1",
-    "generic_attr_08": "generic_v1_generic_attr_08_1",
-    "generic_attr_09": "generic_v1_generic_attr_09_1",
-    "generic_attr_10": "generic_v1_generic_attr_10_1",
-    "generic_attr_11": "generic_v1_generic_attr_11_1",
-    "generic_attr_12": "generic_v1_generic_attr_12_1",
-    "generic_attr_13": "generic_v1_generic_attr_13_1",
-    "generic_attr_14": "generic_v1_generic_attr_14_1",
+    "generic_attr_01": "blank reviewed expected value for generic_attr_01",
+    "generic_attr_02": 7613.2,
+    "generic_attr_03": "currency_dollars",
+    "generic_attr_04": "2025-07-30",
+    "generic_attr_05": "10295809",
+    "generic_attr_06": "blank reviewed expected value for generic_attr_06",
+    "generic_attr_07": "blank reviewed expected value for generic_attr_07",
+    "generic_attr_08": "City of Windom",
+    "generic_attr_09": "KWIK TRIP (1147)",
+    "generic_attr_10": "Direct",
+    "generic_attr_11": "statement_type_bill",
+    "generic_attr_12": "blank reviewed expected value for generic_attr_12",
+    "generic_attr_13": "2025-07-08",
+    "generic_attr_14": 7613.2,
     "generic_group_b": [
       {
-        "generic_attr_08": "generic_attr_08_parent_1",
-        "generic_attr_09": "generic_v1_generic_attr_09_1",
-        "generic_attr_12": "generic_v1_generic_attr_12_1",
-        "generic_attr_15": "generic_v1_generic_attr_15_1",
-        "generic_attr_16": "generic_v1_generic_attr_16_1",
-        "generic_attr_17": "generic_v1_generic_attr_17_1",
-        "generic_attr_18": "generic_attr_18_parent_1",
-        "generic_attr_19": "generic_v1_generic_attr_19_1",
-        "generic_attr_20": "generic_v1_generic_attr_20_1",
-        "generic_attr_21": "generic_v1_generic_attr_21_1",
-        "generic_attr_22": "generic_v1_generic_attr_22_1",
-        "generic_attr_23": "generic_attr_23_parent_1",
-        "generic_attr_24": "generic_v1_generic_attr_24_1",
-        "generic_attr_25": "generic_v1_generic_attr_25_1",
-        "generic_attr_26": "generic_v1_generic_attr_26_1",
-        "generic_attr_27": "generic_v1_generic_attr_27_1",
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "70182657",
+        "generic_attr_23": "electric",
+        "generic_attr_24": "Industrial Electric",
+        "generic_attr_25": "kWh",
+        "generic_attr_26": 60960.0,
         "generic_group_c": [
           {
-            "generic_attr_08": "generic_attr_08_parent_1",
-            "generic_attr_18": "generic_attr_18_parent_1",
-            "generic_attr_23": "generic_attr_23_parent_1",
-            "generic_attr_28": "generic_v1_generic_attr_28_1",
-            "generic_attr_29": "generic_v1_generic_attr_29_1",
-            "generic_attr_30": "generic_v1_generic_attr_30_1"
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 55.0,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Industrial Energy Electric"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_1",
-            "generic_attr_18": "generic_attr_18_parent_1",
-            "generic_attr_23": "generic_attr_23_parent_1",
-            "generic_attr_28": "generic_v1_generic_attr_28_9",
-            "generic_attr_29": "generic_v1_generic_attr_29_9",
-            "generic_attr_30": "generic_v1_generic_attr_30_9"
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 2560.32,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Consumption"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_1",
-            "generic_attr_18": "generic_attr_18_parent_1",
-            "generic_attr_23": "generic_attr_23_parent_1",
-            "generic_attr_28": "generic_v1_generic_attr_28_17",
-            "generic_attr_29": "generic_v1_generic_attr_29_17",
-            "generic_attr_30": "generic_v1_generic_attr_30_17"
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 2218.75,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Demand"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_1",
-            "generic_attr_18": "generic_attr_18_parent_1",
-            "generic_attr_23": "generic_attr_23_parent_1",
-            "generic_attr_28": "generic_v1_generic_attr_28_25",
-            "generic_attr_29": "generic_v1_generic_attr_29_25",
-            "generic_attr_30": "generic_v1_generic_attr_30_25"
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 106.68,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Power Cost Adjustment - $.00175wh (S)"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_1",
-            "generic_attr_18": "generic_attr_18_parent_1",
-            "generic_attr_23": "generic_attr_23_parent_1",
-            "generic_attr_28": "generic_v1_generic_attr_28_33",
-            "generic_attr_29": "generic_v1_generic_attr_29_33",
-            "generic_attr_30": "generic_v1_generic_attr_30_33"
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 2.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN Sales Tax"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_1",
-            "generic_attr_18": "generic_attr_18_parent_1",
-            "generic_attr_23": "generic_attr_23_parent_1",
-            "generic_attr_28": "generic_v1_generic_attr_28_41",
-            "generic_attr_29": "generic_v1_generic_attr_29_41",
-            "generic_attr_30": "generic_v1_generic_attr_30_41"
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 249.74,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN State Tax on Usage"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_1",
-            "generic_attr_18": "generic_attr_18_parent_1",
-            "generic_attr_23": "generic_attr_23_parent_1",
-            "generic_attr_28": "generic_v1_generic_attr_28_49",
-            "generic_attr_29": "generic_v1_generic_attr_29_49",
-            "generic_attr_30": "generic_v1_generic_attr_30_49"
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 55.0,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Industrial Energy Electric"
+          },
+          {
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 2560.32,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Consumption"
+          },
+          {
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 2218.75,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Demand"
+          },
+          {
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 106.68,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Power Cost Adjustment - $.00175wh (S)"
+          },
+          {
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 2.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN Sales Tax"
+          },
+          {
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 249.74,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN State Tax on Usage"
           }
         ]
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_2",
-        "generic_attr_09": "generic_v1_generic_attr_09_2",
-        "generic_attr_12": "generic_v1_generic_attr_12_2",
-        "generic_attr_15": "generic_v1_generic_attr_15_2",
-        "generic_attr_16": "generic_v1_generic_attr_16_2",
-        "generic_attr_17": "generic_v1_generic_attr_17_2",
-        "generic_attr_18": "generic_attr_18_parent_2",
-        "generic_attr_19": "generic_v1_generic_attr_19_2",
-        "generic_attr_20": "generic_v1_generic_attr_20_2",
-        "generic_attr_21": "generic_v1_generic_attr_21_2",
-        "generic_attr_22": "generic_v1_generic_attr_22_2",
-        "generic_attr_23": "generic_attr_23_parent_2",
-        "generic_attr_24": "generic_v1_generic_attr_24_2",
-        "generic_attr_25": "generic_v1_generic_attr_25_2",
-        "generic_attr_26": "generic_v1_generic_attr_26_2",
-        "generic_attr_27": "generic_v1_generic_attr_27_2",
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "89321458",
+        "generic_attr_23": "water",
+        "generic_attr_24": "Commercial Water",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 42303.0,
         "generic_group_c": [
           {
-            "generic_attr_08": "generic_attr_08_parent_2",
-            "generic_attr_18": "generic_attr_18_parent_2",
-            "generic_attr_23": "generic_attr_23_parent_2",
-            "generic_attr_28": "generic_v1_generic_attr_28_2",
-            "generic_attr_29": "generic_v1_generic_attr_29_2",
-            "generic_attr_30": "generic_v1_generic_attr_30_2"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "water",
+            "generic_attr_28": 18.43,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water Minimum Charge"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_2",
-            "generic_attr_18": "generic_attr_18_parent_2",
-            "generic_attr_23": "generic_attr_23_parent_2",
-            "generic_attr_28": "generic_v1_generic_attr_28_10",
-            "generic_attr_29": "generic_v1_generic_attr_29_10",
-            "generic_attr_30": "generic_v1_generic_attr_30_10"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "water",
+            "generic_attr_28": 223.32,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_2",
-            "generic_attr_18": "generic_attr_18_parent_2",
-            "generic_attr_23": "generic_attr_23_parent_2",
-            "generic_attr_28": "generic_v1_generic_attr_28_18",
-            "generic_attr_29": "generic_v1_generic_attr_29_18",
-            "generic_attr_30": "generic_v1_generic_attr_30_18"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "water",
+            "generic_attr_28": 0.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "State Water Surcharge"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_2",
-            "generic_attr_18": "generic_attr_18_parent_2",
-            "generic_attr_23": "generic_attr_23_parent_2",
-            "generic_attr_28": "generic_v1_generic_attr_28_26",
-            "generic_attr_29": "generic_v1_generic_attr_29_26",
-            "generic_attr_30": "generic_v1_generic_attr_30_26"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "water",
+            "generic_attr_28": 18.43,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water Minimum Charge"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_2",
-            "generic_attr_18": "generic_attr_18_parent_2",
-            "generic_attr_23": "generic_attr_23_parent_2",
-            "generic_attr_28": "generic_v1_generic_attr_28_34",
-            "generic_attr_29": "generic_v1_generic_attr_29_34",
-            "generic_attr_30": "generic_v1_generic_attr_30_34"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "water",
+            "generic_attr_28": 223.32,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_2",
-            "generic_attr_18": "generic_attr_18_parent_2",
-            "generic_attr_23": "generic_attr_23_parent_2",
-            "generic_attr_28": "generic_v1_generic_attr_28_42",
-            "generic_attr_29": "generic_v1_generic_attr_29_42",
-            "generic_attr_30": "generic_v1_generic_attr_30_42"
-          },
-          {
-            "generic_attr_08": "generic_attr_08_parent_2",
-            "generic_attr_18": "generic_attr_18_parent_2",
-            "generic_attr_23": "generic_attr_23_parent_2",
-            "generic_attr_28": "generic_v1_generic_attr_28_50",
-            "generic_attr_29": "generic_v1_generic_attr_29_50",
-            "generic_attr_30": "generic_v1_generic_attr_30_50"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "water",
+            "generic_attr_28": 0.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "State Water Surcharge"
           }
         ]
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_3",
-        "generic_attr_09": "generic_v1_generic_attr_09_3",
-        "generic_attr_12": "generic_v1_generic_attr_12_3",
-        "generic_attr_15": "generic_v1_generic_attr_15_3",
-        "generic_attr_16": "generic_v1_generic_attr_16_3",
-        "generic_attr_17": "generic_v1_generic_attr_17_3",
-        "generic_attr_18": "generic_attr_18_parent_3",
-        "generic_attr_19": "generic_v1_generic_attr_19_3",
-        "generic_attr_20": "generic_v1_generic_attr_20_3",
-        "generic_attr_21": "generic_v1_generic_attr_21_3",
-        "generic_attr_22": "generic_v1_generic_attr_22_3",
-        "generic_attr_23": "generic_attr_23_parent_3",
-        "generic_attr_24": "generic_v1_generic_attr_24_3",
-        "generic_attr_25": "generic_v1_generic_attr_25_3",
-        "generic_attr_26": "generic_v1_generic_attr_26_3",
-        "generic_attr_27": "generic_v1_generic_attr_27_3",
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "89321458",
+        "generic_attr_23": "sewer",
+        "generic_attr_24": "Commercial Sewer",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 42303.0,
         "generic_group_c": [
           {
-            "generic_attr_08": "generic_attr_08_parent_3",
-            "generic_attr_18": "generic_attr_18_parent_3",
-            "generic_attr_23": "generic_attr_23_parent_3",
-            "generic_attr_28": "generic_v1_generic_attr_28_3",
-            "generic_attr_29": "generic_v1_generic_attr_29_3",
-            "generic_attr_30": "generic_v1_generic_attr_30_3"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 40.61,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer Minimum Charge"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_3",
-            "generic_attr_18": "generic_attr_18_parent_3",
-            "generic_attr_23": "generic_attr_23_parent_3",
-            "generic_attr_28": "generic_v1_generic_attr_28_11",
-            "generic_attr_29": "generic_v1_generic_attr_29_11",
-            "generic_attr_30": "generic_v1_generic_attr_30_11"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 275.39,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_3",
-            "generic_attr_18": "generic_attr_18_parent_3",
-            "generic_attr_23": "generic_attr_23_parent_3",
-            "generic_attr_28": "generic_v1_generic_attr_28_19",
-            "generic_attr_29": "generic_v1_generic_attr_29_19",
-            "generic_attr_30": "generic_v1_generic_attr_30_19"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 40.61,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer Minimum Charge"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_3",
-            "generic_attr_18": "generic_attr_18_parent_3",
-            "generic_attr_23": "generic_attr_23_parent_3",
-            "generic_attr_28": "generic_v1_generic_attr_28_27",
-            "generic_attr_29": "generic_v1_generic_attr_29_27",
-            "generic_attr_30": "generic_v1_generic_attr_30_27"
-          },
-          {
-            "generic_attr_08": "generic_attr_08_parent_3",
-            "generic_attr_18": "generic_attr_18_parent_3",
-            "generic_attr_23": "generic_attr_23_parent_3",
-            "generic_attr_28": "generic_v1_generic_attr_28_35",
-            "generic_attr_29": "generic_v1_generic_attr_29_35",
-            "generic_attr_30": "generic_v1_generic_attr_30_35"
-          },
-          {
-            "generic_attr_08": "generic_attr_08_parent_3",
-            "generic_attr_18": "generic_attr_18_parent_3",
-            "generic_attr_23": "generic_attr_23_parent_3",
-            "generic_attr_28": "generic_v1_generic_attr_28_43",
-            "generic_attr_29": "generic_v1_generic_attr_29_43",
-            "generic_attr_30": "generic_v1_generic_attr_30_43"
-          },
-          {
-            "generic_attr_08": "generic_attr_08_parent_3",
-            "generic_attr_18": "generic_attr_18_parent_3",
-            "generic_attr_23": "generic_attr_23_parent_3",
-            "generic_attr_28": "generic_v1_generic_attr_28_51",
-            "generic_attr_29": "generic_v1_generic_attr_29_51",
-            "generic_attr_30": "generic_v1_generic_attr_30_51"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 275.39,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer"
           }
         ]
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_4",
-        "generic_attr_09": "generic_v1_generic_attr_09_4",
-        "generic_attr_12": "generic_v1_generic_attr_12_4",
-        "generic_attr_15": "generic_v1_generic_attr_15_4",
-        "generic_attr_16": "generic_v1_generic_attr_16_4",
-        "generic_attr_17": "generic_v1_generic_attr_17_4",
-        "generic_attr_18": "generic_attr_18_parent_4",
-        "generic_attr_19": "generic_v1_generic_attr_19_4",
-        "generic_attr_20": "generic_v1_generic_attr_20_4",
-        "generic_attr_21": "generic_v1_generic_attr_21_4",
-        "generic_attr_22": "generic_v1_generic_attr_22_4",
-        "generic_attr_23": "generic_attr_23_parent_4",
-        "generic_attr_24": "generic_v1_generic_attr_24_4",
-        "generic_attr_25": "generic_v1_generic_attr_25_4",
-        "generic_attr_26": "generic_v1_generic_attr_26_4",
-        "generic_attr_27": "generic_v1_generic_attr_27_4",
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "89321459",
+        "generic_attr_23": "water",
+        "generic_attr_24": "Commercial Water",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 40356.0,
         "generic_group_c": [
           {
-            "generic_attr_08": "generic_attr_08_parent_4",
-            "generic_attr_18": "generic_attr_18_parent_4",
-            "generic_attr_23": "generic_attr_23_parent_4",
-            "generic_attr_28": "generic_v1_generic_attr_28_4",
-            "generic_attr_29": "generic_v1_generic_attr_29_4",
-            "generic_attr_30": "generic_v1_generic_attr_30_4"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "water",
+            "generic_attr_28": 18.43,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water Minimum Charge"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_4",
-            "generic_attr_18": "generic_attr_18_parent_4",
-            "generic_attr_23": "generic_attr_23_parent_4",
-            "generic_attr_28": "generic_v1_generic_attr_28_12",
-            "generic_attr_29": "generic_v1_generic_attr_29_12",
-            "generic_attr_30": "generic_v1_generic_attr_30_12"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "water",
+            "generic_attr_28": 212.19,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_4",
-            "generic_attr_18": "generic_attr_18_parent_4",
-            "generic_attr_23": "generic_attr_23_parent_4",
-            "generic_attr_28": "generic_v1_generic_attr_28_20",
-            "generic_attr_29": "generic_v1_generic_attr_29_20",
-            "generic_attr_30": "generic_v1_generic_attr_30_20"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "water",
+            "generic_attr_28": 0.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "State Water Surcharge"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_4",
-            "generic_attr_18": "generic_attr_18_parent_4",
-            "generic_attr_23": "generic_attr_23_parent_4",
-            "generic_attr_28": "generic_v1_generic_attr_28_28",
-            "generic_attr_29": "generic_v1_generic_attr_29_28",
-            "generic_attr_30": "generic_v1_generic_attr_30_28"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "water",
+            "generic_attr_28": 18.43,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water Minimum Charge"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_4",
-            "generic_attr_18": "generic_attr_18_parent_4",
-            "generic_attr_23": "generic_attr_23_parent_4",
-            "generic_attr_28": "generic_v1_generic_attr_28_36",
-            "generic_attr_29": "generic_v1_generic_attr_29_36",
-            "generic_attr_30": "generic_v1_generic_attr_30_36"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "water",
+            "generic_attr_28": 212.19,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_4",
-            "generic_attr_18": "generic_attr_18_parent_4",
-            "generic_attr_23": "generic_attr_23_parent_4",
-            "generic_attr_28": "generic_v1_generic_attr_28_44",
-            "generic_attr_29": "generic_v1_generic_attr_29_44",
-            "generic_attr_30": "generic_v1_generic_attr_30_44"
-          },
-          {
-            "generic_attr_08": "generic_attr_08_parent_4",
-            "generic_attr_18": "generic_attr_18_parent_4",
-            "generic_attr_23": "generic_attr_23_parent_4",
-            "generic_attr_28": "generic_v1_generic_attr_28_52",
-            "generic_attr_29": "generic_v1_generic_attr_29_52",
-            "generic_attr_30": "generic_v1_generic_attr_30_52"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "water",
+            "generic_attr_28": 0.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "State Water Surcharge"
           }
         ]
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_5",
-        "generic_attr_09": "generic_v1_generic_attr_09_5",
-        "generic_attr_12": "generic_v1_generic_attr_12_5",
-        "generic_attr_15": "generic_v1_generic_attr_15_5",
-        "generic_attr_16": "generic_v1_generic_attr_16_5",
-        "generic_attr_17": "generic_v1_generic_attr_17_5",
-        "generic_attr_18": "generic_attr_18_parent_5",
-        "generic_attr_19": "generic_v1_generic_attr_19_5",
-        "generic_attr_20": "generic_v1_generic_attr_20_5",
-        "generic_attr_21": "generic_v1_generic_attr_21_5",
-        "generic_attr_22": "generic_v1_generic_attr_22_5",
-        "generic_attr_23": "generic_attr_23_parent_5",
-        "generic_attr_24": "generic_v1_generic_attr_24_5",
-        "generic_attr_25": "generic_v1_generic_attr_25_5",
-        "generic_attr_26": "generic_v1_generic_attr_26_5",
-        "generic_attr_27": "generic_v1_generic_attr_27_5",
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "89321459",
+        "generic_attr_23": "sewer",
+        "generic_attr_24": "Commercial Sewer",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 40356.0,
         "generic_group_c": [
           {
-            "generic_attr_08": "generic_attr_08_parent_5",
-            "generic_attr_18": "generic_attr_18_parent_5",
-            "generic_attr_23": "generic_attr_23_parent_5",
-            "generic_attr_28": "generic_v1_generic_attr_28_5",
-            "generic_attr_29": "generic_v1_generic_attr_29_5",
-            "generic_attr_30": "generic_v1_generic_attr_30_5"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 40.61,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer Minimum Charge"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_5",
-            "generic_attr_18": "generic_attr_18_parent_5",
-            "generic_attr_23": "generic_attr_23_parent_5",
-            "generic_attr_28": "generic_v1_generic_attr_28_13",
-            "generic_attr_29": "generic_v1_generic_attr_29_13",
-            "generic_attr_30": "generic_v1_generic_attr_30_13"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 262.71,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_5",
-            "generic_attr_18": "generic_attr_18_parent_5",
-            "generic_attr_23": "generic_attr_23_parent_5",
-            "generic_attr_28": "generic_v1_generic_attr_28_21",
-            "generic_attr_29": "generic_v1_generic_attr_29_21",
-            "generic_attr_30": "generic_v1_generic_attr_30_21"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 40.61,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer Minimum Charge"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_5",
-            "generic_attr_18": "generic_attr_18_parent_5",
-            "generic_attr_23": "generic_attr_23_parent_5",
-            "generic_attr_28": "generic_v1_generic_attr_28_29",
-            "generic_attr_29": "generic_v1_generic_attr_29_29",
-            "generic_attr_30": "generic_v1_generic_attr_30_29"
-          },
-          {
-            "generic_attr_08": "generic_attr_08_parent_5",
-            "generic_attr_18": "generic_attr_18_parent_5",
-            "generic_attr_23": "generic_attr_23_parent_5",
-            "generic_attr_28": "generic_v1_generic_attr_28_37",
-            "generic_attr_29": "generic_v1_generic_attr_29_37",
-            "generic_attr_30": "generic_v1_generic_attr_30_37"
-          },
-          {
-            "generic_attr_08": "generic_attr_08_parent_5",
-            "generic_attr_18": "generic_attr_18_parent_5",
-            "generic_attr_23": "generic_attr_23_parent_5",
-            "generic_attr_28": "generic_v1_generic_attr_28_45",
-            "generic_attr_29": "generic_v1_generic_attr_29_45",
-            "generic_attr_30": "generic_v1_generic_attr_30_45"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 262.71,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer"
           }
         ]
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_6",
-        "generic_attr_09": "generic_v1_generic_attr_09_6",
-        "generic_attr_12": "generic_v1_generic_attr_12_6",
-        "generic_attr_15": "generic_v1_generic_attr_15_6",
-        "generic_attr_16": "generic_v1_generic_attr_16_6",
-        "generic_attr_17": "generic_v1_generic_attr_17_6",
-        "generic_attr_18": "generic_attr_18_parent_6",
-        "generic_attr_19": "generic_v1_generic_attr_19_6",
-        "generic_attr_20": "generic_v1_generic_attr_20_6",
-        "generic_attr_21": "generic_v1_generic_attr_21_6",
-        "generic_attr_22": "generic_v1_generic_attr_22_6",
-        "generic_attr_23": "generic_attr_23_parent_6",
-        "generic_attr_24": "generic_v1_generic_attr_24_6",
-        "generic_attr_25": "generic_v1_generic_attr_25_6",
-        "generic_attr_26": "generic_v1_generic_attr_26_6",
-        "generic_attr_27": "generic_v1_generic_attr_27_6",
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "91496724",
+        "generic_attr_23": "irrigation",
+        "generic_attr_24": "Commercial Water",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 96600.0,
         "generic_group_c": [
           {
-            "generic_attr_08": "generic_attr_08_parent_6",
-            "generic_attr_18": "generic_attr_18_parent_6",
-            "generic_attr_23": "generic_attr_23_parent_6",
-            "generic_attr_28": "generic_v1_generic_attr_28_6",
-            "generic_attr_29": "generic_v1_generic_attr_29_6",
-            "generic_attr_30": "generic_v1_generic_attr_30_6"
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 18.43,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water Minimum Charge"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_6",
-            "generic_attr_18": "generic_attr_18_parent_6",
-            "generic_attr_23": "generic_attr_23_parent_6",
-            "generic_attr_28": "generic_v1_generic_attr_28_14",
-            "generic_attr_29": "generic_v1_generic_attr_29_14",
-            "generic_attr_30": "generic_v1_generic_attr_30_14"
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 533.9,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_6",
-            "generic_attr_18": "generic_attr_18_parent_6",
-            "generic_attr_23": "generic_attr_23_parent_6",
-            "generic_attr_28": "generic_v1_generic_attr_28_22",
-            "generic_attr_29": "generic_v1_generic_attr_29_22",
-            "generic_attr_30": "generic_v1_generic_attr_30_22"
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 1.27,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN Sales Tax"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_6",
-            "generic_attr_18": "generic_attr_18_parent_6",
-            "generic_attr_23": "generic_attr_23_parent_6",
-            "generic_attr_28": "generic_v1_generic_attr_28_30",
-            "generic_attr_29": "generic_v1_generic_attr_29_30",
-            "generic_attr_30": "generic_v1_generic_attr_30_30"
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 36.71,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN State Tax on Usage"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_6",
-            "generic_attr_18": "generic_attr_18_parent_6",
-            "generic_attr_23": "generic_attr_23_parent_6",
-            "generic_attr_28": "generic_v1_generic_attr_28_38",
-            "generic_attr_29": "generic_v1_generic_attr_29_38",
-            "generic_attr_30": "generic_v1_generic_attr_30_38"
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 0.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "State Water Surcharge"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_6",
-            "generic_attr_18": "generic_attr_18_parent_6",
-            "generic_attr_23": "generic_attr_23_parent_6",
-            "generic_attr_28": "generic_v1_generic_attr_28_46",
-            "generic_attr_29": "generic_v1_generic_attr_29_46",
-            "generic_attr_30": "generic_v1_generic_attr_30_46"
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 18.43,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water Minimum Charge"
+          },
+          {
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 533.9,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water"
+          },
+          {
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 1.27,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN Sales Tax"
+          },
+          {
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 36.71,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN State Tax on Usage"
+          },
+          {
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 0.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "State Water Surcharge"
           }
         ]
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_7",
-        "generic_attr_09": "generic_v1_generic_attr_09_7",
-        "generic_attr_12": "generic_v1_generic_attr_12_7",
-        "generic_attr_15": "generic_v1_generic_attr_15_7",
-        "generic_attr_16": "generic_v1_generic_attr_16_7",
-        "generic_attr_17": "generic_v1_generic_attr_17_7",
-        "generic_attr_18": "generic_attr_18_parent_7",
-        "generic_attr_19": "generic_v1_generic_attr_19_7",
-        "generic_attr_20": "generic_v1_generic_attr_20_7",
-        "generic_attr_21": "generic_v1_generic_attr_21_7",
-        "generic_attr_22": "generic_v1_generic_attr_22_7",
-        "generic_attr_23": "generic_attr_23_parent_7",
-        "generic_attr_24": "generic_v1_generic_attr_24_7",
-        "generic_attr_25": "generic_v1_generic_attr_25_7",
-        "generic_attr_26": "generic_v1_generic_attr_26_7",
-        "generic_attr_27": "generic_v1_generic_attr_27_7",
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "91496726",
+        "generic_attr_23": "water",
+        "generic_attr_24": "Commercial Water",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 55000.0,
         "generic_group_c": [
           {
-            "generic_attr_08": "generic_attr_08_parent_7",
-            "generic_attr_18": "generic_attr_18_parent_7",
-            "generic_attr_23": "generic_attr_23_parent_7",
-            "generic_attr_28": "generic_v1_generic_attr_28_7",
-            "generic_attr_29": "generic_v1_generic_attr_29_7",
-            "generic_attr_30": "generic_v1_generic_attr_30_7"
+            "generic_attr_18": "91496726",
+            "generic_attr_23": "water",
+            "generic_attr_28": 18.43,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water Minimum Charge"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_7",
-            "generic_attr_18": "generic_attr_18_parent_7",
-            "generic_attr_23": "generic_attr_23_parent_7",
-            "generic_attr_28": "generic_v1_generic_attr_28_15",
-            "generic_attr_29": "generic_v1_generic_attr_29_15",
-            "generic_attr_30": "generic_v1_generic_attr_30_15"
+            "generic_attr_18": "91496726",
+            "generic_attr_23": "water",
+            "generic_attr_28": 295.95,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_7",
-            "generic_attr_18": "generic_attr_18_parent_7",
-            "generic_attr_23": "generic_attr_23_parent_7",
-            "generic_attr_28": "generic_v1_generic_attr_28_23",
-            "generic_attr_29": "generic_v1_generic_attr_29_23",
-            "generic_attr_30": "generic_v1_generic_attr_30_23"
+            "generic_attr_18": "91496726",
+            "generic_attr_23": "water",
+            "generic_attr_28": 20.35,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN State Tax on Usage"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_7",
-            "generic_attr_18": "generic_attr_18_parent_7",
-            "generic_attr_23": "generic_attr_23_parent_7",
-            "generic_attr_28": "generic_v1_generic_attr_28_31",
-            "generic_attr_29": "generic_v1_generic_attr_29_31",
-            "generic_attr_30": "generic_v1_generic_attr_30_31"
+            "generic_attr_18": "91496726",
+            "generic_attr_23": "water",
+            "generic_attr_28": 1.27,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN Sales Tax"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_7",
-            "generic_attr_18": "generic_attr_18_parent_7",
-            "generic_attr_23": "generic_attr_23_parent_7",
-            "generic_attr_28": "generic_v1_generic_attr_28_39",
-            "generic_attr_29": "generic_v1_generic_attr_29_39",
-            "generic_attr_30": "generic_v1_generic_attr_30_39"
+            "generic_attr_18": "91496726",
+            "generic_attr_23": "water",
+            "generic_attr_28": 0.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "State Water Surcharge"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_7",
-            "generic_attr_18": "generic_attr_18_parent_7",
-            "generic_attr_23": "generic_attr_23_parent_7",
-            "generic_attr_28": "generic_v1_generic_attr_28_47",
-            "generic_attr_29": "generic_v1_generic_attr_29_47",
-            "generic_attr_30": "generic_v1_generic_attr_30_47"
+            "generic_attr_18": "91496726",
+            "generic_attr_23": "water",
+            "generic_attr_28": 18.43,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water Minimum Charge"
           }
         ]
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_8",
-        "generic_attr_09": "generic_v1_generic_attr_09_8",
-        "generic_attr_12": "generic_v1_generic_attr_12_8",
-        "generic_attr_15": "generic_v1_generic_attr_15_8",
-        "generic_attr_16": "generic_v1_generic_attr_16_8",
-        "generic_attr_17": "generic_v1_generic_attr_17_8",
-        "generic_attr_18": "generic_attr_18_parent_8",
-        "generic_attr_19": "generic_v1_generic_attr_19_8",
-        "generic_attr_20": "generic_v1_generic_attr_20_8",
-        "generic_attr_21": "generic_v1_generic_attr_21_8",
-        "generic_attr_22": "generic_v1_generic_attr_22_8",
-        "generic_attr_23": "generic_attr_23_parent_8",
-        "generic_attr_24": "generic_v1_generic_attr_24_8",
-        "generic_attr_25": "generic_v1_generic_attr_25_8",
-        "generic_attr_26": "generic_v1_generic_attr_26_8",
-        "generic_attr_27": "generic_v1_generic_attr_27_8",
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "91496726",
+        "generic_attr_23": "sewer",
+        "generic_attr_24": "Commercial Sewer",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 55000.0,
         "generic_group_c": [
           {
-            "generic_attr_08": "generic_attr_08_parent_8",
-            "generic_attr_18": "generic_attr_18_parent_8",
-            "generic_attr_23": "generic_attr_23_parent_8",
-            "generic_attr_28": "generic_v1_generic_attr_28_8",
-            "generic_attr_29": "generic_v1_generic_attr_29_8",
-            "generic_attr_30": "generic_v1_generic_attr_30_8"
+            "generic_attr_18": "91496726",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 40.61,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer Minimum Charge"
           },
           {
-            "generic_attr_08": "generic_attr_08_parent_8",
-            "generic_attr_18": "generic_attr_18_parent_8",
-            "generic_attr_23": "generic_attr_23_parent_8",
-            "generic_attr_28": "generic_v1_generic_attr_28_16",
-            "generic_attr_29": "generic_v1_generic_attr_29_16",
-            "generic_attr_30": "generic_v1_generic_attr_30_16"
-          },
-          {
-            "generic_attr_08": "generic_attr_08_parent_8",
-            "generic_attr_18": "generic_attr_18_parent_8",
-            "generic_attr_23": "generic_attr_23_parent_8",
-            "generic_attr_28": "generic_v1_generic_attr_28_24",
-            "generic_attr_29": "generic_v1_generic_attr_29_24",
-            "generic_attr_30": "generic_v1_generic_attr_30_24"
-          },
-          {
-            "generic_attr_08": "generic_attr_08_parent_8",
-            "generic_attr_18": "generic_attr_18_parent_8",
-            "generic_attr_23": "generic_attr_23_parent_8",
-            "generic_attr_28": "generic_v1_generic_attr_28_32",
-            "generic_attr_29": "generic_v1_generic_attr_29_32",
-            "generic_attr_30": "generic_v1_generic_attr_30_32"
-          },
-          {
-            "generic_attr_08": "generic_attr_08_parent_8",
-            "generic_attr_18": "generic_attr_18_parent_8",
-            "generic_attr_23": "generic_attr_23_parent_8",
-            "generic_attr_28": "generic_v1_generic_attr_28_40",
-            "generic_attr_29": "generic_v1_generic_attr_29_40",
-            "generic_attr_30": "generic_v1_generic_attr_30_40"
-          },
-          {
-            "generic_attr_08": "generic_attr_08_parent_8",
-            "generic_attr_18": "generic_attr_18_parent_8",
-            "generic_attr_23": "generic_attr_23_parent_8",
-            "generic_attr_28": "generic_v1_generic_attr_28_48",
-            "generic_attr_29": "generic_v1_generic_attr_29_48",
-            "generic_attr_30": "generic_v1_generic_attr_30_48"
+            "generic_attr_18": "91496726",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 358.05,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer"
           }
         ]
       }
     ],
     "generic_group_c": [
       {
-        "generic_attr_08": "generic_attr_08_account_level",
-        "generic_attr_18": "generic_attr_18_account_level",
-        "generic_attr_23": "generic_attr_23_account_level",
-        "generic_attr_28": "generic_v1_generic_attr_28_53",
-        "generic_attr_29": "generic_v1_generic_attr_29_53",
-        "generic_attr_30": "generic_v1_generic_attr_30_53"
+        "generic_attr_28": 55.0,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Industrial Energy Electric"
       }
     ]
   },
@@ -1685,406 +1461,6 @@
       "workflow_group": "generic_group_b"
     },
     {
-      "final_path": "/generic_group_b/*/generic_attr_19",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 0,
-      "workflow_field": "generic_attr_19",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_19",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 1,
-      "workflow_field": "generic_attr_19",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_19",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 2,
-      "workflow_field": "generic_attr_19",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_19",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 3,
-      "workflow_field": "generic_attr_19",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_19",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 4,
-      "workflow_field": "generic_attr_19",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_19",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 5,
-      "workflow_field": "generic_attr_19",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_19",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 6,
-      "workflow_field": "generic_attr_19",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_19",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 7,
-      "workflow_field": "generic_attr_19",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_20",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 0,
-      "workflow_field": "generic_attr_20",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_20",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 1,
-      "workflow_field": "generic_attr_20",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_20",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 2,
-      "workflow_field": "generic_attr_20",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_20",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 3,
-      "workflow_field": "generic_attr_20",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_20",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 4,
-      "workflow_field": "generic_attr_20",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_20",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 5,
-      "workflow_field": "generic_attr_20",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_20",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 6,
-      "workflow_field": "generic_attr_20",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_20",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 7,
-      "workflow_field": "generic_attr_20",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_21",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 0,
-      "workflow_field": "generic_attr_21",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_21",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 1,
-      "workflow_field": "generic_attr_21",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_21",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 2,
-      "workflow_field": "generic_attr_21",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_21",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 3,
-      "workflow_field": "generic_attr_21",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_21",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 4,
-      "workflow_field": "generic_attr_21",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_21",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 5,
-      "workflow_field": "generic_attr_21",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_21",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 6,
-      "workflow_field": "generic_attr_21",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_21",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 7,
-      "workflow_field": "generic_attr_21",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_22",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 0,
-      "workflow_field": "generic_attr_22",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_22",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 1,
-      "workflow_field": "generic_attr_22",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_22",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 2,
-      "workflow_field": "generic_attr_22",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_22",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 3,
-      "workflow_field": "generic_attr_22",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_22",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 4,
-      "workflow_field": "generic_attr_22",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_22",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 5,
-      "workflow_field": "generic_attr_22",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_22",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 6,
-      "workflow_field": "generic_attr_22",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_22",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 7,
-      "workflow_field": "generic_attr_22",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 0,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 1,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 2,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 3,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 4,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 5,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 6,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 7,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_b"
-    },
-    {
       "final_path": "/generic_group_b/*/generic_attr_09",
       "output_source": "customChunkOutputs",
       "page_numbers": [
@@ -2162,86 +1538,6 @@
       ],
       "record_index": 7,
       "workflow_field": "generic_attr_09",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_12",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 0,
-      "workflow_field": "generic_attr_12",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_12",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 1,
-      "workflow_field": "generic_attr_12",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_12",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 2,
-      "workflow_field": "generic_attr_12",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_12",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 3,
-      "workflow_field": "generic_attr_12",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_12",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 4,
-      "workflow_field": "generic_attr_12",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_12",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 5,
-      "workflow_field": "generic_attr_12",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_12",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 6,
-      "workflow_field": "generic_attr_12",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_12",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 7,
-      "workflow_field": "generic_attr_12",
       "workflow_group": "generic_group_b"
     },
     {
@@ -2562,86 +1858,6 @@
       ],
       "record_index": 7,
       "workflow_field": "generic_attr_26",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_27",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 0,
-      "workflow_field": "generic_attr_27",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_27",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 1,
-      "workflow_field": "generic_attr_27",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_27",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 2,
-      "workflow_field": "generic_attr_27",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_27",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 3,
-      "workflow_field": "generic_attr_27",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_27",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 4,
-      "workflow_field": "generic_attr_27",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_27",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 5,
-      "workflow_field": "generic_attr_27",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_27",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 6,
-      "workflow_field": "generic_attr_27",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_27",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 7,
-      "workflow_field": "generic_attr_27",
       "workflow_group": "generic_group_b"
     },
     {
@@ -3151,26 +2367,6 @@
         1
       ],
       "record_index": 50,
-      "workflow_field": "generic_attr_28",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_28",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 51,
-      "workflow_field": "generic_attr_28",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_28",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 52,
       "workflow_field": "generic_attr_28",
       "workflow_group": "generic_group_c"
     },
@@ -3685,26 +2881,6 @@
       "workflow_group": "generic_group_c"
     },
     {
-      "final_path": "/generic_group_c/*/generic_attr_29",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 51,
-      "workflow_field": "generic_attr_29",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_29",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 52,
-      "workflow_field": "generic_attr_29",
-      "workflow_group": "generic_group_c"
-    },
-    {
       "final_path": "/generic_group_c/*/generic_attr_30",
       "output_source": "customChunkOutputs",
       "page_numbers": [
@@ -4215,26 +3391,6 @@
       "workflow_group": "generic_group_c"
     },
     {
-      "final_path": "/generic_group_c/*/generic_attr_30",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 51,
-      "workflow_field": "generic_attr_30",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_30",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 52,
-      "workflow_field": "generic_attr_30",
-      "workflow_group": "generic_group_c"
-    },
-    {
       "final_path": "/generic_group_c/*/generic_attr_18",
       "output_source": "customChunkOutputs",
       "page_numbers": [
@@ -4735,566 +3891,6 @@
       "workflow_group": "generic_group_c"
     },
     {
-      "final_path": "/generic_group_c/*/generic_attr_18",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 50,
-      "workflow_field": "generic_attr_18",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_18",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 51,
-      "workflow_field": "generic_attr_18",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_18",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 52,
-      "workflow_field": "generic_attr_18",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 0,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 1,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 2,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 3,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 4,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 5,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 6,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 7,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 8,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 9,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 10,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 11,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 12,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 13,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 14,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 15,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 16,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 17,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 18,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 19,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 20,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 21,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 22,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 23,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 24,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 25,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 26,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 27,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 28,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 29,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 30,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 31,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 32,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 33,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 34,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 35,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 36,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 37,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 38,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 39,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 40,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 41,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 42,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 43,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 44,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 45,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 46,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 47,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 48,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 49,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 50,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 51,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 52,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
       "final_path": "/generic_group_c/*/generic_attr_23",
       "output_source": "customChunkOutputs",
       "page_numbers": [
@@ -5791,36 +4387,6 @@
         1
       ],
       "record_index": 49,
-      "workflow_field": "generic_attr_23",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_23",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 50,
-      "workflow_field": "generic_attr_23",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_23",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 51,
-      "workflow_field": "generic_attr_23",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_23",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 52,
       "workflow_field": "generic_attr_23",
       "workflow_group": "generic_group_c"
     }
@@ -5829,591 +4395,466 @@
   "surface": "generic_v1",
   "workflow_output": {
     "generic_group_a": {
-      "generic_attr_01": "generic_v1_generic_attr_01_1",
-      "generic_attr_02": "generic_v1_generic_attr_02_1",
-      "generic_attr_03": "generic_v1_generic_attr_03_1",
-      "generic_attr_04": "generic_v1_generic_attr_04_1",
-      "generic_attr_05": "generic_v1_generic_attr_05_1",
-      "generic_attr_06": "generic_v1_generic_attr_06_1",
-      "generic_attr_07": "generic_v1_generic_attr_07_1",
-      "generic_attr_08": "generic_v1_generic_attr_08_1",
-      "generic_attr_09": "generic_v1_generic_attr_09_1",
-      "generic_attr_10": "generic_v1_generic_attr_10_1",
-      "generic_attr_11": "generic_v1_generic_attr_11_1",
-      "generic_attr_12": "generic_v1_generic_attr_12_1",
-      "generic_attr_13": "generic_v1_generic_attr_13_1",
-      "generic_attr_14": "generic_v1_generic_attr_14_1"
+      "generic_attr_01": "blank reviewed expected value for generic_attr_01",
+      "generic_attr_02": 7613.2,
+      "generic_attr_03": "currency_dollars",
+      "generic_attr_04": "2025-07-30",
+      "generic_attr_05": "10295809",
+      "generic_attr_06": "blank reviewed expected value for generic_attr_06",
+      "generic_attr_07": "blank reviewed expected value for generic_attr_07",
+      "generic_attr_08": "City of Windom",
+      "generic_attr_09": "KWIK TRIP (1147)",
+      "generic_attr_10": "Direct",
+      "generic_attr_11": "statement_type_bill",
+      "generic_attr_12": "blank reviewed expected value for generic_attr_12",
+      "generic_attr_13": "2025-07-08",
+      "generic_attr_14": 7613.2
     },
     "generic_group_b": [
       {
-        "generic_attr_08": "generic_attr_08_parent_1",
-        "generic_attr_09": "generic_v1_generic_attr_09_1",
-        "generic_attr_12": "generic_v1_generic_attr_12_1",
-        "generic_attr_15": "generic_v1_generic_attr_15_1",
-        "generic_attr_16": "generic_v1_generic_attr_16_1",
-        "generic_attr_17": "generic_v1_generic_attr_17_1",
-        "generic_attr_18": "generic_attr_18_parent_1",
-        "generic_attr_19": "generic_v1_generic_attr_19_1",
-        "generic_attr_20": "generic_v1_generic_attr_20_1",
-        "generic_attr_21": "generic_v1_generic_attr_21_1",
-        "generic_attr_22": "generic_v1_generic_attr_22_1",
-        "generic_attr_23": "generic_attr_23_parent_1",
-        "generic_attr_24": "generic_v1_generic_attr_24_1",
-        "generic_attr_25": "generic_v1_generic_attr_25_1",
-        "generic_attr_26": "generic_v1_generic_attr_26_1",
-        "generic_attr_27": "generic_v1_generic_attr_27_1"
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "70182657",
+        "generic_attr_23": "electric",
+        "generic_attr_24": "Industrial Electric",
+        "generic_attr_25": "kWh",
+        "generic_attr_26": 60960.0
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_2",
-        "generic_attr_09": "generic_v1_generic_attr_09_2",
-        "generic_attr_12": "generic_v1_generic_attr_12_2",
-        "generic_attr_15": "generic_v1_generic_attr_15_2",
-        "generic_attr_16": "generic_v1_generic_attr_16_2",
-        "generic_attr_17": "generic_v1_generic_attr_17_2",
-        "generic_attr_18": "generic_attr_18_parent_2",
-        "generic_attr_19": "generic_v1_generic_attr_19_2",
-        "generic_attr_20": "generic_v1_generic_attr_20_2",
-        "generic_attr_21": "generic_v1_generic_attr_21_2",
-        "generic_attr_22": "generic_v1_generic_attr_22_2",
-        "generic_attr_23": "generic_attr_23_parent_2",
-        "generic_attr_24": "generic_v1_generic_attr_24_2",
-        "generic_attr_25": "generic_v1_generic_attr_25_2",
-        "generic_attr_26": "generic_v1_generic_attr_26_2",
-        "generic_attr_27": "generic_v1_generic_attr_27_2"
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "89321458",
+        "generic_attr_23": "water",
+        "generic_attr_24": "Commercial Water",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 42303.0
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_3",
-        "generic_attr_09": "generic_v1_generic_attr_09_3",
-        "generic_attr_12": "generic_v1_generic_attr_12_3",
-        "generic_attr_15": "generic_v1_generic_attr_15_3",
-        "generic_attr_16": "generic_v1_generic_attr_16_3",
-        "generic_attr_17": "generic_v1_generic_attr_17_3",
-        "generic_attr_18": "generic_attr_18_parent_3",
-        "generic_attr_19": "generic_v1_generic_attr_19_3",
-        "generic_attr_20": "generic_v1_generic_attr_20_3",
-        "generic_attr_21": "generic_v1_generic_attr_21_3",
-        "generic_attr_22": "generic_v1_generic_attr_22_3",
-        "generic_attr_23": "generic_attr_23_parent_3",
-        "generic_attr_24": "generic_v1_generic_attr_24_3",
-        "generic_attr_25": "generic_v1_generic_attr_25_3",
-        "generic_attr_26": "generic_v1_generic_attr_26_3",
-        "generic_attr_27": "generic_v1_generic_attr_27_3"
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "89321458",
+        "generic_attr_23": "sewer",
+        "generic_attr_24": "Commercial Sewer",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 42303.0
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_4",
-        "generic_attr_09": "generic_v1_generic_attr_09_4",
-        "generic_attr_12": "generic_v1_generic_attr_12_4",
-        "generic_attr_15": "generic_v1_generic_attr_15_4",
-        "generic_attr_16": "generic_v1_generic_attr_16_4",
-        "generic_attr_17": "generic_v1_generic_attr_17_4",
-        "generic_attr_18": "generic_attr_18_parent_4",
-        "generic_attr_19": "generic_v1_generic_attr_19_4",
-        "generic_attr_20": "generic_v1_generic_attr_20_4",
-        "generic_attr_21": "generic_v1_generic_attr_21_4",
-        "generic_attr_22": "generic_v1_generic_attr_22_4",
-        "generic_attr_23": "generic_attr_23_parent_4",
-        "generic_attr_24": "generic_v1_generic_attr_24_4",
-        "generic_attr_25": "generic_v1_generic_attr_25_4",
-        "generic_attr_26": "generic_v1_generic_attr_26_4",
-        "generic_attr_27": "generic_v1_generic_attr_27_4"
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "89321459",
+        "generic_attr_23": "water",
+        "generic_attr_24": "Commercial Water",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 40356.0
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_5",
-        "generic_attr_09": "generic_v1_generic_attr_09_5",
-        "generic_attr_12": "generic_v1_generic_attr_12_5",
-        "generic_attr_15": "generic_v1_generic_attr_15_5",
-        "generic_attr_16": "generic_v1_generic_attr_16_5",
-        "generic_attr_17": "generic_v1_generic_attr_17_5",
-        "generic_attr_18": "generic_attr_18_parent_5",
-        "generic_attr_19": "generic_v1_generic_attr_19_5",
-        "generic_attr_20": "generic_v1_generic_attr_20_5",
-        "generic_attr_21": "generic_v1_generic_attr_21_5",
-        "generic_attr_22": "generic_v1_generic_attr_22_5",
-        "generic_attr_23": "generic_attr_23_parent_5",
-        "generic_attr_24": "generic_v1_generic_attr_24_5",
-        "generic_attr_25": "generic_v1_generic_attr_25_5",
-        "generic_attr_26": "generic_v1_generic_attr_26_5",
-        "generic_attr_27": "generic_v1_generic_attr_27_5"
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "89321459",
+        "generic_attr_23": "sewer",
+        "generic_attr_24": "Commercial Sewer",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 40356.0
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_6",
-        "generic_attr_09": "generic_v1_generic_attr_09_6",
-        "generic_attr_12": "generic_v1_generic_attr_12_6",
-        "generic_attr_15": "generic_v1_generic_attr_15_6",
-        "generic_attr_16": "generic_v1_generic_attr_16_6",
-        "generic_attr_17": "generic_v1_generic_attr_17_6",
-        "generic_attr_18": "generic_attr_18_parent_6",
-        "generic_attr_19": "generic_v1_generic_attr_19_6",
-        "generic_attr_20": "generic_v1_generic_attr_20_6",
-        "generic_attr_21": "generic_v1_generic_attr_21_6",
-        "generic_attr_22": "generic_v1_generic_attr_22_6",
-        "generic_attr_23": "generic_attr_23_parent_6",
-        "generic_attr_24": "generic_v1_generic_attr_24_6",
-        "generic_attr_25": "generic_v1_generic_attr_25_6",
-        "generic_attr_26": "generic_v1_generic_attr_26_6",
-        "generic_attr_27": "generic_v1_generic_attr_27_6"
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "91496724",
+        "generic_attr_23": "irrigation",
+        "generic_attr_24": "Commercial Water",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 96600.0
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_7",
-        "generic_attr_09": "generic_v1_generic_attr_09_7",
-        "generic_attr_12": "generic_v1_generic_attr_12_7",
-        "generic_attr_15": "generic_v1_generic_attr_15_7",
-        "generic_attr_16": "generic_v1_generic_attr_16_7",
-        "generic_attr_17": "generic_v1_generic_attr_17_7",
-        "generic_attr_18": "generic_attr_18_parent_7",
-        "generic_attr_19": "generic_v1_generic_attr_19_7",
-        "generic_attr_20": "generic_v1_generic_attr_20_7",
-        "generic_attr_21": "generic_v1_generic_attr_21_7",
-        "generic_attr_22": "generic_v1_generic_attr_22_7",
-        "generic_attr_23": "generic_attr_23_parent_7",
-        "generic_attr_24": "generic_v1_generic_attr_24_7",
-        "generic_attr_25": "generic_v1_generic_attr_25_7",
-        "generic_attr_26": "generic_v1_generic_attr_26_7",
-        "generic_attr_27": "generic_v1_generic_attr_27_7"
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "91496726",
+        "generic_attr_23": "water",
+        "generic_attr_24": "Commercial Water",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 55000.0
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_8",
-        "generic_attr_09": "generic_v1_generic_attr_09_8",
-        "generic_attr_12": "generic_v1_generic_attr_12_8",
-        "generic_attr_15": "generic_v1_generic_attr_15_8",
-        "generic_attr_16": "generic_v1_generic_attr_16_8",
-        "generic_attr_17": "generic_v1_generic_attr_17_8",
-        "generic_attr_18": "generic_attr_18_parent_8",
-        "generic_attr_19": "generic_v1_generic_attr_19_8",
-        "generic_attr_20": "generic_v1_generic_attr_20_8",
-        "generic_attr_21": "generic_v1_generic_attr_21_8",
-        "generic_attr_22": "generic_v1_generic_attr_22_8",
-        "generic_attr_23": "generic_attr_23_parent_8",
-        "generic_attr_24": "generic_v1_generic_attr_24_8",
-        "generic_attr_25": "generic_v1_generic_attr_25_8",
-        "generic_attr_26": "generic_v1_generic_attr_26_8",
-        "generic_attr_27": "generic_v1_generic_attr_27_8"
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "91496726",
+        "generic_attr_23": "sewer",
+        "generic_attr_24": "Commercial Sewer",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 55000.0
       }
     ],
     "generic_group_c": [
       {
-        "generic_attr_08": "generic_attr_08_parent_1",
-        "generic_attr_18": "generic_attr_18_parent_1",
-        "generic_attr_23": "generic_attr_23_parent_1",
-        "generic_attr_28": "generic_v1_generic_attr_28_1",
-        "generic_attr_29": "generic_v1_generic_attr_29_1",
-        "generic_attr_30": "generic_v1_generic_attr_30_1"
+        "generic_attr_18": "70182657",
+        "generic_attr_23": "electric",
+        "generic_attr_28": 55.0,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Industrial Energy Electric"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_2",
-        "generic_attr_18": "generic_attr_18_parent_2",
-        "generic_attr_23": "generic_attr_23_parent_2",
-        "generic_attr_28": "generic_v1_generic_attr_28_2",
-        "generic_attr_29": "generic_v1_generic_attr_29_2",
-        "generic_attr_30": "generic_v1_generic_attr_30_2"
+        "generic_attr_18": "70182657",
+        "generic_attr_23": "electric",
+        "generic_attr_28": 2560.32,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Consumption"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_3",
-        "generic_attr_18": "generic_attr_18_parent_3",
-        "generic_attr_23": "generic_attr_23_parent_3",
-        "generic_attr_28": "generic_v1_generic_attr_28_3",
-        "generic_attr_29": "generic_v1_generic_attr_29_3",
-        "generic_attr_30": "generic_v1_generic_attr_30_3"
+        "generic_attr_18": "70182657",
+        "generic_attr_23": "electric",
+        "generic_attr_28": 2218.75,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Demand"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_4",
-        "generic_attr_18": "generic_attr_18_parent_4",
-        "generic_attr_23": "generic_attr_23_parent_4",
-        "generic_attr_28": "generic_v1_generic_attr_28_4",
-        "generic_attr_29": "generic_v1_generic_attr_29_4",
-        "generic_attr_30": "generic_v1_generic_attr_30_4"
+        "generic_attr_18": "70182657",
+        "generic_attr_23": "electric",
+        "generic_attr_28": 106.68,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Power Cost Adjustment - $.00175wh (S)"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_5",
-        "generic_attr_18": "generic_attr_18_parent_5",
-        "generic_attr_23": "generic_attr_23_parent_5",
-        "generic_attr_28": "generic_v1_generic_attr_28_5",
-        "generic_attr_29": "generic_v1_generic_attr_29_5",
-        "generic_attr_30": "generic_v1_generic_attr_30_5"
+        "generic_attr_18": "70182657",
+        "generic_attr_23": "electric",
+        "generic_attr_28": 2.81,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "MN Sales Tax"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_6",
-        "generic_attr_18": "generic_attr_18_parent_6",
-        "generic_attr_23": "generic_attr_23_parent_6",
-        "generic_attr_28": "generic_v1_generic_attr_28_6",
-        "generic_attr_29": "generic_v1_generic_attr_29_6",
-        "generic_attr_30": "generic_v1_generic_attr_30_6"
+        "generic_attr_18": "70182657",
+        "generic_attr_23": "electric",
+        "generic_attr_28": 249.74,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "MN State Tax on Usage"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_7",
-        "generic_attr_18": "generic_attr_18_parent_7",
-        "generic_attr_23": "generic_attr_23_parent_7",
-        "generic_attr_28": "generic_v1_generic_attr_28_7",
-        "generic_attr_29": "generic_v1_generic_attr_29_7",
-        "generic_attr_30": "generic_v1_generic_attr_30_7"
+        "generic_attr_18": "89321458",
+        "generic_attr_23": "water",
+        "generic_attr_28": 18.43,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Water Minimum Charge"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_8",
-        "generic_attr_18": "generic_attr_18_parent_8",
-        "generic_attr_23": "generic_attr_23_parent_8",
-        "generic_attr_28": "generic_v1_generic_attr_28_8",
-        "generic_attr_29": "generic_v1_generic_attr_29_8",
-        "generic_attr_30": "generic_v1_generic_attr_30_8"
+        "generic_attr_18": "89321458",
+        "generic_attr_23": "water",
+        "generic_attr_28": 223.32,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Water"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_1",
-        "generic_attr_18": "generic_attr_18_parent_1",
-        "generic_attr_23": "generic_attr_23_parent_1",
-        "generic_attr_28": "generic_v1_generic_attr_28_9",
-        "generic_attr_29": "generic_v1_generic_attr_29_9",
-        "generic_attr_30": "generic_v1_generic_attr_30_9"
+        "generic_attr_18": "89321458",
+        "generic_attr_23": "water",
+        "generic_attr_28": 0.81,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "State Water Surcharge"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_2",
-        "generic_attr_18": "generic_attr_18_parent_2",
-        "generic_attr_23": "generic_attr_23_parent_2",
-        "generic_attr_28": "generic_v1_generic_attr_28_10",
-        "generic_attr_29": "generic_v1_generic_attr_29_10",
-        "generic_attr_30": "generic_v1_generic_attr_30_10"
+        "generic_attr_18": "89321458",
+        "generic_attr_23": "sewer",
+        "generic_attr_28": 40.61,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Sewer Minimum Charge"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_3",
-        "generic_attr_18": "generic_attr_18_parent_3",
-        "generic_attr_23": "generic_attr_23_parent_3",
-        "generic_attr_28": "generic_v1_generic_attr_28_11",
-        "generic_attr_29": "generic_v1_generic_attr_29_11",
-        "generic_attr_30": "generic_v1_generic_attr_30_11"
+        "generic_attr_18": "89321458",
+        "generic_attr_23": "sewer",
+        "generic_attr_28": 275.39,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Sewer"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_4",
-        "generic_attr_18": "generic_attr_18_parent_4",
-        "generic_attr_23": "generic_attr_23_parent_4",
-        "generic_attr_28": "generic_v1_generic_attr_28_12",
-        "generic_attr_29": "generic_v1_generic_attr_29_12",
-        "generic_attr_30": "generic_v1_generic_attr_30_12"
+        "generic_attr_18": "89321459",
+        "generic_attr_23": "water",
+        "generic_attr_28": 18.43,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Water Minimum Charge"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_5",
-        "generic_attr_18": "generic_attr_18_parent_5",
-        "generic_attr_23": "generic_attr_23_parent_5",
-        "generic_attr_28": "generic_v1_generic_attr_28_13",
-        "generic_attr_29": "generic_v1_generic_attr_29_13",
-        "generic_attr_30": "generic_v1_generic_attr_30_13"
+        "generic_attr_18": "89321459",
+        "generic_attr_23": "water",
+        "generic_attr_28": 212.19,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Water"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_6",
-        "generic_attr_18": "generic_attr_18_parent_6",
-        "generic_attr_23": "generic_attr_23_parent_6",
-        "generic_attr_28": "generic_v1_generic_attr_28_14",
-        "generic_attr_29": "generic_v1_generic_attr_29_14",
-        "generic_attr_30": "generic_v1_generic_attr_30_14"
+        "generic_attr_18": "89321459",
+        "generic_attr_23": "water",
+        "generic_attr_28": 0.81,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "State Water Surcharge"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_7",
-        "generic_attr_18": "generic_attr_18_parent_7",
-        "generic_attr_23": "generic_attr_23_parent_7",
-        "generic_attr_28": "generic_v1_generic_attr_28_15",
-        "generic_attr_29": "generic_v1_generic_attr_29_15",
-        "generic_attr_30": "generic_v1_generic_attr_30_15"
+        "generic_attr_18": "89321459",
+        "generic_attr_23": "sewer",
+        "generic_attr_28": 40.61,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Sewer Minimum Charge"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_8",
-        "generic_attr_18": "generic_attr_18_parent_8",
-        "generic_attr_23": "generic_attr_23_parent_8",
-        "generic_attr_28": "generic_v1_generic_attr_28_16",
-        "generic_attr_29": "generic_v1_generic_attr_29_16",
-        "generic_attr_30": "generic_v1_generic_attr_30_16"
+        "generic_attr_18": "89321459",
+        "generic_attr_23": "sewer",
+        "generic_attr_28": 262.71,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Sewer"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_1",
-        "generic_attr_18": "generic_attr_18_parent_1",
-        "generic_attr_23": "generic_attr_23_parent_1",
-        "generic_attr_28": "generic_v1_generic_attr_28_17",
-        "generic_attr_29": "generic_v1_generic_attr_29_17",
-        "generic_attr_30": "generic_v1_generic_attr_30_17"
+        "generic_attr_18": "91496724",
+        "generic_attr_23": "irrigation",
+        "generic_attr_28": 18.43,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Water Minimum Charge"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_2",
-        "generic_attr_18": "generic_attr_18_parent_2",
-        "generic_attr_23": "generic_attr_23_parent_2",
-        "generic_attr_28": "generic_v1_generic_attr_28_18",
-        "generic_attr_29": "generic_v1_generic_attr_29_18",
-        "generic_attr_30": "generic_v1_generic_attr_30_18"
+        "generic_attr_18": "91496724",
+        "generic_attr_23": "irrigation",
+        "generic_attr_28": 533.9,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Water"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_3",
-        "generic_attr_18": "generic_attr_18_parent_3",
-        "generic_attr_23": "generic_attr_23_parent_3",
-        "generic_attr_28": "generic_v1_generic_attr_28_19",
-        "generic_attr_29": "generic_v1_generic_attr_29_19",
-        "generic_attr_30": "generic_v1_generic_attr_30_19"
+        "generic_attr_18": "91496724",
+        "generic_attr_23": "irrigation",
+        "generic_attr_28": 1.27,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "MN Sales Tax"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_4",
-        "generic_attr_18": "generic_attr_18_parent_4",
-        "generic_attr_23": "generic_attr_23_parent_4",
-        "generic_attr_28": "generic_v1_generic_attr_28_20",
-        "generic_attr_29": "generic_v1_generic_attr_29_20",
-        "generic_attr_30": "generic_v1_generic_attr_30_20"
+        "generic_attr_18": "91496724",
+        "generic_attr_23": "irrigation",
+        "generic_attr_28": 36.71,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "MN State Tax on Usage"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_5",
-        "generic_attr_18": "generic_attr_18_parent_5",
-        "generic_attr_23": "generic_attr_23_parent_5",
-        "generic_attr_28": "generic_v1_generic_attr_28_21",
-        "generic_attr_29": "generic_v1_generic_attr_29_21",
-        "generic_attr_30": "generic_v1_generic_attr_30_21"
+        "generic_attr_18": "91496724",
+        "generic_attr_23": "irrigation",
+        "generic_attr_28": 0.81,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "State Water Surcharge"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_6",
-        "generic_attr_18": "generic_attr_18_parent_6",
-        "generic_attr_23": "generic_attr_23_parent_6",
-        "generic_attr_28": "generic_v1_generic_attr_28_22",
-        "generic_attr_29": "generic_v1_generic_attr_29_22",
-        "generic_attr_30": "generic_v1_generic_attr_30_22"
+        "generic_attr_18": "91496726",
+        "generic_attr_23": "water",
+        "generic_attr_28": 18.43,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Water Minimum Charge"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_7",
-        "generic_attr_18": "generic_attr_18_parent_7",
-        "generic_attr_23": "generic_attr_23_parent_7",
-        "generic_attr_28": "generic_v1_generic_attr_28_23",
-        "generic_attr_29": "generic_v1_generic_attr_29_23",
-        "generic_attr_30": "generic_v1_generic_attr_30_23"
+        "generic_attr_18": "91496726",
+        "generic_attr_23": "water",
+        "generic_attr_28": 295.95,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Water"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_8",
-        "generic_attr_18": "generic_attr_18_parent_8",
-        "generic_attr_23": "generic_attr_23_parent_8",
-        "generic_attr_28": "generic_v1_generic_attr_28_24",
-        "generic_attr_29": "generic_v1_generic_attr_29_24",
-        "generic_attr_30": "generic_v1_generic_attr_30_24"
+        "generic_attr_18": "91496726",
+        "generic_attr_23": "water",
+        "generic_attr_28": 20.35,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "MN State Tax on Usage"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_1",
-        "generic_attr_18": "generic_attr_18_parent_1",
-        "generic_attr_23": "generic_attr_23_parent_1",
-        "generic_attr_28": "generic_v1_generic_attr_28_25",
-        "generic_attr_29": "generic_v1_generic_attr_29_25",
-        "generic_attr_30": "generic_v1_generic_attr_30_25"
+        "generic_attr_18": "91496726",
+        "generic_attr_23": "water",
+        "generic_attr_28": 1.27,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "MN Sales Tax"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_2",
-        "generic_attr_18": "generic_attr_18_parent_2",
-        "generic_attr_23": "generic_attr_23_parent_2",
-        "generic_attr_28": "generic_v1_generic_attr_28_26",
-        "generic_attr_29": "generic_v1_generic_attr_29_26",
-        "generic_attr_30": "generic_v1_generic_attr_30_26"
+        "generic_attr_18": "91496726",
+        "generic_attr_23": "water",
+        "generic_attr_28": 0.81,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "State Water Surcharge"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_3",
-        "generic_attr_18": "generic_attr_18_parent_3",
-        "generic_attr_23": "generic_attr_23_parent_3",
-        "generic_attr_28": "generic_v1_generic_attr_28_27",
-        "generic_attr_29": "generic_v1_generic_attr_29_27",
-        "generic_attr_30": "generic_v1_generic_attr_30_27"
+        "generic_attr_18": "91496726",
+        "generic_attr_23": "sewer",
+        "generic_attr_28": 40.61,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Sewer Minimum Charge"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_4",
-        "generic_attr_18": "generic_attr_18_parent_4",
-        "generic_attr_23": "generic_attr_23_parent_4",
-        "generic_attr_28": "generic_v1_generic_attr_28_28",
-        "generic_attr_29": "generic_v1_generic_attr_29_28",
-        "generic_attr_30": "generic_v1_generic_attr_30_28"
+        "generic_attr_18": "91496726",
+        "generic_attr_23": "sewer",
+        "generic_attr_28": 358.05,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Sewer"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_5",
-        "generic_attr_18": "generic_attr_18_parent_5",
-        "generic_attr_23": "generic_attr_23_parent_5",
-        "generic_attr_28": "generic_v1_generic_attr_28_29",
-        "generic_attr_29": "generic_v1_generic_attr_29_29",
-        "generic_attr_30": "generic_v1_generic_attr_30_29"
+        "generic_attr_18": "70182657",
+        "generic_attr_23": "electric",
+        "generic_attr_28": 55.0,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Industrial Energy Electric"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_6",
-        "generic_attr_18": "generic_attr_18_parent_6",
-        "generic_attr_23": "generic_attr_23_parent_6",
-        "generic_attr_28": "generic_v1_generic_attr_28_30",
-        "generic_attr_29": "generic_v1_generic_attr_29_30",
-        "generic_attr_30": "generic_v1_generic_attr_30_30"
+        "generic_attr_18": "70182657",
+        "generic_attr_23": "electric",
+        "generic_attr_28": 2560.32,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Consumption"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_7",
-        "generic_attr_18": "generic_attr_18_parent_7",
-        "generic_attr_23": "generic_attr_23_parent_7",
-        "generic_attr_28": "generic_v1_generic_attr_28_31",
-        "generic_attr_29": "generic_v1_generic_attr_29_31",
-        "generic_attr_30": "generic_v1_generic_attr_30_31"
+        "generic_attr_18": "70182657",
+        "generic_attr_23": "electric",
+        "generic_attr_28": 2218.75,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Demand"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_8",
-        "generic_attr_18": "generic_attr_18_parent_8",
-        "generic_attr_23": "generic_attr_23_parent_8",
-        "generic_attr_28": "generic_v1_generic_attr_28_32",
-        "generic_attr_29": "generic_v1_generic_attr_29_32",
-        "generic_attr_30": "generic_v1_generic_attr_30_32"
+        "generic_attr_18": "70182657",
+        "generic_attr_23": "electric",
+        "generic_attr_28": 106.68,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Power Cost Adjustment - $.00175wh (S)"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_1",
-        "generic_attr_18": "generic_attr_18_parent_1",
-        "generic_attr_23": "generic_attr_23_parent_1",
-        "generic_attr_28": "generic_v1_generic_attr_28_33",
-        "generic_attr_29": "generic_v1_generic_attr_29_33",
-        "generic_attr_30": "generic_v1_generic_attr_30_33"
+        "generic_attr_18": "70182657",
+        "generic_attr_23": "electric",
+        "generic_attr_28": 2.81,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "MN Sales Tax"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_2",
-        "generic_attr_18": "generic_attr_18_parent_2",
-        "generic_attr_23": "generic_attr_23_parent_2",
-        "generic_attr_28": "generic_v1_generic_attr_28_34",
-        "generic_attr_29": "generic_v1_generic_attr_29_34",
-        "generic_attr_30": "generic_v1_generic_attr_30_34"
+        "generic_attr_18": "70182657",
+        "generic_attr_23": "electric",
+        "generic_attr_28": 249.74,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "MN State Tax on Usage"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_3",
-        "generic_attr_18": "generic_attr_18_parent_3",
-        "generic_attr_23": "generic_attr_23_parent_3",
-        "generic_attr_28": "generic_v1_generic_attr_28_35",
-        "generic_attr_29": "generic_v1_generic_attr_29_35",
-        "generic_attr_30": "generic_v1_generic_attr_30_35"
+        "generic_attr_18": "89321458",
+        "generic_attr_23": "water",
+        "generic_attr_28": 18.43,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Water Minimum Charge"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_4",
-        "generic_attr_18": "generic_attr_18_parent_4",
-        "generic_attr_23": "generic_attr_23_parent_4",
-        "generic_attr_28": "generic_v1_generic_attr_28_36",
-        "generic_attr_29": "generic_v1_generic_attr_29_36",
-        "generic_attr_30": "generic_v1_generic_attr_30_36"
+        "generic_attr_18": "89321458",
+        "generic_attr_23": "water",
+        "generic_attr_28": 223.32,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Water"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_5",
-        "generic_attr_18": "generic_attr_18_parent_5",
-        "generic_attr_23": "generic_attr_23_parent_5",
-        "generic_attr_28": "generic_v1_generic_attr_28_37",
-        "generic_attr_29": "generic_v1_generic_attr_29_37",
-        "generic_attr_30": "generic_v1_generic_attr_30_37"
+        "generic_attr_18": "89321458",
+        "generic_attr_23": "water",
+        "generic_attr_28": 0.81,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "State Water Surcharge"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_6",
-        "generic_attr_18": "generic_attr_18_parent_6",
-        "generic_attr_23": "generic_attr_23_parent_6",
-        "generic_attr_28": "generic_v1_generic_attr_28_38",
-        "generic_attr_29": "generic_v1_generic_attr_29_38",
-        "generic_attr_30": "generic_v1_generic_attr_30_38"
+        "generic_attr_18": "89321458",
+        "generic_attr_23": "sewer",
+        "generic_attr_28": 40.61,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Sewer Minimum Charge"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_7",
-        "generic_attr_18": "generic_attr_18_parent_7",
-        "generic_attr_23": "generic_attr_23_parent_7",
-        "generic_attr_28": "generic_v1_generic_attr_28_39",
-        "generic_attr_29": "generic_v1_generic_attr_29_39",
-        "generic_attr_30": "generic_v1_generic_attr_30_39"
+        "generic_attr_18": "89321458",
+        "generic_attr_23": "sewer",
+        "generic_attr_28": 275.39,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Sewer"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_8",
-        "generic_attr_18": "generic_attr_18_parent_8",
-        "generic_attr_23": "generic_attr_23_parent_8",
-        "generic_attr_28": "generic_v1_generic_attr_28_40",
-        "generic_attr_29": "generic_v1_generic_attr_29_40",
-        "generic_attr_30": "generic_v1_generic_attr_30_40"
+        "generic_attr_18": "89321459",
+        "generic_attr_23": "water",
+        "generic_attr_28": 18.43,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Water Minimum Charge"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_1",
-        "generic_attr_18": "generic_attr_18_parent_1",
-        "generic_attr_23": "generic_attr_23_parent_1",
-        "generic_attr_28": "generic_v1_generic_attr_28_41",
-        "generic_attr_29": "generic_v1_generic_attr_29_41",
-        "generic_attr_30": "generic_v1_generic_attr_30_41"
+        "generic_attr_18": "89321459",
+        "generic_attr_23": "water",
+        "generic_attr_28": 212.19,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Water"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_2",
-        "generic_attr_18": "generic_attr_18_parent_2",
-        "generic_attr_23": "generic_attr_23_parent_2",
-        "generic_attr_28": "generic_v1_generic_attr_28_42",
-        "generic_attr_29": "generic_v1_generic_attr_29_42",
-        "generic_attr_30": "generic_v1_generic_attr_30_42"
+        "generic_attr_18": "89321459",
+        "generic_attr_23": "water",
+        "generic_attr_28": 0.81,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "State Water Surcharge"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_3",
-        "generic_attr_18": "generic_attr_18_parent_3",
-        "generic_attr_23": "generic_attr_23_parent_3",
-        "generic_attr_28": "generic_v1_generic_attr_28_43",
-        "generic_attr_29": "generic_v1_generic_attr_29_43",
-        "generic_attr_30": "generic_v1_generic_attr_30_43"
+        "generic_attr_18": "89321459",
+        "generic_attr_23": "sewer",
+        "generic_attr_28": 40.61,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Sewer Minimum Charge"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_4",
-        "generic_attr_18": "generic_attr_18_parent_4",
-        "generic_attr_23": "generic_attr_23_parent_4",
-        "generic_attr_28": "generic_v1_generic_attr_28_44",
-        "generic_attr_29": "generic_v1_generic_attr_29_44",
-        "generic_attr_30": "generic_v1_generic_attr_30_44"
+        "generic_attr_18": "89321459",
+        "generic_attr_23": "sewer",
+        "generic_attr_28": 262.71,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Sewer"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_5",
-        "generic_attr_18": "generic_attr_18_parent_5",
-        "generic_attr_23": "generic_attr_23_parent_5",
-        "generic_attr_28": "generic_v1_generic_attr_28_45",
-        "generic_attr_29": "generic_v1_generic_attr_29_45",
-        "generic_attr_30": "generic_v1_generic_attr_30_45"
+        "generic_attr_18": "91496724",
+        "generic_attr_23": "irrigation",
+        "generic_attr_28": 18.43,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Water Minimum Charge"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_6",
-        "generic_attr_18": "generic_attr_18_parent_6",
-        "generic_attr_23": "generic_attr_23_parent_6",
-        "generic_attr_28": "generic_v1_generic_attr_28_46",
-        "generic_attr_29": "generic_v1_generic_attr_29_46",
-        "generic_attr_30": "generic_v1_generic_attr_30_46"
+        "generic_attr_18": "91496724",
+        "generic_attr_23": "irrigation",
+        "generic_attr_28": 533.9,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Water"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_7",
-        "generic_attr_18": "generic_attr_18_parent_7",
-        "generic_attr_23": "generic_attr_23_parent_7",
-        "generic_attr_28": "generic_v1_generic_attr_28_47",
-        "generic_attr_29": "generic_v1_generic_attr_29_47",
-        "generic_attr_30": "generic_v1_generic_attr_30_47"
+        "generic_attr_18": "91496724",
+        "generic_attr_23": "irrigation",
+        "generic_attr_28": 1.27,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "MN Sales Tax"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_8",
-        "generic_attr_18": "generic_attr_18_parent_8",
-        "generic_attr_23": "generic_attr_23_parent_8",
-        "generic_attr_28": "generic_v1_generic_attr_28_48",
-        "generic_attr_29": "generic_v1_generic_attr_29_48",
-        "generic_attr_30": "generic_v1_generic_attr_30_48"
+        "generic_attr_18": "91496724",
+        "generic_attr_23": "irrigation",
+        "generic_attr_28": 36.71,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "MN State Tax on Usage"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_1",
-        "generic_attr_18": "generic_attr_18_parent_1",
-        "generic_attr_23": "generic_attr_23_parent_1",
-        "generic_attr_28": "generic_v1_generic_attr_28_49",
-        "generic_attr_29": "generic_v1_generic_attr_29_49",
-        "generic_attr_30": "generic_v1_generic_attr_30_49"
+        "generic_attr_18": "91496724",
+        "generic_attr_23": "irrigation",
+        "generic_attr_28": 0.81,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "State Water Surcharge"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_2",
-        "generic_attr_18": "generic_attr_18_parent_2",
-        "generic_attr_23": "generic_attr_23_parent_2",
-        "generic_attr_28": "generic_v1_generic_attr_28_50",
-        "generic_attr_29": "generic_v1_generic_attr_29_50",
-        "generic_attr_30": "generic_v1_generic_attr_30_50"
+        "generic_attr_18": "91496726",
+        "generic_attr_23": "water",
+        "generic_attr_28": 18.43,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Water Minimum Charge"
       },
       {
-        "generic_attr_08": "generic_attr_08_parent_3",
-        "generic_attr_18": "generic_attr_18_parent_3",
-        "generic_attr_23": "generic_attr_23_parent_3",
-        "generic_attr_28": "generic_v1_generic_attr_28_51",
-        "generic_attr_29": "generic_v1_generic_attr_29_51",
-        "generic_attr_30": "generic_v1_generic_attr_30_51"
-      },
-      {
-        "generic_attr_08": "generic_attr_08_parent_4",
-        "generic_attr_18": "generic_attr_18_parent_4",
-        "generic_attr_23": "generic_attr_23_parent_4",
-        "generic_attr_28": "generic_v1_generic_attr_28_52",
-        "generic_attr_29": "generic_v1_generic_attr_29_52",
-        "generic_attr_30": "generic_v1_generic_attr_30_52"
-      },
-      {
-        "generic_attr_08": "generic_attr_08_account_level",
-        "generic_attr_18": "generic_attr_18_account_level",
-        "generic_attr_23": "generic_attr_23_account_level",
-        "generic_attr_28": "generic_v1_generic_attr_28_53",
-        "generic_attr_29": "generic_v1_generic_attr_29_53",
-        "generic_attr_30": "generic_v1_generic_attr_30_53"
+        "generic_attr_28": 55.0,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Industrial Energy Electric"
       }
     ]
   },

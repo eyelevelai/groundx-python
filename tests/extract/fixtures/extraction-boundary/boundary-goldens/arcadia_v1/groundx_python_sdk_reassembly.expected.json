@@ -1,10 +1,10 @@
 {
   "artifacts": {
     "handoff": {
-      "sha256": "1ef24b8eddb0b86c30025b1b828839661d70b9671160c8e0fb9e08b600c50c44"
+      "sha256": "31a32ef2749672adf7fbf0ec89cd5ec8d0de9ef885a48b97277c0f49dfe03994"
     },
     "previous_extract_chain": {
-      "sha256": "4c94ac1e6617ddfd5ee1a2991eb66cda1653ba59e104920a6d0ae247e6c2d4be"
+      "sha256": "3bb47da435e72d4b85c0ca62292d5d17219576c71b78f3256f03c2194a294dfa"
     }
   },
   "assertions": {
@@ -13,14 +13,40 @@
     "has_no_error_diagnostics": true,
     "shape_contract_passed": true
   },
+  "certification_eligible": true,
+  "evidence_level": "reviewed_deterministic_model_fixture",
   "input_from": "internal_arcadia_extract_chain",
-  "input_sha256": "4c94ac1e6617ddfd5ee1a2991eb66cda1653ba59e104920a6d0ae247e6c2d4be",
+  "input_sha256": "3bb47da435e72d4b85c0ca62292d5d17219576c71b78f3256f03c2194a294dfa",
+  "model_fixture": {
+    "path": "testdata/extraction-boundary/model-fixtures/arcadia_v1/extract_model_outputs.json",
+    "schema_version": "internal-arcadia-boundary-model-fixture-v1",
+    "sha256": "7be4243ce2d39c776743dd24593ef9f2ca6025519246c02486259f69e566c49f",
+    "source": {
+      "covered_route_count": 36,
+      "document_file_name": "arcadia.pdf",
+      "expected_answer_sha256": "f115595ef95cb3caf70841569dfe3513a052a35db5449ff99119897c6321fcf4",
+      "expected_answer_url": "https://cdn.eyelevel.ai/internal-harness/e2e-extract/arcadia-extract.json",
+      "kind": "reviewed_expected_answer_shape_stress_projection",
+      "projection_notes": [
+        "Values come from the reviewed expected answer where present.",
+        "Blank statement scalars are filled so final-output shape gates can assert field presence.",
+        "Utility child rows are expanded from reviewed rows to exercise the 50+ charge shape.",
+        "One unmatched utility child row is added when the reviewed expected answer has no account-level charge."
+      ],
+      "record_counts_by_group": {
+        "charges": 51,
+        "meters": 8
+      },
+      "workflow_id": "arcadia_v1-product-path",
+      "workflow_version": "2026-07-12T22:34:01Z"
+    }
+  },
   "output": {
     "diagnostic_count": 0,
-    "final_output_sha256": "d154e01b5b4cf4b46540f12546127e3460f923fef5d6de713ac0540b5e858903",
-    "relationship_output_sha256": "d154e01b5b4cf4b46540f12546127e3460f923fef5d6de713ac0540b5e858903",
-    "source_provenance_count": 460,
-    "workflow_output_sha256": "450dd451af8a9095552b9900530146a3f3c0e07bc18e259b83a69ecd61dea461"
+    "final_output_sha256": "76e3388082f72951b0f82734b47488aaba2563670b1706f1d1b1359ae71da762",
+    "relationship_output_sha256": "76e3388082f72951b0f82734b47488aaba2563670b1706f1d1b1359ae71da762",
+    "source_provenance_count": 339,
+    "workflow_output_sha256": "a3b08ea8dcc65ff88f5d8ef8461c8ab1ec09d4b5c0730d119642c4d406fc25ee"
   },
   "output_for": "internal_arcadia_save_callback",
   "request": {

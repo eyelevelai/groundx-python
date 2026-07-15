@@ -9,7 +9,6 @@ import pytest
 
 from groundx.extract.custom_outputs import reassemble_custom_outputs_from_xray
 
-
 UPDATE_GOLDENS_ENV = "UPDATE_GROUNDX_PYTHON_EXTRACT_BOUNDARY_GOLDENS"
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 EXPECTED_ROOT = ROOT / "tests" / "extract" / "fixtures" / "extraction-boundary"
@@ -43,6 +42,9 @@ def test_sdk_reassembly_boundary_packets(tmp_path: pathlib.Path) -> None:
         golden = _read_json(expected_path)
         expected_handoff_sha = _sha256_file(handoff_path)
         actual_handoff_sha = actual["artifacts"]["handoff"]["sha256"]
+        handoff = _read_json(pathlib.Path(actual["artifacts"]["handoff"]["path"]))
+        _assert_no_synthetic_protected_marker(actual)
+        _assert_no_synthetic_protected_marker(handoff)
         diff: typing.Dict[str, typing.Any] = {
             "kind": "machine_readable_json_diff",
             "status": "passed",
@@ -162,6 +164,7 @@ def _write_boundary_artifacts(
         diagnostics,
         result.relationship_output,
     )
+    inherited_evidence = _inherited_evidence(previous)
 
     handoff = {
         "schema_version": "groundx-python-sdk-reassembly-handoff-v1",
@@ -178,6 +181,7 @@ def _write_boundary_artifacts(
         "diagnostics": diagnostics,
         "source_provenance": source_provenance,
     }
+    handoff.update(inherited_evidence)
     handoff_actual_path = out_dir / "groundx_python_sdk_reassembly.handoff.json"
     _write_json(handoff_actual_path, handoff)
 
@@ -215,10 +219,14 @@ def _write_boundary_artifacts(
             "handoff_written_for_save_callback": handoff_actual_path.exists(),
         },
     }
+    actual.update(inherited_evidence)
     assert actual["assertions"]["consumes_internal_extract_chain_handoff"]
     assert actual["assertions"]["has_no_error_diagnostics"]
     assert actual["assertions"]["shape_contract_passed"]
     assert actual["assertions"]["handoff_written_for_save_callback"]
+    if previous.get("evidence_level") == "plumbing_only_synthetic":
+        assert actual["evidence_level"] == "plumbing_only_synthetic"
+        assert actual["certification_eligible"] is False
 
     actual_path = out_dir / "groundx_python_sdk_reassembly.actual.json"
     expected_path = (
@@ -230,6 +238,52 @@ def _write_boundary_artifacts(
     )
     _write_json(actual_path, actual)
     return actual, actual_path, expected_path, diff_path, previous_path, handoff_path
+
+
+def _inherited_evidence(previous: typing.Mapping[str, typing.Any]) -> typing.Dict[str, typing.Any]:
+    inherited: typing.Dict[str, typing.Any] = {}
+    if "evidence_level" in previous:
+        inherited["evidence_level"] = previous["evidence_level"]
+    if "certification_eligible" in previous:
+        inherited["certification_eligible"] = previous["certification_eligible"]
+    if "model_fixture" in previous:
+        inherited["model_fixture"] = previous["model_fixture"]
+    return inherited
+
+
+def _assert_no_synthetic_protected_marker(
+    value: typing.Any,
+    path: typing.Tuple[str, ...] = (),
+) -> None:
+    if isinstance(value, list):
+        for index, item in enumerate(value):
+            _assert_no_synthetic_protected_marker(item, path + (str(index),))
+        return
+
+    if isinstance(value, dict):
+        for key, item in value.items():
+            child_path = path + (str(key),)
+            assert key != "fake_agent_data", ".".join(child_path)
+            assert not (key == "certification_eligible" and item is False), ".".join(
+                child_path
+            )
+            _assert_no_synthetic_protected_marker(item, child_path)
+        return
+
+    if isinstance(value, str):
+        for marker in (
+            "arcadia_legacy_",
+            "arcadia_v1_",
+            "generic_v1_",
+            "adp_v1_",
+            "_parent_",
+            "_account_level",
+            "deterministic_from_cashbot_deployed_output_routes",
+            "plumbing_only_synthetic",
+            "_fake_xray_for_workflow",
+            "boundary://",
+        ):
+            assert marker not in value, ".".join(path)
 
 
 def _shape_assertions(
