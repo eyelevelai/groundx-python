@@ -58,8 +58,26 @@ class _RouteContainer:
     page_numbers: typing.Tuple[int, ...] = ()
 
 
+@dataclasses.dataclass(frozen=True)
+class _ScalarCandidate:
+    value: typing.Any
+    quality: typing.Tuple[int, int, float]
+
+
 _REPEATED_STEP_KINDS = {"keys", "summary"}
 _EXTRACTED_FIELD_VALUE_KEYS = {"value", "confidence", "conflicts", "qa"}
+_DEFAULT_CANDIDATE_VALUES = {
+    "n/a",
+    "na",
+    "none",
+    "not applicable",
+    "not found",
+    "not provided",
+    "not specified",
+    "not stated",
+    "null",
+    "unknown",
+}
 _GET_ALIASES = {
     "chunkId": ("chunk_id",),
     "customChunkOutputs": ("custom_chunk_outputs",),
@@ -94,10 +112,12 @@ def reassemble_custom_outputs_from_xray(
         typing.Tuple[typing.Tuple[str, ...], typing.Tuple[typing.Any, ...]],
         typing.Dict[str, typing.Any],
     ] = {}
+    scalar_candidates: typing.Dict[str, _ScalarCandidate] = {}
     workflow_repeated_records: typing.Dict[
         typing.Tuple[str, typing.Tuple[typing.Any, ...]],
         typing.Dict[str, typing.Any],
     ] = {}
+    diagnostics: typing.List[CustomOutputDiagnostic] = []
 
     for route_index, route in enumerate(routes):
         route_hits[route_index] = False
@@ -143,14 +163,20 @@ def reassemble_custom_outputs_from_xray(
                     copy.deepcopy(route_value.value),
                     repeated_records=repeated_records,
                     record_key=record_key,
+                    route=route_map,
+                    page_numbers=route_container.page_numbers,
+                    scalar_candidates=scalar_candidates,
+                    diagnostics=diagnostics,
                 )
 
     relationships = workflow.get("output_relationships") if workflow else None
     relationship_output = None
-    diagnostics = _missing_required_route_diagnostics(
-        typing.cast(typing.Sequence[typing.Any], routes),
-        route_hits,
-        workflow_extract,
+    diagnostics.extend(
+        _missing_required_route_diagnostics(
+            typing.cast(typing.Sequence[typing.Any], routes),
+            route_hits,
+            workflow_extract,
+        )
     )
     if isinstance(relationships, list) and relationships:
         relationship_output, diagnostics = _apply_relationships(
@@ -159,6 +185,13 @@ def reassemble_custom_outputs_from_xray(
             diagnostics=diagnostics,
         )
         final_output = copy.deepcopy(relationship_output)
+    else:
+        diagnostics.extend(
+            _missing_relationship_metadata_diagnostics(
+                final_output,
+                workflow_extract,
+            )
+        )
 
     return CustomOutputReassemblyResult(
         final_output=final_output,
@@ -480,6 +513,56 @@ def _is_empty_output(value: typing.Any) -> bool:
     return False
 
 
+def _scalar_candidate(
+    value: typing.Any,
+    page_numbers: typing.Tuple[int, ...],
+) -> _ScalarCandidate:
+    return _ScalarCandidate(
+        value=value,
+        quality=_scalar_candidate_quality(value, page_numbers),
+    )
+
+
+def _scalar_candidate_quality(
+    value: typing.Any,
+    page_numbers: typing.Tuple[int, ...],
+) -> typing.Tuple[int, int, float]:
+    normalized = _normalized_candidate_value(value)
+    is_specific = 0 if _is_default_candidate_value(normalized) else 1
+    has_source_pages = 1 if page_numbers else 0
+    return (is_specific, has_source_pages, _candidate_confidence(value))
+
+
+def _normalized_candidate_value(value: typing.Any) -> typing.Any:
+    unwrapped = _unwrap_match_value(value)
+    if isinstance(unwrapped, str):
+        return " ".join(unwrapped.strip().casefold().split())
+    if isinstance(unwrapped, numbers.Real):
+        return float(unwrapped)
+    return unwrapped
+
+
+def _is_default_candidate_value(value: typing.Any) -> bool:
+    if value is None:
+        return True
+    if isinstance(value, str):
+        return value in _DEFAULT_CANDIDATE_VALUES
+    return False
+
+
+def _candidate_confidence(value: typing.Any) -> float:
+    if not isinstance(value, typing.Mapping):
+        return 0.0
+    confidence = value.get("confidence")
+    if not isinstance(confidence, numbers.Real):
+        return 0.0
+    return max(0.0, min(1.0, float(confidence)))
+
+
+def _string_value(value: typing.Any) -> typing.Optional[str]:
+    return value if isinstance(value, str) else None
+
+
 def _effective_pointer(pointer: str, *, repeated: bool) -> str:
     if not repeated or "*" in pointer:
         return pointer
@@ -499,6 +582,10 @@ def _set_pointer(
         typing.Dict[str, typing.Any],
     ],
     record_key: typing.Tuple[typing.Any, ...],
+    route: typing.Mapping[str, typing.Any],
+    page_numbers: typing.Tuple[int, ...],
+    scalar_candidates: typing.Dict[str, _ScalarCandidate],
+    diagnostics: typing.List[CustomOutputDiagnostic],
 ) -> None:
     parts = _pointer_parts(pointer)
     if not parts:
@@ -538,7 +625,28 @@ def _set_pointer(
         if not isinstance(next_value, dict):
             return
         current = next_value
+    candidate = _scalar_candidate(value, page_numbers)
+    existing = scalar_candidates.get(pointer)
+    if existing is not None:
+        if candidate.quality < existing.quality:
+            return
+        if candidate.quality == existing.quality:
+            if _normalized_candidate_value(candidate.value) != _normalized_candidate_value(
+                existing.value
+            ):
+                diagnostics.append(
+                    CustomOutputDiagnostic(
+                        code="conflicting_output_candidates",
+                        message=f"multiple equal-quality candidates for [{pointer}]",
+                        severity="warning",
+                        workflow_group=_string_value(route.get("workflow_group")),
+                        workflow_field=_string_value(route.get("workflow_field")),
+                        final_path=pointer,
+                    )
+                )
+            return
     current[parts[-1]] = value
+    scalar_candidates[pointer] = candidate
 
 
 def _set_workflow_value(
@@ -668,6 +776,80 @@ def _missing_required_route_diagnostics(
             )
         )
     return diagnostics
+
+
+def _missing_relationship_metadata_diagnostics(
+    final_output: typing.Mapping[str, typing.Any],
+    workflow_extract: typing.Optional[typing.Mapping[str, typing.Any]],
+) -> typing.List[CustomOutputDiagnostic]:
+    if not isinstance(workflow_extract, typing.Mapping):
+        return []
+
+    diagnostics: typing.List[CustomOutputDiagnostic] = []
+    for group_name, group_spec in _relationship_intent_group_specs(workflow_extract):
+        if not isinstance(group_spec, typing.Mapping):
+            continue
+        if not _group_requires_relationship_metadata(group_spec):
+            continue
+        group_output = final_output.get(group_name)
+        if not isinstance(group_output, list) or len(group_output) == 0:
+            continue
+        diagnostics.append(
+            CustomOutputDiagnostic(
+                code="missing_output_relationships",
+                message=(
+                    f"workflow group [{group_name}] requires output relationship "
+                    "metadata but no output_relationships were provided"
+                ),
+                workflow_group=group_name,
+            )
+        )
+    return diagnostics
+
+
+def _relationship_intent_group_specs(
+    workflow_extract: typing.Mapping[str, typing.Any],
+) -> typing.Iterator[typing.Tuple[str, typing.Any]]:
+    seen: typing.Set[str] = set()
+    for container_key in (
+        "_groundx_persisted_extract",
+        "groups",
+        "prepared_final_groups",
+    ):
+        container = workflow_extract.get(container_key)
+        if not isinstance(container, typing.Mapping):
+            continue
+        for group_name, group_spec in container.items():
+            if isinstance(group_name, str) and group_name not in seen:
+                seen.add(group_name)
+                yield group_name, group_spec
+
+    for group_name, group_spec in workflow_extract.items():
+        if group_name in {
+            "_groundx_persisted_extract",
+            "groups",
+            "prepared_final_groups",
+            "workflow",
+        }:
+            continue
+        if isinstance(group_name, str) and group_name not in seen:
+            seen.add(group_name)
+            yield group_name, group_spec
+
+
+def _group_requires_relationship_metadata(
+    group_spec: typing.Mapping[str, typing.Any],
+) -> bool:
+    match_attrs = group_spec.get("match_attrs")
+    if isinstance(match_attrs, list) and len(match_attrs) > 0:
+        return True
+    passthrough = group_spec.get("passthrough")
+    if isinstance(passthrough, typing.Mapping) and isinstance(
+        passthrough.get("from"),
+        str,
+    ):
+        return True
+    return False
 
 
 def _route_is_required(

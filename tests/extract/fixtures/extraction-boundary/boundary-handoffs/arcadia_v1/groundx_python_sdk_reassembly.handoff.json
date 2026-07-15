@@ -3,1226 +3,989 @@
   "diagnostics": [],
   "evidence_level": "reviewed_deterministic_model_fixture",
   "final_output": {
-    "account_number": "ACCT-0001",
-    "amount_due": 100.25,
-    "amount_due_currency": 100.25,
+    "account_number": "blank reviewed expected value for account_number",
+    "amount_due": 7613.2,
+    "amount_due_currency": "currency_dollars",
     "charges": [
       {
-        "charge_amount": 152.25,
-        "charge_amount_currency": 152.25,
-        "charge_description_as_printed": "Line item charge 053",
-        "meter_number": "MTR-ACCOUNT",
-        "provider_name": "Account Provider",
-        "service_type": "Account Service"
+        "charge_amount": 55.0,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Industrial Energy Electric"
       }
     ],
-    "due_date": "2026-01-01",
-    "invoice_number": "INV-0001",
+    "due_date": "2025-07-30",
+    "invoice_number": "10295809",
     "meters": [
       {
         "charges": [
           {
-            "charge_amount": 100.25,
-            "charge_amount_currency": 100.25,
-            "charge_description_as_printed": "Line item charge 001",
-            "meter_number": "MTR-001",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 55.0,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Industrial Energy Electric",
+            "meter_number": "70182657",
+            "service_type": "electric"
           },
           {
-            "charge_amount": 108.25,
-            "charge_amount_currency": 108.25,
-            "charge_description_as_printed": "Line item charge 009",
-            "meter_number": "MTR-001",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 2560.32,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Consumption",
+            "meter_number": "70182657",
+            "service_type": "electric"
           },
           {
-            "charge_amount": 116.25,
-            "charge_amount_currency": 116.25,
-            "charge_description_as_printed": "Line item charge 017",
-            "meter_number": "MTR-001",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 2218.75,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Demand",
+            "meter_number": "70182657",
+            "service_type": "electric"
           },
           {
-            "charge_amount": 124.25,
-            "charge_amount_currency": 124.25,
-            "charge_description_as_printed": "Line item charge 025",
-            "meter_number": "MTR-001",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 106.68,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Power Cost Adjustment - $.00175wh (S)",
+            "meter_number": "70182657",
+            "service_type": "electric"
           },
           {
-            "charge_amount": 132.25,
-            "charge_amount_currency": 132.25,
-            "charge_description_as_printed": "Line item charge 033",
-            "meter_number": "MTR-001",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 2.81,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "MN Sales Tax",
+            "meter_number": "70182657",
+            "service_type": "electric"
           },
           {
-            "charge_amount": 140.25,
-            "charge_amount_currency": 140.25,
-            "charge_description_as_printed": "Line item charge 041",
-            "meter_number": "MTR-001",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 249.74,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "MN State Tax on Usage",
+            "meter_number": "70182657",
+            "service_type": "electric"
           },
           {
-            "charge_amount": 148.25,
-            "charge_amount_currency": 148.25,
-            "charge_description_as_printed": "Line item charge 049",
-            "meter_number": "MTR-001",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 55.0,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Industrial Energy Electric",
+            "meter_number": "70182657",
+            "service_type": "electric"
+          },
+          {
+            "charge_amount": 2560.32,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Consumption",
+            "meter_number": "70182657",
+            "service_type": "electric"
+          },
+          {
+            "charge_amount": 2218.75,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Demand",
+            "meter_number": "70182657",
+            "service_type": "electric"
+          },
+          {
+            "charge_amount": 106.68,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Power Cost Adjustment - $.00175wh (S)",
+            "meter_number": "70182657",
+            "service_type": "electric"
+          },
+          {
+            "charge_amount": 2.81,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "MN Sales Tax",
+            "meter_number": "70182657",
+            "service_type": "electric"
+          },
+          {
+            "charge_amount": 249.74,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "MN State Tax on Usage",
+            "meter_number": "70182657",
+            "service_type": "electric"
           }
         ],
-        "deregulation_status": "Reviewed sample value 001",
-        "measurement_period_end_date": "2026-01-01",
-        "measurement_period_start_date": "2026-01-01",
-        "meter_creation_explanation": "Reviewed sample value 001",
-        "meter_number": "MTR-001",
-        "pass_through_provider_account_number": "ACCT-0001",
-        "pass_through_provider_name": "Utility Provider A",
-        "point_of_delivery_id": "Reviewed sample value 001",
-        "power_factor_percentage": "Reviewed sample value 001",
-        "provider_name": "Utility Provider A",
-        "recipient_name": "Reviewed sample value 001",
-        "service_address": "Reviewed sample value 001",
-        "service_type": "Electric Service",
-        "tariff_name_as_printed": "Reviewed sample value 001",
-        "units_of_measurement": "Reviewed sample value 001",
-        "usage_value": 100.25
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "70182657",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "electric",
+        "tariff_name_as_printed": "Industrial Electric",
+        "units_of_measurement": "kWh",
+        "usage_value": 60960.0
       },
       {
         "charges": [
           {
-            "charge_amount": 101.25,
-            "charge_amount_currency": 101.25,
-            "charge_description_as_printed": "Line item charge 002",
-            "meter_number": "MTR-002",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 18.43,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water Minimum Charge",
+            "meter_number": "89321458",
+            "service_type": "water"
           },
           {
-            "charge_amount": 109.25,
-            "charge_amount_currency": 109.25,
-            "charge_description_as_printed": "Line item charge 010",
-            "meter_number": "MTR-002",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 223.32,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water",
+            "meter_number": "89321458",
+            "service_type": "water"
           },
           {
-            "charge_amount": 117.25,
-            "charge_amount_currency": 117.25,
-            "charge_description_as_printed": "Line item charge 018",
-            "meter_number": "MTR-002",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 0.81,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "State Water Surcharge",
+            "meter_number": "89321458",
+            "service_type": "water"
           },
           {
-            "charge_amount": 125.25,
-            "charge_amount_currency": 125.25,
-            "charge_description_as_printed": "Line item charge 026",
-            "meter_number": "MTR-002",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 18.43,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water Minimum Charge",
+            "meter_number": "89321458",
+            "service_type": "water"
           },
           {
-            "charge_amount": 133.25,
-            "charge_amount_currency": 133.25,
-            "charge_description_as_printed": "Line item charge 034",
-            "meter_number": "MTR-002",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 223.32,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water",
+            "meter_number": "89321458",
+            "service_type": "water"
           },
           {
-            "charge_amount": 141.25,
-            "charge_amount_currency": 141.25,
-            "charge_description_as_printed": "Line item charge 042",
-            "meter_number": "MTR-002",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
-          },
-          {
-            "charge_amount": 149.25,
-            "charge_amount_currency": 149.25,
-            "charge_description_as_printed": "Line item charge 050",
-            "meter_number": "MTR-002",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 0.81,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "State Water Surcharge",
+            "meter_number": "89321458",
+            "service_type": "water"
           }
         ],
-        "deregulation_status": "Reviewed sample value 002",
-        "measurement_period_end_date": "2026-01-02",
-        "measurement_period_start_date": "2026-01-02",
-        "meter_creation_explanation": "Reviewed sample value 002",
-        "meter_number": "MTR-002",
-        "pass_through_provider_account_number": "ACCT-0002",
-        "pass_through_provider_name": "Utility Provider A",
-        "point_of_delivery_id": "Reviewed sample value 002",
-        "power_factor_percentage": "Reviewed sample value 002",
-        "provider_name": "Utility Provider A",
-        "recipient_name": "Reviewed sample value 002",
-        "service_address": "Reviewed sample value 002",
-        "service_type": "Electric Service",
-        "tariff_name_as_printed": "Reviewed sample value 002",
-        "units_of_measurement": "Reviewed sample value 002",
-        "usage_value": 101.25
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "89321458",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "water",
+        "tariff_name_as_printed": "Commercial Water",
+        "units_of_measurement": "gallons",
+        "usage_value": 42303.0
       },
       {
         "charges": [
           {
-            "charge_amount": 102.25,
-            "charge_amount_currency": 102.25,
-            "charge_description_as_printed": "Line item charge 003",
-            "meter_number": "MTR-003",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 40.61,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Sewer Minimum Charge",
+            "meter_number": "89321458",
+            "service_type": "sewer"
           },
           {
-            "charge_amount": 110.25,
-            "charge_amount_currency": 110.25,
-            "charge_description_as_printed": "Line item charge 011",
-            "meter_number": "MTR-003",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 275.39,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Sewer",
+            "meter_number": "89321458",
+            "service_type": "sewer"
           },
           {
-            "charge_amount": 118.25,
-            "charge_amount_currency": 118.25,
-            "charge_description_as_printed": "Line item charge 019",
-            "meter_number": "MTR-003",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 40.61,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Sewer Minimum Charge",
+            "meter_number": "89321458",
+            "service_type": "sewer"
           },
           {
-            "charge_amount": 126.25,
-            "charge_amount_currency": 126.25,
-            "charge_description_as_printed": "Line item charge 027",
-            "meter_number": "MTR-003",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
-          },
-          {
-            "charge_amount": 134.25,
-            "charge_amount_currency": 134.25,
-            "charge_description_as_printed": "Line item charge 035",
-            "meter_number": "MTR-003",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
-          },
-          {
-            "charge_amount": 142.25,
-            "charge_amount_currency": 142.25,
-            "charge_description_as_printed": "Line item charge 043",
-            "meter_number": "MTR-003",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
-          },
-          {
-            "charge_amount": 150.25,
-            "charge_amount_currency": 150.25,
-            "charge_description_as_printed": "Line item charge 051",
-            "meter_number": "MTR-003",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 275.39,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Sewer",
+            "meter_number": "89321458",
+            "service_type": "sewer"
           }
         ],
-        "deregulation_status": "Reviewed sample value 003",
-        "measurement_period_end_date": "2026-01-03",
-        "measurement_period_start_date": "2026-01-03",
-        "meter_creation_explanation": "Reviewed sample value 003",
-        "meter_number": "MTR-003",
-        "pass_through_provider_account_number": "ACCT-0003",
-        "pass_through_provider_name": "Utility Provider A",
-        "point_of_delivery_id": "Reviewed sample value 003",
-        "power_factor_percentage": "Reviewed sample value 003",
-        "provider_name": "Utility Provider A",
-        "recipient_name": "Reviewed sample value 003",
-        "service_address": "Reviewed sample value 003",
-        "service_type": "Electric Service",
-        "tariff_name_as_printed": "Reviewed sample value 003",
-        "units_of_measurement": "Reviewed sample value 003",
-        "usage_value": 102.25
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "89321458",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "sewer",
+        "tariff_name_as_printed": "Commercial Sewer",
+        "units_of_measurement": "gallons",
+        "usage_value": 42303.0
       },
       {
         "charges": [
           {
-            "charge_amount": 103.25,
-            "charge_amount_currency": 103.25,
-            "charge_description_as_printed": "Line item charge 004",
-            "meter_number": "MTR-004",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 18.43,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water Minimum Charge",
+            "meter_number": "89321459",
+            "service_type": "water"
           },
           {
-            "charge_amount": 111.25,
-            "charge_amount_currency": 111.25,
-            "charge_description_as_printed": "Line item charge 012",
-            "meter_number": "MTR-004",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 212.19,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water",
+            "meter_number": "89321459",
+            "service_type": "water"
           },
           {
-            "charge_amount": 119.25,
-            "charge_amount_currency": 119.25,
-            "charge_description_as_printed": "Line item charge 020",
-            "meter_number": "MTR-004",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 0.81,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "State Water Surcharge",
+            "meter_number": "89321459",
+            "service_type": "water"
           },
           {
-            "charge_amount": 127.25,
-            "charge_amount_currency": 127.25,
-            "charge_description_as_printed": "Line item charge 028",
-            "meter_number": "MTR-004",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 18.43,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water Minimum Charge",
+            "meter_number": "89321459",
+            "service_type": "water"
           },
           {
-            "charge_amount": 135.25,
-            "charge_amount_currency": 135.25,
-            "charge_description_as_printed": "Line item charge 036",
-            "meter_number": "MTR-004",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 212.19,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water",
+            "meter_number": "89321459",
+            "service_type": "water"
           },
           {
-            "charge_amount": 143.25,
-            "charge_amount_currency": 143.25,
-            "charge_description_as_printed": "Line item charge 044",
-            "meter_number": "MTR-004",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
-          },
-          {
-            "charge_amount": 151.25,
-            "charge_amount_currency": 151.25,
-            "charge_description_as_printed": "Line item charge 052",
-            "meter_number": "MTR-004",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 0.81,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "State Water Surcharge",
+            "meter_number": "89321459",
+            "service_type": "water"
           }
         ],
-        "deregulation_status": "Reviewed sample value 004",
-        "measurement_period_end_date": "2026-01-04",
-        "measurement_period_start_date": "2026-01-04",
-        "meter_creation_explanation": "Reviewed sample value 004",
-        "meter_number": "MTR-004",
-        "pass_through_provider_account_number": "ACCT-0004",
-        "pass_through_provider_name": "Utility Provider A",
-        "point_of_delivery_id": "Reviewed sample value 004",
-        "power_factor_percentage": "Reviewed sample value 004",
-        "provider_name": "Utility Provider A",
-        "recipient_name": "Reviewed sample value 004",
-        "service_address": "Reviewed sample value 004",
-        "service_type": "Electric Service",
-        "tariff_name_as_printed": "Reviewed sample value 004",
-        "units_of_measurement": "Reviewed sample value 004",
-        "usage_value": 103.25
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "89321459",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "water",
+        "tariff_name_as_printed": "Commercial Water",
+        "units_of_measurement": "gallons",
+        "usage_value": 40356.0
       },
       {
         "charges": [
           {
-            "charge_amount": 104.25,
-            "charge_amount_currency": 104.25,
-            "charge_description_as_printed": "Line item charge 005",
-            "meter_number": "MTR-005",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 40.61,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Sewer Minimum Charge",
+            "meter_number": "89321459",
+            "service_type": "sewer"
           },
           {
-            "charge_amount": 112.25,
-            "charge_amount_currency": 112.25,
-            "charge_description_as_printed": "Line item charge 013",
-            "meter_number": "MTR-005",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 262.71,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Sewer",
+            "meter_number": "89321459",
+            "service_type": "sewer"
           },
           {
-            "charge_amount": 120.25,
-            "charge_amount_currency": 120.25,
-            "charge_description_as_printed": "Line item charge 021",
-            "meter_number": "MTR-005",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 40.61,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Sewer Minimum Charge",
+            "meter_number": "89321459",
+            "service_type": "sewer"
           },
           {
-            "charge_amount": 128.25,
-            "charge_amount_currency": 128.25,
-            "charge_description_as_printed": "Line item charge 029",
-            "meter_number": "MTR-005",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
-          },
-          {
-            "charge_amount": 136.25,
-            "charge_amount_currency": 136.25,
-            "charge_description_as_printed": "Line item charge 037",
-            "meter_number": "MTR-005",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
-          },
-          {
-            "charge_amount": 144.25,
-            "charge_amount_currency": 144.25,
-            "charge_description_as_printed": "Line item charge 045",
-            "meter_number": "MTR-005",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 262.71,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Sewer",
+            "meter_number": "89321459",
+            "service_type": "sewer"
           }
         ],
-        "deregulation_status": "Reviewed sample value 005",
-        "measurement_period_end_date": "2026-01-05",
-        "measurement_period_start_date": "2026-01-05",
-        "meter_creation_explanation": "Reviewed sample value 005",
-        "meter_number": "MTR-005",
-        "pass_through_provider_account_number": "ACCT-0005",
-        "pass_through_provider_name": "Utility Provider A",
-        "point_of_delivery_id": "Reviewed sample value 005",
-        "power_factor_percentage": "Reviewed sample value 005",
-        "provider_name": "Utility Provider A",
-        "recipient_name": "Reviewed sample value 005",
-        "service_address": "Reviewed sample value 005",
-        "service_type": "Electric Service",
-        "tariff_name_as_printed": "Reviewed sample value 005",
-        "units_of_measurement": "Reviewed sample value 005",
-        "usage_value": 104.25
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "89321459",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "sewer",
+        "tariff_name_as_printed": "Commercial Sewer",
+        "units_of_measurement": "gallons",
+        "usage_value": 40356.0
       },
       {
         "charges": [
           {
-            "charge_amount": 105.25,
-            "charge_amount_currency": 105.25,
-            "charge_description_as_printed": "Line item charge 006",
-            "meter_number": "MTR-006",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 18.43,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water Minimum Charge",
+            "meter_number": "91496724",
+            "service_type": "irrigation"
           },
           {
-            "charge_amount": 113.25,
-            "charge_amount_currency": 113.25,
-            "charge_description_as_printed": "Line item charge 014",
-            "meter_number": "MTR-006",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 533.9,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water",
+            "meter_number": "91496724",
+            "service_type": "irrigation"
           },
           {
-            "charge_amount": 121.25,
-            "charge_amount_currency": 121.25,
-            "charge_description_as_printed": "Line item charge 022",
-            "meter_number": "MTR-006",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 1.27,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "MN Sales Tax",
+            "meter_number": "91496724",
+            "service_type": "irrigation"
           },
           {
-            "charge_amount": 129.25,
-            "charge_amount_currency": 129.25,
-            "charge_description_as_printed": "Line item charge 030",
-            "meter_number": "MTR-006",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 36.71,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "MN State Tax on Usage",
+            "meter_number": "91496724",
+            "service_type": "irrigation"
           },
           {
-            "charge_amount": 137.25,
-            "charge_amount_currency": 137.25,
-            "charge_description_as_printed": "Line item charge 038",
-            "meter_number": "MTR-006",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 0.81,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "State Water Surcharge",
+            "meter_number": "91496724",
+            "service_type": "irrigation"
           },
           {
-            "charge_amount": 145.25,
-            "charge_amount_currency": 145.25,
-            "charge_description_as_printed": "Line item charge 046",
-            "meter_number": "MTR-006",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 18.43,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water Minimum Charge",
+            "meter_number": "91496724",
+            "service_type": "irrigation"
+          },
+          {
+            "charge_amount": 533.9,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water",
+            "meter_number": "91496724",
+            "service_type": "irrigation"
+          },
+          {
+            "charge_amount": 1.27,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "MN Sales Tax",
+            "meter_number": "91496724",
+            "service_type": "irrigation"
+          },
+          {
+            "charge_amount": 36.71,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "MN State Tax on Usage",
+            "meter_number": "91496724",
+            "service_type": "irrigation"
+          },
+          {
+            "charge_amount": 0.81,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "State Water Surcharge",
+            "meter_number": "91496724",
+            "service_type": "irrigation"
           }
         ],
-        "deregulation_status": "Reviewed sample value 006",
-        "measurement_period_end_date": "2026-01-06",
-        "measurement_period_start_date": "2026-01-06",
-        "meter_creation_explanation": "Reviewed sample value 006",
-        "meter_number": "MTR-006",
-        "pass_through_provider_account_number": "ACCT-0006",
-        "pass_through_provider_name": "Utility Provider A",
-        "point_of_delivery_id": "Reviewed sample value 006",
-        "power_factor_percentage": "Reviewed sample value 006",
-        "provider_name": "Utility Provider A",
-        "recipient_name": "Reviewed sample value 006",
-        "service_address": "Reviewed sample value 006",
-        "service_type": "Electric Service",
-        "tariff_name_as_printed": "Reviewed sample value 006",
-        "units_of_measurement": "Reviewed sample value 006",
-        "usage_value": 105.25
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "91496724",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "irrigation",
+        "tariff_name_as_printed": "Commercial Water",
+        "units_of_measurement": "gallons",
+        "usage_value": 96600.0
       },
       {
         "charges": [
           {
-            "charge_amount": 106.25,
-            "charge_amount_currency": 106.25,
-            "charge_description_as_printed": "Line item charge 007",
-            "meter_number": "MTR-007",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 18.43,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water Minimum Charge",
+            "meter_number": "91496726",
+            "service_type": "water"
           },
           {
-            "charge_amount": 114.25,
-            "charge_amount_currency": 114.25,
-            "charge_description_as_printed": "Line item charge 015",
-            "meter_number": "MTR-007",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 295.95,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water",
+            "meter_number": "91496726",
+            "service_type": "water"
           },
           {
-            "charge_amount": 122.25,
-            "charge_amount_currency": 122.25,
-            "charge_description_as_printed": "Line item charge 023",
-            "meter_number": "MTR-007",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 20.35,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "MN State Tax on Usage",
+            "meter_number": "91496726",
+            "service_type": "water"
           },
           {
-            "charge_amount": 130.25,
-            "charge_amount_currency": 130.25,
-            "charge_description_as_printed": "Line item charge 031",
-            "meter_number": "MTR-007",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 1.27,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "MN Sales Tax",
+            "meter_number": "91496726",
+            "service_type": "water"
           },
           {
-            "charge_amount": 138.25,
-            "charge_amount_currency": 138.25,
-            "charge_description_as_printed": "Line item charge 039",
-            "meter_number": "MTR-007",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 0.81,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "State Water Surcharge",
+            "meter_number": "91496726",
+            "service_type": "water"
           },
           {
-            "charge_amount": 146.25,
-            "charge_amount_currency": 146.25,
-            "charge_description_as_printed": "Line item charge 047",
-            "meter_number": "MTR-007",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 18.43,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water Minimum Charge",
+            "meter_number": "91496726",
+            "service_type": "water"
           }
         ],
-        "deregulation_status": "Reviewed sample value 007",
-        "measurement_period_end_date": "2026-01-07",
-        "measurement_period_start_date": "2026-01-07",
-        "meter_creation_explanation": "Reviewed sample value 007",
-        "meter_number": "MTR-007",
-        "pass_through_provider_account_number": "ACCT-0007",
-        "pass_through_provider_name": "Utility Provider A",
-        "point_of_delivery_id": "Reviewed sample value 007",
-        "power_factor_percentage": "Reviewed sample value 007",
-        "provider_name": "Utility Provider A",
-        "recipient_name": "Reviewed sample value 007",
-        "service_address": "Reviewed sample value 007",
-        "service_type": "Electric Service",
-        "tariff_name_as_printed": "Reviewed sample value 007",
-        "units_of_measurement": "Reviewed sample value 007",
-        "usage_value": 106.25
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "91496726",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "water",
+        "tariff_name_as_printed": "Commercial Water",
+        "units_of_measurement": "gallons",
+        "usage_value": 55000.0
       },
       {
         "charges": [
           {
-            "charge_amount": 107.25,
-            "charge_amount_currency": 107.25,
-            "charge_description_as_printed": "Line item charge 008",
-            "meter_number": "MTR-008",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 40.61,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Sewer Minimum Charge",
+            "meter_number": "91496726",
+            "service_type": "sewer"
           },
           {
-            "charge_amount": 115.25,
-            "charge_amount_currency": 115.25,
-            "charge_description_as_printed": "Line item charge 016",
-            "meter_number": "MTR-008",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
-          },
-          {
-            "charge_amount": 123.25,
-            "charge_amount_currency": 123.25,
-            "charge_description_as_printed": "Line item charge 024",
-            "meter_number": "MTR-008",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
-          },
-          {
-            "charge_amount": 131.25,
-            "charge_amount_currency": 131.25,
-            "charge_description_as_printed": "Line item charge 032",
-            "meter_number": "MTR-008",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
-          },
-          {
-            "charge_amount": 139.25,
-            "charge_amount_currency": 139.25,
-            "charge_description_as_printed": "Line item charge 040",
-            "meter_number": "MTR-008",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
-          },
-          {
-            "charge_amount": 147.25,
-            "charge_amount_currency": 147.25,
-            "charge_description_as_printed": "Line item charge 048",
-            "meter_number": "MTR-008",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 358.05,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Sewer",
+            "meter_number": "91496726",
+            "service_type": "sewer"
           }
         ],
-        "deregulation_status": "Reviewed sample value 008",
-        "measurement_period_end_date": "2026-01-08",
-        "measurement_period_start_date": "2026-01-08",
-        "meter_creation_explanation": "Reviewed sample value 008",
-        "meter_number": "MTR-008",
-        "pass_through_provider_account_number": "ACCT-0008",
-        "pass_through_provider_name": "Utility Provider A",
-        "point_of_delivery_id": "Reviewed sample value 008",
-        "power_factor_percentage": "Reviewed sample value 008",
-        "provider_name": "Utility Provider A",
-        "recipient_name": "Reviewed sample value 008",
-        "service_address": "Reviewed sample value 008",
-        "service_type": "Electric Service",
-        "tariff_name_as_printed": "Reviewed sample value 008",
-        "units_of_measurement": "Reviewed sample value 008",
-        "usage_value": 107.25
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "91496726",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "sewer",
+        "tariff_name_as_printed": "Commercial Sewer",
+        "units_of_measurement": "gallons",
+        "usage_value": 55000.0
       }
     ],
-    "provider_name": "Utility Provider A",
-    "recipient_name": "Reviewed sample value 001",
-    "service_address": "Reviewed sample value 001",
-    "source_modality": "Reviewed sample value 001",
-    "statement_date": "2026-01-01",
-    "statement_period_end_date": "2026-01-01",
-    "statement_period_start_date": "2026-01-01",
-    "statement_type": "Reviewed sample value 001",
-    "total_billing_amount": 100.25
+    "provider_name": "City of Windom",
+    "recipient_name": "KWIK TRIP (1147)",
+    "service_address": "blank reviewed expected value for service_address",
+    "source_modality": "Direct",
+    "statement_date": "2025-07-08",
+    "statement_period_end_date": "2025-06-30",
+    "statement_period_start_date": "2025-06-01",
+    "statement_type": "statement_type_bill",
+    "total_billing_amount": 7613.2
   },
   "input_from": "internal_arcadia_extract_chain",
-  "input_sha256": "fcbbe06af04749204ed4457f1e219195490b15135cef8cde59b8a2898d8eb580",
+  "input_sha256": "3bb47da435e72d4b85c0ca62292d5d17219576c71b78f3256f03c2194a294dfa",
   "model_fixture": {
     "path": "testdata/extraction-boundary/model-fixtures/arcadia_v1/extract_model_outputs.json",
-    "schema_version": "internal-arcadia-extract-model-output-fixture-v1",
-    "sha256": "8291671f5b8ea4d17a0b974ae4efa1620bf49ff6561e27638b522f8c38eff900",
+    "schema_version": "internal-arcadia-boundary-model-fixture-v1",
+    "sha256": "7be4243ce2d39c776743dd24593ef9f2ca6025519246c02486259f69e566c49f",
     "source": {
+      "covered_route_count": 36,
       "document_file_name": "arcadia.pdf",
-      "kind": "reviewed_deterministic_model_output_fixture",
+      "expected_answer_sha256": "f115595ef95cb3caf70841569dfe3513a052a35db5449ff99119897c6321fcf4",
+      "expected_answer_url": "https://cdn.eyelevel.ai/internal-harness/e2e-extract/arcadia-extract.json",
+      "kind": "reviewed_expected_answer_shape_stress_projection",
+      "projection_notes": [
+        "Values come from the reviewed expected answer where present.",
+        "Blank statement scalars are filled so final-output shape gates can assert field presence.",
+        "Utility child rows are expanded from reviewed rows to exercise the 50+ charge shape.",
+        "One unmatched utility child row is added when the reviewed expected answer has no account-level charge."
+      ],
+      "record_counts_by_group": {
+        "charges": 51,
+        "meters": 8
+      },
       "workflow_id": "arcadia_v1-product-path",
       "workflow_version": "2026-07-12T22:34:01Z"
     }
   },
   "output_for": "internal_arcadia_save_callback",
   "relationship_output": {
-    "account_number": "ACCT-0001",
-    "amount_due": 100.25,
-    "amount_due_currency": 100.25,
+    "account_number": "blank reviewed expected value for account_number",
+    "amount_due": 7613.2,
+    "amount_due_currency": "currency_dollars",
     "charges": [
       {
-        "charge_amount": 152.25,
-        "charge_amount_currency": 152.25,
-        "charge_description_as_printed": "Line item charge 053",
-        "meter_number": "MTR-ACCOUNT",
-        "provider_name": "Account Provider",
-        "service_type": "Account Service"
+        "charge_amount": 55.0,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Industrial Energy Electric"
       }
     ],
-    "due_date": "2026-01-01",
-    "invoice_number": "INV-0001",
+    "due_date": "2025-07-30",
+    "invoice_number": "10295809",
     "meters": [
       {
         "charges": [
           {
-            "charge_amount": 100.25,
-            "charge_amount_currency": 100.25,
-            "charge_description_as_printed": "Line item charge 001",
-            "meter_number": "MTR-001",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 55.0,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Industrial Energy Electric",
+            "meter_number": "70182657",
+            "service_type": "electric"
           },
           {
-            "charge_amount": 108.25,
-            "charge_amount_currency": 108.25,
-            "charge_description_as_printed": "Line item charge 009",
-            "meter_number": "MTR-001",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 2560.32,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Consumption",
+            "meter_number": "70182657",
+            "service_type": "electric"
           },
           {
-            "charge_amount": 116.25,
-            "charge_amount_currency": 116.25,
-            "charge_description_as_printed": "Line item charge 017",
-            "meter_number": "MTR-001",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 2218.75,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Demand",
+            "meter_number": "70182657",
+            "service_type": "electric"
           },
           {
-            "charge_amount": 124.25,
-            "charge_amount_currency": 124.25,
-            "charge_description_as_printed": "Line item charge 025",
-            "meter_number": "MTR-001",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 106.68,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Power Cost Adjustment - $.00175wh (S)",
+            "meter_number": "70182657",
+            "service_type": "electric"
           },
           {
-            "charge_amount": 132.25,
-            "charge_amount_currency": 132.25,
-            "charge_description_as_printed": "Line item charge 033",
-            "meter_number": "MTR-001",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 2.81,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "MN Sales Tax",
+            "meter_number": "70182657",
+            "service_type": "electric"
           },
           {
-            "charge_amount": 140.25,
-            "charge_amount_currency": 140.25,
-            "charge_description_as_printed": "Line item charge 041",
-            "meter_number": "MTR-001",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 249.74,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "MN State Tax on Usage",
+            "meter_number": "70182657",
+            "service_type": "electric"
           },
           {
-            "charge_amount": 148.25,
-            "charge_amount_currency": 148.25,
-            "charge_description_as_printed": "Line item charge 049",
-            "meter_number": "MTR-001",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 55.0,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Industrial Energy Electric",
+            "meter_number": "70182657",
+            "service_type": "electric"
+          },
+          {
+            "charge_amount": 2560.32,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Consumption",
+            "meter_number": "70182657",
+            "service_type": "electric"
+          },
+          {
+            "charge_amount": 2218.75,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Demand",
+            "meter_number": "70182657",
+            "service_type": "electric"
+          },
+          {
+            "charge_amount": 106.68,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Power Cost Adjustment - $.00175wh (S)",
+            "meter_number": "70182657",
+            "service_type": "electric"
+          },
+          {
+            "charge_amount": 2.81,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "MN Sales Tax",
+            "meter_number": "70182657",
+            "service_type": "electric"
+          },
+          {
+            "charge_amount": 249.74,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "MN State Tax on Usage",
+            "meter_number": "70182657",
+            "service_type": "electric"
           }
         ],
-        "deregulation_status": "Reviewed sample value 001",
-        "measurement_period_end_date": "2026-01-01",
-        "measurement_period_start_date": "2026-01-01",
-        "meter_creation_explanation": "Reviewed sample value 001",
-        "meter_number": "MTR-001",
-        "pass_through_provider_account_number": "ACCT-0001",
-        "pass_through_provider_name": "Utility Provider A",
-        "point_of_delivery_id": "Reviewed sample value 001",
-        "power_factor_percentage": "Reviewed sample value 001",
-        "provider_name": "Utility Provider A",
-        "recipient_name": "Reviewed sample value 001",
-        "service_address": "Reviewed sample value 001",
-        "service_type": "Electric Service",
-        "tariff_name_as_printed": "Reviewed sample value 001",
-        "units_of_measurement": "Reviewed sample value 001",
-        "usage_value": 100.25
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "70182657",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "electric",
+        "tariff_name_as_printed": "Industrial Electric",
+        "units_of_measurement": "kWh",
+        "usage_value": 60960.0
       },
       {
         "charges": [
           {
-            "charge_amount": 101.25,
-            "charge_amount_currency": 101.25,
-            "charge_description_as_printed": "Line item charge 002",
-            "meter_number": "MTR-002",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 18.43,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water Minimum Charge",
+            "meter_number": "89321458",
+            "service_type": "water"
           },
           {
-            "charge_amount": 109.25,
-            "charge_amount_currency": 109.25,
-            "charge_description_as_printed": "Line item charge 010",
-            "meter_number": "MTR-002",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 223.32,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water",
+            "meter_number": "89321458",
+            "service_type": "water"
           },
           {
-            "charge_amount": 117.25,
-            "charge_amount_currency": 117.25,
-            "charge_description_as_printed": "Line item charge 018",
-            "meter_number": "MTR-002",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 0.81,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "State Water Surcharge",
+            "meter_number": "89321458",
+            "service_type": "water"
           },
           {
-            "charge_amount": 125.25,
-            "charge_amount_currency": 125.25,
-            "charge_description_as_printed": "Line item charge 026",
-            "meter_number": "MTR-002",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 18.43,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water Minimum Charge",
+            "meter_number": "89321458",
+            "service_type": "water"
           },
           {
-            "charge_amount": 133.25,
-            "charge_amount_currency": 133.25,
-            "charge_description_as_printed": "Line item charge 034",
-            "meter_number": "MTR-002",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 223.32,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water",
+            "meter_number": "89321458",
+            "service_type": "water"
           },
           {
-            "charge_amount": 141.25,
-            "charge_amount_currency": 141.25,
-            "charge_description_as_printed": "Line item charge 042",
-            "meter_number": "MTR-002",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
-          },
-          {
-            "charge_amount": 149.25,
-            "charge_amount_currency": 149.25,
-            "charge_description_as_printed": "Line item charge 050",
-            "meter_number": "MTR-002",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 0.81,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "State Water Surcharge",
+            "meter_number": "89321458",
+            "service_type": "water"
           }
         ],
-        "deregulation_status": "Reviewed sample value 002",
-        "measurement_period_end_date": "2026-01-02",
-        "measurement_period_start_date": "2026-01-02",
-        "meter_creation_explanation": "Reviewed sample value 002",
-        "meter_number": "MTR-002",
-        "pass_through_provider_account_number": "ACCT-0002",
-        "pass_through_provider_name": "Utility Provider A",
-        "point_of_delivery_id": "Reviewed sample value 002",
-        "power_factor_percentage": "Reviewed sample value 002",
-        "provider_name": "Utility Provider A",
-        "recipient_name": "Reviewed sample value 002",
-        "service_address": "Reviewed sample value 002",
-        "service_type": "Electric Service",
-        "tariff_name_as_printed": "Reviewed sample value 002",
-        "units_of_measurement": "Reviewed sample value 002",
-        "usage_value": 101.25
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "89321458",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "water",
+        "tariff_name_as_printed": "Commercial Water",
+        "units_of_measurement": "gallons",
+        "usage_value": 42303.0
       },
       {
         "charges": [
           {
-            "charge_amount": 102.25,
-            "charge_amount_currency": 102.25,
-            "charge_description_as_printed": "Line item charge 003",
-            "meter_number": "MTR-003",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 40.61,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Sewer Minimum Charge",
+            "meter_number": "89321458",
+            "service_type": "sewer"
           },
           {
-            "charge_amount": 110.25,
-            "charge_amount_currency": 110.25,
-            "charge_description_as_printed": "Line item charge 011",
-            "meter_number": "MTR-003",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 275.39,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Sewer",
+            "meter_number": "89321458",
+            "service_type": "sewer"
           },
           {
-            "charge_amount": 118.25,
-            "charge_amount_currency": 118.25,
-            "charge_description_as_printed": "Line item charge 019",
-            "meter_number": "MTR-003",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 40.61,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Sewer Minimum Charge",
+            "meter_number": "89321458",
+            "service_type": "sewer"
           },
           {
-            "charge_amount": 126.25,
-            "charge_amount_currency": 126.25,
-            "charge_description_as_printed": "Line item charge 027",
-            "meter_number": "MTR-003",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
-          },
-          {
-            "charge_amount": 134.25,
-            "charge_amount_currency": 134.25,
-            "charge_description_as_printed": "Line item charge 035",
-            "meter_number": "MTR-003",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
-          },
-          {
-            "charge_amount": 142.25,
-            "charge_amount_currency": 142.25,
-            "charge_description_as_printed": "Line item charge 043",
-            "meter_number": "MTR-003",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
-          },
-          {
-            "charge_amount": 150.25,
-            "charge_amount_currency": 150.25,
-            "charge_description_as_printed": "Line item charge 051",
-            "meter_number": "MTR-003",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 275.39,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Sewer",
+            "meter_number": "89321458",
+            "service_type": "sewer"
           }
         ],
-        "deregulation_status": "Reviewed sample value 003",
-        "measurement_period_end_date": "2026-01-03",
-        "measurement_period_start_date": "2026-01-03",
-        "meter_creation_explanation": "Reviewed sample value 003",
-        "meter_number": "MTR-003",
-        "pass_through_provider_account_number": "ACCT-0003",
-        "pass_through_provider_name": "Utility Provider A",
-        "point_of_delivery_id": "Reviewed sample value 003",
-        "power_factor_percentage": "Reviewed sample value 003",
-        "provider_name": "Utility Provider A",
-        "recipient_name": "Reviewed sample value 003",
-        "service_address": "Reviewed sample value 003",
-        "service_type": "Electric Service",
-        "tariff_name_as_printed": "Reviewed sample value 003",
-        "units_of_measurement": "Reviewed sample value 003",
-        "usage_value": 102.25
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "89321458",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "sewer",
+        "tariff_name_as_printed": "Commercial Sewer",
+        "units_of_measurement": "gallons",
+        "usage_value": 42303.0
       },
       {
         "charges": [
           {
-            "charge_amount": 103.25,
-            "charge_amount_currency": 103.25,
-            "charge_description_as_printed": "Line item charge 004",
-            "meter_number": "MTR-004",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 18.43,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water Minimum Charge",
+            "meter_number": "89321459",
+            "service_type": "water"
           },
           {
-            "charge_amount": 111.25,
-            "charge_amount_currency": 111.25,
-            "charge_description_as_printed": "Line item charge 012",
-            "meter_number": "MTR-004",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 212.19,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water",
+            "meter_number": "89321459",
+            "service_type": "water"
           },
           {
-            "charge_amount": 119.25,
-            "charge_amount_currency": 119.25,
-            "charge_description_as_printed": "Line item charge 020",
-            "meter_number": "MTR-004",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 0.81,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "State Water Surcharge",
+            "meter_number": "89321459",
+            "service_type": "water"
           },
           {
-            "charge_amount": 127.25,
-            "charge_amount_currency": 127.25,
-            "charge_description_as_printed": "Line item charge 028",
-            "meter_number": "MTR-004",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 18.43,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water Minimum Charge",
+            "meter_number": "89321459",
+            "service_type": "water"
           },
           {
-            "charge_amount": 135.25,
-            "charge_amount_currency": 135.25,
-            "charge_description_as_printed": "Line item charge 036",
-            "meter_number": "MTR-004",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 212.19,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water",
+            "meter_number": "89321459",
+            "service_type": "water"
           },
           {
-            "charge_amount": 143.25,
-            "charge_amount_currency": 143.25,
-            "charge_description_as_printed": "Line item charge 044",
-            "meter_number": "MTR-004",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
-          },
-          {
-            "charge_amount": 151.25,
-            "charge_amount_currency": 151.25,
-            "charge_description_as_printed": "Line item charge 052",
-            "meter_number": "MTR-004",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 0.81,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "State Water Surcharge",
+            "meter_number": "89321459",
+            "service_type": "water"
           }
         ],
-        "deregulation_status": "Reviewed sample value 004",
-        "measurement_period_end_date": "2026-01-04",
-        "measurement_period_start_date": "2026-01-04",
-        "meter_creation_explanation": "Reviewed sample value 004",
-        "meter_number": "MTR-004",
-        "pass_through_provider_account_number": "ACCT-0004",
-        "pass_through_provider_name": "Utility Provider A",
-        "point_of_delivery_id": "Reviewed sample value 004",
-        "power_factor_percentage": "Reviewed sample value 004",
-        "provider_name": "Utility Provider A",
-        "recipient_name": "Reviewed sample value 004",
-        "service_address": "Reviewed sample value 004",
-        "service_type": "Electric Service",
-        "tariff_name_as_printed": "Reviewed sample value 004",
-        "units_of_measurement": "Reviewed sample value 004",
-        "usage_value": 103.25
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "89321459",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "water",
+        "tariff_name_as_printed": "Commercial Water",
+        "units_of_measurement": "gallons",
+        "usage_value": 40356.0
       },
       {
         "charges": [
           {
-            "charge_amount": 104.25,
-            "charge_amount_currency": 104.25,
-            "charge_description_as_printed": "Line item charge 005",
-            "meter_number": "MTR-005",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 40.61,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Sewer Minimum Charge",
+            "meter_number": "89321459",
+            "service_type": "sewer"
           },
           {
-            "charge_amount": 112.25,
-            "charge_amount_currency": 112.25,
-            "charge_description_as_printed": "Line item charge 013",
-            "meter_number": "MTR-005",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 262.71,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Sewer",
+            "meter_number": "89321459",
+            "service_type": "sewer"
           },
           {
-            "charge_amount": 120.25,
-            "charge_amount_currency": 120.25,
-            "charge_description_as_printed": "Line item charge 021",
-            "meter_number": "MTR-005",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 40.61,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Sewer Minimum Charge",
+            "meter_number": "89321459",
+            "service_type": "sewer"
           },
           {
-            "charge_amount": 128.25,
-            "charge_amount_currency": 128.25,
-            "charge_description_as_printed": "Line item charge 029",
-            "meter_number": "MTR-005",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
-          },
-          {
-            "charge_amount": 136.25,
-            "charge_amount_currency": 136.25,
-            "charge_description_as_printed": "Line item charge 037",
-            "meter_number": "MTR-005",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
-          },
-          {
-            "charge_amount": 144.25,
-            "charge_amount_currency": 144.25,
-            "charge_description_as_printed": "Line item charge 045",
-            "meter_number": "MTR-005",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 262.71,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Sewer",
+            "meter_number": "89321459",
+            "service_type": "sewer"
           }
         ],
-        "deregulation_status": "Reviewed sample value 005",
-        "measurement_period_end_date": "2026-01-05",
-        "measurement_period_start_date": "2026-01-05",
-        "meter_creation_explanation": "Reviewed sample value 005",
-        "meter_number": "MTR-005",
-        "pass_through_provider_account_number": "ACCT-0005",
-        "pass_through_provider_name": "Utility Provider A",
-        "point_of_delivery_id": "Reviewed sample value 005",
-        "power_factor_percentage": "Reviewed sample value 005",
-        "provider_name": "Utility Provider A",
-        "recipient_name": "Reviewed sample value 005",
-        "service_address": "Reviewed sample value 005",
-        "service_type": "Electric Service",
-        "tariff_name_as_printed": "Reviewed sample value 005",
-        "units_of_measurement": "Reviewed sample value 005",
-        "usage_value": 104.25
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "89321459",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "sewer",
+        "tariff_name_as_printed": "Commercial Sewer",
+        "units_of_measurement": "gallons",
+        "usage_value": 40356.0
       },
       {
         "charges": [
           {
-            "charge_amount": 105.25,
-            "charge_amount_currency": 105.25,
-            "charge_description_as_printed": "Line item charge 006",
-            "meter_number": "MTR-006",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 18.43,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water Minimum Charge",
+            "meter_number": "91496724",
+            "service_type": "irrigation"
           },
           {
-            "charge_amount": 113.25,
-            "charge_amount_currency": 113.25,
-            "charge_description_as_printed": "Line item charge 014",
-            "meter_number": "MTR-006",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 533.9,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water",
+            "meter_number": "91496724",
+            "service_type": "irrigation"
           },
           {
-            "charge_amount": 121.25,
-            "charge_amount_currency": 121.25,
-            "charge_description_as_printed": "Line item charge 022",
-            "meter_number": "MTR-006",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 1.27,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "MN Sales Tax",
+            "meter_number": "91496724",
+            "service_type": "irrigation"
           },
           {
-            "charge_amount": 129.25,
-            "charge_amount_currency": 129.25,
-            "charge_description_as_printed": "Line item charge 030",
-            "meter_number": "MTR-006",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 36.71,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "MN State Tax on Usage",
+            "meter_number": "91496724",
+            "service_type": "irrigation"
           },
           {
-            "charge_amount": 137.25,
-            "charge_amount_currency": 137.25,
-            "charge_description_as_printed": "Line item charge 038",
-            "meter_number": "MTR-006",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 0.81,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "State Water Surcharge",
+            "meter_number": "91496724",
+            "service_type": "irrigation"
           },
           {
-            "charge_amount": 145.25,
-            "charge_amount_currency": 145.25,
-            "charge_description_as_printed": "Line item charge 046",
-            "meter_number": "MTR-006",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 18.43,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water Minimum Charge",
+            "meter_number": "91496724",
+            "service_type": "irrigation"
+          },
+          {
+            "charge_amount": 533.9,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water",
+            "meter_number": "91496724",
+            "service_type": "irrigation"
+          },
+          {
+            "charge_amount": 1.27,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "MN Sales Tax",
+            "meter_number": "91496724",
+            "service_type": "irrigation"
+          },
+          {
+            "charge_amount": 36.71,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "MN State Tax on Usage",
+            "meter_number": "91496724",
+            "service_type": "irrigation"
+          },
+          {
+            "charge_amount": 0.81,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "State Water Surcharge",
+            "meter_number": "91496724",
+            "service_type": "irrigation"
           }
         ],
-        "deregulation_status": "Reviewed sample value 006",
-        "measurement_period_end_date": "2026-01-06",
-        "measurement_period_start_date": "2026-01-06",
-        "meter_creation_explanation": "Reviewed sample value 006",
-        "meter_number": "MTR-006",
-        "pass_through_provider_account_number": "ACCT-0006",
-        "pass_through_provider_name": "Utility Provider A",
-        "point_of_delivery_id": "Reviewed sample value 006",
-        "power_factor_percentage": "Reviewed sample value 006",
-        "provider_name": "Utility Provider A",
-        "recipient_name": "Reviewed sample value 006",
-        "service_address": "Reviewed sample value 006",
-        "service_type": "Electric Service",
-        "tariff_name_as_printed": "Reviewed sample value 006",
-        "units_of_measurement": "Reviewed sample value 006",
-        "usage_value": 105.25
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "91496724",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "irrigation",
+        "tariff_name_as_printed": "Commercial Water",
+        "units_of_measurement": "gallons",
+        "usage_value": 96600.0
       },
       {
         "charges": [
           {
-            "charge_amount": 106.25,
-            "charge_amount_currency": 106.25,
-            "charge_description_as_printed": "Line item charge 007",
-            "meter_number": "MTR-007",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 18.43,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water Minimum Charge",
+            "meter_number": "91496726",
+            "service_type": "water"
           },
           {
-            "charge_amount": 114.25,
-            "charge_amount_currency": 114.25,
-            "charge_description_as_printed": "Line item charge 015",
-            "meter_number": "MTR-007",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 295.95,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water",
+            "meter_number": "91496726",
+            "service_type": "water"
           },
           {
-            "charge_amount": 122.25,
-            "charge_amount_currency": 122.25,
-            "charge_description_as_printed": "Line item charge 023",
-            "meter_number": "MTR-007",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 20.35,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "MN State Tax on Usage",
+            "meter_number": "91496726",
+            "service_type": "water"
           },
           {
-            "charge_amount": 130.25,
-            "charge_amount_currency": 130.25,
-            "charge_description_as_printed": "Line item charge 031",
-            "meter_number": "MTR-007",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 1.27,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "MN Sales Tax",
+            "meter_number": "91496726",
+            "service_type": "water"
           },
           {
-            "charge_amount": 138.25,
-            "charge_amount_currency": 138.25,
-            "charge_description_as_printed": "Line item charge 039",
-            "meter_number": "MTR-007",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 0.81,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "State Water Surcharge",
+            "meter_number": "91496726",
+            "service_type": "water"
           },
           {
-            "charge_amount": 146.25,
-            "charge_amount_currency": 146.25,
-            "charge_description_as_printed": "Line item charge 047",
-            "meter_number": "MTR-007",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 18.43,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water Minimum Charge",
+            "meter_number": "91496726",
+            "service_type": "water"
           }
         ],
-        "deregulation_status": "Reviewed sample value 007",
-        "measurement_period_end_date": "2026-01-07",
-        "measurement_period_start_date": "2026-01-07",
-        "meter_creation_explanation": "Reviewed sample value 007",
-        "meter_number": "MTR-007",
-        "pass_through_provider_account_number": "ACCT-0007",
-        "pass_through_provider_name": "Utility Provider A",
-        "point_of_delivery_id": "Reviewed sample value 007",
-        "power_factor_percentage": "Reviewed sample value 007",
-        "provider_name": "Utility Provider A",
-        "recipient_name": "Reviewed sample value 007",
-        "service_address": "Reviewed sample value 007",
-        "service_type": "Electric Service",
-        "tariff_name_as_printed": "Reviewed sample value 007",
-        "units_of_measurement": "Reviewed sample value 007",
-        "usage_value": 106.25
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "91496726",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "water",
+        "tariff_name_as_printed": "Commercial Water",
+        "units_of_measurement": "gallons",
+        "usage_value": 55000.0
       },
       {
         "charges": [
           {
-            "charge_amount": 107.25,
-            "charge_amount_currency": 107.25,
-            "charge_description_as_printed": "Line item charge 008",
-            "meter_number": "MTR-008",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 40.61,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Sewer Minimum Charge",
+            "meter_number": "91496726",
+            "service_type": "sewer"
           },
           {
-            "charge_amount": 115.25,
-            "charge_amount_currency": 115.25,
-            "charge_description_as_printed": "Line item charge 016",
-            "meter_number": "MTR-008",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
-          },
-          {
-            "charge_amount": 123.25,
-            "charge_amount_currency": 123.25,
-            "charge_description_as_printed": "Line item charge 024",
-            "meter_number": "MTR-008",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
-          },
-          {
-            "charge_amount": 131.25,
-            "charge_amount_currency": 131.25,
-            "charge_description_as_printed": "Line item charge 032",
-            "meter_number": "MTR-008",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
-          },
-          {
-            "charge_amount": 139.25,
-            "charge_amount_currency": 139.25,
-            "charge_description_as_printed": "Line item charge 040",
-            "meter_number": "MTR-008",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
-          },
-          {
-            "charge_amount": 147.25,
-            "charge_amount_currency": 147.25,
-            "charge_description_as_printed": "Line item charge 048",
-            "meter_number": "MTR-008",
-            "provider_name": "Utility Provider A",
-            "service_type": "Electric Service"
+            "charge_amount": 358.05,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Sewer",
+            "meter_number": "91496726",
+            "service_type": "sewer"
           }
         ],
-        "deregulation_status": "Reviewed sample value 008",
-        "measurement_period_end_date": "2026-01-08",
-        "measurement_period_start_date": "2026-01-08",
-        "meter_creation_explanation": "Reviewed sample value 008",
-        "meter_number": "MTR-008",
-        "pass_through_provider_account_number": "ACCT-0008",
-        "pass_through_provider_name": "Utility Provider A",
-        "point_of_delivery_id": "Reviewed sample value 008",
-        "power_factor_percentage": "Reviewed sample value 008",
-        "provider_name": "Utility Provider A",
-        "recipient_name": "Reviewed sample value 008",
-        "service_address": "Reviewed sample value 008",
-        "service_type": "Electric Service",
-        "tariff_name_as_printed": "Reviewed sample value 008",
-        "units_of_measurement": "Reviewed sample value 008",
-        "usage_value": 107.25
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "91496726",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "sewer",
+        "tariff_name_as_printed": "Commercial Sewer",
+        "units_of_measurement": "gallons",
+        "usage_value": 55000.0
       }
     ],
-    "provider_name": "Utility Provider A",
-    "recipient_name": "Reviewed sample value 001",
-    "service_address": "Reviewed sample value 001",
-    "source_modality": "Reviewed sample value 001",
-    "statement_date": "2026-01-01",
-    "statement_period_end_date": "2026-01-01",
-    "statement_period_start_date": "2026-01-01",
-    "statement_type": "Reviewed sample value 001",
-    "total_billing_amount": 100.25
+    "provider_name": "City of Windom",
+    "recipient_name": "KWIK TRIP (1147)",
+    "service_address": "blank reviewed expected value for service_address",
+    "source_modality": "Direct",
+    "statement_date": "2025-07-08",
+    "statement_period_end_date": "2025-06-30",
+    "statement_period_start_date": "2025-06-01",
+    "statement_type": "statement_type_bill",
+    "total_billing_amount": 7613.2
   },
   "request": {
     "callbackURL": "https://api.groundx.ai/callback/layout",
@@ -1698,406 +1461,6 @@
       "workflow_group": "meters"
     },
     {
-      "final_path": "/meters/*/pass_through_provider_account_number",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 0,
-      "workflow_field": "pass_through_provider_account_number",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/pass_through_provider_account_number",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 1,
-      "workflow_field": "pass_through_provider_account_number",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/pass_through_provider_account_number",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 2,
-      "workflow_field": "pass_through_provider_account_number",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/pass_through_provider_account_number",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 3,
-      "workflow_field": "pass_through_provider_account_number",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/pass_through_provider_account_number",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 4,
-      "workflow_field": "pass_through_provider_account_number",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/pass_through_provider_account_number",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 5,
-      "workflow_field": "pass_through_provider_account_number",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/pass_through_provider_account_number",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 6,
-      "workflow_field": "pass_through_provider_account_number",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/pass_through_provider_account_number",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 7,
-      "workflow_field": "pass_through_provider_account_number",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/pass_through_provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 0,
-      "workflow_field": "pass_through_provider_name",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/pass_through_provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 1,
-      "workflow_field": "pass_through_provider_name",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/pass_through_provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 2,
-      "workflow_field": "pass_through_provider_name",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/pass_through_provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 3,
-      "workflow_field": "pass_through_provider_name",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/pass_through_provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 4,
-      "workflow_field": "pass_through_provider_name",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/pass_through_provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 5,
-      "workflow_field": "pass_through_provider_name",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/pass_through_provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 6,
-      "workflow_field": "pass_through_provider_name",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/pass_through_provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 7,
-      "workflow_field": "pass_through_provider_name",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/point_of_delivery_id",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 0,
-      "workflow_field": "point_of_delivery_id",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/point_of_delivery_id",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 1,
-      "workflow_field": "point_of_delivery_id",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/point_of_delivery_id",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 2,
-      "workflow_field": "point_of_delivery_id",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/point_of_delivery_id",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 3,
-      "workflow_field": "point_of_delivery_id",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/point_of_delivery_id",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 4,
-      "workflow_field": "point_of_delivery_id",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/point_of_delivery_id",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 5,
-      "workflow_field": "point_of_delivery_id",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/point_of_delivery_id",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 6,
-      "workflow_field": "point_of_delivery_id",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/point_of_delivery_id",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 7,
-      "workflow_field": "point_of_delivery_id",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/power_factor_percentage",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 0,
-      "workflow_field": "power_factor_percentage",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/power_factor_percentage",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 1,
-      "workflow_field": "power_factor_percentage",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/power_factor_percentage",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 2,
-      "workflow_field": "power_factor_percentage",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/power_factor_percentage",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 3,
-      "workflow_field": "power_factor_percentage",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/power_factor_percentage",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 4,
-      "workflow_field": "power_factor_percentage",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/power_factor_percentage",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 5,
-      "workflow_field": "power_factor_percentage",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/power_factor_percentage",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 6,
-      "workflow_field": "power_factor_percentage",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/power_factor_percentage",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 7,
-      "workflow_field": "power_factor_percentage",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 0,
-      "workflow_field": "provider_name",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 1,
-      "workflow_field": "provider_name",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 2,
-      "workflow_field": "provider_name",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 3,
-      "workflow_field": "provider_name",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 4,
-      "workflow_field": "provider_name",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 5,
-      "workflow_field": "provider_name",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 6,
-      "workflow_field": "provider_name",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 7,
-      "workflow_field": "provider_name",
-      "workflow_group": "meters"
-    },
-    {
       "final_path": "/meters/*/recipient_name",
       "output_source": "customChunkOutputs",
       "page_numbers": [
@@ -2175,86 +1538,6 @@
       ],
       "record_index": 7,
       "workflow_field": "recipient_name",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/service_address",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 0,
-      "workflow_field": "service_address",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/service_address",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 1,
-      "workflow_field": "service_address",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/service_address",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 2,
-      "workflow_field": "service_address",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/service_address",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 3,
-      "workflow_field": "service_address",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/service_address",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 4,
-      "workflow_field": "service_address",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/service_address",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 5,
-      "workflow_field": "service_address",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/service_address",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 6,
-      "workflow_field": "service_address",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/service_address",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 7,
-      "workflow_field": "service_address",
       "workflow_group": "meters"
     },
     {
@@ -2575,86 +1858,6 @@
       ],
       "record_index": 7,
       "workflow_field": "usage_value",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/meter_creation_explanation",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 0,
-      "workflow_field": "meter_creation_explanation",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/meter_creation_explanation",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 1,
-      "workflow_field": "meter_creation_explanation",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/meter_creation_explanation",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 2,
-      "workflow_field": "meter_creation_explanation",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/meter_creation_explanation",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 3,
-      "workflow_field": "meter_creation_explanation",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/meter_creation_explanation",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 4,
-      "workflow_field": "meter_creation_explanation",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/meter_creation_explanation",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 5,
-      "workflow_field": "meter_creation_explanation",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/meter_creation_explanation",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 6,
-      "workflow_field": "meter_creation_explanation",
-      "workflow_group": "meters"
-    },
-    {
-      "final_path": "/meters/*/meter_creation_explanation",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 7,
-      "workflow_field": "meter_creation_explanation",
       "workflow_group": "meters"
     },
     {
@@ -3164,26 +2367,6 @@
         1
       ],
       "record_index": 50,
-      "workflow_field": "charge_amount",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/charge_amount",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 51,
-      "workflow_field": "charge_amount",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/charge_amount",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 52,
       "workflow_field": "charge_amount",
       "workflow_group": "charges"
     },
@@ -3698,26 +2881,6 @@
       "workflow_group": "charges"
     },
     {
-      "final_path": "/charges/*/charge_amount_currency",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 51,
-      "workflow_field": "charge_amount_currency",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/charge_amount_currency",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 52,
-      "workflow_field": "charge_amount_currency",
-      "workflow_group": "charges"
-    },
-    {
       "final_path": "/charges/*/charge_description_as_printed",
       "output_source": "customChunkOutputs",
       "page_numbers": [
@@ -4228,26 +3391,6 @@
       "workflow_group": "charges"
     },
     {
-      "final_path": "/charges/*/charge_description_as_printed",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 51,
-      "workflow_field": "charge_description_as_printed",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/charge_description_as_printed",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 52,
-      "workflow_field": "charge_description_as_printed",
-      "workflow_group": "charges"
-    },
-    {
       "final_path": "/charges/*/meter_number",
       "output_source": "customChunkOutputs",
       "page_numbers": [
@@ -4748,566 +3891,6 @@
       "workflow_group": "charges"
     },
     {
-      "final_path": "/charges/*/meter_number",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 50,
-      "workflow_field": "meter_number",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/meter_number",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 51,
-      "workflow_field": "meter_number",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/meter_number",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 52,
-      "workflow_field": "meter_number",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 0,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 1,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 2,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 3,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 4,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 5,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 6,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 7,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 8,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 9,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 10,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 11,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 12,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 13,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 14,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 15,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 16,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 17,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 18,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 19,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 20,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 21,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 22,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 23,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 24,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 25,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 26,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 27,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 28,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 29,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 30,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 31,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 32,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 33,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 34,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 35,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 36,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 37,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 38,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 39,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 40,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 41,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 42,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 43,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 44,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 45,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 46,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 47,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 48,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 49,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 50,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 51,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/provider_name",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 52,
-      "workflow_field": "provider_name",
-      "workflow_group": "charges"
-    },
-    {
       "final_path": "/charges/*/service_type",
       "output_source": "customChunkOutputs",
       "page_numbers": [
@@ -5804,36 +4387,6 @@
         1
       ],
       "record_index": 49,
-      "workflow_field": "service_type",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/service_type",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 50,
-      "workflow_field": "service_type",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/service_type",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 51,
-      "workflow_field": "service_type",
-      "workflow_group": "charges"
-    },
-    {
-      "final_path": "/charges/*/service_type",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 52,
       "workflow_field": "service_type",
       "workflow_group": "charges"
     }
@@ -5843,591 +4396,466 @@
   "workflow_output": {
     "charges": [
       {
-        "charge_amount": 100.25,
-        "charge_amount_currency": 100.25,
-        "charge_description_as_printed": "Line item charge 001",
-        "meter_number": "MTR-001",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 55.0,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Industrial Energy Electric",
+        "meter_number": "70182657",
+        "service_type": "electric"
       },
       {
-        "charge_amount": 101.25,
-        "charge_amount_currency": 101.25,
-        "charge_description_as_printed": "Line item charge 002",
-        "meter_number": "MTR-002",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 2560.32,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Consumption",
+        "meter_number": "70182657",
+        "service_type": "electric"
       },
       {
-        "charge_amount": 102.25,
-        "charge_amount_currency": 102.25,
-        "charge_description_as_printed": "Line item charge 003",
-        "meter_number": "MTR-003",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 2218.75,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Demand",
+        "meter_number": "70182657",
+        "service_type": "electric"
       },
       {
-        "charge_amount": 103.25,
-        "charge_amount_currency": 103.25,
-        "charge_description_as_printed": "Line item charge 004",
-        "meter_number": "MTR-004",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 106.68,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Power Cost Adjustment - $.00175wh (S)",
+        "meter_number": "70182657",
+        "service_type": "electric"
       },
       {
-        "charge_amount": 104.25,
-        "charge_amount_currency": 104.25,
-        "charge_description_as_printed": "Line item charge 005",
-        "meter_number": "MTR-005",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 2.81,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "MN Sales Tax",
+        "meter_number": "70182657",
+        "service_type": "electric"
       },
       {
-        "charge_amount": 105.25,
-        "charge_amount_currency": 105.25,
-        "charge_description_as_printed": "Line item charge 006",
-        "meter_number": "MTR-006",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 249.74,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "MN State Tax on Usage",
+        "meter_number": "70182657",
+        "service_type": "electric"
       },
       {
-        "charge_amount": 106.25,
-        "charge_amount_currency": 106.25,
-        "charge_description_as_printed": "Line item charge 007",
-        "meter_number": "MTR-007",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 18.43,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Water Minimum Charge",
+        "meter_number": "89321458",
+        "service_type": "water"
       },
       {
-        "charge_amount": 107.25,
-        "charge_amount_currency": 107.25,
-        "charge_description_as_printed": "Line item charge 008",
-        "meter_number": "MTR-008",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 223.32,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Water",
+        "meter_number": "89321458",
+        "service_type": "water"
       },
       {
-        "charge_amount": 108.25,
-        "charge_amount_currency": 108.25,
-        "charge_description_as_printed": "Line item charge 009",
-        "meter_number": "MTR-001",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 0.81,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "State Water Surcharge",
+        "meter_number": "89321458",
+        "service_type": "water"
       },
       {
-        "charge_amount": 109.25,
-        "charge_amount_currency": 109.25,
-        "charge_description_as_printed": "Line item charge 010",
-        "meter_number": "MTR-002",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 40.61,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Sewer Minimum Charge",
+        "meter_number": "89321458",
+        "service_type": "sewer"
       },
       {
-        "charge_amount": 110.25,
-        "charge_amount_currency": 110.25,
-        "charge_description_as_printed": "Line item charge 011",
-        "meter_number": "MTR-003",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 275.39,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Sewer",
+        "meter_number": "89321458",
+        "service_type": "sewer"
       },
       {
-        "charge_amount": 111.25,
-        "charge_amount_currency": 111.25,
-        "charge_description_as_printed": "Line item charge 012",
-        "meter_number": "MTR-004",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 18.43,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Water Minimum Charge",
+        "meter_number": "89321459",
+        "service_type": "water"
       },
       {
-        "charge_amount": 112.25,
-        "charge_amount_currency": 112.25,
-        "charge_description_as_printed": "Line item charge 013",
-        "meter_number": "MTR-005",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 212.19,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Water",
+        "meter_number": "89321459",
+        "service_type": "water"
       },
       {
-        "charge_amount": 113.25,
-        "charge_amount_currency": 113.25,
-        "charge_description_as_printed": "Line item charge 014",
-        "meter_number": "MTR-006",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 0.81,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "State Water Surcharge",
+        "meter_number": "89321459",
+        "service_type": "water"
       },
       {
-        "charge_amount": 114.25,
-        "charge_amount_currency": 114.25,
-        "charge_description_as_printed": "Line item charge 015",
-        "meter_number": "MTR-007",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 40.61,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Sewer Minimum Charge",
+        "meter_number": "89321459",
+        "service_type": "sewer"
       },
       {
-        "charge_amount": 115.25,
-        "charge_amount_currency": 115.25,
-        "charge_description_as_printed": "Line item charge 016",
-        "meter_number": "MTR-008",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 262.71,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Sewer",
+        "meter_number": "89321459",
+        "service_type": "sewer"
       },
       {
-        "charge_amount": 116.25,
-        "charge_amount_currency": 116.25,
-        "charge_description_as_printed": "Line item charge 017",
-        "meter_number": "MTR-001",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 18.43,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Water Minimum Charge",
+        "meter_number": "91496724",
+        "service_type": "irrigation"
       },
       {
-        "charge_amount": 117.25,
-        "charge_amount_currency": 117.25,
-        "charge_description_as_printed": "Line item charge 018",
-        "meter_number": "MTR-002",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 533.9,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Water",
+        "meter_number": "91496724",
+        "service_type": "irrigation"
       },
       {
-        "charge_amount": 118.25,
-        "charge_amount_currency": 118.25,
-        "charge_description_as_printed": "Line item charge 019",
-        "meter_number": "MTR-003",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 1.27,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "MN Sales Tax",
+        "meter_number": "91496724",
+        "service_type": "irrigation"
       },
       {
-        "charge_amount": 119.25,
-        "charge_amount_currency": 119.25,
-        "charge_description_as_printed": "Line item charge 020",
-        "meter_number": "MTR-004",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 36.71,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "MN State Tax on Usage",
+        "meter_number": "91496724",
+        "service_type": "irrigation"
       },
       {
-        "charge_amount": 120.25,
-        "charge_amount_currency": 120.25,
-        "charge_description_as_printed": "Line item charge 021",
-        "meter_number": "MTR-005",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 0.81,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "State Water Surcharge",
+        "meter_number": "91496724",
+        "service_type": "irrigation"
       },
       {
-        "charge_amount": 121.25,
-        "charge_amount_currency": 121.25,
-        "charge_description_as_printed": "Line item charge 022",
-        "meter_number": "MTR-006",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 18.43,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Water Minimum Charge",
+        "meter_number": "91496726",
+        "service_type": "water"
       },
       {
-        "charge_amount": 122.25,
-        "charge_amount_currency": 122.25,
-        "charge_description_as_printed": "Line item charge 023",
-        "meter_number": "MTR-007",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 295.95,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Water",
+        "meter_number": "91496726",
+        "service_type": "water"
       },
       {
-        "charge_amount": 123.25,
-        "charge_amount_currency": 123.25,
-        "charge_description_as_printed": "Line item charge 024",
-        "meter_number": "MTR-008",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 20.35,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "MN State Tax on Usage",
+        "meter_number": "91496726",
+        "service_type": "water"
       },
       {
-        "charge_amount": 124.25,
-        "charge_amount_currency": 124.25,
-        "charge_description_as_printed": "Line item charge 025",
-        "meter_number": "MTR-001",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 1.27,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "MN Sales Tax",
+        "meter_number": "91496726",
+        "service_type": "water"
       },
       {
-        "charge_amount": 125.25,
-        "charge_amount_currency": 125.25,
-        "charge_description_as_printed": "Line item charge 026",
-        "meter_number": "MTR-002",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 0.81,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "State Water Surcharge",
+        "meter_number": "91496726",
+        "service_type": "water"
       },
       {
-        "charge_amount": 126.25,
-        "charge_amount_currency": 126.25,
-        "charge_description_as_printed": "Line item charge 027",
-        "meter_number": "MTR-003",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 40.61,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Sewer Minimum Charge",
+        "meter_number": "91496726",
+        "service_type": "sewer"
       },
       {
-        "charge_amount": 127.25,
-        "charge_amount_currency": 127.25,
-        "charge_description_as_printed": "Line item charge 028",
-        "meter_number": "MTR-004",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 358.05,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Sewer",
+        "meter_number": "91496726",
+        "service_type": "sewer"
       },
       {
-        "charge_amount": 128.25,
-        "charge_amount_currency": 128.25,
-        "charge_description_as_printed": "Line item charge 029",
-        "meter_number": "MTR-005",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 55.0,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Industrial Energy Electric",
+        "meter_number": "70182657",
+        "service_type": "electric"
       },
       {
-        "charge_amount": 129.25,
-        "charge_amount_currency": 129.25,
-        "charge_description_as_printed": "Line item charge 030",
-        "meter_number": "MTR-006",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 2560.32,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Consumption",
+        "meter_number": "70182657",
+        "service_type": "electric"
       },
       {
-        "charge_amount": 130.25,
-        "charge_amount_currency": 130.25,
-        "charge_description_as_printed": "Line item charge 031",
-        "meter_number": "MTR-007",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 2218.75,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Demand",
+        "meter_number": "70182657",
+        "service_type": "electric"
       },
       {
-        "charge_amount": 131.25,
-        "charge_amount_currency": 131.25,
-        "charge_description_as_printed": "Line item charge 032",
-        "meter_number": "MTR-008",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 106.68,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Power Cost Adjustment - $.00175wh (S)",
+        "meter_number": "70182657",
+        "service_type": "electric"
       },
       {
-        "charge_amount": 132.25,
-        "charge_amount_currency": 132.25,
-        "charge_description_as_printed": "Line item charge 033",
-        "meter_number": "MTR-001",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 2.81,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "MN Sales Tax",
+        "meter_number": "70182657",
+        "service_type": "electric"
       },
       {
-        "charge_amount": 133.25,
-        "charge_amount_currency": 133.25,
-        "charge_description_as_printed": "Line item charge 034",
-        "meter_number": "MTR-002",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 249.74,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "MN State Tax on Usage",
+        "meter_number": "70182657",
+        "service_type": "electric"
       },
       {
-        "charge_amount": 134.25,
-        "charge_amount_currency": 134.25,
-        "charge_description_as_printed": "Line item charge 035",
-        "meter_number": "MTR-003",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 18.43,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Water Minimum Charge",
+        "meter_number": "89321458",
+        "service_type": "water"
       },
       {
-        "charge_amount": 135.25,
-        "charge_amount_currency": 135.25,
-        "charge_description_as_printed": "Line item charge 036",
-        "meter_number": "MTR-004",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 223.32,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Water",
+        "meter_number": "89321458",
+        "service_type": "water"
       },
       {
-        "charge_amount": 136.25,
-        "charge_amount_currency": 136.25,
-        "charge_description_as_printed": "Line item charge 037",
-        "meter_number": "MTR-005",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 0.81,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "State Water Surcharge",
+        "meter_number": "89321458",
+        "service_type": "water"
       },
       {
-        "charge_amount": 137.25,
-        "charge_amount_currency": 137.25,
-        "charge_description_as_printed": "Line item charge 038",
-        "meter_number": "MTR-006",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 40.61,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Sewer Minimum Charge",
+        "meter_number": "89321458",
+        "service_type": "sewer"
       },
       {
-        "charge_amount": 138.25,
-        "charge_amount_currency": 138.25,
-        "charge_description_as_printed": "Line item charge 039",
-        "meter_number": "MTR-007",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 275.39,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Sewer",
+        "meter_number": "89321458",
+        "service_type": "sewer"
       },
       {
-        "charge_amount": 139.25,
-        "charge_amount_currency": 139.25,
-        "charge_description_as_printed": "Line item charge 040",
-        "meter_number": "MTR-008",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 18.43,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Water Minimum Charge",
+        "meter_number": "89321459",
+        "service_type": "water"
       },
       {
-        "charge_amount": 140.25,
-        "charge_amount_currency": 140.25,
-        "charge_description_as_printed": "Line item charge 041",
-        "meter_number": "MTR-001",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 212.19,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Water",
+        "meter_number": "89321459",
+        "service_type": "water"
       },
       {
-        "charge_amount": 141.25,
-        "charge_amount_currency": 141.25,
-        "charge_description_as_printed": "Line item charge 042",
-        "meter_number": "MTR-002",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 0.81,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "State Water Surcharge",
+        "meter_number": "89321459",
+        "service_type": "water"
       },
       {
-        "charge_amount": 142.25,
-        "charge_amount_currency": 142.25,
-        "charge_description_as_printed": "Line item charge 043",
-        "meter_number": "MTR-003",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 40.61,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Sewer Minimum Charge",
+        "meter_number": "89321459",
+        "service_type": "sewer"
       },
       {
-        "charge_amount": 143.25,
-        "charge_amount_currency": 143.25,
-        "charge_description_as_printed": "Line item charge 044",
-        "meter_number": "MTR-004",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 262.71,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Sewer",
+        "meter_number": "89321459",
+        "service_type": "sewer"
       },
       {
-        "charge_amount": 144.25,
-        "charge_amount_currency": 144.25,
-        "charge_description_as_printed": "Line item charge 045",
-        "meter_number": "MTR-005",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 18.43,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Water Minimum Charge",
+        "meter_number": "91496724",
+        "service_type": "irrigation"
       },
       {
-        "charge_amount": 145.25,
-        "charge_amount_currency": 145.25,
-        "charge_description_as_printed": "Line item charge 046",
-        "meter_number": "MTR-006",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 533.9,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Water",
+        "meter_number": "91496724",
+        "service_type": "irrigation"
       },
       {
-        "charge_amount": 146.25,
-        "charge_amount_currency": 146.25,
-        "charge_description_as_printed": "Line item charge 047",
-        "meter_number": "MTR-007",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 1.27,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "MN Sales Tax",
+        "meter_number": "91496724",
+        "service_type": "irrigation"
       },
       {
-        "charge_amount": 147.25,
-        "charge_amount_currency": 147.25,
-        "charge_description_as_printed": "Line item charge 048",
-        "meter_number": "MTR-008",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 36.71,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "MN State Tax on Usage",
+        "meter_number": "91496724",
+        "service_type": "irrigation"
       },
       {
-        "charge_amount": 148.25,
-        "charge_amount_currency": 148.25,
-        "charge_description_as_printed": "Line item charge 049",
-        "meter_number": "MTR-001",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 0.81,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "State Water Surcharge",
+        "meter_number": "91496724",
+        "service_type": "irrigation"
       },
       {
-        "charge_amount": 149.25,
-        "charge_amount_currency": 149.25,
-        "charge_description_as_printed": "Line item charge 050",
-        "meter_number": "MTR-002",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
+        "charge_amount": 18.43,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Water Minimum Charge",
+        "meter_number": "91496726",
+        "service_type": "water"
       },
       {
-        "charge_amount": 150.25,
-        "charge_amount_currency": 150.25,
-        "charge_description_as_printed": "Line item charge 051",
-        "meter_number": "MTR-003",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
-      },
-      {
-        "charge_amount": 151.25,
-        "charge_amount_currency": 151.25,
-        "charge_description_as_printed": "Line item charge 052",
-        "meter_number": "MTR-004",
-        "provider_name": "Utility Provider A",
-        "service_type": "Electric Service"
-      },
-      {
-        "charge_amount": 152.25,
-        "charge_amount_currency": 152.25,
-        "charge_description_as_printed": "Line item charge 053",
-        "meter_number": "MTR-ACCOUNT",
-        "provider_name": "Account Provider",
-        "service_type": "Account Service"
+        "charge_amount": 55.0,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Industrial Energy Electric"
       }
     ],
     "meters": [
       {
-        "deregulation_status": "Reviewed sample value 001",
-        "measurement_period_end_date": "2026-01-01",
-        "measurement_period_start_date": "2026-01-01",
-        "meter_creation_explanation": "Reviewed sample value 001",
-        "meter_number": "MTR-001",
-        "pass_through_provider_account_number": "ACCT-0001",
-        "pass_through_provider_name": "Utility Provider A",
-        "point_of_delivery_id": "Reviewed sample value 001",
-        "power_factor_percentage": "Reviewed sample value 001",
-        "provider_name": "Utility Provider A",
-        "recipient_name": "Reviewed sample value 001",
-        "service_address": "Reviewed sample value 001",
-        "service_type": "Electric Service",
-        "tariff_name_as_printed": "Reviewed sample value 001",
-        "units_of_measurement": "Reviewed sample value 001",
-        "usage_value": 100.25
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "70182657",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "electric",
+        "tariff_name_as_printed": "Industrial Electric",
+        "units_of_measurement": "kWh",
+        "usage_value": 60960.0
       },
       {
-        "deregulation_status": "Reviewed sample value 002",
-        "measurement_period_end_date": "2026-01-02",
-        "measurement_period_start_date": "2026-01-02",
-        "meter_creation_explanation": "Reviewed sample value 002",
-        "meter_number": "MTR-002",
-        "pass_through_provider_account_number": "ACCT-0002",
-        "pass_through_provider_name": "Utility Provider A",
-        "point_of_delivery_id": "Reviewed sample value 002",
-        "power_factor_percentage": "Reviewed sample value 002",
-        "provider_name": "Utility Provider A",
-        "recipient_name": "Reviewed sample value 002",
-        "service_address": "Reviewed sample value 002",
-        "service_type": "Electric Service",
-        "tariff_name_as_printed": "Reviewed sample value 002",
-        "units_of_measurement": "Reviewed sample value 002",
-        "usage_value": 101.25
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "89321458",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "water",
+        "tariff_name_as_printed": "Commercial Water",
+        "units_of_measurement": "gallons",
+        "usage_value": 42303.0
       },
       {
-        "deregulation_status": "Reviewed sample value 003",
-        "measurement_period_end_date": "2026-01-03",
-        "measurement_period_start_date": "2026-01-03",
-        "meter_creation_explanation": "Reviewed sample value 003",
-        "meter_number": "MTR-003",
-        "pass_through_provider_account_number": "ACCT-0003",
-        "pass_through_provider_name": "Utility Provider A",
-        "point_of_delivery_id": "Reviewed sample value 003",
-        "power_factor_percentage": "Reviewed sample value 003",
-        "provider_name": "Utility Provider A",
-        "recipient_name": "Reviewed sample value 003",
-        "service_address": "Reviewed sample value 003",
-        "service_type": "Electric Service",
-        "tariff_name_as_printed": "Reviewed sample value 003",
-        "units_of_measurement": "Reviewed sample value 003",
-        "usage_value": 102.25
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "89321458",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "sewer",
+        "tariff_name_as_printed": "Commercial Sewer",
+        "units_of_measurement": "gallons",
+        "usage_value": 42303.0
       },
       {
-        "deregulation_status": "Reviewed sample value 004",
-        "measurement_period_end_date": "2026-01-04",
-        "measurement_period_start_date": "2026-01-04",
-        "meter_creation_explanation": "Reviewed sample value 004",
-        "meter_number": "MTR-004",
-        "pass_through_provider_account_number": "ACCT-0004",
-        "pass_through_provider_name": "Utility Provider A",
-        "point_of_delivery_id": "Reviewed sample value 004",
-        "power_factor_percentage": "Reviewed sample value 004",
-        "provider_name": "Utility Provider A",
-        "recipient_name": "Reviewed sample value 004",
-        "service_address": "Reviewed sample value 004",
-        "service_type": "Electric Service",
-        "tariff_name_as_printed": "Reviewed sample value 004",
-        "units_of_measurement": "Reviewed sample value 004",
-        "usage_value": 103.25
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "89321459",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "water",
+        "tariff_name_as_printed": "Commercial Water",
+        "units_of_measurement": "gallons",
+        "usage_value": 40356.0
       },
       {
-        "deregulation_status": "Reviewed sample value 005",
-        "measurement_period_end_date": "2026-01-05",
-        "measurement_period_start_date": "2026-01-05",
-        "meter_creation_explanation": "Reviewed sample value 005",
-        "meter_number": "MTR-005",
-        "pass_through_provider_account_number": "ACCT-0005",
-        "pass_through_provider_name": "Utility Provider A",
-        "point_of_delivery_id": "Reviewed sample value 005",
-        "power_factor_percentage": "Reviewed sample value 005",
-        "provider_name": "Utility Provider A",
-        "recipient_name": "Reviewed sample value 005",
-        "service_address": "Reviewed sample value 005",
-        "service_type": "Electric Service",
-        "tariff_name_as_printed": "Reviewed sample value 005",
-        "units_of_measurement": "Reviewed sample value 005",
-        "usage_value": 104.25
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "89321459",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "sewer",
+        "tariff_name_as_printed": "Commercial Sewer",
+        "units_of_measurement": "gallons",
+        "usage_value": 40356.0
       },
       {
-        "deregulation_status": "Reviewed sample value 006",
-        "measurement_period_end_date": "2026-01-06",
-        "measurement_period_start_date": "2026-01-06",
-        "meter_creation_explanation": "Reviewed sample value 006",
-        "meter_number": "MTR-006",
-        "pass_through_provider_account_number": "ACCT-0006",
-        "pass_through_provider_name": "Utility Provider A",
-        "point_of_delivery_id": "Reviewed sample value 006",
-        "power_factor_percentage": "Reviewed sample value 006",
-        "provider_name": "Utility Provider A",
-        "recipient_name": "Reviewed sample value 006",
-        "service_address": "Reviewed sample value 006",
-        "service_type": "Electric Service",
-        "tariff_name_as_printed": "Reviewed sample value 006",
-        "units_of_measurement": "Reviewed sample value 006",
-        "usage_value": 105.25
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "91496724",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "irrigation",
+        "tariff_name_as_printed": "Commercial Water",
+        "units_of_measurement": "gallons",
+        "usage_value": 96600.0
       },
       {
-        "deregulation_status": "Reviewed sample value 007",
-        "measurement_period_end_date": "2026-01-07",
-        "measurement_period_start_date": "2026-01-07",
-        "meter_creation_explanation": "Reviewed sample value 007",
-        "meter_number": "MTR-007",
-        "pass_through_provider_account_number": "ACCT-0007",
-        "pass_through_provider_name": "Utility Provider A",
-        "point_of_delivery_id": "Reviewed sample value 007",
-        "power_factor_percentage": "Reviewed sample value 007",
-        "provider_name": "Utility Provider A",
-        "recipient_name": "Reviewed sample value 007",
-        "service_address": "Reviewed sample value 007",
-        "service_type": "Electric Service",
-        "tariff_name_as_printed": "Reviewed sample value 007",
-        "units_of_measurement": "Reviewed sample value 007",
-        "usage_value": 106.25
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "91496726",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "water",
+        "tariff_name_as_printed": "Commercial Water",
+        "units_of_measurement": "gallons",
+        "usage_value": 55000.0
       },
       {
-        "deregulation_status": "Reviewed sample value 008",
-        "measurement_period_end_date": "2026-01-08",
-        "measurement_period_start_date": "2026-01-08",
-        "meter_creation_explanation": "Reviewed sample value 008",
-        "meter_number": "MTR-008",
-        "pass_through_provider_account_number": "ACCT-0008",
-        "pass_through_provider_name": "Utility Provider A",
-        "point_of_delivery_id": "Reviewed sample value 008",
-        "power_factor_percentage": "Reviewed sample value 008",
-        "provider_name": "Utility Provider A",
-        "recipient_name": "Reviewed sample value 008",
-        "service_address": "Reviewed sample value 008",
-        "service_type": "Electric Service",
-        "tariff_name_as_printed": "Reviewed sample value 008",
-        "units_of_measurement": "Reviewed sample value 008",
-        "usage_value": 107.25
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "91496726",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "sewer",
+        "tariff_name_as_printed": "Commercial Sewer",
+        "units_of_measurement": "gallons",
+        "usage_value": 55000.0
       }
     ],
     "statement": {
-      "account_number": "ACCT-0001",
-      "amount_due": 100.25,
-      "amount_due_currency": 100.25,
-      "due_date": "2026-01-01",
-      "invoice_number": "INV-0001",
-      "provider_name": "Utility Provider A",
-      "recipient_name": "Reviewed sample value 001",
-      "service_address": "Reviewed sample value 001",
-      "source_modality": "Reviewed sample value 001",
-      "statement_date": "2026-01-01",
-      "statement_period_end_date": "2026-01-01",
-      "statement_period_start_date": "2026-01-01",
-      "statement_type": "Reviewed sample value 001",
-      "total_billing_amount": 100.25
+      "account_number": "blank reviewed expected value for account_number",
+      "amount_due": 7613.2,
+      "amount_due_currency": "currency_dollars",
+      "due_date": "2025-07-30",
+      "invoice_number": "10295809",
+      "provider_name": "City of Windom",
+      "recipient_name": "KWIK TRIP (1147)",
+      "service_address": "blank reviewed expected value for service_address",
+      "source_modality": "Direct",
+      "statement_date": "2025-07-08",
+      "statement_period_end_date": "2025-06-30",
+      "statement_period_start_date": "2025-06-01",
+      "statement_type": "statement_type_bill",
+      "total_billing_amount": 7613.2
     }
   },
   "workflow_schema_hash": "72fef486d883a3b5d20b157fbaf92626fcef6609d876558f57e0c59403d1df89"

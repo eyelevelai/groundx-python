@@ -3,1224 +3,987 @@
   "diagnostics": [],
   "evidence_level": "reviewed_deterministic_model_fixture",
   "final_output": {
-    "generic_attr_01": "Generic sample value 001",
-    "generic_attr_02": "Generic sample value 001",
-    "generic_attr_03": "Generic sample value 001",
-    "generic_attr_04": "Generic sample value 001",
-    "generic_attr_05": "Generic sample value 001",
-    "generic_attr_06": "Generic sample value 001",
-    "generic_attr_07": "Generic sample value 001",
-    "generic_attr_08": "Generic sample value 001",
-    "generic_attr_09": "Generic sample value 001",
-    "generic_attr_10": "Generic sample value 001",
-    "generic_attr_11": "Generic sample value 001",
-    "generic_attr_12": "Generic sample value 001",
-    "generic_attr_13": "Generic sample value 001",
-    "generic_attr_14": "Generic sample value 001",
+    "generic_attr_01": "blank reviewed expected value for generic_attr_01",
+    "generic_attr_02": 7613.2,
+    "generic_attr_03": "currency_dollars",
+    "generic_attr_04": "2025-07-30",
+    "generic_attr_05": "10295809",
+    "generic_attr_06": "blank reviewed expected value for generic_attr_06",
+    "generic_attr_07": "blank reviewed expected value for generic_attr_07",
+    "generic_attr_08": "City of Windom",
+    "generic_attr_09": "KWIK TRIP (1147)",
+    "generic_attr_10": "Direct",
+    "generic_attr_11": "statement_type_bill",
+    "generic_attr_12": "blank reviewed expected value for generic_attr_12",
+    "generic_attr_13": "2025-07-08",
+    "generic_attr_14": 7613.2,
     "generic_group_b": [
       {
-        "generic_attr_08": "GEN-MTR-001",
-        "generic_attr_09": "Generic sample value 001",
-        "generic_attr_12": "Generic sample value 001",
-        "generic_attr_15": "Generic sample value 001",
-        "generic_attr_16": "Generic sample value 001",
-        "generic_attr_17": "Generic sample value 001",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_19": "Generic sample value 001",
-        "generic_attr_20": "Generic sample value 001",
-        "generic_attr_21": "Generic sample value 001",
-        "generic_attr_22": "Generic sample value 001",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_24": "Generic sample value 001",
-        "generic_attr_25": "Generic sample value 001",
-        "generic_attr_26": "Generic sample value 001",
-        "generic_attr_27": "Generic sample value 001",
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "70182657",
+        "generic_attr_23": "electric",
+        "generic_attr_24": "Industrial Electric",
+        "generic_attr_25": "kWh",
+        "generic_attr_26": 60960.0,
         "generic_group_c": [
           {
-            "generic_attr_08": "GEN-MTR-001",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 001",
-            "generic_attr_29": "Generic sample value 001",
-            "generic_attr_30": "Generic sample value 001"
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 55.0,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Industrial Energy Electric"
           },
           {
-            "generic_attr_08": "GEN-MTR-001",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 009",
-            "generic_attr_29": "Generic sample value 009",
-            "generic_attr_30": "Generic sample value 009"
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 2560.32,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Consumption"
           },
           {
-            "generic_attr_08": "GEN-MTR-001",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 017",
-            "generic_attr_29": "Generic sample value 017",
-            "generic_attr_30": "Generic sample value 017"
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 2218.75,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Demand"
           },
           {
-            "generic_attr_08": "GEN-MTR-001",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 025",
-            "generic_attr_29": "Generic sample value 025",
-            "generic_attr_30": "Generic sample value 025"
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 106.68,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Power Cost Adjustment - $.00175wh (S)"
           },
           {
-            "generic_attr_08": "GEN-MTR-001",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 033",
-            "generic_attr_29": "Generic sample value 033",
-            "generic_attr_30": "Generic sample value 033"
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 2.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN Sales Tax"
           },
           {
-            "generic_attr_08": "GEN-MTR-001",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 041",
-            "generic_attr_29": "Generic sample value 041",
-            "generic_attr_30": "Generic sample value 041"
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 249.74,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN State Tax on Usage"
           },
           {
-            "generic_attr_08": "GEN-MTR-001",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 049",
-            "generic_attr_29": "Generic sample value 049",
-            "generic_attr_30": "Generic sample value 049"
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 55.0,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Industrial Energy Electric"
+          },
+          {
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 2560.32,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Consumption"
+          },
+          {
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 2218.75,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Demand"
+          },
+          {
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 106.68,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Power Cost Adjustment - $.00175wh (S)"
+          },
+          {
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 2.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN Sales Tax"
+          },
+          {
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 249.74,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN State Tax on Usage"
           }
         ]
       },
       {
-        "generic_attr_08": "GEN-MTR-002",
-        "generic_attr_09": "Generic sample value 002",
-        "generic_attr_12": "Generic sample value 002",
-        "generic_attr_15": "Generic sample value 002",
-        "generic_attr_16": "Generic sample value 002",
-        "generic_attr_17": "Generic sample value 002",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_19": "Generic sample value 002",
-        "generic_attr_20": "Generic sample value 002",
-        "generic_attr_21": "Generic sample value 002",
-        "generic_attr_22": "Generic sample value 002",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_24": "Generic sample value 002",
-        "generic_attr_25": "Generic sample value 002",
-        "generic_attr_26": "Generic sample value 002",
-        "generic_attr_27": "Generic sample value 002",
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "89321458",
+        "generic_attr_23": "water",
+        "generic_attr_24": "Commercial Water",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 42303.0,
         "generic_group_c": [
           {
-            "generic_attr_08": "GEN-MTR-002",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 002",
-            "generic_attr_29": "Generic sample value 002",
-            "generic_attr_30": "Generic sample value 002"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "water",
+            "generic_attr_28": 18.43,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water Minimum Charge"
           },
           {
-            "generic_attr_08": "GEN-MTR-002",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 010",
-            "generic_attr_29": "Generic sample value 010",
-            "generic_attr_30": "Generic sample value 010"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "water",
+            "generic_attr_28": 223.32,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water"
           },
           {
-            "generic_attr_08": "GEN-MTR-002",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 018",
-            "generic_attr_29": "Generic sample value 018",
-            "generic_attr_30": "Generic sample value 018"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "water",
+            "generic_attr_28": 0.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "State Water Surcharge"
           },
           {
-            "generic_attr_08": "GEN-MTR-002",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 026",
-            "generic_attr_29": "Generic sample value 026",
-            "generic_attr_30": "Generic sample value 026"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "water",
+            "generic_attr_28": 18.43,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water Minimum Charge"
           },
           {
-            "generic_attr_08": "GEN-MTR-002",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 034",
-            "generic_attr_29": "Generic sample value 034",
-            "generic_attr_30": "Generic sample value 034"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "water",
+            "generic_attr_28": 223.32,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water"
           },
           {
-            "generic_attr_08": "GEN-MTR-002",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 042",
-            "generic_attr_29": "Generic sample value 042",
-            "generic_attr_30": "Generic sample value 042"
-          },
-          {
-            "generic_attr_08": "GEN-MTR-002",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 050",
-            "generic_attr_29": "Generic sample value 050",
-            "generic_attr_30": "Generic sample value 050"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "water",
+            "generic_attr_28": 0.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "State Water Surcharge"
           }
         ]
       },
       {
-        "generic_attr_08": "GEN-MTR-003",
-        "generic_attr_09": "Generic sample value 003",
-        "generic_attr_12": "Generic sample value 003",
-        "generic_attr_15": "Generic sample value 003",
-        "generic_attr_16": "Generic sample value 003",
-        "generic_attr_17": "Generic sample value 003",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_19": "Generic sample value 003",
-        "generic_attr_20": "Generic sample value 003",
-        "generic_attr_21": "Generic sample value 003",
-        "generic_attr_22": "Generic sample value 003",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_24": "Generic sample value 003",
-        "generic_attr_25": "Generic sample value 003",
-        "generic_attr_26": "Generic sample value 003",
-        "generic_attr_27": "Generic sample value 003",
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "89321458",
+        "generic_attr_23": "sewer",
+        "generic_attr_24": "Commercial Sewer",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 42303.0,
         "generic_group_c": [
           {
-            "generic_attr_08": "GEN-MTR-003",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 003",
-            "generic_attr_29": "Generic sample value 003",
-            "generic_attr_30": "Generic sample value 003"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 40.61,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer Minimum Charge"
           },
           {
-            "generic_attr_08": "GEN-MTR-003",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 011",
-            "generic_attr_29": "Generic sample value 011",
-            "generic_attr_30": "Generic sample value 011"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 275.39,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer"
           },
           {
-            "generic_attr_08": "GEN-MTR-003",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 019",
-            "generic_attr_29": "Generic sample value 019",
-            "generic_attr_30": "Generic sample value 019"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 40.61,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer Minimum Charge"
           },
           {
-            "generic_attr_08": "GEN-MTR-003",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 027",
-            "generic_attr_29": "Generic sample value 027",
-            "generic_attr_30": "Generic sample value 027"
-          },
-          {
-            "generic_attr_08": "GEN-MTR-003",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 035",
-            "generic_attr_29": "Generic sample value 035",
-            "generic_attr_30": "Generic sample value 035"
-          },
-          {
-            "generic_attr_08": "GEN-MTR-003",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 043",
-            "generic_attr_29": "Generic sample value 043",
-            "generic_attr_30": "Generic sample value 043"
-          },
-          {
-            "generic_attr_08": "GEN-MTR-003",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 051",
-            "generic_attr_29": "Generic sample value 051",
-            "generic_attr_30": "Generic sample value 051"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 275.39,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer"
           }
         ]
       },
       {
-        "generic_attr_08": "GEN-MTR-004",
-        "generic_attr_09": "Generic sample value 004",
-        "generic_attr_12": "Generic sample value 004",
-        "generic_attr_15": "Generic sample value 004",
-        "generic_attr_16": "Generic sample value 004",
-        "generic_attr_17": "Generic sample value 004",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_19": "Generic sample value 004",
-        "generic_attr_20": "Generic sample value 004",
-        "generic_attr_21": "Generic sample value 004",
-        "generic_attr_22": "Generic sample value 004",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_24": "Generic sample value 004",
-        "generic_attr_25": "Generic sample value 004",
-        "generic_attr_26": "Generic sample value 004",
-        "generic_attr_27": "Generic sample value 004",
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "89321459",
+        "generic_attr_23": "water",
+        "generic_attr_24": "Commercial Water",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 40356.0,
         "generic_group_c": [
           {
-            "generic_attr_08": "GEN-MTR-004",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 004",
-            "generic_attr_29": "Generic sample value 004",
-            "generic_attr_30": "Generic sample value 004"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "water",
+            "generic_attr_28": 18.43,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water Minimum Charge"
           },
           {
-            "generic_attr_08": "GEN-MTR-004",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 012",
-            "generic_attr_29": "Generic sample value 012",
-            "generic_attr_30": "Generic sample value 012"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "water",
+            "generic_attr_28": 212.19,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water"
           },
           {
-            "generic_attr_08": "GEN-MTR-004",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 020",
-            "generic_attr_29": "Generic sample value 020",
-            "generic_attr_30": "Generic sample value 020"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "water",
+            "generic_attr_28": 0.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "State Water Surcharge"
           },
           {
-            "generic_attr_08": "GEN-MTR-004",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 028",
-            "generic_attr_29": "Generic sample value 028",
-            "generic_attr_30": "Generic sample value 028"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "water",
+            "generic_attr_28": 18.43,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water Minimum Charge"
           },
           {
-            "generic_attr_08": "GEN-MTR-004",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 036",
-            "generic_attr_29": "Generic sample value 036",
-            "generic_attr_30": "Generic sample value 036"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "water",
+            "generic_attr_28": 212.19,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water"
           },
           {
-            "generic_attr_08": "GEN-MTR-004",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 044",
-            "generic_attr_29": "Generic sample value 044",
-            "generic_attr_30": "Generic sample value 044"
-          },
-          {
-            "generic_attr_08": "GEN-MTR-004",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 052",
-            "generic_attr_29": "Generic sample value 052",
-            "generic_attr_30": "Generic sample value 052"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "water",
+            "generic_attr_28": 0.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "State Water Surcharge"
           }
         ]
       },
       {
-        "generic_attr_08": "GEN-MTR-005",
-        "generic_attr_09": "Generic sample value 005",
-        "generic_attr_12": "Generic sample value 005",
-        "generic_attr_15": "Generic sample value 005",
-        "generic_attr_16": "Generic sample value 005",
-        "generic_attr_17": "Generic sample value 005",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_19": "Generic sample value 005",
-        "generic_attr_20": "Generic sample value 005",
-        "generic_attr_21": "Generic sample value 005",
-        "generic_attr_22": "Generic sample value 005",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_24": "Generic sample value 005",
-        "generic_attr_25": "Generic sample value 005",
-        "generic_attr_26": "Generic sample value 005",
-        "generic_attr_27": "Generic sample value 005",
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "89321459",
+        "generic_attr_23": "sewer",
+        "generic_attr_24": "Commercial Sewer",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 40356.0,
         "generic_group_c": [
           {
-            "generic_attr_08": "GEN-MTR-005",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 005",
-            "generic_attr_29": "Generic sample value 005",
-            "generic_attr_30": "Generic sample value 005"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 40.61,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer Minimum Charge"
           },
           {
-            "generic_attr_08": "GEN-MTR-005",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 013",
-            "generic_attr_29": "Generic sample value 013",
-            "generic_attr_30": "Generic sample value 013"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 262.71,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer"
           },
           {
-            "generic_attr_08": "GEN-MTR-005",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 021",
-            "generic_attr_29": "Generic sample value 021",
-            "generic_attr_30": "Generic sample value 021"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 40.61,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer Minimum Charge"
           },
           {
-            "generic_attr_08": "GEN-MTR-005",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 029",
-            "generic_attr_29": "Generic sample value 029",
-            "generic_attr_30": "Generic sample value 029"
-          },
-          {
-            "generic_attr_08": "GEN-MTR-005",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 037",
-            "generic_attr_29": "Generic sample value 037",
-            "generic_attr_30": "Generic sample value 037"
-          },
-          {
-            "generic_attr_08": "GEN-MTR-005",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 045",
-            "generic_attr_29": "Generic sample value 045",
-            "generic_attr_30": "Generic sample value 045"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 262.71,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer"
           }
         ]
       },
       {
-        "generic_attr_08": "GEN-MTR-006",
-        "generic_attr_09": "Generic sample value 006",
-        "generic_attr_12": "Generic sample value 006",
-        "generic_attr_15": "Generic sample value 006",
-        "generic_attr_16": "Generic sample value 006",
-        "generic_attr_17": "Generic sample value 006",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_19": "Generic sample value 006",
-        "generic_attr_20": "Generic sample value 006",
-        "generic_attr_21": "Generic sample value 006",
-        "generic_attr_22": "Generic sample value 006",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_24": "Generic sample value 006",
-        "generic_attr_25": "Generic sample value 006",
-        "generic_attr_26": "Generic sample value 006",
-        "generic_attr_27": "Generic sample value 006",
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "91496724",
+        "generic_attr_23": "irrigation",
+        "generic_attr_24": "Commercial Water",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 96600.0,
         "generic_group_c": [
           {
-            "generic_attr_08": "GEN-MTR-006",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 006",
-            "generic_attr_29": "Generic sample value 006",
-            "generic_attr_30": "Generic sample value 006"
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 18.43,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water Minimum Charge"
           },
           {
-            "generic_attr_08": "GEN-MTR-006",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 014",
-            "generic_attr_29": "Generic sample value 014",
-            "generic_attr_30": "Generic sample value 014"
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 533.9,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water"
           },
           {
-            "generic_attr_08": "GEN-MTR-006",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 022",
-            "generic_attr_29": "Generic sample value 022",
-            "generic_attr_30": "Generic sample value 022"
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 1.27,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN Sales Tax"
           },
           {
-            "generic_attr_08": "GEN-MTR-006",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 030",
-            "generic_attr_29": "Generic sample value 030",
-            "generic_attr_30": "Generic sample value 030"
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 36.71,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN State Tax on Usage"
           },
           {
-            "generic_attr_08": "GEN-MTR-006",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 038",
-            "generic_attr_29": "Generic sample value 038",
-            "generic_attr_30": "Generic sample value 038"
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 0.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "State Water Surcharge"
           },
           {
-            "generic_attr_08": "GEN-MTR-006",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 046",
-            "generic_attr_29": "Generic sample value 046",
-            "generic_attr_30": "Generic sample value 046"
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 18.43,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water Minimum Charge"
+          },
+          {
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 533.9,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water"
+          },
+          {
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 1.27,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN Sales Tax"
+          },
+          {
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 36.71,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN State Tax on Usage"
+          },
+          {
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 0.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "State Water Surcharge"
           }
         ]
       },
       {
-        "generic_attr_08": "GEN-MTR-007",
-        "generic_attr_09": "Generic sample value 007",
-        "generic_attr_12": "Generic sample value 007",
-        "generic_attr_15": "Generic sample value 007",
-        "generic_attr_16": "Generic sample value 007",
-        "generic_attr_17": "Generic sample value 007",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_19": "Generic sample value 007",
-        "generic_attr_20": "Generic sample value 007",
-        "generic_attr_21": "Generic sample value 007",
-        "generic_attr_22": "Generic sample value 007",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_24": "Generic sample value 007",
-        "generic_attr_25": "Generic sample value 007",
-        "generic_attr_26": "Generic sample value 007",
-        "generic_attr_27": "Generic sample value 007",
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "91496726",
+        "generic_attr_23": "water",
+        "generic_attr_24": "Commercial Water",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 55000.0,
         "generic_group_c": [
           {
-            "generic_attr_08": "GEN-MTR-007",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 007",
-            "generic_attr_29": "Generic sample value 007",
-            "generic_attr_30": "Generic sample value 007"
+            "generic_attr_18": "91496726",
+            "generic_attr_23": "water",
+            "generic_attr_28": 18.43,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water Minimum Charge"
           },
           {
-            "generic_attr_08": "GEN-MTR-007",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 015",
-            "generic_attr_29": "Generic sample value 015",
-            "generic_attr_30": "Generic sample value 015"
+            "generic_attr_18": "91496726",
+            "generic_attr_23": "water",
+            "generic_attr_28": 295.95,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water"
           },
           {
-            "generic_attr_08": "GEN-MTR-007",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 023",
-            "generic_attr_29": "Generic sample value 023",
-            "generic_attr_30": "Generic sample value 023"
+            "generic_attr_18": "91496726",
+            "generic_attr_23": "water",
+            "generic_attr_28": 20.35,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN State Tax on Usage"
           },
           {
-            "generic_attr_08": "GEN-MTR-007",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 031",
-            "generic_attr_29": "Generic sample value 031",
-            "generic_attr_30": "Generic sample value 031"
+            "generic_attr_18": "91496726",
+            "generic_attr_23": "water",
+            "generic_attr_28": 1.27,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN Sales Tax"
           },
           {
-            "generic_attr_08": "GEN-MTR-007",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 039",
-            "generic_attr_29": "Generic sample value 039",
-            "generic_attr_30": "Generic sample value 039"
+            "generic_attr_18": "91496726",
+            "generic_attr_23": "water",
+            "generic_attr_28": 0.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "State Water Surcharge"
           },
           {
-            "generic_attr_08": "GEN-MTR-007",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 047",
-            "generic_attr_29": "Generic sample value 047",
-            "generic_attr_30": "Generic sample value 047"
+            "generic_attr_18": "91496726",
+            "generic_attr_23": "water",
+            "generic_attr_28": 18.43,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water Minimum Charge"
           }
         ]
       },
       {
-        "generic_attr_08": "GEN-MTR-008",
-        "generic_attr_09": "Generic sample value 008",
-        "generic_attr_12": "Generic sample value 008",
-        "generic_attr_15": "Generic sample value 008",
-        "generic_attr_16": "Generic sample value 008",
-        "generic_attr_17": "Generic sample value 008",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_19": "Generic sample value 008",
-        "generic_attr_20": "Generic sample value 008",
-        "generic_attr_21": "Generic sample value 008",
-        "generic_attr_22": "Generic sample value 008",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_24": "Generic sample value 008",
-        "generic_attr_25": "Generic sample value 008",
-        "generic_attr_26": "Generic sample value 008",
-        "generic_attr_27": "Generic sample value 008",
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "91496726",
+        "generic_attr_23": "sewer",
+        "generic_attr_24": "Commercial Sewer",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 55000.0,
         "generic_group_c": [
           {
-            "generic_attr_08": "GEN-MTR-008",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 008",
-            "generic_attr_29": "Generic sample value 008",
-            "generic_attr_30": "Generic sample value 008"
+            "generic_attr_18": "91496726",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 40.61,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer Minimum Charge"
           },
           {
-            "generic_attr_08": "GEN-MTR-008",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 016",
-            "generic_attr_29": "Generic sample value 016",
-            "generic_attr_30": "Generic sample value 016"
-          },
-          {
-            "generic_attr_08": "GEN-MTR-008",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 024",
-            "generic_attr_29": "Generic sample value 024",
-            "generic_attr_30": "Generic sample value 024"
-          },
-          {
-            "generic_attr_08": "GEN-MTR-008",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 032",
-            "generic_attr_29": "Generic sample value 032",
-            "generic_attr_30": "Generic sample value 032"
-          },
-          {
-            "generic_attr_08": "GEN-MTR-008",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 040",
-            "generic_attr_29": "Generic sample value 040",
-            "generic_attr_30": "Generic sample value 040"
-          },
-          {
-            "generic_attr_08": "GEN-MTR-008",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 048",
-            "generic_attr_29": "Generic sample value 048",
-            "generic_attr_30": "Generic sample value 048"
+            "generic_attr_18": "91496726",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 358.05,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer"
           }
         ]
       }
     ],
     "generic_group_c": [
       {
-        "generic_attr_08": "GEN-ACCOUNT",
-        "generic_attr_18": "Generic Account Provider",
-        "generic_attr_23": "Generic Account Service",
-        "generic_attr_28": "Generic sample value 053",
-        "generic_attr_29": "Generic sample value 053",
-        "generic_attr_30": "Generic sample value 053"
+        "generic_attr_28": 55.0,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Industrial Energy Electric"
       }
     ]
   },
   "input_from": "internal_arcadia_extract_chain",
-  "input_sha256": "b7cba8049859c61b6699f43d8f0949c6986f367b31d1555c34adf22e03e456b3",
+  "input_sha256": "f37bb47e0cb9d3cf7050d2c7301ce6dd4ef964fb6fcf79e4b4b9887c2746c5a4",
   "model_fixture": {
     "path": "testdata/extraction-boundary/model-fixtures/generic_v1/extract_model_outputs.json",
-    "schema_version": "internal-arcadia-extract-model-output-fixture-v1",
-    "sha256": "be08cec381e630869d0e7923d6e02fd7043db42410117863795c6ed1cd48de69",
+    "schema_version": "internal-arcadia-boundary-model-fixture-v1",
+    "sha256": "07ac056f1628d1add21a1cfc33c5026dcf793c7a0dcb66c1835261b1be928355",
     "source": {
+      "covered_route_count": 36,
       "document_file_name": "arcadia.pdf",
-      "kind": "reviewed_deterministic_model_output_fixture",
+      "expected_answer_sha256": "a4a3ee0c4dc9f7519f50c3c4f57b5e49a37de8d2cc74e47bf63218aff5b51ec4",
+      "expected_answer_url": "https://cdn.eyelevel.ai/internal-harness/e2e-extract/generic-v1-extract.json",
+      "kind": "reviewed_expected_answer_shape_stress_projection",
+      "projection_notes": [
+        "Values come from the reviewed expected answer where present.",
+        "Blank statement scalars are filled so final-output shape gates can assert field presence.",
+        "Utility child rows are expanded from reviewed rows to exercise the 50+ charge shape.",
+        "One unmatched utility child row is added when the reviewed expected answer has no account-level charge."
+      ],
+      "record_counts_by_group": {
+        "generic_group_b": 8,
+        "generic_group_c": 51
+      },
       "workflow_id": "generic_v1-product-path",
       "workflow_version": "2026-07-12T22:34:02Z"
     }
   },
   "output_for": "internal_arcadia_save_callback",
   "relationship_output": {
-    "generic_attr_01": "Generic sample value 001",
-    "generic_attr_02": "Generic sample value 001",
-    "generic_attr_03": "Generic sample value 001",
-    "generic_attr_04": "Generic sample value 001",
-    "generic_attr_05": "Generic sample value 001",
-    "generic_attr_06": "Generic sample value 001",
-    "generic_attr_07": "Generic sample value 001",
-    "generic_attr_08": "Generic sample value 001",
-    "generic_attr_09": "Generic sample value 001",
-    "generic_attr_10": "Generic sample value 001",
-    "generic_attr_11": "Generic sample value 001",
-    "generic_attr_12": "Generic sample value 001",
-    "generic_attr_13": "Generic sample value 001",
-    "generic_attr_14": "Generic sample value 001",
+    "generic_attr_01": "blank reviewed expected value for generic_attr_01",
+    "generic_attr_02": 7613.2,
+    "generic_attr_03": "currency_dollars",
+    "generic_attr_04": "2025-07-30",
+    "generic_attr_05": "10295809",
+    "generic_attr_06": "blank reviewed expected value for generic_attr_06",
+    "generic_attr_07": "blank reviewed expected value for generic_attr_07",
+    "generic_attr_08": "City of Windom",
+    "generic_attr_09": "KWIK TRIP (1147)",
+    "generic_attr_10": "Direct",
+    "generic_attr_11": "statement_type_bill",
+    "generic_attr_12": "blank reviewed expected value for generic_attr_12",
+    "generic_attr_13": "2025-07-08",
+    "generic_attr_14": 7613.2,
     "generic_group_b": [
       {
-        "generic_attr_08": "GEN-MTR-001",
-        "generic_attr_09": "Generic sample value 001",
-        "generic_attr_12": "Generic sample value 001",
-        "generic_attr_15": "Generic sample value 001",
-        "generic_attr_16": "Generic sample value 001",
-        "generic_attr_17": "Generic sample value 001",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_19": "Generic sample value 001",
-        "generic_attr_20": "Generic sample value 001",
-        "generic_attr_21": "Generic sample value 001",
-        "generic_attr_22": "Generic sample value 001",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_24": "Generic sample value 001",
-        "generic_attr_25": "Generic sample value 001",
-        "generic_attr_26": "Generic sample value 001",
-        "generic_attr_27": "Generic sample value 001",
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "70182657",
+        "generic_attr_23": "electric",
+        "generic_attr_24": "Industrial Electric",
+        "generic_attr_25": "kWh",
+        "generic_attr_26": 60960.0,
         "generic_group_c": [
           {
-            "generic_attr_08": "GEN-MTR-001",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 001",
-            "generic_attr_29": "Generic sample value 001",
-            "generic_attr_30": "Generic sample value 001"
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 55.0,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Industrial Energy Electric"
           },
           {
-            "generic_attr_08": "GEN-MTR-001",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 009",
-            "generic_attr_29": "Generic sample value 009",
-            "generic_attr_30": "Generic sample value 009"
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 2560.32,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Consumption"
           },
           {
-            "generic_attr_08": "GEN-MTR-001",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 017",
-            "generic_attr_29": "Generic sample value 017",
-            "generic_attr_30": "Generic sample value 017"
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 2218.75,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Demand"
           },
           {
-            "generic_attr_08": "GEN-MTR-001",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 025",
-            "generic_attr_29": "Generic sample value 025",
-            "generic_attr_30": "Generic sample value 025"
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 106.68,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Power Cost Adjustment - $.00175wh (S)"
           },
           {
-            "generic_attr_08": "GEN-MTR-001",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 033",
-            "generic_attr_29": "Generic sample value 033",
-            "generic_attr_30": "Generic sample value 033"
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 2.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN Sales Tax"
           },
           {
-            "generic_attr_08": "GEN-MTR-001",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 041",
-            "generic_attr_29": "Generic sample value 041",
-            "generic_attr_30": "Generic sample value 041"
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 249.74,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN State Tax on Usage"
           },
           {
-            "generic_attr_08": "GEN-MTR-001",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 049",
-            "generic_attr_29": "Generic sample value 049",
-            "generic_attr_30": "Generic sample value 049"
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 55.0,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Industrial Energy Electric"
+          },
+          {
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 2560.32,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Consumption"
+          },
+          {
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 2218.75,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Demand"
+          },
+          {
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 106.68,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Power Cost Adjustment - $.00175wh (S)"
+          },
+          {
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 2.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN Sales Tax"
+          },
+          {
+            "generic_attr_18": "70182657",
+            "generic_attr_23": "electric",
+            "generic_attr_28": 249.74,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN State Tax on Usage"
           }
         ]
       },
       {
-        "generic_attr_08": "GEN-MTR-002",
-        "generic_attr_09": "Generic sample value 002",
-        "generic_attr_12": "Generic sample value 002",
-        "generic_attr_15": "Generic sample value 002",
-        "generic_attr_16": "Generic sample value 002",
-        "generic_attr_17": "Generic sample value 002",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_19": "Generic sample value 002",
-        "generic_attr_20": "Generic sample value 002",
-        "generic_attr_21": "Generic sample value 002",
-        "generic_attr_22": "Generic sample value 002",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_24": "Generic sample value 002",
-        "generic_attr_25": "Generic sample value 002",
-        "generic_attr_26": "Generic sample value 002",
-        "generic_attr_27": "Generic sample value 002",
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "89321458",
+        "generic_attr_23": "water",
+        "generic_attr_24": "Commercial Water",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 42303.0,
         "generic_group_c": [
           {
-            "generic_attr_08": "GEN-MTR-002",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 002",
-            "generic_attr_29": "Generic sample value 002",
-            "generic_attr_30": "Generic sample value 002"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "water",
+            "generic_attr_28": 18.43,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water Minimum Charge"
           },
           {
-            "generic_attr_08": "GEN-MTR-002",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 010",
-            "generic_attr_29": "Generic sample value 010",
-            "generic_attr_30": "Generic sample value 010"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "water",
+            "generic_attr_28": 223.32,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water"
           },
           {
-            "generic_attr_08": "GEN-MTR-002",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 018",
-            "generic_attr_29": "Generic sample value 018",
-            "generic_attr_30": "Generic sample value 018"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "water",
+            "generic_attr_28": 0.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "State Water Surcharge"
           },
           {
-            "generic_attr_08": "GEN-MTR-002",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 026",
-            "generic_attr_29": "Generic sample value 026",
-            "generic_attr_30": "Generic sample value 026"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "water",
+            "generic_attr_28": 18.43,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water Minimum Charge"
           },
           {
-            "generic_attr_08": "GEN-MTR-002",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 034",
-            "generic_attr_29": "Generic sample value 034",
-            "generic_attr_30": "Generic sample value 034"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "water",
+            "generic_attr_28": 223.32,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water"
           },
           {
-            "generic_attr_08": "GEN-MTR-002",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 042",
-            "generic_attr_29": "Generic sample value 042",
-            "generic_attr_30": "Generic sample value 042"
-          },
-          {
-            "generic_attr_08": "GEN-MTR-002",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 050",
-            "generic_attr_29": "Generic sample value 050",
-            "generic_attr_30": "Generic sample value 050"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "water",
+            "generic_attr_28": 0.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "State Water Surcharge"
           }
         ]
       },
       {
-        "generic_attr_08": "GEN-MTR-003",
-        "generic_attr_09": "Generic sample value 003",
-        "generic_attr_12": "Generic sample value 003",
-        "generic_attr_15": "Generic sample value 003",
-        "generic_attr_16": "Generic sample value 003",
-        "generic_attr_17": "Generic sample value 003",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_19": "Generic sample value 003",
-        "generic_attr_20": "Generic sample value 003",
-        "generic_attr_21": "Generic sample value 003",
-        "generic_attr_22": "Generic sample value 003",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_24": "Generic sample value 003",
-        "generic_attr_25": "Generic sample value 003",
-        "generic_attr_26": "Generic sample value 003",
-        "generic_attr_27": "Generic sample value 003",
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "89321458",
+        "generic_attr_23": "sewer",
+        "generic_attr_24": "Commercial Sewer",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 42303.0,
         "generic_group_c": [
           {
-            "generic_attr_08": "GEN-MTR-003",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 003",
-            "generic_attr_29": "Generic sample value 003",
-            "generic_attr_30": "Generic sample value 003"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 40.61,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer Minimum Charge"
           },
           {
-            "generic_attr_08": "GEN-MTR-003",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 011",
-            "generic_attr_29": "Generic sample value 011",
-            "generic_attr_30": "Generic sample value 011"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 275.39,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer"
           },
           {
-            "generic_attr_08": "GEN-MTR-003",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 019",
-            "generic_attr_29": "Generic sample value 019",
-            "generic_attr_30": "Generic sample value 019"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 40.61,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer Minimum Charge"
           },
           {
-            "generic_attr_08": "GEN-MTR-003",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 027",
-            "generic_attr_29": "Generic sample value 027",
-            "generic_attr_30": "Generic sample value 027"
-          },
-          {
-            "generic_attr_08": "GEN-MTR-003",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 035",
-            "generic_attr_29": "Generic sample value 035",
-            "generic_attr_30": "Generic sample value 035"
-          },
-          {
-            "generic_attr_08": "GEN-MTR-003",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 043",
-            "generic_attr_29": "Generic sample value 043",
-            "generic_attr_30": "Generic sample value 043"
-          },
-          {
-            "generic_attr_08": "GEN-MTR-003",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 051",
-            "generic_attr_29": "Generic sample value 051",
-            "generic_attr_30": "Generic sample value 051"
+            "generic_attr_18": "89321458",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 275.39,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer"
           }
         ]
       },
       {
-        "generic_attr_08": "GEN-MTR-004",
-        "generic_attr_09": "Generic sample value 004",
-        "generic_attr_12": "Generic sample value 004",
-        "generic_attr_15": "Generic sample value 004",
-        "generic_attr_16": "Generic sample value 004",
-        "generic_attr_17": "Generic sample value 004",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_19": "Generic sample value 004",
-        "generic_attr_20": "Generic sample value 004",
-        "generic_attr_21": "Generic sample value 004",
-        "generic_attr_22": "Generic sample value 004",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_24": "Generic sample value 004",
-        "generic_attr_25": "Generic sample value 004",
-        "generic_attr_26": "Generic sample value 004",
-        "generic_attr_27": "Generic sample value 004",
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "89321459",
+        "generic_attr_23": "water",
+        "generic_attr_24": "Commercial Water",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 40356.0,
         "generic_group_c": [
           {
-            "generic_attr_08": "GEN-MTR-004",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 004",
-            "generic_attr_29": "Generic sample value 004",
-            "generic_attr_30": "Generic sample value 004"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "water",
+            "generic_attr_28": 18.43,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water Minimum Charge"
           },
           {
-            "generic_attr_08": "GEN-MTR-004",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 012",
-            "generic_attr_29": "Generic sample value 012",
-            "generic_attr_30": "Generic sample value 012"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "water",
+            "generic_attr_28": 212.19,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water"
           },
           {
-            "generic_attr_08": "GEN-MTR-004",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 020",
-            "generic_attr_29": "Generic sample value 020",
-            "generic_attr_30": "Generic sample value 020"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "water",
+            "generic_attr_28": 0.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "State Water Surcharge"
           },
           {
-            "generic_attr_08": "GEN-MTR-004",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 028",
-            "generic_attr_29": "Generic sample value 028",
-            "generic_attr_30": "Generic sample value 028"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "water",
+            "generic_attr_28": 18.43,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water Minimum Charge"
           },
           {
-            "generic_attr_08": "GEN-MTR-004",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 036",
-            "generic_attr_29": "Generic sample value 036",
-            "generic_attr_30": "Generic sample value 036"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "water",
+            "generic_attr_28": 212.19,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water"
           },
           {
-            "generic_attr_08": "GEN-MTR-004",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 044",
-            "generic_attr_29": "Generic sample value 044",
-            "generic_attr_30": "Generic sample value 044"
-          },
-          {
-            "generic_attr_08": "GEN-MTR-004",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 052",
-            "generic_attr_29": "Generic sample value 052",
-            "generic_attr_30": "Generic sample value 052"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "water",
+            "generic_attr_28": 0.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "State Water Surcharge"
           }
         ]
       },
       {
-        "generic_attr_08": "GEN-MTR-005",
-        "generic_attr_09": "Generic sample value 005",
-        "generic_attr_12": "Generic sample value 005",
-        "generic_attr_15": "Generic sample value 005",
-        "generic_attr_16": "Generic sample value 005",
-        "generic_attr_17": "Generic sample value 005",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_19": "Generic sample value 005",
-        "generic_attr_20": "Generic sample value 005",
-        "generic_attr_21": "Generic sample value 005",
-        "generic_attr_22": "Generic sample value 005",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_24": "Generic sample value 005",
-        "generic_attr_25": "Generic sample value 005",
-        "generic_attr_26": "Generic sample value 005",
-        "generic_attr_27": "Generic sample value 005",
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "89321459",
+        "generic_attr_23": "sewer",
+        "generic_attr_24": "Commercial Sewer",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 40356.0,
         "generic_group_c": [
           {
-            "generic_attr_08": "GEN-MTR-005",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 005",
-            "generic_attr_29": "Generic sample value 005",
-            "generic_attr_30": "Generic sample value 005"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 40.61,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer Minimum Charge"
           },
           {
-            "generic_attr_08": "GEN-MTR-005",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 013",
-            "generic_attr_29": "Generic sample value 013",
-            "generic_attr_30": "Generic sample value 013"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 262.71,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer"
           },
           {
-            "generic_attr_08": "GEN-MTR-005",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 021",
-            "generic_attr_29": "Generic sample value 021",
-            "generic_attr_30": "Generic sample value 021"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 40.61,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer Minimum Charge"
           },
           {
-            "generic_attr_08": "GEN-MTR-005",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 029",
-            "generic_attr_29": "Generic sample value 029",
-            "generic_attr_30": "Generic sample value 029"
-          },
-          {
-            "generic_attr_08": "GEN-MTR-005",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 037",
-            "generic_attr_29": "Generic sample value 037",
-            "generic_attr_30": "Generic sample value 037"
-          },
-          {
-            "generic_attr_08": "GEN-MTR-005",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 045",
-            "generic_attr_29": "Generic sample value 045",
-            "generic_attr_30": "Generic sample value 045"
+            "generic_attr_18": "89321459",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 262.71,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer"
           }
         ]
       },
       {
-        "generic_attr_08": "GEN-MTR-006",
-        "generic_attr_09": "Generic sample value 006",
-        "generic_attr_12": "Generic sample value 006",
-        "generic_attr_15": "Generic sample value 006",
-        "generic_attr_16": "Generic sample value 006",
-        "generic_attr_17": "Generic sample value 006",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_19": "Generic sample value 006",
-        "generic_attr_20": "Generic sample value 006",
-        "generic_attr_21": "Generic sample value 006",
-        "generic_attr_22": "Generic sample value 006",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_24": "Generic sample value 006",
-        "generic_attr_25": "Generic sample value 006",
-        "generic_attr_26": "Generic sample value 006",
-        "generic_attr_27": "Generic sample value 006",
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "91496724",
+        "generic_attr_23": "irrigation",
+        "generic_attr_24": "Commercial Water",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 96600.0,
         "generic_group_c": [
           {
-            "generic_attr_08": "GEN-MTR-006",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 006",
-            "generic_attr_29": "Generic sample value 006",
-            "generic_attr_30": "Generic sample value 006"
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 18.43,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water Minimum Charge"
           },
           {
-            "generic_attr_08": "GEN-MTR-006",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 014",
-            "generic_attr_29": "Generic sample value 014",
-            "generic_attr_30": "Generic sample value 014"
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 533.9,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water"
           },
           {
-            "generic_attr_08": "GEN-MTR-006",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 022",
-            "generic_attr_29": "Generic sample value 022",
-            "generic_attr_30": "Generic sample value 022"
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 1.27,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN Sales Tax"
           },
           {
-            "generic_attr_08": "GEN-MTR-006",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 030",
-            "generic_attr_29": "Generic sample value 030",
-            "generic_attr_30": "Generic sample value 030"
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 36.71,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN State Tax on Usage"
           },
           {
-            "generic_attr_08": "GEN-MTR-006",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 038",
-            "generic_attr_29": "Generic sample value 038",
-            "generic_attr_30": "Generic sample value 038"
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 0.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "State Water Surcharge"
           },
           {
-            "generic_attr_08": "GEN-MTR-006",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 046",
-            "generic_attr_29": "Generic sample value 046",
-            "generic_attr_30": "Generic sample value 046"
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 18.43,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water Minimum Charge"
+          },
+          {
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 533.9,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water"
+          },
+          {
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 1.27,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN Sales Tax"
+          },
+          {
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 36.71,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN State Tax on Usage"
+          },
+          {
+            "generic_attr_18": "91496724",
+            "generic_attr_23": "irrigation",
+            "generic_attr_28": 0.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "State Water Surcharge"
           }
         ]
       },
       {
-        "generic_attr_08": "GEN-MTR-007",
-        "generic_attr_09": "Generic sample value 007",
-        "generic_attr_12": "Generic sample value 007",
-        "generic_attr_15": "Generic sample value 007",
-        "generic_attr_16": "Generic sample value 007",
-        "generic_attr_17": "Generic sample value 007",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_19": "Generic sample value 007",
-        "generic_attr_20": "Generic sample value 007",
-        "generic_attr_21": "Generic sample value 007",
-        "generic_attr_22": "Generic sample value 007",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_24": "Generic sample value 007",
-        "generic_attr_25": "Generic sample value 007",
-        "generic_attr_26": "Generic sample value 007",
-        "generic_attr_27": "Generic sample value 007",
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "91496726",
+        "generic_attr_23": "water",
+        "generic_attr_24": "Commercial Water",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 55000.0,
         "generic_group_c": [
           {
-            "generic_attr_08": "GEN-MTR-007",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 007",
-            "generic_attr_29": "Generic sample value 007",
-            "generic_attr_30": "Generic sample value 007"
+            "generic_attr_18": "91496726",
+            "generic_attr_23": "water",
+            "generic_attr_28": 18.43,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water Minimum Charge"
           },
           {
-            "generic_attr_08": "GEN-MTR-007",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 015",
-            "generic_attr_29": "Generic sample value 015",
-            "generic_attr_30": "Generic sample value 015"
+            "generic_attr_18": "91496726",
+            "generic_attr_23": "water",
+            "generic_attr_28": 295.95,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water"
           },
           {
-            "generic_attr_08": "GEN-MTR-007",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 023",
-            "generic_attr_29": "Generic sample value 023",
-            "generic_attr_30": "Generic sample value 023"
+            "generic_attr_18": "91496726",
+            "generic_attr_23": "water",
+            "generic_attr_28": 20.35,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN State Tax on Usage"
           },
           {
-            "generic_attr_08": "GEN-MTR-007",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 031",
-            "generic_attr_29": "Generic sample value 031",
-            "generic_attr_30": "Generic sample value 031"
+            "generic_attr_18": "91496726",
+            "generic_attr_23": "water",
+            "generic_attr_28": 1.27,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "MN Sales Tax"
           },
           {
-            "generic_attr_08": "GEN-MTR-007",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 039",
-            "generic_attr_29": "Generic sample value 039",
-            "generic_attr_30": "Generic sample value 039"
+            "generic_attr_18": "91496726",
+            "generic_attr_23": "water",
+            "generic_attr_28": 0.81,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "State Water Surcharge"
           },
           {
-            "generic_attr_08": "GEN-MTR-007",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 047",
-            "generic_attr_29": "Generic sample value 047",
-            "generic_attr_30": "Generic sample value 047"
+            "generic_attr_18": "91496726",
+            "generic_attr_23": "water",
+            "generic_attr_28": 18.43,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Water Minimum Charge"
           }
         ]
       },
       {
-        "generic_attr_08": "GEN-MTR-008",
-        "generic_attr_09": "Generic sample value 008",
-        "generic_attr_12": "Generic sample value 008",
-        "generic_attr_15": "Generic sample value 008",
-        "generic_attr_16": "Generic sample value 008",
-        "generic_attr_17": "Generic sample value 008",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_19": "Generic sample value 008",
-        "generic_attr_20": "Generic sample value 008",
-        "generic_attr_21": "Generic sample value 008",
-        "generic_attr_22": "Generic sample value 008",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_24": "Generic sample value 008",
-        "generic_attr_25": "Generic sample value 008",
-        "generic_attr_26": "Generic sample value 008",
-        "generic_attr_27": "Generic sample value 008",
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "91496726",
+        "generic_attr_23": "sewer",
+        "generic_attr_24": "Commercial Sewer",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 55000.0,
         "generic_group_c": [
           {
-            "generic_attr_08": "GEN-MTR-008",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 008",
-            "generic_attr_29": "Generic sample value 008",
-            "generic_attr_30": "Generic sample value 008"
+            "generic_attr_18": "91496726",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 40.61,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer Minimum Charge"
           },
           {
-            "generic_attr_08": "GEN-MTR-008",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 016",
-            "generic_attr_29": "Generic sample value 016",
-            "generic_attr_30": "Generic sample value 016"
-          },
-          {
-            "generic_attr_08": "GEN-MTR-008",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 024",
-            "generic_attr_29": "Generic sample value 024",
-            "generic_attr_30": "Generic sample value 024"
-          },
-          {
-            "generic_attr_08": "GEN-MTR-008",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 032",
-            "generic_attr_29": "Generic sample value 032",
-            "generic_attr_30": "Generic sample value 032"
-          },
-          {
-            "generic_attr_08": "GEN-MTR-008",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 040",
-            "generic_attr_29": "Generic sample value 040",
-            "generic_attr_30": "Generic sample value 040"
-          },
-          {
-            "generic_attr_08": "GEN-MTR-008",
-            "generic_attr_18": "Generic Provider A",
-            "generic_attr_23": "Generic Electric Service",
-            "generic_attr_28": "Generic sample value 048",
-            "generic_attr_29": "Generic sample value 048",
-            "generic_attr_30": "Generic sample value 048"
+            "generic_attr_18": "91496726",
+            "generic_attr_23": "sewer",
+            "generic_attr_28": 358.05,
+            "generic_attr_29": "currency_dollars",
+            "generic_attr_30": "Commercial Sewer"
           }
         ]
       }
     ],
     "generic_group_c": [
       {
-        "generic_attr_08": "GEN-ACCOUNT",
-        "generic_attr_18": "Generic Account Provider",
-        "generic_attr_23": "Generic Account Service",
-        "generic_attr_28": "Generic sample value 053",
-        "generic_attr_29": "Generic sample value 053",
-        "generic_attr_30": "Generic sample value 053"
+        "generic_attr_28": 55.0,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Industrial Energy Electric"
       }
     ]
   },
@@ -1698,406 +1461,6 @@
       "workflow_group": "generic_group_b"
     },
     {
-      "final_path": "/generic_group_b/*/generic_attr_19",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 0,
-      "workflow_field": "generic_attr_19",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_19",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 1,
-      "workflow_field": "generic_attr_19",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_19",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 2,
-      "workflow_field": "generic_attr_19",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_19",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 3,
-      "workflow_field": "generic_attr_19",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_19",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 4,
-      "workflow_field": "generic_attr_19",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_19",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 5,
-      "workflow_field": "generic_attr_19",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_19",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 6,
-      "workflow_field": "generic_attr_19",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_19",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 7,
-      "workflow_field": "generic_attr_19",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_20",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 0,
-      "workflow_field": "generic_attr_20",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_20",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 1,
-      "workflow_field": "generic_attr_20",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_20",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 2,
-      "workflow_field": "generic_attr_20",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_20",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 3,
-      "workflow_field": "generic_attr_20",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_20",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 4,
-      "workflow_field": "generic_attr_20",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_20",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 5,
-      "workflow_field": "generic_attr_20",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_20",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 6,
-      "workflow_field": "generic_attr_20",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_20",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 7,
-      "workflow_field": "generic_attr_20",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_21",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 0,
-      "workflow_field": "generic_attr_21",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_21",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 1,
-      "workflow_field": "generic_attr_21",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_21",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 2,
-      "workflow_field": "generic_attr_21",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_21",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 3,
-      "workflow_field": "generic_attr_21",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_21",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 4,
-      "workflow_field": "generic_attr_21",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_21",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 5,
-      "workflow_field": "generic_attr_21",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_21",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 6,
-      "workflow_field": "generic_attr_21",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_21",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 7,
-      "workflow_field": "generic_attr_21",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_22",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 0,
-      "workflow_field": "generic_attr_22",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_22",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 1,
-      "workflow_field": "generic_attr_22",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_22",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 2,
-      "workflow_field": "generic_attr_22",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_22",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 3,
-      "workflow_field": "generic_attr_22",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_22",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 4,
-      "workflow_field": "generic_attr_22",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_22",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 5,
-      "workflow_field": "generic_attr_22",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_22",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 6,
-      "workflow_field": "generic_attr_22",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_22",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 7,
-      "workflow_field": "generic_attr_22",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 0,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 1,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 2,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 3,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 4,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 5,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 6,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 7,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_b"
-    },
-    {
       "final_path": "/generic_group_b/*/generic_attr_09",
       "output_source": "customChunkOutputs",
       "page_numbers": [
@@ -2175,86 +1538,6 @@
       ],
       "record_index": 7,
       "workflow_field": "generic_attr_09",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_12",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 0,
-      "workflow_field": "generic_attr_12",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_12",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 1,
-      "workflow_field": "generic_attr_12",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_12",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 2,
-      "workflow_field": "generic_attr_12",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_12",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 3,
-      "workflow_field": "generic_attr_12",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_12",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 4,
-      "workflow_field": "generic_attr_12",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_12",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 5,
-      "workflow_field": "generic_attr_12",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_12",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 6,
-      "workflow_field": "generic_attr_12",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_12",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 7,
-      "workflow_field": "generic_attr_12",
       "workflow_group": "generic_group_b"
     },
     {
@@ -2575,86 +1858,6 @@
       ],
       "record_index": 7,
       "workflow_field": "generic_attr_26",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_27",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 0,
-      "workflow_field": "generic_attr_27",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_27",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 1,
-      "workflow_field": "generic_attr_27",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_27",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 2,
-      "workflow_field": "generic_attr_27",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_27",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 3,
-      "workflow_field": "generic_attr_27",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_27",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 4,
-      "workflow_field": "generic_attr_27",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_27",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 5,
-      "workflow_field": "generic_attr_27",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_27",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 6,
-      "workflow_field": "generic_attr_27",
-      "workflow_group": "generic_group_b"
-    },
-    {
-      "final_path": "/generic_group_b/*/generic_attr_27",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 7,
-      "workflow_field": "generic_attr_27",
       "workflow_group": "generic_group_b"
     },
     {
@@ -3164,26 +2367,6 @@
         1
       ],
       "record_index": 50,
-      "workflow_field": "generic_attr_28",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_28",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 51,
-      "workflow_field": "generic_attr_28",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_28",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 52,
       "workflow_field": "generic_attr_28",
       "workflow_group": "generic_group_c"
     },
@@ -3698,26 +2881,6 @@
       "workflow_group": "generic_group_c"
     },
     {
-      "final_path": "/generic_group_c/*/generic_attr_29",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 51,
-      "workflow_field": "generic_attr_29",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_29",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 52,
-      "workflow_field": "generic_attr_29",
-      "workflow_group": "generic_group_c"
-    },
-    {
       "final_path": "/generic_group_c/*/generic_attr_30",
       "output_source": "customChunkOutputs",
       "page_numbers": [
@@ -4228,26 +3391,6 @@
       "workflow_group": "generic_group_c"
     },
     {
-      "final_path": "/generic_group_c/*/generic_attr_30",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 51,
-      "workflow_field": "generic_attr_30",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_30",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 52,
-      "workflow_field": "generic_attr_30",
-      "workflow_group": "generic_group_c"
-    },
-    {
       "final_path": "/generic_group_c/*/generic_attr_18",
       "output_source": "customChunkOutputs",
       "page_numbers": [
@@ -4748,566 +3891,6 @@
       "workflow_group": "generic_group_c"
     },
     {
-      "final_path": "/generic_group_c/*/generic_attr_18",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 50,
-      "workflow_field": "generic_attr_18",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_18",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 51,
-      "workflow_field": "generic_attr_18",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_18",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 52,
-      "workflow_field": "generic_attr_18",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 0,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 1,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 2,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 3,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 4,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 5,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 6,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 7,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 8,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 9,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 10,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 11,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 12,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 13,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 14,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 15,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 16,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 17,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 18,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 19,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 20,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 21,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 22,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 23,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 24,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 25,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 26,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 27,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 28,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 29,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 30,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 31,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 32,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 33,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 34,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 35,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 36,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 37,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 38,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 39,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 40,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 41,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 42,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 43,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 44,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 45,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 46,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 47,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 48,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 49,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 50,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 51,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_08",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 52,
-      "workflow_field": "generic_attr_08",
-      "workflow_group": "generic_group_c"
-    },
-    {
       "final_path": "/generic_group_c/*/generic_attr_23",
       "output_source": "customChunkOutputs",
       "page_numbers": [
@@ -5804,36 +4387,6 @@
         1
       ],
       "record_index": 49,
-      "workflow_field": "generic_attr_23",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_23",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 50,
-      "workflow_field": "generic_attr_23",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_23",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 51,
-      "workflow_field": "generic_attr_23",
-      "workflow_group": "generic_group_c"
-    },
-    {
-      "final_path": "/generic_group_c/*/generic_attr_23",
-      "output_source": "customChunkOutputs",
-      "page_numbers": [
-        1
-      ],
-      "record_index": 52,
       "workflow_field": "generic_attr_23",
       "workflow_group": "generic_group_c"
     }
@@ -5842,591 +4395,466 @@
   "surface": "generic_v1",
   "workflow_output": {
     "generic_group_a": {
-      "generic_attr_01": "Generic sample value 001",
-      "generic_attr_02": "Generic sample value 001",
-      "generic_attr_03": "Generic sample value 001",
-      "generic_attr_04": "Generic sample value 001",
-      "generic_attr_05": "Generic sample value 001",
-      "generic_attr_06": "Generic sample value 001",
-      "generic_attr_07": "Generic sample value 001",
-      "generic_attr_08": "Generic sample value 001",
-      "generic_attr_09": "Generic sample value 001",
-      "generic_attr_10": "Generic sample value 001",
-      "generic_attr_11": "Generic sample value 001",
-      "generic_attr_12": "Generic sample value 001",
-      "generic_attr_13": "Generic sample value 001",
-      "generic_attr_14": "Generic sample value 001"
+      "generic_attr_01": "blank reviewed expected value for generic_attr_01",
+      "generic_attr_02": 7613.2,
+      "generic_attr_03": "currency_dollars",
+      "generic_attr_04": "2025-07-30",
+      "generic_attr_05": "10295809",
+      "generic_attr_06": "blank reviewed expected value for generic_attr_06",
+      "generic_attr_07": "blank reviewed expected value for generic_attr_07",
+      "generic_attr_08": "City of Windom",
+      "generic_attr_09": "KWIK TRIP (1147)",
+      "generic_attr_10": "Direct",
+      "generic_attr_11": "statement_type_bill",
+      "generic_attr_12": "blank reviewed expected value for generic_attr_12",
+      "generic_attr_13": "2025-07-08",
+      "generic_attr_14": 7613.2
     },
     "generic_group_b": [
       {
-        "generic_attr_08": "GEN-MTR-001",
-        "generic_attr_09": "Generic sample value 001",
-        "generic_attr_12": "Generic sample value 001",
-        "generic_attr_15": "Generic sample value 001",
-        "generic_attr_16": "Generic sample value 001",
-        "generic_attr_17": "Generic sample value 001",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_19": "Generic sample value 001",
-        "generic_attr_20": "Generic sample value 001",
-        "generic_attr_21": "Generic sample value 001",
-        "generic_attr_22": "Generic sample value 001",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_24": "Generic sample value 001",
-        "generic_attr_25": "Generic sample value 001",
-        "generic_attr_26": "Generic sample value 001",
-        "generic_attr_27": "Generic sample value 001"
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "70182657",
+        "generic_attr_23": "electric",
+        "generic_attr_24": "Industrial Electric",
+        "generic_attr_25": "kWh",
+        "generic_attr_26": 60960.0
       },
       {
-        "generic_attr_08": "GEN-MTR-002",
-        "generic_attr_09": "Generic sample value 002",
-        "generic_attr_12": "Generic sample value 002",
-        "generic_attr_15": "Generic sample value 002",
-        "generic_attr_16": "Generic sample value 002",
-        "generic_attr_17": "Generic sample value 002",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_19": "Generic sample value 002",
-        "generic_attr_20": "Generic sample value 002",
-        "generic_attr_21": "Generic sample value 002",
-        "generic_attr_22": "Generic sample value 002",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_24": "Generic sample value 002",
-        "generic_attr_25": "Generic sample value 002",
-        "generic_attr_26": "Generic sample value 002",
-        "generic_attr_27": "Generic sample value 002"
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "89321458",
+        "generic_attr_23": "water",
+        "generic_attr_24": "Commercial Water",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 42303.0
       },
       {
-        "generic_attr_08": "GEN-MTR-003",
-        "generic_attr_09": "Generic sample value 003",
-        "generic_attr_12": "Generic sample value 003",
-        "generic_attr_15": "Generic sample value 003",
-        "generic_attr_16": "Generic sample value 003",
-        "generic_attr_17": "Generic sample value 003",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_19": "Generic sample value 003",
-        "generic_attr_20": "Generic sample value 003",
-        "generic_attr_21": "Generic sample value 003",
-        "generic_attr_22": "Generic sample value 003",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_24": "Generic sample value 003",
-        "generic_attr_25": "Generic sample value 003",
-        "generic_attr_26": "Generic sample value 003",
-        "generic_attr_27": "Generic sample value 003"
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "89321458",
+        "generic_attr_23": "sewer",
+        "generic_attr_24": "Commercial Sewer",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 42303.0
       },
       {
-        "generic_attr_08": "GEN-MTR-004",
-        "generic_attr_09": "Generic sample value 004",
-        "generic_attr_12": "Generic sample value 004",
-        "generic_attr_15": "Generic sample value 004",
-        "generic_attr_16": "Generic sample value 004",
-        "generic_attr_17": "Generic sample value 004",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_19": "Generic sample value 004",
-        "generic_attr_20": "Generic sample value 004",
-        "generic_attr_21": "Generic sample value 004",
-        "generic_attr_22": "Generic sample value 004",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_24": "Generic sample value 004",
-        "generic_attr_25": "Generic sample value 004",
-        "generic_attr_26": "Generic sample value 004",
-        "generic_attr_27": "Generic sample value 004"
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "89321459",
+        "generic_attr_23": "water",
+        "generic_attr_24": "Commercial Water",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 40356.0
       },
       {
-        "generic_attr_08": "GEN-MTR-005",
-        "generic_attr_09": "Generic sample value 005",
-        "generic_attr_12": "Generic sample value 005",
-        "generic_attr_15": "Generic sample value 005",
-        "generic_attr_16": "Generic sample value 005",
-        "generic_attr_17": "Generic sample value 005",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_19": "Generic sample value 005",
-        "generic_attr_20": "Generic sample value 005",
-        "generic_attr_21": "Generic sample value 005",
-        "generic_attr_22": "Generic sample value 005",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_24": "Generic sample value 005",
-        "generic_attr_25": "Generic sample value 005",
-        "generic_attr_26": "Generic sample value 005",
-        "generic_attr_27": "Generic sample value 005"
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "89321459",
+        "generic_attr_23": "sewer",
+        "generic_attr_24": "Commercial Sewer",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 40356.0
       },
       {
-        "generic_attr_08": "GEN-MTR-006",
-        "generic_attr_09": "Generic sample value 006",
-        "generic_attr_12": "Generic sample value 006",
-        "generic_attr_15": "Generic sample value 006",
-        "generic_attr_16": "Generic sample value 006",
-        "generic_attr_17": "Generic sample value 006",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_19": "Generic sample value 006",
-        "generic_attr_20": "Generic sample value 006",
-        "generic_attr_21": "Generic sample value 006",
-        "generic_attr_22": "Generic sample value 006",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_24": "Generic sample value 006",
-        "generic_attr_25": "Generic sample value 006",
-        "generic_attr_26": "Generic sample value 006",
-        "generic_attr_27": "Generic sample value 006"
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "91496724",
+        "generic_attr_23": "irrigation",
+        "generic_attr_24": "Commercial Water",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 96600.0
       },
       {
-        "generic_attr_08": "GEN-MTR-007",
-        "generic_attr_09": "Generic sample value 007",
-        "generic_attr_12": "Generic sample value 007",
-        "generic_attr_15": "Generic sample value 007",
-        "generic_attr_16": "Generic sample value 007",
-        "generic_attr_17": "Generic sample value 007",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_19": "Generic sample value 007",
-        "generic_attr_20": "Generic sample value 007",
-        "generic_attr_21": "Generic sample value 007",
-        "generic_attr_22": "Generic sample value 007",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_24": "Generic sample value 007",
-        "generic_attr_25": "Generic sample value 007",
-        "generic_attr_26": "Generic sample value 007",
-        "generic_attr_27": "Generic sample value 007"
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "91496726",
+        "generic_attr_23": "water",
+        "generic_attr_24": "Commercial Water",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 55000.0
       },
       {
-        "generic_attr_08": "GEN-MTR-008",
-        "generic_attr_09": "Generic sample value 008",
-        "generic_attr_12": "Generic sample value 008",
-        "generic_attr_15": "Generic sample value 008",
-        "generic_attr_16": "Generic sample value 008",
-        "generic_attr_17": "Generic sample value 008",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_19": "Generic sample value 008",
-        "generic_attr_20": "Generic sample value 008",
-        "generic_attr_21": "Generic sample value 008",
-        "generic_attr_22": "Generic sample value 008",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_24": "Generic sample value 008",
-        "generic_attr_25": "Generic sample value 008",
-        "generic_attr_26": "Generic sample value 008",
-        "generic_attr_27": "Generic sample value 008"
+        "generic_attr_09": "KWIK TRIP (1147)",
+        "generic_attr_15": "full_service",
+        "generic_attr_16": "2025-07-01",
+        "generic_attr_17": "2025-06-01",
+        "generic_attr_18": "91496726",
+        "generic_attr_23": "sewer",
+        "generic_attr_24": "Commercial Sewer",
+        "generic_attr_25": "gallons",
+        "generic_attr_26": 55000.0
       }
     ],
     "generic_group_c": [
       {
-        "generic_attr_08": "GEN-MTR-001",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 001",
-        "generic_attr_29": "Generic sample value 001",
-        "generic_attr_30": "Generic sample value 001"
+        "generic_attr_18": "70182657",
+        "generic_attr_23": "electric",
+        "generic_attr_28": 55.0,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Industrial Energy Electric"
       },
       {
-        "generic_attr_08": "GEN-MTR-002",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 002",
-        "generic_attr_29": "Generic sample value 002",
-        "generic_attr_30": "Generic sample value 002"
+        "generic_attr_18": "70182657",
+        "generic_attr_23": "electric",
+        "generic_attr_28": 2560.32,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Consumption"
       },
       {
-        "generic_attr_08": "GEN-MTR-003",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 003",
-        "generic_attr_29": "Generic sample value 003",
-        "generic_attr_30": "Generic sample value 003"
+        "generic_attr_18": "70182657",
+        "generic_attr_23": "electric",
+        "generic_attr_28": 2218.75,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Demand"
       },
       {
-        "generic_attr_08": "GEN-MTR-004",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 004",
-        "generic_attr_29": "Generic sample value 004",
-        "generic_attr_30": "Generic sample value 004"
+        "generic_attr_18": "70182657",
+        "generic_attr_23": "electric",
+        "generic_attr_28": 106.68,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Power Cost Adjustment - $.00175wh (S)"
       },
       {
-        "generic_attr_08": "GEN-MTR-005",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 005",
-        "generic_attr_29": "Generic sample value 005",
-        "generic_attr_30": "Generic sample value 005"
+        "generic_attr_18": "70182657",
+        "generic_attr_23": "electric",
+        "generic_attr_28": 2.81,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "MN Sales Tax"
       },
       {
-        "generic_attr_08": "GEN-MTR-006",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 006",
-        "generic_attr_29": "Generic sample value 006",
-        "generic_attr_30": "Generic sample value 006"
+        "generic_attr_18": "70182657",
+        "generic_attr_23": "electric",
+        "generic_attr_28": 249.74,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "MN State Tax on Usage"
       },
       {
-        "generic_attr_08": "GEN-MTR-007",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 007",
-        "generic_attr_29": "Generic sample value 007",
-        "generic_attr_30": "Generic sample value 007"
+        "generic_attr_18": "89321458",
+        "generic_attr_23": "water",
+        "generic_attr_28": 18.43,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Water Minimum Charge"
       },
       {
-        "generic_attr_08": "GEN-MTR-008",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 008",
-        "generic_attr_29": "Generic sample value 008",
-        "generic_attr_30": "Generic sample value 008"
+        "generic_attr_18": "89321458",
+        "generic_attr_23": "water",
+        "generic_attr_28": 223.32,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Water"
       },
       {
-        "generic_attr_08": "GEN-MTR-001",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 009",
-        "generic_attr_29": "Generic sample value 009",
-        "generic_attr_30": "Generic sample value 009"
+        "generic_attr_18": "89321458",
+        "generic_attr_23": "water",
+        "generic_attr_28": 0.81,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "State Water Surcharge"
       },
       {
-        "generic_attr_08": "GEN-MTR-002",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 010",
-        "generic_attr_29": "Generic sample value 010",
-        "generic_attr_30": "Generic sample value 010"
+        "generic_attr_18": "89321458",
+        "generic_attr_23": "sewer",
+        "generic_attr_28": 40.61,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Sewer Minimum Charge"
       },
       {
-        "generic_attr_08": "GEN-MTR-003",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 011",
-        "generic_attr_29": "Generic sample value 011",
-        "generic_attr_30": "Generic sample value 011"
+        "generic_attr_18": "89321458",
+        "generic_attr_23": "sewer",
+        "generic_attr_28": 275.39,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Sewer"
       },
       {
-        "generic_attr_08": "GEN-MTR-004",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 012",
-        "generic_attr_29": "Generic sample value 012",
-        "generic_attr_30": "Generic sample value 012"
+        "generic_attr_18": "89321459",
+        "generic_attr_23": "water",
+        "generic_attr_28": 18.43,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Water Minimum Charge"
       },
       {
-        "generic_attr_08": "GEN-MTR-005",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 013",
-        "generic_attr_29": "Generic sample value 013",
-        "generic_attr_30": "Generic sample value 013"
+        "generic_attr_18": "89321459",
+        "generic_attr_23": "water",
+        "generic_attr_28": 212.19,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Water"
       },
       {
-        "generic_attr_08": "GEN-MTR-006",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 014",
-        "generic_attr_29": "Generic sample value 014",
-        "generic_attr_30": "Generic sample value 014"
+        "generic_attr_18": "89321459",
+        "generic_attr_23": "water",
+        "generic_attr_28": 0.81,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "State Water Surcharge"
       },
       {
-        "generic_attr_08": "GEN-MTR-007",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 015",
-        "generic_attr_29": "Generic sample value 015",
-        "generic_attr_30": "Generic sample value 015"
+        "generic_attr_18": "89321459",
+        "generic_attr_23": "sewer",
+        "generic_attr_28": 40.61,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Sewer Minimum Charge"
       },
       {
-        "generic_attr_08": "GEN-MTR-008",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 016",
-        "generic_attr_29": "Generic sample value 016",
-        "generic_attr_30": "Generic sample value 016"
+        "generic_attr_18": "89321459",
+        "generic_attr_23": "sewer",
+        "generic_attr_28": 262.71,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Sewer"
       },
       {
-        "generic_attr_08": "GEN-MTR-001",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 017",
-        "generic_attr_29": "Generic sample value 017",
-        "generic_attr_30": "Generic sample value 017"
+        "generic_attr_18": "91496724",
+        "generic_attr_23": "irrigation",
+        "generic_attr_28": 18.43,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Water Minimum Charge"
       },
       {
-        "generic_attr_08": "GEN-MTR-002",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 018",
-        "generic_attr_29": "Generic sample value 018",
-        "generic_attr_30": "Generic sample value 018"
+        "generic_attr_18": "91496724",
+        "generic_attr_23": "irrigation",
+        "generic_attr_28": 533.9,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Water"
       },
       {
-        "generic_attr_08": "GEN-MTR-003",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 019",
-        "generic_attr_29": "Generic sample value 019",
-        "generic_attr_30": "Generic sample value 019"
+        "generic_attr_18": "91496724",
+        "generic_attr_23": "irrigation",
+        "generic_attr_28": 1.27,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "MN Sales Tax"
       },
       {
-        "generic_attr_08": "GEN-MTR-004",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 020",
-        "generic_attr_29": "Generic sample value 020",
-        "generic_attr_30": "Generic sample value 020"
+        "generic_attr_18": "91496724",
+        "generic_attr_23": "irrigation",
+        "generic_attr_28": 36.71,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "MN State Tax on Usage"
       },
       {
-        "generic_attr_08": "GEN-MTR-005",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 021",
-        "generic_attr_29": "Generic sample value 021",
-        "generic_attr_30": "Generic sample value 021"
+        "generic_attr_18": "91496724",
+        "generic_attr_23": "irrigation",
+        "generic_attr_28": 0.81,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "State Water Surcharge"
       },
       {
-        "generic_attr_08": "GEN-MTR-006",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 022",
-        "generic_attr_29": "Generic sample value 022",
-        "generic_attr_30": "Generic sample value 022"
+        "generic_attr_18": "91496726",
+        "generic_attr_23": "water",
+        "generic_attr_28": 18.43,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Water Minimum Charge"
       },
       {
-        "generic_attr_08": "GEN-MTR-007",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 023",
-        "generic_attr_29": "Generic sample value 023",
-        "generic_attr_30": "Generic sample value 023"
+        "generic_attr_18": "91496726",
+        "generic_attr_23": "water",
+        "generic_attr_28": 295.95,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Water"
       },
       {
-        "generic_attr_08": "GEN-MTR-008",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 024",
-        "generic_attr_29": "Generic sample value 024",
-        "generic_attr_30": "Generic sample value 024"
+        "generic_attr_18": "91496726",
+        "generic_attr_23": "water",
+        "generic_attr_28": 20.35,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "MN State Tax on Usage"
       },
       {
-        "generic_attr_08": "GEN-MTR-001",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 025",
-        "generic_attr_29": "Generic sample value 025",
-        "generic_attr_30": "Generic sample value 025"
+        "generic_attr_18": "91496726",
+        "generic_attr_23": "water",
+        "generic_attr_28": 1.27,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "MN Sales Tax"
       },
       {
-        "generic_attr_08": "GEN-MTR-002",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 026",
-        "generic_attr_29": "Generic sample value 026",
-        "generic_attr_30": "Generic sample value 026"
+        "generic_attr_18": "91496726",
+        "generic_attr_23": "water",
+        "generic_attr_28": 0.81,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "State Water Surcharge"
       },
       {
-        "generic_attr_08": "GEN-MTR-003",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 027",
-        "generic_attr_29": "Generic sample value 027",
-        "generic_attr_30": "Generic sample value 027"
+        "generic_attr_18": "91496726",
+        "generic_attr_23": "sewer",
+        "generic_attr_28": 40.61,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Sewer Minimum Charge"
       },
       {
-        "generic_attr_08": "GEN-MTR-004",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 028",
-        "generic_attr_29": "Generic sample value 028",
-        "generic_attr_30": "Generic sample value 028"
+        "generic_attr_18": "91496726",
+        "generic_attr_23": "sewer",
+        "generic_attr_28": 358.05,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Sewer"
       },
       {
-        "generic_attr_08": "GEN-MTR-005",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 029",
-        "generic_attr_29": "Generic sample value 029",
-        "generic_attr_30": "Generic sample value 029"
+        "generic_attr_18": "70182657",
+        "generic_attr_23": "electric",
+        "generic_attr_28": 55.0,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Industrial Energy Electric"
       },
       {
-        "generic_attr_08": "GEN-MTR-006",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 030",
-        "generic_attr_29": "Generic sample value 030",
-        "generic_attr_30": "Generic sample value 030"
+        "generic_attr_18": "70182657",
+        "generic_attr_23": "electric",
+        "generic_attr_28": 2560.32,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Consumption"
       },
       {
-        "generic_attr_08": "GEN-MTR-007",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 031",
-        "generic_attr_29": "Generic sample value 031",
-        "generic_attr_30": "Generic sample value 031"
+        "generic_attr_18": "70182657",
+        "generic_attr_23": "electric",
+        "generic_attr_28": 2218.75,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Demand"
       },
       {
-        "generic_attr_08": "GEN-MTR-008",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 032",
-        "generic_attr_29": "Generic sample value 032",
-        "generic_attr_30": "Generic sample value 032"
+        "generic_attr_18": "70182657",
+        "generic_attr_23": "electric",
+        "generic_attr_28": 106.68,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Power Cost Adjustment - $.00175wh (S)"
       },
       {
-        "generic_attr_08": "GEN-MTR-001",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 033",
-        "generic_attr_29": "Generic sample value 033",
-        "generic_attr_30": "Generic sample value 033"
+        "generic_attr_18": "70182657",
+        "generic_attr_23": "electric",
+        "generic_attr_28": 2.81,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "MN Sales Tax"
       },
       {
-        "generic_attr_08": "GEN-MTR-002",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 034",
-        "generic_attr_29": "Generic sample value 034",
-        "generic_attr_30": "Generic sample value 034"
+        "generic_attr_18": "70182657",
+        "generic_attr_23": "electric",
+        "generic_attr_28": 249.74,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "MN State Tax on Usage"
       },
       {
-        "generic_attr_08": "GEN-MTR-003",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 035",
-        "generic_attr_29": "Generic sample value 035",
-        "generic_attr_30": "Generic sample value 035"
+        "generic_attr_18": "89321458",
+        "generic_attr_23": "water",
+        "generic_attr_28": 18.43,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Water Minimum Charge"
       },
       {
-        "generic_attr_08": "GEN-MTR-004",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 036",
-        "generic_attr_29": "Generic sample value 036",
-        "generic_attr_30": "Generic sample value 036"
+        "generic_attr_18": "89321458",
+        "generic_attr_23": "water",
+        "generic_attr_28": 223.32,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Water"
       },
       {
-        "generic_attr_08": "GEN-MTR-005",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 037",
-        "generic_attr_29": "Generic sample value 037",
-        "generic_attr_30": "Generic sample value 037"
+        "generic_attr_18": "89321458",
+        "generic_attr_23": "water",
+        "generic_attr_28": 0.81,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "State Water Surcharge"
       },
       {
-        "generic_attr_08": "GEN-MTR-006",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 038",
-        "generic_attr_29": "Generic sample value 038",
-        "generic_attr_30": "Generic sample value 038"
+        "generic_attr_18": "89321458",
+        "generic_attr_23": "sewer",
+        "generic_attr_28": 40.61,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Sewer Minimum Charge"
       },
       {
-        "generic_attr_08": "GEN-MTR-007",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 039",
-        "generic_attr_29": "Generic sample value 039",
-        "generic_attr_30": "Generic sample value 039"
+        "generic_attr_18": "89321458",
+        "generic_attr_23": "sewer",
+        "generic_attr_28": 275.39,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Sewer"
       },
       {
-        "generic_attr_08": "GEN-MTR-008",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 040",
-        "generic_attr_29": "Generic sample value 040",
-        "generic_attr_30": "Generic sample value 040"
+        "generic_attr_18": "89321459",
+        "generic_attr_23": "water",
+        "generic_attr_28": 18.43,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Water Minimum Charge"
       },
       {
-        "generic_attr_08": "GEN-MTR-001",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 041",
-        "generic_attr_29": "Generic sample value 041",
-        "generic_attr_30": "Generic sample value 041"
+        "generic_attr_18": "89321459",
+        "generic_attr_23": "water",
+        "generic_attr_28": 212.19,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Water"
       },
       {
-        "generic_attr_08": "GEN-MTR-002",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 042",
-        "generic_attr_29": "Generic sample value 042",
-        "generic_attr_30": "Generic sample value 042"
+        "generic_attr_18": "89321459",
+        "generic_attr_23": "water",
+        "generic_attr_28": 0.81,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "State Water Surcharge"
       },
       {
-        "generic_attr_08": "GEN-MTR-003",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 043",
-        "generic_attr_29": "Generic sample value 043",
-        "generic_attr_30": "Generic sample value 043"
+        "generic_attr_18": "89321459",
+        "generic_attr_23": "sewer",
+        "generic_attr_28": 40.61,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Sewer Minimum Charge"
       },
       {
-        "generic_attr_08": "GEN-MTR-004",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 044",
-        "generic_attr_29": "Generic sample value 044",
-        "generic_attr_30": "Generic sample value 044"
+        "generic_attr_18": "89321459",
+        "generic_attr_23": "sewer",
+        "generic_attr_28": 262.71,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Sewer"
       },
       {
-        "generic_attr_08": "GEN-MTR-005",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 045",
-        "generic_attr_29": "Generic sample value 045",
-        "generic_attr_30": "Generic sample value 045"
+        "generic_attr_18": "91496724",
+        "generic_attr_23": "irrigation",
+        "generic_attr_28": 18.43,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Water Minimum Charge"
       },
       {
-        "generic_attr_08": "GEN-MTR-006",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 046",
-        "generic_attr_29": "Generic sample value 046",
-        "generic_attr_30": "Generic sample value 046"
+        "generic_attr_18": "91496724",
+        "generic_attr_23": "irrigation",
+        "generic_attr_28": 533.9,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Water"
       },
       {
-        "generic_attr_08": "GEN-MTR-007",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 047",
-        "generic_attr_29": "Generic sample value 047",
-        "generic_attr_30": "Generic sample value 047"
+        "generic_attr_18": "91496724",
+        "generic_attr_23": "irrigation",
+        "generic_attr_28": 1.27,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "MN Sales Tax"
       },
       {
-        "generic_attr_08": "GEN-MTR-008",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 048",
-        "generic_attr_29": "Generic sample value 048",
-        "generic_attr_30": "Generic sample value 048"
+        "generic_attr_18": "91496724",
+        "generic_attr_23": "irrigation",
+        "generic_attr_28": 36.71,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "MN State Tax on Usage"
       },
       {
-        "generic_attr_08": "GEN-MTR-001",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 049",
-        "generic_attr_29": "Generic sample value 049",
-        "generic_attr_30": "Generic sample value 049"
+        "generic_attr_18": "91496724",
+        "generic_attr_23": "irrigation",
+        "generic_attr_28": 0.81,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "State Water Surcharge"
       },
       {
-        "generic_attr_08": "GEN-MTR-002",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 050",
-        "generic_attr_29": "Generic sample value 050",
-        "generic_attr_30": "Generic sample value 050"
+        "generic_attr_18": "91496726",
+        "generic_attr_23": "water",
+        "generic_attr_28": 18.43,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Commercial Water Minimum Charge"
       },
       {
-        "generic_attr_08": "GEN-MTR-003",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 051",
-        "generic_attr_29": "Generic sample value 051",
-        "generic_attr_30": "Generic sample value 051"
-      },
-      {
-        "generic_attr_08": "GEN-MTR-004",
-        "generic_attr_18": "Generic Provider A",
-        "generic_attr_23": "Generic Electric Service",
-        "generic_attr_28": "Generic sample value 052",
-        "generic_attr_29": "Generic sample value 052",
-        "generic_attr_30": "Generic sample value 052"
-      },
-      {
-        "generic_attr_08": "GEN-ACCOUNT",
-        "generic_attr_18": "Generic Account Provider",
-        "generic_attr_23": "Generic Account Service",
-        "generic_attr_28": "Generic sample value 053",
-        "generic_attr_29": "Generic sample value 053",
-        "generic_attr_30": "Generic sample value 053"
+        "generic_attr_28": 55.0,
+        "generic_attr_29": "currency_dollars",
+        "generic_attr_30": "Industrial Energy Electric"
       }
     ]
   },

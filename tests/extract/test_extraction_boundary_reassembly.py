@@ -9,7 +9,6 @@ import pytest
 
 from groundx.extract.custom_outputs import reassemble_custom_outputs_from_xray
 
-
 UPDATE_GOLDENS_ENV = "UPDATE_GROUNDX_PYTHON_EXTRACT_BOUNDARY_GOLDENS"
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 EXPECTED_ROOT = ROOT / "tests" / "extract" / "fixtures" / "extraction-boundary"

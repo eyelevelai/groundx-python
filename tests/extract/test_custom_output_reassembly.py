@@ -432,6 +432,78 @@ def test_missing_relationship_list_groups_are_empty_lists() -> None:
     assert result.relationship_output == result.final_output
 
 
+def test_utility_routes_without_relationships_emit_diagnostic() -> None:
+    workflow_extract = {
+        "_groundx_persisted_extract": {
+            "charges": {
+                "match_attrs": ["meter_number"],
+                "passthrough": {"from": "meters"},
+            },
+            "meters": {"fields": {"meter_number": {}}},
+        },
+        "workflow": {
+            "custom_steps": [
+                {"name": "meter_fields", "level": "chunk", "kind": "summary"},
+                {"name": "charge_fields", "level": "chunk", "kind": "keys"},
+            ],
+            "output_routes": [
+                {
+                    "workflow_group": "meters",
+                    "workflow_field": "meter_number",
+                    "final_path": "/meters/meter_number",
+                    "step_name": "meter_fields",
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": "meter_number",
+                },
+                {
+                    "workflow_group": "charges",
+                    "workflow_field": "meter_number",
+                    "final_path": "/charges/meter_number",
+                    "step_name": "charge_fields",
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": "meter_number",
+                },
+                {
+                    "workflow_group": "charges",
+                    "workflow_field": "charge_amount",
+                    "final_path": "/charges/charge_amount",
+                    "step_name": "charge_fields",
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": "charge_amount",
+                },
+            ],
+        },
+    }
+    xray = {
+        "chunks": [
+            {
+                "customChunkOutputs": {
+                    "meter_fields": {"_records": [{"meter_number": "M-1"}]},
+                    "charge_fields": {
+                        "_records": [
+                            {"meter_number": "M-1", "charge_amount": "12.34"}
+                        ]
+                    },
+                }
+            }
+        ]
+    }
+
+    result = reassemble_custom_outputs_from_xray(
+        xray,
+        workflow_extract=workflow_extract,
+    )
+
+    assert result.relationship_output is None
+    assert [diagnostic.code for diagnostic in result.diagnostics] == [
+        "missing_output_relationships"
+    ]
+    assert result.diagnostics[0].workflow_group == "charges"
+
+
 def test_records_wrapper_preserves_direct_outputs_next_to_records() -> None:
     workflow_extract = {
         "workflow": {
@@ -733,6 +805,81 @@ def test_reassembly_reports_source_provenance_for_routed_outputs() -> None:
             "page_numbers": (2,),
         },
     ]
+
+
+def test_adp_scalar_reducer_prefers_source_backed_positive_over_later_default() -> None:
+    workflow_extract = {
+        "workflow": {
+            "custom_steps": [
+                {
+                    "name": "adp_f2_eligibility_requirements",
+                    "level": "section",
+                    "kind": "instruct",
+                },
+            ],
+            "output_routes": [
+                {
+                    "workflow_group": "adp_f2_eligibility_requirements",
+                    "workflow_field": "predecessor_service",
+                    "final_path": "/eligibility_requirements/predecessor_service",
+                    "step_name": "adp_f2_eligibility_requirements",
+                    "level": "section",
+                    "output_map": "customSectionOutputs",
+                    "output_key": "predecessor_service",
+                },
+                {
+                    "workflow_group": "adp_f2_eligibility_requirements",
+                    "workflow_field": "entry_date",
+                    "final_path": "/eligibility_requirements/entry_date",
+                    "step_name": "adp_f2_eligibility_requirements",
+                    "level": "section",
+                    "output_map": "customSectionOutputs",
+                    "output_key": "entry_date",
+                },
+            ],
+        }
+    }
+    xray = {
+        "chunks": [
+            {
+                "chunkId": "source-backed",
+                "pageNumbers": [12],
+                "customSectionOutputs": {
+                    "adp_f2_eligibility_requirements": {
+                        "predecessor_service": "Service with predecessor employer counts",
+                        "entry_date": "2026-01-01",
+                    }
+                },
+            },
+            {
+                "chunkId": "irrelevant-default",
+                "pageNumbers": [99],
+                "customSectionOutputs": {
+                    "adp_f2_eligibility_requirements": {
+                        "predecessor_service": "Not specified",
+                        "entry_date": "2026-02-01",
+                    }
+                },
+            },
+        ]
+    }
+
+    result = reassemble_custom_outputs_from_xray(
+        xray,
+        workflow_extract=workflow_extract,
+    )
+
+    assert result.final_output == {
+        "eligibility_requirements": {
+            "predecessor_service": "Service with predecessor employer counts",
+            "entry_date": "2026-01-01",
+        }
+    }
+    assert [diagnostic.code for diagnostic in result.diagnostics] == [
+        "conflicting_output_candidates"
+    ]
+    assert result.diagnostics[0].severity == "warning"
+    assert result.diagnostics[0].final_path == "/eligibility_requirements/entry_date"
 
 
 def test_duplicate_parent_keys_do_not_make_relationship_child_ambiguous() -> None:

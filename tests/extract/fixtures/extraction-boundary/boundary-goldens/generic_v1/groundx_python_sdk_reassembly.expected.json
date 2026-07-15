@@ -1,10 +1,10 @@
 {
   "artifacts": {
     "handoff": {
-      "sha256": "0cf83fcf3b438caa5deb753ecd8fb7429541869086832b416d27e9c752ee48fe"
+      "sha256": "40beb546f8510e961719c1837f111fd4cce576d52d1c6e5868edc0201312ce40"
     },
     "previous_extract_chain": {
-      "sha256": "b7cba8049859c61b6699f43d8f0949c6986f367b31d1555c34adf22e03e456b3"
+      "sha256": "f37bb47e0cb9d3cf7050d2c7301ce6dd4ef964fb6fcf79e4b4b9887c2746c5a4"
     }
   },
   "assertions": {
@@ -16,24 +16,37 @@
   "certification_eligible": true,
   "evidence_level": "reviewed_deterministic_model_fixture",
   "input_from": "internal_arcadia_extract_chain",
-  "input_sha256": "b7cba8049859c61b6699f43d8f0949c6986f367b31d1555c34adf22e03e456b3",
+  "input_sha256": "f37bb47e0cb9d3cf7050d2c7301ce6dd4ef964fb6fcf79e4b4b9887c2746c5a4",
   "model_fixture": {
     "path": "testdata/extraction-boundary/model-fixtures/generic_v1/extract_model_outputs.json",
-    "schema_version": "internal-arcadia-extract-model-output-fixture-v1",
-    "sha256": "be08cec381e630869d0e7923d6e02fd7043db42410117863795c6ed1cd48de69",
+    "schema_version": "internal-arcadia-boundary-model-fixture-v1",
+    "sha256": "07ac056f1628d1add21a1cfc33c5026dcf793c7a0dcb66c1835261b1be928355",
     "source": {
+      "covered_route_count": 36,
       "document_file_name": "arcadia.pdf",
-      "kind": "reviewed_deterministic_model_output_fixture",
+      "expected_answer_sha256": "a4a3ee0c4dc9f7519f50c3c4f57b5e49a37de8d2cc74e47bf63218aff5b51ec4",
+      "expected_answer_url": "https://cdn.eyelevel.ai/internal-harness/e2e-extract/generic-v1-extract.json",
+      "kind": "reviewed_expected_answer_shape_stress_projection",
+      "projection_notes": [
+        "Values come from the reviewed expected answer where present.",
+        "Blank statement scalars are filled so final-output shape gates can assert field presence.",
+        "Utility child rows are expanded from reviewed rows to exercise the 50+ charge shape.",
+        "One unmatched utility child row is added when the reviewed expected answer has no account-level charge."
+      ],
+      "record_counts_by_group": {
+        "generic_group_b": 8,
+        "generic_group_c": 51
+      },
       "workflow_id": "generic_v1-product-path",
       "workflow_version": "2026-07-12T22:34:02Z"
     }
   },
   "output": {
     "diagnostic_count": 0,
-    "final_output_sha256": "9b7727b1d873c6fb8f5de8b619dc1d3ae0d6a3b53820ea0af526aee935e99216",
-    "relationship_output_sha256": "9b7727b1d873c6fb8f5de8b619dc1d3ae0d6a3b53820ea0af526aee935e99216",
-    "source_provenance_count": 460,
-    "workflow_output_sha256": "7c134983c9d3057b2cd28d559e275e30ffcb7206606417303e467b67370c3fbb"
+    "final_output_sha256": "4c04dd979864fecf57f72a6861eab84585f88c1b476cbf2858f4d39192b25c15",
+    "relationship_output_sha256": "4c04dd979864fecf57f72a6861eab84585f88c1b476cbf2858f4d39192b25c15",
+    "source_provenance_count": 339,
+    "workflow_output_sha256": "b8faac7e1fe78e59aed899ba562b5c403948e2ae8e2540484eb87d73326f9e3f"
   },
   "output_for": "internal_arcadia_save_callback",
   "request": {
