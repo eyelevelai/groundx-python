@@ -182,6 +182,7 @@ def reassemble_custom_outputs_from_xray(
         relationship_output, diagnostics = _apply_relationships(
             final_output,
             typing.cast(typing.Sequence[typing.Any], relationships),
+            workflow_extract=workflow_extract,
             diagnostics=diagnostics,
         )
         final_output = copy.deepcopy(relationship_output)
@@ -887,7 +888,11 @@ def _group_spec(
     workflow_extract: typing.Mapping[str, typing.Any],
     group_name: str,
 ) -> typing.Any:
-    for container_key in ("groups", "prepared_final_groups"):
+    for container_key in (
+        "_groundx_persisted_extract",
+        "groups",
+        "prepared_final_groups",
+    ):
         container = workflow_extract.get(container_key)
         if isinstance(container, typing.Mapping):
             group_spec = container.get(group_name)
@@ -967,6 +972,7 @@ def _apply_relationships(
     relationships: typing.Sequence[typing.Any],
     *,
     diagnostics: typing.Optional[typing.List[CustomOutputDiagnostic]] = None,
+    workflow_extract: typing.Optional[typing.Mapping[str, typing.Any]] = None,
 ) -> typing.Tuple[typing.Dict[str, typing.Any], typing.List[CustomOutputDiagnostic]]:
     result = copy.deepcopy(dict(final_output))
     diagnostics = diagnostics or []
@@ -1021,7 +1027,14 @@ def _apply_relationships(
             typing.cast(typing.List[str], match_attrs),
         )
         result[parent_group] = parent_list
-        child_list = typing.cast(typing.List[typing.Dict[str, typing.Any]], child_records)
+        child_list = _dedupe_relationship_children(
+            typing.cast(typing.List[typing.Dict[str, typing.Any]], child_records),
+            _relationship_child_unique_attrs(
+                workflow_extract,
+                child_group,
+                typing.cast(typing.List[str], match_attrs),
+            ),
+        )
         for parent in parent_list:
             parent.setdefault(parent_output_field, [])
 
@@ -1090,6 +1103,64 @@ def _dedupe_relationship_parents(
             continue
         _merge_relationship_parent(existing, parent)
     return deduped
+
+
+def _dedupe_relationship_children(
+    child_list: typing.List[typing.Dict[str, typing.Any]],
+    unique_attrs: typing.Sequence[str],
+) -> typing.List[typing.Dict[str, typing.Any]]:
+    deduped: typing.List[typing.Dict[str, typing.Any]] = []
+    by_key: typing.Dict[str, typing.Dict[str, typing.Any]] = {}
+    for child in child_list:
+        child_key = _relationship_child_dedupe_key(child, unique_attrs)
+        existing = by_key.get(child_key)
+        if existing is None:
+            by_key[child_key] = child
+            deduped.append(child)
+            continue
+        _merge_relationship_parent(existing, child)
+    return deduped
+
+
+def _relationship_child_dedupe_key(
+    child: typing.Mapping[str, typing.Any],
+    unique_attrs: typing.Sequence[str],
+) -> str:
+    if unique_attrs:
+        child_key = _match_key(child, unique_attrs)
+        if child_key:
+            return _record_key(child_key)
+    return _record_key(_plain(child))
+
+
+def _relationship_child_unique_attrs(
+    workflow_extract: typing.Optional[typing.Mapping[str, typing.Any]],
+    child_group: str,
+    match_attrs: typing.Sequence[str],
+) -> typing.Tuple[str, ...]:
+    if not isinstance(workflow_extract, typing.Mapping):
+        return ()
+
+    group_spec = _group_spec(workflow_extract, child_group)
+    if not isinstance(group_spec, typing.Mapping):
+        return ()
+
+    unique_attrs = group_spec.get("unique_attrs")
+    if not isinstance(unique_attrs, list) or not unique_attrs:
+        return ()
+
+    return _unique_strings((*match_attrs, *unique_attrs))
+
+
+def _unique_strings(values: typing.Iterable[typing.Any]) -> typing.Tuple[str, ...]:
+    seen: typing.Set[str] = set()
+    result: typing.List[str] = []
+    for value in values:
+        if not isinstance(value, str) or value in seen:
+            continue
+        seen.add(value)
+        result.append(value)
+    return tuple(result)
 
 
 def _merge_relationship_parent(
