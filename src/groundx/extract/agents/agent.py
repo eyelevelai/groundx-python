@@ -52,6 +52,21 @@ Return only your response using the `final_answer` tool format:
 """
 
 SUPPORTED_IMAGE_TRANSPORTS = {"pil", "data_url", "remote_url"}
+AgentTraceCallback = typing.Callable[[typing.Dict[str, typing.Any]], None]
+
+
+def _emit_agent_trace(
+    log: Logger,
+    trace_callback: typing.Optional[AgentTraceCallback],
+    event: str,
+    **payload: typing.Any,
+) -> None:
+    if trace_callback is None:
+        return
+    try:
+        trace_callback({"event": event, **payload})
+    except Exception as exc:
+        log.debug_msg(f"agent trace callback failed: {exc.__class__.__name__}: {exc}")
 
 
 @dataclass
@@ -233,6 +248,7 @@ class AgentTool(ToolCallingAgent):
         type: str = "",
         image_urls: typing.Optional[typing.Sequence[str]] = None,
         image_transport: typing.Optional[str] = None,
+        trace_callback: typing.Optional[AgentTraceCallback] = None,
     ) -> typing.Any:
         selected_image_transport = image_transport or self.image_transport
         transport = self._validate_image_inputs(
@@ -240,22 +256,59 @@ class AgentTool(ToolCallingAgent):
             image_urls=image_urls,
             image_transport=selected_image_transport,
         )
+        task = conflict + prompt_suffix
+        trace_base = {
+            "attempt": attempt,
+            "image_transport": transport,
+            "request_type": type,
+        }
+        _emit_agent_trace(
+            self.log,
+            trace_callback,
+            "prompt",
+            **trace_base,
+            prompt=task,
+        )
         if transport in {"data_url", "remote_url"} and image_urls:
             res = self._run_with_image_urls(
-                conflict + prompt_suffix,
+                task,
                 list(image_urls or []),
                 image_transport=transport,
             )
         else:
             res = super().run(  # pyright: ignore[reportUnknownMemberType]
-                conflict + prompt_suffix,
+                task,
                 images=images,
             )
 
+        _emit_agent_trace(
+            self.log,
+            trace_callback,
+            "raw_response",
+            **trace_base,
+            value=res,
+        )
         try:
-            return process_response(res=res, expected_types=expected_types)
+            parsed = process_response(res=res, expected_types=expected_types)
+            _emit_agent_trace(
+                self.log,
+                trace_callback,
+                "parsed_response",
+                **trace_base,
+                value=parsed,
+            )
+            return parsed
 
         except Exception as e:
+            _emit_agent_trace(
+                self.log,
+                trace_callback,
+                "parse_error",
+                **trace_base,
+                error_message=str(e),
+                error_type=e.__class__.__name__,
+                raw_response=res,
+            )
             if attempt > 2:
                 raise TypeError(
                     f"agent process result is not of expected type(s) {expected_types!r}: [{e}]\n\n{res}"
@@ -273,6 +326,7 @@ class AgentTool(ToolCallingAgent):
                 type,
                 image_urls=image_urls,
                 image_transport=transport,
+                trace_callback=trace_callback,
             )
 
     def _run_with_image_urls(
