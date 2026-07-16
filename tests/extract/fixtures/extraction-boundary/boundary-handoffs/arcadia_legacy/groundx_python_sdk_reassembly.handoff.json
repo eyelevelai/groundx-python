@@ -54,48 +54,6 @@
             "charge_description_as_printed": "MN State Tax on Usage",
             "meter_number": "70182657",
             "service_type": "electric"
-          },
-          {
-            "charge_amount": 55.0,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "Industrial Energy Electric",
-            "meter_number": "70182657",
-            "service_type": "electric"
-          },
-          {
-            "charge_amount": 2560.32,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "Consumption",
-            "meter_number": "70182657",
-            "service_type": "electric"
-          },
-          {
-            "charge_amount": 2218.75,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "Demand",
-            "meter_number": "70182657",
-            "service_type": "electric"
-          },
-          {
-            "charge_amount": 106.68,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "Power Cost Adjustment - $.00175wh (S)",
-            "meter_number": "70182657",
-            "service_type": "electric"
-          },
-          {
-            "charge_amount": 2.81,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "MN Sales Tax",
-            "meter_number": "70182657",
-            "service_type": "electric"
-          },
-          {
-            "charge_amount": 249.74,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "MN State Tax on Usage",
-            "meter_number": "70182657",
-            "service_type": "electric"
           }
         ],
         "deregulation_status": "full_service",
@@ -130,27 +88,6 @@
             "charge_description_as_printed": "State Water Surcharge",
             "meter_number": "89321458",
             "service_type": "water"
-          },
-          {
-            "charge_amount": 18.43,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "Commercial Water Minimum Charge",
-            "meter_number": "89321458",
-            "service_type": "water"
-          },
-          {
-            "charge_amount": 223.32,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "Commercial Water",
-            "meter_number": "89321458",
-            "service_type": "water"
-          },
-          {
-            "charge_amount": 0.81,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "State Water Surcharge",
-            "meter_number": "89321458",
-            "service_type": "water"
           }
         ],
         "deregulation_status": "full_service",
@@ -165,20 +102,6 @@
       },
       {
         "charges": [
-          {
-            "charge_amount": 40.61,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "Commercial Sewer Minimum Charge",
-            "meter_number": "89321458",
-            "service_type": "sewer"
-          },
-          {
-            "charge_amount": 275.39,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "Commercial Sewer",
-            "meter_number": "89321458",
-            "service_type": "sewer"
-          },
           {
             "charge_amount": 40.61,
             "charge_amount_currency": "currency_dollars",
@@ -226,27 +149,6 @@
             "charge_description_as_printed": "State Water Surcharge",
             "meter_number": "89321459",
             "service_type": "water"
-          },
-          {
-            "charge_amount": 18.43,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "Commercial Water Minimum Charge",
-            "meter_number": "89321459",
-            "service_type": "water"
-          },
-          {
-            "charge_amount": 212.19,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "Commercial Water",
-            "meter_number": "89321459",
-            "service_type": "water"
-          },
-          {
-            "charge_amount": 0.81,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "State Water Surcharge",
-            "meter_number": "89321459",
-            "service_type": "water"
           }
         ],
         "deregulation_status": "full_service",
@@ -274,20 +176,6 @@
             "charge_description_as_printed": "Commercial Sewer",
             "meter_number": "89321459",
             "service_type": "sewer"
-          },
-          {
-            "charge_amount": 40.61,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "Commercial Sewer Minimum Charge",
-            "meter_number": "89321459",
-            "service_type": "sewer"
-          },
-          {
-            "charge_amount": 262.71,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "Commercial Sewer",
-            "meter_number": "89321459",
-            "service_type": "sewer"
           }
         ],
         "deregulation_status": "full_service",
@@ -302,41 +190,6 @@
       },
       {
         "charges": [
-          {
-            "charge_amount": 18.43,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "Commercial Water Minimum Charge",
-            "meter_number": "91496724",
-            "service_type": "irrigation"
-          },
-          {
-            "charge_amount": 533.9,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "Commercial Water",
-            "meter_number": "91496724",
-            "service_type": "irrigation"
-          },
-          {
-            "charge_amount": 1.27,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "MN Sales Tax",
-            "meter_number": "91496724",
-            "service_type": "irrigation"
-          },
-          {
-            "charge_amount": 36.71,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "MN State Tax on Usage",
-            "meter_number": "91496724",
-            "service_type": "irrigation"
-          },
-          {
-            "charge_amount": 0.81,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "State Water Surcharge",
-            "meter_number": "91496724",
-            "service_type": "irrigation"
-          },
           {
             "charge_amount": 18.43,
             "charge_amount_currency": "currency_dollars",
@@ -417,13 +270,6 @@
             "charge_amount": 0.81,
             "charge_amount_currency": "currency_dollars",
             "charge_description_as_printed": "State Water Surcharge",
-            "meter_number": "91496726",
-            "service_type": "water"
-          },
-          {
-            "charge_amount": 18.43,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "Commercial Water Minimum Charge",
             "meter_number": "91496726",
             "service_type": "water"
           }
@@ -562,48 +408,6 @@
             "charge_description_as_printed": "MN State Tax on Usage",
             "meter_number": "70182657",
             "service_type": "electric"
-          },
-          {
-            "charge_amount": 55.0,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "Industrial Energy Electric",
-            "meter_number": "70182657",
-            "service_type": "electric"
-          },
-          {
-            "charge_amount": 2560.32,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "Consumption",
-            "meter_number": "70182657",
-            "service_type": "electric"
-          },
-          {
-            "charge_amount": 2218.75,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "Demand",
-            "meter_number": "70182657",
-            "service_type": "electric"
-          },
-          {
-            "charge_amount": 106.68,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "Power Cost Adjustment - $.00175wh (S)",
-            "meter_number": "70182657",
-            "service_type": "electric"
-          },
-          {
-            "charge_amount": 2.81,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "MN Sales Tax",
-            "meter_number": "70182657",
-            "service_type": "electric"
-          },
-          {
-            "charge_amount": 249.74,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "MN State Tax on Usage",
-            "meter_number": "70182657",
-            "service_type": "electric"
           }
         ],
         "deregulation_status": "full_service",
@@ -638,27 +442,6 @@
             "charge_description_as_printed": "State Water Surcharge",
             "meter_number": "89321458",
             "service_type": "water"
-          },
-          {
-            "charge_amount": 18.43,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "Commercial Water Minimum Charge",
-            "meter_number": "89321458",
-            "service_type": "water"
-          },
-          {
-            "charge_amount": 223.32,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "Commercial Water",
-            "meter_number": "89321458",
-            "service_type": "water"
-          },
-          {
-            "charge_amount": 0.81,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "State Water Surcharge",
-            "meter_number": "89321458",
-            "service_type": "water"
           }
         ],
         "deregulation_status": "full_service",
@@ -673,20 +456,6 @@
       },
       {
         "charges": [
-          {
-            "charge_amount": 40.61,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "Commercial Sewer Minimum Charge",
-            "meter_number": "89321458",
-            "service_type": "sewer"
-          },
-          {
-            "charge_amount": 275.39,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "Commercial Sewer",
-            "meter_number": "89321458",
-            "service_type": "sewer"
-          },
           {
             "charge_amount": 40.61,
             "charge_amount_currency": "currency_dollars",
@@ -734,27 +503,6 @@
             "charge_description_as_printed": "State Water Surcharge",
             "meter_number": "89321459",
             "service_type": "water"
-          },
-          {
-            "charge_amount": 18.43,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "Commercial Water Minimum Charge",
-            "meter_number": "89321459",
-            "service_type": "water"
-          },
-          {
-            "charge_amount": 212.19,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "Commercial Water",
-            "meter_number": "89321459",
-            "service_type": "water"
-          },
-          {
-            "charge_amount": 0.81,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "State Water Surcharge",
-            "meter_number": "89321459",
-            "service_type": "water"
           }
         ],
         "deregulation_status": "full_service",
@@ -782,20 +530,6 @@
             "charge_description_as_printed": "Commercial Sewer",
             "meter_number": "89321459",
             "service_type": "sewer"
-          },
-          {
-            "charge_amount": 40.61,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "Commercial Sewer Minimum Charge",
-            "meter_number": "89321459",
-            "service_type": "sewer"
-          },
-          {
-            "charge_amount": 262.71,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "Commercial Sewer",
-            "meter_number": "89321459",
-            "service_type": "sewer"
           }
         ],
         "deregulation_status": "full_service",
@@ -810,41 +544,6 @@
       },
       {
         "charges": [
-          {
-            "charge_amount": 18.43,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "Commercial Water Minimum Charge",
-            "meter_number": "91496724",
-            "service_type": "irrigation"
-          },
-          {
-            "charge_amount": 533.9,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "Commercial Water",
-            "meter_number": "91496724",
-            "service_type": "irrigation"
-          },
-          {
-            "charge_amount": 1.27,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "MN Sales Tax",
-            "meter_number": "91496724",
-            "service_type": "irrigation"
-          },
-          {
-            "charge_amount": 36.71,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "MN State Tax on Usage",
-            "meter_number": "91496724",
-            "service_type": "irrigation"
-          },
-          {
-            "charge_amount": 0.81,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "State Water Surcharge",
-            "meter_number": "91496724",
-            "service_type": "irrigation"
-          },
           {
             "charge_amount": 18.43,
             "charge_amount_currency": "currency_dollars",
@@ -925,13 +624,6 @@
             "charge_amount": 0.81,
             "charge_amount_currency": "currency_dollars",
             "charge_description_as_printed": "State Water Surcharge",
-            "meter_number": "91496726",
-            "service_type": "water"
-          },
-          {
-            "charge_amount": 18.43,
-            "charge_amount_currency": "currency_dollars",
-            "charge_description_as_printed": "Commercial Water Minimum Charge",
             "meter_number": "91496726",
             "service_type": "water"
           }

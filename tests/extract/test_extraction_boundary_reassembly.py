@@ -111,6 +111,76 @@ def test_utility_shape_accepts_reviewed_meter_range(
     assert assertions["has_expected_parent_count"] is expected
 
 
+@pytest.mark.parametrize(
+    ("meter_charge_count", "expected"),
+    [
+        (23, False),
+        (24, True),
+        (28, True),
+        (30, True),
+        (31, False),
+        (50, False),
+    ],
+)
+def test_utility_shape_accepts_reviewed_meter_charge_range(
+    meter_charge_count: int,
+    expected: bool,
+) -> None:
+    final_output: typing.Dict[str, typing.Any] = {
+        "meters": [{"charges": []} for _unused in range(8)],
+        "charges": [],
+    }
+    for index in range(meter_charge_count):
+        final_output["meters"][index % 8]["charges"].append(
+            {"charge_amount": index}
+        )
+    final_output.update({f"statement_field_{index}": index for index in range(14)})
+
+    assertions = _shape_assertions(
+        "arcadia_v1",
+        final_output,
+        diagnostics=[],
+        relationship_output={"meters": final_output["meters"]},
+    )
+
+    assert assertions["has_expected_meter_charge_count"] is expected
+
+
+@pytest.mark.parametrize(
+    ("account_charge_count", "expected"),
+    [
+        (0, True),
+        (1, True),
+        (3, True),
+        (4, False),
+    ],
+)
+def test_utility_shape_accepts_reviewed_account_charge_range(
+    account_charge_count: int,
+    expected: bool,
+) -> None:
+    final_output: typing.Dict[str, typing.Any] = {
+        "meters": [
+            {"charges": [{"charge_amount": meter_index}]}
+            for meter_index in range(8)
+        ],
+        "charges": [
+            {"charge_amount": charge_index}
+            for charge_index in range(account_charge_count)
+        ],
+    }
+    final_output.update({f"statement_field_{index}": index for index in range(14)})
+
+    assertions = _shape_assertions(
+        "arcadia_v1",
+        final_output,
+        diagnostics=[],
+        relationship_output={"meters": final_output["meters"]},
+    )
+
+    assert assertions["has_expected_account_child_count"] is expected
+
+
 def _write_boundary_artifacts(
     tmp_path: pathlib.Path,
     surface: str,
@@ -320,8 +390,12 @@ def _shape_assertions(
                 and len(parent[child_field]) >= 1
                 for parent in parent_records
             ),
-            "has_account_level_child_rows": isinstance(account_children, list)
-            and len(account_children) >= 1,
+            "has_expected_account_child_count": isinstance(account_children, list)
+            and 0 <= len(account_children) <= 3,
+            "has_expected_meter_charge_count": isinstance(parent_records, list)
+            and 24
+            <= _nested_child_count(parent_records, child_field)
+            <= 30,
             "has_statement_fields": _statement_field_count(surface, final_output) >= 14,
             "has_relationship_output": bool(relationship_output),
         }
@@ -350,6 +424,18 @@ def _statement_field_count(
         )
     excluded = {"meters", "charges"}
     return sum(1 for key in final_output if key not in excluded)
+
+
+def _nested_child_count(
+    parent_records: typing.Sequence[typing.Mapping[str, typing.Any]],
+    child_field: str,
+) -> int:
+    child_count = 0
+    for parent in parent_records:
+        children = parent.get(child_field)
+        if isinstance(children, list):
+            child_count += len(children)
+    return child_count
 
 
 def _leaf_count(value: typing.Any) -> int:
