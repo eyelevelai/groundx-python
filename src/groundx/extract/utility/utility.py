@@ -1,12 +1,65 @@
 import typing
 
 
+def _complete_json_document_end(txt: str) -> typing.Optional[int]:
+    stack: typing.List[str] = []
+    in_string = False
+    escaped = False
+    started = False
+
+    for idx, char in enumerate(txt):
+        if not started:
+            if char.isspace():
+                continue
+            if char == "{":
+                stack.append("}")
+                started = True
+                continue
+            if char == "[":
+                stack.append("]")
+                started = True
+                continue
+            return None
+
+        if in_string:
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == '"':
+                in_string = False
+            continue
+
+        if char == '"':
+            in_string = True
+        elif char == "{":
+            stack.append("}")
+        elif char == "[":
+            stack.append("]")
+        elif char in "}]":
+            if not stack:
+                return idx
+            if char != stack[-1]:
+                return None
+            stack.pop()
+            if not stack:
+                return idx + 1
+
+    return None
+
+
 def clean_json(txt: str) -> str:
     for p in ("json```\n", "```json\n", "json\n"):
         if txt.startswith(p):
             txt = txt[len(p) :]
     if txt.endswith("```"):
         txt = txt[:-3]
+    txt = txt.strip()
+    document_end = _complete_json_document_end(txt)
+    if document_end is not None and document_end < len(txt):
+        trailing = txt[document_end:].strip()
+        if trailing and all(char in "}]" for char in trailing):
+            txt = txt[:document_end]
     return txt.strip()
 
 
