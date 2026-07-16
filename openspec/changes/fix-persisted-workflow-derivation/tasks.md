@@ -31,9 +31,15 @@
 
 ## 3. Release + rollout
 
-- [ ] 3.1 Version bump + release (3.7.9) via the repo's release process (`.fern` boundary
-      untouched — `extract/` is hand-written, `.fernignore`-preserved).
-- [x] 3.2 (PR #81 — ALSO fixes the hardcoded {meters,charges} array vocabulary: array-ness now derives from workflow metadata per the archived generalize-v1 spec, UNION legacy names per owner ruling; pin bump pending 3.7.9) internal-arcadia-agents — NOW OWNS THE WILDCARD NORMALIZATION (fresh-scan P2):
+- [ ] 3.1 SDK publication was complete for the original persisted-workflow
+      derivation work via the released 3.8.4 line, but new SDK code changes
+      were added after that release for relationship child-row dedupe in
+      `src/groundx/extract/custom_outputs.py`. A new SDK PR merge and release
+      are required before deployed extract pods can prove the corrected
+      Arcadia-family 24-30 nested meter-charge shape. Runtime verification
+      remains owned by the consolidated deployment gate in
+      `internal-arcadia-agents`.
+- [x] 3.2 (PR #81 — ALSO fixes the hardcoded {meters,charges} array vocabulary: array-ness now derives from workflow metadata per the archived generalize-v1 spec, UNION legacy names per owner ruling; runtime pin/deploy verification tracked in the consolidated plan) internal-arcadia-agents — NOW OWNS THE WILDCARD NORMALIZATION (fresh-scan P2):
       `workflow_reassembly_metadata` normalizes group-repetition paths (`/g/*/f` → `/g/f`)
       when exporting `workflow_field_paths` for the reassembly parser; field-level list paths
       (still >2 tokens after the strip) get an EXPLICIT unsupported-in-reassembly error, not
