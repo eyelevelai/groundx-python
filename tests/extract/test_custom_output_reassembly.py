@@ -147,6 +147,224 @@ def test_reassembles_records_wrapper_to_final_relationship_output() -> None:
     }
 
 
+def test_relationship_dedupes_child_rows_by_match_and_unique_attrs() -> None:
+    workflow_extract = {
+        "_groundx_persisted_extract": {
+            "charges": {
+                "match_attrs": ["meter_number"],
+                "unique_attrs": ["description", "amount"],
+            }
+        },
+        "workflow": {
+            "custom_steps": [
+                {"name": "meter_rows", "level": "chunk", "kind": "summary"},
+                {"name": "charge_rows", "level": "chunk", "kind": "keys"},
+            ],
+            "output_routes": [
+                {
+                    "workflow_group": "meters",
+                    "workflow_field": "meter_number",
+                    "final_path": "/meters/meter_number",
+                    "step_name": "meter_rows",
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": "meter_number",
+                },
+                {
+                    "workflow_group": "charges",
+                    "workflow_field": "meter_number",
+                    "final_path": "/charges/meter_number",
+                    "step_name": "charge_rows",
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": "meter_number",
+                },
+                {
+                    "workflow_group": "charges",
+                    "workflow_field": "description",
+                    "final_path": "/charges/description",
+                    "step_name": "charge_rows",
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": "description",
+                },
+                {
+                    "workflow_group": "charges",
+                    "workflow_field": "amount",
+                    "final_path": "/charges/amount",
+                    "step_name": "charge_rows",
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": "amount",
+                },
+            ],
+            "output_relationships": [
+                {
+                    "parent_group": "meters",
+                    "child_group": "charges",
+                    "parent_output_field": "charges",
+                    "match_attrs": ["meter_number"],
+                    "unmatched_child_group": "charges",
+                }
+            ],
+        },
+    }
+    xray = {
+        "chunks": [
+            {
+                "customChunkOutputs": {
+                    "meter_rows": {"_records": [{"meter_number": "M-1"}]},
+                    "charge_rows": {
+                        "_records": [
+                            {
+                                "meter_number": "M-1",
+                                "description": "Energy",
+                                "amount": 10,
+                            },
+                            {
+                                "meter_number": "M-1",
+                                "description": "Energy",
+                                "amount": 10,
+                            },
+                            {
+                                "meter_number": "M-1",
+                                "description": "Demand",
+                                "amount": 20,
+                            },
+                            {
+                                "description": "Account fee",
+                                "amount": 3,
+                            },
+                            {
+                                "description": "Account fee",
+                                "amount": 3,
+                            },
+                        ]
+                    },
+                }
+            }
+        ]
+    }
+
+    result = reassemble_custom_outputs_from_xray(
+        xray,
+        workflow_extract=workflow_extract,
+    )
+
+    assert result.diagnostics == []
+    assert result.final_output == {
+        "meters": [
+            {
+                "meter_number": "M-1",
+                "charges": [
+                    {
+                        "meter_number": "M-1",
+                        "description": "Energy",
+                        "amount": 10,
+                    },
+                    {
+                        "meter_number": "M-1",
+                        "description": "Demand",
+                        "amount": 20,
+                    },
+                ],
+            }
+        ],
+        "charges": [{"description": "Account fee", "amount": 3}],
+    }
+    assert result.relationship_output == result.final_output
+
+
+def test_relationship_dedupes_exact_child_rows_without_unique_attrs() -> None:
+    workflow_extract = {
+        "_groundx_persisted_extract": {
+            "charges": {
+                "match_attrs": ["meter_number"],
+            }
+        },
+        "workflow": {
+            "custom_steps": [
+                {"name": "meter_rows", "level": "chunk", "kind": "summary"},
+                {"name": "charge_rows", "level": "chunk", "kind": "keys"},
+            ],
+            "output_routes": [
+                {
+                    "workflow_group": "meters",
+                    "workflow_field": "meter_number",
+                    "final_path": "/meters/meter_number",
+                    "step_name": "meter_rows",
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": "meter_number",
+                },
+                {
+                    "workflow_group": "charges",
+                    "workflow_field": "meter_number",
+                    "final_path": "/charges/meter_number",
+                    "step_name": "charge_rows",
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": "meter_number",
+                },
+                {
+                    "workflow_group": "charges",
+                    "workflow_field": "amount",
+                    "final_path": "/charges/amount",
+                    "step_name": "charge_rows",
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": "amount",
+                },
+            ],
+            "output_relationships": [
+                {
+                    "parent_group": "meters",
+                    "child_group": "charges",
+                    "parent_output_field": "charges",
+                    "match_attrs": ["meter_number"],
+                    "unmatched_child_group": "charges",
+                }
+            ],
+        },
+    }
+    xray = {
+        "chunks": [
+            {
+                "customChunkOutputs": {
+                    "meter_rows": {"_records": [{"meter_number": "M-1"}]},
+                    "charge_rows": {
+                        "_records": [
+                            {"meter_number": "M-1", "amount": 10},
+                            {"meter_number": "M-1", "amount": 10},
+                            {"meter_number": "M-1", "amount": 20},
+                        ]
+                    },
+                }
+            }
+        ]
+    }
+
+    result = reassemble_custom_outputs_from_xray(
+        xray,
+        workflow_extract=workflow_extract,
+    )
+
+    assert result.diagnostics == []
+    assert result.final_output == {
+        "meters": [
+            {
+                "meter_number": "M-1",
+                "charges": [
+                    {"meter_number": "M-1", "amount": 10},
+                    {"meter_number": "M-1", "amount": 20},
+                ],
+            }
+        ],
+        "charges": [],
+    }
+    assert result.relationship_output == result.final_output
+
+
 def test_chained_relationships_are_order_independent() -> None:
     workflow_extract = {
         "workflow": {

@@ -1,7 +1,7 @@
 {
   "artifacts": {
     "handoff": {
-      "sha256": "40beb546f8510e961719c1837f111fd4cce576d52d1c6e5868edc0201312ce40"
+      "sha256": "85adfc5399ffd84c5cad8a6fd3a7048b10d4457a1cf37fcb228f3cea7b169fa1"
     },
     "previous_extract_chain": {
       "sha256": "f37bb47e0cb9d3cf7050d2c7301ce6dd4ef964fb6fcf79e4b4b9887c2746c5a4"
@@ -43,8 +43,8 @@
   },
   "output": {
     "diagnostic_count": 0,
-    "final_output_sha256": "4c04dd979864fecf57f72a6861eab84585f88c1b476cbf2858f4d39192b25c15",
-    "relationship_output_sha256": "4c04dd979864fecf57f72a6861eab84585f88c1b476cbf2858f4d39192b25c15",
+    "final_output_sha256": "7d6cabcd06ebb2bd20802181eec9cad4453ec797fdab78119a0834a2042b58af",
+    "relationship_output_sha256": "7d6cabcd06ebb2bd20802181eec9cad4453ec797fdab78119a0834a2042b58af",
     "source_provenance_count": 339,
     "workflow_output_sha256": "b8faac7e1fe78e59aed899ba562b5c403948e2ae8e2540484eb87d73326f9e3f"
   },
@@ -62,7 +62,8 @@
   },
   "shape_assertions": {
     "every_parent_has_child_rows": true,
-    "has_account_level_child_rows": true,
+    "has_expected_account_child_count": true,
+    "has_expected_meter_charge_count": true,
     "has_expected_parent_count": true,
     "has_no_error_diagnostics": true,
     "has_relationship_output": true,

@@ -70,48 +70,6 @@
             "generic_attr_28": 249.74,
             "generic_attr_29": "currency_dollars",
             "generic_attr_30": "MN State Tax on Usage"
-          },
-          {
-            "generic_attr_18": "70182657",
-            "generic_attr_23": "electric",
-            "generic_attr_28": 55.0,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "Industrial Energy Electric"
-          },
-          {
-            "generic_attr_18": "70182657",
-            "generic_attr_23": "electric",
-            "generic_attr_28": 2560.32,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "Consumption"
-          },
-          {
-            "generic_attr_18": "70182657",
-            "generic_attr_23": "electric",
-            "generic_attr_28": 2218.75,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "Demand"
-          },
-          {
-            "generic_attr_18": "70182657",
-            "generic_attr_23": "electric",
-            "generic_attr_28": 106.68,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "Power Cost Adjustment - $.00175wh (S)"
-          },
-          {
-            "generic_attr_18": "70182657",
-            "generic_attr_23": "electric",
-            "generic_attr_28": 2.81,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "MN Sales Tax"
-          },
-          {
-            "generic_attr_18": "70182657",
-            "generic_attr_23": "electric",
-            "generic_attr_28": 249.74,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "MN State Tax on Usage"
           }
         ]
       },
@@ -126,27 +84,6 @@
         "generic_attr_25": "gallons",
         "generic_attr_26": 42303.0,
         "generic_group_c": [
-          {
-            "generic_attr_18": "89321458",
-            "generic_attr_23": "water",
-            "generic_attr_28": 18.43,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "Commercial Water Minimum Charge"
-          },
-          {
-            "generic_attr_18": "89321458",
-            "generic_attr_23": "water",
-            "generic_attr_28": 223.32,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "Commercial Water"
-          },
-          {
-            "generic_attr_18": "89321458",
-            "generic_attr_23": "water",
-            "generic_attr_28": 0.81,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "State Water Surcharge"
-          },
           {
             "generic_attr_18": "89321458",
             "generic_attr_23": "water",
@@ -194,20 +131,6 @@
             "generic_attr_28": 275.39,
             "generic_attr_29": "currency_dollars",
             "generic_attr_30": "Commercial Sewer"
-          },
-          {
-            "generic_attr_18": "89321458",
-            "generic_attr_23": "sewer",
-            "generic_attr_28": 40.61,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "Commercial Sewer Minimum Charge"
-          },
-          {
-            "generic_attr_18": "89321458",
-            "generic_attr_23": "sewer",
-            "generic_attr_28": 275.39,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "Commercial Sewer"
           }
         ]
       },
@@ -242,27 +165,6 @@
             "generic_attr_28": 0.81,
             "generic_attr_29": "currency_dollars",
             "generic_attr_30": "State Water Surcharge"
-          },
-          {
-            "generic_attr_18": "89321459",
-            "generic_attr_23": "water",
-            "generic_attr_28": 18.43,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "Commercial Water Minimum Charge"
-          },
-          {
-            "generic_attr_18": "89321459",
-            "generic_attr_23": "water",
-            "generic_attr_28": 212.19,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "Commercial Water"
-          },
-          {
-            "generic_attr_18": "89321459",
-            "generic_attr_23": "water",
-            "generic_attr_28": 0.81,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "State Water Surcharge"
           }
         ]
       },
@@ -277,20 +179,6 @@
         "generic_attr_25": "gallons",
         "generic_attr_26": 40356.0,
         "generic_group_c": [
-          {
-            "generic_attr_18": "89321459",
-            "generic_attr_23": "sewer",
-            "generic_attr_28": 40.61,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "Commercial Sewer Minimum Charge"
-          },
-          {
-            "generic_attr_18": "89321459",
-            "generic_attr_23": "sewer",
-            "generic_attr_28": 262.71,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "Commercial Sewer"
-          },
           {
             "generic_attr_18": "89321459",
             "generic_attr_23": "sewer",
@@ -318,41 +206,6 @@
         "generic_attr_25": "gallons",
         "generic_attr_26": 96600.0,
         "generic_group_c": [
-          {
-            "generic_attr_18": "91496724",
-            "generic_attr_23": "irrigation",
-            "generic_attr_28": 18.43,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "Commercial Water Minimum Charge"
-          },
-          {
-            "generic_attr_18": "91496724",
-            "generic_attr_23": "irrigation",
-            "generic_attr_28": 533.9,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "Commercial Water"
-          },
-          {
-            "generic_attr_18": "91496724",
-            "generic_attr_23": "irrigation",
-            "generic_attr_28": 1.27,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "MN Sales Tax"
-          },
-          {
-            "generic_attr_18": "91496724",
-            "generic_attr_23": "irrigation",
-            "generic_attr_28": 36.71,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "MN State Tax on Usage"
-          },
-          {
-            "generic_attr_18": "91496724",
-            "generic_attr_23": "irrigation",
-            "generic_attr_28": 0.81,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "State Water Surcharge"
-          },
           {
             "generic_attr_18": "91496724",
             "generic_attr_23": "irrigation",
@@ -435,13 +288,6 @@
             "generic_attr_28": 0.81,
             "generic_attr_29": "currency_dollars",
             "generic_attr_30": "State Water Surcharge"
-          },
-          {
-            "generic_attr_18": "91496726",
-            "generic_attr_23": "water",
-            "generic_attr_28": 18.43,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "Commercial Water Minimum Charge"
           }
         ]
       },
@@ -576,48 +422,6 @@
             "generic_attr_28": 249.74,
             "generic_attr_29": "currency_dollars",
             "generic_attr_30": "MN State Tax on Usage"
-          },
-          {
-            "generic_attr_18": "70182657",
-            "generic_attr_23": "electric",
-            "generic_attr_28": 55.0,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "Industrial Energy Electric"
-          },
-          {
-            "generic_attr_18": "70182657",
-            "generic_attr_23": "electric",
-            "generic_attr_28": 2560.32,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "Consumption"
-          },
-          {
-            "generic_attr_18": "70182657",
-            "generic_attr_23": "electric",
-            "generic_attr_28": 2218.75,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "Demand"
-          },
-          {
-            "generic_attr_18": "70182657",
-            "generic_attr_23": "electric",
-            "generic_attr_28": 106.68,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "Power Cost Adjustment - $.00175wh (S)"
-          },
-          {
-            "generic_attr_18": "70182657",
-            "generic_attr_23": "electric",
-            "generic_attr_28": 2.81,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "MN Sales Tax"
-          },
-          {
-            "generic_attr_18": "70182657",
-            "generic_attr_23": "electric",
-            "generic_attr_28": 249.74,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "MN State Tax on Usage"
           }
         ]
       },
@@ -632,27 +436,6 @@
         "generic_attr_25": "gallons",
         "generic_attr_26": 42303.0,
         "generic_group_c": [
-          {
-            "generic_attr_18": "89321458",
-            "generic_attr_23": "water",
-            "generic_attr_28": 18.43,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "Commercial Water Minimum Charge"
-          },
-          {
-            "generic_attr_18": "89321458",
-            "generic_attr_23": "water",
-            "generic_attr_28": 223.32,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "Commercial Water"
-          },
-          {
-            "generic_attr_18": "89321458",
-            "generic_attr_23": "water",
-            "generic_attr_28": 0.81,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "State Water Surcharge"
-          },
           {
             "generic_attr_18": "89321458",
             "generic_attr_23": "water",
@@ -700,20 +483,6 @@
             "generic_attr_28": 275.39,
             "generic_attr_29": "currency_dollars",
             "generic_attr_30": "Commercial Sewer"
-          },
-          {
-            "generic_attr_18": "89321458",
-            "generic_attr_23": "sewer",
-            "generic_attr_28": 40.61,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "Commercial Sewer Minimum Charge"
-          },
-          {
-            "generic_attr_18": "89321458",
-            "generic_attr_23": "sewer",
-            "generic_attr_28": 275.39,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "Commercial Sewer"
           }
         ]
       },
@@ -748,27 +517,6 @@
             "generic_attr_28": 0.81,
             "generic_attr_29": "currency_dollars",
             "generic_attr_30": "State Water Surcharge"
-          },
-          {
-            "generic_attr_18": "89321459",
-            "generic_attr_23": "water",
-            "generic_attr_28": 18.43,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "Commercial Water Minimum Charge"
-          },
-          {
-            "generic_attr_18": "89321459",
-            "generic_attr_23": "water",
-            "generic_attr_28": 212.19,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "Commercial Water"
-          },
-          {
-            "generic_attr_18": "89321459",
-            "generic_attr_23": "water",
-            "generic_attr_28": 0.81,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "State Water Surcharge"
           }
         ]
       },
@@ -783,20 +531,6 @@
         "generic_attr_25": "gallons",
         "generic_attr_26": 40356.0,
         "generic_group_c": [
-          {
-            "generic_attr_18": "89321459",
-            "generic_attr_23": "sewer",
-            "generic_attr_28": 40.61,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "Commercial Sewer Minimum Charge"
-          },
-          {
-            "generic_attr_18": "89321459",
-            "generic_attr_23": "sewer",
-            "generic_attr_28": 262.71,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "Commercial Sewer"
-          },
           {
             "generic_attr_18": "89321459",
             "generic_attr_23": "sewer",
@@ -824,41 +558,6 @@
         "generic_attr_25": "gallons",
         "generic_attr_26": 96600.0,
         "generic_group_c": [
-          {
-            "generic_attr_18": "91496724",
-            "generic_attr_23": "irrigation",
-            "generic_attr_28": 18.43,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "Commercial Water Minimum Charge"
-          },
-          {
-            "generic_attr_18": "91496724",
-            "generic_attr_23": "irrigation",
-            "generic_attr_28": 533.9,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "Commercial Water"
-          },
-          {
-            "generic_attr_18": "91496724",
-            "generic_attr_23": "irrigation",
-            "generic_attr_28": 1.27,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "MN Sales Tax"
-          },
-          {
-            "generic_attr_18": "91496724",
-            "generic_attr_23": "irrigation",
-            "generic_attr_28": 36.71,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "MN State Tax on Usage"
-          },
-          {
-            "generic_attr_18": "91496724",
-            "generic_attr_23": "irrigation",
-            "generic_attr_28": 0.81,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "State Water Surcharge"
-          },
           {
             "generic_attr_18": "91496724",
             "generic_attr_23": "irrigation",
@@ -941,13 +640,6 @@
             "generic_attr_28": 0.81,
             "generic_attr_29": "currency_dollars",
             "generic_attr_30": "State Water Surcharge"
-          },
-          {
-            "generic_attr_18": "91496726",
-            "generic_attr_23": "water",
-            "generic_attr_28": 18.43,
-            "generic_attr_29": "currency_dollars",
-            "generic_attr_30": "Commercial Water Minimum Charge"
           }
         ]
       },
