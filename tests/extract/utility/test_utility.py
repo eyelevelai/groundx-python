@@ -1,6 +1,21 @@
-import typing, unittest
+import json
+import typing
+import unittest
 
-from groundx.extract.utility.utility import coerce_numeric_string
+from groundx.extract.utility.utility import clean_json, coerce_numeric_string
+
+
+class TestUtilCleanJson(unittest.TestCase):
+    def test_trims_only_unmatched_trailing_json_closers(self) -> None:
+        cleaned = clean_json('{"plan_name": "Example", "items": [1, 2]}]')
+
+        self.assertEqual(
+            json.loads(cleaned),
+            {"plan_name": "Example", "items": [1, 2]},
+        )
+
+    def test_preserves_trailing_non_json_text(self) -> None:
+        self.assertEqual(clean_json('{"plan_name": "Example"} thanks'), '{"plan_name": "Example"} thanks')
 
 
 class TestUtilCoerceNumericString(unittest.TestCase):
