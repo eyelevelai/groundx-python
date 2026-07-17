@@ -282,12 +282,7 @@ or ticket ID in the subject when applicable.
 **Code style.** A `ruff` config lives in `pyproject.toml`. `poetry run ruff check .`
 and `poetry run ruff format .` are available, but ruff is not currently a CI gate. Use
 ruff on the files *you've changed* (`ruff check <paths>` / `ruff format <paths>`)
-rather than the whole tree.
-
-**Comment hygiene.** Use comments for non-obvious behavior, invariants, or risk.
-Do not commit PR history, ticket rationale, implementation-plan prose, or
-"this test proves..." narration in code or tests; put that context in Linear,
-OpenSpec, the PR body, or docs.
+rather than the whole tree. Comment hygiene lives in `CONTRIBUTING.md`.
 
 ---
 
