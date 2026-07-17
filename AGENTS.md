@@ -282,8 +282,7 @@ or ticket ID in the subject when applicable.
 **Code style.** A `ruff` config lives in `pyproject.toml`. `poetry run ruff check .`
 and `poetry run ruff format .` are available, but ruff is not currently a CI gate. Use
 ruff on the files *you've changed* (`ruff check <paths>` / `ruff format <paths>`)
-rather than the whole tree. Use `CONTRIBUTING.md` for pull request workflow and
-comment style.
+rather than the whole tree.
 
 ---
 
