@@ -112,12 +112,12 @@ Write clear, descriptive commit messages that explain what changed and why.
 
 This project uses automated code formatting and linting. Run `poetry run ruff format .` and `poetry run ruff check .` before committing to ensure your code meets the project's style guidelines.
 
-### Comment Hygiene
+### Comment Style
 
-Use comments for non-obvious behavior, invariants, or risk. Do not commit PR
-history, ticket rationale, implementation-plan prose, or "this test proves..."
-narration in code or tests. Put that context in Linear, OpenSpec, the PR body,
-or durable docs.
+Use comments to explain non-obvious behavior, invariants, generated-code
+boundaries, or risk. Keep PR history, ticket rationale, implementation-plan
+notes, and test-result narration in Linear, OpenSpec, the PR body, or durable
+docs instead of committed code or tests.
 
 ## Questions or Issues?
 
