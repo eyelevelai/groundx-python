@@ -284,6 +284,11 @@ and `poetry run ruff format .` are available, but ruff is not currently a CI gat
 ruff on the files *you've changed* (`ruff check <paths>` / `ruff format <paths>`)
 rather than the whole tree.
 
+**Comment hygiene.** Use comments for non-obvious behavior, invariants, or risk.
+Do not commit PR history, ticket rationale, implementation-plan prose, or
+"this test proves..." narration in code or tests; put that context in Linear,
+OpenSpec, the PR body, or docs.
+
 ---
 
 ## 10. Other agent surfaces
