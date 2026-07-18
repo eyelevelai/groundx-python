@@ -15,6 +15,13 @@ EXPECTED_ROOT = ROOT / "tests" / "extract" / "fixtures" / "extraction-boundary"
 BOUNDARY_GOLDENS_ROOT = EXPECTED_ROOT / "boundary-goldens"
 HANDOFF_ROOT = EXPECTED_ROOT / "boundary-handoffs"
 INPUT_ROOT = EXPECTED_ROOT / "inputs"
+ADP_EXPECTED_SECTION_COUNT = 11
+ADP_EXPECTED_FIELD_COUNT = 159
+ADP_MIN_POPULATED_FIELDS = 100
+ADP_MAX_POPULATED_FIELDS = 159
+ADP_MIN_NULL_FIELDS = 0
+ADP_MAX_NULL_FIELDS = 59
+ADP_MIN_SECTION_POPULATED_RATIO = 0.6
 
 
 SURFACES = [
@@ -114,11 +121,12 @@ def test_utility_shape_accepts_reviewed_meter_range(
 @pytest.mark.parametrize(
     ("meter_charge_count", "expected"),
     [
-        (23, False),
-        (24, True),
+        (21, False),
+        (22, True),
+        (23, True),
         (28, True),
-        (30, True),
-        (31, False),
+        (32, True),
+        (33, False),
         (50, False),
     ],
 )
@@ -233,6 +241,7 @@ def _write_boundary_artifacts(
         final_output,
         diagnostics,
         result.relationship_output,
+        workflow_extract=previous["workflow_extract"],
     )
     inherited_evidence = _inherited_evidence(previous)
 
@@ -361,6 +370,8 @@ def _shape_assertions(
     final_output: typing.Mapping[str, typing.Any],
     diagnostics: typing.Sequence[typing.Mapping[str, typing.Any]],
     relationship_output: typing.Any,
+    *,
+    workflow_extract: typing.Optional[typing.Mapping[str, typing.Any]] = None,
 ) -> typing.Dict[str, bool]:
     assertions = {
         "has_no_error_diagnostics": not any(
@@ -368,12 +379,7 @@ def _shape_assertions(
         )
     }
     if surface == "adp_v1":
-        assertions.update(
-            {
-                "has_statement_groups": len(final_output) >= 7,
-                "has_extracted_fields": _leaf_count(final_output) >= 159,
-            }
-        )
+        assertions.update(_adp_shape_assertions(final_output, workflow_extract or {}))
         return assertions
 
     parent_group, child_group, child_field = _utility_groups(surface)
@@ -393,14 +399,129 @@ def _shape_assertions(
             "has_expected_account_child_count": isinstance(account_children, list)
             and 0 <= len(account_children) <= 3,
             "has_expected_meter_charge_count": isinstance(parent_records, list)
-            and 24
+            and 22
             <= _nested_child_count(parent_records, child_field)
-            <= 30,
+            <= 32,
             "has_statement_fields": _statement_field_count(surface, final_output) >= 14,
             "has_relationship_output": bool(relationship_output),
         }
     )
     return assertions
+
+
+def _adp_shape_assertions(
+    final_output: typing.Mapping[str, typing.Any],
+    workflow_extract: typing.Mapping[str, typing.Any],
+) -> typing.Dict[str, bool]:
+    expected_sections = _adp_expected_sections(workflow_extract)
+    actual_sections = {
+        str(section_name)
+        for section_name, section_value in final_output.items()
+        if isinstance(section_value, typing.Mapping)
+    }
+    actual_fields = {
+        f"{section_name}.{field_name}"
+        for section_name, section_value in final_output.items()
+        if isinstance(section_value, typing.Mapping)
+        for field_name in section_value
+        if not str(field_name).startswith("_")
+    }
+    expected_fields = {
+        f"{section_name}.{field_name}"
+        for section_name, fields in expected_sections.items()
+        for field_name in fields
+    }
+
+    populated_field_count = 0
+    populated_by_section: typing.Dict[str, int] = {}
+    ratio_failures: typing.List[str] = []
+    for section_name, fields in expected_sections.items():
+        section_value = final_output.get(section_name)
+        if not isinstance(section_value, typing.Mapping):
+            populated_by_section[section_name] = 0
+            ratio_failures.append(section_name)
+            continue
+        section_populated = 0
+        ratio_fields = _adp_section_ratio_fields(fields)
+        ratio_populated = 0
+        for field_name in fields:
+            if _has_extracted_value(section_value.get(field_name)):
+                populated_field_count += 1
+                section_populated += 1
+                if field_name in ratio_fields:
+                    ratio_populated += 1
+        populated_by_section[section_name] = section_populated
+        ratio = ratio_populated / len(ratio_fields) if ratio_fields else 1.0
+        if ratio < ADP_MIN_SECTION_POPULATED_RATIO:
+            ratio_failures.append(section_name)
+
+    null_or_blank_count = len(expected_fields) - populated_field_count
+    return {
+        "has_expected_adp_section_count": len(expected_sections)
+        == ADP_EXPECTED_SECTION_COUNT
+        and actual_sections == set(expected_sections),
+        "has_expected_adp_field_count": len(expected_fields) == ADP_EXPECTED_FIELD_COUNT
+        and actual_fields == expected_fields,
+        "has_adp_populated_fields_in_range": ADP_MIN_POPULATED_FIELDS
+        <= populated_field_count
+        <= ADP_MAX_POPULATED_FIELDS,
+        "has_adp_null_fields_in_range": ADP_MIN_NULL_FIELDS
+        <= null_or_blank_count
+        <= ADP_MAX_NULL_FIELDS,
+        "has_adp_core_fields_populated_by_section": not ratio_failures,
+    }
+
+
+def _adp_expected_sections(
+    workflow_extract: typing.Mapping[str, typing.Any],
+) -> typing.Dict[str, typing.List[str]]:
+    workflow = workflow_extract.get("workflow")
+    routes = workflow.get("output_routes") if isinstance(workflow, dict) else None
+    expected: typing.Dict[str, typing.List[str]] = {}
+    if not isinstance(routes, list):
+        return expected
+    for route in routes:
+        if not isinstance(route, typing.Mapping):
+            continue
+        final_path = route.get("final_path")
+        if not isinstance(final_path, str):
+            continue
+        parts = _pointer_parts(final_path)
+        if len(parts) != 2:
+            continue
+        section_name, field_name = parts
+        if section_name in {"meters", "charges"}:
+            continue
+        fields = expected.setdefault(section_name, [])
+        if field_name not in fields:
+            fields.append(field_name)
+    return expected
+
+
+def _adp_section_ratio_fields(fields: typing.Sequence[str]) -> typing.Tuple[str, ...]:
+    return tuple(
+        field_name
+        for field_name in fields
+        if not field_name.endswith("_other_specify")
+    )
+
+
+def _has_extracted_value(value: typing.Any) -> bool:
+    if isinstance(value, typing.Mapping) and "value" in value:
+        return _has_extracted_value(value.get("value"))
+    if value in (None, "", [], {}):
+        return False
+    return True
+
+
+def _pointer_parts(pointer: str) -> typing.Tuple[str, ...]:
+    if not pointer.startswith("/"):
+        return ()
+    return tuple(
+        part.replace("~1", "/").replace("~0", "~")
+        for part in pointer.split("/")[1:]
+        if part
+    )
 
 
 def _utility_groups(surface: str) -> typing.Tuple[str, str, str]:

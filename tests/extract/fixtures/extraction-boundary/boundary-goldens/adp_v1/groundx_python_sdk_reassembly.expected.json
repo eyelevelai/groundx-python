@@ -58,9 +58,12 @@
     "workflowVersion": "2026-07-12T22:34:03Z"
   },
   "shape_assertions": {
-    "has_extracted_fields": true,
-    "has_no_error_diagnostics": true,
-    "has_statement_groups": true
+    "has_adp_core_fields_populated_by_section": true,
+    "has_adp_null_fields_in_range": true,
+    "has_adp_populated_fields_in_range": true,
+    "has_expected_adp_field_count": true,
+    "has_expected_adp_section_count": true,
+    "has_no_error_diagnostics": true
   },
   "stage": "groundx_python_sdk_reassembly",
   "surface": "adp_v1",

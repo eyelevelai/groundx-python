@@ -1100,6 +1100,86 @@ def test_adp_scalar_reducer_prefers_source_backed_positive_over_later_default() 
     assert result.diagnostics[0].final_path == "/eligibility_requirements/entry_date"
 
 
+def test_non_repeated_section_list_value_remains_scalar_field() -> None:
+    workflow_extract = {
+        "workflow": {
+            "custom_steps": [
+                {
+                    "name": "adp_f3_vesting_compensation",
+                    "level": "section",
+                    "kind": "instruct",
+                },
+            ],
+            "output_routes": [
+                {
+                    "workflow_group": "adp_f3_vesting_compensation",
+                    "workflow_field": "compensation_definition",
+                    "final_path": "/compensation/compensation_definition",
+                    "step_name": "adp_f3_vesting_compensation",
+                    "level": "section",
+                    "output_map": "customSectionOutputs",
+                    "output_key": "compensation_definition",
+                },
+                {
+                    "workflow_group": "adp_f3_vesting_compensation",
+                    "workflow_field": "compensation_excluded_all",
+                    "final_path": "/compensation/compensation_excluded_all",
+                    "step_name": "adp_f3_vesting_compensation",
+                    "level": "section",
+                    "output_map": "customSectionOutputs",
+                    "output_key": "compensation_excluded_all",
+                },
+            ],
+        }
+    }
+    excluded_all = [
+        {
+            "value": "N/A",
+            "_raw_text": "No selected exclusion shown in the compensation section.",
+        }
+    ]
+    xray = {
+        "chunks": [
+            {
+                "chunkId": "compensation-page",
+                "pageNumbers": [9],
+                "customSectionOutputs": {
+                    "adp_f3_vesting_compensation": {
+                        "compensation_definition": {
+                            "value": "W2 Compensation",
+                            "_raw_text": "Selected compensation definition.",
+                        },
+                        "compensation_excluded_all": excluded_all,
+                    }
+                },
+            },
+        ]
+    }
+
+    result = reassemble_custom_outputs_from_xray(
+        xray,
+        workflow_extract=workflow_extract,
+    )
+
+    assert result.final_output == {
+        "compensation": {
+            "compensation_definition": {
+                "value": "W2 Compensation",
+                "_raw_text": "Selected compensation definition.",
+            },
+            "compensation_excluded_all": excluded_all,
+        }
+    }
+    assert result.workflow_output["adp_f3_vesting_compensation"][
+        "compensation_excluded_all"
+    ] == excluded_all
+    assert [
+        provenance.record_index
+        for provenance in result.source_provenance
+        if provenance.workflow_field == "compensation_excluded_all"
+    ] == [None]
+
+
 def test_duplicate_parent_keys_do_not_make_relationship_child_ambiguous() -> None:
     workflow_extract = {
         "workflow": {
