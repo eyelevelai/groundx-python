@@ -1079,6 +1079,18 @@ def test_adp_scalar_reducer_prefers_source_backed_positive_over_later_default() 
                     }
                 },
             },
+            {
+                "chunkId": "irrelevant-not-indicated",
+                "pageNumbers": [100],
+                "customSectionOutputs": {
+                    "adp_f2_eligibility_requirements": {
+                        "predecessor_service": {
+                            "value": "Not Indicated",
+                            "_raw_text": "No predecessor-service section visible.",
+                        },
+                    }
+                },
+            },
         ]
     }
 

@@ -1,0 +1,52 @@
+{
+  "artifacts": {
+    "handoff": {
+      "sha256": "967a38571e557c6c7c8654f18fe0901298116de23eb589f4d680c58a2b6a2b6d"
+    },
+    "previous_extract_chain": {
+      "sha256": "2568c3d28f6c6cb60dc4322d057287282da5e18933263c1051ea1bf0c09e7200"
+    }
+  },
+  "assertions": {
+    "consumes_internal_extract_chain_handoff": true,
+    "handoff_written_for_save_callback": true,
+    "has_no_error_diagnostics": true,
+    "shape_contract_passed": true
+  },
+  "certification_eligible": false,
+  "diagnostic_only_reason": "Expected-answer projection fixture; not protected boundary evidence.",
+  "evidence_level": "expected_answer_projection_diagnostic",
+  "input_from": "internal_arcadia_extract_chain",
+  "input_sha256": "2568c3d28f6c6cb60dc4322d057287282da5e18933263c1051ea1bf0c09e7200",
+  "output": {
+    "diagnostic_count": 0,
+    "final_output_sha256": "1d57d260339feb8d353e1503b26d529c55eb2b427705a721bc4a019cda284cf8",
+    "relationship_output_sha256": "1d57d260339feb8d353e1503b26d529c55eb2b427705a721bc4a019cda284cf8",
+    "source_provenance_count": 339,
+    "workflow_output_sha256": "2e8b3885cf0c0ba5383a2be50ec90f8e27abcc830b8c1e3e43c563bdf59222b9"
+  },
+  "output_for": "internal_arcadia_save_callback",
+  "request": {
+    "callbackURL": "https://api.groundx.ai/callback/layout",
+    "documentID": "8e961e89-e5f3-4ad8-827e-22419f4ea417",
+    "fileName": "arcadia.pdf",
+    "modelID": 30294,
+    "processorID": 134,
+    "taskID": "70d7e0dc-335f-40a8-9434-0d9279912cc5",
+    "workflowID": "arcadia_legacy-product-path",
+    "workflowSchemaHash": "b859b731ea3d23ad2f130681b1bd664c85209a44a9de653ad81a0f74a3a318be",
+    "workflowVersion": "2026-07-12T22:34:00Z"
+  },
+  "shape_assertions": {
+    "every_parent_has_child_rows": true,
+    "has_expected_account_child_count": true,
+    "has_expected_meter_charge_count": true,
+    "has_expected_parent_count": true,
+    "has_no_error_diagnostics": true,
+    "has_relationship_output": true,
+    "has_statement_fields": true
+  },
+  "stage": "groundx_python_sdk_reassembly",
+  "surface": "arcadia_legacy",
+  "workflow_schema_hash": "b859b731ea3d23ad2f130681b1bd664c85209a44a9de653ad81a0f74a3a318be"
+}

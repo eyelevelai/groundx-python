@@ -1,7 +1,8 @@
 {
-  "certification_eligible": true,
+  "certification_eligible": false,
+  "diagnostic_only_reason": "Expected-answer projection fixture; not protected boundary evidence.",
   "diagnostics": [],
-  "evidence_level": "reviewed_deterministic_model_fixture",
+  "evidence_level": "expected_answer_projection_diagnostic",
   "final_output": {
     "generic_attr_01": "blank reviewed expected value for generic_attr_01",
     "generic_attr_02": 7613.2,
@@ -27,12 +28,12 @@
         "generic_attr_23": "electric",
         "generic_attr_24": "Industrial Electric",
         "generic_attr_25": "kWh",
-        "generic_attr_26": 60960.0,
+        "generic_attr_26": 60960,
         "generic_group_c": [
           {
             "generic_attr_18": "70182657",
             "generic_attr_23": "electric",
-            "generic_attr_28": 55.0,
+            "generic_attr_28": 55,
             "generic_attr_29": "currency_dollars",
             "generic_attr_30": "Industrial Energy Electric"
           },
@@ -82,7 +83,7 @@
         "generic_attr_23": "water",
         "generic_attr_24": "Commercial Water",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 42303.0,
+        "generic_attr_26": 42303,
         "generic_group_c": [
           {
             "generic_attr_18": "89321458",
@@ -116,7 +117,7 @@
         "generic_attr_23": "sewer",
         "generic_attr_24": "Commercial Sewer",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 42303.0,
+        "generic_attr_26": 42303,
         "generic_group_c": [
           {
             "generic_attr_18": "89321458",
@@ -143,7 +144,7 @@
         "generic_attr_23": "water",
         "generic_attr_24": "Commercial Water",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 40356.0,
+        "generic_attr_26": 40356,
         "generic_group_c": [
           {
             "generic_attr_18": "89321459",
@@ -177,7 +178,7 @@
         "generic_attr_23": "sewer",
         "generic_attr_24": "Commercial Sewer",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 40356.0,
+        "generic_attr_26": 40356,
         "generic_group_c": [
           {
             "generic_attr_18": "89321459",
@@ -204,7 +205,7 @@
         "generic_attr_23": "irrigation",
         "generic_attr_24": "Commercial Water",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 96600.0,
+        "generic_attr_26": 96600,
         "generic_group_c": [
           {
             "generic_attr_18": "91496724",
@@ -252,7 +253,7 @@
         "generic_attr_23": "water",
         "generic_attr_24": "Commercial Water",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 55000.0,
+        "generic_attr_26": 55000,
         "generic_group_c": [
           {
             "generic_attr_18": "91496726",
@@ -300,7 +301,7 @@
         "generic_attr_23": "sewer",
         "generic_attr_24": "Commercial Sewer",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 55000.0,
+        "generic_attr_26": 55000,
         "generic_group_c": [
           {
             "generic_attr_18": "91496726",
@@ -321,38 +322,14 @@
     ],
     "generic_group_c": [
       {
-        "generic_attr_28": 55.0,
+        "generic_attr_28": 55,
         "generic_attr_29": "currency_dollars",
         "generic_attr_30": "Industrial Energy Electric"
       }
     ]
   },
   "input_from": "internal_arcadia_extract_chain",
-  "input_sha256": "f37bb47e0cb9d3cf7050d2c7301ce6dd4ef964fb6fcf79e4b4b9887c2746c5a4",
-  "model_fixture": {
-    "path": "testdata/extraction-boundary/model-fixtures/generic_v1/extract_model_outputs.json",
-    "schema_version": "internal-arcadia-boundary-model-fixture-v1",
-    "sha256": "07ac056f1628d1add21a1cfc33c5026dcf793c7a0dcb66c1835261b1be928355",
-    "source": {
-      "covered_route_count": 36,
-      "document_file_name": "arcadia.pdf",
-      "expected_answer_sha256": "a4a3ee0c4dc9f7519f50c3c4f57b5e49a37de8d2cc74e47bf63218aff5b51ec4",
-      "expected_answer_url": "https://cdn.eyelevel.ai/internal-harness/e2e-extract/generic-v1-extract.json",
-      "kind": "reviewed_expected_answer_shape_stress_projection",
-      "projection_notes": [
-        "Values come from the reviewed expected answer where present.",
-        "Blank statement scalars are filled so final-output shape gates can assert field presence.",
-        "Utility child rows are expanded from reviewed rows to exercise the 50+ charge shape.",
-        "One unmatched utility child row is added when the reviewed expected answer has no account-level charge."
-      ],
-      "record_counts_by_group": {
-        "generic_group_b": 8,
-        "generic_group_c": 51
-      },
-      "workflow_id": "generic_v1-product-path",
-      "workflow_version": "2026-07-12T22:34:02Z"
-    }
-  },
+  "input_sha256": "963e3e9679ce80f586a4a1902debc095a47998288a318b43c653bb70e27a7361",
   "output_for": "internal_arcadia_save_callback",
   "relationship_output": {
     "generic_attr_01": "blank reviewed expected value for generic_attr_01",
@@ -379,12 +356,12 @@
         "generic_attr_23": "electric",
         "generic_attr_24": "Industrial Electric",
         "generic_attr_25": "kWh",
-        "generic_attr_26": 60960.0,
+        "generic_attr_26": 60960,
         "generic_group_c": [
           {
             "generic_attr_18": "70182657",
             "generic_attr_23": "electric",
-            "generic_attr_28": 55.0,
+            "generic_attr_28": 55,
             "generic_attr_29": "currency_dollars",
             "generic_attr_30": "Industrial Energy Electric"
           },
@@ -434,7 +411,7 @@
         "generic_attr_23": "water",
         "generic_attr_24": "Commercial Water",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 42303.0,
+        "generic_attr_26": 42303,
         "generic_group_c": [
           {
             "generic_attr_18": "89321458",
@@ -468,7 +445,7 @@
         "generic_attr_23": "sewer",
         "generic_attr_24": "Commercial Sewer",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 42303.0,
+        "generic_attr_26": 42303,
         "generic_group_c": [
           {
             "generic_attr_18": "89321458",
@@ -495,7 +472,7 @@
         "generic_attr_23": "water",
         "generic_attr_24": "Commercial Water",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 40356.0,
+        "generic_attr_26": 40356,
         "generic_group_c": [
           {
             "generic_attr_18": "89321459",
@@ -529,7 +506,7 @@
         "generic_attr_23": "sewer",
         "generic_attr_24": "Commercial Sewer",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 40356.0,
+        "generic_attr_26": 40356,
         "generic_group_c": [
           {
             "generic_attr_18": "89321459",
@@ -556,7 +533,7 @@
         "generic_attr_23": "irrigation",
         "generic_attr_24": "Commercial Water",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 96600.0,
+        "generic_attr_26": 96600,
         "generic_group_c": [
           {
             "generic_attr_18": "91496724",
@@ -604,7 +581,7 @@
         "generic_attr_23": "water",
         "generic_attr_24": "Commercial Water",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 55000.0,
+        "generic_attr_26": 55000,
         "generic_group_c": [
           {
             "generic_attr_18": "91496726",
@@ -652,7 +629,7 @@
         "generic_attr_23": "sewer",
         "generic_attr_24": "Commercial Sewer",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 55000.0,
+        "generic_attr_26": 55000,
         "generic_group_c": [
           {
             "generic_attr_18": "91496726",
@@ -673,7 +650,7 @@
     ],
     "generic_group_c": [
       {
-        "generic_attr_28": 55.0,
+        "generic_attr_28": 55,
         "generic_attr_29": "currency_dollars",
         "generic_attr_30": "Industrial Energy Electric"
       }
@@ -4112,7 +4089,7 @@
         "generic_attr_23": "electric",
         "generic_attr_24": "Industrial Electric",
         "generic_attr_25": "kWh",
-        "generic_attr_26": 60960.0
+        "generic_attr_26": 60960
       },
       {
         "generic_attr_09": "KWIK TRIP (1147)",
@@ -4123,7 +4100,7 @@
         "generic_attr_23": "water",
         "generic_attr_24": "Commercial Water",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 42303.0
+        "generic_attr_26": 42303
       },
       {
         "generic_attr_09": "KWIK TRIP (1147)",
@@ -4134,7 +4111,7 @@
         "generic_attr_23": "sewer",
         "generic_attr_24": "Commercial Sewer",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 42303.0
+        "generic_attr_26": 42303
       },
       {
         "generic_attr_09": "KWIK TRIP (1147)",
@@ -4145,7 +4122,7 @@
         "generic_attr_23": "water",
         "generic_attr_24": "Commercial Water",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 40356.0
+        "generic_attr_26": 40356
       },
       {
         "generic_attr_09": "KWIK TRIP (1147)",
@@ -4156,7 +4133,7 @@
         "generic_attr_23": "sewer",
         "generic_attr_24": "Commercial Sewer",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 40356.0
+        "generic_attr_26": 40356
       },
       {
         "generic_attr_09": "KWIK TRIP (1147)",
@@ -4167,7 +4144,7 @@
         "generic_attr_23": "irrigation",
         "generic_attr_24": "Commercial Water",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 96600.0
+        "generic_attr_26": 96600
       },
       {
         "generic_attr_09": "KWIK TRIP (1147)",
@@ -4178,7 +4155,7 @@
         "generic_attr_23": "water",
         "generic_attr_24": "Commercial Water",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 55000.0
+        "generic_attr_26": 55000
       },
       {
         "generic_attr_09": "KWIK TRIP (1147)",
@@ -4189,14 +4166,14 @@
         "generic_attr_23": "sewer",
         "generic_attr_24": "Commercial Sewer",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 55000.0
+        "generic_attr_26": 55000
       }
     ],
     "generic_group_c": [
       {
         "generic_attr_18": "70182657",
         "generic_attr_23": "electric",
-        "generic_attr_28": 55.0,
+        "generic_attr_28": 55,
         "generic_attr_29": "currency_dollars",
         "generic_attr_30": "Industrial Energy Electric"
       },
@@ -4392,7 +4369,7 @@
       {
         "generic_attr_18": "70182657",
         "generic_attr_23": "electric",
-        "generic_attr_28": 55.0,
+        "generic_attr_28": 55,
         "generic_attr_29": "currency_dollars",
         "generic_attr_30": "Industrial Energy Electric"
       },
@@ -4544,7 +4521,7 @@
         "generic_attr_30": "Commercial Water Minimum Charge"
       },
       {
-        "generic_attr_28": 55.0,
+        "generic_attr_28": 55,
         "generic_attr_29": "currency_dollars",
         "generic_attr_30": "Industrial Energy Electric"
       }
