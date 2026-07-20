@@ -65,13 +65,14 @@ class _ScalarCandidate:
 
 
 _REPEATED_STEP_KINDS = {"keys", "summary"}
-_EXTRACTED_FIELD_VALUE_KEYS = {"value", "confidence", "conflicts", "qa"}
+_EXTRACTED_FIELD_VALUE_KEYS = {"value", "_raw_text", "confidence", "conflicts", "qa"}
 _DEFAULT_CANDIDATE_VALUES = {
     "n/a",
     "na",
     "none",
     "not applicable",
     "not found",
+    "not indicated",
     "not provided",
     "not specified",
     "not stated",
@@ -355,6 +356,10 @@ def _custom_route_values(
 
     step_value = output_map.get(step_name)
     is_repeated_step = step_kinds.get(step_name) in _REPEATED_STEP_KINDS
+    final_path = route.get("final_path")
+    route_repeats = is_repeated_step or (
+        isinstance(final_path, str) and "*" in final_path
+    )
 
     if isinstance(step_value, typing.Mapping):
         records = step_value.get("_records")
@@ -376,7 +381,7 @@ def _custom_route_values(
         if output_key not in step_value:
             return []
         value = step_value[output_key]
-        if isinstance(value, list):
+        if isinstance(value, list) and route_repeats:
             return [
                 _RouteValue(value=item, record_index=index, repeated=True)
                 for index, item in enumerate(value)
@@ -384,8 +389,8 @@ def _custom_route_values(
         return [
             _RouteValue(
                 value=value,
-                record_index=0 if is_repeated_step else None,
-                repeated=is_repeated_step and not isinstance(records, list),
+                record_index=0 if route_repeats else None,
+                repeated=route_repeats and not isinstance(records, list),
             )
         ]
 

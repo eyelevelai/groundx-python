@@ -1,7 +1,8 @@
 {
-  "certification_eligible": true,
+  "certification_eligible": false,
+  "diagnostic_only_reason": "Expected-answer projection fixture; not protected boundary evidence.",
   "diagnostics": [],
-  "evidence_level": "reviewed_deterministic_model_fixture",
+  "evidence_level": "expected_answer_projection_diagnostic",
   "final_output": {
     "automatic_enrollment": {
       "auto_escalation_pct": {
@@ -842,28 +843,7 @@
     }
   },
   "input_from": "internal_arcadia_extract_chain",
-  "input_sha256": "01760933b0cd9469cd4bdb70c66b31d830da98e1f8fbbb0af88aa3dfda28b04b",
-  "model_fixture": {
-    "path": "testdata/extraction-boundary/model-fixtures/adp_v1/extract_model_outputs.json",
-    "schema_version": "internal-arcadia-boundary-model-fixture-v1",
-    "sha256": "a20e9ee968a84eff81de7f3d9885ad39fef8eb11825e576fdaede139e7dc5eb7",
-    "source": {
-      "covered_route_count": 159,
-      "document_file_name": "adp.pdf",
-      "expected_answer_sha256": "450e3ac1f00d31781f029ec2b2897de6e94152efd696fc7e148813314789633c",
-      "expected_answer_url": "https://cdn.eyelevel.ai/internal-harness/e2e-extract/adp-extract.json",
-      "kind": "reviewed_expected_answer_shape_stress_projection",
-      "projection_notes": [
-        "Values come from the reviewed expected answer where present.",
-        "Blank statement scalars are filled so final-output shape gates can assert field presence.",
-        "Utility child rows are expanded from reviewed rows to exercise the 50+ charge shape.",
-        "One unmatched utility child row is added when the reviewed expected answer has no account-level charge."
-      ],
-      "record_counts_by_group": {},
-      "workflow_id": "adp_v1-product-path",
-      "workflow_version": "2026-07-12T22:34:03Z"
-    }
-  },
+  "input_sha256": "4320ec5e8ed6e737f6c90db62fc41128548a5d06e0807ed329d2d20b3ffde446",
   "output_for": "internal_arcadia_save_callback",
   "relationship_output": null,
   "request": {

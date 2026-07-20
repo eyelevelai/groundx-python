@@ -1,0 +1,52 @@
+{
+  "artifacts": {
+    "handoff": {
+      "sha256": "bf1c1cf27d4b3d33065b336d8831def3ca657eaccab19ccc2cc66c965fdbd538"
+    },
+    "previous_extract_chain": {
+      "sha256": "963e3e9679ce80f586a4a1902debc095a47998288a318b43c653bb70e27a7361"
+    }
+  },
+  "assertions": {
+    "consumes_internal_extract_chain_handoff": true,
+    "handoff_written_for_save_callback": true,
+    "has_no_error_diagnostics": true,
+    "shape_contract_passed": true
+  },
+  "certification_eligible": false,
+  "diagnostic_only_reason": "Expected-answer projection fixture; not protected boundary evidence.",
+  "evidence_level": "expected_answer_projection_diagnostic",
+  "input_from": "internal_arcadia_extract_chain",
+  "input_sha256": "963e3e9679ce80f586a4a1902debc095a47998288a318b43c653bb70e27a7361",
+  "output": {
+    "diagnostic_count": 0,
+    "final_output_sha256": "cf5a04a7ebc0c22d1314f07be1fe359671d6d281edab5e926e23bb3405b1c9a9",
+    "relationship_output_sha256": "cf5a04a7ebc0c22d1314f07be1fe359671d6d281edab5e926e23bb3405b1c9a9",
+    "source_provenance_count": 339,
+    "workflow_output_sha256": "d46a5d24d8c3e9e41484d0beca9564b1ee9553ca6126056b2a3f3a9b7d29af38"
+  },
+  "output_for": "internal_arcadia_save_callback",
+  "request": {
+    "callbackURL": "https://api.groundx.ai/callback/layout",
+    "documentID": "aac63247-1613-4507-be26-4d8a04b60072",
+    "fileName": "arcadia.pdf",
+    "modelID": 30296,
+    "processorID": 134,
+    "taskID": "aa797958-a229-4059-b2c8-3078e2451c05",
+    "workflowID": "generic_v1-product-path",
+    "workflowSchemaHash": "66b0e276d5996122e278951cf52009cd5b9e2891dfff9f15c13bc21696edcf14",
+    "workflowVersion": "2026-07-12T22:34:02Z"
+  },
+  "shape_assertions": {
+    "every_parent_has_child_rows": true,
+    "has_expected_account_child_count": true,
+    "has_expected_meter_charge_count": true,
+    "has_expected_parent_count": true,
+    "has_no_error_diagnostics": true,
+    "has_relationship_output": true,
+    "has_statement_fields": true
+  },
+  "stage": "groundx_python_sdk_reassembly",
+  "surface": "generic_v1",
+  "workflow_schema_hash": "66b0e276d5996122e278951cf52009cd5b9e2891dfff9f15c13bc21696edcf14"
+}

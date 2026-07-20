@@ -1,25 +1,21 @@
 {
-  "certification_eligible": true,
+  "certification_eligible": false,
+  "diagnostic_only_reason": "Expected-answer projection fixture; not protected boundary evidence.",
   "diagnostics": [],
-  "evidence_level": "reviewed_deterministic_model_fixture",
+  "evidence_level": "expected_answer_projection_diagnostic",
   "final_output": {
-    "account_number": "blank reviewed expected value for account_number",
-    "amount_due": 7613.2,
-    "amount_due_currency": "currency_dollars",
     "charges": [
       {
-        "charge_amount": 55.0,
+        "charge_amount": 55,
         "charge_amount_currency": "currency_dollars",
         "charge_description_as_printed": "Industrial Energy Electric"
       }
     ],
-    "due_date": "2025-07-30",
-    "invoice_number": "10295809",
     "meters": [
       {
         "charges": [
           {
-            "charge_amount": 55.0,
+            "charge_amount": 55,
             "charge_amount_currency": "currency_dollars",
             "charge_description_as_printed": "Industrial Energy Electric",
             "meter_number": "70182657",
@@ -69,7 +65,7 @@
         "service_type": "electric",
         "tariff_name_as_printed": "Industrial Electric",
         "units_of_measurement": "kWh",
-        "usage_value": 60960.0
+        "usage_value": 60960
       },
       {
         "charges": [
@@ -103,7 +99,7 @@
         "service_type": "water",
         "tariff_name_as_printed": "Commercial Water",
         "units_of_measurement": "gallons",
-        "usage_value": 42303.0
+        "usage_value": 42303
       },
       {
         "charges": [
@@ -130,7 +126,7 @@
         "service_type": "sewer",
         "tariff_name_as_printed": "Commercial Sewer",
         "units_of_measurement": "gallons",
-        "usage_value": 42303.0
+        "usage_value": 42303
       },
       {
         "charges": [
@@ -164,7 +160,7 @@
         "service_type": "water",
         "tariff_name_as_printed": "Commercial Water",
         "units_of_measurement": "gallons",
-        "usage_value": 40356.0
+        "usage_value": 40356
       },
       {
         "charges": [
@@ -191,7 +187,7 @@
         "service_type": "sewer",
         "tariff_name_as_printed": "Commercial Sewer",
         "units_of_measurement": "gallons",
-        "usage_value": 40356.0
+        "usage_value": 40356
       },
       {
         "charges": [
@@ -239,7 +235,7 @@
         "service_type": "irrigation",
         "tariff_name_as_printed": "Commercial Water",
         "units_of_measurement": "gallons",
-        "usage_value": 96600.0
+        "usage_value": 96600
       },
       {
         "charges": [
@@ -287,7 +283,7 @@
         "service_type": "water",
         "tariff_name_as_printed": "Commercial Water",
         "units_of_measurement": "gallons",
-        "usage_value": 55000.0
+        "usage_value": 55000
       },
       {
         "charges": [
@@ -314,64 +310,42 @@
         "service_type": "sewer",
         "tariff_name_as_printed": "Commercial Sewer",
         "units_of_measurement": "gallons",
-        "usage_value": 55000.0
+        "usage_value": 55000
       }
     ],
-    "provider_name": "City of Windom",
-    "recipient_name": "KWIK TRIP (1147)",
-    "service_address": "blank reviewed expected value for service_address",
-    "source_modality": "Direct",
-    "statement_date": "2025-07-08",
-    "statement_period_end_date": "2025-06-30",
-    "statement_period_start_date": "2025-06-01",
-    "statement_type": "statement_type_bill",
-    "total_billing_amount": 7613.2
-  },
-  "input_from": "internal_arcadia_extract_chain",
-  "input_sha256": "3bb47da435e72d4b85c0ca62292d5d17219576c71b78f3256f03c2194a294dfa",
-  "model_fixture": {
-    "path": "testdata/extraction-boundary/model-fixtures/arcadia_v1/extract_model_outputs.json",
-    "schema_version": "internal-arcadia-boundary-model-fixture-v1",
-    "sha256": "7be4243ce2d39c776743dd24593ef9f2ca6025519246c02486259f69e566c49f",
-    "source": {
-      "covered_route_count": 36,
-      "document_file_name": "arcadia.pdf",
-      "expected_answer_sha256": "f115595ef95cb3caf70841569dfe3513a052a35db5449ff99119897c6321fcf4",
-      "expected_answer_url": "https://cdn.eyelevel.ai/internal-harness/e2e-extract/arcadia-extract.json",
-      "kind": "reviewed_expected_answer_shape_stress_projection",
-      "projection_notes": [
-        "Values come from the reviewed expected answer where present.",
-        "Blank statement scalars are filled so final-output shape gates can assert field presence.",
-        "Utility child rows are expanded from reviewed rows to exercise the 50+ charge shape.",
-        "One unmatched utility child row is added when the reviewed expected answer has no account-level charge."
-      ],
-      "record_counts_by_group": {
-        "charges": 51,
-        "meters": 8
-      },
-      "workflow_id": "arcadia_v1-product-path",
-      "workflow_version": "2026-07-12T22:34:01Z"
+    "statement": {
+      "account_number": "blank reviewed expected value for account_number",
+      "amount_due": 7613.2,
+      "amount_due_currency": "currency_dollars",
+      "due_date": "2025-07-30",
+      "invoice_number": "10295809",
+      "provider_name": "City of Windom",
+      "recipient_name": "KWIK TRIP (1147)",
+      "service_address": "blank reviewed expected value for service_address",
+      "source_modality": "Direct",
+      "statement_date": "2025-07-08",
+      "statement_period_end_date": "2025-06-30",
+      "statement_period_start_date": "2025-06-01",
+      "statement_type": "statement_type_bill",
+      "total_billing_amount": 7613.2
     }
   },
+  "input_from": "internal_arcadia_extract_chain",
+  "input_sha256": "2568c3d28f6c6cb60dc4322d057287282da5e18933263c1051ea1bf0c09e7200",
   "output_for": "internal_arcadia_save_callback",
   "relationship_output": {
-    "account_number": "blank reviewed expected value for account_number",
-    "amount_due": 7613.2,
-    "amount_due_currency": "currency_dollars",
     "charges": [
       {
-        "charge_amount": 55.0,
+        "charge_amount": 55,
         "charge_amount_currency": "currency_dollars",
         "charge_description_as_printed": "Industrial Energy Electric"
       }
     ],
-    "due_date": "2025-07-30",
-    "invoice_number": "10295809",
     "meters": [
       {
         "charges": [
           {
-            "charge_amount": 55.0,
+            "charge_amount": 55,
             "charge_amount_currency": "currency_dollars",
             "charge_description_as_printed": "Industrial Energy Electric",
             "meter_number": "70182657",
@@ -421,7 +395,7 @@
         "service_type": "electric",
         "tariff_name_as_printed": "Industrial Electric",
         "units_of_measurement": "kWh",
-        "usage_value": 60960.0
+        "usage_value": 60960
       },
       {
         "charges": [
@@ -455,7 +429,7 @@
         "service_type": "water",
         "tariff_name_as_printed": "Commercial Water",
         "units_of_measurement": "gallons",
-        "usage_value": 42303.0
+        "usage_value": 42303
       },
       {
         "charges": [
@@ -482,7 +456,7 @@
         "service_type": "sewer",
         "tariff_name_as_printed": "Commercial Sewer",
         "units_of_measurement": "gallons",
-        "usage_value": 42303.0
+        "usage_value": 42303
       },
       {
         "charges": [
@@ -516,7 +490,7 @@
         "service_type": "water",
         "tariff_name_as_printed": "Commercial Water",
         "units_of_measurement": "gallons",
-        "usage_value": 40356.0
+        "usage_value": 40356
       },
       {
         "charges": [
@@ -543,7 +517,7 @@
         "service_type": "sewer",
         "tariff_name_as_printed": "Commercial Sewer",
         "units_of_measurement": "gallons",
-        "usage_value": 40356.0
+        "usage_value": 40356
       },
       {
         "charges": [
@@ -591,7 +565,7 @@
         "service_type": "irrigation",
         "tariff_name_as_printed": "Commercial Water",
         "units_of_measurement": "gallons",
-        "usage_value": 96600.0
+        "usage_value": 96600
       },
       {
         "charges": [
@@ -639,7 +613,7 @@
         "service_type": "water",
         "tariff_name_as_printed": "Commercial Water",
         "units_of_measurement": "gallons",
-        "usage_value": 55000.0
+        "usage_value": 55000
       },
       {
         "charges": [
@@ -666,34 +640,41 @@
         "service_type": "sewer",
         "tariff_name_as_printed": "Commercial Sewer",
         "units_of_measurement": "gallons",
-        "usage_value": 55000.0
+        "usage_value": 55000
       }
     ],
-    "provider_name": "City of Windom",
-    "recipient_name": "KWIK TRIP (1147)",
-    "service_address": "blank reviewed expected value for service_address",
-    "source_modality": "Direct",
-    "statement_date": "2025-07-08",
-    "statement_period_end_date": "2025-06-30",
-    "statement_period_start_date": "2025-06-01",
-    "statement_type": "statement_type_bill",
-    "total_billing_amount": 7613.2
+    "statement": {
+      "account_number": "blank reviewed expected value for account_number",
+      "amount_due": 7613.2,
+      "amount_due_currency": "currency_dollars",
+      "due_date": "2025-07-30",
+      "invoice_number": "10295809",
+      "provider_name": "City of Windom",
+      "recipient_name": "KWIK TRIP (1147)",
+      "service_address": "blank reviewed expected value for service_address",
+      "source_modality": "Direct",
+      "statement_date": "2025-07-08",
+      "statement_period_end_date": "2025-06-30",
+      "statement_period_start_date": "2025-06-01",
+      "statement_type": "statement_type_bill",
+      "total_billing_amount": 7613.2
+    }
   },
   "request": {
     "callbackURL": "https://api.groundx.ai/callback/layout",
-    "documentID": "b4afb073-8807-4243-a4a1-0b5fa1a76154",
+    "documentID": "8e961e89-e5f3-4ad8-827e-22419f4ea417",
     "fileName": "arcadia.pdf",
-    "modelID": 30295,
+    "modelID": 30294,
     "processorID": 134,
-    "taskID": "fd259f67-3d41-464c-8eaf-7782ae4c4b41",
-    "workflowID": "arcadia_v1-product-path",
-    "workflowSchemaHash": "72fef486d883a3b5d20b157fbaf92626fcef6609d876558f57e0c59403d1df89",
-    "workflowVersion": "2026-07-12T22:34:01Z"
+    "taskID": "70d7e0dc-335f-40a8-9434-0d9279912cc5",
+    "workflowID": "arcadia_legacy-product-path",
+    "workflowSchemaHash": "b859b731ea3d23ad2f130681b1bd664c85209a44a9de653ad81a0f74a3a318be",
+    "workflowVersion": "2026-07-12T22:34:00Z"
   },
   "schema_version": "groundx-python-sdk-reassembly-handoff-v1",
   "source_provenance": [
     {
-      "final_path": "/account_number",
+      "final_path": "/statement/account_number",
       "output_source": "customChunkOutputs",
       "page_numbers": [
         1
@@ -703,7 +684,7 @@
       "workflow_group": "statement"
     },
     {
-      "final_path": "/amount_due",
+      "final_path": "/statement/amount_due",
       "output_source": "customChunkOutputs",
       "page_numbers": [
         1
@@ -713,7 +694,7 @@
       "workflow_group": "statement"
     },
     {
-      "final_path": "/amount_due_currency",
+      "final_path": "/statement/amount_due_currency",
       "output_source": "customChunkOutputs",
       "page_numbers": [
         1
@@ -723,7 +704,7 @@
       "workflow_group": "statement"
     },
     {
-      "final_path": "/due_date",
+      "final_path": "/statement/due_date",
       "output_source": "customChunkOutputs",
       "page_numbers": [
         1
@@ -733,7 +714,7 @@
       "workflow_group": "statement"
     },
     {
-      "final_path": "/invoice_number",
+      "final_path": "/statement/invoice_number",
       "output_source": "customChunkOutputs",
       "page_numbers": [
         1
@@ -743,7 +724,7 @@
       "workflow_group": "statement"
     },
     {
-      "final_path": "/statement_period_end_date",
+      "final_path": "/statement/statement_period_end_date",
       "output_source": "customChunkOutputs",
       "page_numbers": [
         1
@@ -753,7 +734,7 @@
       "workflow_group": "statement"
     },
     {
-      "final_path": "/statement_period_start_date",
+      "final_path": "/statement/statement_period_start_date",
       "output_source": "customChunkOutputs",
       "page_numbers": [
         1
@@ -763,7 +744,7 @@
       "workflow_group": "statement"
     },
     {
-      "final_path": "/provider_name",
+      "final_path": "/statement/provider_name",
       "output_source": "customChunkOutputs",
       "page_numbers": [
         1
@@ -773,7 +754,7 @@
       "workflow_group": "statement"
     },
     {
-      "final_path": "/recipient_name",
+      "final_path": "/statement/recipient_name",
       "output_source": "customChunkOutputs",
       "page_numbers": [
         1
@@ -783,7 +764,7 @@
       "workflow_group": "statement"
     },
     {
-      "final_path": "/source_modality",
+      "final_path": "/statement/source_modality",
       "output_source": "customChunkOutputs",
       "page_numbers": [
         1
@@ -793,7 +774,7 @@
       "workflow_group": "statement"
     },
     {
-      "final_path": "/statement_type",
+      "final_path": "/statement/statement_type",
       "output_source": "customChunkOutputs",
       "page_numbers": [
         1
@@ -803,7 +784,7 @@
       "workflow_group": "statement"
     },
     {
-      "final_path": "/service_address",
+      "final_path": "/statement/service_address",
       "output_source": "customChunkOutputs",
       "page_numbers": [
         1
@@ -813,7 +794,7 @@
       "workflow_group": "statement"
     },
     {
-      "final_path": "/statement_date",
+      "final_path": "/statement/statement_date",
       "output_source": "customChunkOutputs",
       "page_numbers": [
         1
@@ -823,7 +804,7 @@
       "workflow_group": "statement"
     },
     {
-      "final_path": "/total_billing_amount",
+      "final_path": "/statement/total_billing_amount",
       "output_source": "customChunkOutputs",
       "page_numbers": [
         1
@@ -4084,11 +4065,11 @@
     }
   ],
   "stage": "groundx_python_sdk_reassembly",
-  "surface": "arcadia_v1",
+  "surface": "arcadia_legacy",
   "workflow_output": {
     "charges": [
       {
-        "charge_amount": 55.0,
+        "charge_amount": 55,
         "charge_amount_currency": "currency_dollars",
         "charge_description_as_printed": "Industrial Energy Electric",
         "meter_number": "70182657",
@@ -4284,7 +4265,7 @@
         "service_type": "sewer"
       },
       {
-        "charge_amount": 55.0,
+        "charge_amount": 55,
         "charge_amount_currency": "currency_dollars",
         "charge_description_as_printed": "Industrial Energy Electric",
         "meter_number": "70182657",
@@ -4438,7 +4419,7 @@
         "service_type": "water"
       },
       {
-        "charge_amount": 55.0,
+        "charge_amount": 55,
         "charge_amount_currency": "currency_dollars",
         "charge_description_as_printed": "Industrial Energy Electric"
       }
@@ -4453,7 +4434,7 @@
         "service_type": "electric",
         "tariff_name_as_printed": "Industrial Electric",
         "units_of_measurement": "kWh",
-        "usage_value": 60960.0
+        "usage_value": 60960
       },
       {
         "deregulation_status": "full_service",
@@ -4464,7 +4445,7 @@
         "service_type": "water",
         "tariff_name_as_printed": "Commercial Water",
         "units_of_measurement": "gallons",
-        "usage_value": 42303.0
+        "usage_value": 42303
       },
       {
         "deregulation_status": "full_service",
@@ -4475,7 +4456,7 @@
         "service_type": "sewer",
         "tariff_name_as_printed": "Commercial Sewer",
         "units_of_measurement": "gallons",
-        "usage_value": 42303.0
+        "usage_value": 42303
       },
       {
         "deregulation_status": "full_service",
@@ -4486,7 +4467,7 @@
         "service_type": "water",
         "tariff_name_as_printed": "Commercial Water",
         "units_of_measurement": "gallons",
-        "usage_value": 40356.0
+        "usage_value": 40356
       },
       {
         "deregulation_status": "full_service",
@@ -4497,7 +4478,7 @@
         "service_type": "sewer",
         "tariff_name_as_printed": "Commercial Sewer",
         "units_of_measurement": "gallons",
-        "usage_value": 40356.0
+        "usage_value": 40356
       },
       {
         "deregulation_status": "full_service",
@@ -4508,7 +4489,7 @@
         "service_type": "irrigation",
         "tariff_name_as_printed": "Commercial Water",
         "units_of_measurement": "gallons",
-        "usage_value": 96600.0
+        "usage_value": 96600
       },
       {
         "deregulation_status": "full_service",
@@ -4519,7 +4500,7 @@
         "service_type": "water",
         "tariff_name_as_printed": "Commercial Water",
         "units_of_measurement": "gallons",
-        "usage_value": 55000.0
+        "usage_value": 55000
       },
       {
         "deregulation_status": "full_service",
@@ -4530,7 +4511,7 @@
         "service_type": "sewer",
         "tariff_name_as_printed": "Commercial Sewer",
         "units_of_measurement": "gallons",
-        "usage_value": 55000.0
+        "usage_value": 55000
       }
     ],
     "statement": {
@@ -4550,5 +4531,5 @@
       "total_billing_amount": 7613.2
     }
   },
-  "workflow_schema_hash": "72fef486d883a3b5d20b157fbaf92626fcef6609d876558f57e0c59403d1df89"
+  "workflow_schema_hash": "b859b731ea3d23ad2f130681b1bd664c85209a44a9de653ad81a0f74a3a318be"
 }
