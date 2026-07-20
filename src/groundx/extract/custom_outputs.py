@@ -65,13 +65,14 @@ class _ScalarCandidate:
 
 
 _REPEATED_STEP_KINDS = {"keys", "summary"}
-_EXTRACTED_FIELD_VALUE_KEYS = {"value", "confidence", "conflicts", "qa"}
+_EXTRACTED_FIELD_VALUE_KEYS = {"value", "_raw_text", "confidence", "conflicts", "qa"}
 _DEFAULT_CANDIDATE_VALUES = {
     "n/a",
     "na",
     "none",
     "not applicable",
     "not found",
+    "not indicated",
     "not provided",
     "not specified",
     "not stated",

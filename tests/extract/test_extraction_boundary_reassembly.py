@@ -11,10 +11,19 @@ from groundx.extract.custom_outputs import reassemble_custom_outputs_from_xray
 
 UPDATE_GOLDENS_ENV = "UPDATE_GROUNDX_PYTHON_EXTRACT_BOUNDARY_GOLDENS"
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-EXPECTED_ROOT = ROOT / "tests" / "extract" / "fixtures" / "extraction-boundary"
-BOUNDARY_GOLDENS_ROOT = EXPECTED_ROOT / "boundary-goldens"
-HANDOFF_ROOT = EXPECTED_ROOT / "boundary-handoffs"
-INPUT_ROOT = EXPECTED_ROOT / "inputs"
+DIAGNOSTIC_ROOT = (
+    ROOT
+    / "tests"
+    / "extract"
+    / "fixtures"
+    / "extraction-diagnostics"
+    / "expected-answer-projection"
+)
+DIAGNOSTIC_GOLDENS_ROOT = DIAGNOSTIC_ROOT / "boundary-goldens"
+DIAGNOSTIC_HANDOFF_ROOT = DIAGNOSTIC_ROOT / "boundary-handoffs"
+DIAGNOSTIC_INPUT_ROOT = DIAGNOSTIC_ROOT / "inputs"
+CATALOG_PATH = ROOT / "tests" / "extract" / "fixtures" / "extraction-boundary" / "catalog.json"
+CATALOG_SHA256 = "0cf14992b439ef90c4e4f101d32990404f762c0cda2f74c471027ce7172897e8"
 ADP_EXPECTED_SECTION_COUNT = 11
 ADP_EXPECTED_FIELD_COUNT = 159
 ADP_MIN_POPULATED_FIELDS = 100
@@ -32,7 +41,20 @@ SURFACES = [
 ]
 
 
-def test_sdk_reassembly_boundary_packets(tmp_path: pathlib.Path) -> None:
+def test_extraction_boundary_catalog_is_pinned() -> None:
+    catalog = _read_json(CATALOG_PATH)
+
+    assert _sha256_file(CATALOG_PATH) == CATALOG_SHA256
+    assert catalog["schema_version"] == "extraction_boundary_artifact_catalog_v1"
+    assert catalog["catalog_version"] == "2026-07-19.1"
+    assert catalog["surfaces"] == SURFACES
+    artifact_names = {artifact["name"] for artifact in catalog["artifacts"]}
+    assert "groundx_python_xray_reassembly" in artifact_names
+
+
+def test_sdk_reassembly_expected_answer_projection_diagnostic_packets(
+    tmp_path: pathlib.Path,
+) -> None:
     update_goldens = os.environ.get(UPDATE_GOLDENS_ENV) == "1"
     for surface in SURFACES:
         actual, actual_path, expected_path, diff_path, previous_path, handoff_path = (
@@ -50,8 +72,17 @@ def test_sdk_reassembly_boundary_packets(tmp_path: pathlib.Path) -> None:
         expected_handoff_sha = _sha256_file(handoff_path)
         actual_handoff_sha = actual["artifacts"]["handoff"]["sha256"]
         handoff = _read_json(pathlib.Path(actual["artifacts"]["handoff"]["path"]))
-        _assert_no_synthetic_protected_marker(actual)
-        _assert_no_synthetic_protected_marker(handoff)
+        if (
+            _is_expected_answer_projection_diagnostic(actual)
+            or _is_expected_answer_projection_diagnostic(handoff)
+            or _has_projection_marker(actual)
+            or _has_projection_marker(handoff)
+        ):
+            _assert_expected_answer_projection_diagnostic(actual)
+            _assert_expected_answer_projection_diagnostic(handoff)
+        else:
+            _assert_no_synthetic_protected_marker(actual)
+            _assert_no_synthetic_protected_marker(handoff)
         diff: typing.Dict[str, typing.Any] = {
             "kind": "machine_readable_json_diff",
             "status": "passed",
@@ -67,12 +98,22 @@ def test_sdk_reassembly_boundary_packets(tmp_path: pathlib.Path) -> None:
             }
             _write_json(diff_path, diff)
             pytest.fail(
-                "SDK reassembly boundary drifted for "
+                "SDK reassembly diagnostic packet drifted for "
                 f"{surface}; run {UPDATE_GOLDENS_ENV}=1 PYTHONPATH=src pytest "
                 "tests/extract/test_extraction_boundary_reassembly.py -q if "
                 "this contract change is intended"
             )
         _write_json(diff_path, diff)
+
+
+def test_projection_fixtures_are_diagnostic_only() -> None:
+    for fixture_path in DIAGNOSTIC_ROOT.glob("**/*.json"):
+        fixture = _read_json(fixture_path)
+        if _has_projection_marker(fixture):
+            assert fixture.get("evidence_level") == (
+                "expected_answer_projection_diagnostic"
+            ), fixture_path
+            assert fixture.get("certification_eligible") is False, fixture_path
 
 
 def test_boundary_inputs_are_repo_local() -> None:
@@ -202,7 +243,7 @@ def _write_boundary_artifacts(
 ]:
     out_dir = tmp_path / surface
     previous_path = (
-        INPUT_ROOT
+        DIAGNOSTIC_INPUT_ROOT
         / surface
         / "internal_arcadia_extract_chain.handoff.json"
     )
@@ -309,17 +350,26 @@ def _write_boundary_artifacts(
 
     actual_path = out_dir / "groundx_python_sdk_reassembly.actual.json"
     expected_path = (
-        BOUNDARY_GOLDENS_ROOT / surface / "groundx_python_sdk_reassembly.expected.json"
+        DIAGNOSTIC_GOLDENS_ROOT / surface / "groundx_python_sdk_reassembly.expected.json"
     )
     diff_path = out_dir / "groundx_python_sdk_reassembly.diff.json"
     handoff_path = (
-        HANDOFF_ROOT / surface / "groundx_python_sdk_reassembly.handoff.json"
+        DIAGNOSTIC_HANDOFF_ROOT / surface / "groundx_python_sdk_reassembly.handoff.json"
     )
     _write_json(actual_path, actual)
     return actual, actual_path, expected_path, diff_path, previous_path, handoff_path
 
 
 def _inherited_evidence(previous: typing.Mapping[str, typing.Any]) -> typing.Dict[str, typing.Any]:
+    if _has_projection_marker(previous):
+        return {
+            "evidence_level": "expected_answer_projection_diagnostic",
+            "certification_eligible": False,
+            "diagnostic_only_reason": (
+                "Expected-answer projection fixture; not protected boundary evidence."
+            ),
+        }
+
     inherited: typing.Dict[str, typing.Any] = {}
     if "evidence_level" in previous:
         inherited["evidence_level"] = previous["evidence_level"]
@@ -363,6 +413,30 @@ def _assert_no_synthetic_protected_marker(
             "boundary://",
         ):
             assert marker not in value, ".".join(path)
+
+
+def _has_projection_marker(value: typing.Any) -> bool:
+    if isinstance(value, list):
+        return any(_has_projection_marker(item) for item in value)
+    if isinstance(value, dict):
+        return any(_has_projection_marker(item) for item in value.values())
+    return (
+        isinstance(value, str)
+        and "reviewed_expected_answer_shape_stress_projection" in value
+    )
+
+
+def _is_expected_answer_projection_diagnostic(
+    value: typing.Mapping[str, typing.Any],
+) -> bool:
+    return value.get("evidence_level") == "expected_answer_projection_diagnostic"
+
+
+def _assert_expected_answer_projection_diagnostic(
+    value: typing.Mapping[str, typing.Any],
+) -> None:
+    assert value.get("evidence_level") == "expected_answer_projection_diagnostic"
+    assert value.get("certification_eligible") is False
 
 
 def _shape_assertions(
