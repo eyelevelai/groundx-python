@@ -22,8 +22,11 @@ DIAGNOSTIC_ROOT = (
 DIAGNOSTIC_GOLDENS_ROOT = DIAGNOSTIC_ROOT / "boundary-goldens"
 DIAGNOSTIC_HANDOFF_ROOT = DIAGNOSTIC_ROOT / "boundary-handoffs"
 DIAGNOSTIC_INPUT_ROOT = DIAGNOSTIC_ROOT / "inputs"
+BOUNDARY_ROOT = ROOT / "tests" / "extract" / "fixtures" / "extraction-boundary"
+BOUNDARY_INPUT_ROOT = BOUNDARY_ROOT / "inputs"
+BOUNDARY_GOLDENS_ROOT = BOUNDARY_ROOT / "boundary-goldens"
 CATALOG_PATH = ROOT / "tests" / "extract" / "fixtures" / "extraction-boundary" / "catalog.json"
-CATALOG_SHA256 = "8e7ca3a00341f6d06d88ee9b15c123e3ae653734ec8cb09c44d40db313ee87a7"
+CATALOG_SHA256 = "61608e59629d6ad4fcff4a92e03fcb144006b31a6d7d03773d7412bdb9e7c443"
 ADP_EXPECTED_SECTION_COUNT = 11
 ADP_EXPECTED_FIELD_COUNT = 159
 ADP_MIN_POPULATED_FIELDS = 100
@@ -45,11 +48,21 @@ def test_extraction_boundary_catalog_is_pinned() -> None:
     catalog = _read_json(CATALOG_PATH)
 
     assert _sha256_file(CATALOG_PATH) == CATALOG_SHA256
-    assert catalog["schema_version"] == "extraction_boundary_artifact_catalog_v1"
+    assert catalog["schema_version"] == "groundx_python_extraction_boundary_catalog_v1"
     assert catalog["catalog_version"] == "2026-07-20.1"
     assert catalog["surfaces"] == SURFACES
-    artifact_names = {artifact["name"] for artifact in catalog["artifacts"]}
-    assert "groundx_python_xray_reassembly" in artifact_names
+    assert catalog["source_artifact_catalog_sha256"] == (
+        "c1729c581461dd029b127b1716701958c2037ef060a26996d88a183958565e2d"
+    )
+    assert catalog["artifacts"] == [
+        {
+            "input_from": "internal_arcadia_download_workflow_load",
+            "name": "groundx_python_xray_reassembly",
+            "output_for": "sdk_reassembly_proof",
+            "owner": "groundx-python",
+            "stage": "groundx_python_xray_reassembly",
+        }
+    ]
 
 
 def test_sdk_reassembly_expected_answer_projection_diagnostic_packets(
@@ -98,7 +111,7 @@ def test_sdk_reassembly_expected_answer_projection_diagnostic_packets(
             }
             _write_json(diff_path, diff)
             pytest.fail(
-                "SDK reassembly diagnostic packet drifted for "
+                "SDK X-Ray reassembly proof drifted for "
                 f"{surface}; run {UPDATE_GOLDENS_ENV}=1 PYTHONPATH=src pytest "
                 "tests/extract/test_extraction_boundary_reassembly.py -q if "
                 "this contract change is intended"
@@ -126,6 +139,16 @@ def test_boundary_inputs_are_repo_local() -> None:
         assert token not in source, (
             "SDK reassembly boundary tests must consume committed local "
             f"previous-boundary inputs, not sibling repo path {token}"
+        )
+
+
+def test_sdk_reassembly_consumes_download_workflow_load_boundary_input() -> None:
+    for surface in SURFACES:
+        previous_path = _previous_boundary_input_path(surface)
+        assert previous_path == (
+            BOUNDARY_INPUT_ROOT
+            / surface
+            / "internal_arcadia_download_workflow_load.handoff.json"
         )
 
 
@@ -242,11 +265,7 @@ def _write_boundary_artifacts(
     pathlib.Path,
 ]:
     out_dir = tmp_path / surface
-    previous_path = (
-        DIAGNOSTIC_INPUT_ROOT
-        / surface
-        / "internal_arcadia_extract_chain.handoff.json"
-    )
+    previous_path = _previous_boundary_input_path(surface)
     previous = _read_json(previous_path)
     result = reassemble_custom_outputs_from_xray(
         previous["xray"],
@@ -287,11 +306,11 @@ def _write_boundary_artifacts(
     inherited_evidence = _inherited_evidence(previous)
 
     handoff = {
-        "schema_version": "groundx-python-sdk-reassembly-handoff-v1",
+        "schema_version": "groundx-python-xray-reassembly-proof-v1",
         "surface": surface,
-        "stage": "groundx_python_sdk_reassembly",
-        "input_from": "internal_arcadia_extract_chain",
-        "output_for": "internal_arcadia_save_callback",
+        "stage": "groundx_python_xray_reassembly",
+        "input_from": "internal_arcadia_download_workflow_load",
+        "output_for": "sdk_reassembly_proof",
         "workflow_schema_hash": previous["workflow_schema_hash"],
         "request": previous["request"],
         "input_sha256": _sha256_file(previous_path),
@@ -302,14 +321,14 @@ def _write_boundary_artifacts(
         "source_provenance": source_provenance,
     }
     handoff.update(inherited_evidence)
-    handoff_actual_path = out_dir / "groundx_python_sdk_reassembly.handoff.json"
+    handoff_actual_path = out_dir / "groundx_python_xray_reassembly.actual_handoff.json"
     _write_json(handoff_actual_path, handoff)
 
     actual = {
         "surface": surface,
-        "stage": "groundx_python_sdk_reassembly",
-        "input_from": "internal_arcadia_extract_chain",
-        "output_for": "internal_arcadia_save_callback",
+        "stage": "groundx_python_xray_reassembly",
+        "input_from": "internal_arcadia_download_workflow_load",
+        "output_for": "sdk_reassembly_proof",
         "workflow_schema_hash": previous["workflow_schema_hash"],
         "request": previous["request"],
         "input_sha256": _sha256_file(previous_path),
@@ -322,7 +341,7 @@ def _write_boundary_artifacts(
         },
         "shape_assertions": assertions,
         "artifacts": {
-            "previous_extract_chain": {
+            "previous_workflow_load": {
                 "path": str(previous_path),
                 "sha256": _sha256_file(previous_path),
             },
@@ -332,32 +351,36 @@ def _write_boundary_artifacts(
             },
         },
         "assertions": {
-            "consumes_internal_extract_chain_handoff": previous["stage"]
-            == "internal_arcadia_extract_chain",
+            "consumes_internal_download_workflow_load": previous["stage"]
+            == "internal_arcadia_download_workflow_load",
             "has_no_error_diagnostics": assertions["has_no_error_diagnostics"],
             "shape_contract_passed": all(assertions.values()),
-            "handoff_written_for_save_callback": handoff_actual_path.exists(),
+            "reassembly_proof_written": handoff_actual_path.exists(),
         },
     }
     actual.update(inherited_evidence)
-    assert actual["assertions"]["consumes_internal_extract_chain_handoff"]
+    assert actual["assertions"]["consumes_internal_download_workflow_load"]
     assert actual["assertions"]["has_no_error_diagnostics"]
     assert actual["assertions"]["shape_contract_passed"]
-    assert actual["assertions"]["handoff_written_for_save_callback"]
+    assert actual["assertions"]["reassembly_proof_written"]
     if previous.get("evidence_level") == "plumbing_only_synthetic":
         assert actual["evidence_level"] == "plumbing_only_synthetic"
         assert actual["certification_eligible"] is False
 
-    actual_path = out_dir / "groundx_python_sdk_reassembly.actual.json"
+    actual_path = out_dir / "groundx_python_xray_reassembly.actual.json"
     expected_path = (
-        DIAGNOSTIC_GOLDENS_ROOT / surface / "groundx_python_sdk_reassembly.expected.json"
+        BOUNDARY_GOLDENS_ROOT / surface / "groundx_python_xray_reassembly.expected.json"
     )
-    diff_path = out_dir / "groundx_python_sdk_reassembly.diff.json"
+    diff_path = out_dir / "groundx_python_xray_reassembly.diff.json"
     handoff_path = (
-        DIAGNOSTIC_HANDOFF_ROOT / surface / "groundx_python_sdk_reassembly.handoff.json"
+        BOUNDARY_GOLDENS_ROOT / surface / "groundx_python_xray_reassembly.actual_handoff.json"
     )
     _write_json(actual_path, actual)
     return actual, actual_path, expected_path, diff_path, previous_path, handoff_path
+
+
+def _previous_boundary_input_path(surface: str) -> pathlib.Path:
+    return BOUNDARY_INPUT_ROOT / surface / "internal_arcadia_download_workflow_load.handoff.json"
 
 
 def _inherited_evidence(previous: typing.Mapping[str, typing.Any]) -> typing.Dict[str, typing.Any]:
