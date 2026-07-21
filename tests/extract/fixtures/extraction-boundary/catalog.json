@@ -1,103 +1,21 @@
 {
-  "schema_version": "extraction_boundary_artifact_catalog_v1",
-  "catalog_version": "2026-07-19.1",
+  "schema_version": "groundx_python_extraction_boundary_catalog_v1",
+  "catalog_version": "2026-07-21.1",
+  "source_artifact_catalog_path": "groundx-studio-harness/scripts/fixtures/extraction-boundary-artifact-catalog.json",
+  "source_artifact_catalog_sha256": "3267ea15081fdafcb56e0986350e35a843dbfcc23e37fee401b3a9fc05a6c509",
   "surfaces": [
     "arcadia_legacy",
     "arcadia_v1",
     "generic_v1",
     "adp_v1"
   ],
-  "allowed_statuses": [
-    "complete",
-    "not_applicable",
-    "missing"
-  ],
-  "allowed_not_applicable_reasons": [
-    "case_does_not_call_stage",
-    "service_not_in_runtime_path",
-    "terminal_before_stage"
-  ],
   "artifacts": [
     {
-      "name": "cashbot_go_persisted_workflow",
-      "owner": "cashbot-go",
-      "stage": "workflow_persistence",
-      "required": true,
-      "path_template": "cashbot-go/pkg/testdata/partner/boundary-handoffs/{surface}/cashbot_go_persisted_workflow.handoff.json",
-      "source_log_required": true,
-      "status": "complete"
-    },
-    {
-      "name": "cashbot_go_summary_request",
-      "owner": "cashbot-go",
-      "stage": "summary_extract_task_request",
-      "required": true,
-      "path_template": "cashbot-go/pkg/testdata/documentlayout/boundary-goldens/{surface}/cashbot_go_summary_request.expected.json",
-      "consumer_path_template": "internal-arcadia-agents/testdata/extraction-boundary/inputs/{surface}/cashbot_go_summary_request.handoff.json",
-      "input_from": "cashbot_go_persisted_workflow",
-      "output_for": "internal_arcadia_extract_api_download_packet",
-      "source_log_required": true,
-      "status": "complete"
-    },
-    {
-      "name": "internal_arcadia_extract_api_download_packet",
-      "owner": "internal-arcadia-agents",
-      "stage": "extract_api_download_packet",
-      "required": true,
-      "path_template": "internal-arcadia-agents/testdata/extraction-boundary/boundary-goldens/{surface}/internal_arcadia_extract_api_download_packet.expected.json",
-      "consumer_path_template": "internal-arcadia-agents/testdata/extraction-boundary/inputs/{surface}/internal_arcadia_extract_api_download_packet.handoff.json",
-      "input_from": "cashbot_go_summary_request",
-      "output_for": "internal_arcadia_download_workflow_load",
-      "source_log_required": true,
-      "status": "complete"
-    },
-    {
-      "name": "internal_arcadia_download_workflow_load",
-      "owner": "internal-arcadia-agents",
-      "stage": "download_workflow_and_xray_load",
-      "required": true,
-      "path_template": "internal-arcadia-agents/testdata/extraction-boundary/boundary-goldens/{surface}/internal_arcadia_download_workflow_load.expected.json",
-      "consumer_path_template": "internal-arcadia-agents/testdata/extraction-boundary/inputs/{surface}/internal_arcadia_download_workflow_load.handoff.json",
-      "sdk_consumer_path_template": "groundx-python/tests/extract/fixtures/extraction-boundary/inputs/{surface}/internal_arcadia_download_workflow_load.handoff.json",
-      "input_from": "internal_arcadia_extract_api_download_packet",
-      "output_for": "internal_arcadia_extract_chain",
-      "source_log_required": true,
-      "status": "complete"
-    },
-    {
+      "input_from": "internal_arcadia_download_workflow_load",
       "name": "groundx_python_xray_reassembly",
-      "owner": "groundx-python",
-      "stage": "sdk_xray_reassembly",
-      "required": true,
-      "path_template": "groundx-python/tests/extract/fixtures/extraction-boundary/boundary-goldens/{surface}/groundx_python_xray_reassembly.expected.json",
-      "input_path_template": "groundx-python/tests/extract/fixtures/extraction-boundary/inputs/{surface}/internal_arcadia_download_workflow_load.handoff.json",
-      "input_from": "internal_arcadia_download_workflow_load",
       "output_for": "sdk_reassembly_proof",
-      "source_log_required": false,
-      "status": "complete"
-    },
-    {
-      "name": "internal_arcadia_extract_chain",
-      "owner": "internal-arcadia-agents",
-      "stage": "agent_chain_handoff",
-      "required": true,
-      "path_template": "internal-arcadia-agents/testdata/extraction-boundary/boundary-handoffs/{surface}/internal_arcadia_extract_chain.handoff.json",
-      "consumer_path_template": "internal-arcadia-agents/testdata/extraction-boundary/inputs/{surface}/internal_arcadia_extract_chain.handoff.json",
-      "input_from": "internal_arcadia_download_workflow_load",
-      "output_for": "internal_arcadia_save_callback",
-      "source_log_required": true,
-      "status": "complete"
-    },
-    {
-      "name": "internal_arcadia_save_callback",
-      "owner": "internal-arcadia-agents",
-      "stage": "save_and_callback",
-      "required": true,
-      "path_template": "internal-arcadia-agents/testdata/extraction-boundary/boundary-goldens/{surface}/internal_arcadia_save_callback.expected.json",
-      "input_from": "internal_arcadia_extract_chain",
-      "output_for": "chain_report",
-      "source_log_required": true,
-      "status": "complete"
+      "owner": "groundx-python",
+      "stage": "groundx_python_xray_reassembly"
     }
   ]
 }
