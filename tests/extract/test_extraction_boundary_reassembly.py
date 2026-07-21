@@ -23,7 +23,7 @@ DIAGNOSTIC_GOLDENS_ROOT = DIAGNOSTIC_ROOT / "boundary-goldens"
 DIAGNOSTIC_HANDOFF_ROOT = DIAGNOSTIC_ROOT / "boundary-handoffs"
 DIAGNOSTIC_INPUT_ROOT = DIAGNOSTIC_ROOT / "inputs"
 CATALOG_PATH = ROOT / "tests" / "extract" / "fixtures" / "extraction-boundary" / "catalog.json"
-CATALOG_SHA256 = "0cf14992b439ef90c4e4f101d32990404f762c0cda2f74c471027ce7172897e8"
+CATALOG_SHA256 = "8e7ca3a00341f6d06d88ee9b15c123e3ae653734ec8cb09c44d40db313ee87a7"
 ADP_EXPECTED_SECTION_COUNT = 11
 ADP_EXPECTED_FIELD_COUNT = 159
 ADP_MIN_POPULATED_FIELDS = 100
@@ -46,7 +46,7 @@ def test_extraction_boundary_catalog_is_pinned() -> None:
 
     assert _sha256_file(CATALOG_PATH) == CATALOG_SHA256
     assert catalog["schema_version"] == "extraction_boundary_artifact_catalog_v1"
-    assert catalog["catalog_version"] == "2026-07-19.1"
+    assert catalog["catalog_version"] == "2026-07-20.1"
     assert catalog["surfaces"] == SURFACES
     artifact_names = {artifact["name"] for artifact in catalog["artifacts"]}
     assert "groundx_python_xray_reassembly" in artifact_names
