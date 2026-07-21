@@ -1,4 +1,14 @@
 {
+  "schema_version": "groundx_python_extraction_boundary_catalog_v1",
+  "catalog_version": "2026-07-21.1",
+  "source_artifact_catalog_path": "groundx-studio-harness/scripts/fixtures/extraction-boundary-artifact-catalog.json",
+  "source_artifact_catalog_sha256": "3267ea15081fdafcb56e0986350e35a843dbfcc23e37fee401b3a9fc05a6c509",
+  "surfaces": [
+    "arcadia_legacy",
+    "arcadia_v1",
+    "generic_v1",
+    "adp_v1"
+  ],
   "artifacts": [
     {
       "input_from": "internal_arcadia_download_workflow_load",
@@ -7,14 +17,5 @@
       "owner": "groundx-python",
       "stage": "groundx_python_xray_reassembly"
     }
-  ],
-  "catalog_version": "2026-07-20.1",
-  "schema_version": "groundx_python_extraction_boundary_catalog_v1",
-  "source_artifact_catalog_sha256": "c1729c581461dd029b127b1716701958c2037ef060a26996d88a183958565e2d",
-  "surfaces": [
-    "arcadia_legacy",
-    "arcadia_v1",
-    "generic_v1",
-    "adp_v1"
   ]
 }
