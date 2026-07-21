@@ -1,0 +1,70 @@
+{
+  "artifacts": {
+    "previous_download_workflow_load": {
+      "sha256": "cd6da4c6cd4577670589238679b786dfbe584a040b2d9ea041e9d4f6f38d2fdd"
+    }
+  },
+  "assertions": {
+    "consumes_download_workflow_load_handoff": true,
+    "has_no_error_diagnostics": true,
+    "shape_contract_passed": true
+  },
+  "input_from": "internal_arcadia_download_workflow_load",
+  "input_sha256": "cd6da4c6cd4577670589238679b786dfbe584a040b2d9ea041e9d4f6f38d2fdd",
+  "output": {
+    "diagnostic_count": 204,
+    "final_output_sha256": "6c651ef8d56a6b1ceea75e90c25933d1ef7056805032fb5fdc7c1dfc5dfe7aa9",
+    "relationship_output_sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+    "source_provenance_count": 667,
+    "workflow_output_sha256": "72f4b5ed9058ec034791b791b10ee476ac6143f6b17b70214367d89130e08d54"
+  },
+  "output_for": "sdk_reassembly_proof",
+  "request": {
+    "api_key_present": true,
+    "callbackURL": "https://api.eyelevel.ai/documentlayout",
+    "contentURL": "https://upload.eyelevel.ai/layout/processed/aabbbba5-5f14-4d5d-9f85-1610ea045729/ccaad3a1-8a63-40b5-8e4d-c5611ced7763-xray.json",
+    "documentID": "ccaad3a1-8a63-40b5-8e4d-c5611ced7763",
+    "fileName": "adp.pdf",
+    "fileType": "pdf",
+    "maxPages": 1000,
+    "modelID": 30637,
+    "path": "process",
+    "processorID": 134,
+    "serviceURL": "http://k8s-eyelevel-extracta-d05e39aeae-33b1ad95b494fcb5.elb.us-west-2.amazonaws.com",
+    "taskID": "aabbbba5-5f14-4d5d-9f85-1610ea045729",
+    "workflowID": "b13ec1bd-4387-4cba-a364-5d944fd24778",
+    "workflowSchemaHash": "440d6a1064202a8a2e1fcff746dcc7b132d0e1117b0ab1212da3cee07dc28725",
+    "workflowVersion": "2026-07-21T21:02:53.454Z",
+    "workflow_capture": {
+      "capture_config_hash": "6fb540d205c185af6c95c3ab0ce9f65e8fdad39da2be3d1b33f5bd5e3083d3b8",
+      "capture_types": [
+        "pipeline_trace",
+        "prompt_capture"
+      ],
+      "case_id": "adp-v1",
+      "enabled": true,
+      "expires_at": "2026-07-22T03:02:50Z",
+      "max_artifacts": 500,
+      "retention": {
+        "delete_after": "2026-07-28T21:02:50Z",
+        "owner": "private-extraction-certification"
+      },
+      "run_id": "extract-cert-adp-v1-01",
+      "schema_version": "extraction_pipeline_capture_v1",
+      "workflow_id": "b13ec1bd-4387-4cba-a364-5d944fd24778"
+    }
+  },
+  "schema_version": "groundx-python-xray-reassembly-boundary-v1",
+  "shape_assertions": {
+    "has_adp_core_fields_populated_by_section": true,
+    "has_adp_null_fields_in_range": true,
+    "has_adp_populated_fields_in_range": true,
+    "has_expected_adp_section_count": true,
+    "has_expected_adp_workflow_field_count": true,
+    "has_no_error_diagnostics": true,
+    "has_no_unexpected_adp_fields": true
+  },
+  "stage": "groundx_python_xray_reassembly",
+  "surface": "adp_v1",
+  "workflow_schema_hash": "440d6a1064202a8a2e1fcff746dcc7b132d0e1117b0ab1212da3cee07dc28725"
+}

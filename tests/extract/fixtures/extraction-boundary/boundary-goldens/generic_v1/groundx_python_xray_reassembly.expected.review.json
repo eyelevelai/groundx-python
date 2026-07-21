@@ -1,0 +1,27 @@
+{
+  "reviewed_expected_output": {
+    "acceptance_reason": "Accepted as deterministic SDK X-Ray reassembly output from a passing hosted fixture-seeding run.",
+    "accepted_actual_as_expected": true,
+    "artifact_catalog_sha256": "2bd6aa4ebde7a8f0b3f617b103e6a2b5fc51e1ad0537422e697e3722912745e9",
+    "artifact_catalog_version": "2026-07-21.1",
+    "author_identity": "Codex",
+    "diff_path": "tests/extract/fixtures/extraction-boundary/boundary-goldens/generic_v1/groundx_python_xray_reassembly.expected.diff.json",
+    "diff_status": "passed",
+    "expected_path": "tests/extract/fixtures/extraction-boundary/boundary-goldens/generic_v1/groundx_python_xray_reassembly.expected.json",
+    "expected_sha256": "63b150f291b66f0649ceae9405dcbf3900195e025f53139629ed189e6c3d06bf",
+    "packet_sha256": "63b150f291b66f0649ceae9405dcbf3900195e025f53139629ed189e6c3d06bf",
+    "reviewed_at": "2026-07-21T22:12:08.864Z",
+    "reviewed_field_count_summary": {
+      "boundary": "groundx_python_xray_reassembly",
+      "input_from": "internal_arcadia_download_workflow_load",
+      "output_for": "sdk_reassembly_proof",
+      "stage": "groundx_python_xray_reassembly",
+      "surface": "generic_v1"
+    },
+    "reviewer_identity": "Benjamin Fletcher",
+    "reviewer_role": "product/engineering reviewer",
+    "source_path": "tests/extract/fixtures/extraction-boundary/inputs/generic_v1/internal_arcadia_download_workflow_load.handoff.json",
+    "source_run_id": "live-20260721T203535Z-sdk388-cashbot-5fd-internal-998-digest9c09-trace-fixture-seeding",
+    "source_sha256": "2f8ed47a560cef1d9143377b94ff96c51bcb3e9acb18eb425a32a8c57db090ad"
+  }
+}

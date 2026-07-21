@@ -26,7 +26,7 @@ BOUNDARY_ROOT = ROOT / "tests" / "extract" / "fixtures" / "extraction-boundary"
 BOUNDARY_INPUT_ROOT = BOUNDARY_ROOT / "inputs"
 BOUNDARY_GOLDENS_ROOT = BOUNDARY_ROOT / "boundary-goldens"
 CATALOG_PATH = ROOT / "tests" / "extract" / "fixtures" / "extraction-boundary" / "catalog.json"
-CATALOG_SHA256 = "b89277326221c65120e38ccb938bf30c4d619a16863cc10dfaae74d41fd0be5d"
+CATALOG_SHA256 = "71f8630c48f334742739aa6982edb85c429b0397ac5de68744b5704688a5b348"
 ADP_EXPECTED_SECTION_COUNT = 11
 ADP_EXPECTED_FIELD_COUNT = 159
 ADP_MIN_POPULATED_FIELDS = 100
@@ -42,6 +42,15 @@ SURFACES = [
     "generic_v1",
     "adp_v1",
 ]
+REAL_BOUNDARY_SURFACES = tuple(
+    surface
+    for surface in SURFACES
+    if (
+        BOUNDARY_INPUT_ROOT
+        / surface
+        / "internal_arcadia_download_workflow_load.handoff.json"
+    ).exists()
+)
 
 
 def test_extraction_boundary_catalog_is_pinned() -> None:
@@ -52,7 +61,7 @@ def test_extraction_boundary_catalog_is_pinned() -> None:
     assert catalog["catalog_version"] == "2026-07-21.1"
     assert catalog["surfaces"] == SURFACES
     assert catalog["source_artifact_catalog_sha256"] == (
-        "3267ea15081fdafcb56e0986350e35a843dbfcc23e37fee401b3a9fc05a6c509"
+        "06b9136a4aaf3787bc55182f8ac6df14c24cb4017c14b0172767b0315c3c4aa6"
     )
     assert catalog["artifacts"] == [
         {
@@ -119,6 +128,55 @@ def test_sdk_reassembly_expected_answer_projection_diagnostic_packets(
         _write_json(diff_path, diff)
 
 
+@pytest.mark.parametrize("surface", REAL_BOUNDARY_SURFACES)
+def test_sdk_xray_reassembly_real_boundary_packets(
+    tmp_path: pathlib.Path,
+    surface: str,
+) -> None:
+    actual, expected_path, diff_path = _write_xray_reassembly_boundary_artifact(
+        tmp_path,
+        surface,
+    )
+    expected = _stable_boundary_output(actual)
+    update_goldens = os.environ.get(UPDATE_GOLDENS_ENV) == "1"
+    if update_goldens:
+        _write_json(expected_path, expected)
+        _write_reviewed_expected_output_sidecars(
+            surface=surface,
+            packet_path=expected_path,
+            source_path=_real_download_workflow_load_input_path(surface),
+            reviewed_field_count_summary={
+                "boundary": "groundx_python_xray_reassembly",
+                "surface": surface,
+                "stage": "groundx_python_xray_reassembly",
+                "input_from": "internal_arcadia_download_workflow_load",
+                "output_for": "sdk_reassembly_proof",
+            },
+        )
+
+    golden = _read_json(expected_path)
+    diff: typing.Dict[str, typing.Any] = {
+        "kind": "machine_readable_json_diff",
+        "status": "passed",
+    }
+    if golden != expected:
+        diff = {
+            "kind": "machine_readable_json_diff",
+            "status": "failed",
+            "expected": golden,
+            "actual": expected,
+        }
+        _write_json(diff_path, diff)
+        pytest.fail(
+            "SDK X-Ray reassembly real boundary proof drifted for "
+            f"{surface}; run {UPDATE_GOLDENS_ENV}=1 PYTHONPATH=src pytest "
+            "tests/extract/test_extraction_boundary_reassembly.py -q if "
+            "this contract change is intended"
+            )
+    _write_json(diff_path, diff)
+    _assert_reviewed_expected_output_sidecar(expected_path)
+
+
 def test_projection_fixtures_are_diagnostic_only() -> None:
     for fixture_path in DIAGNOSTIC_ROOT.glob("**/*.json"):
         fixture = _read_json(fixture_path)
@@ -144,7 +202,7 @@ def test_boundary_inputs_are_repo_local() -> None:
 
 def test_sdk_reassembly_diagnostic_consumes_projection_input() -> None:
     for surface in SURFACES:
-        previous_path = _previous_boundary_input_path(surface)
+        previous_path = _diagnostic_previous_boundary_input_path(surface)
         assert previous_path == (
             DIAGNOSTIC_INPUT_ROOT
             / surface
@@ -270,7 +328,7 @@ def _write_boundary_artifacts(
     pathlib.Path,
 ]:
     out_dir = tmp_path / surface
-    previous_path = _previous_boundary_input_path(surface)
+    previous_path = _diagnostic_previous_boundary_input_path(surface)
     previous = _read_json(previous_path)
     result = reassemble_custom_outputs_from_xray(
         previous["xray"],
@@ -385,8 +443,193 @@ def _write_boundary_artifacts(
     return actual, actual_path, expected_path, diff_path, previous_path, handoff_path
 
 
-def _previous_boundary_input_path(surface: str) -> pathlib.Path:
+def _diagnostic_previous_boundary_input_path(surface: str) -> pathlib.Path:
     return DIAGNOSTIC_INPUT_ROOT / surface / "internal_arcadia_extract_chain.handoff.json"
+
+
+def _real_download_workflow_load_input_path(surface: str) -> pathlib.Path:
+    return (
+        BOUNDARY_INPUT_ROOT
+        / surface
+        / "internal_arcadia_download_workflow_load.handoff.json"
+    )
+
+
+def _write_xray_reassembly_boundary_artifact(
+    tmp_path: pathlib.Path,
+    surface: str,
+) -> typing.Tuple[typing.Dict[str, typing.Any], pathlib.Path, pathlib.Path]:
+    out_dir = tmp_path / surface
+    previous_path = _real_download_workflow_load_input_path(surface)
+    previous = _read_json(previous_path)
+    result = reassemble_custom_outputs_from_xray(
+        previous["xray"],
+        workflow_extract=previous["workflow_extract"],
+    )
+    diagnostics = [
+        {
+            "child_record_index": diagnostic.child_record_index,
+            "code": diagnostic.code,
+            "final_path": diagnostic.final_path,
+            "message": diagnostic.message,
+            "relationship": diagnostic.relationship,
+            "severity": diagnostic.severity,
+            "workflow_field": diagnostic.workflow_field,
+            "workflow_group": diagnostic.workflow_group,
+        }
+        for diagnostic in result.diagnostics
+    ]
+    source_provenance = [
+        {
+            "final_path": provenance.final_path,
+            "output_source": provenance.output_source,
+            "page_numbers": list(provenance.page_numbers),
+            "record_index": provenance.record_index,
+            "workflow_field": provenance.workflow_field,
+            "workflow_group": provenance.workflow_group,
+        }
+        for provenance in result.source_provenance
+    ]
+    final_output = copy.deepcopy(result.final_output)
+    assertions = _xray_reassembly_shape_assertions(
+        surface,
+        final_output,
+        diagnostics,
+        result.relationship_output,
+        workflow_extract=previous["workflow_extract"],
+    )
+    actual = {
+        "schema_version": "groundx-python-xray-reassembly-boundary-v1",
+        "surface": surface,
+        "stage": "groundx_python_xray_reassembly",
+        "input_from": "internal_arcadia_download_workflow_load",
+        "output_for": "sdk_reassembly_proof",
+        "workflow_schema_hash": previous["workflow_schema_hash"],
+        "request": previous["request"],
+        "input_sha256": _sha256_file(previous_path),
+        "output": {
+            "diagnostic_count": len(diagnostics),
+            "final_output_sha256": _sha256_json(final_output),
+            "relationship_output_sha256": _sha256_json(result.relationship_output),
+            "source_provenance_count": len(source_provenance),
+            "workflow_output_sha256": _sha256_json(result.workflow_output),
+        },
+        "shape_assertions": assertions,
+        "artifacts": {
+            "previous_download_workflow_load": {
+                "path": str(previous_path),
+                "sha256": _sha256_file(previous_path),
+            },
+        },
+        "assertions": {
+            "consumes_download_workflow_load_handoff": previous["stage"]
+            == "internal_arcadia_download_workflow_load",
+            "has_no_error_diagnostics": assertions["has_no_error_diagnostics"],
+            "shape_contract_passed": all(assertions.values()),
+        },
+    }
+    assert actual["assertions"]["consumes_download_workflow_load_handoff"]
+    assert actual["assertions"]["has_no_error_diagnostics"]
+    assert actual["assertions"]["shape_contract_passed"]
+    _assert_no_synthetic_protected_marker(previous)
+    _assert_no_synthetic_protected_marker(actual)
+
+    expected_path = (
+        BOUNDARY_GOLDENS_ROOT / surface / "groundx_python_xray_reassembly.expected.json"
+    )
+    diff_path = out_dir / "groundx_python_xray_reassembly.diff.json"
+    return actual, expected_path, diff_path
+
+
+def _write_reviewed_expected_output_sidecars(
+    *,
+    surface: str,
+    packet_path: pathlib.Path,
+    source_path: pathlib.Path,
+    reviewed_field_count_summary: typing.Mapping[str, typing.Any],
+) -> None:
+    packet_sha = _sha256_file(packet_path)
+    source_sha = _sha256_file(source_path)
+    diff_path = packet_path.with_name(
+        packet_path.name.replace(".expected.json", ".expected.diff.json")
+    )
+    review_path = packet_path.with_name(
+        packet_path.name.replace(".expected.json", ".expected.review.json")
+    )
+    _write_json(
+        diff_path,
+        {
+            "accepted_actual_as_expected": True,
+            "acceptance_reason": (
+                "Accepted as deterministic SDK X-Ray reassembly output from "
+                "a passing hosted fixture-seeding run."
+            ),
+            "actual_sha256": packet_sha,
+            "artifact_name": "groundx_python_xray_reassembly",
+            "expected_sha256": packet_sha,
+            "kind": "machine_readable_json_diff",
+            "reviewed_field_count_summary": dict(reviewed_field_count_summary),
+            "source_artifact_sha256": source_sha,
+            "status": "passed",
+            "surface": surface,
+        },
+    )
+    _write_json(
+        review_path,
+        {
+            "reviewed_expected_output": {
+                "accepted_actual_as_expected": True,
+                "acceptance_reason": (
+                    "Accepted as deterministic SDK X-Ray reassembly output "
+                    "from a passing hosted fixture-seeding run."
+                ),
+                "artifact_catalog_sha256": (
+                    "2bd6aa4ebde7a8f0b3f617b103e6a2b5fc51e1ad0537422e697e3722912745e9"
+                ),
+                "artifact_catalog_version": "2026-07-21.1",
+                "author_identity": "Codex",
+                "diff_path": str(diff_path.relative_to(ROOT)),
+                "diff_status": "passed",
+                "expected_path": str(packet_path.relative_to(ROOT)),
+                "expected_sha256": packet_sha,
+                "packet_sha256": packet_sha,
+                "reviewed_at": "2026-07-21T22:12:08.864Z",
+                "reviewed_field_count_summary": dict(reviewed_field_count_summary),
+                "reviewer_identity": "Benjamin Fletcher",
+                "reviewer_role": "product/engineering reviewer",
+                "source_path": str(source_path.relative_to(ROOT)),
+                "source_run_id": (
+                    "live-20260721T203535Z-sdk388-cashbot-5fd-internal-998-"
+                    "digest9c09-trace-fixture-seeding"
+                ),
+                "source_sha256": source_sha,
+            },
+        },
+    )
+
+
+def _assert_reviewed_expected_output_sidecar(packet_path: pathlib.Path) -> None:
+    review_path = packet_path.with_name(
+        packet_path.name.replace(".expected.json", ".expected.review.json")
+    )
+    diff_path = packet_path.with_name(
+        packet_path.name.replace(".expected.json", ".expected.diff.json")
+    )
+    review = _read_json(review_path)
+    evidence = review["reviewed_expected_output"]
+    assert evidence["packet_sha256"] == _sha256_file(packet_path)
+    assert evidence["expected_sha256"] == _sha256_file(packet_path)
+    assert evidence["expected_path"] == str(packet_path.relative_to(ROOT))
+    assert evidence["diff_path"] == str(diff_path.relative_to(ROOT))
+    assert evidence["diff_status"] == "passed"
+    assert evidence["reviewer_identity"] != evidence["author_identity"]
+    source_path = ROOT / evidence["source_path"]
+    assert source_path.exists()
+    assert evidence["source_sha256"] == _sha256_file(source_path)
+    diff = _read_json(diff_path)
+    assert diff["status"] == "passed"
+    assert diff["actual_sha256"] == _sha256_file(packet_path)
+    assert diff["expected_sha256"] == _sha256_file(packet_path)
 
 
 def _inherited_evidence(previous: typing.Mapping[str, typing.Any]) -> typing.Dict[str, typing.Any]:
@@ -510,6 +753,104 @@ def _shape_assertions(
         }
     )
     return assertions
+
+
+def _xray_reassembly_shape_assertions(
+    surface: str,
+    final_output: typing.Mapping[str, typing.Any],
+    diagnostics: typing.Sequence[typing.Mapping[str, typing.Any]],
+    relationship_output: typing.Any,
+    *,
+    workflow_extract: typing.Optional[typing.Mapping[str, typing.Any]] = None,
+) -> typing.Dict[str, bool]:
+    assertions = {
+        "has_no_error_diagnostics": not any(
+            diagnostic.get("severity") == "error" for diagnostic in diagnostics
+        )
+    }
+    if surface == "adp_v1":
+        assertions.update(
+            _adp_xray_reassembly_shape_assertions(final_output, workflow_extract or {})
+        )
+        return assertions
+
+    parent_group, child_group, child_field = _utility_groups(surface)
+    parent_records = final_output.get(parent_group)
+    account_children = final_output.get(child_group)
+    assertions.update(
+        {
+            "has_minimum_parent_candidates": isinstance(parent_records, list)
+            and len(parent_records) >= 7,
+            "has_account_child_candidates": isinstance(account_children, list),
+            "has_minimum_total_child_candidates": isinstance(parent_records, list)
+            and isinstance(account_children, list)
+            and _nested_child_count(parent_records, child_field)
+            + len(account_children)
+            >= 22,
+            "has_statement_fields": _statement_field_count(surface, final_output) >= 14,
+            "has_relationship_output": bool(relationship_output),
+        }
+    )
+    return assertions
+
+
+def _adp_xray_reassembly_shape_assertions(
+    final_output: typing.Mapping[str, typing.Any],
+    workflow_extract: typing.Mapping[str, typing.Any],
+) -> typing.Dict[str, bool]:
+    expected_sections = _adp_expected_sections(workflow_extract)
+    actual_sections = {
+        str(section_name)
+        for section_name, section_value in final_output.items()
+        if isinstance(section_value, typing.Mapping)
+    }
+    actual_fields = {
+        f"{section_name}.{field_name}"
+        for section_name, section_value in final_output.items()
+        if isinstance(section_value, typing.Mapping)
+        for field_name in section_value
+        if not str(field_name).startswith("_")
+    }
+    expected_fields = {
+        f"{section_name}.{field_name}"
+        for section_name, fields in expected_sections.items()
+        for field_name in fields
+    }
+
+    populated_field_count = 0
+    ratio_failures: typing.List[str] = []
+    for section_name, fields in expected_sections.items():
+        section_value = final_output.get(section_name)
+        if not isinstance(section_value, typing.Mapping):
+            ratio_failures.append(section_name)
+            continue
+        ratio_fields = _adp_section_ratio_fields(fields)
+        ratio_populated = 0
+        for field_name in fields:
+            if _has_extracted_value(section_value.get(field_name)):
+                populated_field_count += 1
+                if field_name in ratio_fields:
+                    ratio_populated += 1
+        ratio = ratio_populated / len(ratio_fields) if ratio_fields else 1.0
+        if ratio < ADP_MIN_SECTION_POPULATED_RATIO:
+            ratio_failures.append(section_name)
+
+    null_or_blank_count = len(expected_fields) - populated_field_count
+    return {
+        "has_expected_adp_section_count": len(expected_sections)
+        == ADP_EXPECTED_SECTION_COUNT
+        and actual_sections == set(expected_sections),
+        "has_expected_adp_workflow_field_count": len(expected_fields)
+        == ADP_EXPECTED_FIELD_COUNT,
+        "has_no_unexpected_adp_fields": actual_fields <= expected_fields,
+        "has_adp_populated_fields_in_range": ADP_MIN_POPULATED_FIELDS
+        <= populated_field_count
+        <= ADP_MAX_POPULATED_FIELDS,
+        "has_adp_null_fields_in_range": ADP_MIN_NULL_FIELDS
+        <= null_or_blank_count
+        <= ADP_MAX_NULL_FIELDS,
+        "has_adp_core_fields_populated_by_section": not ratio_failures,
+    }
 
 
 def _adp_shape_assertions(
