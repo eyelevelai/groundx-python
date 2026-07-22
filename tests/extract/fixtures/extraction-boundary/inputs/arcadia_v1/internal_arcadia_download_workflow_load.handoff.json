@@ -2,6 +2,11 @@
   "also_verified_by": [
     "groundx_python_xray_reassembly"
   ],
+  "artifacts": {
+    "previous_extract_api_download_packet": {
+      "sha256": "29f4fc574846088e176a966e4936b80e26d57bafaa38ff3a7c51cc1c79a257a0"
+    }
+  },
   "assertions": {
     "has_document_id": true,
     "has_task_id": true,

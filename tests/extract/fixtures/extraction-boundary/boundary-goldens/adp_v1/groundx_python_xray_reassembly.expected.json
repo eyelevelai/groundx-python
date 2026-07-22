@@ -1,10 +1,10 @@
 {
   "artifacts": {
     "previous_download_workflow_load": {
-      "sha256": "6182e59ce6218e5406286b05caede990405dd464ce7f3a82bdfb8ca4de628e55"
+      "sha256": "88e6ac8ea7591e0feef3c707a4b5e3990df7adc8d8b86516159a645091c69069"
     },
     "xray_sidecar": {
-      "sha256": "554867e75d39f0c77e32a314796365a17ffbc11bd6c577f023d98d2908e29dc7"
+      "sha256": "b4989c81d84e8ce979fea781678b60f8c55ef92cf981a73760cfbbf1c713c484"
     }
   },
   "assertions": {
@@ -14,43 +14,43 @@
     "shape_contract_passed": true
   },
   "input_from": "internal_arcadia_download_workflow_load",
-  "input_sha256": "6182e59ce6218e5406286b05caede990405dd464ce7f3a82bdfb8ca4de628e55",
+  "input_sha256": "88e6ac8ea7591e0feef3c707a4b5e3990df7adc8d8b86516159a645091c69069",
   "output": {
-    "diagnostic_count": 156,
-    "final_output_sha256": "f5dca3960d1e84f48212c9904fdeb465f05b2779676bcb70577c555d9885ea6d",
+    "diagnostic_count": 218,
+    "final_output_sha256": "d7844662cde9600195ace39134dadee69f64f73cc14e9614476febe5654cc5d0",
     "relationship_output_sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
-    "source_provenance_count": 623,
-    "workflow_output_sha256": "4675d4bc35461bd980244e4b011affd6f48f558421e39ef8b51e310bb7bf9a12"
+    "source_provenance_count": 712,
+    "workflow_output_sha256": "e646a8d7d39ea23da6c934ec13a6620480632776e9b97a90fd509fce27d149c0"
   },
   "output_for": "sdk_reassembly_proof",
   "request": {
     "callback_url": "https://api.eyelevel.ai/documentlayout",
-    "document_id": "905cd934-49dd-446d-a3bc-036ccc00291a",
+    "document_id": "d69400ac-a032-4e2f-8872-d34b4901a6bb",
     "file_name": "adp",
-    "model_id": 30646,
+    "model_id": 30663,
     "processor_id": 134,
-    "task_id": "4d3d3001-7818-474f-bfa2-c55a3646b4d1",
+    "task_id": "286344b0-100d-4ddd-bc94-95985c8989f7",
     "workflow_capture": {
-      "capture_config_hash": "47c31554131692f6b254dd53c980725aa14aeb84264c473d8944f57442ffde6f",
+      "capture_config_hash": "28c460e7ddec482c7282601507b0dc740427b4d11ff07527e453e73c5c07a5e6",
       "capture_types": [
         "pipeline_trace",
         "prompt_capture"
       ],
       "case_id": "adp-v1",
       "enabled": true,
-      "expires_at": "2026-07-22T06:38:20Z",
+      "expires_at": "2026-07-22T20:10:46Z",
       "max_artifacts": 500,
       "retention": {
-        "delete_after": "2026-07-29T00:38:20Z",
+        "delete_after": "2026-07-29T14:10:46Z",
         "owner": "private-extraction-certification"
       },
       "run_id": "extract-cert-adp-v1-01",
       "schema_version": "extraction_pipeline_capture_v1",
-      "workflow_id": "937145eb-0ebd-4a55-ab69-4b9f053dc1f8"
+      "workflow_id": "ebaa902d-94e1-4272-858a-aeb673baf421"
     },
-    "workflow_id": "937145eb-0ebd-4a55-ab69-4b9f053dc1f8",
+    "workflow_id": "ebaa902d-94e1-4272-858a-aeb673baf421",
     "workflow_schema_hash": "440d6a1064202a8a2e1fcff746dcc7b132d0e1117b0ab1212da3cee07dc28725",
-    "workflow_version": "2026-07-22T00:38:23.883Z"
+    "workflow_version": "2026-07-22T14:10:49.331Z"
   },
   "schema_version": "groundx-python-xray-reassembly-boundary-v1",
   "shape_assertions": {

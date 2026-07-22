@@ -1,9 +1,10 @@
 {
   "acceptance_reason": "Accepted as deterministic SDK X-Ray reassembly output from a passing hosted fixture-seeding run.",
   "accepted_actual_as_expected": true,
-  "actual_sha256": "9d0d791494a30c93b9e29a01143c038dd8e74df08213c1a8626c161613e280a7",
+  "actual_sha256": "dc0610348fc6d06c366d3cdf30baaf89ce49425a41f91126f4593fe0b2e43394",
+  "artifact_catalog_sha256": "a0a3dd5ea8d5232bd4ad17a804545c7ffd163993a8d4971e613b5b16f3bed10d",
   "artifact_name": "groundx_python_xray_reassembly",
-  "expected_sha256": "9d0d791494a30c93b9e29a01143c038dd8e74df08213c1a8626c161613e280a7",
+  "expected_sha256": "dc0610348fc6d06c366d3cdf30baaf89ce49425a41f91126f4593fe0b2e43394",
   "kind": "machine_readable_json_diff",
   "reviewed_field_count_summary": {
     "boundary": "groundx_python_xray_reassembly",
@@ -12,7 +13,8 @@
     "stage": "groundx_python_xray_reassembly",
     "surface": "adp_v1"
   },
-  "source_artifact_sha256": "6182e59ce6218e5406286b05caede990405dd464ce7f3a82bdfb8ca4de628e55",
+  "source_artifact_sha256": "88e6ac8ea7591e0feef3c707a4b5e3990df7adc8d8b86516159a645091c69069",
+  "source_run_id": "live-20260722T134446Z-sdk388-cashbot-82b-internal-6a5-digest026-trace-fixture-seeding",
   "status": "passed",
   "surface": "adp_v1"
 }

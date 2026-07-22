@@ -1,58 +1,56 @@
 {
   "artifacts": {
     "previous_download_workflow_load": {
-      "sha256": "08b8155f43a788a3402579cdeafb6baadc4471aad46831f7ee1e4eb0c9afdcc1"
+      "sha256": "910642ab22b5f30e7487a858e231d7b7c7cad3aacc35c9ee157ee22939c6cd70"
+    },
+    "xray_sidecar": {
+      "sha256": "486dfd5f206f298fbeec767bf51f07d802403f5818cbe294a21b1193f8da1160"
     }
   },
   "assertions": {
     "consumes_download_workflow_load_handoff": true,
+    "consumes_real_xray_sidecar": true,
     "has_no_error_diagnostics": true,
     "shape_contract_passed": true
   },
   "input_from": "internal_arcadia_download_workflow_load",
-  "input_sha256": "08b8155f43a788a3402579cdeafb6baadc4471aad46831f7ee1e4eb0c9afdcc1",
+  "input_sha256": "910642ab22b5f30e7487a858e231d7b7c7cad3aacc35c9ee157ee22939c6cd70",
   "output": {
-    "diagnostic_count": 18,
-    "final_output_sha256": "502a4d7eeac65bd257ba87126825dbff95c5ecfd321e0d0277f39bd8a20361d8",
-    "relationship_output_sha256": "502a4d7eeac65bd257ba87126825dbff95c5ecfd321e0d0277f39bd8a20361d8",
-    "source_provenance_count": 2506,
-    "workflow_output_sha256": "a251584e037dfa059846e6f05c5fa20b8986e139eccc398e60e10ada7b36cfff"
+    "diagnostic_count": 11,
+    "final_output_sha256": "0d4586b175ae7a65105d719dc8b571533a053bb389dffa563b6a782e5c41da28",
+    "relationship_output_sha256": "0d4586b175ae7a65105d719dc8b571533a053bb389dffa563b6a782e5c41da28",
+    "source_provenance_count": 1746,
+    "workflow_output_sha256": "6c7891216652c81a1a8d8a842380d6bef86c4022ad6a12a53c4a6c63c4967643"
   },
   "output_for": "sdk_reassembly_proof",
   "request": {
-    "api_key_present": true,
-    "callbackURL": "https://api.eyelevel.ai/documentlayout",
-    "contentURL": "https://upload.eyelevel.ai/layout/processed/8539f22e-9f8e-4cf9-9868-9a4a866c737b/52c77597-4921-4ddc-875f-c69c67b830c3-xray.json",
-    "documentID": "52c77597-4921-4ddc-875f-c69c67b830c3",
-    "fileName": "arcadia.pdf",
-    "fileType": "pdf",
-    "maxPages": 1000,
-    "modelID": 30634,
-    "path": "process",
-    "processorID": 134,
-    "serviceURL": "http://k8s-eyelevel-extracta-d05e39aeae-33b1ad95b494fcb5.elb.us-west-2.amazonaws.com",
-    "taskID": "8539f22e-9f8e-4cf9-9868-9a4a866c737b",
-    "workflowID": "82b5f5b9-37e7-47e6-bf0d-d401583587b6",
-    "workflowSchemaHash": "b859b731ea3d23ad2f130681b1bd664c85209a44a9de653ad81a0f74a3a318be",
-    "workflowVersion": "2026-07-21T20:37:23.929Z",
+    "callback_url": "https://api.eyelevel.ai/documentlayout",
+    "document_id": "1bbebf19-8a3b-44e7-a203-35366f7de8a3",
+    "file_name": "arcadia",
+    "model_id": 30660,
+    "processor_id": 134,
+    "task_id": "fed6b253-8fa4-45bd-b20a-226f455c1f5c",
     "workflow_capture": {
-      "capture_config_hash": "052f909357cc0ee7583eaeb7d9ca1c51745951c60368566927f1deaa8f74e3b6",
+      "capture_config_hash": "1b9f1f89fefb71b003da4de119973456d2223403ec5bc53746fd53e5970f6422",
       "capture_types": [
         "pipeline_trace",
         "prompt_capture"
       ],
       "case_id": "arcadia-legacy",
       "enabled": true,
-      "expires_at": "2026-07-22T02:37:22Z",
+      "expires_at": "2026-07-22T19:46:34Z",
       "max_artifacts": 500,
       "retention": {
-        "delete_after": "2026-07-28T20:37:22Z",
+        "delete_after": "2026-07-29T13:46:34Z",
         "owner": "private-extraction-certification"
       },
       "run_id": "extract-cert-arcadia-legacy-01",
       "schema_version": "extraction_pipeline_capture_v1",
-      "workflow_id": "82b5f5b9-37e7-47e6-bf0d-d401583587b6"
-    }
+      "workflow_id": "958c6f48-1485-445e-b554-af8c145df46f"
+    },
+    "workflow_id": "958c6f48-1485-445e-b554-af8c145df46f",
+    "workflow_schema_hash": "b859b731ea3d23ad2f130681b1bd664c85209a44a9de653ad81a0f74a3a318be",
+    "workflow_version": "2026-07-22T13:46:35.542Z"
   },
   "schema_version": "groundx-python-xray-reassembly-boundary-v1",
   "shape_assertions": {

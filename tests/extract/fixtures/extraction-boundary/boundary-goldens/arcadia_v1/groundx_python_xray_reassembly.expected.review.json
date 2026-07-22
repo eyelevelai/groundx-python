@@ -2,14 +2,14 @@
   "reviewed_expected_output": {
     "acceptance_reason": "Accepted as deterministic SDK X-Ray reassembly output from a passing hosted fixture-seeding run.",
     "accepted_actual_as_expected": true,
-    "artifact_catalog_sha256": "2bd6aa4ebde7a8f0b3f617b103e6a2b5fc51e1ad0537422e697e3722912745e9",
+    "artifact_catalog_sha256": "a0a3dd5ea8d5232bd4ad17a804545c7ffd163993a8d4971e613b5b16f3bed10d",
     "artifact_catalog_version": "2026-07-21.1",
     "author_identity": "Codex",
     "diff_path": "tests/extract/fixtures/extraction-boundary/boundary-goldens/arcadia_v1/groundx_python_xray_reassembly.expected.diff.json",
     "diff_status": "passed",
     "expected_path": "tests/extract/fixtures/extraction-boundary/boundary-goldens/arcadia_v1/groundx_python_xray_reassembly.expected.json",
-    "expected_sha256": "c3732b05041f39b6833559f7f90e81ea5d27a44fd22970097ca86eaf8ae5d1c4",
-    "packet_sha256": "c3732b05041f39b6833559f7f90e81ea5d27a44fd22970097ca86eaf8ae5d1c4",
+    "expected_sha256": "edbdddc553f606dc8e43b600cf410c9cc2d100887c61993c67474febe05f7cfd",
+    "packet_sha256": "edbdddc553f606dc8e43b600cf410c9cc2d100887c61993c67474febe05f7cfd",
     "reviewed_at": "2026-07-21T22:12:08.864Z",
     "reviewed_field_count_summary": {
       "boundary": "groundx_python_xray_reassembly",
@@ -21,7 +21,7 @@
     "reviewer_identity": "Benjamin Fletcher",
     "reviewer_role": "product/engineering reviewer",
     "source_path": "tests/extract/fixtures/extraction-boundary/inputs/arcadia_v1/internal_arcadia_download_workflow_load.handoff.json",
-    "source_run_id": "live-20260721T203535Z-sdk388-cashbot-5fd-internal-998-digest9c09-trace-fixture-seeding",
-    "source_sha256": "e6d7ffb27a072b572055009c18f8663a6459ceb85f92abae50eaefb0e33450df"
+    "source_run_id": "live-20260722T001149Z-sdk388-cashbot-700-internal-a48-digest5d-trace-fixture-seeding-promptcapture",
+    "source_sha256": "e094dca38e0fa227eb99777a6dfe12b56d8bc590eecaa5725fbe5eee70894b53"
   }
 }
