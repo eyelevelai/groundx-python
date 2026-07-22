@@ -10,7 +10,7 @@
   ],
   "catalog_version": "2026-07-21.1",
   "schema_version": "groundx_python_extraction_boundary_catalog_v1",
-  "source_artifact_catalog_sha256": "06b9136a4aaf3787bc55182f8ac6df14c24cb4017c14b0172767b0315c3c4aa6",
+  "source_artifact_catalog_sha256": "18cae158e9eec2321f01339c178d55652a67c013ff0b53e6314ba271e863e0cc",
   "surfaces": [
     "arcadia_legacy",
     "arcadia_v1",

@@ -1,0 +1,18 @@
+{
+  "acceptance_reason": "Accepted as deterministic SDK X-Ray reassembly output from a passing hosted fixture-seeding run.",
+  "accepted_actual_as_expected": true,
+  "actual_sha256": "c3732b05041f39b6833559f7f90e81ea5d27a44fd22970097ca86eaf8ae5d1c4",
+  "artifact_name": "groundx_python_xray_reassembly",
+  "expected_sha256": "c3732b05041f39b6833559f7f90e81ea5d27a44fd22970097ca86eaf8ae5d1c4",
+  "kind": "machine_readable_json_diff",
+  "reviewed_field_count_summary": {
+    "boundary": "groundx_python_xray_reassembly",
+    "input_from": "internal_arcadia_download_workflow_load",
+    "output_for": "sdk_reassembly_proof",
+    "stage": "groundx_python_xray_reassembly",
+    "surface": "arcadia_v1"
+  },
+  "source_artifact_sha256": "e6d7ffb27a072b572055009c18f8663a6459ceb85f92abae50eaefb0e33450df",
+  "status": "passed",
+  "surface": "arcadia_v1"
+}

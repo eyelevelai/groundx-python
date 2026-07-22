@@ -26,7 +26,7 @@ BOUNDARY_ROOT = ROOT / "tests" / "extract" / "fixtures" / "extraction-boundary"
 BOUNDARY_INPUT_ROOT = BOUNDARY_ROOT / "inputs"
 BOUNDARY_GOLDENS_ROOT = BOUNDARY_ROOT / "boundary-goldens"
 CATALOG_PATH = ROOT / "tests" / "extract" / "fixtures" / "extraction-boundary" / "catalog.json"
-CATALOG_SHA256 = "71f8630c48f334742739aa6982edb85c429b0397ac5de68744b5704688a5b348"
+CATALOG_SHA256 = "a0a3dd5ea8d5232bd4ad17a804545c7ffd163993a8d4971e613b5b16f3bed10d"
 ADP_EXPECTED_SECTION_COUNT = 11
 ADP_EXPECTED_FIELD_COUNT = 159
 ADP_MIN_POPULATED_FIELDS = 100
@@ -61,7 +61,7 @@ def test_extraction_boundary_catalog_is_pinned() -> None:
     assert catalog["catalog_version"] == "2026-07-21.1"
     assert catalog["surfaces"] == SURFACES
     assert catalog["source_artifact_catalog_sha256"] == (
-        "06b9136a4aaf3787bc55182f8ac6df14c24cb4017c14b0172767b0315c3c4aa6"
+        "18cae158e9eec2321f01339c178d55652a67c013ff0b53e6314ba271e863e0cc"
     )
     assert catalog["artifacts"] == [
         {
@@ -455,15 +455,30 @@ def _real_download_workflow_load_input_path(surface: str) -> pathlib.Path:
     )
 
 
+def _real_xray_sidecar_path(surface: str) -> pathlib.Path:
+    return (
+        BOUNDARY_INPUT_ROOT
+        / surface
+        / "groundx_python_xray_reassembly.xray.json"
+    )
+
+
 def _write_xray_reassembly_boundary_artifact(
     tmp_path: pathlib.Path,
     surface: str,
 ) -> typing.Tuple[typing.Dict[str, typing.Any], pathlib.Path, pathlib.Path]:
     out_dir = tmp_path / surface
     previous_path = _real_download_workflow_load_input_path(surface)
+    xray_path = _real_xray_sidecar_path(surface)
     previous = _read_json(previous_path)
+    if xray_path.exists():
+        xray_sidecar = _read_json(xray_path)
+        xray_payload = xray_sidecar["xray"]
+    else:
+        xray_sidecar = None
+        xray_payload = previous["xray"]
     result = reassemble_custom_outputs_from_xray(
-        previous["xray"],
+        xray_payload,
         workflow_extract=previous["workflow_extract"],
     )
     diagnostics = [
@@ -504,7 +519,7 @@ def _write_xray_reassembly_boundary_artifact(
         "stage": "groundx_python_xray_reassembly",
         "input_from": "internal_arcadia_download_workflow_load",
         "output_for": "sdk_reassembly_proof",
-        "workflow_schema_hash": previous["workflow_schema_hash"],
+        "workflow_schema_hash": _workflow_schema_hash(previous),
         "request": previous["request"],
         "input_sha256": _sha256_file(previous_path),
         "output": {
@@ -528,10 +543,23 @@ def _write_xray_reassembly_boundary_artifact(
             "shape_contract_passed": all(assertions.values()),
         },
     }
+    if xray_sidecar is not None:
+        actual["artifacts"]["xray_sidecar"] = {
+            "path": str(xray_path),
+            "sha256": _sha256_file(xray_path),
+        }
+        actual["assertions"]["consumes_real_xray_sidecar"] = (
+            xray_sidecar["schema_version"]
+            == "groundx_python_xray_reassembly_sidecar_v1"
+        )
     assert actual["assertions"]["consumes_download_workflow_load_handoff"]
+    if xray_sidecar is not None:
+        assert actual["assertions"]["consumes_real_xray_sidecar"]
     assert actual["assertions"]["has_no_error_diagnostics"]
     assert actual["assertions"]["shape_contract_passed"]
     _assert_no_synthetic_protected_marker(previous)
+    if xray_sidecar is not None:
+        _assert_no_synthetic_protected_marker(xray_sidecar)
     _assert_no_synthetic_protected_marker(actual)
 
     expected_path = (
@@ -539,6 +567,18 @@ def _write_xray_reassembly_boundary_artifact(
     )
     diff_path = out_dir / "groundx_python_xray_reassembly.diff.json"
     return actual, expected_path, diff_path
+
+
+def _workflow_schema_hash(previous: typing.Mapping[str, typing.Any]) -> str:
+    value = previous.get("workflow_schema_hash")
+    if isinstance(value, str) and value:
+        return value
+    workflow_identity = previous.get("workflow_identity")
+    if isinstance(workflow_identity, typing.Mapping):
+        value = workflow_identity.get("workflow_schema_hash")
+        if isinstance(value, str) and value:
+            return value
+    raise KeyError("workflow_schema_hash")
 
 
 def _write_reviewed_expected_output_sidecars(

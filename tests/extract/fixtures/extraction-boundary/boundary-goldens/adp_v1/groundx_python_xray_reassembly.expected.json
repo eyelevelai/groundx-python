@@ -1,58 +1,56 @@
 {
   "artifacts": {
     "previous_download_workflow_load": {
-      "sha256": "cd6da4c6cd4577670589238679b786dfbe584a040b2d9ea041e9d4f6f38d2fdd"
+      "sha256": "6182e59ce6218e5406286b05caede990405dd464ce7f3a82bdfb8ca4de628e55"
+    },
+    "xray_sidecar": {
+      "sha256": "554867e75d39f0c77e32a314796365a17ffbc11bd6c577f023d98d2908e29dc7"
     }
   },
   "assertions": {
     "consumes_download_workflow_load_handoff": true,
+    "consumes_real_xray_sidecar": true,
     "has_no_error_diagnostics": true,
     "shape_contract_passed": true
   },
   "input_from": "internal_arcadia_download_workflow_load",
-  "input_sha256": "cd6da4c6cd4577670589238679b786dfbe584a040b2d9ea041e9d4f6f38d2fdd",
+  "input_sha256": "6182e59ce6218e5406286b05caede990405dd464ce7f3a82bdfb8ca4de628e55",
   "output": {
-    "diagnostic_count": 204,
-    "final_output_sha256": "6c651ef8d56a6b1ceea75e90c25933d1ef7056805032fb5fdc7c1dfc5dfe7aa9",
+    "diagnostic_count": 156,
+    "final_output_sha256": "f5dca3960d1e84f48212c9904fdeb465f05b2779676bcb70577c555d9885ea6d",
     "relationship_output_sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
-    "source_provenance_count": 667,
-    "workflow_output_sha256": "72f4b5ed9058ec034791b791b10ee476ac6143f6b17b70214367d89130e08d54"
+    "source_provenance_count": 623,
+    "workflow_output_sha256": "4675d4bc35461bd980244e4b011affd6f48f558421e39ef8b51e310bb7bf9a12"
   },
   "output_for": "sdk_reassembly_proof",
   "request": {
-    "api_key_present": true,
-    "callbackURL": "https://api.eyelevel.ai/documentlayout",
-    "contentURL": "https://upload.eyelevel.ai/layout/processed/aabbbba5-5f14-4d5d-9f85-1610ea045729/ccaad3a1-8a63-40b5-8e4d-c5611ced7763-xray.json",
-    "documentID": "ccaad3a1-8a63-40b5-8e4d-c5611ced7763",
-    "fileName": "adp.pdf",
-    "fileType": "pdf",
-    "maxPages": 1000,
-    "modelID": 30637,
-    "path": "process",
-    "processorID": 134,
-    "serviceURL": "http://k8s-eyelevel-extracta-d05e39aeae-33b1ad95b494fcb5.elb.us-west-2.amazonaws.com",
-    "taskID": "aabbbba5-5f14-4d5d-9f85-1610ea045729",
-    "workflowID": "b13ec1bd-4387-4cba-a364-5d944fd24778",
-    "workflowSchemaHash": "440d6a1064202a8a2e1fcff746dcc7b132d0e1117b0ab1212da3cee07dc28725",
-    "workflowVersion": "2026-07-21T21:02:53.454Z",
+    "callback_url": "https://api.eyelevel.ai/documentlayout",
+    "document_id": "905cd934-49dd-446d-a3bc-036ccc00291a",
+    "file_name": "adp",
+    "model_id": 30646,
+    "processor_id": 134,
+    "task_id": "4d3d3001-7818-474f-bfa2-c55a3646b4d1",
     "workflow_capture": {
-      "capture_config_hash": "6fb540d205c185af6c95c3ab0ce9f65e8fdad39da2be3d1b33f5bd5e3083d3b8",
+      "capture_config_hash": "47c31554131692f6b254dd53c980725aa14aeb84264c473d8944f57442ffde6f",
       "capture_types": [
         "pipeline_trace",
         "prompt_capture"
       ],
       "case_id": "adp-v1",
       "enabled": true,
-      "expires_at": "2026-07-22T03:02:50Z",
+      "expires_at": "2026-07-22T06:38:20Z",
       "max_artifacts": 500,
       "retention": {
-        "delete_after": "2026-07-28T21:02:50Z",
+        "delete_after": "2026-07-29T00:38:20Z",
         "owner": "private-extraction-certification"
       },
       "run_id": "extract-cert-adp-v1-01",
       "schema_version": "extraction_pipeline_capture_v1",
-      "workflow_id": "b13ec1bd-4387-4cba-a364-5d944fd24778"
-    }
+      "workflow_id": "937145eb-0ebd-4a55-ab69-4b9f053dc1f8"
+    },
+    "workflow_id": "937145eb-0ebd-4a55-ab69-4b9f053dc1f8",
+    "workflow_schema_hash": "440d6a1064202a8a2e1fcff746dcc7b132d0e1117b0ab1212da3cee07dc28725",
+    "workflow_version": "2026-07-22T00:38:23.883Z"
   },
   "schema_version": "groundx-python-xray-reassembly-boundary-v1",
   "shape_assertions": {

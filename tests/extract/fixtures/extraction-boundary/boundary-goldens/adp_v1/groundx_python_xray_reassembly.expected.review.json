@@ -8,8 +8,8 @@
     "diff_path": "tests/extract/fixtures/extraction-boundary/boundary-goldens/adp_v1/groundx_python_xray_reassembly.expected.diff.json",
     "diff_status": "passed",
     "expected_path": "tests/extract/fixtures/extraction-boundary/boundary-goldens/adp_v1/groundx_python_xray_reassembly.expected.json",
-    "expected_sha256": "077e3dab01f3d5cde591cb02c50b5e1a9d74fa66e9b080035f3b5a0c83658549",
-    "packet_sha256": "077e3dab01f3d5cde591cb02c50b5e1a9d74fa66e9b080035f3b5a0c83658549",
+    "expected_sha256": "9d0d791494a30c93b9e29a01143c038dd8e74df08213c1a8626c161613e280a7",
+    "packet_sha256": "9d0d791494a30c93b9e29a01143c038dd8e74df08213c1a8626c161613e280a7",
     "reviewed_at": "2026-07-21T22:12:08.864Z",
     "reviewed_field_count_summary": {
       "boundary": "groundx_python_xray_reassembly",
@@ -22,6 +22,6 @@
     "reviewer_role": "product/engineering reviewer",
     "source_path": "tests/extract/fixtures/extraction-boundary/inputs/adp_v1/internal_arcadia_download_workflow_load.handoff.json",
     "source_run_id": "live-20260721T203535Z-sdk388-cashbot-5fd-internal-998-digest9c09-trace-fixture-seeding",
-    "source_sha256": "cd6da4c6cd4577670589238679b786dfbe584a040b2d9ea041e9d4f6f38d2fdd"
+    "source_sha256": "6182e59ce6218e5406286b05caede990405dd464ce7f3a82bdfb8ca4de628e55"
   }
 }
