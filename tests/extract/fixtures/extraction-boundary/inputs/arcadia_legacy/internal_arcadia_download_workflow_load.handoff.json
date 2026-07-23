@@ -4,7 +4,7 @@
   ],
   "artifacts": {
     "previous_extract_api_download_packet": {
-      "sha256": "b6f19e8f46ca6ff1000a626160f6906d3f845b2eb85f24aeef113445b5681d87"
+      "sha256": "bd978c9c7fceef0614f51cc856d616e539a4d010f6416dd3f0e5c4615dd9202f"
     }
   },
   "assertions": {
@@ -88,7 +88,7 @@
         "charge_description_as_printed": "MN State Tax on Usage"
       },
       {
-        "charge_amount": 55,
+        "charge_amount": 55.0,
         "charge_amount_currency": "USD",
         "charge_description_as_printed": "Industrial Energy Electric"
       },
@@ -143,7 +143,7 @@
         "charge_description_as_printed": "City of Windom-Utilities"
       },
       {
-        "charge_amount": 654,
+        "charge_amount": 654.0,
         "charge_amount_currency": "USD",
         "charge_description_as_printed": "City of Windom-Utilities"
       },
@@ -203,7 +203,7 @@
         "service_type": "electric",
         "tariff_name_as_printed": "Industrial Electric",
         "units_of_measurement": "kWh",
-        "usage_value": 60960
+        "usage_value": 60960.0
       },
       {
         "deregulation_status": "delivery",
@@ -220,7 +220,7 @@
         "service_type": "water",
         "tariff_name_as_printed": "Commercial Water",
         "units_of_measurement": "gallons",
-        "usage_value": 0
+        "usage_value": 0.0
       },
       {
         "deregulation_status": "full_service",
@@ -237,7 +237,7 @@
         "service_type": "sewer",
         "tariff_name_as_printed": "Commercial Sewer",
         "units_of_measurement": "gallons",
-        "usage_value": 42303
+        "usage_value": 42303.0
       },
       {
         "deregulation_status": "full_service",
@@ -254,7 +254,7 @@
         "service_type": "water",
         "tariff_name_as_printed": "Commercial Water",
         "units_of_measurement": "gallons",
-        "usage_value": 42303
+        "usage_value": 42303.0
       },
       {
         "deregulation_status": "delivery",
@@ -271,7 +271,7 @@
         "service_type": "sewer",
         "tariff_name_as_printed": "Commercial Sewer",
         "units_of_measurement": "gallons",
-        "usage_value": 0
+        "usage_value": 0.0
       },
       {
         "deregulation_status": "full_service",
@@ -288,7 +288,7 @@
         "service_type": "water",
         "tariff_name_as_printed": "Commercial Water",
         "units_of_measurement": "gallons",
-        "usage_value": 40356
+        "usage_value": 40356.0
       },
       {
         "deregulation_status": "full_service",
@@ -305,7 +305,7 @@
         "service_type": "water",
         "tariff_name_as_printed": "Commercial Water",
         "units_of_measurement": "gal",
-        "usage_value": 42303
+        "usage_value": 42303.0
       },
       {
         "deregulation_status": "full_service",
@@ -322,7 +322,7 @@
         "service_type": "sewer",
         "tariff_name_as_printed": "Commercial Sewer",
         "units_of_measurement": "gal",
-        "usage_value": 42303
+        "usage_value": 42303.0
       },
       {
         "deregulation_status": "delivery",
@@ -339,7 +339,7 @@
         "service_type": "water",
         "tariff_name_as_printed": "Commercial Water",
         "units_of_measurement": "gallons",
-        "usage_value": 0
+        "usage_value": 0.0
       },
       {
         "deregulation_status": "delivery",
@@ -373,7 +373,7 @@
         "service_type": "irrigation",
         "tariff_name_as_printed": "Commercial Water",
         "units_of_measurement": "gal",
-        "usage_value": 0
+        "usage_value": 0.0
       },
       {
         "deregulation_status": "full_service",
@@ -390,7 +390,7 @@
         "service_type": "water",
         "tariff_name_as_printed": "Commercial Water",
         "units_of_measurement": "gallons",
-        "usage_value": 96600
+        "usage_value": 96600.0
       },
       {
         "deregulation_status": "full_service",
@@ -407,7 +407,7 @@
         "service_type": "water",
         "tariff_name_as_printed": "Commercial Water",
         "units_of_measurement": "gallons",
-        "usage_value": 55000
+        "usage_value": 55000.0
       },
       {
         "deregulation_status": "delivery",
@@ -424,7 +424,7 @@
         "service_type": "sewer",
         "tariff_name_as_printed": "Commercial Sewer",
         "units_of_measurement": "gal",
-        "usage_value": 55000
+        "usage_value": 55000.0
       },
       {
         "deregulation_status": "full_service",
@@ -441,7 +441,7 @@
         "service_type": "water",
         "tariff_name_as_printed": "Commercial Water",
         "units_of_measurement": "gal",
-        "usage_value": 0
+        "usage_value": 0.0
       },
       {
         "deregulation_status": "full_service",
@@ -458,7 +458,7 @@
         "service_type": "sewer",
         "tariff_name_as_printed": "Commercial Sewer",
         "units_of_measurement": "gal",
-        "usage_value": 0
+        "usage_value": 0.0
       },
       {
         "deregulation_status": "supply",
@@ -475,7 +475,7 @@
         "service_type": "sewer",
         "tariff_name_as_printed": "Commercial Sewer",
         "units_of_measurement": "gallons",
-        "usage_value": 42303
+        "usage_value": 42303.0
       },
       {
         "deregulation_status": "supply",
@@ -492,7 +492,7 @@
         "service_type": "water",
         "tariff_name_as_printed": "Commercial Water",
         "units_of_measurement": "gallons",
-        "usage_value": 42303
+        "usage_value": 42303.0
       },
       {
         "deregulation_status": "supply",
@@ -509,7 +509,7 @@
         "service_type": "sewer",
         "tariff_name_as_printed": "Commercial Sewer",
         "units_of_measurement": "gallons",
-        "usage_value": 0
+        "usage_value": 0.0
       },
       {
         "deregulation_status": "supply",
@@ -526,7 +526,7 @@
         "service_type": "water",
         "tariff_name_as_printed": "Commercial Water",
         "units_of_measurement": "gallons",
-        "usage_value": 40356
+        "usage_value": 40356.0
       },
       {
         "deregulation_status": "supply",
@@ -560,7 +560,7 @@
         "service_type": "water",
         "tariff_name_as_printed": "Commercial Water",
         "units_of_measurement": "gallons",
-        "usage_value": 55000
+        "usage_value": 55000.0
       },
       {
         "deregulation_status": "supply",
@@ -577,7 +577,7 @@
         "service_type": "sewer",
         "tariff_name_as_printed": "Commercial Sewer",
         "units_of_measurement": "gal",
-        "usage_value": 55000
+        "usage_value": 55000.0
       }
     ],
     "provider_name": "City of Windom",
@@ -598,26 +598,26 @@
     "processor_id": 134,
     "task_id": "fed6b253-8fa4-45bd-b20a-226f455c1f5c",
     "workflow_capture": {
-      "capture_config_hash": "1b9f1f89fefb71b003da4de119973456d2223403ec5bc53746fd53e5970f6422",
+      "capture_config_hash": "ae651a03a5af713614a8b87c7e33d5234b562631ca437854ab8a384ff67376ce",
       "capture_types": [
         "pipeline_trace",
         "prompt_capture"
       ],
       "case_id": "arcadia-legacy",
       "enabled": true,
-      "expires_at": "2026-07-22T19:46:34Z",
+      "expires_at": "2099-01-01T00:00:00Z",
       "max_artifacts": 500,
       "retention": {
-        "delete_after": "2026-07-29T13:46:34Z",
+        "delete_after": "2099-01-02T00:00:00Z",
         "owner": "private-extraction-certification"
       },
       "run_id": "extract-cert-arcadia-legacy-01",
       "schema_version": "extraction_pipeline_capture_v1",
-      "workflow_id": "958c6f48-1485-445e-b554-af8c145df46f"
+      "workflow_id": "arcadia_legacy-product-path"
     },
-    "workflow_id": "958c6f48-1485-445e-b554-af8c145df46f",
+    "workflow_id": "arcadia_legacy-product-path",
     "workflow_schema_hash": "b859b731ea3d23ad2f130681b1bd664c85209a44a9de653ad81a0f74a3a318be",
-    "workflow_version": "2026-07-22T13:46:35.542Z"
+    "workflow_version": "2026-07-12T22:34:00Z"
   },
   "schema_version": "internal-arcadia-download-workflow-load-v1",
   "stage": "internal_arcadia_download_workflow_load",
@@ -1090,7 +1090,7 @@
         "charge_amount": {
           "confidence": null,
           "conflicts": [],
-          "value": 55
+          "value": 55.0
         },
         "charge_amount_currency": {
           "confidence": null,
@@ -1481,7 +1481,7 @@
         "charge_amount": {
           "confidence": null,
           "conflicts": [],
-          "value": 654
+          "value": 654.0
         },
         "charge_amount_currency": {
           "confidence": null,
@@ -1757,7 +1757,7 @@
           "conflicts": [
             5193.3
           ],
-          "value": 60960
+          "value": 60960.0
         }
       },
       {
@@ -1824,7 +1824,7 @@
         "usage_value": {
           "confidence": null,
           "conflicts": [],
-          "value": 0
+          "value": 0.0
         }
       },
       {
@@ -1897,7 +1897,7 @@
         "usage_value": {
           "confidence": null,
           "conflicts": [],
-          "value": 42303
+          "value": 42303.0
         }
       },
       {
@@ -1970,9 +1970,9 @@
         "usage_value": {
           "confidence": null,
           "conflicts": [
-            0
+            0.0
           ],
-          "value": 42303
+          "value": 42303.0
         }
       },
       {
@@ -2039,7 +2039,7 @@
         "usage_value": {
           "confidence": null,
           "conflicts": [],
-          "value": 0
+          "value": 0.0
         }
       },
       {
@@ -2106,7 +2106,7 @@
         "usage_value": {
           "confidence": null,
           "conflicts": [],
-          "value": 40356
+          "value": 40356.0
         }
       },
       {
@@ -2168,7 +2168,7 @@
         "usage_value": {
           "confidence": null,
           "conflicts": [],
-          "value": 42303
+          "value": 42303.0
         }
       },
       {
@@ -2230,7 +2230,7 @@
         "usage_value": {
           "confidence": null,
           "conflicts": [],
-          "value": 42303
+          "value": 42303.0
         }
       },
       {
@@ -2292,7 +2292,7 @@
         "usage_value": {
           "confidence": null,
           "conflicts": [],
-          "value": 0
+          "value": 0.0
         }
       },
       {
@@ -2416,7 +2416,7 @@
         "usage_value": {
           "confidence": null,
           "conflicts": [],
-          "value": 0
+          "value": 0.0
         }
       },
       {
@@ -2478,7 +2478,7 @@
         "usage_value": {
           "confidence": null,
           "conflicts": [],
-          "value": 96600
+          "value": 96600.0
         }
       },
       {
@@ -2545,7 +2545,7 @@
         "usage_value": {
           "confidence": null,
           "conflicts": [],
-          "value": 55000
+          "value": 55000.0
         }
       },
       {
@@ -2612,7 +2612,7 @@
         "usage_value": {
           "confidence": null,
           "conflicts": [],
-          "value": 55000
+          "value": 55000.0
         }
       },
       {
@@ -2674,7 +2674,7 @@
         "usage_value": {
           "confidence": null,
           "conflicts": [],
-          "value": 0
+          "value": 0.0
         }
       },
       {
@@ -2736,7 +2736,7 @@
         "usage_value": {
           "confidence": null,
           "conflicts": [],
-          "value": 0
+          "value": 0.0
         }
       },
       {
@@ -2802,7 +2802,7 @@
         "usage_value": {
           "confidence": null,
           "conflicts": [],
-          "value": 42303
+          "value": 42303.0
         }
       },
       {
@@ -2868,9 +2868,9 @@
         "usage_value": {
           "confidence": null,
           "conflicts": [
-            0
+            0.0
           ],
-          "value": 42303
+          "value": 42303.0
         }
       },
       {
@@ -2932,7 +2932,7 @@
         "usage_value": {
           "confidence": null,
           "conflicts": [],
-          "value": 0
+          "value": 0.0
         }
       },
       {
@@ -2994,7 +2994,7 @@
         "usage_value": {
           "confidence": null,
           "conflicts": [],
-          "value": 40356
+          "value": 40356.0
         }
       },
       {
@@ -3113,7 +3113,7 @@
         "usage_value": {
           "confidence": null,
           "conflicts": [],
-          "value": 55000
+          "value": 55000.0
         }
       },
       {
@@ -3175,7 +3175,7 @@
         "usage_value": {
           "confidence": null,
           "conflicts": [],
-          "value": 55000
+          "value": 55000.0
         }
       }
     ],
@@ -3348,58 +3348,6 @@
         "workflow_group": "statement"
       },
       {
-        "final_field": "account_number",
-        "final_group": "statement",
-        "final_path": "/statement/account_number",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          1,
-          2
-        ],
-        "record_index": null,
-        "workflow_field": "account_number",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "account_number",
-        "final_group": "statement",
-        "final_path": "/statement/account_number",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          1,
-          2
-        ],
-        "record_index": null,
-        "workflow_field": "account_number",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "account_number",
-        "final_group": "statement",
-        "final_path": "/statement/account_number",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          2,
-          3
-        ],
-        "record_index": null,
-        "workflow_field": "account_number",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "account_number",
-        "final_group": "statement",
-        "final_path": "/statement/account_number",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          2,
-          3
-        ],
-        "record_index": null,
-        "workflow_field": "account_number",
-        "workflow_group": "statement"
-      },
-      {
         "final_field": "amount_due",
         "final_group": "statement",
         "final_path": "/statement/amount_due",
@@ -3527,58 +3475,6 @@
         "final_path": "/statement/amount_due",
         "output_source": "customChunkOutputs",
         "page_numbers": [
-          3
-        ],
-        "record_index": null,
-        "workflow_field": "amount_due",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "amount_due",
-        "final_group": "statement",
-        "final_path": "/statement/amount_due",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          1,
-          2
-        ],
-        "record_index": null,
-        "workflow_field": "amount_due",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "amount_due",
-        "final_group": "statement",
-        "final_path": "/statement/amount_due",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          1,
-          2
-        ],
-        "record_index": null,
-        "workflow_field": "amount_due",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "amount_due",
-        "final_group": "statement",
-        "final_path": "/statement/amount_due",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          2,
-          3
-        ],
-        "record_index": null,
-        "workflow_field": "amount_due",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "amount_due",
-        "final_group": "statement",
-        "final_path": "/statement/amount_due",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          2,
           3
         ],
         "record_index": null,
@@ -3720,58 +3616,6 @@
         "workflow_group": "statement"
       },
       {
-        "final_field": "amount_due_currency",
-        "final_group": "statement",
-        "final_path": "/statement/amount_due_currency",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          1,
-          2
-        ],
-        "record_index": null,
-        "workflow_field": "amount_due_currency",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "amount_due_currency",
-        "final_group": "statement",
-        "final_path": "/statement/amount_due_currency",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          1,
-          2
-        ],
-        "record_index": null,
-        "workflow_field": "amount_due_currency",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "amount_due_currency",
-        "final_group": "statement",
-        "final_path": "/statement/amount_due_currency",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          2,
-          3
-        ],
-        "record_index": null,
-        "workflow_field": "amount_due_currency",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "amount_due_currency",
-        "final_group": "statement",
-        "final_path": "/statement/amount_due_currency",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          2,
-          3
-        ],
-        "record_index": null,
-        "workflow_field": "amount_due_currency",
-        "workflow_group": "statement"
-      },
-      {
         "final_field": "due_date",
         "final_group": "statement",
         "final_path": "/statement/due_date",
@@ -3906,58 +3750,6 @@
         "workflow_group": "statement"
       },
       {
-        "final_field": "due_date",
-        "final_group": "statement",
-        "final_path": "/statement/due_date",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          1,
-          2
-        ],
-        "record_index": null,
-        "workflow_field": "due_date",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "due_date",
-        "final_group": "statement",
-        "final_path": "/statement/due_date",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          1,
-          2
-        ],
-        "record_index": null,
-        "workflow_field": "due_date",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "due_date",
-        "final_group": "statement",
-        "final_path": "/statement/due_date",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          2,
-          3
-        ],
-        "record_index": null,
-        "workflow_field": "due_date",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "due_date",
-        "final_group": "statement",
-        "final_path": "/statement/due_date",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          2,
-          3
-        ],
-        "record_index": null,
-        "workflow_field": "due_date",
-        "workflow_group": "statement"
-      },
-      {
         "final_field": "invoice_number",
         "final_group": "statement",
         "final_path": "/statement/invoice_number",
@@ -4085,58 +3877,6 @@
         "final_path": "/statement/invoice_number",
         "output_source": "customChunkOutputs",
         "page_numbers": [
-          3
-        ],
-        "record_index": null,
-        "workflow_field": "invoice_number",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "invoice_number",
-        "final_group": "statement",
-        "final_path": "/statement/invoice_number",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          1,
-          2
-        ],
-        "record_index": null,
-        "workflow_field": "invoice_number",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "invoice_number",
-        "final_group": "statement",
-        "final_path": "/statement/invoice_number",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          1,
-          2
-        ],
-        "record_index": null,
-        "workflow_field": "invoice_number",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "invoice_number",
-        "final_group": "statement",
-        "final_path": "/statement/invoice_number",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          2,
-          3
-        ],
-        "record_index": null,
-        "workflow_field": "invoice_number",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "invoice_number",
-        "final_group": "statement",
-        "final_path": "/statement/invoice_number",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          2,
           3
         ],
         "record_index": null,
@@ -4271,58 +4011,6 @@
         "final_path": "/statement/provider_name",
         "output_source": "customChunkOutputs",
         "page_numbers": [
-          3
-        ],
-        "record_index": null,
-        "workflow_field": "provider_name",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "provider_name",
-        "final_group": "statement",
-        "final_path": "/statement/provider_name",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          1,
-          2
-        ],
-        "record_index": null,
-        "workflow_field": "provider_name",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "provider_name",
-        "final_group": "statement",
-        "final_path": "/statement/provider_name",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          1,
-          2
-        ],
-        "record_index": null,
-        "workflow_field": "provider_name",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "provider_name",
-        "final_group": "statement",
-        "final_path": "/statement/provider_name",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          2,
-          3
-        ],
-        "record_index": null,
-        "workflow_field": "provider_name",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "provider_name",
-        "final_group": "statement",
-        "final_path": "/statement/provider_name",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          2,
           3
         ],
         "record_index": null,
@@ -4457,58 +4145,6 @@
         "final_path": "/statement/recipient_name",
         "output_source": "customChunkOutputs",
         "page_numbers": [
-          3
-        ],
-        "record_index": null,
-        "workflow_field": "recipient_name",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "recipient_name",
-        "final_group": "statement",
-        "final_path": "/statement/recipient_name",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          1,
-          2
-        ],
-        "record_index": null,
-        "workflow_field": "recipient_name",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "recipient_name",
-        "final_group": "statement",
-        "final_path": "/statement/recipient_name",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          1,
-          2
-        ],
-        "record_index": null,
-        "workflow_field": "recipient_name",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "recipient_name",
-        "final_group": "statement",
-        "final_path": "/statement/recipient_name",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          2,
-          3
-        ],
-        "record_index": null,
-        "workflow_field": "recipient_name",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "recipient_name",
-        "final_group": "statement",
-        "final_path": "/statement/recipient_name",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          2,
           3
         ],
         "record_index": null,
@@ -4643,58 +4279,6 @@
         "final_path": "/statement/source_modality",
         "output_source": "customChunkOutputs",
         "page_numbers": [
-          3
-        ],
-        "record_index": null,
-        "workflow_field": "source_modality",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "source_modality",
-        "final_group": "statement",
-        "final_path": "/statement/source_modality",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          1,
-          2
-        ],
-        "record_index": null,
-        "workflow_field": "source_modality",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "source_modality",
-        "final_group": "statement",
-        "final_path": "/statement/source_modality",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          1,
-          2
-        ],
-        "record_index": null,
-        "workflow_field": "source_modality",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "source_modality",
-        "final_group": "statement",
-        "final_path": "/statement/source_modality",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          2,
-          3
-        ],
-        "record_index": null,
-        "workflow_field": "source_modality",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "source_modality",
-        "final_group": "statement",
-        "final_path": "/statement/source_modality",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          2,
           3
         ],
         "record_index": null,
@@ -4829,58 +4413,6 @@
         "final_path": "/statement/statement_type",
         "output_source": "customChunkOutputs",
         "page_numbers": [
-          3
-        ],
-        "record_index": null,
-        "workflow_field": "statement_type",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "statement_type",
-        "final_group": "statement",
-        "final_path": "/statement/statement_type",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          1,
-          2
-        ],
-        "record_index": null,
-        "workflow_field": "statement_type",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "statement_type",
-        "final_group": "statement",
-        "final_path": "/statement/statement_type",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          1,
-          2
-        ],
-        "record_index": null,
-        "workflow_field": "statement_type",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "statement_type",
-        "final_group": "statement",
-        "final_path": "/statement/statement_type",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          2,
-          3
-        ],
-        "record_index": null,
-        "workflow_field": "statement_type",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "statement_type",
-        "final_group": "statement",
-        "final_path": "/statement/statement_type",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          2,
           3
         ],
         "record_index": null,
@@ -5015,58 +4547,6 @@
         "final_path": "/statement/service_address",
         "output_source": "customChunkOutputs",
         "page_numbers": [
-          3
-        ],
-        "record_index": null,
-        "workflow_field": "service_address",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "service_address",
-        "final_group": "statement",
-        "final_path": "/statement/service_address",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          1,
-          2
-        ],
-        "record_index": null,
-        "workflow_field": "service_address",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "service_address",
-        "final_group": "statement",
-        "final_path": "/statement/service_address",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          1,
-          2
-        ],
-        "record_index": null,
-        "workflow_field": "service_address",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "service_address",
-        "final_group": "statement",
-        "final_path": "/statement/service_address",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          2,
-          3
-        ],
-        "record_index": null,
-        "workflow_field": "service_address",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "service_address",
-        "final_group": "statement",
-        "final_path": "/statement/service_address",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          2,
           3
         ],
         "record_index": null,
@@ -5201,58 +4681,6 @@
         "final_path": "/statement/statement_date",
         "output_source": "customChunkOutputs",
         "page_numbers": [
-          3
-        ],
-        "record_index": null,
-        "workflow_field": "statement_date",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "statement_date",
-        "final_group": "statement",
-        "final_path": "/statement/statement_date",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          1,
-          2
-        ],
-        "record_index": null,
-        "workflow_field": "statement_date",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "statement_date",
-        "final_group": "statement",
-        "final_path": "/statement/statement_date",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          1,
-          2
-        ],
-        "record_index": null,
-        "workflow_field": "statement_date",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "statement_date",
-        "final_group": "statement",
-        "final_path": "/statement/statement_date",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          2,
-          3
-        ],
-        "record_index": null,
-        "workflow_field": "statement_date",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "statement_date",
-        "final_group": "statement",
-        "final_path": "/statement/statement_date",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          2,
           3
         ],
         "record_index": null,
@@ -5387,58 +4815,6 @@
         "final_path": "/statement/total_billing_amount",
         "output_source": "customChunkOutputs",
         "page_numbers": [
-          3
-        ],
-        "record_index": null,
-        "workflow_field": "total_billing_amount",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "total_billing_amount",
-        "final_group": "statement",
-        "final_path": "/statement/total_billing_amount",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          1,
-          2
-        ],
-        "record_index": null,
-        "workflow_field": "total_billing_amount",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "total_billing_amount",
-        "final_group": "statement",
-        "final_path": "/statement/total_billing_amount",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          1,
-          2
-        ],
-        "record_index": null,
-        "workflow_field": "total_billing_amount",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "total_billing_amount",
-        "final_group": "statement",
-        "final_path": "/statement/total_billing_amount",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          2,
-          3
-        ],
-        "record_index": null,
-        "workflow_field": "total_billing_amount",
-        "workflow_group": "statement"
-      },
-      {
-        "final_field": "total_billing_amount",
-        "final_group": "statement",
-        "final_path": "/statement/total_billing_amount",
-        "output_source": "customChunkOutputs",
-        "page_numbers": [
-          2,
           3
         ],
         "record_index": null,
@@ -5464,24 +4840,24 @@
       "value": 7613.2
     },
     "workflow_capture": {
-      "capture_config_hash": "1b9f1f89fefb71b003da4de119973456d2223403ec5bc53746fd53e5970f6422",
+      "capture_config_hash": "ae651a03a5af713614a8b87c7e33d5234b562631ca437854ab8a384ff67376ce",
       "capture_types": [
         "pipeline_trace",
         "prompt_capture"
       ],
       "case_id": "arcadia-legacy",
       "enabled": true,
-      "expires_at": "2026-07-22T19:46:34Z",
+      "expires_at": "2099-01-01T00:00:00Z",
       "max_artifacts": 500,
       "retention": {
-        "delete_after": "2026-07-29T13:46:34Z",
+        "delete_after": "2099-01-02T00:00:00Z",
         "owner": "private-extraction-certification"
       },
       "run_id": "extract-cert-arcadia-legacy-01",
       "schema_version": "extraction_pipeline_capture_v1",
-      "workflow_id": "958c6f48-1485-445e-b554-af8c145df46f"
+      "workflow_id": "arcadia_legacy-product-path"
     },
-    "workflow_id": "958c6f48-1485-445e-b554-af8c145df46f"
+    "workflow_id": "arcadia_legacy-product-path"
   },
   "summary": {
     "account_charge_count": 28,
@@ -8455,9 +7831,9 @@
     }
   },
   "workflow_identity": {
-    "workflow_id": "958c6f48-1485-445e-b554-af8c145df46f",
+    "workflow_id": "arcadia_legacy-product-path",
     "workflow_schema_hash": "b859b731ea3d23ad2f130681b1bd664c85209a44a9de653ad81a0f74a3a318be",
-    "workflow_version": "2026-07-22T13:46:35.542Z"
+    "workflow_version": "2026-07-12T22:34:00Z"
   },
   "workflow_metadata": {
     "agent_chain": [

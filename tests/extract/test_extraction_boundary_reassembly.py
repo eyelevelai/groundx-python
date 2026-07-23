@@ -27,7 +27,7 @@ BOUNDARY_ROOT = ROOT / "tests" / "extract" / "fixtures" / "extraction-boundary"
 BOUNDARY_INPUT_ROOT = BOUNDARY_ROOT / "inputs"
 BOUNDARY_GOLDENS_ROOT = BOUNDARY_ROOT / "boundary-goldens"
 CATALOG_PATH = ROOT / "tests" / "extract" / "fixtures" / "extraction-boundary" / "catalog.json"
-CATALOG_SHA256 = "57249eb92bbb7870659444dafc4d8896ed398566a526ad7802b87e9b92286883"
+CATALOG_SHA256 = "95acc2b8d0d9f0447bea153ed20e339615b6b1c3788f079990cf5eb3af9e7153"
 ADP_EXPECTED_SECTION_COUNT = 11
 ADP_EXPECTED_FIELD_COUNT = 159
 ADP_MIN_POPULATED_FIELDS = 100
@@ -52,10 +52,10 @@ def test_extraction_boundary_catalog_is_pinned() -> None:
 
     assert _sha256_file(CATALOG_PATH) == CATALOG_SHA256
     assert catalog["schema_version"] == "groundx_python_extraction_boundary_catalog_v1"
-    assert catalog["catalog_version"] == "2026-07-21.1"
+    assert catalog["catalog_version"] == "2026-07-23.1"
     assert catalog["surfaces"] == SURFACES
     assert catalog["source_artifact_catalog_sha256"] == (
-        "0590559c83c8074e717fdf9297a4e435807ab2df4deb708bb75de58cdad476c8"
+        "41e9ddc493a3f98b34e7576d6e792a70639d20ec0526cb795c6869c95061ef60"
     )
     assert catalog["artifacts"] == [
         {
@@ -694,6 +694,7 @@ def _write_reviewed_expected_output_sidecars(
             "kind": "machine_readable_json_diff",
             "reviewed_field_count_summary": dict(reviewed_field_count_summary),
             "source_artifact_sha256": source_sha,
+            "source_lineage": "repo_fixture",
             "source_run_id": source_run_id,
             "status": "passed",
             "surface": surface,
@@ -721,6 +722,7 @@ def _write_reviewed_expected_output_sidecars(
                 "reviewer_identity": "Benjamin Fletcher",
                 "reviewer_role": "product/engineering reviewer",
                 "source_path": str(source_path.relative_to(ROOT)),
+                "source_lineage": "repo_fixture",
                 "source_run_id": source_run_id,
                 "source_sha256": source_sha,
             },

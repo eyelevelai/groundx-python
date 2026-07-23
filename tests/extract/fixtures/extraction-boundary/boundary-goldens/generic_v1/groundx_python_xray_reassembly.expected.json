@@ -1,7 +1,7 @@
 {
   "artifacts": {
     "previous_download_workflow_load": {
-      "sha256": "1d7fad1a8f6d84a3df55060883b6f562a834e1493a21a412e861cb54ef739c0a"
+      "sha256": "40957dbf359561102dfdbe45fa5401c3ae8a49f6cf90da9347e6a15c59a40460"
     },
     "xray_sidecar": {
       "sha256": "790df496544843b523ec1591f5888f43fa259097e0b672d72b67ad60dc0abb7d"
@@ -14,7 +14,7 @@
     "shape_contract_passed": true
   },
   "input_from": "internal_arcadia_download_workflow_load",
-  "input_sha256": "1d7fad1a8f6d84a3df55060883b6f562a834e1493a21a412e861cb54ef739c0a",
+  "input_sha256": "40957dbf359561102dfdbe45fa5401c3ae8a49f6cf90da9347e6a15c59a40460",
   "output": {
     "diagnostic_count": 12,
     "final_output_sha256": "990dbbf78a6cc24f53866b4aa52846c24c7e85b09b15fca477fa9463b8efc534",
@@ -31,26 +31,26 @@
     "processor_id": 134,
     "task_id": "d5cce6cf-db79-4997-9f01-f78bfc990c0c",
     "workflow_capture": {
-      "capture_config_hash": "fb046bc305f31466d677a05064bfb2bd09db6bf250d619709b8a669926dfd1a0",
+      "capture_config_hash": "ac907b522b6647858e88707f7d89389f6216578888866e283df202c7b197736d",
       "capture_types": [
         "pipeline_trace",
         "prompt_capture"
       ],
       "case_id": "generic-v1",
       "enabled": true,
-      "expires_at": "2026-07-22T20:02:27Z",
+      "expires_at": "2099-01-01T00:00:00Z",
       "max_artifacts": 500,
       "retention": {
-        "delete_after": "2026-07-29T14:02:27Z",
+        "delete_after": "2099-01-02T00:00:00Z",
         "owner": "private-extraction-certification"
       },
       "run_id": "extract-cert-generic-v1-01",
       "schema_version": "extraction_pipeline_capture_v1",
-      "workflow_id": "96c82785-9fb8-4d74-848f-1f3ff6417711"
+      "workflow_id": "generic_v1-product-path"
     },
-    "workflow_id": "96c82785-9fb8-4d74-848f-1f3ff6417711",
+    "workflow_id": "generic_v1-product-path",
     "workflow_schema_hash": "66b0e276d5996122e278951cf52009cd5b9e2891dfff9f15c13bc21696edcf14",
-    "workflow_version": "2026-07-22T14:02:29.25Z"
+    "workflow_version": "2026-07-12T22:34:02Z"
   },
   "schema_version": "groundx-python-xray-reassembly-boundary-v1",
   "shape_assertions": {

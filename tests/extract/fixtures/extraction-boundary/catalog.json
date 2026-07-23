@@ -8,9 +8,9 @@
       "stage": "groundx_python_xray_reassembly"
     }
   ],
-  "catalog_version": "2026-07-21.1",
+  "catalog_version": "2026-07-23.1",
   "schema_version": "groundx_python_extraction_boundary_catalog_v1",
-  "source_artifact_catalog_sha256": "0590559c83c8074e717fdf9297a4e435807ab2df4deb708bb75de58cdad476c8",
+  "source_artifact_catalog_sha256": "41e9ddc493a3f98b34e7576d6e792a70639d20ec0526cb795c6869c95061ef60",
   "surfaces": [
     "arcadia_legacy",
     "arcadia_v1",

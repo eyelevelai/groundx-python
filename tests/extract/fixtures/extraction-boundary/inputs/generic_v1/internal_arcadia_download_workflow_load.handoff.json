@@ -4,7 +4,7 @@
   ],
   "artifacts": {
     "previous_extract_api_download_packet": {
-      "sha256": "aca40ec545c4027d4789bf918a7946a0ebc7bda11a5e2ef67c0cdf2093388ffa"
+      "sha256": "c95af26c9953acc8714d39f18dd7cd20be00eeda3747cef3fb6c34919bf21a3d"
     }
   },
   "assertions": {
@@ -67,7 +67,7 @@
         "generic_attr_23": "water",
         "generic_attr_24": "",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 42303,
+        "generic_attr_26": 42303.0,
         "generic_group_c": []
       },
       {
@@ -118,7 +118,7 @@
         "generic_attr_23": "water",
         "generic_attr_24": "Commercial Water",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 42303,
+        "generic_attr_26": 42303.0,
         "generic_group_c": []
       },
       {
@@ -135,7 +135,7 @@
         "generic_attr_23": "water",
         "generic_attr_24": "Commercial Water",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 40356,
+        "generic_attr_26": 40356.0,
         "generic_group_c": []
       },
       {
@@ -152,7 +152,7 @@
         "generic_attr_23": "water",
         "generic_attr_24": "Commercial Water",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 55000,
+        "generic_attr_26": 55000.0,
         "generic_group_c": []
       },
       {
@@ -169,7 +169,7 @@
         "generic_attr_23": "water",
         "generic_attr_24": "Commercial Water",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 96600,
+        "generic_attr_26": 96600.0,
         "generic_group_c": []
       },
       {
@@ -186,7 +186,7 @@
         "generic_attr_23": "electric",
         "generic_attr_24": "Industrial Energy Electric",
         "generic_attr_25": "kWh",
-        "generic_attr_26": 60960,
+        "generic_attr_26": 60960.0,
         "generic_group_c": []
       },
       {
@@ -203,7 +203,7 @@
         "generic_attr_23": "sewer",
         "generic_attr_24": "Commercial Sewer",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 42303,
+        "generic_attr_26": 42303.0,
         "generic_group_c": []
       },
       {
@@ -220,7 +220,7 @@
         "generic_attr_23": "water",
         "generic_attr_24": "Commercial Water",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 42303,
+        "generic_attr_26": 42303.0,
         "generic_group_c": []
       },
       {
@@ -237,7 +237,7 @@
         "generic_attr_23": "water",
         "generic_attr_24": "Commercial Water",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 42303,
+        "generic_attr_26": 42303.0,
         "generic_group_c": []
       },
       {
@@ -254,7 +254,7 @@
         "generic_attr_23": "water",
         "generic_attr_24": "Commercial Water",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 42303,
+        "generic_attr_26": 42303.0,
         "generic_group_c": []
       },
       {
@@ -271,7 +271,7 @@
         "generic_attr_23": "irrigation",
         "generic_attr_24": "Water Only",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 42303,
+        "generic_attr_26": 42303.0,
         "generic_group_c": []
       },
       {
@@ -322,7 +322,7 @@
         "generic_attr_23": "electric",
         "generic_attr_24": "Industrial Electric",
         "generic_attr_25": "kWh",
-        "generic_attr_26": 60960,
+        "generic_attr_26": 60960.0,
         "generic_group_c": []
       },
       {
@@ -339,7 +339,7 @@
         "generic_attr_23": "water",
         "generic_attr_24": "Commercial Water",
         "generic_attr_25": "gal",
-        "generic_attr_26": 42303,
+        "generic_attr_26": 42303.0,
         "generic_group_c": []
       },
       {
@@ -356,7 +356,7 @@
         "generic_attr_23": "sewer",
         "generic_attr_24": "Commercial Sewer",
         "generic_attr_25": "gal",
-        "generic_attr_26": 42303,
+        "generic_attr_26": 42303.0,
         "generic_group_c": []
       },
       {
@@ -373,7 +373,7 @@
         "generic_attr_23": "water",
         "generic_attr_24": "Commercial Water",
         "generic_attr_25": "gal",
-        "generic_attr_26": 40356,
+        "generic_attr_26": 40356.0,
         "generic_group_c": []
       },
       {
@@ -390,7 +390,7 @@
         "generic_attr_23": "sewer",
         "generic_attr_24": "Commercial Sewer",
         "generic_attr_25": "gal",
-        "generic_attr_26": 40356,
+        "generic_attr_26": 40356.0,
         "generic_group_c": []
       },
       {
@@ -407,7 +407,7 @@
         "generic_attr_23": "water",
         "generic_attr_24": "Commercial Water",
         "generic_attr_25": "gal",
-        "generic_attr_26": 96600,
+        "generic_attr_26": 96600.0,
         "generic_group_c": []
       },
       {
@@ -424,7 +424,7 @@
         "generic_attr_23": "sewer",
         "generic_attr_24": "Commercial Sewer",
         "generic_attr_25": "gal",
-        "generic_attr_26": 96600,
+        "generic_attr_26": 96600.0,
         "generic_group_c": []
       },
       {
@@ -441,7 +441,7 @@
         "generic_attr_23": "sewer",
         "generic_attr_24": "Commercial Sewer",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 40356,
+        "generic_attr_26": 40356.0,
         "generic_group_c": []
       },
       {
@@ -458,7 +458,7 @@
         "generic_attr_23": "sewer",
         "generic_attr_24": "Commercial Sewer",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 55000,
+        "generic_attr_26": 55000.0,
         "generic_group_c": []
       },
       {
@@ -475,7 +475,7 @@
         "generic_attr_23": "sewer",
         "generic_attr_24": "",
         "generic_attr_25": "gallons",
-        "generic_attr_26": 40356,
+        "generic_attr_26": 40356.0,
         "generic_group_c": []
       }
     ],
@@ -541,7 +541,7 @@
         "generic_attr_30": "Commercial Water"
       },
       {
-        "generic_attr_28": 55,
+        "generic_attr_28": 55.0,
         "generic_attr_29": "currency_dollars",
         "generic_attr_30": "Industrial Energy Electric"
       },
@@ -591,7 +591,7 @@
         "generic_attr_30": "City of Windom-Utilities"
       },
       {
-        "generic_attr_28": 654,
+        "generic_attr_28": 654.0,
         "generic_attr_29": "currency_dollars",
         "generic_attr_30": "City of Windom-Utilities"
       },
@@ -632,26 +632,26 @@
     "processor_id": 134,
     "task_id": "d5cce6cf-db79-4997-9f01-f78bfc990c0c",
     "workflow_capture": {
-      "capture_config_hash": "fb046bc305f31466d677a05064bfb2bd09db6bf250d619709b8a669926dfd1a0",
+      "capture_config_hash": "ac907b522b6647858e88707f7d89389f6216578888866e283df202c7b197736d",
       "capture_types": [
         "pipeline_trace",
         "prompt_capture"
       ],
       "case_id": "generic-v1",
       "enabled": true,
-      "expires_at": "2026-07-22T20:02:27Z",
+      "expires_at": "2099-01-01T00:00:00Z",
       "max_artifacts": 500,
       "retention": {
-        "delete_after": "2026-07-29T14:02:27Z",
+        "delete_after": "2099-01-02T00:00:00Z",
         "owner": "private-extraction-certification"
       },
       "run_id": "extract-cert-generic-v1-01",
       "schema_version": "extraction_pipeline_capture_v1",
-      "workflow_id": "96c82785-9fb8-4d74-848f-1f3ff6417711"
+      "workflow_id": "generic_v1-product-path"
     },
-    "workflow_id": "96c82785-9fb8-4d74-848f-1f3ff6417711",
+    "workflow_id": "generic_v1-product-path",
     "workflow_schema_hash": "66b0e276d5996122e278951cf52009cd5b9e2891dfff9f15c13bc21696edcf14",
-    "workflow_version": "2026-07-22T14:02:29.25Z"
+    "workflow_version": "2026-07-12T22:34:02Z"
   },
   "schema_version": "internal-arcadia-download-workflow-load-v1",
   "stage": "internal_arcadia_download_workflow_load",
@@ -1089,7 +1089,7 @@
         "generic_attr_28": {
           "confidence": null,
           "conflicts": [],
-          "value": 55
+          "value": 55.0
         },
         "generic_attr_29": {
           "confidence": null,
@@ -1424,7 +1424,7 @@
         "generic_attr_28": {
           "confidence": null,
           "conflicts": [],
-          "value": 654
+          "value": 654.0
         },
         "generic_attr_29": {
           "confidence": null,
@@ -1674,7 +1674,7 @@
         "generic_attr_26": {
           "confidence": null,
           "conflicts": [],
-          "value": 42303
+          "value": 42303.0
         },
         "generic_attr_27": {
           "confidence": null,
@@ -1805,7 +1805,7 @@
         "generic_attr_26": {
           "confidence": null,
           "conflicts": [],
-          "value": 42303
+          "value": 42303.0
         },
         "generic_attr_27": {
           "confidence": null,
@@ -1872,7 +1872,7 @@
         "generic_attr_26": {
           "confidence": null,
           "conflicts": [],
-          "value": 40356
+          "value": 40356.0
         },
         "generic_attr_27": {
           "confidence": null,
@@ -1939,7 +1939,7 @@
         "generic_attr_26": {
           "confidence": null,
           "conflicts": [],
-          "value": 55000
+          "value": 55000.0
         },
         "generic_attr_27": {
           "confidence": null,
@@ -2006,7 +2006,7 @@
         "generic_attr_26": {
           "confidence": null,
           "conflicts": [],
-          "value": 96600
+          "value": 96600.0
         },
         "generic_attr_27": {
           "confidence": null,
@@ -2073,7 +2073,7 @@
         "generic_attr_26": {
           "confidence": null,
           "conflicts": [],
-          "value": 60960
+          "value": 60960.0
         },
         "generic_attr_27": {
           "confidence": null,
@@ -2140,7 +2140,7 @@
         "generic_attr_26": {
           "confidence": null,
           "conflicts": [],
-          "value": 42303
+          "value": 42303.0
         },
         "generic_attr_27": {
           "confidence": null,
@@ -2207,7 +2207,7 @@
         "generic_attr_26": {
           "confidence": null,
           "conflicts": [],
-          "value": 42303
+          "value": 42303.0
         },
         "generic_attr_27": {
           "confidence": null,
@@ -2274,7 +2274,7 @@
         "generic_attr_26": {
           "confidence": null,
           "conflicts": [],
-          "value": 42303
+          "value": 42303.0
         },
         "generic_attr_27": {
           "confidence": null,
@@ -2341,7 +2341,7 @@
         "generic_attr_26": {
           "confidence": null,
           "conflicts": [],
-          "value": 42303
+          "value": 42303.0
         },
         "generic_attr_27": {
           "confidence": null,
@@ -2408,7 +2408,7 @@
         "generic_attr_26": {
           "confidence": null,
           "conflicts": [],
-          "value": 42303
+          "value": 42303.0
         },
         "generic_attr_27": {
           "confidence": null,
@@ -2554,7 +2554,7 @@
         "generic_attr_26": {
           "confidence": null,
           "conflicts": [],
-          "value": 60960
+          "value": 60960.0
         },
         "generic_attr_27": {
           "confidence": null,
@@ -2621,7 +2621,7 @@
         "generic_attr_26": {
           "confidence": null,
           "conflicts": [],
-          "value": 42303
+          "value": 42303.0
         },
         "generic_attr_27": {
           "confidence": null,
@@ -2688,7 +2688,7 @@
         "generic_attr_26": {
           "confidence": null,
           "conflicts": [],
-          "value": 42303
+          "value": 42303.0
         },
         "generic_attr_27": {
           "confidence": null,
@@ -2755,7 +2755,7 @@
         "generic_attr_26": {
           "confidence": null,
           "conflicts": [],
-          "value": 40356
+          "value": 40356.0
         },
         "generic_attr_27": {
           "confidence": null,
@@ -2822,7 +2822,7 @@
         "generic_attr_26": {
           "confidence": null,
           "conflicts": [],
-          "value": 40356
+          "value": 40356.0
         },
         "generic_attr_27": {
           "confidence": null,
@@ -2889,7 +2889,7 @@
         "generic_attr_26": {
           "confidence": null,
           "conflicts": [],
-          "value": 96600
+          "value": 96600.0
         },
         "generic_attr_27": {
           "confidence": null,
@@ -2956,7 +2956,7 @@
         "generic_attr_26": {
           "confidence": null,
           "conflicts": [],
-          "value": 96600
+          "value": 96600.0
         },
         "generic_attr_27": {
           "confidence": null,
@@ -3013,7 +3013,7 @@
         "generic_attr_26": {
           "confidence": null,
           "conflicts": [],
-          "value": 40356
+          "value": 40356.0
         },
         "generic_attr_27": {
           "confidence": null,
@@ -3070,7 +3070,7 @@
         "generic_attr_26": {
           "confidence": null,
           "conflicts": [],
-          "value": 55000
+          "value": 55000.0
         },
         "generic_attr_27": {
           "confidence": null,
@@ -3107,7 +3107,7 @@
         "generic_attr_26": {
           "confidence": null,
           "conflicts": [],
-          "value": 40356
+          "value": 40356.0
         },
         "generic_attr_27": {
           "confidence": null,
@@ -3132,24 +3132,24 @@
     "source_url": "https://upload.eyelevel.ai/prod/file/ssp/7e45e510-871e-4df5-b62e-1744eeed1a32.pdf",
     "task_id": "d5cce6cf-db79-4997-9f01-f78bfc990c0c",
     "workflow_capture": {
-      "capture_config_hash": "fb046bc305f31466d677a05064bfb2bd09db6bf250d619709b8a669926dfd1a0",
+      "capture_config_hash": "ac907b522b6647858e88707f7d89389f6216578888866e283df202c7b197736d",
       "capture_types": [
         "pipeline_trace",
         "prompt_capture"
       ],
       "case_id": "generic-v1",
       "enabled": true,
-      "expires_at": "2026-07-22T20:02:27Z",
+      "expires_at": "2099-01-01T00:00:00Z",
       "max_artifacts": 500,
       "retention": {
-        "delete_after": "2026-07-29T14:02:27Z",
+        "delete_after": "2099-01-02T00:00:00Z",
         "owner": "private-extraction-certification"
       },
       "run_id": "extract-cert-generic-v1-01",
       "schema_version": "extraction_pipeline_capture_v1",
-      "workflow_id": "96c82785-9fb8-4d74-848f-1f3ff6417711"
+      "workflow_id": "generic_v1-product-path"
     },
-    "workflow_id": "96c82785-9fb8-4d74-848f-1f3ff6417711"
+    "workflow_id": "generic_v1-product-path"
   },
   "summary": {
     "account_charge_count": 28,
@@ -6249,9 +6249,9 @@
     }
   },
   "workflow_identity": {
-    "workflow_id": "96c82785-9fb8-4d74-848f-1f3ff6417711",
+    "workflow_id": "generic_v1-product-path",
     "workflow_schema_hash": "66b0e276d5996122e278951cf52009cd5b9e2891dfff9f15c13bc21696edcf14",
-    "workflow_version": "2026-07-22T14:02:29.25Z"
+    "workflow_version": "2026-07-12T22:34:02Z"
   },
   "workflow_metadata": {
     "agent_chain": [
@@ -6872,6 +6872,9 @@
           "generic_attr_16",
           "generic_attr_17",
           "generic_attr_18"
+        ],
+        "service_type_attrs": [
+          "generic_attr_23"
         ]
       },
       "generic_group_c": {
