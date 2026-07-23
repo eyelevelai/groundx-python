@@ -27,7 +27,7 @@ BOUNDARY_ROOT = ROOT / "tests" / "extract" / "fixtures" / "extraction-boundary"
 BOUNDARY_INPUT_ROOT = BOUNDARY_ROOT / "inputs"
 BOUNDARY_GOLDENS_ROOT = BOUNDARY_ROOT / "boundary-goldens"
 CATALOG_PATH = ROOT / "tests" / "extract" / "fixtures" / "extraction-boundary" / "catalog.json"
-CATALOG_SHA256 = "a0a3dd5ea8d5232bd4ad17a804545c7ffd163993a8d4971e613b5b16f3bed10d"
+CATALOG_SHA256 = "57249eb92bbb7870659444dafc4d8896ed398566a526ad7802b87e9b92286883"
 ADP_EXPECTED_SECTION_COUNT = 11
 ADP_EXPECTED_FIELD_COUNT = 159
 ADP_MIN_POPULATED_FIELDS = 100
@@ -55,7 +55,7 @@ def test_extraction_boundary_catalog_is_pinned() -> None:
     assert catalog["catalog_version"] == "2026-07-21.1"
     assert catalog["surfaces"] == SURFACES
     assert catalog["source_artifact_catalog_sha256"] == (
-        "18cae158e9eec2321f01339c178d55652a67c013ff0b53e6314ba271e863e0cc"
+        "0590559c83c8074e717fdf9297a4e435807ab2df4deb708bb75de58cdad476c8"
     )
     assert catalog["artifacts"] == [
         {
@@ -308,6 +308,61 @@ def test_utility_shape_accepts_reviewed_account_charge_range(
     )
 
     assert assertions["has_expected_account_child_count"] is expected
+
+
+def test_utility_shape_assertions_follow_workflow_relationship_metadata() -> None:
+    parent_group = "customer_parent_records"
+    child_group = "customer_unmatched_children"
+    child_field = "customer_nested_children"
+    workflow_extract = {
+        "workflow": {
+            "output_relationships": [
+                {
+                    "parent_group": parent_group,
+                    "child_group": child_group,
+                    "parent_output_field": child_field,
+                }
+            ],
+            "output_routes": [
+                {"final_path": f"/customer_statement_field_{index}"}
+                for index in range(14)
+            ],
+        }
+    }
+    parents = [{child_field: []} for _unused in range(8)]
+    for index in range(24):
+        parents[index % len(parents)][child_field].append({"amount": index})
+    final_output: typing.Dict[str, typing.Any] = {
+        parent_group: parents,
+        child_group: [{"amount": "account-level"}],
+    }
+    final_output.update(
+        {f"customer_statement_field_{index}": index for index in range(14)}
+    )
+
+    final_assertions = _shape_assertions(
+        "generic_v1",
+        final_output,
+        diagnostics=[],
+        relationship_output={"relationships": []},
+        workflow_extract=workflow_extract,
+    )
+    xray_assertions = _xray_reassembly_shape_assertions(
+        "generic_v1",
+        final_output,
+        diagnostics=[],
+        relationship_output={"relationships": []},
+        workflow_extract=workflow_extract,
+    )
+
+    assert final_assertions["has_expected_parent_count"] is True
+    assert final_assertions["every_parent_has_child_rows"] is True
+    assert final_assertions["has_expected_meter_charge_count"] is True
+    assert final_assertions["has_expected_account_child_count"] is True
+    assert final_assertions["has_statement_fields"] is True
+    assert xray_assertions["has_minimum_parent_candidates"] is True
+    assert xray_assertions["has_minimum_total_child_candidates"] is True
+    assert xray_assertions["has_statement_fields"] is True
 
 
 def _write_boundary_artifacts(
@@ -798,7 +853,10 @@ def _shape_assertions(
         assertions.update(_adp_shape_assertions(final_output, workflow_extract or {}))
         return assertions
 
-    parent_group, child_group, child_field = _utility_groups(surface)
+    parent_group, child_group, child_field = _utility_groups(
+        surface,
+        workflow_extract=workflow_extract,
+    )
     parent_records = final_output.get(parent_group)
     account_children = final_output.get(child_group)
     assertions.update(
@@ -818,7 +876,13 @@ def _shape_assertions(
             and 22
             <= _nested_child_count(parent_records, child_field)
             <= 32,
-            "has_statement_fields": _statement_field_count(surface, final_output) >= 14,
+            "has_statement_fields": _statement_field_count(
+                surface,
+                final_output,
+                workflow_extract=workflow_extract,
+                utility_groups=(parent_group, child_group, child_field),
+            )
+            >= 14,
             "has_relationship_output": bool(relationship_output),
         }
     )
@@ -844,7 +908,10 @@ def _xray_reassembly_shape_assertions(
         )
         return assertions
 
-    parent_group, child_group, child_field = _utility_groups(surface)
+    parent_group, child_group, child_field = _utility_groups(
+        surface,
+        workflow_extract=workflow_extract,
+    )
     parent_records = final_output.get(parent_group)
     account_children = final_output.get(child_group)
     assertions.update(
@@ -857,7 +924,12 @@ def _xray_reassembly_shape_assertions(
             and _nested_child_count(parent_records, child_field)
             + len(account_children)
             >= 22,
-            "has_statement_fields": _statement_field_count(surface, final_output)
+            "has_statement_fields": _statement_field_count(
+                surface,
+                final_output,
+                workflow_extract=workflow_extract,
+                utility_groups=(parent_group, child_group, child_field),
+            )
             >= _minimum_xray_statement_fields(surface),
             "has_relationship_output": bool(relationship_output),
         }
@@ -1039,7 +1111,80 @@ def _pointer_parts(pointer: str) -> typing.Tuple[str, ...]:
     )
 
 
-def _utility_groups(surface: str) -> typing.Tuple[str, str, str]:
+_MISSING = object()
+
+
+def _workflow_definition(
+    workflow_extract: typing.Optional[typing.Mapping[str, typing.Any]],
+) -> typing.Mapping[str, typing.Any]:
+    if not isinstance(workflow_extract, typing.Mapping):
+        return {}
+    workflow = workflow_extract.get("workflow")
+    if isinstance(workflow, typing.Mapping):
+        return workflow
+    persisted = workflow_extract.get("_groundx_persisted_extract")
+    if isinstance(persisted, typing.Mapping):
+        workflow = persisted.get("workflow")
+        if isinstance(workflow, typing.Mapping):
+            return workflow
+    return workflow_extract
+
+
+def _workflow_output_relationships(
+    workflow_extract: typing.Optional[typing.Mapping[str, typing.Any]],
+) -> typing.Sequence[typing.Mapping[str, typing.Any]]:
+    workflow = _workflow_definition(workflow_extract)
+    relationships = workflow.get("output_relationships") or workflow.get(
+        "outputRelationships"
+    )
+    if not isinstance(relationships, list):
+        return ()
+    return tuple(
+        relationship
+        for relationship in relationships
+        if isinstance(relationship, typing.Mapping)
+    )
+
+
+def _relationship_string(
+    relationship: typing.Mapping[str, typing.Any],
+    *keys: str,
+) -> typing.Optional[str]:
+    for key in keys:
+        value = relationship.get(key)
+        if isinstance(value, str) and value:
+            return value
+    return None
+
+
+def _utility_groups(
+    surface: str,
+    *,
+    workflow_extract: typing.Optional[typing.Mapping[str, typing.Any]] = None,
+) -> typing.Tuple[str, str, str]:
+    for relationship in _workflow_output_relationships(workflow_extract):
+        parent_group = _relationship_string(
+            relationship,
+            "parent_group",
+            "parentGroup",
+        )
+        child_group = _relationship_string(
+            relationship,
+            "unmatched_child_group",
+            "unmatchedChildGroup",
+            "child_group",
+            "childGroup",
+        )
+        child_field = _relationship_string(
+            relationship,
+            "parent_output_field",
+            "parentOutputField",
+            "child_group",
+            "childGroup",
+        )
+        if parent_group and child_group and child_field:
+            return parent_group, child_group, child_field
+
     if surface == "generic_v1":
         return "generic_group_b", "generic_group_c", "generic_group_c"
     return "meters", "charges", "charges"
@@ -1048,7 +1193,17 @@ def _utility_groups(surface: str) -> typing.Tuple[str, str, str]:
 def _statement_field_count(
     surface: str,
     final_output: typing.Mapping[str, typing.Any],
+    *,
+    workflow_extract: typing.Optional[typing.Mapping[str, typing.Any]] = None,
+    utility_groups: typing.Optional[typing.Tuple[str, str, str]] = None,
 ) -> int:
+    workflow_count = _workflow_statement_field_count(
+        final_output,
+        workflow_extract,
+        utility_groups,
+    )
+    if workflow_count is not None:
+        return workflow_count
     if surface == "arcadia_legacy":
         statement = final_output.get("statement")
         return len(statement) if isinstance(statement, dict) else 0
@@ -1060,6 +1215,47 @@ def _statement_field_count(
         )
     excluded = {"meters", "charges"}
     return sum(1 for key in final_output if key not in excluded)
+
+
+def _workflow_statement_field_count(
+    final_output: typing.Mapping[str, typing.Any],
+    workflow_extract: typing.Optional[typing.Mapping[str, typing.Any]],
+    utility_groups: typing.Optional[typing.Tuple[str, str, str]],
+) -> typing.Optional[int]:
+    workflow = _workflow_definition(workflow_extract)
+    routes = workflow.get("output_routes") or workflow.get("outputRoutes")
+    if not isinstance(routes, list):
+        return None
+    excluded_groups = set(utility_groups[:2]) if utility_groups else set()
+    count = 0
+    seen: typing.Set[typing.Tuple[str, ...]] = set()
+    for route in routes:
+        if not isinstance(route, typing.Mapping):
+            continue
+        final_path = route.get("final_path")
+        if not isinstance(final_path, str):
+            continue
+        parts = _pointer_parts(final_path)
+        if not parts or parts[0] in excluded_groups:
+            continue
+        if parts in seen:
+            continue
+        if _value_at_path(final_output, parts) is not _MISSING:
+            seen.add(parts)
+            count += 1
+    return count
+
+
+def _value_at_path(
+    value: typing.Mapping[str, typing.Any],
+    parts: typing.Sequence[str],
+) -> typing.Any:
+    current: typing.Any = value
+    for part in parts:
+        if not isinstance(current, typing.Mapping) or part not in current:
+            return _MISSING
+        current = current[part]
+    return current
 
 
 def _minimum_xray_statement_fields(surface: str) -> int:

@@ -2,7 +2,7 @@
   "reviewed_expected_output": {
     "acceptance_reason": "Accepted as deterministic SDK X-Ray reassembly output from a passing hosted fixture-seeding run.",
     "accepted_actual_as_expected": true,
-    "artifact_catalog_sha256": "a0a3dd5ea8d5232bd4ad17a804545c7ffd163993a8d4971e613b5b16f3bed10d",
+    "artifact_catalog_sha256": "57249eb92bbb7870659444dafc4d8896ed398566a526ad7802b87e9b92286883",
     "artifact_catalog_version": "2026-07-21.1",
     "author_identity": "Codex",
     "diff_path": "tests/extract/fixtures/extraction-boundary/boundary-goldens/generic_v1/groundx_python_xray_reassembly.expected.diff.json",

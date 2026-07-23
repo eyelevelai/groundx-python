@@ -1,10 +1,10 @@
 {
   "artifacts": {
     "previous_download_workflow_load": {
-      "sha256": "e094dca38e0fa227eb99777a6dfe12b56d8bc590eecaa5725fbe5eee70894b53"
+      "sha256": "41ddf29927dfaea1b8f135f4fd080a7f863b5345a15d4ed608be87677db50e4a"
     },
     "xray_sidecar": {
-      "sha256": "e63e6b7530c10c613710f4fdfdbf1cb787b4e2b3b47f9c59feb872e771d098f8"
+      "sha256": "b29723c0a461d5327a224f0b980bb4a81b20d0974f2b5e7c8055506fcda7369d"
     }
   },
   "assertions": {
@@ -14,7 +14,7 @@
     "shape_contract_passed": true
   },
   "input_from": "internal_arcadia_download_workflow_load",
-  "input_sha256": "e094dca38e0fa227eb99777a6dfe12b56d8bc590eecaa5725fbe5eee70894b53",
+  "input_sha256": "41ddf29927dfaea1b8f135f4fd080a7f863b5345a15d4ed608be87677db50e4a",
   "output": {
     "diagnostic_count": 18,
     "final_output_sha256": "5be1da972066baf4013f95300b0f43d499f8e0ebc4618510719b22dbe2ffd81f",

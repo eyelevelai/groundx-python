@@ -1,31 +1,8 @@
 {
-  "schema_version": "groundx_python_xray_reassembly_sidecar_v1",
-  "surface": "arcadia_v1",
   "input_for": "groundx_python_xray_reassembly",
+  "schema_version": "groundx_python_xray_reassembly_sidecar_v1",
   "source_handoff": "internal_arcadia_download_workflow_load.handoff.json",
-  "xray_fixture": {
-    "kept_fields": [
-      "chunkId",
-      "chunk_id",
-      "customChunkOutputs",
-      "customDocumentOutputs",
-      "customSectionOutputs",
-      "custom_chunk_outputs",
-      "custom_document_outputs",
-      "custom_section_outputs",
-      "id",
-      "pageNumbers",
-      "page_numbers",
-      "section",
-      "sectionID",
-      "sectionId",
-      "section_id"
-    ],
-    "raw_xray_committed": false,
-    "sanitized_from_live_trace": true,
-    "source_case": "arcadia-v1",
-    "source_run_id": "live-20260722T001149Z-sdk388-cashbot-700-internal-a48-digest5d-trace-fixture-seeding-promptcapture"
-  },
+  "surface": "arcadia_v1",
   "xray": {
     "chunks": [
       {
@@ -5671,5 +5648,32 @@
         "pageNumber": 3
       }
     ]
+  },
+  "xray_fixture": {
+    "kept_fields": [
+      "chunkId",
+      "chunk_id",
+      "chunks",
+      "customChunkOutputs",
+      "customDocumentOutputs",
+      "customSectionOutputs",
+      "custom_chunk_outputs",
+      "custom_document_outputs",
+      "custom_section_outputs",
+      "documentPages",
+      "id",
+      "pageNumber",
+      "pageNumbers",
+      "page_number",
+      "page_numbers",
+      "section",
+      "sectionID",
+      "sectionId",
+      "section_id"
+    ],
+    "raw_xray_committed": false,
+    "sanitized_from_live_trace": true,
+    "source_case": "arcadia-v1",
+    "source_run_id": "live-20260722T001149Z-sdk388-cashbot-700-internal-a48-digest5d-trace-fixture-seeding-promptcapture"
   }
 }
