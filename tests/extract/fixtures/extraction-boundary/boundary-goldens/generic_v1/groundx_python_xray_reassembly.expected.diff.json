@@ -1,0 +1,21 @@
+{
+  "acceptance_reason": "Accepted as deterministic SDK X-Ray reassembly output from a passing hosted fixture-seeding run.",
+  "accepted_actual_as_expected": true,
+  "actual_sha256": "d0a08a450b70d14e74d54942536cc2b746b4727543b6388adefcdffa033263b0",
+  "artifact_catalog_sha256": "95acc2b8d0d9f0447bea153ed20e339615b6b1c3788f079990cf5eb3af9e7153",
+  "artifact_name": "groundx_python_xray_reassembly",
+  "expected_sha256": "d0a08a450b70d14e74d54942536cc2b746b4727543b6388adefcdffa033263b0",
+  "kind": "machine_readable_json_diff",
+  "reviewed_field_count_summary": {
+    "boundary": "groundx_python_xray_reassembly",
+    "input_from": "internal_arcadia_download_workflow_load",
+    "output_for": "sdk_reassembly_proof",
+    "stage": "groundx_python_xray_reassembly",
+    "surface": "generic_v1"
+  },
+  "source_artifact_sha256": "40957dbf359561102dfdbe45fa5401c3ae8a49f6cf90da9347e6a15c59a40460",
+  "source_lineage": "repo_fixture",
+  "source_run_id": "live-20260722T134446Z-sdk388-cashbot-82b-internal-6a5-digest026-trace-fixture-seeding",
+  "status": "passed",
+  "surface": "generic_v1"
+}

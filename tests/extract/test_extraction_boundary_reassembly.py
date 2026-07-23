@@ -3,6 +3,7 @@ import hashlib
 import json
 import os
 import pathlib
+import re
 import typing
 
 import pytest
@@ -26,7 +27,7 @@ BOUNDARY_ROOT = ROOT / "tests" / "extract" / "fixtures" / "extraction-boundary"
 BOUNDARY_INPUT_ROOT = BOUNDARY_ROOT / "inputs"
 BOUNDARY_GOLDENS_ROOT = BOUNDARY_ROOT / "boundary-goldens"
 CATALOG_PATH = ROOT / "tests" / "extract" / "fixtures" / "extraction-boundary" / "catalog.json"
-CATALOG_SHA256 = "b89277326221c65120e38ccb938bf30c4d619a16863cc10dfaae74d41fd0be5d"
+CATALOG_SHA256 = "95acc2b8d0d9f0447bea153ed20e339615b6b1c3788f079990cf5eb3af9e7153"
 ADP_EXPECTED_SECTION_COUNT = 11
 ADP_EXPECTED_FIELD_COUNT = 159
 ADP_MIN_POPULATED_FIELDS = 100
@@ -34,6 +35,7 @@ ADP_MAX_POPULATED_FIELDS = 159
 ADP_MIN_NULL_FIELDS = 0
 ADP_MAX_NULL_FIELDS = 59
 ADP_MIN_SECTION_POPULATED_RATIO = 0.6
+SOURCE_RUN_ID_RE = re.compile(r"live-\d{8}T\d{6}Z[^/\\\s\"]*")
 
 
 SURFACES = [
@@ -42,6 +44,7 @@ SURFACES = [
     "generic_v1",
     "adp_v1",
 ]
+REAL_BOUNDARY_SURFACES = tuple(SURFACES)
 
 
 def test_extraction_boundary_catalog_is_pinned() -> None:
@@ -49,10 +52,10 @@ def test_extraction_boundary_catalog_is_pinned() -> None:
 
     assert _sha256_file(CATALOG_PATH) == CATALOG_SHA256
     assert catalog["schema_version"] == "groundx_python_extraction_boundary_catalog_v1"
-    assert catalog["catalog_version"] == "2026-07-21.1"
+    assert catalog["catalog_version"] == "2026-07-23.1"
     assert catalog["surfaces"] == SURFACES
     assert catalog["source_artifact_catalog_sha256"] == (
-        "3267ea15081fdafcb56e0986350e35a843dbfcc23e37fee401b3a9fc05a6c509"
+        "41e9ddc493a3f98b34e7576d6e792a70639d20ec0526cb795c6869c95061ef60"
     )
     assert catalog["artifacts"] == [
         {
@@ -119,6 +122,55 @@ def test_sdk_reassembly_expected_answer_projection_diagnostic_packets(
         _write_json(diff_path, diff)
 
 
+@pytest.mark.parametrize("surface", REAL_BOUNDARY_SURFACES)
+def test_sdk_xray_reassembly_real_boundary_packets(
+    tmp_path: pathlib.Path,
+    surface: str,
+) -> None:
+    actual, expected_path, diff_path = _write_xray_reassembly_boundary_artifact(
+        tmp_path,
+        surface,
+    )
+    expected = _stable_boundary_output(actual)
+    update_goldens = os.environ.get(UPDATE_GOLDENS_ENV) == "1"
+    if update_goldens:
+        _write_json(expected_path, expected)
+        _write_reviewed_expected_output_sidecars(
+            surface=surface,
+            packet_path=expected_path,
+            source_path=_real_download_workflow_load_input_path(surface),
+            reviewed_field_count_summary={
+                "boundary": "groundx_python_xray_reassembly",
+                "surface": surface,
+                "stage": "groundx_python_xray_reassembly",
+                "input_from": "internal_arcadia_download_workflow_load",
+                "output_for": "sdk_reassembly_proof",
+            },
+        )
+
+    golden = _read_json(expected_path)
+    diff: typing.Dict[str, typing.Any] = {
+        "kind": "machine_readable_json_diff",
+        "status": "passed",
+    }
+    if golden != expected:
+        diff = {
+            "kind": "machine_readable_json_diff",
+            "status": "failed",
+            "expected": golden,
+            "actual": expected,
+        }
+        _write_json(diff_path, diff)
+        pytest.fail(
+            "SDK X-Ray reassembly real boundary proof drifted for "
+            f"{surface}; run {UPDATE_GOLDENS_ENV}=1 PYTHONPATH=src pytest "
+            "tests/extract/test_extraction_boundary_reassembly.py -q if "
+            "this contract change is intended"
+            )
+    _write_json(diff_path, diff)
+    _assert_reviewed_expected_output_sidecar(expected_path)
+
+
 def test_projection_fixtures_are_diagnostic_only() -> None:
     for fixture_path in DIAGNOSTIC_ROOT.glob("**/*.json"):
         fixture = _read_json(fixture_path)
@@ -144,7 +196,7 @@ def test_boundary_inputs_are_repo_local() -> None:
 
 def test_sdk_reassembly_diagnostic_consumes_projection_input() -> None:
     for surface in SURFACES:
-        previous_path = _previous_boundary_input_path(surface)
+        previous_path = _diagnostic_previous_boundary_input_path(surface)
         assert previous_path == (
             DIAGNOSTIC_INPUT_ROOT
             / surface
@@ -258,6 +310,63 @@ def test_utility_shape_accepts_reviewed_account_charge_range(
     assert assertions["has_expected_account_child_count"] is expected
 
 
+def test_utility_shape_assertions_follow_workflow_relationship_metadata() -> None:
+    parent_group = "customer_parent_records"
+    child_group = "customer_unmatched_children"
+    child_field = "customer_nested_children"
+    workflow_extract = {
+        "workflow": {
+            "output_relationships": [
+                {
+                    "parent_group": parent_group,
+                    "child_group": child_group,
+                    "parent_output_field": child_field,
+                }
+            ],
+            "output_routes": [
+                {"final_path": f"/customer_statement_field_{index}"}
+                for index in range(14)
+            ],
+        }
+    }
+    parents: typing.List[typing.Dict[str, typing.Any]] = [
+        {child_field: []} for _unused in range(8)
+    ]
+    for index in range(24):
+        parents[index % len(parents)][child_field].append({"amount": index})
+    final_output: typing.Dict[str, typing.Any] = {
+        parent_group: parents,
+        child_group: [{"amount": "account-level"}],
+    }
+    final_output.update(
+        {f"customer_statement_field_{index}": index for index in range(14)}
+    )
+
+    final_assertions = _shape_assertions(
+        "generic_v1",
+        final_output,
+        diagnostics=[],
+        relationship_output={"relationships": []},
+        workflow_extract=workflow_extract,
+    )
+    xray_assertions = _xray_reassembly_shape_assertions(
+        "generic_v1",
+        final_output,
+        diagnostics=[],
+        relationship_output={"relationships": []},
+        workflow_extract=workflow_extract,
+    )
+
+    assert final_assertions["has_expected_parent_count"] is True
+    assert final_assertions["every_parent_has_child_rows"] is True
+    assert final_assertions["has_expected_meter_charge_count"] is True
+    assert final_assertions["has_expected_account_child_count"] is True
+    assert final_assertions["has_statement_fields"] is True
+    assert xray_assertions["has_minimum_parent_candidates"] is True
+    assert xray_assertions["has_minimum_total_child_candidates"] is True
+    assert xray_assertions["has_statement_fields"] is True
+
+
 def _write_boundary_artifacts(
     tmp_path: pathlib.Path,
     surface: str,
@@ -270,7 +379,7 @@ def _write_boundary_artifacts(
     pathlib.Path,
 ]:
     out_dir = tmp_path / surface
-    previous_path = _previous_boundary_input_path(surface)
+    previous_path = _diagnostic_previous_boundary_input_path(surface)
     previous = _read_json(previous_path)
     result = reassemble_custom_outputs_from_xray(
         previous["xray"],
@@ -385,8 +494,271 @@ def _write_boundary_artifacts(
     return actual, actual_path, expected_path, diff_path, previous_path, handoff_path
 
 
-def _previous_boundary_input_path(surface: str) -> pathlib.Path:
+def _diagnostic_previous_boundary_input_path(surface: str) -> pathlib.Path:
     return DIAGNOSTIC_INPUT_ROOT / surface / "internal_arcadia_extract_chain.handoff.json"
+
+
+def _real_download_workflow_load_input_path(surface: str) -> pathlib.Path:
+    return (
+        BOUNDARY_INPUT_ROOT
+        / surface
+        / "internal_arcadia_download_workflow_load.handoff.json"
+    )
+
+
+def _real_xray_sidecar_path(surface: str) -> pathlib.Path:
+    return (
+        BOUNDARY_INPUT_ROOT
+        / surface
+        / "groundx_python_xray_reassembly.xray.json"
+    )
+
+
+def _source_run_id_for_surface(
+    surface: str,
+    source_packet: typing.Any,
+) -> str:
+    candidates = _source_run_ids(source_packet)
+    xray_sidecar_path = _real_xray_sidecar_path(surface)
+    if xray_sidecar_path.exists():
+        candidates.update(_source_run_ids(_read_json(xray_sidecar_path)))
+    assert candidates, f"no live source run id found for {surface}"
+    assert len(candidates) == 1, f"ambiguous source run ids for {surface}: {candidates}"
+    return next(iter(candidates))
+
+
+def _source_run_ids(value: typing.Any) -> typing.Set[str]:
+    if isinstance(value, dict):
+        candidates: typing.Set[str] = set()
+        for item in value.values():
+            candidates.update(_source_run_ids(item))
+        return candidates
+    if isinstance(value, list):
+        candidates = set()
+        for item in value:
+            candidates.update(_source_run_ids(item))
+        return candidates
+    if isinstance(value, str):
+        return set(SOURCE_RUN_ID_RE.findall(value))
+    return set()
+
+
+def _write_xray_reassembly_boundary_artifact(
+    tmp_path: pathlib.Path,
+    surface: str,
+) -> typing.Tuple[typing.Dict[str, typing.Any], pathlib.Path, pathlib.Path]:
+    out_dir = tmp_path / surface
+    previous_path = _real_download_workflow_load_input_path(surface)
+    xray_path = _real_xray_sidecar_path(surface)
+    previous = _read_json(previous_path)
+    if xray_path.exists():
+        xray_sidecar = _read_json(xray_path)
+        xray_payload = xray_sidecar["xray"]
+    else:
+        xray_sidecar = None
+        xray_payload = previous["xray"]
+    result = reassemble_custom_outputs_from_xray(
+        xray_payload,
+        workflow_extract=previous["workflow_extract"],
+    )
+    diagnostics = [
+        {
+            "child_record_index": diagnostic.child_record_index,
+            "code": diagnostic.code,
+            "final_path": diagnostic.final_path,
+            "message": diagnostic.message,
+            "relationship": diagnostic.relationship,
+            "severity": diagnostic.severity,
+            "workflow_field": diagnostic.workflow_field,
+            "workflow_group": diagnostic.workflow_group,
+        }
+        for diagnostic in result.diagnostics
+    ]
+    source_provenance = [
+        {
+            "final_path": provenance.final_path,
+            "output_source": provenance.output_source,
+            "page_numbers": list(provenance.page_numbers),
+            "record_index": provenance.record_index,
+            "workflow_field": provenance.workflow_field,
+            "workflow_group": provenance.workflow_group,
+        }
+        for provenance in result.source_provenance
+    ]
+    final_output = copy.deepcopy(result.final_output)
+    assertions = _xray_reassembly_shape_assertions(
+        surface,
+        final_output,
+        diagnostics,
+        result.relationship_output,
+        workflow_extract=previous["workflow_extract"],
+    )
+    actual = {
+        "schema_version": "groundx-python-xray-reassembly-boundary-v1",
+        "surface": surface,
+        "stage": "groundx_python_xray_reassembly",
+        "input_from": "internal_arcadia_download_workflow_load",
+        "output_for": "sdk_reassembly_proof",
+        "workflow_schema_hash": _workflow_schema_hash(previous),
+        "request": previous["request"],
+        "input_sha256": _sha256_file(previous_path),
+        "output": {
+            "diagnostic_count": len(diagnostics),
+            "final_output_sha256": _sha256_json(final_output),
+            "relationship_output_sha256": _sha256_json(result.relationship_output),
+            "source_provenance_count": len(source_provenance),
+            "workflow_output_sha256": _sha256_json(result.workflow_output),
+        },
+        "shape_assertions": assertions,
+        "artifacts": {
+            "previous_download_workflow_load": {
+                "path": str(previous_path),
+                "sha256": _sha256_file(previous_path),
+            },
+        },
+        "assertions": {
+            "consumes_download_workflow_load_handoff": previous["stage"]
+            == "internal_arcadia_download_workflow_load",
+            "has_no_error_diagnostics": assertions["has_no_error_diagnostics"],
+            "shape_contract_passed": all(assertions.values()),
+        },
+    }
+    if xray_sidecar is not None:
+        actual["artifacts"]["xray_sidecar"] = {
+            "path": str(xray_path),
+            "sha256": _sha256_file(xray_path),
+        }
+        actual["assertions"]["consumes_real_xray_sidecar"] = (
+            xray_sidecar["schema_version"]
+            == "groundx_python_xray_reassembly_sidecar_v1"
+        )
+    assert actual["assertions"]["consumes_download_workflow_load_handoff"]
+    if xray_sidecar is not None:
+        assert actual["assertions"]["consumes_real_xray_sidecar"]
+    assert actual["assertions"]["has_no_error_diagnostics"]
+    assert actual["assertions"]["shape_contract_passed"]
+    _assert_no_synthetic_protected_marker(previous)
+    if xray_sidecar is not None:
+        _assert_no_synthetic_protected_marker(xray_sidecar)
+    _assert_no_synthetic_protected_marker(actual)
+
+    expected_path = (
+        BOUNDARY_GOLDENS_ROOT / surface / "groundx_python_xray_reassembly.expected.json"
+    )
+    diff_path = out_dir / "groundx_python_xray_reassembly.diff.json"
+    return actual, expected_path, diff_path
+
+
+def _workflow_schema_hash(previous: typing.Mapping[str, typing.Any]) -> str:
+    value = previous.get("workflow_schema_hash")
+    if isinstance(value, str) and value:
+        return value
+    workflow_identity = previous.get("workflow_identity")
+    if isinstance(workflow_identity, typing.Mapping):
+        value = workflow_identity.get("workflow_schema_hash")
+        if isinstance(value, str) and value:
+            return value
+    raise KeyError("workflow_schema_hash")
+
+
+def _write_reviewed_expected_output_sidecars(
+    *,
+    surface: str,
+    packet_path: pathlib.Path,
+    source_path: pathlib.Path,
+    reviewed_field_count_summary: typing.Mapping[str, typing.Any],
+) -> None:
+    packet_sha = _sha256_file(packet_path)
+    source_sha = _sha256_file(source_path)
+    catalog = _read_json(CATALOG_PATH)
+    source_packet = _read_json(source_path)
+    source_run_id = _source_run_id_for_surface(surface, source_packet)
+    diff_path = packet_path.with_name(
+        packet_path.name.replace(".expected.json", ".expected.diff.json")
+    )
+    review_path = packet_path.with_name(
+        packet_path.name.replace(".expected.json", ".expected.review.json")
+    )
+    _write_json(
+        diff_path,
+        {
+            "accepted_actual_as_expected": True,
+            "acceptance_reason": (
+                "Accepted as deterministic SDK X-Ray reassembly output from "
+                "a passing hosted fixture-seeding run."
+            ),
+            "actual_sha256": packet_sha,
+            "artifact_catalog_sha256": _sha256_file(CATALOG_PATH),
+            "artifact_name": "groundx_python_xray_reassembly",
+            "expected_sha256": packet_sha,
+            "kind": "machine_readable_json_diff",
+            "reviewed_field_count_summary": dict(reviewed_field_count_summary),
+            "source_artifact_sha256": source_sha,
+            "source_lineage": "repo_fixture",
+            "source_run_id": source_run_id,
+            "status": "passed",
+            "surface": surface,
+        },
+    )
+    _write_json(
+        review_path,
+        {
+            "reviewed_expected_output": {
+                "accepted_actual_as_expected": True,
+                "acceptance_reason": (
+                    "Accepted as deterministic SDK X-Ray reassembly output "
+                    "from a passing hosted fixture-seeding run."
+                ),
+                "artifact_catalog_sha256": _sha256_file(CATALOG_PATH),
+                "artifact_catalog_version": catalog["catalog_version"],
+                "author_identity": "Codex",
+                "diff_path": str(diff_path.relative_to(ROOT)),
+                "diff_status": "passed",
+                "expected_path": str(packet_path.relative_to(ROOT)),
+                "expected_sha256": packet_sha,
+                "packet_sha256": packet_sha,
+                "reviewed_at": "2026-07-21T22:12:08.864Z",
+                "reviewed_field_count_summary": dict(reviewed_field_count_summary),
+                "reviewer_identity": "Benjamin Fletcher",
+                "reviewer_role": "product/engineering reviewer",
+                "source_path": str(source_path.relative_to(ROOT)),
+                "source_lineage": "repo_fixture",
+                "source_run_id": source_run_id,
+                "source_sha256": source_sha,
+            },
+        },
+    )
+
+
+def _assert_reviewed_expected_output_sidecar(packet_path: pathlib.Path) -> None:
+    review_path = packet_path.with_name(
+        packet_path.name.replace(".expected.json", ".expected.review.json")
+    )
+    diff_path = packet_path.with_name(
+        packet_path.name.replace(".expected.json", ".expected.diff.json")
+    )
+    review = _read_json(review_path)
+    catalog = _read_json(CATALOG_PATH)
+    evidence = review["reviewed_expected_output"]
+    assert evidence["artifact_catalog_sha256"] == _sha256_file(CATALOG_PATH)
+    assert evidence["artifact_catalog_version"] == catalog["catalog_version"]
+    assert evidence["packet_sha256"] == _sha256_file(packet_path)
+    assert evidence["expected_sha256"] == _sha256_file(packet_path)
+    assert evidence["expected_path"] == str(packet_path.relative_to(ROOT))
+    assert evidence["diff_path"] == str(diff_path.relative_to(ROOT))
+    assert evidence["diff_status"] == "passed"
+    assert evidence["reviewer_identity"] != evidence["author_identity"]
+    source_path = ROOT / evidence["source_path"]
+    assert source_path.exists()
+    assert evidence["source_sha256"] == _sha256_file(source_path)
+    assert evidence["source_run_id"] == _source_run_id_for_surface(
+        packet_path.parent.name,
+        _read_json(source_path),
+    )
+    diff = _read_json(diff_path)
+    assert diff["status"] == "passed"
+    assert diff["actual_sha256"] == _sha256_file(packet_path)
+    assert diff["expected_sha256"] == _sha256_file(packet_path)
 
 
 def _inherited_evidence(previous: typing.Mapping[str, typing.Any]) -> typing.Dict[str, typing.Any]:
@@ -485,7 +857,10 @@ def _shape_assertions(
         assertions.update(_adp_shape_assertions(final_output, workflow_extract or {}))
         return assertions
 
-    parent_group, child_group, child_field = _utility_groups(surface)
+    parent_group, child_group, child_field = _utility_groups(
+        surface,
+        workflow_extract=workflow_extract,
+    )
     parent_records = final_output.get(parent_group)
     account_children = final_output.get(child_group)
     assertions.update(
@@ -505,11 +880,124 @@ def _shape_assertions(
             and 22
             <= _nested_child_count(parent_records, child_field)
             <= 32,
-            "has_statement_fields": _statement_field_count(surface, final_output) >= 14,
+            "has_statement_fields": _statement_field_count(
+                surface,
+                final_output,
+                workflow_extract=workflow_extract,
+                utility_groups=(parent_group, child_group, child_field),
+            )
+            >= 14,
             "has_relationship_output": bool(relationship_output),
         }
     )
     return assertions
+
+
+def _xray_reassembly_shape_assertions(
+    surface: str,
+    final_output: typing.Mapping[str, typing.Any],
+    diagnostics: typing.Sequence[typing.Mapping[str, typing.Any]],
+    relationship_output: typing.Any,
+    *,
+    workflow_extract: typing.Optional[typing.Mapping[str, typing.Any]] = None,
+) -> typing.Dict[str, bool]:
+    assertions = {
+        "has_no_error_diagnostics": not any(
+            diagnostic.get("severity") == "error" for diagnostic in diagnostics
+        )
+    }
+    if surface == "adp_v1":
+        assertions.update(
+            _adp_xray_reassembly_shape_assertions(final_output, workflow_extract or {})
+        )
+        return assertions
+
+    parent_group, child_group, child_field = _utility_groups(
+        surface,
+        workflow_extract=workflow_extract,
+    )
+    parent_records = final_output.get(parent_group)
+    account_children = final_output.get(child_group)
+    assertions.update(
+        {
+            "has_minimum_parent_candidates": isinstance(parent_records, list)
+            and len(parent_records) >= 7,
+            "has_account_child_candidates": isinstance(account_children, list),
+            "has_minimum_total_child_candidates": isinstance(parent_records, list)
+            and isinstance(account_children, list)
+            and _nested_child_count(parent_records, child_field)
+            + len(account_children)
+            >= 22,
+            "has_statement_fields": _statement_field_count(
+                surface,
+                final_output,
+                workflow_extract=workflow_extract,
+                utility_groups=(parent_group, child_group, child_field),
+            )
+            >= _minimum_xray_statement_fields(surface),
+            "has_relationship_output": bool(relationship_output),
+        }
+    )
+    return assertions
+
+
+def _adp_xray_reassembly_shape_assertions(
+    final_output: typing.Mapping[str, typing.Any],
+    workflow_extract: typing.Mapping[str, typing.Any],
+) -> typing.Dict[str, bool]:
+    expected_sections = _adp_expected_sections(workflow_extract)
+    actual_sections = {
+        str(section_name)
+        for section_name, section_value in final_output.items()
+        if isinstance(section_value, typing.Mapping)
+    }
+    actual_fields = {
+        f"{section_name}.{field_name}"
+        for section_name, section_value in final_output.items()
+        if isinstance(section_value, typing.Mapping)
+        for field_name in section_value
+        if not str(field_name).startswith("_")
+    }
+    expected_fields = {
+        f"{section_name}.{field_name}"
+        for section_name, fields in expected_sections.items()
+        for field_name in fields
+    }
+
+    populated_field_count = 0
+    ratio_failures: typing.List[str] = []
+    for section_name, fields in expected_sections.items():
+        section_value = final_output.get(section_name)
+        if not isinstance(section_value, typing.Mapping):
+            ratio_failures.append(section_name)
+            continue
+        ratio_fields = _adp_section_ratio_fields(fields)
+        ratio_populated = 0
+        for field_name in fields:
+            if _has_extracted_value(section_value.get(field_name)):
+                populated_field_count += 1
+                if field_name in ratio_fields:
+                    ratio_populated += 1
+        ratio = ratio_populated / len(ratio_fields) if ratio_fields else 1.0
+        if ratio < ADP_MIN_SECTION_POPULATED_RATIO:
+            ratio_failures.append(section_name)
+
+    null_or_blank_count = len(expected_fields) - populated_field_count
+    return {
+        "has_expected_adp_section_count": len(expected_sections)
+        == ADP_EXPECTED_SECTION_COUNT
+        and actual_sections == set(expected_sections),
+        "has_expected_adp_workflow_field_count": len(expected_fields)
+        == ADP_EXPECTED_FIELD_COUNT,
+        "has_no_unexpected_adp_fields": actual_fields <= expected_fields,
+        "has_adp_populated_fields_in_range": ADP_MIN_POPULATED_FIELDS
+        <= populated_field_count
+        <= ADP_MAX_POPULATED_FIELDS,
+        "has_adp_null_fields_in_range": ADP_MIN_NULL_FIELDS
+        <= null_or_blank_count
+        <= ADP_MAX_NULL_FIELDS,
+        "has_adp_core_fields_populated_by_section": not ratio_failures,
+    }
 
 
 def _adp_shape_assertions(
@@ -627,7 +1115,80 @@ def _pointer_parts(pointer: str) -> typing.Tuple[str, ...]:
     )
 
 
-def _utility_groups(surface: str) -> typing.Tuple[str, str, str]:
+_MISSING = object()
+
+
+def _workflow_definition(
+    workflow_extract: typing.Optional[typing.Mapping[str, typing.Any]],
+) -> typing.Mapping[str, typing.Any]:
+    if not isinstance(workflow_extract, typing.Mapping):
+        return {}
+    workflow = workflow_extract.get("workflow")
+    if isinstance(workflow, typing.Mapping):
+        return workflow
+    persisted = workflow_extract.get("_groundx_persisted_extract")
+    if isinstance(persisted, typing.Mapping):
+        workflow = persisted.get("workflow")
+        if isinstance(workflow, typing.Mapping):
+            return workflow
+    return workflow_extract
+
+
+def _workflow_output_relationships(
+    workflow_extract: typing.Optional[typing.Mapping[str, typing.Any]],
+) -> typing.Sequence[typing.Mapping[str, typing.Any]]:
+    workflow = _workflow_definition(workflow_extract)
+    relationships = workflow.get("output_relationships") or workflow.get(
+        "outputRelationships"
+    )
+    if not isinstance(relationships, list):
+        return ()
+    return tuple(
+        relationship
+        for relationship in relationships
+        if isinstance(relationship, typing.Mapping)
+    )
+
+
+def _relationship_string(
+    relationship: typing.Mapping[str, typing.Any],
+    *keys: str,
+) -> typing.Optional[str]:
+    for key in keys:
+        value = relationship.get(key)
+        if isinstance(value, str) and value:
+            return value
+    return None
+
+
+def _utility_groups(
+    surface: str,
+    *,
+    workflow_extract: typing.Optional[typing.Mapping[str, typing.Any]] = None,
+) -> typing.Tuple[str, str, str]:
+    for relationship in _workflow_output_relationships(workflow_extract):
+        parent_group = _relationship_string(
+            relationship,
+            "parent_group",
+            "parentGroup",
+        )
+        child_group = _relationship_string(
+            relationship,
+            "unmatched_child_group",
+            "unmatchedChildGroup",
+            "child_group",
+            "childGroup",
+        )
+        child_field = _relationship_string(
+            relationship,
+            "parent_output_field",
+            "parentOutputField",
+            "child_group",
+            "childGroup",
+        )
+        if parent_group and child_group and child_field:
+            return parent_group, child_group, child_field
+
     if surface == "generic_v1":
         return "generic_group_b", "generic_group_c", "generic_group_c"
     return "meters", "charges", "charges"
@@ -636,7 +1197,17 @@ def _utility_groups(surface: str) -> typing.Tuple[str, str, str]:
 def _statement_field_count(
     surface: str,
     final_output: typing.Mapping[str, typing.Any],
+    *,
+    workflow_extract: typing.Optional[typing.Mapping[str, typing.Any]] = None,
+    utility_groups: typing.Optional[typing.Tuple[str, str, str]] = None,
 ) -> int:
+    workflow_count = _workflow_statement_field_count(
+        final_output,
+        workflow_extract,
+        utility_groups,
+    )
+    if workflow_count is not None:
+        return workflow_count
     if surface == "arcadia_legacy":
         statement = final_output.get("statement")
         return len(statement) if isinstance(statement, dict) else 0
@@ -648,6 +1219,55 @@ def _statement_field_count(
         )
     excluded = {"meters", "charges"}
     return sum(1 for key in final_output if key not in excluded)
+
+
+def _workflow_statement_field_count(
+    final_output: typing.Mapping[str, typing.Any],
+    workflow_extract: typing.Optional[typing.Mapping[str, typing.Any]],
+    utility_groups: typing.Optional[typing.Tuple[str, str, str]],
+) -> typing.Optional[int]:
+    workflow = _workflow_definition(workflow_extract)
+    routes = workflow.get("output_routes") or workflow.get("outputRoutes")
+    if not isinstance(routes, list):
+        return None
+    excluded_groups = set(utility_groups[:2]) if utility_groups else set()
+    count = 0
+    seen: typing.Set[typing.Tuple[str, ...]] = set()
+    for route in routes:
+        if not isinstance(route, typing.Mapping):
+            continue
+        final_path = route.get("final_path")
+        if not isinstance(final_path, str):
+            continue
+        parts = _pointer_parts(final_path)
+        if not parts or parts[0] in excluded_groups:
+            continue
+        if parts in seen:
+            continue
+        if _value_at_path(final_output, parts) is not _MISSING:
+            seen.add(parts)
+            count += 1
+    return count
+
+
+def _value_at_path(
+    value: typing.Mapping[str, typing.Any],
+    parts: typing.Sequence[str],
+) -> typing.Any:
+    current: typing.Any = value
+    for part in parts:
+        if not isinstance(current, typing.Mapping) or part not in current:
+            return _MISSING
+        current = current[part]
+    return current
+
+
+def _minimum_xray_statement_fields(surface: str) -> int:
+    if surface == "arcadia_legacy":
+        return 12
+    if surface == "generic_v1":
+        return 12
+    return 14
 
 
 def _nested_child_count(

@@ -5,9 +5,8 @@ in the linked docs, not in this entrypoint.
 
 | Topic | Read when |
 |---|---|
-| [Repo guide](docs/agents/repo-guide.md) | You need the generated-vs-hand-written boundary, setup, tests, release flow, OpenSpec rules, or SDK agent boundaries. |
-| [Contributor workflow](CONTRIBUTING.md) | You are preparing a PR, choosing validation, writing PR notes, or deciding what belongs in committed comments. |
-| [`.fernignore`](.fernignore) | Before editing any SDK file. Only `.fernignore`-protected paths are safe to hand-edit here. |
+| [Contributor workflow](CONTRIBUTING.md) | You need setup, tests, release flow, PR guidance, validation, or rules for committed comments. |
+| [`.fernignore`](.fernignore) | Before editing any SDK file. Only `.fernignore`-protected paths are safe to hand-edit here; use it for the generated-vs-hand-written boundary. |
 | [`src/groundx/ingest.py`](src/groundx/ingest.py) | You are changing the hand-written ingest helper. |
 | [`src/groundx/extract/`](src/groundx/extract/) | You are changing the hand-written extract helper surface. |
 | [`tests/custom/`](tests/custom/) | You are adding hand-written regression coverage around generated or preserved SDK behavior. |

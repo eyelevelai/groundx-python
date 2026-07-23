@@ -1,5 +1,11 @@
 # Tasks — fix-persisted-workflow-derivation
 
+Execution note: this is the SDK implementation input for the consolidated
+extraction reliability plan in
+`internal-arcadia-agents/openspec/changes/2026-07-10-bound-workflow-cache-loads/consolidated-plan.md`.
+SDK release and runtime deployment proof are closed through that consolidated
+plan. Do not treat this as a separate live-certification finish path.
+
 ## 1. Failing tests first (TDD; both are red today)
 
 - [x] 1.1 (re-scoped, fresh-scan P1/P2) Tests in THIS repo: (a) harness-dialect stored hash
