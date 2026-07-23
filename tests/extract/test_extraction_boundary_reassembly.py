@@ -329,7 +329,9 @@ def test_utility_shape_assertions_follow_workflow_relationship_metadata() -> Non
             ],
         }
     }
-    parents = [{child_field: []} for _unused in range(8)]
+    parents: typing.List[typing.Dict[str, typing.Any]] = [
+        {child_field: []} for _unused in range(8)
+    ]
     for index in range(24):
         parents[index % len(parents)][child_field].append({"amount": index})
     final_output: typing.Dict[str, typing.Any] = {
