@@ -191,6 +191,13 @@
       }
     },
     {
+      "name": "approved_candidate_without_interactive_approval",
+      "set": {
+        "path": "candidate_review.status",
+        "value": "approved"
+      }
+    },
+    {
       "name": "unordered_provider_attempts",
       "set": {
         "path": "provider_executions.0.attempts",
@@ -227,6 +234,23 @@
         "path": "lineage.0",
         "value": {
           "kind": "fan_in",
+          "edges": [
+            {
+              "from_event_id": "before-reconcile-statement",
+              "to_event_id": "after-reconcile-statement",
+              "artifact_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            }
+          ],
+          "complete": false
+        }
+      }
+    },
+    {
+      "name": "incomplete_fan_out",
+      "set": {
+        "path": "lineage.0",
+        "value": {
+          "kind": "fan_out",
           "edges": [
             {
               "from_event_id": "before-reconcile-statement",
