@@ -15,7 +15,7 @@ CONTRACT_ROOT = (
 SCHEMA_PATH = CONTRACT_ROOT / "evidence.schema.json"
 VECTORS_PATH = CONTRACT_ROOT / "evidence.vectors.json"
 SCHEMA_SHA256 = "587d018cb3c99b97439683ef7d6d2d55c984fb6c60509a236644454f475f62ea"
-VECTORS_SHA256 = "c2e4eb3872c00e84190dce363eef5be0d456141e3b9528770a7ad3cab2b6e1b3"
+VECTORS_SHA256 = "2a03568bc7bb67a41c9cf6ff3d399f926d78bf9843d39b94e565a024a2e37fa3"
 SHA256_RE = re.compile(r"^[a-f0-9]{64}$")
 
 
@@ -120,6 +120,105 @@ def _validate_evidence(value: dict[str, Any]) -> None:
                 raise ValueError("invalid terminal reason")
         else:
             raise ValueError("invalid lineage kind")
+    _validate_semantics(value)
+
+
+def _validate_semantics(value: dict[str, Any]) -> None:
+    node_stages: dict[str, str] = {}
+    for node in value["workflow_plan_nodes"]:
+        node_id = node["node_id"]
+        if node_id in node_stages:
+            raise ValueError("workflow plan node IDs must be unique")
+        node_stages[node_id] = node["stage"]
+
+    not_applicable_stages = {
+        item["stage"] for item in value["not_applicable"]
+    }
+    planned_by_id: dict[str, dict[str, Any]] = {}
+    planned_nodes: set[str] = set()
+    for execution in value["planned_executions"]:
+        execution_id = execution["execution_id"]
+        node_id = execution["node_id"]
+        if execution_id in planned_by_id:
+            raise ValueError("planned execution IDs must be unique")
+        if node_id not in node_stages:
+            raise ValueError("planned execution references unknown workflow node")
+        planned_by_id[execution_id] = execution
+        planned_nodes.add(node_id)
+    for node_id, stage in node_stages.items():
+        if node_id not in planned_nodes and stage not in not_applicable_stages:
+            raise ValueError(
+                "workflow plan node has no planned execution or not_applicable proof"
+            )
+
+    provider_bodies = value["provider_bodies"]
+    provider_execution_ids: set[str] = set()
+    for execution in value["provider_executions"]:
+        execution_id = execution["execution_id"]
+        planned = planned_by_id.get(execution_id)
+        if planned is None:
+            raise ValueError("provider execution must reference a planned execution")
+        if execution_id in provider_execution_ids:
+            raise ValueError("provider execution IDs must be unique")
+        provider_execution_ids.add(execution_id)
+        if execution["stage"] != node_stages[planned["node_id"]]:
+            raise ValueError("provider execution stage does not match workflow node")
+        for attempt in execution["attempts"]:
+            if attempt["request_body_sha256"] not in provider_bodies:
+                raise ValueError(
+                    "provider attempt request body is missing from provider_bodies"
+                )
+
+    events: dict[str, dict[str, Any]] = {}
+    for event in value["boundary_events"]:
+        event_id = event["event_id"]
+        if event_id in events:
+            raise ValueError("boundary event IDs must be unique")
+        events[event_id] = event
+    outgoing: set[str] = set()
+    terminal: set[str] = set()
+
+    def validate_edge(edge: dict[str, Any]) -> None:
+        from_id = edge["from_event_id"]
+        to_id = edge["to_event_id"]
+        if from_id not in events or to_id not in events:
+            raise ValueError("lineage edge references unknown boundary event")
+        artifact_sha = edge["artifact_sha256"]
+        if (
+            events[from_id]["output_sha256"] != artifact_sha
+            or events[to_id]["input_sha256"] != artifact_sha
+        ):
+            raise ValueError(
+                "lineage edge hash must match producer output and consumer input"
+            )
+        outgoing.add(from_id)
+
+    for item in value["lineage"]:
+        if item["kind"] == "handoff":
+            validate_edge(item["edge"])
+        elif item["kind"] in {"fan_out", "fan_in"}:
+            for edge in item["edges"]:
+                validate_edge(edge)
+        elif item["kind"] == "terminal":
+            event_id = item["event_id"]
+            if event_id not in events:
+                raise ValueError("terminal lineage references unknown boundary event")
+            terminal.add(event_id)
+    for event_id in events:
+        if event_id in terminal and event_id in outgoing:
+            raise ValueError("terminal boundary event cannot have a successor")
+        if event_id not in terminal and event_id not in outgoing:
+            raise ValueError("nonterminal boundary event must have a successor")
+
+    review = value["candidate_review"]
+    approval = value["interactive_approval"]
+    if review["status"] == "approved" and approval is None:
+        raise ValueError("approved candidate requires interactive approval")
+    if approval is not None and (
+        review["status"] != "approved"
+        or approval["approved_sha256"] != review["candidate_sha256"]
+    ):
+        raise ValueError("interactive approval must match an approved candidate")
 
 
 def _validate_edge(edge: dict[str, Any]) -> None:

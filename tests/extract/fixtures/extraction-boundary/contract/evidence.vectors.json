@@ -118,6 +118,79 @@
       }
     },
     {
+      "name": "missing_planned_execution",
+      "set": {
+        "path": "planned_executions",
+        "value": []
+      }
+    },
+    {
+      "name": "missing_provider_bundle",
+      "set": {
+        "path": "provider_bodies",
+        "value": {}
+      }
+    },
+    {
+      "name": "provider_execution_not_planned",
+      "set": {
+        "path": "provider_executions.0.execution_id",
+        "value": "unknown-execution"
+      }
+    },
+    {
+      "name": "missing_expected_output",
+      "set": {
+        "path": "boundary_events.0.output_sha256",
+        "value": ""
+      }
+    },
+    {
+      "name": "missing_reducer_input_lineage",
+      "set": {
+        "path": "lineage.0.edge.artifact_sha256",
+        "value": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+      }
+    },
+    {
+      "name": "unknown_next_boundary",
+      "set": {
+        "path": "lineage.0.edge.to_event_id",
+        "value": "unknown-event"
+      }
+    },
+    {
+      "name": "nonterminal_without_successor",
+      "set": {
+        "path": "lineage",
+        "value": [
+          {
+            "kind": "terminal",
+            "event_id": "after-reconcile-statement",
+            "reason": "success"
+          }
+        ]
+      }
+    },
+    {
+      "name": "terminal_event_has_successor",
+      "set": {
+        "path": "lineage.1.event_id",
+        "value": "before-reconcile-statement"
+      }
+    },
+    {
+      "name": "interactive_approval_without_approved_candidate",
+      "set": {
+        "path": "interactive_approval",
+        "value": {
+          "reviewer": "reviewer@example.test",
+          "approved_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+          "approved_at": "2026-07-25T00:00:00Z"
+        }
+      }
+    },
+    {
       "name": "unordered_provider_attempts",
       "set": {
         "path": "provider_executions.0.attempts",
