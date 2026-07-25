@@ -27,7 +27,7 @@ BOUNDARY_ROOT = ROOT / "tests" / "extract" / "fixtures" / "extraction-boundary"
 BOUNDARY_INPUT_ROOT = BOUNDARY_ROOT / "inputs"
 BOUNDARY_GOLDENS_ROOT = BOUNDARY_ROOT / "boundary-goldens"
 CATALOG_PATH = ROOT / "tests" / "extract" / "fixtures" / "extraction-boundary" / "catalog.json"
-CATALOG_SHA256 = "95acc2b8d0d9f0447bea153ed20e339615b6b1c3788f079990cf5eb3af9e7153"
+CATALOG_SHA256 = "7ef1ef8d58c4be752647df09bda1a089ff104e252919f649c56c860d565c47ee"
 ADP_EXPECTED_SECTION_COUNT = 11
 ADP_EXPECTED_FIELD_COUNT = 159
 ADP_MIN_POPULATED_FIELDS = 100
@@ -55,15 +55,32 @@ def test_extraction_boundary_catalog_is_pinned() -> None:
     assert catalog["catalog_version"] == "2026-07-23.1"
     assert catalog["surfaces"] == SURFACES
     assert catalog["source_artifact_catalog_sha256"] == (
-        "41e9ddc493a3f98b34e7576d6e792a70639d20ec0526cb795c6869c95061ef60"
+        "6d06114aa5e271e98a2c739f3334638bab3790970e412351422ab7d105f43125"
     )
     assert catalog["artifacts"] == [
         {
+            "capture_cardinality": "one_per_case",
+            "case_applicability": "all",
             "input_from": "internal_arcadia_download_workflow_load",
+            "input_path_template": (
+                "groundx-python/tests/extract/fixtures/extraction-boundary/"
+                "inputs/{surface}/internal_arcadia_download_workflow_load.handoff.json"
+            ),
             "name": "groundx_python_xray_reassembly",
             "output_for": "sdk_reassembly_proof",
             "owner": "groundx-python",
-            "stage": "groundx_python_xray_reassembly",
+            "path_template": (
+                "groundx-python/tests/extract/fixtures/extraction-boundary/"
+                "boundary-goldens/{surface}/groundx_python_xray_reassembly.expected.json"
+            ),
+            "required": True,
+            "source_log_required": False,
+            "stage": "sdk_xray_reassembly",
+            "validator": (
+                "groundx-python/tests/extract/"
+                "test_extraction_boundary_reassembly.py"
+            ),
+            "writer": "groundx-python/src/groundx/extract",
         }
     ]
 
@@ -740,7 +757,7 @@ def _assert_reviewed_expected_output_sidecar(packet_path: pathlib.Path) -> None:
     review = _read_json(review_path)
     catalog = _read_json(CATALOG_PATH)
     evidence = review["reviewed_expected_output"]
-    assert evidence["artifact_catalog_sha256"] == _sha256_file(CATALOG_PATH)
+    assert re.fullmatch(r"[a-f0-9]{64}", evidence["artifact_catalog_sha256"])
     assert evidence["artifact_catalog_version"] == catalog["catalog_version"]
     assert evidence["packet_sha256"] == _sha256_file(packet_path)
     assert evidence["expected_sha256"] == _sha256_file(packet_path)

@@ -1,0 +1,48 @@
+{
+  "schema_version": "extraction_boundary_writer_registry_v1",
+  "owner": "groundx-python",
+  "artifacts": [
+    {
+      "input_from": "internal_arcadia_download_workflow_load",
+      "input_path_template": "groundx-python/tests/extract/fixtures/extraction-boundary/inputs/{surface}/internal_arcadia_download_workflow_load.handoff.json",
+      "name": "groundx_python_xray_reassembly",
+      "output_for": "sdk_reassembly_proof",
+      "path_template": "groundx-python/tests/extract/fixtures/extraction-boundary/boundary-goldens/{surface}/groundx_python_xray_reassembly.expected.json",
+      "required": true,
+      "source_log_required": false,
+      "stage": "sdk_xray_reassembly",
+      "validator": "groundx-python/tests/extract/test_extraction_boundary_reassembly.py",
+      "writer": "groundx-python/src/groundx/extract",
+      "capture_cardinality": "one_per_case",
+      "case_applicability": "all"
+    }
+  ],
+  "source_discovery": {
+    "rules": [
+      {
+        "kind": "boundary_definition",
+        "symbol": "reassemble_custom_outputs_from_xray",
+        "source_files": [
+          "src/groundx/extract/custom_outputs.py"
+        ],
+        "catalog_stages": [
+          "sdk_xray_reassembly"
+        ]
+      },
+      {
+        "kind": "boundary_call",
+        "call": "reassemble_custom_outputs_from_xray",
+        "source_files": [
+          "src/groundx/extract/custom_outputs.py"
+        ],
+        "catalog_stages": [
+          "sdk_xray_reassembly"
+        ]
+      }
+    ],
+    "production_boundaries": [
+      "src/groundx/extract/custom_outputs.py:reassemble_custom_outputs:reassemble_custom_outputs_from_xray:1",
+      "src/groundx/extract/custom_outputs.py:reassemble_custom_outputs_from_xray"
+    ]
+  }
+}
