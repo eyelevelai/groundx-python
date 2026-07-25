@@ -44,7 +44,10 @@ def _discover(source: str) -> dict[str, list[str]]:
             self.generic_visit(node)
             scope.pop()
 
-        visit_AsyncFunctionDef = visit_FunctionDef
+        def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
+            scope.append(node.name)
+            self.generic_visit(node)
+            scope.pop()
 
         def visit_Call(self, node: ast.Call) -> None:
             call_name = _qualified_name(node.func)
