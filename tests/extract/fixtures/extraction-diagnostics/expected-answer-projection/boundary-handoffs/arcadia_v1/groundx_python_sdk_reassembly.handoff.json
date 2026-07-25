@@ -1,0 +1,4531 @@
+{
+  "certification_eligible": false,
+  "diagnostic_only_reason": "Expected-answer projection fixture; not protected boundary evidence.",
+  "diagnostics": [],
+  "evidence_level": "expected_answer_projection_diagnostic",
+  "final_output": {
+    "account_number": "blank reviewed expected value for account_number",
+    "amount_due": 7613.2,
+    "amount_due_currency": "currency_dollars",
+    "charges": [
+      {
+        "charge_amount": 55,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Industrial Energy Electric"
+      }
+    ],
+    "due_date": "2025-07-30",
+    "invoice_number": "10295809",
+    "meters": [
+      {
+        "charges": [
+          {
+            "charge_amount": 55,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Industrial Energy Electric",
+            "meter_number": "70182657",
+            "service_type": "electric"
+          },
+          {
+            "charge_amount": 2560.32,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Consumption",
+            "meter_number": "70182657",
+            "service_type": "electric"
+          },
+          {
+            "charge_amount": 2218.75,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Demand",
+            "meter_number": "70182657",
+            "service_type": "electric"
+          },
+          {
+            "charge_amount": 106.68,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Power Cost Adjustment - $.00175wh (S)",
+            "meter_number": "70182657",
+            "service_type": "electric"
+          },
+          {
+            "charge_amount": 2.81,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "MN Sales Tax",
+            "meter_number": "70182657",
+            "service_type": "electric"
+          },
+          {
+            "charge_amount": 249.74,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "MN State Tax on Usage",
+            "meter_number": "70182657",
+            "service_type": "electric"
+          }
+        ],
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "70182657",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "electric",
+        "tariff_name_as_printed": "Industrial Electric",
+        "units_of_measurement": "kWh",
+        "usage_value": 60960
+      },
+      {
+        "charges": [
+          {
+            "charge_amount": 18.43,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water Minimum Charge",
+            "meter_number": "89321458",
+            "service_type": "water"
+          },
+          {
+            "charge_amount": 223.32,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water",
+            "meter_number": "89321458",
+            "service_type": "water"
+          },
+          {
+            "charge_amount": 0.81,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "State Water Surcharge",
+            "meter_number": "89321458",
+            "service_type": "water"
+          }
+        ],
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "89321458",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "water",
+        "tariff_name_as_printed": "Commercial Water",
+        "units_of_measurement": "gallons",
+        "usage_value": 42303
+      },
+      {
+        "charges": [
+          {
+            "charge_amount": 40.61,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Sewer Minimum Charge",
+            "meter_number": "89321458",
+            "service_type": "sewer"
+          },
+          {
+            "charge_amount": 275.39,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Sewer",
+            "meter_number": "89321458",
+            "service_type": "sewer"
+          }
+        ],
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "89321458",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "sewer",
+        "tariff_name_as_printed": "Commercial Sewer",
+        "units_of_measurement": "gallons",
+        "usage_value": 42303
+      },
+      {
+        "charges": [
+          {
+            "charge_amount": 18.43,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water Minimum Charge",
+            "meter_number": "89321459",
+            "service_type": "water"
+          },
+          {
+            "charge_amount": 212.19,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water",
+            "meter_number": "89321459",
+            "service_type": "water"
+          },
+          {
+            "charge_amount": 0.81,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "State Water Surcharge",
+            "meter_number": "89321459",
+            "service_type": "water"
+          }
+        ],
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "89321459",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "water",
+        "tariff_name_as_printed": "Commercial Water",
+        "units_of_measurement": "gallons",
+        "usage_value": 40356
+      },
+      {
+        "charges": [
+          {
+            "charge_amount": 40.61,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Sewer Minimum Charge",
+            "meter_number": "89321459",
+            "service_type": "sewer"
+          },
+          {
+            "charge_amount": 262.71,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Sewer",
+            "meter_number": "89321459",
+            "service_type": "sewer"
+          }
+        ],
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "89321459",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "sewer",
+        "tariff_name_as_printed": "Commercial Sewer",
+        "units_of_measurement": "gallons",
+        "usage_value": 40356
+      },
+      {
+        "charges": [
+          {
+            "charge_amount": 18.43,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water Minimum Charge",
+            "meter_number": "91496724",
+            "service_type": "irrigation"
+          },
+          {
+            "charge_amount": 533.9,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water",
+            "meter_number": "91496724",
+            "service_type": "irrigation"
+          },
+          {
+            "charge_amount": 1.27,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "MN Sales Tax",
+            "meter_number": "91496724",
+            "service_type": "irrigation"
+          },
+          {
+            "charge_amount": 36.71,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "MN State Tax on Usage",
+            "meter_number": "91496724",
+            "service_type": "irrigation"
+          },
+          {
+            "charge_amount": 0.81,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "State Water Surcharge",
+            "meter_number": "91496724",
+            "service_type": "irrigation"
+          }
+        ],
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "91496724",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "irrigation",
+        "tariff_name_as_printed": "Commercial Water",
+        "units_of_measurement": "gallons",
+        "usage_value": 96600
+      },
+      {
+        "charges": [
+          {
+            "charge_amount": 18.43,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water Minimum Charge",
+            "meter_number": "91496726",
+            "service_type": "water"
+          },
+          {
+            "charge_amount": 295.95,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water",
+            "meter_number": "91496726",
+            "service_type": "water"
+          },
+          {
+            "charge_amount": 20.35,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "MN State Tax on Usage",
+            "meter_number": "91496726",
+            "service_type": "water"
+          },
+          {
+            "charge_amount": 1.27,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "MN Sales Tax",
+            "meter_number": "91496726",
+            "service_type": "water"
+          },
+          {
+            "charge_amount": 0.81,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "State Water Surcharge",
+            "meter_number": "91496726",
+            "service_type": "water"
+          }
+        ],
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "91496726",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "water",
+        "tariff_name_as_printed": "Commercial Water",
+        "units_of_measurement": "gallons",
+        "usage_value": 55000
+      },
+      {
+        "charges": [
+          {
+            "charge_amount": 40.61,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Sewer Minimum Charge",
+            "meter_number": "91496726",
+            "service_type": "sewer"
+          },
+          {
+            "charge_amount": 358.05,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Sewer",
+            "meter_number": "91496726",
+            "service_type": "sewer"
+          }
+        ],
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "91496726",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "sewer",
+        "tariff_name_as_printed": "Commercial Sewer",
+        "units_of_measurement": "gallons",
+        "usage_value": 55000
+      }
+    ],
+    "provider_name": "City of Windom",
+    "recipient_name": "KWIK TRIP (1147)",
+    "service_address": "blank reviewed expected value for service_address",
+    "source_modality": "Direct",
+    "statement_date": "2025-07-08",
+    "statement_period_end_date": "2025-06-30",
+    "statement_period_start_date": "2025-06-01",
+    "statement_type": "statement_type_bill",
+    "total_billing_amount": 7613.2
+  },
+  "input_from": "internal_arcadia_extract_chain",
+  "input_sha256": "3ee71ca2bf1fa43522372ca18707dc4245ae1c9c8042da88fe127863d560e585",
+  "output_for": "internal_arcadia_save_callback",
+  "relationship_output": {
+    "account_number": "blank reviewed expected value for account_number",
+    "amount_due": 7613.2,
+    "amount_due_currency": "currency_dollars",
+    "charges": [
+      {
+        "charge_amount": 55,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Industrial Energy Electric"
+      }
+    ],
+    "due_date": "2025-07-30",
+    "invoice_number": "10295809",
+    "meters": [
+      {
+        "charges": [
+          {
+            "charge_amount": 55,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Industrial Energy Electric",
+            "meter_number": "70182657",
+            "service_type": "electric"
+          },
+          {
+            "charge_amount": 2560.32,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Consumption",
+            "meter_number": "70182657",
+            "service_type": "electric"
+          },
+          {
+            "charge_amount": 2218.75,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Demand",
+            "meter_number": "70182657",
+            "service_type": "electric"
+          },
+          {
+            "charge_amount": 106.68,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Power Cost Adjustment - $.00175wh (S)",
+            "meter_number": "70182657",
+            "service_type": "electric"
+          },
+          {
+            "charge_amount": 2.81,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "MN Sales Tax",
+            "meter_number": "70182657",
+            "service_type": "electric"
+          },
+          {
+            "charge_amount": 249.74,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "MN State Tax on Usage",
+            "meter_number": "70182657",
+            "service_type": "electric"
+          }
+        ],
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "70182657",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "electric",
+        "tariff_name_as_printed": "Industrial Electric",
+        "units_of_measurement": "kWh",
+        "usage_value": 60960
+      },
+      {
+        "charges": [
+          {
+            "charge_amount": 18.43,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water Minimum Charge",
+            "meter_number": "89321458",
+            "service_type": "water"
+          },
+          {
+            "charge_amount": 223.32,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water",
+            "meter_number": "89321458",
+            "service_type": "water"
+          },
+          {
+            "charge_amount": 0.81,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "State Water Surcharge",
+            "meter_number": "89321458",
+            "service_type": "water"
+          }
+        ],
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "89321458",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "water",
+        "tariff_name_as_printed": "Commercial Water",
+        "units_of_measurement": "gallons",
+        "usage_value": 42303
+      },
+      {
+        "charges": [
+          {
+            "charge_amount": 40.61,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Sewer Minimum Charge",
+            "meter_number": "89321458",
+            "service_type": "sewer"
+          },
+          {
+            "charge_amount": 275.39,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Sewer",
+            "meter_number": "89321458",
+            "service_type": "sewer"
+          }
+        ],
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "89321458",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "sewer",
+        "tariff_name_as_printed": "Commercial Sewer",
+        "units_of_measurement": "gallons",
+        "usage_value": 42303
+      },
+      {
+        "charges": [
+          {
+            "charge_amount": 18.43,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water Minimum Charge",
+            "meter_number": "89321459",
+            "service_type": "water"
+          },
+          {
+            "charge_amount": 212.19,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water",
+            "meter_number": "89321459",
+            "service_type": "water"
+          },
+          {
+            "charge_amount": 0.81,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "State Water Surcharge",
+            "meter_number": "89321459",
+            "service_type": "water"
+          }
+        ],
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "89321459",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "water",
+        "tariff_name_as_printed": "Commercial Water",
+        "units_of_measurement": "gallons",
+        "usage_value": 40356
+      },
+      {
+        "charges": [
+          {
+            "charge_amount": 40.61,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Sewer Minimum Charge",
+            "meter_number": "89321459",
+            "service_type": "sewer"
+          },
+          {
+            "charge_amount": 262.71,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Sewer",
+            "meter_number": "89321459",
+            "service_type": "sewer"
+          }
+        ],
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "89321459",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "sewer",
+        "tariff_name_as_printed": "Commercial Sewer",
+        "units_of_measurement": "gallons",
+        "usage_value": 40356
+      },
+      {
+        "charges": [
+          {
+            "charge_amount": 18.43,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water Minimum Charge",
+            "meter_number": "91496724",
+            "service_type": "irrigation"
+          },
+          {
+            "charge_amount": 533.9,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water",
+            "meter_number": "91496724",
+            "service_type": "irrigation"
+          },
+          {
+            "charge_amount": 1.27,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "MN Sales Tax",
+            "meter_number": "91496724",
+            "service_type": "irrigation"
+          },
+          {
+            "charge_amount": 36.71,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "MN State Tax on Usage",
+            "meter_number": "91496724",
+            "service_type": "irrigation"
+          },
+          {
+            "charge_amount": 0.81,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "State Water Surcharge",
+            "meter_number": "91496724",
+            "service_type": "irrigation"
+          }
+        ],
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "91496724",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "irrigation",
+        "tariff_name_as_printed": "Commercial Water",
+        "units_of_measurement": "gallons",
+        "usage_value": 96600
+      },
+      {
+        "charges": [
+          {
+            "charge_amount": 18.43,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water Minimum Charge",
+            "meter_number": "91496726",
+            "service_type": "water"
+          },
+          {
+            "charge_amount": 295.95,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Water",
+            "meter_number": "91496726",
+            "service_type": "water"
+          },
+          {
+            "charge_amount": 20.35,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "MN State Tax on Usage",
+            "meter_number": "91496726",
+            "service_type": "water"
+          },
+          {
+            "charge_amount": 1.27,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "MN Sales Tax",
+            "meter_number": "91496726",
+            "service_type": "water"
+          },
+          {
+            "charge_amount": 0.81,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "State Water Surcharge",
+            "meter_number": "91496726",
+            "service_type": "water"
+          }
+        ],
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "91496726",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "water",
+        "tariff_name_as_printed": "Commercial Water",
+        "units_of_measurement": "gallons",
+        "usage_value": 55000
+      },
+      {
+        "charges": [
+          {
+            "charge_amount": 40.61,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Sewer Minimum Charge",
+            "meter_number": "91496726",
+            "service_type": "sewer"
+          },
+          {
+            "charge_amount": 358.05,
+            "charge_amount_currency": "currency_dollars",
+            "charge_description_as_printed": "Commercial Sewer",
+            "meter_number": "91496726",
+            "service_type": "sewer"
+          }
+        ],
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "91496726",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "sewer",
+        "tariff_name_as_printed": "Commercial Sewer",
+        "units_of_measurement": "gallons",
+        "usage_value": 55000
+      }
+    ],
+    "provider_name": "City of Windom",
+    "recipient_name": "KWIK TRIP (1147)",
+    "service_address": "blank reviewed expected value for service_address",
+    "source_modality": "Direct",
+    "statement_date": "2025-07-08",
+    "statement_period_end_date": "2025-06-30",
+    "statement_period_start_date": "2025-06-01",
+    "statement_type": "statement_type_bill",
+    "total_billing_amount": 7613.2
+  },
+  "request": {
+    "callbackURL": "https://api.groundx.ai/callback/layout",
+    "documentID": "b4afb073-8807-4243-a4a1-0b5fa1a76154",
+    "fileName": "arcadia.pdf",
+    "modelID": 30295,
+    "processorID": 134,
+    "taskID": "fd259f67-3d41-464c-8eaf-7782ae4c4b41",
+    "workflowID": "arcadia_v1-product-path",
+    "workflowSchemaHash": "72fef486d883a3b5d20b157fbaf92626fcef6609d876558f57e0c59403d1df89",
+    "workflowVersion": "2026-07-12T22:34:01Z"
+  },
+  "schema_version": "groundx-python-sdk-reassembly-handoff-v1",
+  "source_provenance": [
+    {
+      "final_path": "/account_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "account_number",
+      "workflow_group": "statement"
+    },
+    {
+      "final_path": "/amount_due",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "amount_due",
+      "workflow_group": "statement"
+    },
+    {
+      "final_path": "/amount_due_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "amount_due_currency",
+      "workflow_group": "statement"
+    },
+    {
+      "final_path": "/due_date",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "due_date",
+      "workflow_group": "statement"
+    },
+    {
+      "final_path": "/invoice_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "invoice_number",
+      "workflow_group": "statement"
+    },
+    {
+      "final_path": "/statement_period_end_date",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "statement_period_end_date",
+      "workflow_group": "statement"
+    },
+    {
+      "final_path": "/statement_period_start_date",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "statement_period_start_date",
+      "workflow_group": "statement"
+    },
+    {
+      "final_path": "/provider_name",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "provider_name",
+      "workflow_group": "statement"
+    },
+    {
+      "final_path": "/recipient_name",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "recipient_name",
+      "workflow_group": "statement"
+    },
+    {
+      "final_path": "/source_modality",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "source_modality",
+      "workflow_group": "statement"
+    },
+    {
+      "final_path": "/statement_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "statement_type",
+      "workflow_group": "statement"
+    },
+    {
+      "final_path": "/service_address",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "service_address",
+      "workflow_group": "statement"
+    },
+    {
+      "final_path": "/statement_date",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "statement_date",
+      "workflow_group": "statement"
+    },
+    {
+      "final_path": "/total_billing_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": null,
+      "workflow_field": "total_billing_amount",
+      "workflow_group": "statement"
+    },
+    {
+      "final_path": "/meters/*/deregulation_status",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 0,
+      "workflow_field": "deregulation_status",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/deregulation_status",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 1,
+      "workflow_field": "deregulation_status",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/deregulation_status",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 2,
+      "workflow_field": "deregulation_status",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/deregulation_status",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 3,
+      "workflow_field": "deregulation_status",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/deregulation_status",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 4,
+      "workflow_field": "deregulation_status",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/deregulation_status",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 5,
+      "workflow_field": "deregulation_status",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/deregulation_status",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 6,
+      "workflow_field": "deregulation_status",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/deregulation_status",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 7,
+      "workflow_field": "deregulation_status",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/measurement_period_end_date",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 0,
+      "workflow_field": "measurement_period_end_date",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/measurement_period_end_date",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 1,
+      "workflow_field": "measurement_period_end_date",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/measurement_period_end_date",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 2,
+      "workflow_field": "measurement_period_end_date",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/measurement_period_end_date",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 3,
+      "workflow_field": "measurement_period_end_date",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/measurement_period_end_date",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 4,
+      "workflow_field": "measurement_period_end_date",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/measurement_period_end_date",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 5,
+      "workflow_field": "measurement_period_end_date",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/measurement_period_end_date",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 6,
+      "workflow_field": "measurement_period_end_date",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/measurement_period_end_date",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 7,
+      "workflow_field": "measurement_period_end_date",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/measurement_period_start_date",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 0,
+      "workflow_field": "measurement_period_start_date",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/measurement_period_start_date",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 1,
+      "workflow_field": "measurement_period_start_date",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/measurement_period_start_date",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 2,
+      "workflow_field": "measurement_period_start_date",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/measurement_period_start_date",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 3,
+      "workflow_field": "measurement_period_start_date",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/measurement_period_start_date",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 4,
+      "workflow_field": "measurement_period_start_date",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/measurement_period_start_date",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 5,
+      "workflow_field": "measurement_period_start_date",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/measurement_period_start_date",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 6,
+      "workflow_field": "measurement_period_start_date",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/measurement_period_start_date",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 7,
+      "workflow_field": "measurement_period_start_date",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 0,
+      "workflow_field": "meter_number",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 1,
+      "workflow_field": "meter_number",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 2,
+      "workflow_field": "meter_number",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 3,
+      "workflow_field": "meter_number",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 4,
+      "workflow_field": "meter_number",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 5,
+      "workflow_field": "meter_number",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 6,
+      "workflow_field": "meter_number",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 7,
+      "workflow_field": "meter_number",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/recipient_name",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 0,
+      "workflow_field": "recipient_name",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/recipient_name",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 1,
+      "workflow_field": "recipient_name",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/recipient_name",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 2,
+      "workflow_field": "recipient_name",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/recipient_name",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 3,
+      "workflow_field": "recipient_name",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/recipient_name",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 4,
+      "workflow_field": "recipient_name",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/recipient_name",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 5,
+      "workflow_field": "recipient_name",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/recipient_name",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 6,
+      "workflow_field": "recipient_name",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/recipient_name",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 7,
+      "workflow_field": "recipient_name",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 0,
+      "workflow_field": "service_type",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 1,
+      "workflow_field": "service_type",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 2,
+      "workflow_field": "service_type",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 3,
+      "workflow_field": "service_type",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 4,
+      "workflow_field": "service_type",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 5,
+      "workflow_field": "service_type",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 6,
+      "workflow_field": "service_type",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 7,
+      "workflow_field": "service_type",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/tariff_name_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 0,
+      "workflow_field": "tariff_name_as_printed",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/tariff_name_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 1,
+      "workflow_field": "tariff_name_as_printed",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/tariff_name_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 2,
+      "workflow_field": "tariff_name_as_printed",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/tariff_name_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 3,
+      "workflow_field": "tariff_name_as_printed",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/tariff_name_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 4,
+      "workflow_field": "tariff_name_as_printed",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/tariff_name_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 5,
+      "workflow_field": "tariff_name_as_printed",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/tariff_name_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 6,
+      "workflow_field": "tariff_name_as_printed",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/tariff_name_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 7,
+      "workflow_field": "tariff_name_as_printed",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/units_of_measurement",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 0,
+      "workflow_field": "units_of_measurement",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/units_of_measurement",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 1,
+      "workflow_field": "units_of_measurement",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/units_of_measurement",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 2,
+      "workflow_field": "units_of_measurement",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/units_of_measurement",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 3,
+      "workflow_field": "units_of_measurement",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/units_of_measurement",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 4,
+      "workflow_field": "units_of_measurement",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/units_of_measurement",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 5,
+      "workflow_field": "units_of_measurement",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/units_of_measurement",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 6,
+      "workflow_field": "units_of_measurement",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/units_of_measurement",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 7,
+      "workflow_field": "units_of_measurement",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/usage_value",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 0,
+      "workflow_field": "usage_value",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/usage_value",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 1,
+      "workflow_field": "usage_value",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/usage_value",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 2,
+      "workflow_field": "usage_value",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/usage_value",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 3,
+      "workflow_field": "usage_value",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/usage_value",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 4,
+      "workflow_field": "usage_value",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/usage_value",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 5,
+      "workflow_field": "usage_value",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/usage_value",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 6,
+      "workflow_field": "usage_value",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/meters/*/usage_value",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 7,
+      "workflow_field": "usage_value",
+      "workflow_group": "meters"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 0,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 1,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 2,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 3,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 4,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 5,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 6,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 7,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 8,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 9,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 10,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 11,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 12,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 13,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 14,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 15,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 16,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 17,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 18,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 19,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 20,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 21,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 22,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 23,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 24,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 25,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 26,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 27,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 28,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 29,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 30,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 31,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 32,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 33,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 34,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 35,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 36,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 37,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 38,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 39,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 40,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 41,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 42,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 43,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 44,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 45,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 46,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 47,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 48,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 49,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 50,
+      "workflow_field": "charge_amount",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 0,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 1,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 2,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 3,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 4,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 5,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 6,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 7,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 8,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 9,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 10,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 11,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 12,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 13,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 14,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 15,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 16,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 17,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 18,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 19,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 20,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 21,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 22,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 23,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 24,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 25,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 26,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 27,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 28,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 29,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 30,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 31,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 32,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 33,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 34,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 35,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 36,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 37,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 38,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 39,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 40,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 41,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 42,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 43,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 44,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 45,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 46,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 47,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 48,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 49,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_amount_currency",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 50,
+      "workflow_field": "charge_amount_currency",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 0,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 1,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 2,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 3,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 4,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 5,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 6,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 7,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 8,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 9,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 10,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 11,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 12,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 13,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 14,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 15,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 16,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 17,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 18,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 19,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 20,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 21,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 22,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 23,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 24,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 25,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 26,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 27,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 28,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 29,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 30,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 31,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 32,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 33,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 34,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 35,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 36,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 37,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 38,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 39,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 40,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 41,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 42,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 43,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 44,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 45,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 46,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 47,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 48,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 49,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/charge_description_as_printed",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 50,
+      "workflow_field": "charge_description_as_printed",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 0,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 1,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 2,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 3,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 4,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 5,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 6,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 7,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 8,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 9,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 10,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 11,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 12,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 13,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 14,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 15,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 16,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 17,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 18,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 19,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 20,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 21,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 22,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 23,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 24,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 25,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 26,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 27,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 28,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 29,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 30,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 31,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 32,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 33,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 34,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 35,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 36,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 37,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 38,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 39,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 40,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 41,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 42,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 43,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 44,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 45,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 46,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 47,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 48,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/meter_number",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 49,
+      "workflow_field": "meter_number",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 0,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 1,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 2,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 3,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 4,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 5,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 6,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 7,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 8,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 9,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 10,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 11,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 12,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 13,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 14,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 15,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 16,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 17,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 18,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 19,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 20,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 21,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 22,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 23,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 24,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 25,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 26,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 27,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 28,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 29,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 30,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 31,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 32,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 33,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 34,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 35,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 36,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 37,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 38,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 39,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 40,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 41,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 42,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 43,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 44,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 45,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 46,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 47,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 48,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    },
+    {
+      "final_path": "/charges/*/service_type",
+      "output_source": "customChunkOutputs",
+      "page_numbers": [
+        1
+      ],
+      "record_index": 49,
+      "workflow_field": "service_type",
+      "workflow_group": "charges"
+    }
+  ],
+  "stage": "groundx_python_sdk_reassembly",
+  "surface": "arcadia_v1",
+  "workflow_output": {
+    "charges": [
+      {
+        "charge_amount": 55,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Industrial Energy Electric",
+        "meter_number": "70182657",
+        "service_type": "electric"
+      },
+      {
+        "charge_amount": 2560.32,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Consumption",
+        "meter_number": "70182657",
+        "service_type": "electric"
+      },
+      {
+        "charge_amount": 2218.75,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Demand",
+        "meter_number": "70182657",
+        "service_type": "electric"
+      },
+      {
+        "charge_amount": 106.68,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Power Cost Adjustment - $.00175wh (S)",
+        "meter_number": "70182657",
+        "service_type": "electric"
+      },
+      {
+        "charge_amount": 2.81,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "MN Sales Tax",
+        "meter_number": "70182657",
+        "service_type": "electric"
+      },
+      {
+        "charge_amount": 249.74,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "MN State Tax on Usage",
+        "meter_number": "70182657",
+        "service_type": "electric"
+      },
+      {
+        "charge_amount": 18.43,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Water Minimum Charge",
+        "meter_number": "89321458",
+        "service_type": "water"
+      },
+      {
+        "charge_amount": 223.32,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Water",
+        "meter_number": "89321458",
+        "service_type": "water"
+      },
+      {
+        "charge_amount": 0.81,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "State Water Surcharge",
+        "meter_number": "89321458",
+        "service_type": "water"
+      },
+      {
+        "charge_amount": 40.61,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Sewer Minimum Charge",
+        "meter_number": "89321458",
+        "service_type": "sewer"
+      },
+      {
+        "charge_amount": 275.39,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Sewer",
+        "meter_number": "89321458",
+        "service_type": "sewer"
+      },
+      {
+        "charge_amount": 18.43,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Water Minimum Charge",
+        "meter_number": "89321459",
+        "service_type": "water"
+      },
+      {
+        "charge_amount": 212.19,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Water",
+        "meter_number": "89321459",
+        "service_type": "water"
+      },
+      {
+        "charge_amount": 0.81,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "State Water Surcharge",
+        "meter_number": "89321459",
+        "service_type": "water"
+      },
+      {
+        "charge_amount": 40.61,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Sewer Minimum Charge",
+        "meter_number": "89321459",
+        "service_type": "sewer"
+      },
+      {
+        "charge_amount": 262.71,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Sewer",
+        "meter_number": "89321459",
+        "service_type": "sewer"
+      },
+      {
+        "charge_amount": 18.43,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Water Minimum Charge",
+        "meter_number": "91496724",
+        "service_type": "irrigation"
+      },
+      {
+        "charge_amount": 533.9,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Water",
+        "meter_number": "91496724",
+        "service_type": "irrigation"
+      },
+      {
+        "charge_amount": 1.27,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "MN Sales Tax",
+        "meter_number": "91496724",
+        "service_type": "irrigation"
+      },
+      {
+        "charge_amount": 36.71,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "MN State Tax on Usage",
+        "meter_number": "91496724",
+        "service_type": "irrigation"
+      },
+      {
+        "charge_amount": 0.81,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "State Water Surcharge",
+        "meter_number": "91496724",
+        "service_type": "irrigation"
+      },
+      {
+        "charge_amount": 18.43,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Water Minimum Charge",
+        "meter_number": "91496726",
+        "service_type": "water"
+      },
+      {
+        "charge_amount": 295.95,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Water",
+        "meter_number": "91496726",
+        "service_type": "water"
+      },
+      {
+        "charge_amount": 20.35,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "MN State Tax on Usage",
+        "meter_number": "91496726",
+        "service_type": "water"
+      },
+      {
+        "charge_amount": 1.27,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "MN Sales Tax",
+        "meter_number": "91496726",
+        "service_type": "water"
+      },
+      {
+        "charge_amount": 0.81,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "State Water Surcharge",
+        "meter_number": "91496726",
+        "service_type": "water"
+      },
+      {
+        "charge_amount": 40.61,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Sewer Minimum Charge",
+        "meter_number": "91496726",
+        "service_type": "sewer"
+      },
+      {
+        "charge_amount": 358.05,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Sewer",
+        "meter_number": "91496726",
+        "service_type": "sewer"
+      },
+      {
+        "charge_amount": 55,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Industrial Energy Electric",
+        "meter_number": "70182657",
+        "service_type": "electric"
+      },
+      {
+        "charge_amount": 2560.32,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Consumption",
+        "meter_number": "70182657",
+        "service_type": "electric"
+      },
+      {
+        "charge_amount": 2218.75,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Demand",
+        "meter_number": "70182657",
+        "service_type": "electric"
+      },
+      {
+        "charge_amount": 106.68,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Power Cost Adjustment - $.00175wh (S)",
+        "meter_number": "70182657",
+        "service_type": "electric"
+      },
+      {
+        "charge_amount": 2.81,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "MN Sales Tax",
+        "meter_number": "70182657",
+        "service_type": "electric"
+      },
+      {
+        "charge_amount": 249.74,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "MN State Tax on Usage",
+        "meter_number": "70182657",
+        "service_type": "electric"
+      },
+      {
+        "charge_amount": 18.43,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Water Minimum Charge",
+        "meter_number": "89321458",
+        "service_type": "water"
+      },
+      {
+        "charge_amount": 223.32,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Water",
+        "meter_number": "89321458",
+        "service_type": "water"
+      },
+      {
+        "charge_amount": 0.81,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "State Water Surcharge",
+        "meter_number": "89321458",
+        "service_type": "water"
+      },
+      {
+        "charge_amount": 40.61,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Sewer Minimum Charge",
+        "meter_number": "89321458",
+        "service_type": "sewer"
+      },
+      {
+        "charge_amount": 275.39,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Sewer",
+        "meter_number": "89321458",
+        "service_type": "sewer"
+      },
+      {
+        "charge_amount": 18.43,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Water Minimum Charge",
+        "meter_number": "89321459",
+        "service_type": "water"
+      },
+      {
+        "charge_amount": 212.19,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Water",
+        "meter_number": "89321459",
+        "service_type": "water"
+      },
+      {
+        "charge_amount": 0.81,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "State Water Surcharge",
+        "meter_number": "89321459",
+        "service_type": "water"
+      },
+      {
+        "charge_amount": 40.61,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Sewer Minimum Charge",
+        "meter_number": "89321459",
+        "service_type": "sewer"
+      },
+      {
+        "charge_amount": 262.71,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Sewer",
+        "meter_number": "89321459",
+        "service_type": "sewer"
+      },
+      {
+        "charge_amount": 18.43,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Water Minimum Charge",
+        "meter_number": "91496724",
+        "service_type": "irrigation"
+      },
+      {
+        "charge_amount": 533.9,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Water",
+        "meter_number": "91496724",
+        "service_type": "irrigation"
+      },
+      {
+        "charge_amount": 1.27,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "MN Sales Tax",
+        "meter_number": "91496724",
+        "service_type": "irrigation"
+      },
+      {
+        "charge_amount": 36.71,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "MN State Tax on Usage",
+        "meter_number": "91496724",
+        "service_type": "irrigation"
+      },
+      {
+        "charge_amount": 0.81,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "State Water Surcharge",
+        "meter_number": "91496724",
+        "service_type": "irrigation"
+      },
+      {
+        "charge_amount": 18.43,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Commercial Water Minimum Charge",
+        "meter_number": "91496726",
+        "service_type": "water"
+      },
+      {
+        "charge_amount": 55,
+        "charge_amount_currency": "currency_dollars",
+        "charge_description_as_printed": "Industrial Energy Electric"
+      }
+    ],
+    "meters": [
+      {
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "70182657",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "electric",
+        "tariff_name_as_printed": "Industrial Electric",
+        "units_of_measurement": "kWh",
+        "usage_value": 60960
+      },
+      {
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "89321458",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "water",
+        "tariff_name_as_printed": "Commercial Water",
+        "units_of_measurement": "gallons",
+        "usage_value": 42303
+      },
+      {
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "89321458",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "sewer",
+        "tariff_name_as_printed": "Commercial Sewer",
+        "units_of_measurement": "gallons",
+        "usage_value": 42303
+      },
+      {
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "89321459",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "water",
+        "tariff_name_as_printed": "Commercial Water",
+        "units_of_measurement": "gallons",
+        "usage_value": 40356
+      },
+      {
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "89321459",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "sewer",
+        "tariff_name_as_printed": "Commercial Sewer",
+        "units_of_measurement": "gallons",
+        "usage_value": 40356
+      },
+      {
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "91496724",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "irrigation",
+        "tariff_name_as_printed": "Commercial Water",
+        "units_of_measurement": "gallons",
+        "usage_value": 96600
+      },
+      {
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "91496726",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "water",
+        "tariff_name_as_printed": "Commercial Water",
+        "units_of_measurement": "gallons",
+        "usage_value": 55000
+      },
+      {
+        "deregulation_status": "full_service",
+        "measurement_period_end_date": "2025-07-01",
+        "measurement_period_start_date": "2025-06-01",
+        "meter_number": "91496726",
+        "recipient_name": "KWIK TRIP (1147)",
+        "service_type": "sewer",
+        "tariff_name_as_printed": "Commercial Sewer",
+        "units_of_measurement": "gallons",
+        "usage_value": 55000
+      }
+    ],
+    "statement": {
+      "account_number": "blank reviewed expected value for account_number",
+      "amount_due": 7613.2,
+      "amount_due_currency": "currency_dollars",
+      "due_date": "2025-07-30",
+      "invoice_number": "10295809",
+      "provider_name": "City of Windom",
+      "recipient_name": "KWIK TRIP (1147)",
+      "service_address": "blank reviewed expected value for service_address",
+      "source_modality": "Direct",
+      "statement_date": "2025-07-08",
+      "statement_period_end_date": "2025-06-30",
+      "statement_period_start_date": "2025-06-01",
+      "statement_type": "statement_type_bill",
+      "total_billing_amount": 7613.2
+    }
+  },
+  "workflow_schema_hash": "72fef486d883a3b5d20b157fbaf92626fcef6609d876558f57e0c59403d1df89"
+}
