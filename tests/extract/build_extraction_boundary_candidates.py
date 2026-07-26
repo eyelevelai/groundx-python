@@ -203,6 +203,15 @@ def build_candidates(
             "artifact_catalog_sha256": sidecar_manifest["artifact_catalog_sha256"],
             "source_boundary_manifest_sha256": sidecar_manifest["source_boundary_manifest_sha256"],
             "upstream_candidate_manifest_sha256": _sha256(xray_candidate_manifest_path),
+            "generator": {
+                "candidate_builder_sha256": _sha256(Path(__file__)),
+                "boundary_replay_sha256": _sha256(
+                    repo_root / "tests" / "extract" / "test_extraction_boundary_reassembly.py"
+                ),
+                "production_reassembly_sha256": _sha256(
+                    repo_root / "src" / "groundx" / "extract" / "custom_outputs.py"
+                ),
+            },
             "candidates": candidates,
             "private_references": [],
         },

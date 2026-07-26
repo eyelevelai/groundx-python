@@ -83,6 +83,12 @@ def test_builder_writes_review_candidates_without_touching_accepted_fixtures(
     assert result.returncode == 0, result.stderr
     manifest = json.loads((candidate_root / "fixture_candidate_manifest.json").read_text())
     assert len(manifest["candidates"]) == 1
+    assert set(manifest["generator"]) == {
+        "boundary_replay_sha256",
+        "candidate_builder_sha256",
+        "production_reassembly_sha256",
+    }
+    assert all(len(value) == 64 for value in manifest["generator"].values())
     candidate = manifest["candidates"][0]
     assert candidate["artifact_name"] == "groundx_python_xray_reassembly"
     assert candidate["surface"] == SURFACE
