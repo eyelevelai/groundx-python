@@ -2065,6 +2065,7 @@ def prepare_extraction_yaml(
     top_level_metadata_keys: typing.Optional[typing.Iterable[str]] = None,
     final_group_metadata_keys: typing.Optional[typing.Iterable[str]] = None,
     workflow_group_metadata_keys: typing.Optional[typing.Iterable[str]] = None,
+    pseudo_group_metadata_keys: typing.Optional[typing.Iterable[str]] = None,
 ) -> PreparedExtractionYaml:
     data = _load_extraction_mapping(raw_yaml)
     if _PERSISTED_WORKFLOW_EXTRACT_KEY in data:
@@ -2104,6 +2105,9 @@ def prepare_extraction_yaml(
     effective_workflow_metadata_key_set = workflow_metadata_key_set | {
         _CUSTOM_WORKFLOW_GROUP_METADATA_KEY
     }
+    effective_pseudo_metadata_key_set = effective_workflow_metadata_key_set | set(
+        pseudo_group_metadata_keys or []
+    )
     metadata_overlap = final_metadata_key_set & effective_workflow_metadata_key_set
     if metadata_overlap:
         raise ValueError(
@@ -2181,7 +2185,7 @@ def prepare_extraction_yaml(
             f"_pseudo_groups.{pseudo_group_name}",
         )
         pseudo_group, explicit_workflow_metadata = _split_metadata(
-            pseudo_group, effective_workflow_metadata_key_set
+            pseudo_group, effective_pseudo_metadata_key_set
         )
         unsupported_pseudo_keys = set(pseudo_group.keys()) - _PSEUDO_GROUP_BODY_KEYS
         if unsupported_pseudo_keys:
@@ -2287,7 +2291,7 @@ def prepare_extraction_yaml(
             explicit_workflow_metadata,
             parent_paths,
             final_workflow_metadata,
-            effective_workflow_metadata_key_set,
+            effective_pseudo_metadata_key_set,
         )
         if resolved_metadata:
             workflow_group_metadata[pseudo_group_name] = resolved_metadata

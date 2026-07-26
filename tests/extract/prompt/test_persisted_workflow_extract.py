@@ -245,6 +245,49 @@ def test_persisted_workflow_extract_round_trips_authored_metadata() -> None:
     }
 
 
+def test_persisted_workflow_extract_round_trips_pseudo_group_metadata() -> None:
+    raw = """
+extraction_policy_version: v1
+
+statement:
+  role: statement
+  fields:
+    account_number:
+      prompt:
+        instructions: Return the account number.
+        type: str
+
+_pseudo_groups:
+  statement_identity:
+    role: statement
+    workflow_step: chunk-keys
+    fields:
+      account_number:
+        path: /statement/account_number
+"""
+
+    prepared = prepare_extraction_yaml(
+        raw,
+        final_group_metadata_keys={"role"},
+        workflow_group_metadata_keys={"workflow_step"},
+        pseudo_group_metadata_keys={"role"},
+    )
+    reloaded = prepare_extraction_yaml(
+        json.loads(json.dumps(prepared.persisted_workflow_extract)),
+        final_group_metadata_keys={"role"},
+        workflow_group_metadata_keys={"workflow_step"},
+        pseudo_group_metadata_keys={"role"},
+    )
+
+    assert prepared.final_group_metadata["statement"] == {"role": "statement"}
+    assert prepared.workflow_group_metadata["statement_identity"] == {
+        "role": "statement",
+        "workflow_step": "chunk-keys",
+    }
+    assert reloaded.final_group_metadata == prepared.final_group_metadata
+    assert reloaded.workflow_group_metadata == prepared.workflow_group_metadata
+
+
 def test_prepare_extraction_yaml_accepts_mapping_without_mutating_it() -> None:
     prepared = _prepare(POLICY_YAML)
     persisted = prepared.persisted_workflow_extract

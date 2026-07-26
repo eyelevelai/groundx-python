@@ -1,0 +1,67 @@
+{
+  "artifacts": {
+    "previous_download_workflow_load": {
+      "sha256": "40957dbf359561102dfdbe45fa5401c3ae8a49f6cf90da9347e6a15c59a40460"
+    },
+    "xray_sidecar": {
+      "sha256": "790df496544843b523ec1591f5888f43fa259097e0b672d72b67ad60dc0abb7d"
+    }
+  },
+  "assertions": {
+    "consumes_download_workflow_load_handoff": true,
+    "consumes_real_xray_sidecar": true,
+    "has_no_error_diagnostics": true,
+    "shape_contract_passed": true
+  },
+  "input_from": "internal_arcadia_download_workflow_load",
+  "input_sha256": "40957dbf359561102dfdbe45fa5401c3ae8a49f6cf90da9347e6a15c59a40460",
+  "output": {
+    "diagnostic_count": 12,
+    "final_output_sha256": "990dbbf78a6cc24f53866b4aa52846c24c7e85b09b15fca477fa9463b8efc534",
+    "relationship_output_sha256": "990dbbf78a6cc24f53866b4aa52846c24c7e85b09b15fca477fa9463b8efc534",
+    "source_provenance_count": 1674,
+    "workflow_output_sha256": "787eb53b2d9216ec64c92ce52e1d21904ff0e4e0a7136df17b8a039915f55619"
+  },
+  "output_for": "sdk_reassembly_proof",
+  "request": {
+    "callback_url": "https://api.eyelevel.ai/documentlayout",
+    "document_id": "705e1563-c112-4cc8-b64e-69710dbf092e",
+    "file_name": "arcadia",
+    "model_id": 30662,
+    "processor_id": 134,
+    "task_id": "d5cce6cf-db79-4997-9f01-f78bfc990c0c",
+    "workflow_capture": {
+      "capture_config_hash": "ac907b522b6647858e88707f7d89389f6216578888866e283df202c7b197736d",
+      "capture_types": [
+        "pipeline_trace",
+        "prompt_capture"
+      ],
+      "case_id": "generic-v1",
+      "enabled": true,
+      "expires_at": "2099-01-01T00:00:00Z",
+      "max_artifacts": 500,
+      "retention": {
+        "delete_after": "2099-01-02T00:00:00Z",
+        "owner": "private-extraction-certification"
+      },
+      "run_id": "extract-cert-generic-v1-01",
+      "schema_version": "extraction_pipeline_capture_v1",
+      "workflow_id": "generic_v1-product-path"
+    },
+    "workflow_id": "generic_v1-product-path",
+    "workflow_schema_hash": "66b0e276d5996122e278951cf52009cd5b9e2891dfff9f15c13bc21696edcf14",
+    "workflow_version": "2026-07-12T22:34:02Z"
+  },
+  "schema_version": "groundx-python-xray-reassembly-boundary-v1",
+  "shape_assertions": {
+    "has_account_child_candidates": true,
+    "has_minimum_parent_candidates": true,
+    "has_minimum_total_child_candidates": true,
+    "has_no_error_diagnostics": true,
+    "has_relationship_output": true,
+    "has_statement_fields": true
+  },
+  "stage": "groundx_python_xray_reassembly",
+  "surface": "generic_v1",
+  "workflow_schema_hash": "66b0e276d5996122e278951cf52009cd5b9e2891dfff9f15c13bc21696edcf14"
+}

@@ -1,0 +1,21 @@
+{
+  "acceptance_reason": "Accepted as deterministic SDK X-Ray reassembly output from a passing hosted fixture-seeding run.",
+  "accepted_actual_as_expected": true,
+  "actual_sha256": "b002c7ff5bab332961bab1c22c704e44b07baf815d323a974a1fd9ec34f51f07",
+  "artifact_catalog_sha256": "95acc2b8d0d9f0447bea153ed20e339615b6b1c3788f079990cf5eb3af9e7153",
+  "artifact_name": "groundx_python_xray_reassembly",
+  "expected_sha256": "b002c7ff5bab332961bab1c22c704e44b07baf815d323a974a1fd9ec34f51f07",
+  "kind": "machine_readable_json_diff",
+  "reviewed_field_count_summary": {
+    "boundary": "groundx_python_xray_reassembly",
+    "input_from": "internal_arcadia_download_workflow_load",
+    "output_for": "sdk_reassembly_proof",
+    "stage": "groundx_python_xray_reassembly",
+    "surface": "arcadia_v1"
+  },
+  "source_artifact_sha256": "90be49ed3b5fab46fb5d1d5686b11c55462a4bceb45136151c93178d7a76a68b",
+  "source_lineage": "repo_fixture",
+  "source_run_id": "live-20260722T001149Z-sdk388-cashbot-700-internal-a48-digest5d-trace-fixture-seeding-promptcapture",
+  "status": "passed",
+  "surface": "arcadia_v1"
+}

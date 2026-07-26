@@ -1,21 +1,28 @@
 {
+  "artifacts": [
+    {
+      "input_from": "internal_arcadia_download_workflow_load",
+      "input_path_template": "groundx-python/tests/extract/fixtures/extraction-boundary/inputs/{surface}/internal_arcadia_download_workflow_load.handoff.json",
+      "name": "groundx_python_xray_reassembly",
+      "output_for": "sdk_reassembly_proof",
+      "owner": "groundx-python",
+      "path_template": "groundx-python/tests/extract/fixtures/extraction-boundary/boundary-goldens/{surface}/groundx_python_xray_reassembly.expected.json",
+      "required": true,
+      "source_log_required": false,
+      "stage": "sdk_xray_reassembly",
+      "validator": "groundx-python/tests/extract/test_extraction_boundary_reassembly.py",
+      "writer": "groundx-python/src/groundx/extract",
+      "capture_cardinality": "one_per_case",
+      "case_applicability": "all"
+    }
+  ],
+  "catalog_version": "2026-07-23.1",
   "schema_version": "groundx_python_extraction_boundary_catalog_v1",
-  "catalog_version": "2026-07-21.1",
-  "source_artifact_catalog_path": "groundx-studio-harness/scripts/fixtures/extraction-boundary-artifact-catalog.json",
-  "source_artifact_catalog_sha256": "3267ea15081fdafcb56e0986350e35a843dbfcc23e37fee401b3a9fc05a6c509",
+  "source_artifact_catalog_sha256": "e517e8e1dd72a990ea3c941454d99586888dd036335979c78dc7a5792ef2dfd6",
   "surfaces": [
     "arcadia_legacy",
     "arcadia_v1",
     "generic_v1",
     "adp_v1"
-  ],
-  "artifacts": [
-    {
-      "input_from": "internal_arcadia_download_workflow_load",
-      "name": "groundx_python_xray_reassembly",
-      "output_for": "sdk_reassembly_proof",
-      "owner": "groundx-python",
-      "stage": "groundx_python_xray_reassembly"
-    }
   ]
 }

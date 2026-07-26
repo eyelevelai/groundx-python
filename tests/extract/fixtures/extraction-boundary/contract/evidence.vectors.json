@@ -1,0 +1,266 @@
+{
+  "schema_version": "extraction_boundary_evidence_vectors_v1",
+  "valid": [
+    {
+      "name": "single_handoff_and_terminal",
+      "value": {
+        "schema_version": "extraction_boundary_evidence_v1",
+        "case_id": "arcadia-v1",
+        "surface": "arcadia_v1",
+        "run_id": "live-example",
+        "workflow_plan_nodes": [
+          {
+            "node_id": "reconcile-statement",
+            "stage": "reconcile_statement",
+            "owner": "internal-arcadia-agents",
+            "workflow_schema_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          }
+        ],
+        "planned_executions": [
+          {
+            "execution_id": "reconcile-statement-1",
+            "node_id": "reconcile-statement",
+            "ordinal": 1,
+            "input_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        ],
+        "boundary_events": [
+          {
+            "event_id": "before-reconcile-statement",
+            "stage": "reconcile_statement",
+            "owner_repo": "internal-arcadia-agents",
+            "owner_service": "extract-agent",
+            "entrypoint": "StatementRequest.reconcile_statement",
+            "input_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "output_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "artifact_path": "layout/processed/task/document-extract-trace/internal-arcadia-agents/reconcile_statement.json"
+          },
+          {
+            "event_id": "after-reconcile-statement",
+            "stage": "reconcile_statement",
+            "owner_repo": "internal-arcadia-agents",
+            "owner_service": "extract-agent",
+            "entrypoint": "StatementRequest.reconcile_statement",
+            "input_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "output_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            "artifact_path": "layout/processed/task/document-extract-trace/internal-arcadia-agents/reconcile_statement_after.json"
+          }
+        ],
+        "provider_bodies": {
+          "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee": {
+            "sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+            "artifact_path": "layout/processed/task/document-extract-trace/internal-arcadia-agents/provider_request.json"
+          }
+        },
+        "provider_executions": [
+          {
+            "execution_id": "reconcile-statement-1",
+            "stage": "reconcile_statement",
+            "attempts": [
+              {
+                "attempt": 1,
+                "request_body_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+                "response_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+                "status": "success"
+              }
+            ]
+          }
+        ],
+        "not_applicable": [],
+        "lineage": [
+          {
+            "kind": "handoff",
+            "edge": {
+              "from_event_id": "before-reconcile-statement",
+              "to_event_id": "after-reconcile-statement",
+              "artifact_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            }
+          },
+          {
+            "kind": "terminal",
+            "event_id": "after-reconcile-statement",
+            "reason": "success"
+          }
+        ],
+        "candidate_review": {
+          "status": "unreviewed",
+          "candidate_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+        },
+        "interactive_approval": null,
+        "live_certification": null
+      }
+    }
+  ],
+  "invalid": [
+    {
+      "name": "missing_boundary_events",
+      "remove": "boundary_events"
+    },
+    {
+      "name": "invalid_surface",
+      "set": {
+        "path": "surface",
+        "value": "arcadia"
+      }
+    },
+    {
+      "name": "invalid_sha256",
+      "set": {
+        "path": "boundary_events.0.output_sha256",
+        "value": "not-a-sha"
+      }
+    },
+    {
+      "name": "provider_body_key_mismatch",
+      "set": {
+        "path": "provider_bodies.eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.sha256",
+        "value": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+      }
+    },
+    {
+      "name": "missing_planned_execution",
+      "set": {
+        "path": "planned_executions",
+        "value": []
+      }
+    },
+    {
+      "name": "missing_provider_bundle",
+      "set": {
+        "path": "provider_bodies",
+        "value": {}
+      }
+    },
+    {
+      "name": "provider_execution_not_planned",
+      "set": {
+        "path": "provider_executions.0.execution_id",
+        "value": "unknown-execution"
+      }
+    },
+    {
+      "name": "missing_expected_output",
+      "set": {
+        "path": "boundary_events.0.output_sha256",
+        "value": ""
+      }
+    },
+    {
+      "name": "missing_reducer_input_lineage",
+      "set": {
+        "path": "lineage.0.edge.artifact_sha256",
+        "value": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+      }
+    },
+    {
+      "name": "unknown_next_boundary",
+      "set": {
+        "path": "lineage.0.edge.to_event_id",
+        "value": "unknown-event"
+      }
+    },
+    {
+      "name": "nonterminal_without_successor",
+      "set": {
+        "path": "lineage",
+        "value": [
+          {
+            "kind": "terminal",
+            "event_id": "after-reconcile-statement",
+            "reason": "success"
+          }
+        ]
+      }
+    },
+    {
+      "name": "terminal_event_has_successor",
+      "set": {
+        "path": "lineage.1.event_id",
+        "value": "before-reconcile-statement"
+      }
+    },
+    {
+      "name": "interactive_approval_without_approved_candidate",
+      "set": {
+        "path": "interactive_approval",
+        "value": {
+          "reviewer": "reviewer@example.test",
+          "approved_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+          "approved_at": "2026-07-25T00:00:00Z"
+        }
+      }
+    },
+    {
+      "name": "approved_candidate_without_interactive_approval",
+      "set": {
+        "path": "candidate_review.status",
+        "value": "approved"
+      }
+    },
+    {
+      "name": "unordered_provider_attempts",
+      "set": {
+        "path": "provider_executions.0.attempts",
+        "value": [
+          {
+            "attempt": 2,
+            "request_body_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+            "response_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+            "status": "error"
+          },
+          {
+            "attempt": 1,
+            "request_body_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+            "response_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            "status": "success"
+          }
+        ]
+      }
+    },
+    {
+      "name": "terminal_with_successor",
+      "set": {
+        "path": "lineage.1.edge",
+        "value": {
+          "from_event_id": "after-reconcile-statement",
+          "to_event_id": "another-event",
+          "artifact_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+        }
+      }
+    },
+    {
+      "name": "incomplete_fan_in",
+      "set": {
+        "path": "lineage.0",
+        "value": {
+          "kind": "fan_in",
+          "edges": [
+            {
+              "from_event_id": "before-reconcile-statement",
+              "to_event_id": "after-reconcile-statement",
+              "artifact_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            }
+          ],
+          "complete": false
+        }
+      }
+    },
+    {
+      "name": "incomplete_fan_out",
+      "set": {
+        "path": "lineage.0",
+        "value": {
+          "kind": "fan_out",
+          "edges": [
+            {
+              "from_event_id": "before-reconcile-statement",
+              "to_event_id": "after-reconcile-statement",
+              "artifact_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            }
+          ],
+          "complete": false
+        }
+      }
+    }
+  ]
+}

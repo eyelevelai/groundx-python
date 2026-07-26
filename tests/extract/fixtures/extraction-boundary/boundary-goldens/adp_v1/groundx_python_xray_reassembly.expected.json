@@ -1,0 +1,68 @@
+{
+  "artifacts": {
+    "previous_download_workflow_load": {
+      "sha256": "258e1f9a1feac9342e0d1d79a660665733bb38f4a146e9946783358572c5f846"
+    },
+    "xray_sidecar": {
+      "sha256": "b4989c81d84e8ce979fea781678b60f8c55ef92cf981a73760cfbbf1c713c484"
+    }
+  },
+  "assertions": {
+    "consumes_download_workflow_load_handoff": true,
+    "consumes_real_xray_sidecar": true,
+    "has_no_error_diagnostics": true,
+    "shape_contract_passed": true
+  },
+  "input_from": "internal_arcadia_download_workflow_load",
+  "input_sha256": "258e1f9a1feac9342e0d1d79a660665733bb38f4a146e9946783358572c5f846",
+  "output": {
+    "diagnostic_count": 218,
+    "final_output_sha256": "d7844662cde9600195ace39134dadee69f64f73cc14e9614476febe5654cc5d0",
+    "relationship_output_sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+    "source_provenance_count": 712,
+    "workflow_output_sha256": "e646a8d7d39ea23da6c934ec13a6620480632776e9b97a90fd509fce27d149c0"
+  },
+  "output_for": "sdk_reassembly_proof",
+  "request": {
+    "callback_url": "https://api.eyelevel.ai/documentlayout",
+    "document_id": "d69400ac-a032-4e2f-8872-d34b4901a6bb",
+    "file_name": "adp",
+    "model_id": 30663,
+    "processor_id": 134,
+    "task_id": "286344b0-100d-4ddd-bc94-95985c8989f7",
+    "workflow_capture": {
+      "capture_config_hash": "a8e1bd62b2501d9574f1fe9dce234bd338317b319cb2ed5b4bfa933f9fc1b088",
+      "capture_types": [
+        "pipeline_trace",
+        "prompt_capture"
+      ],
+      "case_id": "adp-v1",
+      "enabled": true,
+      "expires_at": "2099-01-01T00:00:00Z",
+      "max_artifacts": 500,
+      "retention": {
+        "delete_after": "2099-01-02T00:00:00Z",
+        "owner": "private-extraction-certification"
+      },
+      "run_id": "extract-cert-adp-v1-01",
+      "schema_version": "extraction_pipeline_capture_v1",
+      "workflow_id": "adp_v1-product-path"
+    },
+    "workflow_id": "adp_v1-product-path",
+    "workflow_schema_hash": "440d6a1064202a8a2e1fcff746dcc7b132d0e1117b0ab1212da3cee07dc28725",
+    "workflow_version": "2026-07-12T22:34:03Z"
+  },
+  "schema_version": "groundx-python-xray-reassembly-boundary-v1",
+  "shape_assertions": {
+    "has_adp_core_fields_populated_by_section": true,
+    "has_adp_null_fields_in_range": true,
+    "has_adp_populated_fields_in_range": true,
+    "has_expected_adp_section_count": true,
+    "has_expected_adp_workflow_field_count": true,
+    "has_no_error_diagnostics": true,
+    "has_no_unexpected_adp_fields": true
+  },
+  "stage": "groundx_python_xray_reassembly",
+  "surface": "adp_v1",
+  "workflow_schema_hash": "440d6a1064202a8a2e1fcff746dcc7b132d0e1117b0ab1212da3cee07dc28725"
+}

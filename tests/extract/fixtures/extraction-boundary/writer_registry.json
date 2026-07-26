@@ -1,0 +1,64 @@
+{
+  "schema_version": "extraction_boundary_writer_registry_v1",
+  "owner": "groundx-python",
+  "artifacts": [
+    {
+      "input_from": "internal_arcadia_download_workflow_load",
+      "input_path_template": "groundx-python/tests/extract/fixtures/extraction-boundary/inputs/{surface}/internal_arcadia_download_workflow_load.handoff.json",
+      "name": "groundx_python_xray_reassembly",
+      "output_for": "sdk_reassembly_proof",
+      "path_template": "groundx-python/tests/extract/fixtures/extraction-boundary/boundary-goldens/{surface}/groundx_python_xray_reassembly.expected.json",
+      "service_role": "internal-arcadia-agents extract pod embedded GroundX Python SDK",
+      "repo": "groundx-python",
+      "production_entrypoint": "groundx.extract.custom_outputs.reassemble_custom_outputs",
+      "before_boundary_function": "groundx.extract.custom_outputs.reassemble_custom_outputs_from_xray",
+      "after_boundary_function": "classes.statement.Statement._load_xray_with_trace",
+      "evidence_writer_function": "classes.pipeline_trace.capture_load_xray_after",
+      "s3_path_template": "layout/processed/{task_id}/{document_id}-extract-trace/internal-arcadia-agents/{stage_run}/output.full_json.json",
+      "consumer_boundary": "internal_arcadia_download_workflow_load",
+      "fixture_path_template": "groundx-python/tests/extract/fixtures/extraction-boundary/boundary-goldens/{surface}/groundx_python_xray_reassembly.expected.json",
+      "applicability": "all protected cases during Internal Arcadia X-Ray load",
+      "ci_test": "tests/extract/test_extraction_boundary_reassembly.py",
+      "required_ci_check": "Test",
+      "capture_source": "workflow _groundx_internal_capture propagated by Internal Arcadia",
+      "payload_carrier_or_lookup_key": "X-Ray customOutputs plus persisted workflow extract passed to reassemble_custom_outputs",
+      "validation_point": "groundx.extract.custom_outputs.reassemble_custom_outputs_from_xray",
+      "pre_hydration_failure_recovery": "Internal Arcadia download records the fatal callback from the original task body before SDK reassembly completes",
+      "required": true,
+      "source_log_required": false,
+      "stage": "sdk_xray_reassembly",
+      "validator": "groundx-python/tests/extract/test_extraction_boundary_reassembly.py",
+      "writer": "groundx-python/src/groundx/extract",
+      "capture_cardinality": "one_per_case",
+      "case_applicability": "all"
+    }
+  ],
+  "source_discovery": {
+    "rules": [
+      {
+        "kind": "boundary_definition",
+        "symbol": "reassemble_custom_outputs_from_xray",
+        "source_files": [
+          "src/groundx/extract/custom_outputs.py"
+        ],
+        "catalog_stages": [
+          "sdk_xray_reassembly"
+        ]
+      },
+      {
+        "kind": "boundary_call",
+        "call": "reassemble_custom_outputs_from_xray",
+        "source_files": [
+          "src/groundx/extract/custom_outputs.py"
+        ],
+        "catalog_stages": [
+          "sdk_xray_reassembly"
+        ]
+      }
+    ],
+    "production_boundaries": [
+      "src/groundx/extract/custom_outputs.py:reassemble_custom_outputs:reassemble_custom_outputs_from_xray:1",
+      "src/groundx/extract/custom_outputs.py:reassemble_custom_outputs_from_xray"
+    ]
+  }
+}
