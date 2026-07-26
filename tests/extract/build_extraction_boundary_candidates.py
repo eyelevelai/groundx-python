@@ -5,7 +5,6 @@ import datetime
 import hashlib
 import importlib.util
 import json
-import sys
 import typing
 from pathlib import Path
 
@@ -231,4 +230,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()
