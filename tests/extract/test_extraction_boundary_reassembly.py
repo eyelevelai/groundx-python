@@ -1,7 +1,6 @@
 import copy
 import hashlib
 import json
-import os
 import pathlib
 import re
 import typing
@@ -10,7 +9,6 @@ import pytest
 
 from groundx.extract.custom_outputs import reassemble_custom_outputs_from_xray
 
-UPDATE_GOLDENS_ENV = "UPDATE_GROUNDX_PYTHON_EXTRACT_BOUNDARY_GOLDENS"
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 DIAGNOSTIC_ROOT = (
     ROOT
@@ -88,19 +86,11 @@ def test_extraction_boundary_catalog_is_pinned() -> None:
 def test_sdk_reassembly_expected_answer_projection_diagnostic_packets(
     tmp_path: pathlib.Path,
 ) -> None:
-    update_goldens = os.environ.get(UPDATE_GOLDENS_ENV) == "1"
     for surface in SURFACES:
         actual, actual_path, expected_path, diff_path, previous_path, handoff_path = (
             _write_boundary_artifacts(tmp_path, surface)
         )
         expected = _stable_boundary_output(actual)
-        if update_goldens:
-            _write_json(expected_path, expected)
-            _write_json(
-                handoff_path,
-                _read_json(pathlib.Path(actual["artifacts"]["handoff"]["path"])),
-            )
-
         golden = _read_json(expected_path)
         expected_handoff_sha = _sha256_file(handoff_path)
         actual_handoff_sha = actual["artifacts"]["handoff"]["sha256"]
@@ -132,9 +122,8 @@ def test_sdk_reassembly_expected_answer_projection_diagnostic_packets(
             _write_json(diff_path, diff)
             pytest.fail(
                 "SDK X-Ray reassembly proof drifted for "
-                f"{surface}; run {UPDATE_GOLDENS_ENV}=1 PYTHONPATH=src pytest "
-                "tests/extract/test_extraction_boundary_reassembly.py -q if "
-                "this contract change is intended"
+                f"{surface}; stage reviewed replacements through the Harness "
+                "fixture promotion flow"
             )
         _write_json(diff_path, diff)
 
@@ -149,22 +138,6 @@ def test_sdk_xray_reassembly_real_boundary_packets(
         surface,
     )
     expected = _stable_boundary_output(actual)
-    update_goldens = os.environ.get(UPDATE_GOLDENS_ENV) == "1"
-    if update_goldens:
-        _write_json(expected_path, expected)
-        _write_reviewed_expected_output_sidecars(
-            surface=surface,
-            packet_path=expected_path,
-            source_path=_real_download_workflow_load_input_path(surface),
-            reviewed_field_count_summary={
-                "boundary": "groundx_python_xray_reassembly",
-                "surface": surface,
-                "stage": "groundx_python_xray_reassembly",
-                "input_from": "internal_arcadia_download_workflow_load",
-                "output_for": "sdk_reassembly_proof",
-            },
-        )
-
     golden = _read_json(expected_path)
     diff: typing.Dict[str, typing.Any] = {
         "kind": "machine_readable_json_diff",
@@ -180,9 +153,8 @@ def test_sdk_xray_reassembly_real_boundary_packets(
         _write_json(diff_path, diff)
         pytest.fail(
             "SDK X-Ray reassembly real boundary proof drifted for "
-            f"{surface}; run {UPDATE_GOLDENS_ENV}=1 PYTHONPATH=src pytest "
-            "tests/extract/test_extraction_boundary_reassembly.py -q if "
-            "this contract change is intended"
+            f"{surface}; stage reviewed replacements through the Harness "
+            "fixture promotion flow"
             )
     _write_json(diff_path, diff)
     _assert_reviewed_expected_output_sidecar(expected_path)
