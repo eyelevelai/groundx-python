@@ -1,10 +1,10 @@
 {
   "artifacts": {
     "previous_download_workflow_load": {
-      "sha256": "6f38b6ecdbd9146b86d958cb2bdf26cc3bcb4cd2cb8e850a950856d163fd7775"
+      "sha256": "a5746e71582de3d0907e25e131a08ec0027d7f2361d55be9dc61f6566a0e5008"
     },
     "xray_sidecar": {
-      "sha256": "486dfd5f206f298fbeec767bf51f07d802403f5818cbe294a21b1193f8da1160"
+      "sha256": "2aa63d13f494df2e57a8d7d370981c03dade296a1ce8b5fe32ce9ac6dd9acf33"
     }
   },
   "assertions": {
@@ -14,43 +14,43 @@
     "shape_contract_passed": true
   },
   "input_from": "internal_arcadia_download_workflow_load",
-  "input_sha256": "6f38b6ecdbd9146b86d958cb2bdf26cc3bcb4cd2cb8e850a950856d163fd7775",
+  "input_sha256": "a5746e71582de3d0907e25e131a08ec0027d7f2361d55be9dc61f6566a0e5008",
   "output": {
-    "diagnostic_count": 11,
-    "final_output_sha256": "0d4586b175ae7a65105d719dc8b571533a053bb389dffa563b6a782e5c41da28",
-    "relationship_output_sha256": "0d4586b175ae7a65105d719dc8b571533a053bb389dffa563b6a782e5c41da28",
-    "source_provenance_count": 1746,
-    "workflow_output_sha256": "6c7891216652c81a1a8d8a842380d6bef86c4022ad6a12a53c4a6c63c4967643"
+    "diagnostic_count": 15,
+    "final_output_sha256": "83cccc9c2b1295254cb8f358c88ba13fdafc7815593030591db72258127574dd",
+    "relationship_output_sha256": "83cccc9c2b1295254cb8f358c88ba13fdafc7815593030591db72258127574dd",
+    "source_provenance_count": 1601,
+    "workflow_output_sha256": "3f526ee87ba08add036761d0e0ead781124dba18f1b64908fa91658c21260f87"
   },
   "output_for": "sdk_reassembly_proof",
   "request": {
     "callback_url": "https://api.eyelevel.ai/documentlayout",
-    "document_id": "1bbebf19-8a3b-44e7-a203-35366f7de8a3",
+    "document_id": "46cf1f54-9a39-498e-9fb0-e1439233bed0",
     "file_name": "arcadia",
-    "model_id": 30660,
+    "model_id": 30884,
     "processor_id": 134,
-    "task_id": "fed6b253-8fa4-45bd-b20a-226f455c1f5c",
+    "task_id": "ad81b5ff-f62e-4f6e-98f2-6d9a96bd8a27",
     "workflow_capture": {
-      "capture_config_hash": "ae651a03a5af713614a8b87c7e33d5234b562631ca437854ab8a384ff67376ce",
+      "capture_config_hash": "51a36f57bb46aa2b8eaab8b9db4c7ca3112a8d5bf26cf72cb2fd9ae44d8a5bf0",
       "capture_types": [
         "pipeline_trace",
         "prompt_capture"
       ],
       "case_id": "arcadia-legacy",
       "enabled": true,
-      "expires_at": "2099-01-01T00:00:00Z",
+      "expires_at": "2026-07-26T19:30:43Z",
       "max_artifacts": 500,
       "retention": {
-        "delete_after": "2099-01-02T00:00:00Z",
+        "delete_after": "2026-08-02T13:30:43Z",
         "owner": "private-extraction-certification"
       },
       "run_id": "extract-cert-arcadia-legacy-01",
       "schema_version": "extraction_pipeline_capture_v1",
-      "workflow_id": "arcadia_legacy-product-path"
+      "workflow_id": "e6cfa4e7-0c72-48bd-9f4c-bde7be8ec424"
     },
-    "workflow_id": "arcadia_legacy-product-path",
+    "workflow_id": "e6cfa4e7-0c72-48bd-9f4c-bde7be8ec424",
     "workflow_schema_hash": "b859b731ea3d23ad2f130681b1bd664c85209a44a9de653ad81a0f74a3a318be",
-    "workflow_version": "2026-07-12T22:34:00Z"
+    "workflow_version": "2026-07-26T13:30:44.759Z"
   },
   "schema_version": "groundx-python-xray-reassembly-boundary-v1",
   "shape_assertions": {

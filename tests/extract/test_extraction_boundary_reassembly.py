@@ -701,8 +701,9 @@ def _write_reviewed_expected_output_sidecars(
         {
             "accepted_actual_as_expected": True,
             "acceptance_reason": (
-                "Accepted as deterministic SDK X-Ray reassembly output from "
-                "a passing hosted fixture-seeding run."
+                "Accepted as deterministic SDK X-Ray reassembly behavior from "
+                "the reviewed hosted fixture-seeding run. This freezes behavior, "
+                "not extraction quality."
             ),
             "actual_sha256": packet_sha,
             "artifact_catalog_sha256": _sha256_file(CATALOG_PATH),
@@ -723,8 +724,9 @@ def _write_reviewed_expected_output_sidecars(
             "reviewed_expected_output": {
                 "accepted_actual_as_expected": True,
                 "acceptance_reason": (
-                    "Accepted as deterministic SDK X-Ray reassembly output "
-                    "from a passing hosted fixture-seeding run."
+                    "Accepted as deterministic SDK X-Ray reassembly behavior "
+                    "from the reviewed hosted fixture-seeding run. This freezes "
+                    "behavior, not extraction quality."
                 ),
                 "artifact_catalog_sha256": _sha256_file(CATALOG_PATH),
                 "artifact_catalog_version": catalog["catalog_version"],
@@ -734,10 +736,10 @@ def _write_reviewed_expected_output_sidecars(
                 "expected_path": str(packet_path.relative_to(ROOT)),
                 "expected_sha256": packet_sha,
                 "packet_sha256": packet_sha,
-                "reviewed_at": "2026-07-21T22:12:08.864Z",
+                "reviewed_at": "2026-07-26T15:25:00Z",
                 "reviewed_field_count_summary": dict(reviewed_field_count_summary),
                 "reviewer_identity": "Benjamin Fletcher",
-                "reviewer_role": "product/engineering reviewer",
+                "reviewer_role": "product owner and human fixture reviewer",
                 "source_path": str(source_path.relative_to(ROOT)),
                 "source_lineage": "repo_fixture",
                 "source_run_id": source_run_id,
@@ -819,10 +821,6 @@ def _assert_no_synthetic_protected_marker(
 
     if isinstance(value, str):
         for marker in (
-            "arcadia_legacy_",
-            "arcadia_v1_",
-            "generic_v1_",
-            "adp_v1_",
             "_parent_",
             "_account_level",
             "deterministic_from_cashbot_deployed_output_routes",

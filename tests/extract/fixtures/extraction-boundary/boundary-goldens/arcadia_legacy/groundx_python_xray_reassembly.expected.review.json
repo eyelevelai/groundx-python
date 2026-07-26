@@ -1,16 +1,16 @@
 {
   "reviewed_expected_output": {
-    "acceptance_reason": "Accepted as deterministic SDK X-Ray reassembly output from a passing hosted fixture-seeding run.",
+    "acceptance_reason": "Accepted as deterministic SDK X-Ray reassembly behavior from the reviewed hosted fixture-seeding run. This freezes behavior, not extraction quality.",
     "accepted_actual_as_expected": true,
-    "artifact_catalog_sha256": "95acc2b8d0d9f0447bea153ed20e339615b6b1c3788f079990cf5eb3af9e7153",
+    "artifact_catalog_sha256": "6d820016ccf14fa1702eb0e6d7be9d2b2dd0ae0c485f3c6fd9a12b4dc91d6784",
     "artifact_catalog_version": "2026-07-23.1",
     "author_identity": "Codex",
     "diff_path": "tests/extract/fixtures/extraction-boundary/boundary-goldens/arcadia_legacy/groundx_python_xray_reassembly.expected.diff.json",
     "diff_status": "passed",
     "expected_path": "tests/extract/fixtures/extraction-boundary/boundary-goldens/arcadia_legacy/groundx_python_xray_reassembly.expected.json",
-    "expected_sha256": "7acf3efac5e275b687e11edc44fa2141a5c9d9996a591a128ac8080cea0c7f4e",
-    "packet_sha256": "7acf3efac5e275b687e11edc44fa2141a5c9d9996a591a128ac8080cea0c7f4e",
-    "reviewed_at": "2026-07-21T22:12:08.864Z",
+    "expected_sha256": "d589aa6c29e4c262dcc0ad22bc1e5631401151381d1a26004efacab9bb135e24",
+    "packet_sha256": "d589aa6c29e4c262dcc0ad22bc1e5631401151381d1a26004efacab9bb135e24",
+    "reviewed_at": "2026-07-26T15:25:00Z",
     "reviewed_field_count_summary": {
       "boundary": "groundx_python_xray_reassembly",
       "input_from": "internal_arcadia_download_workflow_load",
@@ -19,10 +19,10 @@
       "surface": "arcadia_legacy"
     },
     "reviewer_identity": "Benjamin Fletcher",
-    "reviewer_role": "product/engineering reviewer",
+    "reviewer_role": "product owner and human fixture reviewer",
     "source_lineage": "repo_fixture",
     "source_path": "tests/extract/fixtures/extraction-boundary/inputs/arcadia_legacy/internal_arcadia_download_workflow_load.handoff.json",
-    "source_run_id": "live-20260722T134446Z-sdk388-cashbot-82b-internal-6a5-digest026-trace-fixture-seeding",
-    "source_sha256": "6f38b6ecdbd9146b86d958cb2bdf26cc3bcb4cd2cb8e850a950856d163fd7775"
+    "source_run_id": "live-20260726T132601Z-sdk389-cashbot-e516-internal-24a-digest75a8-trace-fixture-seeding",
+    "source_sha256": "a5746e71582de3d0907e25e131a08ec0027d7f2361d55be9dc61f6566a0e5008"
   }
 }
