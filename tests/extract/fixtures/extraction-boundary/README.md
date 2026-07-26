@@ -19,5 +19,19 @@ a candidate diff separately, explain why the old behavior is wrong, and obtain
 Benjamin Fletcher's approval before replacing an accepted fixture. Never update
 an expected file merely because a new run differs.
 
+When the reviewed X-Ray input candidate changes, generate matching SDK output
+candidates with:
+
+```bash
+poetry run python tests/extract/build_extraction_boundary_candidates.py \
+  --xray-candidate-manifest <xray-candidate-root>/fixture_candidate_manifest.json \
+  --candidate-root <empty-sdk-candidate-root>
+```
+
+This command calls `reassemble_custom_outputs_from_xray` and writes only to the
+candidate root. Review and approve both candidate-manifest hashes before using
+the Studio Harness promotion command. Do not promote an X-Ray input without its
+matching SDK output candidate.
+
 Only the external model/provider response may be replaced by a fixed fixture.
 Tests must call production reassembly functions unchanged.
