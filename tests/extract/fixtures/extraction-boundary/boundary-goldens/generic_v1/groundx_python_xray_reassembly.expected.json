@@ -4,7 +4,7 @@
       "sha256": "b649df9d9d441e6da2b5db99536e61e9183f7189183e03ca81eff5efaff8a4fc"
     },
     "xray_sidecar": {
-      "sha256": "e1140d4e9de279e8bb139672cdc9889621280627f5f64bc3aa7de2acaa038e62"
+      "sha256": "11efb161acb22e21ae5fd58249ab6c2cc76dd302e699002f39fec2c11f93a4af"
     }
   },
   "assertions": {
@@ -16,11 +16,11 @@
   "input_from": "internal_arcadia_download_workflow_load",
   "input_sha256": "b649df9d9d441e6da2b5db99536e61e9183f7189183e03ca81eff5efaff8a4fc",
   "output": {
-    "diagnostic_count": 21,
+    "diagnostic_count": 29,
     "final_output_sha256": "2ae41318a02ae686742295a4bbb504ed3930b4c8b8f89fd342504a1a7da9d97c",
     "relationship_output_sha256": "2ae41318a02ae686742295a4bbb504ed3930b4c8b8f89fd342504a1a7da9d97c",
-    "source_provenance_count": 1538,
-    "workflow_output_sha256": "d4e998cea914c612772c2fd0289a72bbe03581235327ae2239f15d310ab83ba8"
+    "source_provenance_count": 2092,
+    "workflow_output_sha256": "35957ae2c85b18cd3ff9d218527a0367d4befd9477a55a7ffde4183185c01cec"
   },
   "output_for": "sdk_reassembly_proof",
   "request": {

@@ -1,21 +1,13 @@
 {
-  "acceptance_reason": "Accepted as deterministic SDK X-Ray reassembly behavior from the reviewed hosted fixture-seeding run. This freezes behavior, not extraction quality.",
-  "accepted_actual_as_expected": true,
-  "actual_sha256": "5691b3b84604421230b1cbd80cb5af9324203df9ceb8e6a8451db0ff5fd4661d",
-  "artifact_catalog_sha256": "6d820016ccf14fa1702eb0e6d7be9d2b2dd0ae0c485f3c6fd9a12b4dc91d6784",
+  "actual_sha256": "4609d7d7e478248cfd863b12603ca1c7cd8ab2e870eac5e4b8f13fecfc2b6e97",
+  "approval_sha256": "7db76c9bedb62588b0e892cdc4f083c25ea8d007a58cea51754252cf28b4576a",
   "artifact_name": "groundx_python_xray_reassembly",
-  "expected_sha256": "5691b3b84604421230b1cbd80cb5af9324203df9ceb8e6a8451db0ff5fd4661d",
+  "candidate_diff_sha256": "e311cf09a7d59c811f91518600e00cc878e07628b31cf7f81f508dc46c363bdf",
+  "candidate_manifest_sha256": "8305098e661792b94b625b71cd5e790a9abcd4392bf2b14664297261f8f94c4a",
+  "candidate_sha256": "4609d7d7e478248cfd863b12603ca1c7cd8ab2e870eac5e4b8f13fecfc2b6e97",
+  "expected_sha256": "4609d7d7e478248cfd863b12603ca1c7cd8ab2e870eac5e4b8f13fecfc2b6e97",
   "kind": "machine_readable_json_diff",
-  "reviewed_field_count_summary": {
-    "boundary": "groundx_python_xray_reassembly",
-    "input_from": "internal_arcadia_download_workflow_load",
-    "output_for": "sdk_reassembly_proof",
-    "stage": "groundx_python_xray_reassembly",
-    "surface": "generic_v1"
-  },
-  "source_artifact_sha256": "b649df9d9d441e6da2b5db99536e61e9183f7189183e03ca81eff5efaff8a4fc",
-  "source_lineage": "repo_fixture",
+  "source_artifact_sha256": "12b6f0094a76f1c388a120b6f0148a763418929a0693e5362bbebd8ad24c129b",
   "source_run_id": "live-20260726T132601Z-sdk389-cashbot-e516-internal-24a-digest75a8-trace-fixture-seeding",
-  "status": "passed",
-  "surface": "generic_v1"
+  "status": "passed"
 }

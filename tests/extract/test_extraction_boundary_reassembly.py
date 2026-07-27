@@ -4,6 +4,7 @@ import json
 import pathlib
 import re
 import typing
+import urllib.parse
 
 import pytest
 
@@ -735,21 +736,36 @@ def _assert_reviewed_expected_output_sidecar(packet_path: pathlib.Path) -> None:
     assert evidence["artifact_catalog_version"] == catalog["catalog_version"]
     assert evidence["packet_sha256"] == _sha256_file(packet_path)
     assert evidence["expected_sha256"] == _sha256_file(packet_path)
-    assert evidence["expected_path"] == str(packet_path.relative_to(ROOT))
-    assert evidence["diff_path"] == str(diff_path.relative_to(ROOT))
+    assert _repo_evidence_path(evidence["expected_path"]) == packet_path.relative_to(ROOT)
+    assert _repo_evidence_path(evidence["diff_path"]) == diff_path.relative_to(ROOT)
     assert evidence["diff_status"] == "passed"
     assert evidence["reviewer_identity"] != evidence["author_identity"]
-    source_path = ROOT / evidence["source_path"]
-    assert source_path.exists()
-    assert evidence["source_sha256"] == _sha256_file(source_path)
-    assert evidence["source_run_id"] == _source_run_id_for_surface(
-        packet_path.parent.name,
-        _read_json(source_path),
-    )
+    assert re.fullmatch(r"[a-f0-9]{64}", evidence["source_sha256"])
+    if "source_path" in evidence:
+        source_path = ROOT / _repo_evidence_path(evidence["source_path"])
+        assert source_path.exists()
+        assert evidence["source_sha256"] == _sha256_file(source_path)
+        assert evidence["source_run_id"] == _source_run_id_for_surface(
+            packet_path.parent.name,
+            _read_json(source_path),
+        )
+    else:
+        source_url = urllib.parse.urlsplit(evidence["source_url"])
+        assert source_url.scheme == "https"
+        assert not source_url.query
+        assert not source_url.fragment
+        assert source_url.path.endswith(f"/{evidence['source_hosted_path']}")
     diff = _read_json(diff_path)
     assert diff["status"] == "passed"
     assert diff["actual_sha256"] == _sha256_file(packet_path)
     assert diff["expected_sha256"] == _sha256_file(packet_path)
+
+
+def _repo_evidence_path(value: str) -> pathlib.Path:
+    path = pathlib.Path(value)
+    if path.parts and path.parts[0] == ROOT.name:
+        return pathlib.Path(*path.parts[1:])
+    return path
 
 
 def _inherited_evidence(previous: typing.Mapping[str, typing.Any]) -> typing.Dict[str, typing.Any]:

@@ -1,28 +1,31 @@
 {
   "reviewed_expected_output": {
-    "acceptance_reason": "Accepted as deterministic SDK X-Ray reassembly behavior from the reviewed hosted fixture-seeding run. This freezes behavior, not extraction quality.",
-    "accepted_actual_as_expected": true,
-    "artifact_catalog_sha256": "6d820016ccf14fa1702eb0e6d7be9d2b2dd0ae0c485f3c6fd9a12b4dc91d6784",
+    "approval_sha256": "7db76c9bedb62588b0e892cdc4f083c25ea8d007a58cea51754252cf28b4576a",
+    "artifact_catalog_sha256": "e517e8e1dd72a990ea3c941454d99586888dd036335979c78dc7a5792ef2dfd6",
     "artifact_catalog_version": "2026-07-23.1",
     "author_identity": "Codex",
-    "diff_path": "tests/extract/fixtures/extraction-boundary/boundary-goldens/generic_v1/groundx_python_xray_reassembly.expected.diff.json",
+    "candidate_manifest_sha256": "8305098e661792b94b625b71cd5e790a9abcd4392bf2b14664297261f8f94c4a",
+    "diff_path": "groundx-python/tests/extract/fixtures/extraction-boundary/boundary-goldens/generic_v1/groundx_python_xray_reassembly.expected.diff.json",
     "diff_status": "passed",
-    "expected_path": "tests/extract/fixtures/extraction-boundary/boundary-goldens/generic_v1/groundx_python_xray_reassembly.expected.json",
-    "expected_sha256": "5691b3b84604421230b1cbd80cb5af9324203df9ceb8e6a8451db0ff5fd4661d",
-    "packet_sha256": "5691b3b84604421230b1cbd80cb5af9324203df9ceb8e6a8451db0ff5fd4661d",
-    "reviewed_at": "2026-07-26T15:25:00Z",
-    "reviewed_field_count_summary": {
-      "boundary": "groundx_python_xray_reassembly",
-      "input_from": "internal_arcadia_download_workflow_load",
-      "output_for": "sdk_reassembly_proof",
-      "stage": "groundx_python_xray_reassembly",
-      "surface": "generic_v1"
-    },
+    "expected_path": "groundx-python/tests/extract/fixtures/extraction-boundary/boundary-goldens/generic_v1/groundx_python_xray_reassembly.expected.json",
+    "expected_sha256": "4609d7d7e478248cfd863b12603ca1c7cd8ab2e870eac5e4b8f13fecfc2b6e97",
+    "packet_sha256": "4609d7d7e478248cfd863b12603ca1c7cd8ab2e870eac5e4b8f13fecfc2b6e97",
+    "privacy_disposition": "Commit only deterministic SDK summary packets derived from the approved sanitized X-Ray sidecars. Do not commit raw X-Ray content, prompts, model responses, credentials, or customer content.",
+    "review_reason": "Freeze the exact GroundX Python SDK output produced from the approved X-Ray candidates by production reassembly. Utility final extraction output is unchanged; diagnostics and provenance now reflect the real replay input.",
+    "reviewed_at": "2026-07-26T23:59:22Z",
     "reviewer_identity": "Benjamin Fletcher",
+    "reviewer_relation": "non_author",
     "reviewer_role": "product owner and human fixture reviewer",
-    "source_lineage": "repo_fixture",
-    "source_path": "tests/extract/fixtures/extraction-boundary/inputs/generic_v1/internal_arcadia_download_workflow_load.handoff.json",
+    "source_boundary_manifest_sha256": "e5df7dfbb97463cf5fce11ebfac004a3e6d6979ccfdd43bfe013d9ce55aa5828",
+    "source_hosted_path": "layout/processed/f1fa95e9-503c-48bd-8940-e51709848736/83d92902-2244-41c1-b772-a77522f18708-xray.json",
     "source_run_id": "live-20260726T132601Z-sdk389-cashbot-e516-internal-24a-digest75a8-trace-fixture-seeding",
-    "source_sha256": "b649df9d9d441e6da2b5db99536e61e9183f7189183e03ca81eff5efaff8a4fc"
+    "source_run_mode": "fixture_seeding",
+    "source_sha256": "12b6f0094a76f1c388a120b6f0148a763418929a0693e5362bbebd8ad24c129b",
+    "source_url": "https://upload.eyelevel.ai/layout/processed/f1fa95e9-503c-48bd-8940-e51709848736/83d92902-2244-41c1-b772-a77522f18708-xray.json",
+    "transformations": [
+      "Replay each approved X-Ray candidate through the production GroundX Python reassembly function.",
+      "Store the complete deterministic expected packet without normalizing or substituting expected values.",
+      "Preserve the upstream candidate manifest and production implementation hashes as lineage."
+    ]
   }
 }
