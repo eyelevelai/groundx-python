@@ -29,9 +29,11 @@ poetry run python tests/extract/build_extraction_boundary_candidates.py \
 ```
 
 This command calls `reassemble_custom_outputs_from_xray` and writes only to the
-candidate root. Review and approve both candidate-manifest hashes before using
-the Studio Harness promotion command. Do not promote an X-Ray input without its
-matching SDK output candidate.
+candidate root. It records shape and diagnostic assertions but does not require
+them to pass; candidate generation freezes observed behavior, while human review
+decides whether that behavior should replace the accepted fixture. Review and
+approve both candidate-manifest hashes before using the Studio Harness promotion
+command. Do not promote an X-Ray input without its matching SDK output candidate.
 
 Only the external model/provider response may be replaced by a fixed fixture.
 Tests must call production reassembly functions unchanged.

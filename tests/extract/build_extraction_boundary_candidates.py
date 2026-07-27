@@ -154,7 +154,7 @@ def build_candidates(
     replay._real_xray_sidecar_path = lambda surface: _resolve_inside(sidecar_root, sidecars[surface]["candidate_path"])
     candidates = []
     for surface in surfaces:
-        actual, accepted_path, _unused_diff_path = replay._write_xray_reassembly_boundary_artifact(
+        actual, accepted_path, _unused_diff_path = replay._build_xray_reassembly_boundary_artifact(
             candidate_root, surface
         )
         packet = replay._stable_boundary_output(actual)

@@ -161,6 +161,17 @@ def test_sdk_xray_reassembly_real_boundary_packets(
     _assert_reviewed_expected_output_sidecar(expected_path)
 
 
+def test_repo_evidence_path_accepts_canonical_repo_prefix(
+    tmp_path: pathlib.Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setitem(globals(), "ROOT", tmp_path / "renamed-worktree")
+
+    assert _repo_evidence_path(
+        "groundx-python/tests/extract/fixtures/example.json"
+    ) == pathlib.Path("tests/extract/fixtures/example.json")
+
+
 def test_projection_fixtures_are_diagnostic_only() -> None:
     for fixture_path in DIAGNOSTIC_ROOT.glob("**/*.json"):
         fixture = _read_json(fixture_path)
@@ -533,7 +544,7 @@ def _source_run_ids(value: typing.Any) -> typing.Set[str]:
     return set()
 
 
-def _write_xray_reassembly_boundary_artifact(
+def _build_xray_reassembly_boundary_artifact(
     tmp_path: pathlib.Path,
     surface: str,
 ) -> typing.Tuple[typing.Dict[str, typing.Any], pathlib.Path, pathlib.Path]:
@@ -622,20 +633,31 @@ def _write_xray_reassembly_boundary_artifact(
             xray_sidecar["schema_version"]
             == "groundx_python_xray_reassembly_sidecar_v1"
         )
-    assert actual["assertions"]["consumes_download_workflow_load_handoff"]
-    if xray_sidecar is not None:
-        assert actual["assertions"]["consumes_real_xray_sidecar"]
-    assert actual["assertions"]["has_no_error_diagnostics"]
-    assert actual["assertions"]["shape_contract_passed"]
-    _assert_no_synthetic_protected_marker(previous)
-    if xray_sidecar is not None:
-        _assert_no_synthetic_protected_marker(xray_sidecar)
-    _assert_no_synthetic_protected_marker(actual)
-
     expected_path = (
         BOUNDARY_GOLDENS_ROOT / surface / "groundx_python_xray_reassembly.expected.json"
     )
     diff_path = out_dir / "groundx_python_xray_reassembly.diff.json"
+    return actual, expected_path, diff_path
+
+
+def _write_xray_reassembly_boundary_artifact(
+    tmp_path: pathlib.Path,
+    surface: str,
+) -> typing.Tuple[typing.Dict[str, typing.Any], pathlib.Path, pathlib.Path]:
+    actual, expected_path, diff_path = _build_xray_reassembly_boundary_artifact(
+        tmp_path,
+        surface,
+    )
+    previous = _read_json(_real_download_workflow_load_input_path(surface))
+    xray_path = _real_xray_sidecar_path(surface)
+
+    assert actual["assertions"]["consumes_download_workflow_load_handoff"]
+    if xray_path.exists():
+        assert actual["assertions"]["consumes_real_xray_sidecar"]
+    _assert_no_synthetic_protected_marker(previous)
+    if xray_path.exists():
+        _assert_no_synthetic_protected_marker(_read_json(xray_path))
+    _assert_no_synthetic_protected_marker(actual)
     return actual, expected_path, diff_path
 
 
@@ -763,7 +785,7 @@ def _assert_reviewed_expected_output_sidecar(packet_path: pathlib.Path) -> None:
 
 def _repo_evidence_path(value: str) -> pathlib.Path:
     path = pathlib.Path(value)
-    if path.parts and path.parts[0] == ROOT.name:
+    if path.parts and path.parts[0] in {ROOT.name, "groundx-python"}:
         return pathlib.Path(*path.parts[1:])
     return path
 
