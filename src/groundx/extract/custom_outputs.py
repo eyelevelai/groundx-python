@@ -1092,13 +1092,10 @@ def _dedupe_relationship_parents(
     match_attrs: typing.Sequence[str],
 ) -> typing.List[typing.Dict[str, typing.Any]]:
     deduped: typing.List[typing.Dict[str, typing.Any]] = []
-    by_key: typing.Dict[
-        typing.Tuple[typing.Tuple[str, typing.Any], ...],
-        typing.Dict[str, typing.Any],
-    ] = {}
+    by_key: typing.Dict[str, typing.Dict[str, typing.Any]] = {}
     for parent in parent_list:
-        parent_key = _match_key(parent, match_attrs)
-        if not parent_key:
+        parent_key = _relationship_record_key(parent, match_attrs)
+        if parent_key is None:
             deduped.append(parent)
             continue
         existing = by_key.get(parent_key)
@@ -1132,10 +1129,18 @@ def _relationship_child_dedupe_key(
     unique_attrs: typing.Sequence[str],
 ) -> str:
     if unique_attrs:
-        child_key = _match_key(child, unique_attrs)
-        if child_key:
-            return _record_key(child_key)
+        child_key = _relationship_record_key(child, unique_attrs)
+        if child_key is not None:
+            return child_key
     return _record_key(_plain(child))
+
+
+def _relationship_record_key(
+    record: typing.Mapping[str, typing.Any],
+    attrs: typing.Sequence[str],
+) -> typing.Optional[str]:
+    match_key = _match_key(record, attrs)
+    return _record_key(match_key) if match_key else None
 
 
 def _relationship_child_unique_attrs(
@@ -1271,8 +1276,28 @@ def _normalize_match_value(value: typing.Any) -> typing.Any:
     unwrapped = _unwrap_match_value(value)
     if isinstance(unwrapped, str):
         return unwrapped.strip().casefold()
+    if isinstance(unwrapped, bool):
+        return ("boolean", unwrapped)
     if isinstance(unwrapped, numbers.Real):
-        return float(unwrapped)
+        return ("number", float(unwrapped))
+    if isinstance(unwrapped, typing.Mapping):
+        return (
+            "object",
+            tuple(
+                sorted(
+                    (
+                        str(key),
+                        _normalize_match_value(item),
+                    )
+                    for key, item in unwrapped.items()
+                )
+            ),
+        )
+    if isinstance(unwrapped, (list, tuple)):
+        return (
+            "list",
+            tuple(_normalize_match_value(item) for item in unwrapped),
+        )
     return unwrapped
 
 

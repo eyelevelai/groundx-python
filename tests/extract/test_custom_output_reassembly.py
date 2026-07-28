@@ -275,6 +275,176 @@ def test_relationship_dedupes_child_rows_by_match_and_unique_attrs() -> None:
     assert result.relationship_output == result.final_output
 
 
+def test_relationship_roles_support_the_same_declared_value_types() -> None:
+    parent_group = "generic_parent_records"
+    child_group = "generic_child_records"
+    parent_step = "generic_parent_step"
+    child_step = "generic_child_step"
+    child_field = "generic_children"
+    values = {
+        "generic_identity": {
+            "region": "north",
+            "parts": [1, True, {"code": "A"}],
+        },
+        "generic_scalar": "source value",
+        "generic_list": ["one", 2, False],
+        "generic_null": None,
+        "generic_number": 12.5,
+        "generic_boolean": False,
+        "generic_object": {"nested": {"enabled": True}},
+        "generic_conflict": {
+            "value": "primary",
+            "confidence": 0.8,
+            "conflicts": ["alternate"],
+        },
+        "generic_passthrough": {"source": "workflow"},
+    }
+    workflow_extract = {
+        "workflow": {
+            "custom_steps": [
+                {"name": parent_step, "level": "chunk", "kind": "summary"},
+                {"name": child_step, "level": "chunk", "kind": "keys"},
+            ],
+            "output_routes": [
+                {
+                    "workflow_group": group,
+                    "workflow_field": field,
+                    "final_path": f"/{group}/{field}",
+                    "step_name": step,
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": field,
+                }
+                for group, step in (
+                    (parent_group, parent_step),
+                    (child_group, child_step),
+                )
+                for field in values
+            ],
+            "output_relationships": [
+                {
+                    "parent_group": parent_group,
+                    "child_group": child_group,
+                    "parent_output_field": child_field,
+                    "match_attrs": ["generic_identity"],
+                    "unmatched_child_group": child_group,
+                }
+            ],
+        }
+    }
+    xray = {
+        "chunks": [
+            {
+                "customChunkOutputs": {
+                    parent_step: {"_records": [values]},
+                    child_step: {"_records": [values]},
+                }
+            }
+        ]
+    }
+
+    result = reassemble_custom_outputs_from_xray(
+        xray,
+        workflow_extract=workflow_extract,
+    )
+
+    expected = {key: value for key, value in values.items() if value is not None}
+    parent = result.final_output[parent_group][0]
+    child = parent[child_field][0]
+    assert result.diagnostics == []
+    assert {
+        key: value for key, value in parent.items() if key != child_field
+    } == expected
+    assert child == expected
+    assert result.workflow_output == {
+        parent_group: [expected],
+        child_group: [expected],
+    }
+    assert json.loads(json.dumps(result.final_output)) == result.final_output
+
+
+def test_relationship_match_keeps_booleans_distinct_from_numbers() -> None:
+    workflow_extract = {
+        "workflow": {
+            "custom_steps": [
+                {"name": "generic_parent_step", "level": "chunk", "kind": "summary"},
+                {"name": "generic_child_step", "level": "chunk", "kind": "keys"},
+            ],
+            "output_routes": [
+                {
+                    "workflow_group": group,
+                    "workflow_field": field,
+                    "final_path": f"/{group}/{field}",
+                    "step_name": step,
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": field,
+                }
+                for group, step in (
+                    ("generic_parents", "generic_parent_step"),
+                    ("generic_children", "generic_child_step"),
+                )
+                for field in ("generic_identity", "generic_label")
+            ],
+            "output_relationships": [
+                {
+                    "parent_group": "generic_parents",
+                    "child_group": "generic_children",
+                    "parent_output_field": "generic_children",
+                    "match_attrs": ["generic_identity"],
+                    "unmatched_child_group": "generic_children",
+                }
+            ],
+        }
+    }
+    xray = {
+        "chunks": [
+            {
+                "customChunkOutputs": {
+                    "generic_parent_step": {
+                        "_records": [
+                            {"generic_identity": True, "generic_label": "boolean"},
+                            {"generic_identity": 1, "generic_label": "number"},
+                        ]
+                    },
+                    "generic_child_step": {
+                        "_records": [
+                            {"generic_identity": True, "generic_label": "boolean"},
+                            {"generic_identity": 1, "generic_label": "number"},
+                        ]
+                    },
+                }
+            }
+        ]
+    }
+
+    result = reassemble_custom_outputs_from_xray(
+        xray,
+        workflow_extract=workflow_extract,
+    )
+
+    assert result.diagnostics == []
+    assert result.final_output == {
+        "generic_parents": [
+            {
+                "generic_identity": True,
+                "generic_label": "boolean",
+                "generic_children": [
+                    {"generic_identity": True, "generic_label": "boolean"}
+                ],
+            },
+            {
+                "generic_identity": 1,
+                "generic_label": "number",
+                "generic_children": [
+                    {"generic_identity": 1, "generic_label": "number"}
+                ],
+            },
+        ],
+        "generic_children": [],
+    }
+
+
 def test_relationship_dedupes_exact_child_rows_without_unique_attrs() -> None:
     workflow_extract = {
         "_groundx_persisted_extract": {
