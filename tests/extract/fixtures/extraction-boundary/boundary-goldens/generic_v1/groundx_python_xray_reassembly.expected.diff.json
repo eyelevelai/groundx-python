@@ -1,13 +1,13 @@
 {
-  "actual_sha256": "4609d7d7e478248cfd863b12603ca1c7cd8ab2e870eac5e4b8f13fecfc2b6e97",
-  "approval_sha256": "7db76c9bedb62588b0e892cdc4f083c25ea8d007a58cea51754252cf28b4576a",
+  "actual_sha256": "59b4caf4ea14bd65d20a3dad4e8567bf30c80114303dd8633c6717277391a6ae",
+  "approval_sha256": "966f352d4654c9bebf8b175bc9d3c5089356b515f931d7cce0b9970f2eb6aa14",
   "artifact_name": "groundx_python_xray_reassembly",
-  "candidate_diff_sha256": "e311cf09a7d59c811f91518600e00cc878e07628b31cf7f81f508dc46c363bdf",
-  "candidate_manifest_sha256": "8305098e661792b94b625b71cd5e790a9abcd4392bf2b14664297261f8f94c4a",
-  "candidate_sha256": "4609d7d7e478248cfd863b12603ca1c7cd8ab2e870eac5e4b8f13fecfc2b6e97",
-  "expected_sha256": "4609d7d7e478248cfd863b12603ca1c7cd8ab2e870eac5e4b8f13fecfc2b6e97",
+  "candidate_diff_sha256": "07ecbff855d9b98973d8edeaad2c3513a1a1adc3248d15a83c7772b51f8782ab",
+  "candidate_manifest_sha256": "b0eb7f80b8140f5332e36926fbb4182d0ecbebe72e51bae2bf4e80b602cfc7d0",
+  "candidate_sha256": "9853637790cefc1abde920dfe3deb8afa587d561e3143e87e70bde2e9b9db721",
+  "expected_sha256": "59b4caf4ea14bd65d20a3dad4e8567bf30c80114303dd8633c6717277391a6ae",
   "kind": "machine_readable_json_diff",
-  "source_artifact_sha256": "12b6f0094a76f1c388a120b6f0148a763418929a0693e5362bbebd8ad24c129b",
-  "source_run_id": "live-20260726T132601Z-sdk389-cashbot-e516-internal-24a-digest75a8-trace-fixture-seeding",
+  "source_artifact_sha256": "fae9098beaf76c7621a80f2029b2961ef33574cdfc7a55e41d9a7d4a3d1d3f3f",
+  "source_run_id": "live-20260728T050315Z-sdk389-cashbot-ecc3b43-internal-8089bd-digestc456-harnessf857-trace-fixture-seeding",
   "status": "passed"
 }

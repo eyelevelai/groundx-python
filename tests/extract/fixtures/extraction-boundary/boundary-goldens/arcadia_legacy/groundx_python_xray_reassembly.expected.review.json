@@ -8,8 +8,8 @@
     "diff_path": "groundx-python/tests/extract/fixtures/extraction-boundary/boundary-goldens/arcadia_legacy/groundx_python_xray_reassembly.expected.diff.json",
     "diff_status": "passed",
     "expected_path": "groundx-python/tests/extract/fixtures/extraction-boundary/boundary-goldens/arcadia_legacy/groundx_python_xray_reassembly.expected.json",
-    "expected_sha256": "c367a4a45286cbe22369ea621099f6b760303006d311ed9eeec92b95a7e774b8",
-    "packet_sha256": "c367a4a45286cbe22369ea621099f6b760303006d311ed9eeec92b95a7e774b8",
+  "expected_sha256": "b5fb13078da79869d28001ab57982894185d7a4308d28817f733111d53d6da3d",
+  "packet_sha256": "b5fb13078da79869d28001ab57982894185d7a4308d28817f733111d53d6da3d",
     "privacy_disposition": "Commit only deterministic SDK summary packets derived from the approved sanitized X-Ray sidecars. Do not commit raw X-Ray content, prompts, model responses, credentials, or customer content.",
     "review_reason": "Freeze the exact GroundX Python SDK output produced from the approved X-Ray candidates by production reassembly. Utility final extraction output is unchanged; diagnostics and provenance now reflect the real replay input.",
     "reviewed_at": "2026-07-26T23:59:22Z",
@@ -25,7 +25,9 @@
     "transformations": [
       "Replay each approved X-Ray candidate through the production GroundX Python reassembly function.",
       "Store the complete deterministic expected packet without normalizing or substituting expected values.",
-      "Preserve the upstream candidate manifest and production implementation hashes as lineage."
+      "Preserve the upstream candidate manifest and production implementation hashes as lineage.",
+    "Mechanically corrected predecessor lineage after the approved model-ID metadata repair; SDK outputs are unchanged.",
+    "Mechanically propagated bucket-bound capture metadata; reassembled extraction values are unchanged."
     ]
   }
 }

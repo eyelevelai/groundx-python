@@ -1,7 +1,7 @@
 {
   "artifacts": {
     "previous_download_workflow_load": {
-      "sha256": "77276b663ffd2ac3eed4159c1bfb8eaccd9dc8552267b072483ce6a0c1d2cdc8"
+      "sha256": "f309082e643ba3704f2579dafa7cee0947397cd4208bea164bc5e8a54638e221"
     },
     "xray_sidecar": {
       "sha256": "2e56b44108e1bc7d436e603c3b99a573d3dcbd461f4cb95d8940b0a1392d1106"
@@ -14,7 +14,7 @@
     "shape_contract_passed": true
   },
   "input_from": "internal_arcadia_download_workflow_load",
-  "input_sha256": "77276b663ffd2ac3eed4159c1bfb8eaccd9dc8552267b072483ce6a0c1d2cdc8",
+  "input_sha256": "f309082e643ba3704f2579dafa7cee0947397cd4208bea164bc5e8a54638e221",
   "output": {
     "diagnostic_count": 25,
     "final_output_sha256": "ec75d987510b4ce9fa3a9e042463e7320c2424a632481214079acd2520be5c35",
@@ -31,7 +31,8 @@
     "processor_id": 134,
     "task_id": "9a6c2389-4822-4cfb-b06d-1b186596898a",
     "workflow_capture": {
-      "capture_config_hash": "afa23e827f59a07c8283555a1a657bfee19468dc6155a7e174a3c8eb3ec07343",
+      "bucket_id": 30885,
+      "capture_config_hash": "43723ef0036f40711df8e61502427c77f741cf8802a19d4c03e5ffe0480700e3",
       "capture_types": [
         "pipeline_trace",
         "prompt_capture"

@@ -1,31 +1,27 @@
 {
   "reviewed_expected_output": {
-    "approval_sha256": "7db76c9bedb62588b0e892cdc4f083c25ea8d007a58cea51754252cf28b4576a",
+    "approval_sha256": "966f352d4654c9bebf8b175bc9d3c5089356b515f931d7cce0b9970f2eb6aa14",
     "artifact_catalog_sha256": "e517e8e1dd72a990ea3c941454d99586888dd036335979c78dc7a5792ef2dfd6",
     "artifact_catalog_version": "2026-07-23.1",
-    "author_identity": "Codex",
-    "candidate_manifest_sha256": "8305098e661792b94b625b71cd5e790a9abcd4392bf2b14664297261f8f94c4a",
+    "author_identity": "codex-agent",
+    "candidate_manifest_sha256": "b0eb7f80b8140f5332e36926fbb4182d0ecbebe72e51bae2bf4e80b602cfc7d0",
     "diff_path": "groundx-python/tests/extract/fixtures/extraction-boundary/boundary-goldens/generic_v1/groundx_python_xray_reassembly.expected.diff.json",
     "diff_status": "passed",
     "expected_path": "groundx-python/tests/extract/fixtures/extraction-boundary/boundary-goldens/generic_v1/groundx_python_xray_reassembly.expected.json",
-    "expected_sha256": "4609d7d7e478248cfd863b12603ca1c7cd8ab2e870eac5e4b8f13fecfc2b6e97",
-    "packet_sha256": "4609d7d7e478248cfd863b12603ca1c7cd8ab2e870eac5e4b8f13fecfc2b6e97",
-    "privacy_disposition": "Commit only deterministic SDK summary packets derived from the approved sanitized X-Ray sidecars. Do not commit raw X-Ray content, prompts, model responses, credentials, or customer content.",
-    "review_reason": "Freeze the exact GroundX Python SDK output produced from the approved X-Ray candidates by production reassembly. Utility final extraction output is unchanged; diagnostics and provenance now reflect the real replay input.",
-    "reviewed_at": "2026-07-26T23:59:22Z",
-    "reviewer_identity": "Benjamin Fletcher",
+    "expected_sha256": "59b4caf4ea14bd65d20a3dad4e8567bf30c80114303dd8633c6717277391a6ae",
+    "packet_sha256": "59b4caf4ea14bd65d20a3dad4e8567bf30c80114303dd8633c6717277391a6ae",
+    "privacy_disposition": "Approved sanitized service-state artifacts for repository storage; private artifacts remain URL and hash references.",
+    "review_reason": "Approved generic v1 SDK reassembly fixture from the July 28 hosted run.",
+    "reviewed_at": "2026-07-28T13:01:06Z",
+    "reviewer_identity": "benjamin-fletcher",
     "reviewer_relation": "non_author",
-    "reviewer_role": "product owner and human fixture reviewer",
-    "source_boundary_manifest_sha256": "e5df7dfbb97463cf5fce11ebfac004a3e6d6979ccfdd43bfe013d9ce55aa5828",
-    "source_hosted_path": "layout/processed/f1fa95e9-503c-48bd-8940-e51709848736/83d92902-2244-41c1-b772-a77522f18708-xray.json",
-    "source_run_id": "live-20260726T132601Z-sdk389-cashbot-e516-internal-24a-digest75a8-trace-fixture-seeding",
+    "reviewer_role": "human fixture reviewer",
+    "source_boundary_manifest_sha256": "264959b4a97a44ce0ad47fe7a32628b4bfb1406f06684e6cd2e31bbdfc59f51b",
+    "source_hosted_path": "layout/processed/b14a3459-b735-40ff-9222-a2e8ccd989e5/1662573d-1502-4248-8235-11d81f3a3c71-xray.json",
+    "source_run_id": "live-20260728T050315Z-sdk389-cashbot-ecc3b43-internal-8089bd-digestc456-harnessf857-trace-fixture-seeding",
     "source_run_mode": "fixture_seeding",
-    "source_sha256": "12b6f0094a76f1c388a120b6f0148a763418929a0693e5362bbebd8ad24c129b",
-    "source_url": "https://upload.eyelevel.ai/layout/processed/f1fa95e9-503c-48bd-8940-e51709848736/83d92902-2244-41c1-b772-a77522f18708-xray.json",
-    "transformations": [
-      "Replay each approved X-Ray candidate through the production GroundX Python reassembly function.",
-      "Store the complete deterministic expected packet without normalizing or substituting expected values.",
-      "Preserve the upstream candidate manifest and production implementation hashes as lineage."
-    ]
+    "source_sha256": "fae9098beaf76c7621a80f2029b2961ef33574cdfc7a55e41d9a7d4a3d1d3f3f",
+    "source_url": "https://upload.eyelevel.ai/layout/processed/b14a3459-b735-40ff-9222-a2e8ccd989e5/1662573d-1502-4248-8235-11d81f3a3c71-xray.json",
+    "transformations": []
   }
 }
