@@ -26,7 +26,7 @@ BOUNDARY_ROOT = ROOT / "tests" / "extract" / "fixtures" / "extraction-boundary"
 BOUNDARY_INPUT_ROOT = BOUNDARY_ROOT / "inputs"
 BOUNDARY_GOLDENS_ROOT = BOUNDARY_ROOT / "boundary-goldens"
 CATALOG_PATH = ROOT / "tests" / "extract" / "fixtures" / "extraction-boundary" / "catalog.json"
-CATALOG_SHA256 = "d5c399b675c5faa884f7d1b47d6ef9ec7fe6a12d92c1475d1a0c03cf599321ca"
+CATALOG_SHA256 = "b3c2b146e817f33ac3c78096dcd5fa35300cc829ba78a1d2273a1b6ee1ff72c9"
 ADP_EXPECTED_SECTION_COUNT = 11
 ADP_EXPECTED_FIELD_COUNT = 159
 ADP_MIN_POPULATED_FIELDS = 100
@@ -54,7 +54,7 @@ def test_extraction_boundary_catalog_is_pinned() -> None:
     assert catalog["catalog_version"] == "2026-07-23.1"
     assert catalog["surfaces"] == SURFACES
     assert catalog["source_artifact_catalog_sha256"] == (
-        "028e2df7a99ec7dba2000d9bcf2c2a99d9a2141ad92d317bd09e6e68c4d66c68"
+        "0a4dd694334d4968dae01edb16cdfae309dfed411a40b627ed73fab72d538144"
     )
     assert catalog["artifacts"] == [
         {
