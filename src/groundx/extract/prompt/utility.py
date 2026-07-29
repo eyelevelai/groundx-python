@@ -63,7 +63,6 @@ _SUPPORTED_FINAL_GROUP_METADATA_KEYS = {
     "exclude_dict_attrs",
     "explanation_attrs",
     "fill_rules",
-    "final_value_aliases",
     "match_attrs",
     "not_required_service_types",
     "partial_pair_attrs",
@@ -353,6 +352,19 @@ def _reject_unsupported_authored_keys(data: typing.Dict[str, typing.Any]) -> Non
                 f"top-level [{key}] is not supported in extraction YAML; "
                 "use extraction_policy_version: v1 with workflow metadata, or "
                 "pure legacy statement/meters/charges YAML"
+            )
+
+    for group_name, group in data.items():
+        if (
+            group_name in _RESERVED_TOP_LEVEL_KEYS
+            or group_name in _SUPPORTED_TOP_LEVEL_METADATA_KEYS
+            or not isinstance(group, dict)
+        ):
+            continue
+        if "final_value_aliases" in group:
+            raise ValueError(
+                "unsupported group metadata [final_value_aliases]; authored v1 "
+                "field names are final output names"
             )
 
 
@@ -1399,6 +1411,12 @@ def _normalize_custom_relationship(
 ) -> typing.Dict[str, typing.Any]:
     path = f"{_CUSTOM_WORKFLOW_KEY}.output_relationships[{idx}]"
     relationship = _ensure_mapping(value, path)
+    match_attrs_raw = relationship.get("match_attrs")
+    if match_attrs_raw is None or match_attrs_raw == []:
+        return {}
+    if not isinstance(match_attrs_raw, list):
+        raise ValueError("custom workflow relationship match_attrs must be a list")
+
     normalized: typing.Dict[str, typing.Any] = {}
     for key in ("parent_group", "child_group", "parent_output_field"):
         raw_value = relationship.get(key)
@@ -1406,9 +1424,6 @@ def _normalize_custom_relationship(
             raise ValueError(f"custom workflow relationship is missing [{key}]")
         normalized[key] = raw_value
 
-    match_attrs_raw = relationship.get("match_attrs")
-    if not isinstance(match_attrs_raw, list) or not match_attrs_raw:
-        raise ValueError("custom workflow relationship is missing [match_attrs]")
     match_attrs: typing.List[str] = []
     for attr_idx, attr_raw in enumerate(match_attrs_raw):
         if not isinstance(attr_raw, str) or attr_raw == "":
@@ -1440,8 +1455,9 @@ def _normalize_custom_relationships(
         raise ValueError(f"Expected list at [{_CUSTOM_WORKFLOW_KEY}.output_relationships]")
 
     return [
-        _normalize_custom_relationship(relationship, idx)
-        for idx, relationship in enumerate(value)
+        relationship
+        for idx, item in enumerate(value)
+        if (relationship := _normalize_custom_relationship(item, idx))
     ]
 
 
@@ -1791,9 +1807,7 @@ def _is_document_root_statement_group(
 ) -> bool:
     if group_role != "statement":
         return False
-    return isinstance(group_metadata.get("final_value_aliases"), dict) or isinstance(
-        group_metadata.get("fill_rules"), list
-    )
+    return isinstance(group_metadata.get("fill_rules"), list)
 
 
 def _collect_pseudo_custom_workflow_routes(

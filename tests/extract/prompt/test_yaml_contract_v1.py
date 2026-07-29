@@ -1,12 +1,11 @@
 import json
-from pathlib import Path
 import typing
+from pathlib import Path
 
 import pytest
 
 from groundx import GroundX
 from groundx.extract import prepare_extraction_yaml
-
 
 FIXTURE_DIR = Path(__file__).parent / "fixtures"
 CONTRACT_YAML = FIXTURE_DIR / "extraction_yaml_contract_v1.yaml"

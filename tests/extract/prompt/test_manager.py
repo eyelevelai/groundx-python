@@ -828,8 +828,7 @@ statement:
             """
 extraction_policy_version: v1
 statement:
-  final_value_aliases:
-    account_number: account_number
+  fill_rules: []
   fields:
     account_number:
       prompt:
@@ -1143,8 +1142,6 @@ statement:
   workflow_step: chunk-instruct
   unique_attrs:
     - account_number
-  final_value_aliases:
-    account_number: account_number
   fields:
     account_number:
       prompt:
@@ -1169,7 +1166,7 @@ _pseudo_groups:
       total_amount_due:
         path: /statement/total_amount_due
 """,
-            final_group_metadata_keys={"unique_attrs", "final_value_aliases"},
+            final_group_metadata_keys={"unique_attrs"},
             workflow_group_metadata_keys={"workflow_step"},
         )
 
@@ -1182,7 +1179,6 @@ _pseudo_groups:
             {
                 "statement": {
                     "unique_attrs": ["account_number"],
-                    "final_value_aliases": {"account_number": "account_number"},
                 }
             },
         )
@@ -1795,8 +1791,7 @@ workflow:
 
 generic_group_a:
   workflow_step: generic_step_a
-  final_value_aliases:
-    generic_attr_01: generic_attr_99
+  fill_rules: []
   fields:
     generic_attr_01:
       workflow_output_key: generic_attr_01

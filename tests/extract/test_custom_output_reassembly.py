@@ -152,7 +152,7 @@ def test_relationship_dedupes_child_rows_by_match_and_unique_attrs() -> None:
         "_groundx_persisted_extract": {
             "charges": {
                 "match_attrs": ["meter_number"],
-                "unique_attrs": ["description", "amount"],
+                "unique_attrs": ["status"],
             }
         },
         "workflow": {
@@ -197,6 +197,15 @@ def test_relationship_dedupes_child_rows_by_match_and_unique_attrs() -> None:
                     "output_map": "customChunkOutputs",
                     "output_key": "amount",
                 },
+                {
+                    "workflow_group": "charges",
+                    "workflow_field": "status",
+                    "final_path": "/charges/status",
+                    "step_name": "charge_rows",
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": "status",
+                },
             ],
             "output_relationships": [
                 {
@@ -220,24 +229,45 @@ def test_relationship_dedupes_child_rows_by_match_and_unique_attrs() -> None:
                                 "meter_number": "M-1",
                                 "description": "Energy",
                                 "amount": 10,
+                                "status": "supply",
                             },
                             {
                                 "meter_number": "M-1",
                                 "description": "Energy",
                                 "amount": 10,
+                                "status": "supply",
                             },
                             {
                                 "meter_number": "M-1",
-                                "description": "Demand",
-                                "amount": 20,
+                                "description": "Energy",
+                                "amount": 10,
+                                "status": "delivery",
+                            },
+                            {
+                                "meter_number": "M-1",
+                                "description": "Energy",
+                                "amount": 10,
+                                "status": "full_service",
                             },
                             {
                                 "description": "Account fee",
                                 "amount": 3,
+                                "status": "supply",
+                            },
+                            {
+                                "description": "Blank status fee",
+                                "amount": 4,
+                                "status": "",
+                            },
+                            {
+                                "description": "Blank status fee",
+                                "amount": 4,
+                                "status": "",
                             },
                             {
                                 "description": "Account fee",
                                 "amount": 3,
+                                "status": "supply",
                             },
                         ]
                     },
@@ -261,16 +291,28 @@ def test_relationship_dedupes_child_rows_by_match_and_unique_attrs() -> None:
                         "meter_number": "M-1",
                         "description": "Energy",
                         "amount": 10,
+                        "status": "supply",
                     },
                     {
                         "meter_number": "M-1",
-                        "description": "Demand",
-                        "amount": 20,
+                        "description": "Energy",
+                        "amount": 10,
+                        "status": "delivery",
+                    },
+                    {
+                        "meter_number": "M-1",
+                        "description": "Energy",
+                        "amount": 10,
+                        "status": "full_service",
                     },
                 ],
             }
         ],
-        "charges": [{"description": "Account fee", "amount": 3}],
+        "charges": [
+            {"description": "Account fee", "amount": 3, "status": "supply"},
+            {"description": "Blank status fee", "amount": 4},
+            {"description": "Blank status fee", "amount": 4},
+        ],
     }
     assert result.relationship_output == result.final_output
 
@@ -445,7 +487,7 @@ def test_relationship_match_keeps_booleans_distinct_from_numbers() -> None:
     }
 
 
-def test_relationship_dedupes_exact_child_rows_without_unique_attrs() -> None:
+def test_relationship_preserves_identical_child_rows_without_unique_attrs() -> None:
     workflow_extract = {
         "_groundx_persisted_extract": {
             "charges": {
@@ -526,6 +568,7 @@ def test_relationship_dedupes_exact_child_rows_without_unique_attrs() -> None:
                 "meter_number": "M-1",
                 "charges": [
                     {"meter_number": "M-1", "amount": 10},
+                    {"meter_number": "M-1", "amount": 10},
                     {"meter_number": "M-1", "amount": 20},
                 ],
             }
@@ -533,6 +576,67 @@ def test_relationship_dedupes_exact_child_rows_without_unique_attrs() -> None:
         "charges": [],
     }
     assert result.relationship_output == result.final_output
+
+
+def test_empty_match_attrs_leaves_generic_groups_unrelated() -> None:
+    workflow_extract = {
+        "workflow": {
+            "custom_steps": [
+                {"name": "parent_rows", "level": "chunk", "kind": "summary"},
+                {"name": "child_rows", "level": "chunk", "kind": "keys"},
+            ],
+            "output_routes": [
+                {
+                    "workflow_group": "generic_parents",
+                    "workflow_field": "parent_reference",
+                    "final_path": "/generic_parents/parent_reference",
+                    "step_name": "parent_rows",
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": "parent_reference",
+                },
+                {
+                    "workflow_group": "generic_children",
+                    "workflow_field": "child_reference",
+                    "final_path": "/generic_children/child_reference",
+                    "step_name": "child_rows",
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": "child_reference",
+                },
+            ],
+            "output_relationships": [
+                {
+                    "parent_group": "generic_parents",
+                    "child_group": "generic_children",
+                    "parent_output_field": "nested_children",
+                    "match_attrs": [],
+                    "unmatched_child_group": "generic_children",
+                }
+            ],
+        }
+    }
+    xray = {
+        "chunks": [
+            {
+                "customChunkOutputs": {
+                    "parent_rows": {"_records": [{"parent_reference": "P-1"}]},
+                    "child_rows": {"_records": [{"child_reference": "P-1"}]},
+                }
+            }
+        ]
+    }
+
+    result = reassemble_custom_outputs(
+        xray,
+        workflow_extract=workflow_extract,
+    )
+
+    assert result.relationship_output is None
+    assert result.final_output == {
+        "generic_parents": [{"parent_reference": "P-1"}],
+        "generic_children": [{"child_reference": "P-1"}],
+    }
 
 
 def test_chained_relationships_are_order_independent() -> None:

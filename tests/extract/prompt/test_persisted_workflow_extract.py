@@ -3,17 +3,14 @@ import json
 import typing
 
 import pytest
+from ._fixtures import SAMPLE_YAML_1, TestSource
 
 from groundx.extract import prepare_extraction_yaml
 from groundx.extract.prompt.manager import PromptManager
 from groundx.types.workflow_request import WorkflowRequest
 
-from ._fixtures import SAMPLE_YAML_1, TestSource
-
-
 TOP_LEVEL_METADATA_KEYS = {"extraction_policy_version"}
 FINAL_GROUP_METADATA_KEYS = {
-    "final_value_aliases",
     "fill_rules",
     "always_check_attrs",
     "match_attrs",
@@ -101,8 +98,6 @@ extraction_policy_version: v1
 
 statement:
   workflow_step: chunk-instruct
-  final_value_aliases:
-    amount_due: total_due
   fill_rules:
     - source: provider_name
       target: /meters/provider_name
@@ -221,9 +216,6 @@ def test_persisted_workflow_extract_round_trips_authored_metadata() -> None:
     reloaded = _prepare(round_tripped)
 
     assert reloaded.top_level_metadata == {"extraction_policy_version": "v1"}
-    assert reloaded.final_group_metadata["statement"]["final_value_aliases"] == {
-        "amount_due": "total_due"
-    }
     assert reloaded.final_group_metadata["statement"]["explanation_attrs"] == [
         "statement_explanation"
     ]
