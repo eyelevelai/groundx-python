@@ -1481,6 +1481,69 @@ def _relationships_from_final_group_metadata(
     ]
 
 
+def _validate_group_unique_attrs(
+    groups: typing.Mapping[str, typing.Dict[str, typing.Any]],
+    final_group_metadata: typing.Mapping[str, typing.Mapping[str, typing.Any]],
+) -> None:
+    for group_name, metadata in final_group_metadata.items():
+        if "unique_attrs" not in metadata:
+            continue
+
+        unique_attrs = metadata["unique_attrs"]
+        if not isinstance(unique_attrs, list) or any(
+            not isinstance(attr, str) or attr == "" for attr in unique_attrs
+        ):
+            raise ValueError(
+                f"{group_name}.unique_attrs must be a list of field-name strings"
+            )
+
+        group = groups.get(group_name)
+        if group is None:
+            raise ValueError(f"unique_attrs references unknown group [{group_name}]")
+        declared_fields = set(_collect_field_paths(group, group_name))
+        for attr in unique_attrs:
+            if attr not in declared_fields:
+                raise ValueError(
+                    f"{group_name}.unique_attrs references unknown field [{attr}]"
+                )
+
+
+def _validate_relationship_match_attrs(
+    workflow_groups: typing.Mapping[str, typing.Dict[str, typing.Any]],
+    custom_workflow_metadata: typing.Optional[typing.Mapping[str, typing.Any]],
+) -> None:
+    if not custom_workflow_metadata:
+        return
+
+    relationships = custom_workflow_metadata.get("output_relationships")
+    if not isinstance(relationships, list):
+        return
+
+    for idx, relationship in enumerate(relationships):
+        if not isinstance(relationship, typing.Mapping):
+            continue
+        match_attrs = relationship.get("match_attrs")
+        if not isinstance(match_attrs, list) or not match_attrs:
+            continue
+
+        for role in ("parent", "child"):
+            group_name = relationship.get(f"{role}_group")
+            if not isinstance(group_name, str) or group_name not in workflow_groups:
+                raise ValueError(
+                    f"workflow.output_relationships[{idx}] references unknown "
+                    f"{role} group [{group_name}]"
+                )
+            declared_fields = set(
+                _collect_field_paths(workflow_groups[group_name], group_name)
+            )
+            for attr in match_attrs:
+                if attr not in declared_fields:
+                    raise ValueError(
+                        f"workflow.output_relationships[{idx}].match_attrs "
+                        f"field [{attr}] is missing from {role} group [{group_name}]"
+                    )
+
+
 def _validate_custom_workflow_routes_and_leaves(
     routes: typing.List[typing.Dict[str, typing.Any]],
     leaves: typing.List[typing.Dict[str, typing.Any]],
@@ -2160,6 +2223,8 @@ def prepare_extraction_yaml(
         if workflow_metadata:
             final_workflow_metadata[group_name] = workflow_metadata
 
+    _validate_group_unique_attrs(groups, final_group_metadata)
+
     custom_workflow_metadata: typing.Optional[typing.Dict[str, typing.Any]] = None
     custom_workflow_authoring_input: typing.Optional[typing.Dict[str, typing.Any]] = None
     if custom_workflow_kind_and_input:
@@ -2320,6 +2385,10 @@ def prepare_extraction_yaml(
             )
             _strip_custom_workflow_authoring_keys(groups)
             _strip_custom_workflow_authoring_keys(workflow_groups)
+        _validate_relationship_match_attrs(
+            workflow_groups,
+            custom_workflow_metadata,
+        )
         _apply_custom_workflow_field_paths(
             workflow_field_paths,
             custom_workflow_metadata,
@@ -2377,6 +2446,10 @@ def prepare_extraction_yaml(
             workflow_field_paths,
             custom_workflow_metadata,
         )
+    _validate_relationship_match_attrs(
+        workflow_groups,
+        custom_workflow_metadata,
+    )
 
     return PreparedExtractionYaml(
         groups=groups,

@@ -3,6 +3,7 @@ import json
 import typing
 
 import pytest
+import yaml
 from ._fixtures import SAMPLE_YAML_1, TestSource
 
 from groundx.extract import prepare_extraction_yaml
@@ -91,6 +92,91 @@ def _persisted_custom_workflow_extract() -> typing.Dict[str, typing.Any]:
         },
         "workflow": _custom_workflow_metadata(),
     }
+
+
+def _relationship_contract_yaml(shape: str) -> str:
+    if shape == "generic":
+        parent_group = "generic_parent_records"
+        child_group = "generic_child_records"
+        relationship_attr = "generic_relationship_id"
+        parent_identity = "generic_parent_id"
+        child_identity = "generic_child_id"
+    elif shape == "arcadia":
+        parent_group = "meters"
+        child_group = "charges"
+        relationship_attr = "meter_number"
+        parent_identity = "service_type"
+        child_identity = "charge_description"
+    else:
+        raise AssertionError(f"unsupported shape [{shape}]")
+
+    return f"""
+extraction_policy_version: v1
+workflow:
+  custom_steps:
+    - name: parent_rows
+      level: chunk
+      kind: summary
+    - name: child_rows
+      level: chunk
+      kind: keys
+  output_relationships:
+    - parent_group: {parent_group}
+      child_group: {child_group}
+      parent_output_field: {child_group}
+      match_attrs: [{relationship_attr}]
+      unmatched_child_group: {child_group}
+
+{parent_group}:
+  repeats: true
+  workflow_step: parent_rows
+  unique_attrs: [{parent_identity}]
+  fields:
+    {relationship_attr}:
+      workflow_output_key: {relationship_attr}
+      prompt:
+        instructions: Return the relationship identifier.
+        type: str
+    {parent_identity}:
+      workflow_output_key: {parent_identity}
+      prompt:
+        instructions: Return the parent identifier.
+        type: str
+
+{child_group}:
+  repeats: true
+  workflow_step: child_rows
+  unique_attrs: [{child_identity}]
+  fields:
+    {relationship_attr}:
+      workflow_output_key: {relationship_attr}
+      prompt:
+        instructions: Return the relationship identifier.
+        type: str
+    {child_identity}:
+      workflow_output_key: {child_identity}
+      prompt:
+        instructions: Return the child identifier.
+        type: str
+"""
+
+
+def _relationship_contract_names(shape: str) -> typing.Dict[str, str]:
+    if shape == "generic":
+        return {
+            "parent_group": "generic_parent_records",
+            "child_group": "generic_child_records",
+            "parent_only": "generic_parent_id",
+            "child_only": "generic_child_id",
+        }
+    if shape == "arcadia":
+        return {
+            "parent_group": "meters",
+            "child_group": "charges",
+            "parent_only": "service_type",
+            "child_only": "charge_description",
+        }
+    raise AssertionError(f"unsupported shape [{shape}]")
 
 
 POLICY_YAML = """
@@ -182,6 +268,13 @@ charges:
   explanation_attrs:
     - charge_explanation
   fields:
+    charge_description_as_printed:
+      prompt:
+        description: Charge description.
+        identifiers:
+          - Charge Description
+        instructions: Return the charge description.
+        type: str
     charge_amount:
       prompt:
         description: Charge amount.
@@ -482,6 +575,138 @@ transactions:
     prepared = prepare_extraction_yaml(raw)
 
     assert "output_relationships" not in prepared.persisted_workflow_extract["workflow"]
+
+
+@pytest.mark.parametrize("shape", ["generic", "arcadia"])
+@pytest.mark.parametrize(
+    ("invalid_unique_attrs", "message"),
+    [
+        ("identity", "must be a list of field-name strings"),
+        (["identity", 7], "must be a list of field-name strings"),
+        (
+            ["missing_identity"],
+            r"references unknown field \[missing_identity\]",
+        ),
+    ],
+)
+def test_authored_unique_attrs_validate_declared_group_fields(
+    shape: str,
+    invalid_unique_attrs: typing.Any,
+    message: str,
+) -> None:
+    source = yaml.safe_load(_relationship_contract_yaml(shape))
+    names = _relationship_contract_names(shape)
+    source[names["parent_group"]]["unique_attrs"] = invalid_unique_attrs
+
+    with pytest.raises(ValueError, match=rf"unique_attrs.*{message}"):
+        prepare_extraction_yaml(yaml.safe_dump(source, sort_keys=False))
+
+
+@pytest.mark.parametrize("shape", ["generic", "arcadia"])
+@pytest.mark.parametrize(
+    ("match_attr_key", "missing_group_key"),
+    [
+        ("parent_only", "child_group"),
+        ("child_only", "parent_group"),
+    ],
+)
+def test_authored_match_attrs_must_exist_in_both_related_groups(
+    shape: str,
+    match_attr_key: str,
+    missing_group_key: str,
+) -> None:
+    source = yaml.safe_load(_relationship_contract_yaml(shape))
+    names = _relationship_contract_names(shape)
+    source["workflow"]["output_relationships"][0]["match_attrs"] = [
+        names[match_attr_key]
+    ]
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            rf"match_attrs.*\[{names[match_attr_key]}\].*"
+            rf"{names[missing_group_key]}"
+        ),
+    ):
+        prepare_extraction_yaml(yaml.safe_dump(source, sort_keys=False))
+
+
+@pytest.mark.parametrize("shape", ["generic", "arcadia"])
+def test_empty_unique_attrs_are_valid_for_authored_and_persisted_inputs(
+    shape: str,
+) -> None:
+    source = yaml.safe_load(_relationship_contract_yaml(shape))
+    names = _relationship_contract_names(shape)
+    source[names["parent_group"]]["unique_attrs"] = []
+
+    prepared = prepare_extraction_yaml(yaml.safe_dump(source, sort_keys=False))
+    reloaded = prepare_extraction_yaml(prepared.persisted_workflow_extract)
+
+    assert prepared.final_group_metadata[names["parent_group"]]["unique_attrs"] == []
+    assert reloaded.final_group_metadata[names["parent_group"]]["unique_attrs"] == []
+
+
+@pytest.mark.parametrize("shape", ["generic", "arcadia"])
+@pytest.mark.parametrize(
+    ("invalid_unique_attrs", "message"),
+    [
+        ("identity", "must be a list of field-name strings"),
+        (["identity", 7], "must be a list of field-name strings"),
+        (
+            ["missing_identity"],
+            r"references unknown field \[missing_identity\]",
+        ),
+    ],
+)
+def test_persisted_unique_attrs_revalidate_declared_group_fields(
+    shape: str,
+    invalid_unique_attrs: typing.Any,
+    message: str,
+) -> None:
+    persisted = prepare_extraction_yaml(
+        _relationship_contract_yaml(shape)
+    ).persisted_workflow_extract
+    names = _relationship_contract_names(shape)
+    persisted["_groundx_persisted_extract"][names["child_group"]][
+        "unique_attrs"
+    ] = invalid_unique_attrs
+
+    with pytest.raises(
+        ValueError,
+        match=rf"unique_attrs.*{message}",
+    ):
+        prepare_extraction_yaml(persisted)
+
+
+@pytest.mark.parametrize("shape", ["generic", "arcadia"])
+@pytest.mark.parametrize(
+    ("match_attr_key", "missing_group_key"),
+    [
+        ("parent_only", "child_group"),
+        ("child_only", "parent_group"),
+    ],
+)
+def test_persisted_match_attrs_revalidate_both_related_groups(
+    shape: str,
+    match_attr_key: str,
+    missing_group_key: str,
+) -> None:
+    persisted = prepare_extraction_yaml(
+        _relationship_contract_yaml(shape)
+    ).persisted_workflow_extract
+    names = _relationship_contract_names(shape)
+    persisted["workflow"]["output_relationships"][0]["match_attrs"] = [
+        names[match_attr_key]
+    ]
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            rf"match_attrs.*\[{names[match_attr_key]}\].*"
+            rf"{names[missing_group_key]}"
+        ),
+    ):
+        prepare_extraction_yaml(persisted)
 
 
 def test_persisted_custom_workflow_extract_rejects_unknown_version() -> None:
