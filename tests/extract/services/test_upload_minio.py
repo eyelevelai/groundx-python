@@ -3,7 +3,7 @@ import sys
 import types
 import typing
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from groundx.extract.services.logger import Logger
 from groundx.extract.services.upload_minio import MinIOClient
@@ -42,11 +42,10 @@ class FakeMinioClient:
 
 
 class TestMinIOClient(unittest.TestCase):
-    @patch("minio.Minio")
-    def test_minio_client_has_bounded_io_and_no_hidden_retries(
-        self,
-        mock_minio: typing.Any,
-    ) -> None:
+    def test_minio_client_has_bounded_io_and_no_hidden_retries(self) -> None:
+        mock_minio = Mock()
+        minio_module = types.ModuleType("minio")
+        setattr(minio_module, "Minio", mock_minio)
         mock_minio.return_value.bucket_exists.return_value = True
         settings = ContainerSettings(
             broker="",
@@ -60,7 +59,8 @@ class TestMinIOClient(unittest.TestCase):
             workers=1,
         )
 
-        MinIOClient(settings, Logger("test", "debug"))
+        with patch.dict(sys.modules, {"minio": minio_module}):
+            MinIOClient(settings, Logger("test", "debug"))
 
         http_client = mock_minio.call_args.kwargs["http_client"]
         timeout = http_client.connection_pool_kw["timeout"]

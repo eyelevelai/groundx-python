@@ -1,3 +1,5 @@
+import sys
+import types
 import typing
 import unittest
 from unittest.mock import Mock, patch
@@ -33,12 +35,22 @@ class FakeS3Client:
         return {"ETag": '"etag-1"'}
 
 
+class FakeConfig:
+    def __init__(self, **kwargs: typing.Any) -> None:
+        self.__dict__.update(kwargs)
+
+
 class TestS3Client(unittest.TestCase):
-    @patch("boto3.client")
-    def test_s3_client_has_bounded_io_and_no_hidden_retries(
-        self,
-        mock_boto_client: Mock,
-    ) -> None:
+    def test_s3_client_has_bounded_io_and_no_hidden_retries(self) -> None:
+        mock_boto_client = Mock()
+        boto3_module = types.ModuleType("boto3")
+        certifi_module = types.ModuleType("certifi")
+        botocore_module = types.ModuleType("botocore")
+        botocore_config_module = types.ModuleType("botocore.config")
+        setattr(boto3_module, "client", mock_boto_client)
+        setattr(certifi_module, "where", lambda: "/tmp/ca.pem")
+        setattr(botocore_config_module, "Config", FakeConfig)
+        setattr(botocore_module, "config", botocore_config_module)
         settings = ContainerSettings(
             broker="",
             service="s3",
@@ -50,7 +62,16 @@ class TestS3Client(unittest.TestCase):
             ),
             workers=1,
         )
-        S3Client(settings, Logger("test", "debug"))
+        with patch.dict(
+            sys.modules,
+            {
+                "boto3": boto3_module,
+                "certifi": certifi_module,
+                "botocore": botocore_module,
+                "botocore.config": botocore_config_module,
+            },
+        ):
+            S3Client(settings, Logger("test", "debug"))
 
         config = mock_boto_client.call_args.kwargs["config"]
         self.assertEqual(config.connect_timeout, 5)
