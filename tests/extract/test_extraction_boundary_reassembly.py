@@ -8,6 +8,7 @@ import urllib.parse
 
 import pytest
 
+from groundx.extract import prepare_extraction_yaml
 from groundx.extract.custom_outputs import reassemble_custom_outputs_from_xray
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
@@ -44,6 +45,19 @@ SURFACES = [
     "adp_v1",
 ]
 REAL_BOUNDARY_SURFACES = tuple(SURFACES)
+
+
+@pytest.mark.parametrize("surface", REAL_BOUNDARY_SURFACES)
+def test_deployed_workflow_payloads_pass_production_preparation(surface: str) -> None:
+    handoff = _read_json(_real_download_workflow_load_input_path(surface))
+
+    prepared = prepare_extraction_yaml(
+        handoff["workflow_extract"],
+        final_group_metadata_keys={"role"},
+        pseudo_group_metadata_keys={"role"},
+    )
+
+    assert prepared.persisted_workflow_extract
 
 
 def test_extraction_boundary_catalog_is_pinned() -> None:
@@ -104,8 +118,6 @@ def test_sdk_reassembly_expected_answer_projection_diagnostic_packets(
         ):
             _assert_expected_answer_projection_diagnostic(actual)
             _assert_expected_answer_projection_diagnostic(handoff)
-            _write_json(diff_path, {"kind": "machine_readable_json_diff", "status": "passed"})
-            continue
         else:
             _assert_no_synthetic_protected_marker(actual)
             _assert_no_synthetic_protected_marker(handoff)
@@ -479,8 +491,7 @@ def _write_boundary_artifacts(
     actual.update(inherited_evidence)
     assert actual["assertions"]["consumes_internal_extract_chain_handoff"]
     assert actual["assertions"]["has_no_error_diagnostics"]
-    if not _is_expected_answer_projection_diagnostic(actual):
-        assert actual["assertions"]["shape_contract_passed"]
+    assert actual["assertions"]["shape_contract_passed"]
     assert actual["assertions"]["handoff_written_for_save_callback"]
     if previous.get("evidence_level") == "plumbing_only_synthetic":
         assert actual["evidence_level"] == "plumbing_only_synthetic"

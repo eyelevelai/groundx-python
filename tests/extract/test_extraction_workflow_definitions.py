@@ -776,22 +776,66 @@ def test_create_and_update_yaml_path_errors_include_source_context(
     assert workflows.calls == []
 
 
-def test_create_rejects_final_value_aliases_in_v1_yaml(tmp_path: Path) -> None:
+def test_create_and_update_accept_aliases_until_protected_workflows_are_migrated(
+    tmp_path: Path,
+) -> None:
     path = tmp_path / "statement.yaml"
     path.write_text(POLICY_METADATA_YAML)
     workflows = RecordingWorkflows()
     client = _client(workflows)
 
-    with pytest.raises(
-        ValueError,
-        match=r"unsupported group metadata \[final_value_aliases\]",
-    ):
+    assert (
         client.create_extraction_workflow(
             path=path,
             name="statement extraction",
         )
+        == "created"
+    )
+    assert (
+        client.update_extraction_workflow(
+            "workflow-1",
+            path=path,
+            name="statement extraction",
+        )
+        == "updated"
+    )
 
-    assert workflows.calls == []
+    create_extract = workflows.calls[0][1]["extract"]
+    update_extract = workflows.calls[1][2]["extract"]
+    assert create_extract == update_extract
+    assert create_extract["_groundx_persisted_extract"]["statement"][
+        "final_value_aliases"
+    ] == {"account_number": "final_account_number"}
+
+
+@pytest.mark.asyncio
+async def test_async_create_and_update_accept_aliases_until_migration(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "statement.yaml"
+    path.write_text(POLICY_METADATA_YAML)
+    workflows = AsyncRecordingWorkflows()
+    client = _async_client(workflows)
+
+    assert (
+        await client.create_extraction_workflow(
+            path=path,
+            name="statement extraction",
+        )
+        == "created"
+    )
+    assert (
+        await client.update_extraction_workflow(
+            "workflow-1",
+            path=path,
+            name="statement extraction",
+        )
+        == "updated"
+    )
+
+    create_extract = workflows.calls[0][1]["extract"]
+    update_extract = workflows.calls[1][2]["extract"]
+    assert create_extract == update_extract
 
 
 def test_empty_custom_workflow_match_attrs_compile_without_relationship() -> None:

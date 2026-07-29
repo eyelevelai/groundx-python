@@ -1,3 +1,4 @@
+import copy
 import json
 import pathlib
 
@@ -147,7 +148,7 @@ def test_reassembles_records_wrapper_to_final_relationship_output() -> None:
     }
 
 
-def test_relationship_dedupes_child_rows_by_match_and_unique_attrs() -> None:
+def test_relationship_dedupes_child_rows_by_unique_attrs_only() -> None:
     workflow_extract = {
         "_groundx_persisted_extract": {
             "charges": {
@@ -309,7 +310,6 @@ def test_relationship_dedupes_child_rows_by_match_and_unique_attrs() -> None:
             }
         ],
         "charges": [
-            {"description": "Account fee", "amount": 3, "status": "supply"},
             {"description": "Blank status fee", "amount": 4},
             {"description": "Blank status fee", "amount": 4},
         ],
@@ -576,6 +576,18 @@ def test_relationship_preserves_identical_child_rows_without_unique_attrs() -> N
         "charges": [],
     }
     assert result.relationship_output == result.final_output
+
+    legacy_workflow_extract = copy.deepcopy(workflow_extract)
+    legacy_workflow_extract["_groundx_persisted_extract"][
+        "legacy_policy_default_provenance"
+    ] = {"source": "legacy"}
+    legacy_result = reassemble_custom_outputs_from_xray(
+        xray,
+        workflow_extract=legacy_workflow_extract,
+    )
+
+    assert legacy_result.final_output == result.final_output
+    assert legacy_result.relationship_output == result.relationship_output
 
 
 def test_empty_match_attrs_leaves_generic_groups_unrelated() -> None:
@@ -1466,8 +1478,25 @@ def test_non_repeated_section_list_value_remains_scalar_field() -> None:
     ] == [None]
 
 
-def test_duplicate_parent_keys_do_not_make_relationship_child_ambiguous() -> None:
+@pytest.mark.parametrize(
+    ("parent_metadata", "parent_records"),
+    [
+        (
+            {"unique_attrs": ["parent_id"]},
+            [
+                {"account_id": "A-1", "parent_id": "P-1"},
+                {"account_id": "A-1", "parent_id": "P-2"},
+            ],
+        ),
+        ({}, [{"account_id": "A-1"}, {"account_id": "A-1"}]),
+    ],
+)
+def test_parent_identity_does_not_hide_ambiguous_relationship_matches(
+    parent_metadata: dict,
+    parent_records: list[dict],
+) -> None:
     workflow_extract = {
+        "_groundx_persisted_extract": {"accounts": parent_metadata},
         "workflow": {
             "custom_steps": [
                 {"name": "account_rows", "level": "chunk", "kind": "keys"},
@@ -1482,6 +1511,15 @@ def test_duplicate_parent_keys_do_not_make_relationship_child_ambiguous() -> Non
                     "level": "chunk",
                     "output_map": "customChunkOutputs",
                     "output_key": "account_id",
+                },
+                {
+                    "workflow_group": "accounts",
+                    "workflow_field": "parent_id",
+                    "final_path": "/accounts/parent_id",
+                    "step_name": "account_rows",
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": "parent_id",
                 },
                 {
                     "workflow_group": "transactions",
@@ -1518,10 +1556,7 @@ def test_duplicate_parent_keys_do_not_make_relationship_child_ambiguous() -> Non
             {
                 "customChunkOutputs": {
                     "account_rows": {
-                        "_records": [
-                            {"account_id": "A-1"},
-                            {"account_id": "A-1"},
-                        ]
+                        "_records": parent_records
                     },
                     "transaction_rows": {
                         "_records": [{"account_id": "a-1", "amount": 10}]
@@ -1533,13 +1568,153 @@ def test_duplicate_parent_keys_do_not_make_relationship_child_ambiguous() -> Non
 
     result = reassemble_custom_outputs_from_xray(xray, workflow_extract=workflow_extract)
 
-    assert result.diagnostics == []
+    assert [diagnostic.code for diagnostic in result.diagnostics] == [
+        "ambiguous_relationship_match"
+    ]
+    assert result.final_output == {
+        "accounts": [
+            {**parent, "transactions": []}
+            for parent in parent_records
+        ],
+        "transactions": [{"account_id": "a-1", "amount": 10}],
+    }
+
+
+def test_match_attrs_do_not_expand_child_business_identity() -> None:
+    workflow_extract = {
+        "_groundx_persisted_extract": {
+            "transactions": {"unique_attrs": ["status"]},
+        },
+        "workflow": {
+            "custom_steps": [
+                {"name": "account_rows", "level": "chunk", "kind": "keys"},
+                {"name": "transaction_rows", "level": "chunk", "kind": "keys"},
+            ],
+            "output_routes": [
+                {
+                    "workflow_group": group,
+                    "workflow_field": field,
+                    "final_path": f"/{group}/{field}",
+                    "step_name": step,
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": field,
+                }
+                for group, step in (
+                    ("accounts", "account_rows"),
+                    ("transactions", "transaction_rows"),
+                )
+                for field in ("account_id", "status")
+            ],
+            "output_relationships": [
+                {
+                    "parent_group": "accounts",
+                    "child_group": "transactions",
+                    "parent_output_field": "transactions",
+                    "match_attrs": ["account_id"],
+                    "unmatched_child_group": "transactions",
+                }
+            ],
+        },
+    }
+    xray = {
+        "chunks": [
+            {
+                "customChunkOutputs": {
+                    "account_rows": {
+                        "_records": [
+                            {"account_id": "A-1"},
+                            {"account_id": "A-2"},
+                        ]
+                    },
+                    "transaction_rows": {
+                        "_records": [
+                            {"account_id": "A-1", "status": "open"},
+                            {"account_id": "A-2", "status": "open"},
+                        ]
+                    },
+                }
+            }
+        ]
+    }
+
+    result = reassemble_custom_outputs_from_xray(xray, workflow_extract=workflow_extract)
+
     assert result.final_output == {
         "accounts": [
             {
                 "account_id": "A-1",
-                "transactions": [{"account_id": "a-1", "amount": 10}],
-            }
+                "transactions": [{"account_id": "A-1", "status": "open"}],
+            },
+            {"account_id": "A-2", "transactions": []},
         ],
         "transactions": [],
     }
+
+
+def test_unique_attrs_can_explicitly_scope_child_identity_by_relationship_field() -> None:
+    workflow_extract = {
+        "_groundx_persisted_extract": {
+            "transactions": {"unique_attrs": ["account_id", "status"]},
+        },
+        "workflow": {
+            "custom_steps": [
+                {"name": "account_rows", "level": "chunk", "kind": "keys"},
+                {"name": "transaction_rows", "level": "chunk", "kind": "keys"},
+            ],
+            "output_routes": [
+                {
+                    "workflow_group": group,
+                    "workflow_field": field,
+                    "final_path": f"/{group}/{field}",
+                    "step_name": step,
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": field,
+                }
+                for group, step in (
+                    ("accounts", "account_rows"),
+                    ("transactions", "transaction_rows"),
+                )
+                for field in ("account_id", "status")
+            ],
+            "output_relationships": [
+                {
+                    "parent_group": "accounts",
+                    "child_group": "transactions",
+                    "parent_output_field": "transactions",
+                    "match_attrs": ["account_id"],
+                    "unmatched_child_group": "transactions",
+                }
+            ],
+        },
+    }
+    xray = {
+        "chunks": [
+            {
+                "customChunkOutputs": {
+                    "account_rows": {
+                        "_records": [
+                            {"account_id": "A-1"},
+                            {"account_id": "A-2"},
+                        ]
+                    },
+                    "transaction_rows": {
+                        "_records": [
+                            {"account_id": "A-1", "status": "open"},
+                            {"account_id": "A-2", "status": "open"},
+                        ]
+                    },
+                }
+            }
+        ]
+    }
+
+    result = reassemble_custom_outputs_from_xray(xray, workflow_extract=workflow_extract)
+
+    assert [
+        account["transactions"] for account in result.final_output["accounts"]
+    ] == [
+        [{"account_id": "A-1", "status": "open"}],
+        [{"account_id": "A-2", "status": "open"}],
+    ]

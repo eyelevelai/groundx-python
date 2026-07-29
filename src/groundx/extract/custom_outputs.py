@@ -1036,21 +1036,14 @@ def _apply_relationships(
             )
             continue
 
-        parent_list = _dedupe_relationship_parents(
+        parent_list = _dedupe_relationship_records(
             typing.cast(typing.List[typing.Dict[str, typing.Any]], parent_records),
-            typing.cast(typing.List[str], match_attrs),
+            _relationship_group_unique_attrs(workflow_extract, parent_group),
         )
         result[parent_group] = parent_list
         child_list = _dedupe_relationship_records(
             typing.cast(typing.List[typing.Dict[str, typing.Any]], child_records),
-            _relationship_child_unique_attrs(
-                workflow_extract,
-                child_group,
-                typing.cast(typing.List[str], match_attrs),
-            ),
-            dedupe_when_unique_attrs_empty=_uses_legacy_identity_compatibility(
-                workflow_extract
-            ),
+            _relationship_group_unique_attrs(workflow_extract, child_group),
         )
         for parent in parent_list:
             parent.setdefault(parent_output_field, [])
@@ -1099,44 +1092,17 @@ def _apply_relationships(
     return result, diagnostics
 
 
-def _dedupe_relationship_parents(
-    parent_list: typing.List[typing.Dict[str, typing.Any]],
-    match_attrs: typing.Sequence[str],
-) -> typing.List[typing.Dict[str, typing.Any]]:
-    deduped: typing.List[typing.Dict[str, typing.Any]] = []
-    by_key: typing.Dict[str, typing.Dict[str, typing.Any]] = {}
-    for parent in parent_list:
-        parent_key = _relationship_record_key(parent, match_attrs)
-        if parent_key is None:
-            deduped.append(parent)
-            continue
-        existing = by_key.get(parent_key)
-        if existing is None:
-            by_key[parent_key] = parent
-            deduped.append(parent)
-            continue
-        _merge_relationship_parent(existing, parent)
-    return deduped
-
-
 def _dedupe_relationship_records(
     records: typing.List[typing.Dict[str, typing.Any]],
     unique_attrs: typing.Sequence[str],
-    *,
-    dedupe_when_unique_attrs_empty: bool = False,
 ) -> typing.List[typing.Dict[str, typing.Any]]:
     if not unique_attrs:
-        if not dedupe_when_unique_attrs_empty:
-            return records
+        return records
 
     deduped: typing.List[typing.Dict[str, typing.Any]] = []
     by_key: typing.Dict[str, typing.Dict[str, typing.Any]] = {}
     for record in records:
-        record_key = (
-            _relationship_record_key(record, unique_attrs)
-            if unique_attrs
-            else _record_key(_plain(record))
-        )
+        record_key = _relationship_record_key(record, unique_attrs)
         if record_key is None:
             deduped.append(record)
             continue
@@ -1157,10 +1123,9 @@ def _relationship_record_key(
     return _record_key(match_key) if match_key else None
 
 
-def _relationship_child_unique_attrs(
+def _relationship_group_unique_attrs(
     workflow_extract: typing.Optional[typing.Mapping[str, typing.Any]],
     group_name: str,
-    match_attrs: typing.Sequence[str],
 ) -> typing.Tuple[str, ...]:
     if not isinstance(workflow_extract, typing.Mapping):
         return ()
@@ -1173,7 +1138,7 @@ def _relationship_child_unique_attrs(
     if not isinstance(unique_attrs, list) or not unique_attrs:
         return ()
 
-    return _unique_strings((*match_attrs, *unique_attrs))
+    return _unique_strings(unique_attrs)
 
 
 def _relationship_has_match_attrs(relationship: typing.Any) -> bool:
@@ -1182,17 +1147,6 @@ def _relationship_has_match_attrs(relationship: typing.Any) -> bool:
     match_attrs = relationship.get("match_attrs")
     return isinstance(match_attrs, list) and any(
         isinstance(attr, str) and attr != "" for attr in match_attrs
-    )
-
-
-def _uses_legacy_identity_compatibility(
-    workflow_extract: typing.Optional[typing.Mapping[str, typing.Any]],
-) -> bool:
-    if not isinstance(workflow_extract, typing.Mapping):
-        return False
-    persisted = workflow_extract.get("_groundx_persisted_extract")
-    return isinstance(persisted, typing.Mapping) and isinstance(
-        persisted.get("legacy_policy_default_provenance"), typing.Mapping
     )
 
 

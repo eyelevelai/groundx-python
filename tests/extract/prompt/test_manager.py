@@ -828,7 +828,8 @@ statement:
             """
 extraction_policy_version: v1
 statement:
-  fill_rules: []
+  final_value_aliases:
+    account_number: account_number
   fields:
     account_number:
       prompt:
@@ -1767,11 +1768,10 @@ invoice:
             "/invoice/charges/*",
         )
 
-    def test_prepare_extraction_yaml_routes_direct_statement_role_fields_to_root(
+    def test_prepare_extraction_yaml_routes_statement_role_to_root_independent_of_fill_rules(
         self,
     ) -> None:
-        prepared = prepare_extraction_yaml(
-            """
+        yaml_template = """
 extraction_policy_version: v1
 
 workflow:
@@ -1791,7 +1791,7 @@ workflow:
 
 generic_group_a:
   workflow_step: generic_step_a
-  fill_rules: []
+{fill_rules}
   fields:
     generic_attr_01:
       workflow_output_key: generic_attr_01
@@ -1808,20 +1808,38 @@ generic_group_b:
         instructions: Return the meter identifier.
         type: str
 """
-        )
+        paths_by_fill_rules = []
+        for fill_rules in (
+            "",
+            """  fill_rules:
+    - source: generic_attr_01
+      target: /generic_attr_01
+""",
+        ):
+            prepared = prepare_extraction_yaml(
+                yaml_template.format(fill_rules=fill_rules)
+            )
 
-        workflow = prepared.persisted_workflow_extract["workflow"]
-        paths_by_group = {
-            (route["workflow_group"], route["workflow_field"]): route["final_path"]
-            for route in workflow["output_routes"]
-        }
+            workflow = prepared.persisted_workflow_extract["workflow"]
+            paths_by_fill_rules.append(
+                {
+                    (route["workflow_group"], route["workflow_field"]): route[
+                        "final_path"
+                    ]
+                    for route in workflow["output_routes"]
+                }
+            )
+
+        self.assertEqual(paths_by_fill_rules[0], paths_by_fill_rules[1])
         self.assertEqual(
-            paths_by_group[("generic_group_a", "generic_attr_01")],
-            "/generic_attr_01",
-        )
-        self.assertEqual(
-            paths_by_group[("generic_group_b", "generic_attr_15")],
-            "/generic_group_b/generic_attr_15",
+            paths_by_fill_rules[0],
+            {
+                ("generic_group_a", "generic_attr_01"): "/generic_attr_01",
+                (
+                    "generic_group_b",
+                    "generic_attr_15",
+                ): "/generic_group_b/generic_attr_15",
+            },
         )
 
     def test_prepare_extraction_yaml_rejects_slot_metadata(

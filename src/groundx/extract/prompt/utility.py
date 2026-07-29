@@ -63,6 +63,7 @@ _SUPPORTED_FINAL_GROUP_METADATA_KEYS = {
     "exclude_dict_attrs",
     "explanation_attrs",
     "fill_rules",
+    "final_value_aliases",
     "match_attrs",
     "not_required_service_types",
     "partial_pair_attrs",
@@ -353,20 +354,6 @@ def _reject_unsupported_authored_keys(data: typing.Dict[str, typing.Any]) -> Non
                 "use extraction_policy_version: v1 with workflow metadata, or "
                 "pure legacy statement/meters/charges YAML"
             )
-
-    for group_name, group in data.items():
-        if (
-            group_name in _RESERVED_TOP_LEVEL_KEYS
-            or group_name in _SUPPORTED_TOP_LEVEL_METADATA_KEYS
-            or not isinstance(group, dict)
-        ):
-            continue
-        if "final_value_aliases" in group:
-            raise ValueError(
-                "unsupported group metadata [final_value_aliases]; authored v1 "
-                "field names are final output names"
-            )
-
 
 def _reject_unsupported_workflow_group_keys(
     mapping: typing.Dict[str, typing.Any],
@@ -1802,12 +1789,9 @@ def _agent_chain_group_roles(raw_chain: typing.Any) -> typing.Dict[str, str]:
 
 
 def _is_document_root_statement_group(
-    group_metadata: typing.Mapping[str, typing.Any],
     group_role: typing.Optional[str],
 ) -> bool:
-    if group_role != "statement":
-        return False
-    return isinstance(group_metadata.get("fill_rules"), list)
+    return group_role == "statement"
 
 
 def _collect_pseudo_custom_workflow_routes(
@@ -1920,7 +1904,6 @@ def _build_authored_custom_workflow_metadata(
             )
         else:
             document_root = _is_document_root_statement_group(
-                final_group_metadata.get(group_name, {}),
                 agent_chain_group_roles.get(group_name),
             )
             group_routes, group_leaves = _collect_custom_workflow_routes(
