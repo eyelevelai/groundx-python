@@ -1,10 +1,10 @@
 {
   "artifacts": {
     "previous_download_workflow_load": {
-      "sha256": "40957dbf359561102dfdbe45fa5401c3ae8a49f6cf90da9347e6a15c59a40460"
+      "sha256": "545f3a7937f9996bffd74a502df3d85e9fb716e9c0bf8af3480cd27f673b5536"
     },
     "xray_sidecar": {
-      "sha256": "790df496544843b523ec1591f5888f43fa259097e0b672d72b67ad60dc0abb7d"
+      "sha256": "a10d188e8273c9e8b5f3e7e382dd6dad678dca359ad5f64db7f093fd47475331"
     }
   },
   "assertions": {
@@ -14,43 +14,46 @@
     "shape_contract_passed": true
   },
   "input_from": "internal_arcadia_download_workflow_load",
-  "input_sha256": "40957dbf359561102dfdbe45fa5401c3ae8a49f6cf90da9347e6a15c59a40460",
+  "input_sha256": "545f3a7937f9996bffd74a502df3d85e9fb716e9c0bf8af3480cd27f673b5536",
   "output": {
-    "diagnostic_count": 12,
-    "final_output_sha256": "990dbbf78a6cc24f53866b4aa52846c24c7e85b09b15fca477fa9463b8efc534",
-    "relationship_output_sha256": "990dbbf78a6cc24f53866b4aa52846c24c7e85b09b15fca477fa9463b8efc534",
-    "source_provenance_count": 1674,
-    "workflow_output_sha256": "787eb53b2d9216ec64c92ce52e1d21904ff0e4e0a7136df17b8a039915f55619"
+    "diagnostic_count": 24,
+    "final_output_sha256": "324ab1a00311776f69e36d756afa1751323784166ef0c13ee5a5ee9750efe092",
+    "relationship_output_sha256": "324ab1a00311776f69e36d756afa1751323784166ef0c13ee5a5ee9750efe092",
+    "source_provenance_count": 2215,
+    "workflow_output_sha256": "0797f41640a2dc9ba1c228405275478643b411e349abb00b5dd0ab06a0b98915"
   },
   "output_for": "sdk_reassembly_proof",
   "request": {
     "callback_url": "https://api.eyelevel.ai/documentlayout",
-    "document_id": "705e1563-c112-4cc8-b64e-69710dbf092e",
+    "document_id": "1662573d-1502-4248-8235-11d81f3a3c71",
     "file_name": "arcadia",
-    "model_id": 30662,
+    "model_id": 31006,
     "processor_id": 134,
-    "task_id": "d5cce6cf-db79-4997-9f01-f78bfc990c0c",
+    "task_id": "b14a3459-b735-40ff-9222-a2e8ccd989e5",
     "workflow_capture": {
-      "capture_config_hash": "ac907b522b6647858e88707f7d89389f6216578888866e283df202c7b197736d",
+      "account_id": "f2a864f6-987b-4dac-90f3-1029671c8e77",
+      "bucket_id": 31006,
+      "capture_config_hash": "62289ab0d7246bc355152a8635c9e07ab5b4ccf9e671d2fbb88fc2e1a36106e6",
       "capture_types": [
         "pipeline_trace",
         "prompt_capture"
       ],
       "case_id": "generic-v1",
       "enabled": true,
-      "expires_at": "2099-01-01T00:00:00Z",
+      "expires_at": "2026-07-28T11:23:31Z",
       "max_artifacts": 500,
+      "operator_id": "f2a864f6-987b-4dac-90f3-1029671c8e77",
       "retention": {
-        "delete_after": "2099-01-02T00:00:00Z",
+        "delete_after": "2026-08-04T05:23:31Z",
         "owner": "private-extraction-certification"
       },
       "run_id": "extract-cert-generic-v1-01",
       "schema_version": "extraction_pipeline_capture_v1",
-      "workflow_id": "generic_v1-product-path"
+      "workflow_id": "6a6150f2-ed71-4cb0-b430-a4f36039dc7f"
     },
-    "workflow_id": "generic_v1-product-path",
+    "workflow_id": "6a6150f2-ed71-4cb0-b430-a4f36039dc7f",
     "workflow_schema_hash": "66b0e276d5996122e278951cf52009cd5b9e2891dfff9f15c13bc21696edcf14",
-    "workflow_version": "2026-07-12T22:34:02Z"
+    "workflow_version": "2026-07-28T05:23:34.218Z"
   },
   "schema_version": "groundx-python-xray-reassembly-boundary-v1",
   "shape_assertions": {

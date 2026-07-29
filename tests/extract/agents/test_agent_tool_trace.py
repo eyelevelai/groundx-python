@@ -103,3 +103,34 @@ def test_agent_tool_trace_callback_records_parse_error(monkeypatch) -> None:
     assert events[2]["request_type"] == "qa_statement"
     assert events[2]["raw_response"] == "{not json"
     assert events[2]["error_type"] == "JSONDecodeError"
+
+
+def test_agent_tool_can_leave_response_retry_ownership_to_caller(
+    monkeypatch,
+) -> None:
+    calls = 0
+
+    def fake_run(
+        self: typing.Any,
+        task: str,
+        images: typing.List[typing.Any],
+    ) -> str:
+        nonlocal calls
+        calls += 1
+        return "{not json"
+
+    monkeypatch.setattr(ToolCallingAgent, "run", fake_run)
+    agent = AgentTool(
+        AgentSettings(
+            api_key="test-key",
+            model_id="test-model",
+            max_steps=1,
+            response_parse_max_retries=0,
+        ),
+        Logger("agent-tool-trace", "error"),
+    )
+
+    with pytest.raises(TypeError, match="agent process result is not of expected type"):
+        agent.process("bad json", images=[])
+
+    assert calls == 1

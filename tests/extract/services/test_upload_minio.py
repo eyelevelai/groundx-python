@@ -1,12 +1,13 @@
-import unittest
 import contextlib
 import sys
 import types
 import typing
+import unittest
+from unittest.mock import Mock, patch
 
 from groundx.extract.services.logger import Logger
-from groundx.extract.settings.settings import ContainerSettings, ContainerUploadSettings
 from groundx.extract.services.upload_minio import MinIOClient
+from groundx.extract.settings.settings import ContainerSettings, ContainerUploadSettings
 
 
 class FakeMinioResponse:
@@ -41,6 +42,32 @@ class FakeMinioClient:
 
 
 class TestMinIOClient(unittest.TestCase):
+    def test_minio_client_has_bounded_io_and_no_hidden_retries(self) -> None:
+        mock_minio = Mock()
+        minio_module = types.ModuleType("minio")
+        setattr(minio_module, "Minio", mock_minio)
+        mock_minio.return_value.bucket_exists.return_value = True
+        settings = ContainerSettings(
+            broker="",
+            service="minio",
+            upload=ContainerUploadSettings(
+                base_domain="minio.test",
+                bucket="eyelevel",
+                type="minio",
+                url="",
+            ),
+            workers=1,
+        )
+
+        with patch.dict(sys.modules, {"minio": minio_module}):
+            MinIOClient(settings, Logger("test", "debug"))
+
+        http_client = mock_minio.call_args.kwargs["http_client"]
+        timeout = http_client.connection_pool_kw["timeout"]
+        self.assertEqual(timeout.connect_timeout, 5)
+        self.assertEqual(timeout.read_timeout, 20)
+        self.assertFalse(http_client.connection_pool_kw["retries"].total)
+
     def _client(self) -> MinIOClient:
         logger = Logger("parse_url", "debug")
         return MinIOClient(

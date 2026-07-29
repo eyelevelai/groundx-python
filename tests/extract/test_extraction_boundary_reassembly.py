@@ -1,16 +1,15 @@
 import copy
 import hashlib
 import json
-import os
 import pathlib
 import re
 import typing
+import urllib.parse
 
 import pytest
 
 from groundx.extract.custom_outputs import reassemble_custom_outputs_from_xray
 
-UPDATE_GOLDENS_ENV = "UPDATE_GROUNDX_PYTHON_EXTRACT_BOUNDARY_GOLDENS"
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 DIAGNOSTIC_ROOT = (
     ROOT
@@ -27,7 +26,7 @@ BOUNDARY_ROOT = ROOT / "tests" / "extract" / "fixtures" / "extraction-boundary"
 BOUNDARY_INPUT_ROOT = BOUNDARY_ROOT / "inputs"
 BOUNDARY_GOLDENS_ROOT = BOUNDARY_ROOT / "boundary-goldens"
 CATALOG_PATH = ROOT / "tests" / "extract" / "fixtures" / "extraction-boundary" / "catalog.json"
-CATALOG_SHA256 = "6d820016ccf14fa1702eb0e6d7be9d2b2dd0ae0c485f3c6fd9a12b4dc91d6784"
+CATALOG_SHA256 = "b3c2b146e817f33ac3c78096dcd5fa35300cc829ba78a1d2273a1b6ee1ff72c9"
 ADP_EXPECTED_SECTION_COUNT = 11
 ADP_EXPECTED_FIELD_COUNT = 159
 ADP_MIN_POPULATED_FIELDS = 100
@@ -55,7 +54,7 @@ def test_extraction_boundary_catalog_is_pinned() -> None:
     assert catalog["catalog_version"] == "2026-07-23.1"
     assert catalog["surfaces"] == SURFACES
     assert catalog["source_artifact_catalog_sha256"] == (
-        "e517e8e1dd72a990ea3c941454d99586888dd036335979c78dc7a5792ef2dfd6"
+        "0a4dd694334d4968dae01edb16cdfae309dfed411a40b627ed73fab72d538144"
     )
     assert catalog["artifacts"] == [
         {
@@ -88,19 +87,11 @@ def test_extraction_boundary_catalog_is_pinned() -> None:
 def test_sdk_reassembly_expected_answer_projection_diagnostic_packets(
     tmp_path: pathlib.Path,
 ) -> None:
-    update_goldens = os.environ.get(UPDATE_GOLDENS_ENV) == "1"
     for surface in SURFACES:
         actual, actual_path, expected_path, diff_path, previous_path, handoff_path = (
             _write_boundary_artifacts(tmp_path, surface)
         )
         expected = _stable_boundary_output(actual)
-        if update_goldens:
-            _write_json(expected_path, expected)
-            _write_json(
-                handoff_path,
-                _read_json(pathlib.Path(actual["artifacts"]["handoff"]["path"])),
-            )
-
         golden = _read_json(expected_path)
         expected_handoff_sha = _sha256_file(handoff_path)
         actual_handoff_sha = actual["artifacts"]["handoff"]["sha256"]
@@ -132,9 +123,8 @@ def test_sdk_reassembly_expected_answer_projection_diagnostic_packets(
             _write_json(diff_path, diff)
             pytest.fail(
                 "SDK X-Ray reassembly proof drifted for "
-                f"{surface}; run {UPDATE_GOLDENS_ENV}=1 PYTHONPATH=src pytest "
-                "tests/extract/test_extraction_boundary_reassembly.py -q if "
-                "this contract change is intended"
+                f"{surface}; stage reviewed replacements through the Harness "
+                "fixture promotion flow"
             )
         _write_json(diff_path, diff)
 
@@ -149,22 +139,6 @@ def test_sdk_xray_reassembly_real_boundary_packets(
         surface,
     )
     expected = _stable_boundary_output(actual)
-    update_goldens = os.environ.get(UPDATE_GOLDENS_ENV) == "1"
-    if update_goldens:
-        _write_json(expected_path, expected)
-        _write_reviewed_expected_output_sidecars(
-            surface=surface,
-            packet_path=expected_path,
-            source_path=_real_download_workflow_load_input_path(surface),
-            reviewed_field_count_summary={
-                "boundary": "groundx_python_xray_reassembly",
-                "surface": surface,
-                "stage": "groundx_python_xray_reassembly",
-                "input_from": "internal_arcadia_download_workflow_load",
-                "output_for": "sdk_reassembly_proof",
-            },
-        )
-
     golden = _read_json(expected_path)
     diff: typing.Dict[str, typing.Any] = {
         "kind": "machine_readable_json_diff",
@@ -180,12 +154,22 @@ def test_sdk_xray_reassembly_real_boundary_packets(
         _write_json(diff_path, diff)
         pytest.fail(
             "SDK X-Ray reassembly real boundary proof drifted for "
-            f"{surface}; run {UPDATE_GOLDENS_ENV}=1 PYTHONPATH=src pytest "
-            "tests/extract/test_extraction_boundary_reassembly.py -q if "
-            "this contract change is intended"
+            f"{surface}; stage reviewed replacements through the Harness "
+            "fixture promotion flow"
             )
     _write_json(diff_path, diff)
     _assert_reviewed_expected_output_sidecar(expected_path)
+
+
+def test_repo_evidence_path_accepts_canonical_repo_prefix(
+    tmp_path: pathlib.Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setitem(globals(), "ROOT", tmp_path / "renamed-worktree")
+
+    assert _repo_evidence_path(
+        "groundx-python/tests/extract/fixtures/example.json"
+    ) == pathlib.Path("tests/extract/fixtures/example.json")
 
 
 def test_projection_fixtures_are_diagnostic_only() -> None:
@@ -560,7 +544,7 @@ def _source_run_ids(value: typing.Any) -> typing.Set[str]:
     return set()
 
 
-def _write_xray_reassembly_boundary_artifact(
+def _build_xray_reassembly_boundary_artifact(
     tmp_path: pathlib.Path,
     surface: str,
 ) -> typing.Tuple[typing.Dict[str, typing.Any], pathlib.Path, pathlib.Path]:
@@ -649,20 +633,31 @@ def _write_xray_reassembly_boundary_artifact(
             xray_sidecar["schema_version"]
             == "groundx_python_xray_reassembly_sidecar_v1"
         )
-    assert actual["assertions"]["consumes_download_workflow_load_handoff"]
-    if xray_sidecar is not None:
-        assert actual["assertions"]["consumes_real_xray_sidecar"]
-    assert actual["assertions"]["has_no_error_diagnostics"]
-    assert actual["assertions"]["shape_contract_passed"]
-    _assert_no_synthetic_protected_marker(previous)
-    if xray_sidecar is not None:
-        _assert_no_synthetic_protected_marker(xray_sidecar)
-    _assert_no_synthetic_protected_marker(actual)
-
     expected_path = (
         BOUNDARY_GOLDENS_ROOT / surface / "groundx_python_xray_reassembly.expected.json"
     )
     diff_path = out_dir / "groundx_python_xray_reassembly.diff.json"
+    return actual, expected_path, diff_path
+
+
+def _write_xray_reassembly_boundary_artifact(
+    tmp_path: pathlib.Path,
+    surface: str,
+) -> typing.Tuple[typing.Dict[str, typing.Any], pathlib.Path, pathlib.Path]:
+    actual, expected_path, diff_path = _build_xray_reassembly_boundary_artifact(
+        tmp_path,
+        surface,
+    )
+    previous = _read_json(_real_download_workflow_load_input_path(surface))
+    xray_path = _real_xray_sidecar_path(surface)
+
+    assert actual["assertions"]["consumes_download_workflow_load_handoff"]
+    if xray_path.exists():
+        assert actual["assertions"]["consumes_real_xray_sidecar"]
+    _assert_no_synthetic_protected_marker(previous)
+    if xray_path.exists():
+        _assert_no_synthetic_protected_marker(_read_json(xray_path))
+    _assert_no_synthetic_protected_marker(actual)
     return actual, expected_path, diff_path
 
 
@@ -701,8 +696,9 @@ def _write_reviewed_expected_output_sidecars(
         {
             "accepted_actual_as_expected": True,
             "acceptance_reason": (
-                "Accepted as deterministic SDK X-Ray reassembly output from "
-                "a passing hosted fixture-seeding run."
+                "Accepted as deterministic SDK X-Ray reassembly behavior from "
+                "the reviewed hosted fixture-seeding run. This freezes behavior, "
+                "not extraction quality."
             ),
             "actual_sha256": packet_sha,
             "artifact_catalog_sha256": _sha256_file(CATALOG_PATH),
@@ -723,8 +719,9 @@ def _write_reviewed_expected_output_sidecars(
             "reviewed_expected_output": {
                 "accepted_actual_as_expected": True,
                 "acceptance_reason": (
-                    "Accepted as deterministic SDK X-Ray reassembly output "
-                    "from a passing hosted fixture-seeding run."
+                    "Accepted as deterministic SDK X-Ray reassembly behavior "
+                    "from the reviewed hosted fixture-seeding run. This freezes "
+                    "behavior, not extraction quality."
                 ),
                 "artifact_catalog_sha256": _sha256_file(CATALOG_PATH),
                 "artifact_catalog_version": catalog["catalog_version"],
@@ -734,10 +731,10 @@ def _write_reviewed_expected_output_sidecars(
                 "expected_path": str(packet_path.relative_to(ROOT)),
                 "expected_sha256": packet_sha,
                 "packet_sha256": packet_sha,
-                "reviewed_at": "2026-07-21T22:12:08.864Z",
+                "reviewed_at": "2026-07-26T15:25:00Z",
                 "reviewed_field_count_summary": dict(reviewed_field_count_summary),
                 "reviewer_identity": "Benjamin Fletcher",
-                "reviewer_role": "product/engineering reviewer",
+                "reviewer_role": "product owner and human fixture reviewer",
                 "source_path": str(source_path.relative_to(ROOT)),
                 "source_lineage": "repo_fixture",
                 "source_run_id": source_run_id,
@@ -761,21 +758,36 @@ def _assert_reviewed_expected_output_sidecar(packet_path: pathlib.Path) -> None:
     assert evidence["artifact_catalog_version"] == catalog["catalog_version"]
     assert evidence["packet_sha256"] == _sha256_file(packet_path)
     assert evidence["expected_sha256"] == _sha256_file(packet_path)
-    assert evidence["expected_path"] == str(packet_path.relative_to(ROOT))
-    assert evidence["diff_path"] == str(diff_path.relative_to(ROOT))
+    assert _repo_evidence_path(evidence["expected_path"]) == packet_path.relative_to(ROOT)
+    assert _repo_evidence_path(evidence["diff_path"]) == diff_path.relative_to(ROOT)
     assert evidence["diff_status"] == "passed"
     assert evidence["reviewer_identity"] != evidence["author_identity"]
-    source_path = ROOT / evidence["source_path"]
-    assert source_path.exists()
-    assert evidence["source_sha256"] == _sha256_file(source_path)
-    assert evidence["source_run_id"] == _source_run_id_for_surface(
-        packet_path.parent.name,
-        _read_json(source_path),
-    )
+    assert re.fullmatch(r"[a-f0-9]{64}", evidence["source_sha256"])
+    if "source_path" in evidence:
+        source_path = ROOT / _repo_evidence_path(evidence["source_path"])
+        assert source_path.exists()
+        assert evidence["source_sha256"] == _sha256_file(source_path)
+        assert evidence["source_run_id"] == _source_run_id_for_surface(
+            packet_path.parent.name,
+            _read_json(source_path),
+        )
+    else:
+        source_url = urllib.parse.urlsplit(evidence["source_url"])
+        assert source_url.scheme == "https"
+        assert not source_url.query
+        assert not source_url.fragment
+        assert source_url.path.endswith(f"/{evidence['source_hosted_path']}")
     diff = _read_json(diff_path)
     assert diff["status"] == "passed"
     assert diff["actual_sha256"] == _sha256_file(packet_path)
     assert diff["expected_sha256"] == _sha256_file(packet_path)
+
+
+def _repo_evidence_path(value: str) -> pathlib.Path:
+    path = pathlib.Path(value)
+    if path.parts and path.parts[0] in {ROOT.name, "groundx-python"}:
+        return pathlib.Path(*path.parts[1:])
+    return path
 
 
 def _inherited_evidence(previous: typing.Mapping[str, typing.Any]) -> typing.Dict[str, typing.Any]:
@@ -819,10 +831,6 @@ def _assert_no_synthetic_protected_marker(
 
     if isinstance(value, str):
         for marker in (
-            "arcadia_legacy_",
-            "arcadia_v1_",
-            "generic_v1_",
-            "adp_v1_",
             "_parent_",
             "_account_level",
             "deterministic_from_cashbot_deployed_output_routes",

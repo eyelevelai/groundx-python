@@ -4,6 +4,8 @@ import typing
 
 import requests
 
+from .deadline import remaining_operation_seconds
+
 DEFAULT_HTTP_CONNECT_TIMEOUT_SECONDS = 5.0
 DEFAULT_HTTP_READ_TIMEOUT_SECONDS = 30.0
 DEFAULT_HTTP_MAX_ATTEMPTS = 2
@@ -71,7 +73,9 @@ def _bounded_request(
     last_exc: typing.Optional[requests.RequestException] = None
 
     for attempt in range(attempts):
-        remaining = operation_deadline_seconds - (time.monotonic() - started)
+        local_remaining = operation_deadline_seconds - (time.monotonic() - started)
+        remaining = remaining_operation_seconds(local_remaining)
+        assert remaining is not None
         if remaining <= 0:
             cause = requests.Timeout(
                 f"{operation} exceeded {operation_deadline_seconds} second deadline"
@@ -83,7 +87,10 @@ def _bounded_request(
         try:
             return method(
                 url,
-                timeout=(connect_timeout, min(read_timeout, remaining)),
+                timeout=(
+                    min(connect_timeout, remaining),
+                    min(read_timeout, remaining),
+                ),
                 **kwargs,
             )
         except requests.RequestException as exc:
@@ -104,7 +111,9 @@ def _bounded_request(
             if sleep_between_attempts:
                 backoff = min(float(attempt + 1), backoff_cap_seconds)
                 elapsed = time.monotonic() - started
-                remaining_after_attempt = operation_deadline_seconds - elapsed
+                local_remaining = operation_deadline_seconds - elapsed
+                remaining_after_attempt = remaining_operation_seconds(local_remaining)
+                assert remaining_after_attempt is not None
                 if remaining_after_attempt <= 0:
                     continue
                 time.sleep(min(backoff, remaining_after_attempt))
@@ -129,6 +138,57 @@ def bounded_get(
 ) -> requests.Response:
     return _bounded_request(
         requests.get,
+        url,
+        operation=operation,
+        connect_timeout=connect_timeout
+        if connect_timeout is not None
+        else _env_float(
+            "GROUNDX_EXTRACT_HTTP_CONNECT_TIMEOUT_SECONDS",
+            DEFAULT_HTTP_CONNECT_TIMEOUT_SECONDS,
+        ),
+        read_timeout=read_timeout
+        if read_timeout is not None
+        else _env_float(
+            "GROUNDX_EXTRACT_HTTP_READ_TIMEOUT_SECONDS",
+            DEFAULT_HTTP_READ_TIMEOUT_SECONDS,
+        ),
+        max_attempts=max_attempts
+        if max_attempts is not None
+        else _env_int(
+            "GROUNDX_EXTRACT_HTTP_MAX_ATTEMPTS",
+            DEFAULT_HTTP_MAX_ATTEMPTS,
+        ),
+        backoff_cap_seconds=backoff_cap_seconds
+        if backoff_cap_seconds is not None
+        else _env_float(
+            "GROUNDX_EXTRACT_HTTP_BACKOFF_CAP_SECONDS",
+            DEFAULT_HTTP_BACKOFF_CAP_SECONDS,
+        ),
+        operation_deadline_seconds=operation_deadline_seconds
+        if operation_deadline_seconds is not None
+        else _env_float(
+            "GROUNDX_EXTRACT_HTTP_OPERATION_DEADLINE_SECONDS",
+            DEFAULT_HTTP_OPERATION_DEADLINE_SECONDS,
+        ),
+        sleep_between_attempts=sleep_between_attempts,
+        **kwargs,
+    )
+
+
+def bounded_head(
+    url: str,
+    *,
+    operation: str,
+    connect_timeout: typing.Optional[float] = None,
+    read_timeout: typing.Optional[float] = None,
+    max_attempts: typing.Optional[int] = None,
+    backoff_cap_seconds: typing.Optional[float] = None,
+    operation_deadline_seconds: typing.Optional[float] = None,
+    sleep_between_attempts: bool = True,
+    **kwargs: typing.Any,
+) -> requests.Response:
+    return _bounded_request(
+        requests.head,
         url,
         operation=operation,
         connect_timeout=connect_timeout

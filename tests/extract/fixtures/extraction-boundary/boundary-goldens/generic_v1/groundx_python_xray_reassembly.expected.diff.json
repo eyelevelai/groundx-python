@@ -1,21 +1,13 @@
 {
-  "acceptance_reason": "Accepted as deterministic SDK X-Ray reassembly output from a passing hosted fixture-seeding run.",
-  "accepted_actual_as_expected": true,
-  "actual_sha256": "d0a08a450b70d14e74d54942536cc2b746b4727543b6388adefcdffa033263b0",
-  "artifact_catalog_sha256": "95acc2b8d0d9f0447bea153ed20e339615b6b1c3788f079990cf5eb3af9e7153",
+  "actual_sha256": "59b4caf4ea14bd65d20a3dad4e8567bf30c80114303dd8633c6717277391a6ae",
+  "approval_sha256": "966f352d4654c9bebf8b175bc9d3c5089356b515f931d7cce0b9970f2eb6aa14",
   "artifact_name": "groundx_python_xray_reassembly",
-  "expected_sha256": "d0a08a450b70d14e74d54942536cc2b746b4727543b6388adefcdffa033263b0",
+  "candidate_diff_sha256": "07ecbff855d9b98973d8edeaad2c3513a1a1adc3248d15a83c7772b51f8782ab",
+  "candidate_manifest_sha256": "b0eb7f80b8140f5332e36926fbb4182d0ecbebe72e51bae2bf4e80b602cfc7d0",
+  "candidate_sha256": "9853637790cefc1abde920dfe3deb8afa587d561e3143e87e70bde2e9b9db721",
+  "expected_sha256": "59b4caf4ea14bd65d20a3dad4e8567bf30c80114303dd8633c6717277391a6ae",
   "kind": "machine_readable_json_diff",
-  "reviewed_field_count_summary": {
-    "boundary": "groundx_python_xray_reassembly",
-    "input_from": "internal_arcadia_download_workflow_load",
-    "output_for": "sdk_reassembly_proof",
-    "stage": "groundx_python_xray_reassembly",
-    "surface": "generic_v1"
-  },
-  "source_artifact_sha256": "40957dbf359561102dfdbe45fa5401c3ae8a49f6cf90da9347e6a15c59a40460",
-  "source_lineage": "repo_fixture",
-  "source_run_id": "live-20260722T134446Z-sdk388-cashbot-82b-internal-6a5-digest026-trace-fixture-seeding",
-  "status": "passed",
-  "surface": "generic_v1"
+  "source_artifact_sha256": "fae9098beaf76c7621a80f2029b2961ef33574cdfc7a55e41d9a7d4a3d1d3f3f",
+  "source_run_id": "live-20260728T050315Z-sdk389-cashbot-ecc3b43-internal-8089bd-digestc456-harnessf857-trace-fixture-seeding",
+  "status": "passed"
 }
