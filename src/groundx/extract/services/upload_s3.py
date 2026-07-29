@@ -10,7 +10,8 @@ class S3Client:
         self.client = None
         self.logger = logger
         if self.settings.upload.type == "s3":
-            import boto3, certifi
+            import boto3
+            import certifi
             from botocore.config import Config
 
             self.client = boto3.client(  # pyright: ignore[reportUnknownMemberType]
@@ -18,7 +19,12 @@ class S3Client:
                 aws_access_key_id=self.settings.upload.get_key(),
                 aws_secret_access_key=self.settings.upload.get_secret(),
                 aws_session_token=self.settings.upload.get_token(),
-                config=Config(max_pool_connections=50),
+                config=Config(
+                    connect_timeout=5,
+                    read_timeout=20,
+                    max_pool_connections=50,
+                    retries={"total_max_attempts": 1, "mode": "standard"},
+                ),
                 region_name=self.settings.upload.get_region(),
                 verify=certifi.where(),
             )
@@ -104,7 +110,7 @@ class S3Client:
         )
 
     @staticmethod
-    def _read_body(response: typing.Dict[str, typing.Any]) -> bytes:
+    def _read_body(response: typing.Mapping[str, typing.Any]) -> bytes:
         body = response.get("Body")
         if body is None:
             raise Exception("S3 response missing Body")
@@ -118,7 +124,7 @@ class S3Client:
 
     @staticmethod
     def _metadata_from_response(
-        response: typing.Dict[str, typing.Any]
+        response: typing.Mapping[str, typing.Any]
     ) -> typing.Dict[str, str]:
         etag = response.get("ETag", "")
         metadata: typing.Dict[str, str] = {

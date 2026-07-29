@@ -9,6 +9,7 @@ try:
 except ModuleNotFoundError:
     pytest.skip("smolagents extra is not installed", allow_module_level=True)
 
+from groundx.extract.services.deadline import operation_deadline
 from groundx.extract.services.logger import Logger
 from groundx.extract.settings.settings import AgentSettings
 
@@ -80,3 +81,34 @@ def test_agent_code_preserves_explicit_model_and_reasoning_overrides(
 
     assert CapturingOpenAIModel.calls[-1]["model_id"] == "gpt-5-reasoning"
     assert CapturingOpenAIModel.calls[-1]["reasoning_effort"] == "medium"
+
+
+def test_agent_model_client_uses_remaining_shared_deadline(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from groundx.extract.agents.agent import _DeadlineOpenAIClient
+
+    calls: typing.List[typing.Dict[str, typing.Any]] = []
+
+    class Completions:
+        def create(self, **kwargs: typing.Any) -> str:
+            calls.append(kwargs)
+            return "ok"
+
+    class Client:
+        def __init__(self) -> None:
+            self.chat = types.SimpleNamespace(completions=Completions())
+
+        def with_options(self, **options: typing.Any) -> "Client":
+            calls.append(options)
+            return self
+
+    client = _DeadlineOpenAIClient(Client())
+
+    with operation_deadline(9):
+        result = client.chat.completions.create(model="test")
+
+    assert result == "ok"
+    assert calls[0]["max_retries"] == 0
+    assert 0 < calls[0]["timeout"] <= 9
+    assert calls[1] == {"model": "test"}

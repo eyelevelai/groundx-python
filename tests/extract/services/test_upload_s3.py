@@ -1,5 +1,6 @@
 import typing
 import unittest
+from unittest.mock import Mock, patch
 
 from groundx.extract.services.logger import Logger
 from groundx.extract.services.upload_s3 import S3Client
@@ -33,6 +34,29 @@ class FakeS3Client:
 
 
 class TestS3Client(unittest.TestCase):
+    @patch("boto3.client")
+    def test_s3_client_has_bounded_io_and_no_hidden_retries(
+        self,
+        mock_boto_client: Mock,
+    ) -> None:
+        settings = ContainerSettings(
+            broker="",
+            service="s3",
+            upload=ContainerUploadSettings(
+                base_domain="",
+                bucket="eyelevel",
+                type="s3",
+                url="",
+            ),
+            workers=1,
+        )
+        S3Client(settings, Logger("test", "debug"))
+
+        config = mock_boto_client.call_args.kwargs["config"]
+        self.assertEqual(config.connect_timeout, 5)
+        self.assertEqual(config.read_timeout, 20)
+        self.assertEqual(config.retries["total_max_attempts"], 1)
+
     def _client(self) -> S3Client:
         logger = Logger("s3", "debug")
         return S3Client(

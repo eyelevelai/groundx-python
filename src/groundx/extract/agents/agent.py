@@ -20,12 +20,44 @@ from smolagents.models import (  # pyright: ignore[reportMissingTypeStubs]
     OpenAIServerModel,
 )
 
+from ..services.deadline import remaining_operation_seconds
 from ..services.logger import Logger
 from ..settings.settings import AgentSettings
 from ..utility.utility import clean_json
 
 if typing.TYPE_CHECKING:
     from PIL.Image import Image
+
+
+class _DeadlineOpenAICompletions:
+    def __init__(self, client: typing.Any) -> None:
+        self._client = client
+
+    def create(self, *args: typing.Any, **kwargs: typing.Any) -> typing.Any:
+        remaining = remaining_operation_seconds()
+        client = self._client
+        if remaining is not None:
+            if remaining <= 0:
+                raise TimeoutError("agent provider call exceeded task deadline")
+            client = client.with_options(
+                max_retries=0,
+                timeout=remaining,
+            )
+        return client.chat.completions.create(*args, **kwargs)
+
+
+class _DeadlineOpenAIChat:
+    def __init__(self, client: typing.Any) -> None:
+        self.completions = _DeadlineOpenAICompletions(client)
+
+
+class _DeadlineOpenAIClient:
+    def __init__(self, client: typing.Any) -> None:
+        self._client = client
+        self.chat = _DeadlineOpenAIChat(client)
+
+    def __getattr__(self, name: str) -> typing.Any:
+        return getattr(self._client, name)
 
 
 def build_openai_server_model(settings: AgentSettings) -> OpenAIServerModel:
@@ -38,9 +70,14 @@ def build_openai_server_model(settings: AgentSettings) -> OpenAIServerModel:
         model_kwargs["reasoning_effort"] = settings.reasoning_effort
 
     if settings.model_kwargs:
-        return OpenAIServerModel(**model_kwargs, **settings.model_kwargs)
+        model = OpenAIServerModel(**model_kwargs, **settings.model_kwargs)
+    else:
+        model = OpenAIServerModel(**model_kwargs)
 
-    return OpenAIServerModel(**model_kwargs)
+    client = getattr(model, "client", None)
+    if client is not None and not isinstance(client, _DeadlineOpenAIClient):
+        model.client = _DeadlineOpenAIClient(client)
+    return model
 
 
 prompt_suffix = """
@@ -182,6 +219,7 @@ class AgentCode(CodeAgent):
         self.python_executor.static_tools.update({"open": open})  # type: ignore
 
         self.log = log
+        self.response_parse_max_retries = settings.response_parse_max_retries
 
     def process(
         self,
@@ -200,7 +238,7 @@ class AgentCode(CodeAgent):
             return process_response(res=res, expected_types=expected_types)
 
         except Exception as e:
-            if attempt > 2:
+            if attempt >= self.response_parse_max_retries:
                 raise TypeError(
                     f"agent process result is not of expected type(s) {expected_types!r}: [{e}]\n\n{res}"
                 )
@@ -238,6 +276,7 @@ class AgentTool(ToolCallingAgent):
 
         self.log = log
         self.image_transport = settings.image_transport
+        self.response_parse_max_retries = settings.response_parse_max_retries
 
     def process(
         self,
@@ -309,7 +348,7 @@ class AgentTool(ToolCallingAgent):
                 error_type=e.__class__.__name__,
                 raw_response=res,
             )
-            if attempt > 2:
+            if attempt >= self.response_parse_max_retries:
                 raise TypeError(
                     f"agent process result is not of expected type(s) {expected_types!r}: [{e}]\n\n{res}"
                 )

@@ -15,6 +15,7 @@ class MinIOClient:
         self.logger = logger
         if self.settings.upload.type == "minio":
             import json
+            import urllib3
             from minio import Minio
 
             self.client = Minio(
@@ -24,6 +25,10 @@ class MinIOClient:
                 region=self.settings.upload.get_region(),
                 session_token=self.settings.upload.get_token(),
                 secure=self.settings.upload.ssl,
+                http_client=urllib3.PoolManager(
+                    retries=False,
+                    timeout=urllib3.Timeout(connect=5, read=20),
+                ),
             )
 
             if not self.client.bucket_exists(self.settings.upload.bucket):

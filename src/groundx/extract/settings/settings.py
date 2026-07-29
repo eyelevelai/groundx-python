@@ -43,6 +43,7 @@ class AgentSettings(BaseModel):
     max_steps: int = 7
     model_id: str = "gpt-5.4-mini"
     reasoning_effort: typing.Optional[str] = None
+    response_parse_max_retries: int = 3
     image_transport: str = "pil"
     model_kwargs: typing.Optional[typing.Dict[str, typing.Any]] = None
 
