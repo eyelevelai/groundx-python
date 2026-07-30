@@ -50,7 +50,11 @@ _RESERVED_TOP_LEVEL_KEYS = {
     _CUSTOM_WORKFLOW_KEY,
 }
 _EXTRACTION_POLICY_VERSION_KEY = "extraction_policy_version"
-_SUPPORTED_TOP_LEVEL_METADATA_KEYS = {_EXTRACTION_POLICY_VERSION_KEY}
+_SUPPORTED_TOP_LEVEL_METADATA_KEYS = {
+    _EXTRACTION_POLICY_VERSION_KEY,
+    "_groundx_internal_capture",
+}
+_SUPPORTED_PSEUDO_GROUP_METADATA_KEYS = {"role"}
 _SUPPORTED_FINAL_GROUP_METADATA_KEYS = {
     "always_check_attrs",
     "conflict_attrs",
@@ -149,6 +153,7 @@ _CUSTOM_WORKFLOW_AUTHORING_KEYS = {
     "custom_steps",
     _CUSTOM_WORKFLOW_AGENT_CHAIN_KEY,
     "output_relationships",
+    "section_strategy",
 }
 _CUSTOM_WORKFLOW_PERSISTED_KEYS = {
     "metadata_version",
@@ -156,6 +161,7 @@ _CUSTOM_WORKFLOW_PERSISTED_KEYS = {
     "custom_steps",
     _CUSTOM_WORKFLOW_AGENT_CHAIN_KEY,
     "output_relationships",
+    "section_strategy",
     "output_routes",
     "leaf_fields",
     "field_counts",
@@ -1600,6 +1606,8 @@ def _normalize_persisted_custom_workflow_metadata(
     }
     if relationships:
         metadata["output_relationships"] = relationships
+    if workflow.get("section_strategy") is not None:
+        metadata["section_strategy"] = workflow["section_strategy"]
     if template:
         metadata["template"] = template
     if field_counts:
@@ -1930,6 +1938,8 @@ def _build_authored_custom_workflow_metadata(
     }
     if relationships:
         metadata["output_relationships"] = relationships
+    if workflow.get("section_strategy") is not None:
+        metadata["section_strategy"] = workflow["section_strategy"]
     if template:
         metadata["template"] = template
     if field_counts:
@@ -2105,8 +2115,10 @@ def prepare_extraction_yaml(
     effective_workflow_metadata_key_set = workflow_metadata_key_set | {
         _CUSTOM_WORKFLOW_GROUP_METADATA_KEY
     }
-    effective_pseudo_metadata_key_set = effective_workflow_metadata_key_set | set(
-        pseudo_group_metadata_keys or []
+    effective_pseudo_metadata_key_set = (
+        effective_workflow_metadata_key_set
+        | _SUPPORTED_PSEUDO_GROUP_METADATA_KEYS
+        | set(pseudo_group_metadata_keys or [])
     )
     metadata_overlap = final_metadata_key_set & effective_workflow_metadata_key_set
     if metadata_overlap:
