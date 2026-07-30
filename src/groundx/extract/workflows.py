@@ -185,7 +185,10 @@ def load_extraction_definition_from_workflow_response(
         output_routes=_plain_metadata_sequence(output_routes, _OUTPUT_ROUTE_ALIASES),
         leaf_fields=_plain_metadata_sequence(leaf_fields, _LEAF_FIELD_ALIASES),
         chunk_strategy=_get_workflow_value(workflow, "chunk_strategy"),
-        section_strategy=_get_workflow_value(workflow, "section_strategy"),
+        section_strategy=_first_present(
+            _get_workflow_value(workflow, "section_strategy"),
+            _section_strategy_from_extract(extract_mapping),
+        ),
         steps=_plain_or_none(_get_workflow_value(workflow, "steps")),
     )
 
@@ -324,6 +327,7 @@ def _definition_from_prepared(prepared: PreparedExtractionYaml) -> ExtractionDef
             metadata.get("leaf_fields"),
             _LEAF_FIELD_ALIASES,
         ),
+        section_strategy=_section_strategy_from_extract(extract),
     )
 
 
@@ -349,6 +353,7 @@ def _definition_from_workflow_extract(
             metadata.get("leaf_fields"),
             _LEAF_FIELD_ALIASES,
         ),
+        section_strategy=_section_strategy_from_extract(extract_mapping),
     )
 
 
@@ -528,6 +533,19 @@ def _workflow_metadata(
     if isinstance(metadata, Mapping):
         return typing.cast(typing.Mapping[str, typing.Any], metadata)
     return {}
+
+
+def _section_strategy_from_extract(
+    extract: typing.Mapping[str, typing.Any],
+) -> typing.Any:
+    metadata = _workflow_metadata(extract)
+    if metadata.get("section_strategy") is not None:
+        return metadata["section_strategy"]
+    persisted = extract.get(_PERSISTED_WORKFLOW_EXTRACT_KEY)
+    if isinstance(persisted, Mapping):
+        persisted_metadata = _workflow_metadata(persisted)
+        return persisted_metadata.get("section_strategy")
+    return None
 
 
 def _normalize_template(value: typing.Any) -> typing.Optional[typing.Dict[str, str]]:
