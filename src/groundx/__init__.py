@@ -31,6 +31,10 @@ if typing.TYPE_CHECKING:
         CustomerDetail,
         CustomerDetailStatus,
         CustomerResponse,
+        CustomerUsageDetail,
+        CustomerUsageDetailMetric,
+        CustomerUsageResponse,
+        CustomerUsageResponseCustomer,
         Document,
         DocumentDetail,
         DocumentListResponse,
@@ -97,9 +101,10 @@ if typing.TYPE_CHECKING:
         WorkflowTemplate,
         WorkflowsResponse,
     )
-    from .errors import BadRequestError, UnauthorizedError
+    from .errors import BadRequestError, NotFoundError, UnauthorizedError
     from . import api_key, buckets, customer, documents, groups, health, search, workflows
     from ._default_clients import DefaultAioHttpClient, DefaultAsyncHttpxClient
+    from .customer import CustomerGetUsageRequestMetric
     from .environment import GroundXEnvironment
     from .ingest import AsyncGroundX, GroundX
     from .search import SearchContentRequestId
@@ -131,7 +136,12 @@ _dynamic_imports: typing.Dict[str, str] = {
     "CustomWorkflowStepLevel": ".types",
     "CustomerDetail": ".types",
     "CustomerDetailStatus": ".types",
+    "CustomerGetUsageRequestMetric": ".customer",
     "CustomerResponse": ".types",
+    "CustomerUsageDetail": ".types",
+    "CustomerUsageDetailMetric": ".types",
+    "CustomerUsageResponse": ".types",
+    "CustomerUsageResponseCustomer": ".types",
     "DefaultAioHttpClient": "._default_clients",
     "DefaultAsyncHttpxClient": "._default_clients",
     "Document": ".types",
@@ -168,6 +178,7 @@ _dynamic_imports: typing.Dict[str, str] = {
     "IngestStatusProgressQueued": ".types",
     "MessageResponse": ".types",
     "MeterDetail": ".types",
+    "NotFoundError": ".errors",
     "ProcessLevel": ".types",
     "ProcessesStatusResponse": ".types",
     "ProcessingStatus": ".types",
@@ -264,7 +275,12 @@ __all__ = [
     "CustomWorkflowStepLevel",
     "CustomerDetail",
     "CustomerDetailStatus",
+    "CustomerGetUsageRequestMetric",
     "CustomerResponse",
+    "CustomerUsageDetail",
+    "CustomerUsageDetailMetric",
+    "CustomerUsageResponse",
+    "CustomerUsageResponseCustomer",
     "DefaultAioHttpClient",
     "DefaultAsyncHttpxClient",
     "Document",
@@ -301,6 +317,7 @@ __all__ = [
     "IngestStatusProgressQueued",
     "MessageResponse",
     "MeterDetail",
+    "NotFoundError",
     "ProcessLevel",
     "ProcessesStatusResponse",
     "ProcessingStatus",

@@ -3373,6 +3373,100 @@ client.customer.get()
 </dl>
 </details>
 
+<details><summary><code>client.customer.<a href="src/groundx/customer/client.py">get_usage</a>(...) -> CustomerUsageResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Get aggregate usage for the authenticated customer over a requested time period.
+
+The API resolves the account subscription and usage meter from the authenticated account. Do not provide customer ids, subscription ids, or meter ids. `startTime` is inclusive, `endTime` is exclusive, and both timestamps must be RFC3339 values aligned to minute boundaries. Timestamps are normalized to UTC. `endTime` cannot be in the future, windows longer than 366 days are rejected, and `usageAsOf` reflects the latest usage summary available to GroundX.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from groundx import GroundX
+from groundx.environment import GroundXEnvironment
+import datetime
+
+client = GroundX(
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
+)
+
+client.customer.get_usage(
+    metric="searches",
+    start_time=datetime.datetime.fromisoformat("2026-07-15T00:00:00+00:00"),
+    end_time=datetime.datetime.fromisoformat("2026-07-29T00:00:00+00:00"),
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**metric:** `CustomerGetUsageRequestMetric` — Supported usage metric to query.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**start_time:** `datetime.datetime` — Inclusive RFC3339 window start. Must be aligned to a minute boundary.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**end_time:** `datetime.datetime` — Exclusive RFC3339 window end. Must be aligned to a minute boundary and cannot be in the future.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## ApiKey
 <details><summary><code>client.api_key.<a href="src/groundx/api_key/client.py">list</a>() -> ApiKeyResponse</code></summary>
 <dl>
