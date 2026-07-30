@@ -22397,25 +22397,6 @@
   },
   "surface": "generic_v1",
   "workflow_extract": {
-    "_groundx_internal_capture": {
-      "bucket_id": 31006,
-      "capture_config_hash": "57c37b27dd21eaa9de11eca34ef45f6bc4d236518a8e5c57ede315ae34c40ece",
-      "capture_types": [
-        "pipeline_trace",
-        "prompt_capture"
-      ],
-      "case_id": "generic-v1",
-      "enabled": true,
-      "expires_at": "2026-07-28T11:23:31Z",
-      "fields": {},
-      "max_artifacts": 500,
-      "retention": {
-        "delete_after": "2026-08-04T05:23:31Z",
-        "owner": "private-extraction-certification"
-      },
-      "run_id": "extract-cert-generic-v1-01",
-      "schema_version": "extraction_pipeline_capture_v1"
-    },
     "_groundx_persisted_extract": {
       "_groundx_internal_capture": {
         "bucket_id": 31006,
@@ -26184,25 +26165,6 @@
       }
     },
     "groups": {
-      "_groundx_internal_capture": {
-        "bucket_id": 31006,
-        "capture_config_hash": "57c37b27dd21eaa9de11eca34ef45f6bc4d236518a8e5c57ede315ae34c40ece",
-        "capture_types": [
-          "pipeline_trace",
-          "prompt_capture"
-        ],
-        "case_id": "generic-v1",
-        "enabled": true,
-        "expires_at": "2026-07-28T11:23:31Z",
-        "fields": {},
-        "max_artifacts": 500,
-        "retention": {
-          "delete_after": "2026-08-04T05:23:31Z",
-          "owner": "private-extraction-certification"
-        },
-        "run_id": "extract-cert-generic-v1-01",
-        "schema_version": "extraction_pipeline_capture_v1"
-      },
       "generic_group_a": {
         "fields": {
           "generic_attr_01": {
@@ -26756,10 +26718,27 @@
     ],
     "schema_version": "extraction_workflow_metadata_v1",
     "top_level_metadata": {
+      "_groundx_internal_capture": {
+        "bucket_id": 31006,
+        "capture_config_hash": "57c37b27dd21eaa9de11eca34ef45f6bc4d236518a8e5c57ede315ae34c40ece",
+        "capture_types": [
+          "pipeline_trace",
+          "prompt_capture"
+        ],
+        "case_id": "generic-v1",
+        "enabled": true,
+        "expires_at": "2026-07-28T11:23:31Z",
+        "max_artifacts": 500,
+        "retention": {
+          "delete_after": "2026-08-04T05:23:31Z",
+          "owner": "private-extraction-certification"
+        },
+        "run_id": "extract-cert-generic-v1-01",
+        "schema_version": "extraction_pipeline_capture_v1"
+      },
       "extraction_policy_version": "v1"
     },
     "workflow_field_paths": {
-      "_groundx_internal_capture": {},
       "generic_group_a": {
         "generic_attr_01": "/generic_group_a/generic_attr_01",
         "generic_attr_02": "/generic_group_a/generic_attr_02",

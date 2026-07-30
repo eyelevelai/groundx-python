@@ -8,11 +8,11 @@
     "diff_path": "groundx-python/tests/extract/fixtures/extraction-boundary/boundary-goldens/arcadia_v1/groundx_python_xray_reassembly.expected.diff.json",
     "diff_status": "passed",
     "expected_path": "groundx-python/tests/extract/fixtures/extraction-boundary/boundary-goldens/arcadia_v1/groundx_python_xray_reassembly.expected.json",
-  "expected_sha256": "c02cb50123809dcfd83f49777e27b91b231d152ab39c55e33409b66156f506ea",
-  "packet_sha256": "c02cb50123809dcfd83f49777e27b91b231d152ab39c55e33409b66156f506ea",
+    "expected_sha256": "3a8efc484639d9e006a468a13e9ca688ca9b35673705a2d5d01e42a75d942f04",
+    "packet_sha256": "3a8efc484639d9e006a468a13e9ca688ca9b35673705a2d5d01e42a75d942f04",
     "privacy_disposition": "Commit only deterministic SDK summary packets derived from the approved sanitized X-Ray sidecars. Do not commit raw X-Ray content, prompts, model responses, credentials, or customer content.",
     "review_reason": "Freeze the exact GroundX Python SDK output produced from the approved X-Ray candidates by production reassembly. Utility final extraction output is unchanged; diagnostics and provenance now reflect the real replay input.",
-    "reviewed_at": "2026-07-26T23:59:22Z",
+    "reviewed_at": "2026-07-30T00:00:00Z",
     "reviewer_identity": "Benjamin Fletcher",
     "reviewer_relation": "non_author",
     "reviewer_role": "product owner and human fixture reviewer",
@@ -26,8 +26,9 @@
       "Replay each approved X-Ray candidate through the production GroundX Python reassembly function.",
       "Store the complete deterministic expected packet without normalizing or substituting expected values.",
       "Preserve the upstream candidate manifest and production implementation hashes as lineage.",
-    "Mechanically corrected predecessor lineage after the approved model-ID metadata repair; SDK outputs are unchanged.",
-    "Mechanically propagated bucket-bound capture metadata; reassembled extraction values are unchanged."
+      "Mechanically corrected predecessor lineage after the approved model-ID metadata repair; SDK outputs are unchanged.",
+      "Mechanically propagated bucket-bound capture metadata; reassembled extraction values are unchanged.",
+      "Refresh predecessor hashes after GroundX Python 3.9.0 moved workflow capture metadata out of extraction groups."
     ]
   }
 }

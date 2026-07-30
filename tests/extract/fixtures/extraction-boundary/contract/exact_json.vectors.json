@@ -1,0 +1,188 @@
+{
+  "schema_version": "extraction_boundary_exact_json_vectors_v1",
+  "vectors": [
+    {
+      "actual": {
+        "items": [
+          1,
+          "two",
+          null
+        ]
+      },
+      "differences": [],
+      "expected": {
+        "items": [
+          1,
+          "two",
+          null
+        ]
+      },
+      "name": "exact_match"
+    },
+    {
+      "actual": {
+        "extra": true,
+        "value": 1
+      },
+      "differences": [
+        {
+          "actual": true,
+          "actual_type": "boolean",
+          "kind": "unexpected",
+          "path": "$.extra"
+        }
+      ],
+      "expected": {
+        "value": 1
+      },
+      "name": "unexpected_object_field"
+    },
+    {
+      "actual": {},
+      "differences": [
+        {
+          "expected": null,
+          "expected_type": "null",
+          "kind": "missing",
+          "path": "$.value"
+        }
+      ],
+      "expected": {
+        "value": null
+      },
+      "name": "null_is_not_missing"
+    },
+    {
+      "actual": {
+        "value": "1"
+      },
+      "differences": [
+        {
+          "actual": "1",
+          "actual_type": "string",
+          "expected": 1,
+          "expected_type": "number",
+          "kind": "type",
+          "path": "$.value"
+        }
+      ],
+      "expected": {
+        "value": 1
+      },
+      "name": "string_is_not_number"
+    },
+    {
+      "actual": {
+        "items": [
+          "second",
+          "first"
+        ]
+      },
+      "differences": [
+        {
+          "actual": "second",
+          "actual_type": "string",
+          "expected": "first",
+          "expected_type": "string",
+          "kind": "value",
+          "path": "$.items[0]"
+        },
+        {
+          "actual": "first",
+          "actual_type": "string",
+          "expected": "second",
+          "expected_type": "string",
+          "kind": "value",
+          "path": "$.items[1]"
+        }
+      ],
+      "expected": {
+        "items": [
+          "first",
+          "second"
+        ]
+      },
+      "name": "array_order_is_significant"
+    },
+    {
+      "actual": {
+        "outer": [
+          {
+            "value": "wrong"
+          }
+        ]
+      },
+      "differences": [
+        {
+          "actual": "wrong",
+          "actual_type": "string",
+          "expected": "right",
+          "expected_type": "string",
+          "kind": "value",
+          "path": "$.outer[0].value"
+        }
+      ],
+      "expected": {
+        "outer": [
+          {
+            "value": "right"
+          }
+        ]
+      },
+      "name": "nested_value_change"
+    },
+    {
+      "actual": {
+        "items": [
+          1,
+          2
+        ]
+      },
+      "differences": [
+        {
+          "expected": 3,
+          "expected_type": "number",
+          "kind": "missing",
+          "path": "$.items[2]"
+        }
+      ],
+      "expected": {
+        "items": [
+          1,
+          2,
+          3
+        ]
+      },
+      "name": "missing_array_item"
+    },
+    {
+      "actual": {
+        "value": 1
+      },
+      "differences": [],
+      "expected": {
+        "value": 1.0
+      },
+      "name": "equivalent_json_numbers"
+    },
+    {
+      "actual": {
+        "value": 9007199254740993
+      },
+      "differences": [
+        {
+          "actual": 9007199254740993,
+          "actual_type": "number",
+          "expected": 9007199254740992,
+          "expected_type": "number",
+          "kind": "value",
+          "path": "$.value"
+        }
+      ],
+      "expected": {
+        "value": 9007199254740992
+      },
+      "name": "large_integer_change"
+    }
+  ]
+}

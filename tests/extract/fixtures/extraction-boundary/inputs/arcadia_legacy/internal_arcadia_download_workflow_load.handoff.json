@@ -5450,24 +5450,6 @@
   },
   "surface": "arcadia_legacy",
   "workflow_extract": {
-    "_groundx_internal_capture": {
-      "capture_config_hash": "cc79cb98319fd9a1c03c665daa4189ada340a1f5cb5acaec001e82fa85f317b0",
-      "capture_types": [
-        "pipeline_trace",
-        "prompt_capture"
-      ],
-      "case_id": "arcadia-legacy",
-      "enabled": true,
-      "expires_at": "2026-07-26T19:30:43Z",
-      "fields": {},
-      "max_artifacts": 500,
-      "retention": {
-        "delete_after": "2026-08-02T13:30:43Z",
-        "owner": "private-extraction-certification"
-      },
-      "run_id": "extract-cert-arcadia-legacy-01",
-      "schema_version": "extraction_pipeline_capture_v1"
-    },
     "_groundx_persisted_extract": {
       "_groundx_internal_capture": {
         "capture_config_hash": "cc79cb98319fd9a1c03c665daa4189ada340a1f5cb5acaec001e82fa85f317b0",
@@ -8961,24 +8943,6 @@
       }
     },
     "groups": {
-      "_groundx_internal_capture": {
-        "capture_config_hash": "cc79cb98319fd9a1c03c665daa4189ada340a1f5cb5acaec001e82fa85f317b0",
-        "capture_types": [
-          "pipeline_trace",
-          "prompt_capture"
-        ],
-        "case_id": "arcadia-legacy",
-        "enabled": true,
-        "expires_at": "2026-07-26T19:30:43Z",
-        "fields": {},
-        "max_artifacts": 500,
-        "retention": {
-          "delete_after": "2026-08-02T13:30:43Z",
-          "owner": "private-extraction-certification"
-        },
-        "run_id": "extract-cert-arcadia-legacy-01",
-        "schema_version": "extraction_pipeline_capture_v1"
-      },
       "charges": {
         "fields": {
           "charge_amount": {
@@ -9532,6 +9496,23 @@
     ],
     "schema_version": "extraction_workflow_metadata_v1",
     "top_level_metadata": {
+      "_groundx_internal_capture": {
+        "capture_config_hash": "cc79cb98319fd9a1c03c665daa4189ada340a1f5cb5acaec001e82fa85f317b0",
+        "capture_types": [
+          "pipeline_trace",
+          "prompt_capture"
+        ],
+        "case_id": "arcadia-legacy",
+        "enabled": true,
+        "expires_at": "2026-07-26T19:30:43Z",
+        "max_artifacts": 500,
+        "retention": {
+          "delete_after": "2026-08-02T13:30:43Z",
+          "owner": "private-extraction-certification"
+        },
+        "run_id": "extract-cert-arcadia-legacy-01",
+        "schema_version": "extraction_pipeline_capture_v1"
+      },
       "extraction_policy_version": "v1",
       "legacy_policy_default_provenance": {
         "reviewed": true,
@@ -9539,7 +9520,6 @@
       }
     },
     "workflow_field_paths": {
-      "_groundx_internal_capture": {},
       "charges": {
         "charge_amount": "/charges/charge_amount",
         "charge_amount_currency": "/charges/charge_amount_currency",

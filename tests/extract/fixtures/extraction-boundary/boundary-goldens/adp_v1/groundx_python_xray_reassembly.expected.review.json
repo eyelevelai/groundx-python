@@ -8,11 +8,11 @@
     "diff_path": "groundx-python/tests/extract/fixtures/extraction-boundary/boundary-goldens/adp_v1/groundx_python_xray_reassembly.expected.diff.json",
     "diff_status": "passed",
     "expected_path": "groundx-python/tests/extract/fixtures/extraction-boundary/boundary-goldens/adp_v1/groundx_python_xray_reassembly.expected.json",
-    "expected_sha256": "ae4db2014c3643f4311f3b3a3af012410e684a711efdb35ea5f89f66489e2575",
-    "packet_sha256": "ae4db2014c3643f4311f3b3a3af012410e684a711efdb35ea5f89f66489e2575",
+    "expected_sha256": "fe8e8f33c35023ed6212311d1ad0dda02e0d9215eee4b5d8f545c8d118f65389",
+    "packet_sha256": "fe8e8f33c35023ed6212311d1ad0dda02e0d9215eee4b5d8f545c8d118f65389",
     "privacy_disposition": "Approved sanitized service-state artifacts for repository storage; private artifacts remain URL and hash references.",
     "review_reason": "Approved ADP SDK reassembly fixture from the July 28 hosted run.",
-    "reviewed_at": "2026-07-28T13:01:06Z",
+    "reviewed_at": "2026-07-30T00:00:00Z",
     "reviewer_identity": "benjamin-fletcher",
     "reviewer_relation": "non_author",
     "reviewer_role": "human fixture reviewer",
@@ -22,6 +22,8 @@
     "source_run_mode": "fixture_seeding",
     "source_sha256": "df32a7fc563f7fd4e6ce921ad105827d5d48ddb3bee56a7877566323e4f8e030",
     "source_url": "https://upload.eyelevel.ai/layout/processed/00de4247-585a-4561-850a-d738013f3491/516aea1a-7872-4c74-84d2-7185cde13b06-xray.json",
-    "transformations": []
+    "transformations": [
+      "Refresh predecessor hashes after GroundX Python 3.9.0 moved workflow capture metadata out of extraction groups."
+    ]
   }
 }

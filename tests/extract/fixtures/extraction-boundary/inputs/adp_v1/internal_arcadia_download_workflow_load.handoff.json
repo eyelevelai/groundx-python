@@ -23526,25 +23526,6 @@
     ],
     "final_group_metadata": {},
     "groups": {
-      "_groundx_internal_capture": {
-        "bucket_id": 31005,
-        "capture_config_hash": "ee9aa0c31eb00e89ed55ad6c3d7affdfe2b2aea0975830b4e19a0f5fce0cc85e",
-        "capture_types": [
-          "pipeline_trace",
-          "prompt_capture"
-        ],
-        "case_id": "adp-v1",
-        "enabled": true,
-        "expires_at": "2026-07-28T11:23:31Z",
-        "fields": {},
-        "max_artifacts": 500,
-        "retention": {
-          "delete_after": "2026-08-04T05:23:31Z",
-          "owner": "private-extraction-certification"
-        },
-        "run_id": "extract-cert-adp-v1-01",
-        "schema_version": "extraction_pipeline_capture_v1"
-      },
       "automatic_enrollment": {
         "fields": {
           "auto_escalation_pct": {
@@ -25517,6 +25498,24 @@
     },
     "schema_version": "extraction_workflow_metadata_v1",
     "top_level_metadata": {
+      "_groundx_internal_capture": {
+        "bucket_id": 31005,
+        "capture_config_hash": "ee9aa0c31eb00e89ed55ad6c3d7affdfe2b2aea0975830b4e19a0f5fce0cc85e",
+        "capture_types": [
+          "pipeline_trace",
+          "prompt_capture"
+        ],
+        "case_id": "adp-v1",
+        "enabled": true,
+        "expires_at": "2026-07-28T11:23:31Z",
+        "max_artifacts": 500,
+        "retention": {
+          "delete_after": "2026-08-04T05:23:31Z",
+          "owner": "private-extraction-certification"
+        },
+        "run_id": "extract-cert-adp-v1-01",
+        "schema_version": "extraction_pipeline_capture_v1"
+      },
       "extraction_policy_version": "v1"
     },
     "workflow_field_paths": {
