@@ -4,7 +4,7 @@ import pathlib
 
 import pytest
 
-from groundx.extract import reassemble_custom_outputs
+from groundx.extract import prepare_extraction_yaml, reassemble_custom_outputs
 from groundx.extract.custom_outputs import reassemble_custom_outputs_from_xray
 
 FIXTURE_DIR = pathlib.Path(__file__).parent / "fixtures"
@@ -317,6 +317,124 @@ def test_relationship_dedupes_child_rows_by_unique_attrs_only() -> None:
     assert result.relationship_output == result.final_output
 
 
+@pytest.mark.parametrize(
+    (
+        "parent_group",
+        "child_group",
+        "link_field",
+        "parent_field",
+        "child_field",
+    ),
+    [
+        (
+            "meters",
+            "charges",
+            "meter_number",
+            "service_type",
+            "charge_description",
+        ),
+        (
+            "generic_group_b",
+            "generic_group_c",
+            "generic_attr_15",
+            "generic_attr_16",
+            "generic_attr_28",
+        ),
+    ],
+    ids=["arcadia-v1", "generic-v1"],
+)
+def test_authored_names_are_final_for_renamed_relationship_shapes(
+    parent_group: str,
+    child_group: str,
+    link_field: str,
+    parent_field: str,
+    child_field: str,
+) -> None:
+    prepared = prepare_extraction_yaml(
+        f"""
+extraction_policy_version: v1
+workflow:
+  custom_steps:
+    - name: parent_rows
+      level: chunk
+      kind: keys
+    - name: child_rows
+      level: chunk
+      kind: keys
+  output_relationships:
+    - parent_group: {parent_group}
+      child_group: {child_group}
+      parent_output_field: {child_group}
+      match_attrs: [{link_field}]
+      unmatched_child_group: {child_group}
+{parent_group}:
+  workflow_step: parent_rows
+  unique_attrs: []
+  fields:
+    {link_field}:
+      workflow_output_key: provider_link
+      prompt: {{instructions: Return the link., type: str}}
+    {parent_field}:
+      workflow_output_key: provider_parent_value
+      prompt: {{instructions: Return the parent value., type: str}}
+{child_group}:
+  workflow_step: child_rows
+  unique_attrs: []
+  fields:
+    {link_field}:
+      workflow_output_key: provider_link
+      prompt: {{instructions: Return the link., type: str}}
+    {child_field}:
+      workflow_output_key: provider_child_value
+      prompt: {{instructions: Return the child value., type: str}}
+"""
+    )
+    xray = {
+        "chunks": [
+            {
+                "customChunkOutputs": {
+                    "parent_rows": {
+                        "_records": [
+                            {
+                                "provider_link": "A-1",
+                                "provider_parent_value": "parent",
+                            }
+                        ]
+                    },
+                    "child_rows": {
+                        "_records": [
+                            {
+                                "provider_link": "a-1",
+                                "provider_child_value": "child",
+                            }
+                        ]
+                    },
+                }
+            }
+        ]
+    }
+
+    result = reassemble_custom_outputs_from_xray(
+        xray,
+        workflow_extract=prepared.persisted_workflow_extract,
+    )
+
+    assert result.diagnostics == []
+    assert result.final_output == {
+        parent_group: [
+            {
+                link_field: "A-1",
+                parent_field: "parent",
+                child_group: [
+                    {link_field: "a-1", child_field: "child"},
+                ],
+            }
+        ],
+        child_group: [],
+    }
+    assert "provider_link" not in json.dumps(result.final_output)
+
+
 def test_relationship_roles_support_the_same_declared_value_types() -> None:
     parent_group = "generic_parent_records"
     child_group = "generic_child_records"
@@ -487,12 +605,20 @@ def test_relationship_match_keeps_booleans_distinct_from_numbers() -> None:
     }
 
 
-def test_relationship_preserves_identical_child_rows_without_unique_attrs() -> None:
+@pytest.mark.parametrize(
+    "child_metadata",
+    [
+        {"match_attrs": ["meter_number"]},
+        {"match_attrs": ["meter_number"], "unique_attrs": []},
+    ],
+    ids=["missing", "empty"],
+)
+def test_relationship_preserves_identical_child_rows_without_unique_attrs(
+    child_metadata: dict,
+) -> None:
     workflow_extract = {
         "_groundx_persisted_extract": {
-            "charges": {
-                "match_attrs": ["meter_number"],
-            }
+            "charges": child_metadata,
         },
         "workflow": {
             "custom_steps": [

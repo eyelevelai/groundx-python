@@ -526,6 +526,59 @@ transactions:
     }
 
 
+def test_relationship_fields_validate_against_final_groups_with_pseudo_routes() -> None:
+    prepared = prepare_extraction_yaml(
+        """
+extraction_policy_version: v1
+workflow:
+  custom_steps:
+    - name: account_rows
+      level: chunk
+      kind: keys
+    - name: transaction_rows
+      level: chunk
+      kind: keys
+  output_relationships:
+    - parent_group: accounts
+      child_group: transactions
+      parent_output_field: transactions
+      match_attrs: [account_id]
+      unmatched_child_group: transactions
+accounts:
+  unique_attrs: []
+  fields:
+    account_id:
+      prompt: {instructions: Return the account id., type: str}
+transactions:
+  unique_attrs: []
+  fields:
+    account_id:
+      prompt: {instructions: Return the account id., type: str}
+_pseudo_groups:
+  account_rows:
+    workflow_step: account_rows
+    fields:
+      provider_account_id:
+        path: /accounts/account_id
+  transaction_rows:
+    workflow_step: transaction_rows
+    fields:
+      provider_account_id:
+        path: /transactions/account_id
+"""
+    )
+
+    assert prepared.persisted_workflow_extract["workflow"]["output_relationships"] == [
+        {
+            "parent_group": "accounts",
+            "child_group": "transactions",
+            "parent_output_field": "transactions",
+            "match_attrs": ["account_id"],
+            "unmatched_child_group": "transactions",
+        }
+    ]
+
+
 def test_final_group_relationship_metadata_converts_when_parent_is_explicit() -> None:
     raw = """
 extraction_policy_version: v1

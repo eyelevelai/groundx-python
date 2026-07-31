@@ -39,6 +39,8 @@ _defs:
 statement:
   prompt:
     instructions: Extract statement fields.
+  final_value_aliases:
+    total_amount_due: amount_due
   explanation_attrs:
     - statement_explanation
   include:

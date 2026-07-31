@@ -3,7 +3,10 @@
     "statement": {
       "explanation_attrs": [
         "statement_explanation"
-      ]
+      ],
+      "final_value_aliases": {
+        "total_amount_due": "amount_due"
+      }
     }
   },
   "groups": {
@@ -108,6 +111,9 @@
               "type": "float"
             }
           }
+        },
+        "final_value_aliases": {
+          "total_amount_due": "amount_due"
         },
         "include": [
           "identity_fields"

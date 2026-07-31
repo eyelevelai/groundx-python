@@ -355,6 +355,7 @@ def _reject_unsupported_authored_keys(data: typing.Dict[str, typing.Any]) -> Non
                 "pure legacy statement/meters/charges YAML"
             )
 
+
 def _reject_unsupported_workflow_group_keys(
     mapping: typing.Dict[str, typing.Any],
     path: str,
@@ -1525,7 +1526,7 @@ def _validate_group_unique_attrs(
 
 
 def _validate_relationship_match_attrs(
-    workflow_groups: typing.Mapping[str, typing.Dict[str, typing.Any]],
+    final_groups: typing.Mapping[str, typing.Dict[str, typing.Any]],
     custom_workflow_metadata: typing.Optional[typing.Mapping[str, typing.Any]],
 ) -> None:
     if not custom_workflow_metadata:
@@ -1544,13 +1545,13 @@ def _validate_relationship_match_attrs(
 
         for role in ("parent", "child"):
             group_name = relationship.get(f"{role}_group")
-            if not isinstance(group_name, str) or group_name not in workflow_groups:
+            if not isinstance(group_name, str) or group_name not in final_groups:
                 raise ValueError(
                     f"workflow.output_relationships[{idx}] references unknown "
                     f"{role} group [{group_name}]"
                 )
             declared_fields = set(
-                _collect_field_paths(workflow_groups[group_name], group_name)
+                _collect_field_paths(final_groups[group_name], group_name)
             )
             for attr in match_attrs:
                 if attr not in declared_fields:
@@ -2403,7 +2404,7 @@ def prepare_extraction_yaml(
             _strip_custom_workflow_authoring_keys(groups)
             _strip_custom_workflow_authoring_keys(workflow_groups)
         _validate_relationship_match_attrs(
-            workflow_groups,
+            groups,
             custom_workflow_metadata,
         )
         _apply_custom_workflow_field_paths(
@@ -2464,7 +2465,7 @@ def prepare_extraction_yaml(
             custom_workflow_metadata,
         )
     _validate_relationship_match_attrs(
-        workflow_groups,
+        groups,
         custom_workflow_metadata,
     )
 

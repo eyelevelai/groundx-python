@@ -800,6 +800,39 @@ def test_create_and_update_reject_final_value_aliases_in_authored_v1_yaml(
     assert workflows.calls == []
 
 
+def test_create_and_update_allow_final_value_aliases_as_a_field_name() -> None:
+    yaml_text = """
+extraction_policy_version: v1
+statement:
+  unique_attrs: []
+  fields:
+    final_value_aliases:
+      prompt:
+        instructions: Return the printed value.
+        type: str
+"""
+    workflows = RecordingWorkflows()
+    client = _client(workflows)
+
+    assert (
+        client.create_extraction_workflow(
+            yaml_text=yaml_text,
+            name="statement extraction",
+        )
+        == "created"
+    )
+    assert (
+        client.update_extraction_workflow(
+            "workflow-1",
+            yaml_text=yaml_text,
+        )
+        == "updated"
+    )
+
+    for extract in (workflows.calls[0][1]["extract"], workflows.calls[1][2]["extract"]):
+        assert "final_value_aliases" in extract["statement"]["fields"]
+
+
 @pytest.mark.asyncio
 async def test_async_create_and_update_reject_final_value_aliases_in_authored_v1_yaml(
     tmp_path: Path,
