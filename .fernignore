@@ -14,3 +14,7 @@ pyrightconfig.json
 .gitignore
 .cgcignore
 CLAUDE.md
+.gitattributes
+.editorconfig
+scripts/check-line-endings.sh
+.github/workflows/line-endings.yml

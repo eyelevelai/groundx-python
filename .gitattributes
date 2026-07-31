@@ -1,0 +1,21 @@
+* text=auto eol=lf
+
+*.py text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.toml text eol=lf
+*.txt text eol=lf
+.gitignore text eol=lf
+.fernignore text eol=lf
+.cgcignore text eol=lf
+.gitattributes text eol=lf
+.editorconfig text eol=lf
+
+# Future Windows command files may stay CRLF; uncomment if any are added.
+# *.bat text eol=crlf
+# *.cmd text eol=crlf
+
+poetry.lock binary
+*.DS_Store binary
