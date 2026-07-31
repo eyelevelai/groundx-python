@@ -10,4 +10,5 @@ in the linked docs, not in this entrypoint.
 | [`src/groundx/ingest.py`](src/groundx/ingest.py) | You are changing the hand-written ingest helper. |
 | [`src/groundx/extract/`](src/groundx/extract/) | You are changing the hand-written extract helper surface. |
 | [`tests/custom/`](tests/custom/) | You are adding hand-written regression coverage around generated or preserved SDK behavior. |
+| [Extraction boundary fixtures](tests/extract/fixtures/extraction-boundary/README.md) | A four-case X-Ray reassembly test changed or failed. Read this before changing any accepted fixture. |
 | [`eyelevel-fern-config`](https://github.com/eyelevelai/eyelevel-fern-config) | You need an API-shape, generated model, endpoint, package metadata, or SDK generation change. |
