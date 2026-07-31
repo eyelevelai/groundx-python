@@ -37,3 +37,9 @@ command. Do not promote an X-Ray input without its matching SDK output candidate
 
 Only the external model/provider response may be replaced by a fixed fixture.
 Tests must call production reassembly functions unchanged.
+
+GroundX Python's reassembly boundary has no external I/O call to replace. Its
+input is the committed X-Ray handoff, so `writer_registry.json` declares an
+empty mock allowlist. The source-discovery tests require the certifying replay
+to call `reassemble_custom_outputs_from_xray` and reject replacement of that
+module's parser, relationship, reassembly, or result-building code.
