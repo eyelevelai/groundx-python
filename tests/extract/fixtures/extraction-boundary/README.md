@@ -3,6 +3,11 @@
 These fixtures freeze GroundX Python's X-Ray-to-structured-output reassembly
 behavior for Arcadia legacy, Arcadia v1, generic v1, and ADP v1.
 
+The canonical cross-repo process starts in
+`groundx-studio-harness/skills/groundx-extraction-workflows/references/certification.private.md`
+at **Normal Fixture Update Path**. This document describes only the GroundX
+Python handoff and candidate builder.
+
 Each case consumes the committed handoff produced by the previous pipeline
 boundary. `test_extraction_boundary_reassembly.py` passes that input through the
 same reassembly functions used by the SDK and compares the complete stable
