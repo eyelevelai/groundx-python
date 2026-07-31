@@ -127,8 +127,9 @@ def test_sdk_reassembly_expected_answer_projection_diagnostic_packets(
             _write_json(diff_path, diff)
             pytest.fail(
                 "SDK X-Ray reassembly proof drifted for "
-                f"{surface}; stage reviewed replacements through the Harness "
-                "fixture promotion flow"
+                f"{surface}; follow groundx-studio-harness certification.private.md, "
+                "Normal Fixture Update Path, starting with "
+                "run_extraction_fixture_seeding.private.py init"
             )
         _write_json(diff_path, diff)
 
@@ -161,8 +162,9 @@ def test_sdk_xray_reassembly_real_boundary_packets(
         _write_json(diff_path, diff)
         pytest.fail(
             "SDK X-Ray reassembly real boundary proof drifted for "
-            f"{surface}; stage reviewed replacements through the Harness "
-            "fixture promotion flow"
+            f"{surface}; follow groundx-studio-harness certification.private.md, "
+            "Normal Fixture Update Path, starting with "
+            "run_extraction_fixture_seeding.private.py init"
             )
     _write_json(diff_path, diff)
     _assert_reviewed_expected_output_sidecar(expected_path)

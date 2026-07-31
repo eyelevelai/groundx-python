@@ -5,8 +5,8 @@ behavior for Arcadia legacy, Arcadia v1, generic v1, and ADP v1.
 
 The canonical cross-repo process starts in
 `groundx-studio-harness/skills/groundx-extraction-workflows/references/certification.private.md`
-at **Normal Fixture Update Path**. Use its config-driven fixture-seeding
-sequencer; this document describes only the GroundX
+at **Normal Fixture Update Path**. Use its `init`, `run` or `run --resume`,
+review, and `promote` lifecycle; this document describes only the GroundX
 Python handoff and candidate builder.
 
 Each case consumes the committed handoff produced by the previous pipeline
