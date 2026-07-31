@@ -5,6 +5,7 @@ import datetime
 import hashlib
 import importlib.util
 import json
+import sys
 import typing
 from pathlib import Path
 
@@ -67,7 +68,11 @@ def _load_replay_module(repo_root: Path) -> typing.Any:
     if spec is None or spec.loader is None:
         raise RuntimeError(f"cannot load boundary replay from {path}")
     module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    sys.path.insert(0, str(repo_root))
+    try:
+        spec.loader.exec_module(module)
+    finally:
+        sys.path.pop(0)
     return module
 
 

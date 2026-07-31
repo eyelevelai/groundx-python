@@ -13,6 +13,13 @@ SURFACE = "arcadia_legacy"
 BOUNDARY_ROOT = REPO_ROOT / "tests" / "extract" / "fixtures" / "extraction-boundary"
 
 
+def test_fixture_guide_routes_normal_updates_through_the_studio_lifecycle() -> None:
+    guide = (BOUNDARY_ROOT / "README.md").read_text()
+
+    assert "Studio Harness lifecycle generates matching SDK output candidates" in guide
+    assert "Run it directly only to inspect or recover" in guide
+
+
 def _write_json(path: Path, value: object) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n")

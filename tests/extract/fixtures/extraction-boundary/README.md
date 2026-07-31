@@ -3,6 +3,12 @@
 These fixtures freeze GroundX Python's X-Ray-to-structured-output reassembly
 behavior for Arcadia legacy, Arcadia v1, generic v1, and ADP v1.
 
+The canonical cross-repo process starts in
+`groundx-studio-harness/skills/groundx-extraction-workflows/references/certification.private.md`
+at **Normal Fixture Update Path**. Use its `init`, `run` or `run --resume`,
+review, and `promote` lifecycle; this document describes only the GroundX
+Python handoff and candidate builder.
+
 Each case consumes the committed handoff produced by the previous pipeline
 boundary. `test_extraction_boundary_reassembly.py` passes that input through the
 same reassembly functions used by the SDK and compares the complete stable
@@ -19,8 +25,9 @@ a candidate diff separately, explain why the old behavior is wrong, and obtain
 Benjamin Fletcher's approval before replacing an accepted fixture. Never update
 an expected file merely because a new run differs.
 
-When the reviewed X-Ray input candidate changes, generate matching SDK output
-candidates with:
+The Studio Harness lifecycle generates matching SDK output candidates when a
+reviewed X-Ray input candidate changes. For recovery or implementation
+inspection, the underlying command is:
 
 ```bash
 poetry run python tests/extract/build_extraction_boundary_candidates.py \
@@ -29,11 +36,12 @@ poetry run python tests/extract/build_extraction_boundary_candidates.py \
 ```
 
 This command calls `reassemble_custom_outputs_from_xray` and writes only to the
-candidate root. It records shape and diagnostic assertions but does not require
-them to pass; candidate generation freezes observed behavior, while human review
-decides whether that behavior should replace the accepted fixture. Review and
-approve both candidate-manifest hashes before using the Studio Harness promotion
-command. Do not promote an X-Ray input without its matching SDK output candidate.
+candidate root. Run it directly only to inspect or recover the SDK-candidate
+step. It records shape and diagnostic assertions but does not require them to
+pass; candidate generation freezes observed behavior, while human review decides
+whether that behavior should replace the accepted fixture. Review and approve
+both candidate-manifest hashes before using the Studio Harness promotion command.
+Do not promote an X-Ray input without its matching SDK output candidate.
 
 Only the external model/provider response may be replaced by a fixed fixture.
 Tests must call production reassembly functions unchanged.

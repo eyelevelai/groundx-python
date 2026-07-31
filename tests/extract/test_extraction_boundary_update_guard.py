@@ -8,5 +8,6 @@ def test_boundary_replay_cannot_update_approved_goldens() -> None:
     forbidden = "UPDATE_GROUNDX_PYTHON_" + "EXTRACT_BOUNDARY_GOLDENS"
 
     assert forbidden not in source, (
-        "approved fixtures must be updated through the reviewed Harness promotion flow"
+        "approved fixtures must be updated through the Studio Harness Normal Fixture "
+        "Update Path, starting with run_extraction_fixture_seeding.private.py init"
     )

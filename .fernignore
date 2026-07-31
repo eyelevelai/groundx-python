@@ -7,6 +7,7 @@ src/groundx/test.py
 src/groundx/extract
 src/test.py
 tests/custom
+tests/__init__.py
 tests/extract
 openspec
 pyrightconfig.json

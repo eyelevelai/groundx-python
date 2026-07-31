@@ -10,6 +10,7 @@ import pytest
 
 from groundx.extract import prepare_extraction_yaml
 from groundx.extract.custom_outputs import reassemble_custom_outputs_from_xray
+from tests.extract.exact_json import exact_json_report
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 DIAGNOSTIC_ROOT = (
@@ -125,20 +126,24 @@ def test_sdk_reassembly_expected_answer_projection_diagnostic_packets(
             "kind": "machine_readable_json_diff",
             "status": "passed",
         }
-        if golden != expected or expected_handoff_sha != actual_handoff_sha:
+        exact_report = exact_json_report(expected, golden)
+        if exact_report["differences"] or expected_handoff_sha != actual_handoff_sha:
             diff = {
                 "kind": "machine_readable_json_diff",
                 "status": "failed",
-                "expected": golden,
                 "actual": expected,
+                "differences": exact_report["differences"],
+                "expected": golden,
+                "first_path": exact_report["first_path"],
                 "handoff_expected_sha256": expected_handoff_sha,
                 "handoff_actual_sha256": actual_handoff_sha,
             }
             _write_json(diff_path, diff)
             pytest.fail(
                 "SDK X-Ray reassembly proof drifted for "
-                f"{surface}; stage reviewed replacements through the Harness "
-                "fixture promotion flow"
+                f"{surface}; follow groundx-studio-harness certification.private.md, "
+                "Normal Fixture Update Path, starting with "
+                "run_extraction_fixture_seeding.private.py init"
             )
         _write_json(diff_path, diff)
 
@@ -158,18 +163,22 @@ def test_sdk_xray_reassembly_real_boundary_packets(
         "kind": "machine_readable_json_diff",
         "status": "passed",
     }
-    if golden != expected:
+    exact_report = exact_json_report(expected, golden)
+    if exact_report["differences"]:
         diff = {
             "kind": "machine_readable_json_diff",
             "status": "failed",
-            "expected": golden,
             "actual": expected,
+            "differences": exact_report["differences"],
+            "expected": golden,
+            "first_path": exact_report["first_path"],
         }
         _write_json(diff_path, diff)
         pytest.fail(
             "SDK X-Ray reassembly real boundary proof drifted for "
-            f"{surface}; stage reviewed replacements through the Harness "
-            "fixture promotion flow"
+            f"{surface}; follow groundx-studio-harness certification.private.md, "
+            "Normal Fixture Update Path, starting with "
+            "run_extraction_fixture_seeding.private.py init"
             )
     _write_json(diff_path, diff)
     _assert_reviewed_expected_output_sidecar(expected_path)
