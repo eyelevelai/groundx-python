@@ -1,6 +1,7 @@
 import copy
 import json
 import pathlib
+import typing
 
 import pytest
 
@@ -703,7 +704,7 @@ def test_relationship_preserves_identical_child_rows_without_unique_attrs(
     }
     assert result.relationship_output == result.final_output
 
-    legacy_workflow_extract = copy.deepcopy(workflow_extract)
+    legacy_workflow_extract: dict[str, typing.Any] = copy.deepcopy(workflow_extract)
     legacy_workflow_extract["_groundx_persisted_extract"][
         "legacy_policy_default_provenance"
     ] = {"source": "legacy"}

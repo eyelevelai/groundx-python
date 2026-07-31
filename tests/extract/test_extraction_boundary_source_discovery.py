@@ -3,6 +3,7 @@ from __future__ import annotations
 import ast
 import json
 from pathlib import Path
+import typing
 
 import pytest
 
@@ -71,7 +72,7 @@ def _discover(source: str) -> dict[str, list[str]]:
     }
 
 
-def _catalog() -> dict[str, object]:
+def _catalog() -> dict[str, typing.Any]:
     return json.loads(CATALOG_PATH.read_text(encoding="utf-8"))
 
 
@@ -129,7 +130,7 @@ def _reachable_symbols(call_graph: dict[str, set[str]], entrypoint: str) -> set[
 
 def _replay_policy_violations(
     source: str,
-    policy: dict[str, object],
+    policy: dict[str, typing.Any],
 ) -> list[str]:
     tree = ast.parse(source, filename=str(REPLAY_PATH.relative_to(ROOT)))
     protected = {

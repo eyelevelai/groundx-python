@@ -65,6 +65,14 @@
               "unmatched_child_group": "account_charges"
             }
           ]
+        },
+        "meters": {
+          "unique_attrs": ["meter_number"],
+          "fields": {}
+        },
+        "charges": {
+          "unique_attrs": ["meter_number", "charge_amount"],
+          "fields": {}
         }
       },
       "xray": {
@@ -229,6 +237,14 @@
               "unmatched_child_group": "account_charges"
             }
           ]
+        },
+        "meters": {
+          "unique_attrs": ["meter_number"],
+          "fields": {}
+        },
+        "charges": {
+          "unique_attrs": ["meter_number", "charge_description"],
+          "fields": {}
         }
       },
       "xray": {
@@ -365,6 +381,14 @@
               "unmatched_child_group": "generic_group_c"
             }
           ]
+        },
+        "generic_group_b": {
+          "unique_attrs": ["generic_attr_15"],
+          "fields": {}
+        },
+        "generic_group_c": {
+          "unique_attrs": ["generic_attr_15", "generic_attr_29"],
+          "fields": {}
         }
       },
       "xray": {
