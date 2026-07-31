@@ -821,11 +821,12 @@ statement:
         self.assertIn("unsupported top-level metadata [unsupported_policy_version]", message)
         self.assertIn("workflow metadata", message)
 
-    def test_prepare_extraction_yaml_accepts_supported_policy_version_metadata(
+    def test_prepare_extraction_yaml_rejects_final_value_aliases_metadata(
         self,
     ) -> None:
-        prepared = prepare_extraction_yaml(
-            """
+        with self.assertRaises(ValueError) as exc:
+            prepare_extraction_yaml(
+                """
 extraction_policy_version: v1
 statement:
   final_value_aliases:
@@ -836,13 +837,27 @@ statement:
         instructions: Return the account number.
         type: str
 """
+            )
+
+        self.assertIn("unsupported workflow metadata", str(exc.exception))
+
+    def test_prepare_extraction_yaml_allows_final_value_aliases_field_name(
+        self,
+    ) -> None:
+        prepared = prepare_extraction_yaml(
+            """
+extraction_policy_version: v1
+statement:
+  unique_attrs: []
+  fields:
+    final_value_aliases:
+      prompt:
+        instructions: Return the printed value.
+        type: str
+"""
         )
 
-        self.assertEqual(
-            prepared.top_level_metadata,
-            {"extraction_policy_version": "v1"},
-        )
-        self.assertIn("statement", prepared.groups)
+        self.assertIn("final_value_aliases", prepared.groups["statement"]["fields"])
 
     def test_prepare_extraction_yaml_identity_route_map_for_legacy_yaml(self) -> None:
         prepared = prepare_extraction_yaml(SAMPLE_YAML_1)

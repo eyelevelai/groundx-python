@@ -385,6 +385,35 @@ def test_prepare_extraction_yaml_accepts_mapping_without_mutating_it() -> None:
     assert reloaded.workflow_group_metadata == prepared.workflow_group_metadata
 
 
+def test_persisted_workflow_extract_rejects_final_value_aliases_metadata() -> None:
+    persisted = _prepare(POLICY_YAML).persisted_workflow_extract
+    persisted["_groundx_persisted_extract"]["statement"]["final_value_aliases"] = {
+        "account_number": "final_account_number"
+    }
+
+    with pytest.raises(ValueError, match="unsupported workflow metadata"):
+        _prepare(persisted)
+
+
+def test_persisted_workflow_extract_allows_final_value_aliases_field_name() -> None:
+    prepared = _prepare(
+        """
+extraction_policy_version: v1
+statement:
+  unique_attrs: []
+  fields:
+    final_value_aliases:
+      prompt:
+        instructions: Return the printed value.
+        type: str
+"""
+    )
+
+    reloaded = _prepare(prepared.persisted_workflow_extract)
+
+    assert "final_value_aliases" in reloaded.groups["statement"]["fields"]
+
+
 def test_persisted_workflow_extract_keeps_execution_groups_resolvable() -> None:
     source = TestSource(POLICY_YAML)
     manager = PromptManager(

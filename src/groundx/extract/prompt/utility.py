@@ -63,7 +63,6 @@ _SUPPORTED_FINAL_GROUP_METADATA_KEYS = {
     "exclude_dict_attrs",
     "explanation_attrs",
     "fill_rules",
-    "final_value_aliases",
     "match_attrs",
     "not_required_service_types",
     "partial_pair_attrs",
@@ -167,6 +166,7 @@ _CUSTOM_WORKFLOW_PERSISTED_KEYS = {
     "field_counts",
     "schema_hash",
 }
+_REMOVED_FINAL_VALUE_ALIASES_KEY = "final_value_aliases"
 
 
 def _metadata_factory() -> typing.Dict[str, typing.Any]:
@@ -407,6 +407,22 @@ def _has_supported_policy_metadata(data: typing.Dict[str, typing.Any]) -> bool:
 def _has_persisted_workflow_metadata(data: typing.Dict[str, typing.Any]) -> bool:
     workflow = data.get(_CUSTOM_WORKFLOW_KEY)
     return isinstance(workflow, dict) and "metadata_version" in workflow
+
+
+def _reject_removed_final_value_aliases(
+    data: typing.Mapping[str, typing.Any],
+) -> None:
+    for group_name, group in data.items():
+        if (
+            group_name in _RESERVED_TOP_LEVEL_KEYS
+            or group_name in _SUPPORTED_TOP_LEVEL_METADATA_KEYS
+        ):
+            continue
+        if isinstance(group, dict) and _REMOVED_FINAL_VALUE_ALIASES_KEY in group:
+            raise ValueError(
+                "unsupported workflow metadata "
+                f"[{_REMOVED_FINAL_VALUE_ALIASES_KEY}] at [$.{group_name}]"
+            )
 
 
 def _ensure_fields_mapping(
@@ -2158,6 +2174,7 @@ def prepare_extraction_yaml(
     )
     _reject_unsupported_authored_keys(data)
     has_persisted_workflow_metadata = _has_persisted_workflow_metadata(data)
+    _reject_removed_final_value_aliases(data)
     _validate_policy_version(
         data,
         bool(
