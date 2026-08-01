@@ -103,8 +103,17 @@ def test_builder_writes_review_candidates_without_touching_accepted_fixtures(
     assert candidate["surface"] == SURFACE
     candidate_expected = candidate_root / candidate["candidate_path"]
     candidate_diff = candidate_root / candidate["candidate_diff_path"]
-    assert json.loads(candidate_expected.read_text()) == json.loads(accepted_expected.read_text())
-    assert json.loads(candidate_diff.read_text())["changes"] == []
+    candidate_payload = json.loads(candidate_expected.read_text())
+    accepted_payload = json.loads(accepted_expected.read_text())
+    diff_payload = json.loads(candidate_diff.read_text())
+    assert diff_payload["status"] == "pending_review"
+    assert diff_payload["candidate_sha256"] == _sha256(candidate_expected)
+    assert diff_payload["current_accepted_sha256"] == _sha256(accepted_expected)
+    assert bool(diff_payload["changes"]) == (candidate_payload != accepted_payload)
+    assert all(
+        set(change) == {"path", "before", "after"}
+        for change in diff_payload["changes"]
+    )
     assert {path: _sha256(path) for path in accepted_hashes} == accepted_hashes
 
     candidate_sidecar.write_text("{}\n")
