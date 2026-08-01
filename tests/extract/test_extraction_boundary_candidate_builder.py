@@ -106,6 +106,13 @@ def test_builder_writes_review_candidates_without_touching_accepted_fixtures(
     candidate_payload = json.loads(candidate_expected.read_text())
     accepted_payload = json.loads(accepted_expected.read_text())
     diff_payload = json.loads(candidate_diff.read_text())
+    assert {
+        "diagnostics",
+        "final_output",
+        "relationship_output",
+        "source_provenance",
+        "workflow_output",
+    } <= set(candidate_payload["output"])
     assert diff_payload["status"] == "pending_review"
     assert diff_payload["candidate_sha256"] == _sha256(candidate_expected)
     assert diff_payload["current_accepted_sha256"] == _sha256(accepted_expected)

@@ -14,6 +14,11 @@ boundary. `test_extraction_boundary_reassembly.py` passes that input through the
 same reassembly functions used by the SDK and compares the complete stable
 result with the reviewed expected output.
 
+The reviewed output includes the complete workflow output, relationship
+output, final output, diagnostics, and source provenance. Hashes and counts are
+helpful diagnostics, but they do not replace those values or their field-level
+candidate diff.
+
 Accepted fixtures must be real-derived, privacy-reviewed, and sanitized with
 recorded source hashes and transformations. The adjacent review records and
 fixture verifier establish that status; this README does not. These are
