@@ -62,9 +62,19 @@
               "child_group": "charges",
               "parent_output_field": "charges",
               "match_attrs": ["meter_number"],
-              "unmatched_child_group": "account_charges"
+              "unmatched_child_group": "account_charges",
+              "multiple_match_strategy": "first_stable"
             }
           ]
+        },
+        "meters": {
+          "unique_attrs": ["meter_number"],
+          "identity_match": {"exact_attrs": ["meter_number"]},
+          "fields": {}
+        },
+        "charges": {
+          "unique_attrs": ["meter_number", "charge_amount"],
+          "fields": {}
         }
       },
       "xray": {
@@ -103,9 +113,9 @@
           "meters": [
             {
               "meter_number": "M-1",
-              "service_address": "100 Main",
               "charges": [{"meter_number": "M-1", "charge_amount": "42.00"}]
-            }
+            },
+            {"meter_number": "m-1", "service_address": "100 Main", "charges": []}
           ],
           "account_charges": []
         },
@@ -114,9 +124,9 @@
           "meters": [
             {
               "meter_number": "M-1",
-              "service_address": "100 Main",
               "charges": [{"meter_number": "M-1", "charge_amount": "42.00"}]
-            }
+            },
+            {"meter_number": "m-1", "service_address": "100 Main", "charges": []}
           ],
           "account_charges": []
         },
@@ -229,6 +239,14 @@
               "unmatched_child_group": "account_charges"
             }
           ]
+        },
+        "meters": {
+          "unique_attrs": ["meter_number"],
+          "fields": {}
+        },
+        "charges": {
+          "unique_attrs": ["meter_number", "charge_description"],
+          "fields": {}
         }
       },
       "xray": {
@@ -365,6 +383,15 @@
               "unmatched_child_group": "generic_group_c"
             }
           ]
+        },
+        "generic_group_b": {
+          "unique_attrs": ["generic_attr_15"],
+          "identity_match": {"exact_attrs": []},
+          "fields": {}
+        },
+        "generic_group_c": {
+          "unique_attrs": ["generic_attr_15", "generic_attr_29"],
+          "fields": {}
         }
       },
       "xray": {

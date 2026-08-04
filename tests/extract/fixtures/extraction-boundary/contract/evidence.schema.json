@@ -744,6 +744,7 @@
           "type": "object",
           "additionalProperties": false,
           "required": [
+            "bucket",
             "path",
             "sha256",
             "bytes",
@@ -751,6 +752,9 @@
             "seal_sha256"
           ],
           "properties": {
+            "bucket": {
+              "$ref": "#/$defs/non_empty_string"
+            },
             "path": {
               "$ref": "#/$defs/non_empty_string"
             },
@@ -771,6 +775,7 @@
         },
         "four_case_result": {
           "type": "object",
+          "additionalProperties": false,
           "required": [
             "sha256",
             "summary",
@@ -785,7 +790,37 @@
             },
             "cases": {
               "type": "array",
-              "minItems": 4
+              "minItems": 4,
+              "maxItems": 4,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "case_id",
+                  "surface",
+                  "status",
+                  "result_sha256"
+                ],
+                "properties": {
+                  "case_id": {
+                    "$ref": "#/$defs/non_empty_string"
+                  },
+                  "surface": {
+                    "enum": [
+                      "arcadia_legacy",
+                      "arcadia_v1",
+                      "generic_v1",
+                      "adp_v1"
+                    ]
+                  },
+                  "status": {
+                    "const": "passed"
+                  },
+                  "result_sha256": {
+                    "$ref": "#/$defs/sha256"
+                  }
+                }
+              }
             }
           }
         },

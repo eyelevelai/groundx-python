@@ -6,6 +6,10 @@ from .logger import Logger
 from fastapi import Response
 
 latency_to = 60
+REDIS_CONNECT_TIMEOUT_SECONDS = 5.0
+REDIS_SOCKET_TIMEOUT_SECONDS = 5.0
+REDIS_SCAN_DEADLINE_SECONDS = 10.0
+PROMPT_INIT_LOCK_TIMEOUT_SECONDS = 15.0
 
 
 class Status:
@@ -33,7 +37,13 @@ class Status:
                 rl_host = base
 
         self.client = redis.Redis(
-            host=rl_host, port=rl_port, decode_responses=True, ssl=rl_ssl
+            host=rl_host,
+            port=rl_port,
+            decode_responses=True,
+            ssl=rl_ssl,
+            retry=redis.retry.Retry(redis.backoff.NoBackoff(), 0),
+            socket_connect_timeout=REDIS_CONNECT_TIMEOUT_SECONDS,
+            socket_timeout=REDIS_SOCKET_TIMEOUT_SECONDS,
         )
         self.host = rl_host
         self.port = rl_port
@@ -61,31 +71,41 @@ class Status:
         return int(current_available), self.config.workers  # type: ignore
 
     def get_service_state(self) -> typing.Tuple[int, int]:
-        available = 0
-
-        keys: typing.Iterator[str] = self.client.scan_iter(  # type: ignore
-            match=f"{self.config.service}:*:requests",
-            count=1000,
+        deadline = time.monotonic() + REDIS_SCAN_DEADLINE_SECONDS
+        available = self._sum_service_values(
+            f"{self.config.service}:*:requests",
+            deadline,
         )
-        for key in keys:
-            value = self.client.get(key)
-            if value is not None:
-                available += int(value)  # type: ignore
-
-        total = 0
-
-        keys: typing.Iterator[str] = self.client.scan_iter(  # type: ignore
-            match=f"{self.config.service}:*:total", count=1000
+        total = self._sum_service_values(
+            f"{self.config.service}:*:total",
+            deadline,
         )
-        for key in keys:
-            value = self.client.get(key)
-            if value is not None:
-                total += int(value)  # type: ignore
 
         if total == 0:
             total = self.config.workers
 
         return available, total
+
+    def _sum_service_values(self, match: str, deadline: float) -> int:
+        cursor = 0
+        total = 0
+        while True:
+            self._check_scan_deadline(deadline)
+            cursor, keys = self.client.scan(cursor=cursor, match=match, count=1000)
+            self._check_scan_deadline(deadline)
+            for key in keys:
+                value = self.client.get(key)
+                self._check_scan_deadline(deadline)
+                if value is not None:
+                    total += int(value)
+            if cursor == 0:
+                return total
+
+    def _check_scan_deadline(self, deadline: float) -> None:
+        if time.monotonic() >= deadline:
+            raise TimeoutError(
+                f"service status scan exceeded {REDIS_SCAN_DEADLINE_SECONDS} seconds"
+            )
 
     def key_api_latency(self, id: str) -> str:
         return f"{id}:{time.time_ns()}:latency"
@@ -100,7 +120,11 @@ class Status:
         return f"{self.config.service}:{id}:total"
 
     def prompt_init_lock(self) -> typing.Any:
-        return self.client.lock(name="prompt_manager:init", timeout=15)
+        return self.client.lock(
+            name="prompt_manager:init",
+            timeout=PROMPT_INIT_LOCK_TIMEOUT_SECONDS,
+            blocking_timeout=PROMPT_INIT_LOCK_TIMEOUT_SECONDS,
+        )
 
     def refresh_worker(self, id: str, to: typing.Optional[int] = None) -> None:
         self.refresh_worker_online(id, to)

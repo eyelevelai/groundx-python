@@ -36,12 +36,8 @@ class CustomOutputReassemblyResult:
     final_output: typing.Dict[str, typing.Any]
     relationship_output: typing.Optional[typing.Dict[str, typing.Any]]
     diagnostics: typing.List[CustomOutputDiagnostic]
-    workflow_output: typing.Dict[str, typing.Any] = dataclasses.field(
-        default_factory=dict
-    )
-    source_provenance: typing.List[CustomOutputSourceProvenance] = (
-        dataclasses.field(default_factory=list)
-    )
+    workflow_output: typing.Dict[str, typing.Any] = dataclasses.field(default_factory=dict)
+    source_provenance: typing.List[CustomOutputSourceProvenance] = dataclasses.field(default_factory=list)
 
 
 @dataclasses.dataclass(frozen=True)
@@ -118,6 +114,10 @@ def reassemble_custom_outputs_from_xray(
         typing.Tuple[str, typing.Tuple[typing.Any, ...]],
         typing.Dict[str, typing.Any],
     ] = {}
+    repeated_group_paths: typing.Dict[
+        str,
+        typing.Set[typing.Tuple[str, ...]],
+    ] = {}
     diagnostics: typing.List[CustomOutputDiagnostic] = []
 
     for route_index, route in enumerate(routes):
@@ -138,7 +138,12 @@ def reassemble_custom_outputs_from_xray(
                 if _is_empty_output(route_value.value):
                     continue
                 route_hits[route_index] = True
-                pointer = _effective_pointer(final_path, repeated=route_value.repeated)
+                pointer = final_path
+                if route_value.repeated:
+                    _record_repeated_group_path(
+                        repeated_group_paths,
+                        pointer,
+                    )
                 record_key = (
                     *route_container.identity,
                     route_map.get("step_name"),
@@ -170,6 +175,11 @@ def reassemble_custom_outputs_from_xray(
                     diagnostics=diagnostics,
                 )
 
+    _dedupe_repeated_group_outputs(
+        final_output,
+        repeated_group_paths,
+        workflow_extract,
+    )
     relationships = workflow.get("output_relationships") if workflow else None
     relationship_output = None
     diagnostics.extend(
@@ -183,7 +193,6 @@ def reassemble_custom_outputs_from_xray(
         relationship_output, diagnostics = _apply_relationships(
             final_output,
             typing.cast(typing.Sequence[typing.Any], relationships),
-            workflow_extract=workflow_extract,
             diagnostics=diagnostics,
         )
         final_output = copy.deepcopy(relationship_output)
@@ -231,9 +240,7 @@ def custom_output_section_identity(
     payload_identity = custom_output_payload_identity(output_payload)
     page_numbers = _page_numbers(chunk)
     if page_numbers:
-        return _record_key(
-            (output_map_name, "payload_pages", payload_identity, page_numbers)
-        )
+        return _record_key((output_map_name, "payload_pages", payload_identity, page_numbers))
     return _record_key((output_map_name, "payload", payload_identity))
 
 
@@ -357,9 +364,7 @@ def _custom_route_values(
     step_value = output_map.get(step_name)
     is_repeated_step = step_kinds.get(step_name) in _REPEATED_STEP_KINDS
     final_path = route.get("final_path")
-    route_repeats = is_repeated_step or (
-        isinstance(final_path, str) and "*" in final_path
-    )
+    route_repeats = is_repeated_step or (isinstance(final_path, str) and "*" in final_path)
 
     if isinstance(step_value, typing.Mapping):
         records = step_value.get("_records")
@@ -382,10 +387,7 @@ def _custom_route_values(
             return []
         value = step_value[output_key]
         if isinstance(value, list) and route_repeats:
-            return [
-                _RouteValue(value=item, record_index=index, repeated=True)
-                for index, item in enumerate(value)
-            ]
+            return [_RouteValue(value=item, record_index=index, repeated=True) for index, item in enumerate(value)]
         return [
             _RouteValue(
                 value=value,
@@ -408,9 +410,7 @@ def _custom_route_values(
                     )
                 )
             else:
-                values.append(
-                    _RouteValue(value=record, record_index=index, repeated=True)
-                )
+                values.append(_RouteValue(value=record, record_index=index, repeated=True))
         return values
 
     if step_value is None:
@@ -569,15 +569,6 @@ def _string_value(value: typing.Any) -> typing.Optional[str]:
     return value if isinstance(value, str) else None
 
 
-def _effective_pointer(pointer: str, *, repeated: bool) -> str:
-    if not repeated or "*" in pointer:
-        return pointer
-    parts = _pointer_parts(pointer)
-    if len(parts) < 2:
-        return pointer
-    return _encode_pointer((*parts[:-1], "*", parts[-1]))
-
-
 def _set_pointer(
     result: typing.Dict[str, typing.Any],
     pointer: str,
@@ -637,9 +628,7 @@ def _set_pointer(
         if candidate.quality < existing.quality:
             return
         if candidate.quality == existing.quality:
-            if _normalized_candidate_value(candidate.value) != _normalized_candidate_value(
-                existing.value
-            ):
+            if _normalized_candidate_value(candidate.value) != _normalized_candidate_value(existing.value):
                 diagnostics.append(
                     CustomOutputDiagnostic(
                         code="conflicting_output_candidates",
@@ -765,17 +754,13 @@ def _missing_required_route_diagnostics(
         final_path = route_map.get("final_path")
         code = (
             "missing_workflow_group"
-            if isinstance(workflow_group, str)
-            and workflow_group not in hit_workflow_groups
+            if isinstance(workflow_group, str) and workflow_group not in hit_workflow_groups
             else "missing_workflow_field"
         )
         diagnostics.append(
             CustomOutputDiagnostic(
                 code=code,
-                message=(
-                    f"required workflow output [{workflow_group}.{workflow_field}] "
-                    f"for [{final_path}] is missing"
-                ),
+                message=(f"required workflow output [{workflow_group}.{workflow_field}] for [{final_path}] is missing"),
                 workflow_group=workflow_group if isinstance(workflow_group, str) else None,
                 workflow_field=workflow_field if isinstance(workflow_field, str) else None,
                 final_path=final_path if isinstance(final_path, str) else None,
@@ -929,11 +914,7 @@ def _field_spec_at_path(
         return field_spec
 
     if len(field_path) >= 3 and field_path[1] == "*":
-        item_spec = (
-            field_spec[0]
-            if isinstance(field_spec, list) and field_spec
-            else field_spec
-        )
+        item_spec = field_spec[0] if isinstance(field_spec, list) and field_spec else field_spec
         if isinstance(item_spec, typing.Mapping):
             return _field_spec_at_path(
                 typing.cast(typing.Mapping[str, typing.Any], item_spec),
@@ -967,9 +948,7 @@ def _decode_pointer_part(part: str) -> str:
 
 
 def _encode_pointer(parts: typing.Sequence[str]) -> str:
-    return "/" + "/".join(
-        part.replace("~", "~0").replace("/", "~1") for part in parts
-    )
+    return "/" + "/".join(part.replace("~", "~0").replace("/", "~1") for part in parts)
 
 
 def _apply_relationships(
@@ -977,7 +956,6 @@ def _apply_relationships(
     relationships: typing.Sequence[typing.Any],
     *,
     diagnostics: typing.Optional[typing.List[CustomOutputDiagnostic]] = None,
-    workflow_extract: typing.Optional[typing.Mapping[str, typing.Any]] = None,
 ) -> typing.Tuple[typing.Dict[str, typing.Any], typing.List[CustomOutputDiagnostic]]:
     result = copy.deepcopy(dict(final_output))
     diagnostics = diagnostics or []
@@ -992,6 +970,7 @@ def _apply_relationships(
         parent_output_field = rel.get("parent_output_field")
         match_attrs = rel.get("match_attrs")
         unmatched_child_group = rel.get("unmatched_child_group")
+        multiple_match_strategy = rel.get("multiple_match_strategy")
         if not (
             isinstance(parent_group, str)
             and isinstance(child_group, str)
@@ -1018,52 +997,48 @@ def _apply_relationships(
             diagnostics.append(
                 CustomOutputDiagnostic(
                     code="invalid_relationship_output",
-                    message=(
-                        f"relationship {rel_name} requires list outputs for "
-                        f"{parent_group} and {child_group}"
-                    ),
+                    message=(f"relationship {rel_name} requires list outputs for {parent_group} and {child_group}"),
                     relationship=rel_name,
                 )
             )
             continue
 
-        parent_list = _dedupe_relationship_parents(
-            typing.cast(typing.List[typing.Dict[str, typing.Any]], parent_records),
-            typing.cast(typing.List[str], match_attrs),
+        parent_list = typing.cast(
+            typing.List[typing.Dict[str, typing.Any]],
+            parent_records,
         )
-        result[parent_group] = parent_list
-        child_list = _dedupe_relationship_children(
-            typing.cast(typing.List[typing.Dict[str, typing.Any]], child_records),
-            _relationship_child_unique_attrs(
-                workflow_extract,
-                child_group,
-                typing.cast(typing.List[str], match_attrs),
-            ),
+        child_list = typing.cast(
+            typing.List[typing.Dict[str, typing.Any]],
+            child_records,
         )
         for parent in parent_list:
             parent.setdefault(parent_output_field, [])
+        relationship_index: typing.Dict[
+            typing.Tuple[typing.Tuple[str, typing.Any], ...],
+            typing.List[typing.Dict[str, typing.Any]],
+        ] = {}
+        for parent in parent_list:
+            parent_key = _match_key(
+                parent,
+                typing.cast(typing.List[str], match_attrs),
+            )
+            if parent_key:
+                relationship_index.setdefault(parent_key, []).append(parent)
 
         unmatched: typing.List[typing.Dict[str, typing.Any]] = []
         for child_index, child in enumerate(child_list):
-            matches = [
-                parent
-                for parent in parent_list
-                if _records_match(parent, child, typing.cast(typing.List[str], match_attrs))
-            ]
-            if len(matches) > 1:
+            child_key = _match_key(
+                child,
+                typing.cast(typing.List[str], match_attrs),
+            )
+            matches = relationship_index.get(child_key, []) if child_key else []
+            if len(matches) > 1 and multiple_match_strategy == "first_stable":
+                matches = matches[:1]
+            elif len(matches) > 1:
                 diagnostics.append(
                     CustomOutputDiagnostic(
                         code="ambiguous_relationship_match",
-                        message=(
-                            f"relationship {rel_name} child record {child_index} "
-                            "matches more than one parent"
-                        ),
-                        # Ambiguity is a HANDLED data condition: the child is
-                        # routed to the unmatched group (rendered account-level
-                        # per the relationship algorithm), so it must not fail
-                        # the document. Live prod 2026-07-08: a real utility
-                        # bill whose meters share match-attr values failed
-                        # entirely under the default severity="error".
+                        message=(f"relationship {rel_name} child record {child_index} matches more than one parent"),
                         severity="warning",
                         relationship=rel_name,
                         child_record_index=child_index,
@@ -1087,79 +1062,544 @@ def _apply_relationships(
     return result, diagnostics
 
 
-def _dedupe_relationship_parents(
-    parent_list: typing.List[typing.Dict[str, typing.Any]],
-    match_attrs: typing.Sequence[str],
-) -> typing.List[typing.Dict[str, typing.Any]]:
-    deduped: typing.List[typing.Dict[str, typing.Any]] = []
-    by_key: typing.Dict[str, typing.Dict[str, typing.Any]] = {}
-    for parent in parent_list:
-        parent_key = _relationship_record_key(parent, match_attrs)
-        if parent_key is None:
-            deduped.append(parent)
-            continue
-        existing = by_key.get(parent_key)
-        if existing is None:
-            by_key[parent_key] = parent
-            deduped.append(parent)
-            continue
-        _merge_relationship_parent(existing, parent)
-    return deduped
+def _record_repeated_group_path(
+    repeated_group_paths: typing.Dict[
+        str,
+        typing.Set[typing.Tuple[str, ...]],
+    ],
+    pointer: str,
+) -> None:
+    parts = _pointer_parts(pointer)
+    if "*" not in parts:
+        return
+    if not parts:
+        return
+    final_group = parts[0]
+    repeated_path = parts[: parts.index("*")]
+    if repeated_path:
+        repeated_group_paths.setdefault(final_group, set()).add(repeated_path)
 
 
-def _dedupe_relationship_children(
-    child_list: typing.List[typing.Dict[str, typing.Any]],
+def _dedupe_repeated_group_outputs(
+    final_output: typing.Dict[str, typing.Any],
+    repeated_group_paths: typing.Mapping[
+        str,
+        typing.Set[typing.Tuple[str, ...]],
+    ],
+    workflow_extract: typing.Optional[typing.Mapping[str, typing.Any]],
+) -> None:
+    for workflow_group, paths in repeated_group_paths.items():
+        unique_attrs, identity_match = _group_identity_policy(
+            workflow_extract,
+            workflow_group,
+        )
+        if not unique_attrs:
+            continue
+        for path in paths:
+            records = _value_at_path(final_output, path)
+            if not _is_mapping_list(records):
+                continue
+            record_list = typing.cast(
+                typing.List[typing.Dict[str, typing.Any]],
+                records,
+            )
+            record_list[:] = _dedupe_repeated_records(
+                record_list,
+                unique_attrs,
+                identity_match,
+            )
+
+
+def _value_at_path(
+    output: typing.Mapping[str, typing.Any],
+    path: typing.Sequence[str],
+) -> typing.Any:
+    value: typing.Any = output
+    for part in path:
+        if not isinstance(value, typing.Mapping):
+            return None
+        value = value.get(part)
+    return value
+
+
+def _dedupe_repeated_records(
+    records: typing.List[typing.Dict[str, typing.Any]],
     unique_attrs: typing.Sequence[str],
+    identity_match: typing.Optional[typing.Mapping[str, typing.Any]] = None,
 ) -> typing.List[typing.Dict[str, typing.Any]]:
-    deduped: typing.List[typing.Dict[str, typing.Any]] = []
-    by_key: typing.Dict[str, typing.Dict[str, typing.Any]] = {}
-    for child in child_list:
-        child_key = _relationship_child_dedupe_key(child, unique_attrs)
-        existing = by_key.get(child_key)
-        if existing is None:
-            by_key[child_key] = child
-            deduped.append(child)
+    if not unique_attrs:
+        return records
+
+    if identity_match is not None:
+        deduped: typing.List[typing.Dict[str, typing.Any]] = []
+        exact_attrs = _identity_exact_attrs(identity_match, unique_attrs)
+        threshold_attrs = set(
+            _unique_strings(
+                typing.cast(
+                    typing.Iterable[typing.Any],
+                    identity_match.get("threshold_attrs", []),
+                )
+            )
+        )
+        fixed_attrs = tuple(attr for attr in unique_attrs if attr not in threshold_attrs)
+        indexes_by_fixed_identity: typing.Dict[
+            typing.Tuple[typing.Tuple[str, typing.Any], ...],
+            _AdvancedIdentityIndex,
+        ] = {}
+        for record in records:
+            fixed_identity = _identity_partition_key(
+                record,
+                fixed_attrs,
+                exact_attrs,
+            )
+            index = indexes_by_fixed_identity.get(fixed_identity)
+            if index is None:
+                index = _AdvancedIdentityIndex(identity_match, unique_attrs)
+                indexes_by_fixed_identity[fixed_identity] = index
+            match = index.first_match(record, unique_attrs)
+            if match is None:
+                deduped.append(record)
+                index.add(record)
+            else:
+                existing_index, existing = match
+                _merge_identity_record(existing, record)
+                index.refresh(existing_index)
+        return deduped
+
+    exact_deduped: typing.List[typing.Dict[str, typing.Any]] = []
+    by_key: typing.Dict[
+        typing.Tuple[typing.Tuple[str, typing.Any], ...],
+        typing.Dict[str, typing.Any],
+    ] = {}
+    for record in records:
+        identity_key = _identity_key(record, unique_attrs)
+        if identity_key is None:
+            exact_deduped.append(record)
             continue
-        _merge_relationship_parent(existing, child)
-    return deduped
+        exact_existing = by_key.get(identity_key)
+        if exact_existing is None:
+            by_key[identity_key] = record
+            exact_deduped.append(record)
+            continue
+        _merge_identity_record(exact_existing, record)
+    return exact_deduped
 
 
-def _relationship_child_dedupe_key(
-    child: typing.Mapping[str, typing.Any],
+class _AdvancedIdentityIndex:
+    def __init__(
+        self,
+        identity_match: typing.Mapping[str, typing.Any],
+        unique_attrs: typing.Sequence[str],
+    ) -> None:
+        self.identity_match = identity_match
+        self.threshold_attrs = _unique_strings(
+            typing.cast(
+                typing.Iterable[typing.Any],
+                identity_match.get("threshold_attrs", []),
+            )
+        )
+        self.activate_threshold_at = _identity_threshold(
+            identity_match,
+            "activate_threshold_at",
+        )
+        self.minimum_threshold_matches = _identity_threshold(
+            identity_match,
+            "minimum_threshold_matches",
+        )
+        self.exact_attrs = _identity_exact_attrs(identity_match, unique_attrs)
+        self.records: typing.List[typing.Dict[str, typing.Any]] = []
+        self.presence_bits = {attr: 0 for attr in self.threshold_attrs}
+        self.value_bits: typing.Dict[str, typing.Dict[typing.Any, int]] = {
+            attr: {} for attr in self.threshold_attrs
+        }
+        self.indexed_values: typing.List[
+            typing.Dict[str, typing.Tuple[bool, typing.Any]]
+        ] = []
+        shortcuts = identity_match.get("equal_value_shortcuts", {})
+        shortcut_map = (
+            typing.cast(typing.Mapping[str, typing.Any], shortcuts)
+            if isinstance(shortcuts, typing.Mapping)
+            else {}
+        )
+        self.shortcut_values = {
+            attr: {
+                _identity_index_value(value, exact=attr in self.exact_attrs)
+                for value in typing.cast(typing.Iterable[typing.Any], values)
+            }
+            for attr, values in shortcut_map.items()
+            if isinstance(values, list)
+        }
+
+    def add(self, record: typing.Dict[str, typing.Any]) -> None:
+        index = len(self.records)
+        self.records.append(record)
+        self.indexed_values.append({})
+        self._index(index)
+
+    def refresh(self, index: int) -> None:
+        bit = 1 << index
+        for attr, (present, value_key) in self.indexed_values[index].items():
+            if present:
+                self.presence_bits[attr] &= ~bit
+            value_index = self.value_bits[attr]
+            remaining = value_index[value_key] & ~bit
+            if remaining:
+                value_index[value_key] = remaining
+            else:
+                del value_index[value_key]
+        self.indexed_values[index] = {}
+        self._index(index)
+
+    def first_match(
+        self,
+        record: typing.Mapping[str, typing.Any],
+        unique_attrs: typing.Sequence[str],
+    ) -> typing.Optional[typing.Tuple[int, typing.Dict[str, typing.Any]]]:
+        candidates = self._candidate_bits(record)
+        while candidates:
+            candidate_bit = candidates & -candidates
+            candidate_index = candidate_bit.bit_length() - 1
+            candidate = self.records[candidate_index]
+            if _records_share_identity(
+                candidate,
+                record,
+                unique_attrs,
+                self.identity_match,
+            ):
+                return candidate_index, candidate
+            candidates ^= candidate_bit
+        return None
+
+    def _index(self, index: int) -> None:
+        record = self.records[index]
+        bit = 1 << index
+        indexed_values: typing.Dict[str, typing.Tuple[bool, typing.Any]] = {}
+        for attr in self.threshold_attrs:
+            present = attr in record
+            value_key = _identity_index_value(
+                record.get(attr),
+                exact=attr in self.exact_attrs,
+            )
+            indexed_values[attr] = present, value_key
+            if present:
+                self.presence_bits[attr] |= bit
+            attr_values = self.value_bits[attr]
+            attr_values[value_key] = attr_values.get(value_key, 0) | bit
+        self.indexed_values[index] = indexed_values
+
+    def _candidate_bits(self, record: typing.Mapping[str, typing.Any]) -> int:
+        universe = (1 << len(self.records)) - 1
+        if not universe:
+            return 0
+
+        equality_bits: typing.List[int] = []
+        shortcut_bits = 0
+        present_attrs: typing.Set[str] = set()
+        for attr in self.threshold_attrs:
+            present = attr in record
+            if present:
+                present_attrs.add(attr)
+            value_key = _identity_index_value(
+                record.get(attr),
+                exact=attr in self.exact_attrs,
+            )
+            equal = self.value_bits[attr].get(value_key, 0)
+            if not present:
+                equal &= self.presence_bits[attr]
+            equality_bits.append(equal)
+            if present and value_key in self.shortcut_values.get(attr, set()):
+                shortcut_bits |= equal & self.presence_bits[attr]
+
+        threshold_bits = _at_least_count_bits(
+            equality_bits,
+            self.minimum_threshold_matches,
+            universe,
+        )
+        remaining_presence_limit = self.activate_threshold_at - len(present_attrs) - 1
+        underactivation_bits = _at_most_count_bits(
+            [
+                self.presence_bits[attr]
+                for attr in self.threshold_attrs
+                if attr not in present_attrs
+            ],
+            remaining_presence_limit,
+            universe,
+        )
+        return shortcut_bits | threshold_bits | underactivation_bits
+
+
+def _at_least_count_bits(
+    value_bits: typing.Sequence[int],
+    minimum: int,
+    universe: int,
+) -> int:
+    if minimum <= 0:
+        return universe
+    if minimum > len(value_bits):
+        return 0
+    at_least = [universe, *([0] * minimum)]
+    for bits in value_bits:
+        for count in range(minimum, 0, -1):
+            at_least[count] |= at_least[count - 1] & bits
+    return at_least[minimum]
+
+
+def _at_most_count_bits(
+    value_bits: typing.Sequence[int],
+    maximum: int,
+    universe: int,
+) -> int:
+    if maximum < 0:
+        return 0
+    if maximum >= len(value_bits):
+        return universe
+    exact = [universe, *([0] * maximum)]
+    for bits in value_bits:
+        without_bits = universe ^ bits
+        next_exact = [0] * (maximum + 1)
+        next_exact[0] = exact[0] & without_bits
+        for count in range(1, maximum + 1):
+            next_exact[count] = (exact[count] & without_bits) | (
+                exact[count - 1] & bits
+            )
+        exact = next_exact
+    result = 0
+    for bits in exact:
+        result |= bits
+    return result
+
+
+def _identity_index_value(value: typing.Any, *, exact: bool = False) -> typing.Any:
+    if _match_value_absent(value):
+        return ("absent",)
+    return ("value", _hashable_identity_value(value, exact=exact))
+
+
+def _records_share_identity(
+    first: typing.Mapping[str, typing.Any],
+    second: typing.Mapping[str, typing.Any],
     unique_attrs: typing.Sequence[str],
-) -> str:
-    if unique_attrs:
-        child_key = _relationship_record_key(child, unique_attrs)
-        if child_key is not None:
-            return child_key
-    return _record_key(_plain(child))
+    identity_match: typing.Mapping[str, typing.Any],
+) -> bool:
+    threshold_attrs = _unique_strings(
+        typing.cast(typing.Iterable[typing.Any], identity_match.get("threshold_attrs", []))
+    )
+    threshold_attr_set = set(threshold_attrs)
+    exact_attrs = _identity_exact_attrs(identity_match, unique_attrs)
+    for attr in unique_attrs:
+        if attr in threshold_attr_set:
+            continue
+        if not _identity_values_match(
+            first.get(attr),
+            second.get(attr),
+            match_absent=True,
+            exact=attr in exact_attrs,
+        ):
+            return False
+
+    shortcuts_value = identity_match.get("equal_value_shortcuts", {})
+    shortcuts = (
+        typing.cast(typing.Mapping[str, typing.Any], shortcuts_value)
+        if isinstance(shortcuts_value, typing.Mapping)
+        else {}
+    )
+    threshold_values = 0
+    threshold_matches = 0
+    for attr in threshold_attrs:
+        first_value = first.get(attr)
+        second_value = second.get(attr)
+        first_present = attr in first
+        second_present = attr in second
+        if first_present or second_present:
+            threshold_values += 1
+        if (first_present or second_present) and _identity_values_match(
+            first_value,
+            second_value,
+            match_absent=True,
+            exact=attr in exact_attrs,
+        ):
+            threshold_matches += 1
+
+        shortcut_values = shortcuts.get(attr, [])
+        if (
+            isinstance(shortcut_values, list)
+            and first_present
+            and second_present
+            and _identity_comparison_value(
+                first_value,
+                exact=attr in exact_attrs,
+            )
+            == _identity_comparison_value(
+                second_value,
+                exact=attr in exact_attrs,
+            )
+            and any(
+                _identity_comparison_value(
+                    first_value,
+                    exact=attr in exact_attrs,
+                )
+                == _identity_comparison_value(
+                    shortcut,
+                    exact=attr in exact_attrs,
+                )
+                for shortcut in shortcut_values
+            )
+        ):
+            return True
+
+    activate_threshold_at = _identity_threshold(
+        identity_match,
+        "activate_threshold_at",
+    )
+    minimum_threshold_matches = _identity_threshold(
+        identity_match,
+        "minimum_threshold_matches",
+    )
+    return not (threshold_values >= activate_threshold_at and threshold_matches < minimum_threshold_matches)
 
 
-def _relationship_record_key(
+def _identity_values_match(
+    first: typing.Any,
+    second: typing.Any,
+    *,
+    match_absent: bool,
+    exact: bool = False,
+) -> bool:
+    first_absent = _match_value_absent(first)
+    second_absent = _match_value_absent(second)
+    if first_absent or second_absent:
+        return match_absent and first_absent and second_absent
+    return _identity_comparison_value(
+        first,
+        exact=exact,
+    ) == _identity_comparison_value(second, exact=exact)
+
+
+def _identity_key(
+    record: typing.Mapping[str, typing.Any],
+    unique_attrs: typing.Sequence[str],
+    exact_attrs: typing.AbstractSet[str] = frozenset(),
+) -> typing.Optional[typing.Tuple[typing.Tuple[str, typing.Any], ...]]:
+    values: typing.List[typing.Tuple[str, typing.Any]] = []
+    for attr in unique_attrs:
+        raw = record.get(attr)
+        if _match_value_absent(raw):
+            return None
+        values.append(
+            (
+                attr,
+                _hashable_identity_value(raw, exact=attr in exact_attrs),
+            )
+        )
+    return tuple(values)
+
+
+def _identity_partition_key(
     record: typing.Mapping[str, typing.Any],
     attrs: typing.Sequence[str],
-) -> typing.Optional[str]:
-    match_key = _match_key(record, attrs)
-    return _record_key(match_key) if match_key else None
+    exact_attrs: typing.AbstractSet[str] = frozenset(),
+) -> typing.Tuple[typing.Tuple[str, typing.Any], ...]:
+    return tuple(
+        (
+            attr,
+            ("absent",)
+            if _match_value_absent(record.get(attr))
+            else (
+                "value",
+                _hashable_identity_value(
+                    record.get(attr),
+                    exact=attr in exact_attrs,
+                ),
+            ),
+        )
+        for attr in attrs
+    )
 
 
-def _relationship_child_unique_attrs(
+def _hashable_identity_value(value: typing.Any, *, exact: bool = False) -> typing.Any:
+    normalized = _identity_comparison_value(value, exact=exact)
+    try:
+        hash(normalized)
+    except TypeError:
+        return (
+            "structured",
+            type(normalized).__name__,
+            _record_key(_plain(normalized)),
+        )
+    return normalized
+
+
+def _identity_comparison_value(value: typing.Any, *, exact: bool) -> typing.Any:
+    if not exact:
+        return _normalize_match_value(value)
+    unwrapped = _unwrap_match_value(value)
+    if isinstance(unwrapped, bool):
+        return ("bool", unwrapped)
+    if isinstance(unwrapped, int):
+        return ("number", unwrapped)
+    if isinstance(unwrapped, float):
+        if unwrapped.is_integer():
+            return ("number", int(unwrapped))
+        return ("float", unwrapped)
+    return unwrapped
+
+
+def _identity_exact_attrs(
+    identity_match: typing.Mapping[str, typing.Any],
+    unique_attrs: typing.Sequence[str],
+) -> typing.FrozenSet[str]:
+    configured = (
+        identity_match["exact_attrs"]
+        if "exact_attrs" in identity_match
+        else unique_attrs
+    )
+    return frozenset(
+        _unique_strings(
+            typing.cast(typing.Iterable[typing.Any], configured),
+        )
+    )
+
+
+def _identity_threshold(
+    identity_match: typing.Mapping[str, typing.Any],
+    key: str,
+) -> int:
+    value = identity_match.get(key, 0)
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise ValueError(f"identity_match.{key} must be an integer")
+    if value < 0:
+        raise ValueError(f"identity_match.{key} must be non-negative")
+    return value
+
+
+def _group_identity_policy(
     workflow_extract: typing.Optional[typing.Mapping[str, typing.Any]],
-    child_group: str,
-    match_attrs: typing.Sequence[str],
-) -> typing.Tuple[str, ...]:
+    group_name: str,
+) -> typing.Tuple[
+    typing.Tuple[str, ...],
+    typing.Optional[typing.Mapping[str, typing.Any]],
+]:
     if not isinstance(workflow_extract, typing.Mapping):
-        return ()
+        return (), None
 
-    group_spec = _group_spec(workflow_extract, child_group)
+    group_spec = _group_spec(workflow_extract, group_name)
     if not isinstance(group_spec, typing.Mapping):
-        return ()
+        return (), None
 
     unique_attrs = group_spec.get("unique_attrs")
     if not isinstance(unique_attrs, list) or not unique_attrs:
-        return ()
+        return (), None
 
-    return _unique_strings((*match_attrs, *unique_attrs))
+    identity_match = group_spec.get("identity_match")
+    if isinstance(identity_match, typing.Mapping):
+        _identity_threshold(identity_match, "activate_threshold_at")
+        _identity_threshold(identity_match, "minimum_threshold_matches")
+    return (
+        _unique_strings(unique_attrs),
+        typing.cast(typing.Mapping[str, typing.Any], identity_match)
+        if isinstance(identity_match, typing.Mapping)
+        else None,
+    )
 
 
 def _unique_strings(values: typing.Iterable[typing.Any]) -> typing.Tuple[str, ...]:
@@ -1173,7 +1613,7 @@ def _unique_strings(values: typing.Iterable[typing.Any]) -> typing.Tuple[str, ..
     return tuple(result)
 
 
-def _merge_relationship_parent(
+def _merge_identity_record(
     target: typing.Dict[str, typing.Any],
     source: typing.Mapping[str, typing.Any],
 ) -> None:
@@ -1183,7 +1623,7 @@ def _merge_relationship_parent(
             continue
         target_value = target.get(key)
         if isinstance(target_value, dict) and isinstance(value, typing.Mapping):
-            _merge_relationship_parent(
+            _merge_identity_record(
                 target_value,
                 typing.cast(typing.Mapping[str, typing.Any], value),
             )
@@ -1238,18 +1678,6 @@ def _is_mapping_list(value: typing.Any) -> bool:
     return isinstance(value, list) and all(isinstance(item, dict) for item in value)
 
 
-def _records_match(
-    parent: typing.Mapping[str, typing.Any],
-    child: typing.Mapping[str, typing.Any],
-    match_attrs: typing.Sequence[str],
-) -> bool:
-    parent_key = _match_key(parent, match_attrs)
-    child_key = _match_key(child, match_attrs)
-    if not parent_key or not child_key:
-        return False
-    return parent_key == child_key
-
-
 def _match_key(
     record: typing.Mapping[str, typing.Any],
     match_attrs: typing.Sequence[str],
@@ -1278,8 +1706,13 @@ def _normalize_match_value(value: typing.Any) -> typing.Any:
         return unwrapped.strip().casefold()
     if isinstance(unwrapped, bool):
         return ("boolean", unwrapped)
+    if isinstance(unwrapped, numbers.Integral):
+        return ("number", int(unwrapped))
     if isinstance(unwrapped, numbers.Real):
-        return ("number", float(unwrapped))
+        numeric = float(unwrapped)
+        if numeric.is_integer():
+            return ("number", int(numeric))
+        return ("float", numeric)
     if isinstance(unwrapped, typing.Mapping):
         return (
             "object",
@@ -1304,9 +1737,7 @@ def _normalize_match_value(value: typing.Any) -> typing.Any:
 def _unwrap_match_value(value: typing.Any) -> typing.Any:
     if isinstance(value, typing.Mapping):
         value_map = typing.cast(typing.Mapping[str, typing.Any], value)
-        if "value" in value_map and set(value_map.keys()).issubset(
-            _EXTRACTED_FIELD_VALUE_KEYS
-        ):
+        if "value" in value_map and set(value_map.keys()).issubset(_EXTRACTED_FIELD_VALUE_KEYS):
             return value_map.get("value")
     return value
 

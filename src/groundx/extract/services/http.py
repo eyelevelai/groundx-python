@@ -1,9 +1,11 @@
+import contextlib
 import os
+import signal
+import threading
 import time
 import typing
 
 import requests
-
 from .deadline import remaining_operation_seconds
 
 DEFAULT_HTTP_CONNECT_TIMEOUT_SECONDS = 5.0
@@ -17,6 +19,7 @@ DEFAULT_CALLBACK_READ_TIMEOUT_SECONDS = 10.0
 DEFAULT_CALLBACK_MAX_ATTEMPTS = 2
 DEFAULT_CALLBACK_BACKOFF_CAP_SECONDS = 3.0
 DEFAULT_CALLBACK_OPERATION_DEADLINE_SECONDS = 30.0
+DEFAULT_GENERATED_CLIENT_TIMEOUT_SECONDS = 30.0
 
 
 class BoundedRequestError(RuntimeError):
@@ -39,6 +42,55 @@ class BoundedRequestError(RuntimeError):
 
 class BoundedRequestTimeout(BoundedRequestError):
     pass
+
+
+class WallClockDeadlineExceeded(TimeoutError):
+    pass
+
+
+def bounded_generated_request_options(
+    timeout_seconds: float = DEFAULT_GENERATED_CLIENT_TIMEOUT_SECONDS,
+) -> typing.Dict[str, typing.Any]:
+    remaining = remaining_operation_seconds(timeout_seconds)
+    assert remaining is not None
+    if remaining <= 0:
+        raise TimeoutError("generated client call exceeded operation deadline")
+    return {
+        "timeout_in_seconds": remaining,
+        "max_retries": 0,
+    }
+
+
+@contextlib.contextmanager
+def wall_clock_operation_deadline(
+    seconds: float,
+    *,
+    operation: str,
+) -> typing.Iterator[None]:
+    if seconds <= 0:
+        raise ValueError("operation deadline must be greater than zero")
+    if threading.current_thread() is not threading.main_thread():
+        raise RuntimeError("wall-clock deadline requires the main thread")
+    if not hasattr(signal, "setitimer"):
+        raise RuntimeError("wall-clock deadline is unavailable on this platform")
+
+    previous_delay, _ = signal.getitimer(signal.ITIMER_REAL)
+    if previous_delay > 0:
+        raise RuntimeError("wall-clock deadline cannot replace an active alarm")
+    previous_handler = signal.getsignal(signal.SIGALRM)
+
+    def raise_timeout(_signum: int, _frame: typing.Any) -> typing.NoReturn:
+        raise WallClockDeadlineExceeded(
+            f"{operation} exceeded {seconds} second deadline"
+        )
+
+    signal.signal(signal.SIGALRM, raise_timeout)
+    signal.setitimer(signal.ITIMER_REAL, seconds)
+    try:
+        yield
+    finally:
+        signal.setitimer(signal.ITIMER_REAL, 0)
+        signal.signal(signal.SIGALRM, previous_handler)
 
 
 def _env_float(name: str, default: float) -> float:

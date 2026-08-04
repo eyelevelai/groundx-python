@@ -3,21 +3,20 @@ import json
 import typing
 
 import pytest
+from ._fixtures import SAMPLE_YAML_1, TestSource
 
 from groundx.extract import prepare_extraction_yaml
 from groundx.extract.prompt.manager import PromptManager
 from groundx.types.workflow_request import WorkflowRequest
 
-from ._fixtures import SAMPLE_YAML_1, TestSource
-
-
 TOP_LEVEL_METADATA_KEYS = {"extraction_policy_version"}
 FINAL_GROUP_METADATA_KEYS = {
-    "final_value_aliases",
     "fill_rules",
     "always_check_attrs",
     "match_attrs",
     "unique_attrs",
+    "identity_match",
+    "passthrough_transform",
     "required_any_attrs",
     "conflict_attrs",
     "exclude_dict_attrs",
@@ -57,9 +56,7 @@ def _custom_workflow_metadata() -> typing.Dict[str, typing.Any]:
                 "level": "chunk",
                 "output_map": "customChunkOutputs",
                 "output_key": "label",
-                "readback_path": (
-                    "/chunks/*/customChunkOutputs/line_item_labels/label"
-                ),
+                "readback_path": ("/chunks/*/customChunkOutputs/line_item_labels/label"),
             }
         ],
         "leaf_fields": [
@@ -101,8 +98,6 @@ extraction_policy_version: v1
 
 statement:
   workflow_step: chunk-instruct
-  final_value_aliases:
-    amount_due: total_due
   fill_rules:
     - source: provider_name
       target: /meters/provider_name
@@ -187,6 +182,13 @@ charges:
   explanation_attrs:
     - charge_explanation
   fields:
+    charge_description_as_printed:
+      prompt:
+        description: Printed charge description.
+        identifiers:
+          - Charge Description
+        instructions: Return the printed charge description.
+        type: str
     charge_amount:
       prompt:
         description: Charge amount.
@@ -221,28 +223,203 @@ def test_persisted_workflow_extract_round_trips_authored_metadata() -> None:
     reloaded = _prepare(round_tripped)
 
     assert reloaded.top_level_metadata == {"extraction_policy_version": "v1"}
-    assert reloaded.final_group_metadata["statement"]["final_value_aliases"] == {
-        "amount_due": "total_due"
-    }
-    assert reloaded.final_group_metadata["statement"]["explanation_attrs"] == [
-        "statement_explanation"
-    ]
-    assert reloaded.final_group_metadata["meters"]["passthrough_attrs"] == [
-        "meter_number"
-    ]
-    assert reloaded.final_group_metadata["meters"]["explanation_attrs"] == [
-        "meter_explanation"
-    ]
+    assert reloaded.final_group_metadata["statement"]["explanation_attrs"] == ["statement_explanation"]
+    assert reloaded.final_group_metadata["meters"]["passthrough_attrs"] == ["meter_number"]
+    assert reloaded.final_group_metadata["meters"]["explanation_attrs"] == ["meter_explanation"]
     assert reloaded.final_group_metadata["charges"]["match_attrs"] == ["meter_number"]
-    assert reloaded.final_group_metadata["charges"]["explanation_attrs"] == [
-        "charge_explanation"
-    ]
-    assert reloaded.workflow_group_metadata["statement_identity"] == {
-        "workflow_step": "chunk-keys"
+    assert reloaded.final_group_metadata["charges"]["explanation_attrs"] == ["charge_explanation"]
+    assert reloaded.workflow_group_metadata["statement_identity"] == {"workflow_step": "chunk-keys"}
+    assert reloaded.workflow_field_paths["statement_identity"] == {"account_number": "/statement/account_number"}
+
+
+def test_object_array_policy_metadata_round_trips_without_rewriting() -> None:
+    raw = """
+extraction_policy_version: v1
+
+generic_parents:
+  unique_attrs:
+    - object_code
+    - market_state
+    - primary_company
+    - alternate_company
+  identity_match:
+    threshold_attrs:
+      - market_state
+      - primary_company
+      - alternate_company
+    activate_threshold_at: 2
+    minimum_threshold_matches: 3
+    group_attrs:
+      - object_code
+      - market_state
+    sort_attrs:
+      - object_code
+    equal_value_shortcuts:
+      market_state:
+        - combined
+  passthrough_transform:
+    status_attr: market_state
+    provider_attr: primary_company
+    passthrough_provider_attr: alternate_company
+    clear_attrs:
+      - alternate_company
+  fields:
+    object_code:
+      prompt: {instructions: Return the object code., type: str}
+    market_state:
+      prompt: {instructions: Return the market state., type: str}
+    primary_company:
+      prompt: {instructions: Return the primary company., type: str}
+    alternate_company:
+      prompt: {instructions: Return the alternate company., type: str}
+"""
+
+    prepared = _prepare(raw)
+    persisted = json.loads(json.dumps(prepared.persisted_workflow_extract))
+    reloaded = _prepare(persisted)
+
+    expected = {
+        "unique_attrs": [
+            "object_code",
+            "market_state",
+            "primary_company",
+            "alternate_company",
+        ],
+        "identity_match": {
+            "threshold_attrs": [
+                "market_state",
+                "primary_company",
+                "alternate_company",
+            ],
+            "activate_threshold_at": 2,
+            "minimum_threshold_matches": 3,
+            "group_attrs": ["object_code", "market_state"],
+            "sort_attrs": ["object_code"],
+            "equal_value_shortcuts": {"market_state": ["combined"]},
+        },
+        "passthrough_transform": {
+            "status_attr": "market_state",
+            "provider_attr": "primary_company",
+            "passthrough_provider_attr": "alternate_company",
+            "clear_attrs": ["alternate_company"],
+        },
     }
-    assert reloaded.workflow_field_paths["statement_identity"] == {
-        "account_number": "/statement/account_number"
+    assert prepared.final_group_metadata["generic_parents"] == expected
+    assert reloaded.final_group_metadata["generic_parents"] == expected
+    assert persisted["_groundx_persisted_extract"]["generic_parents"] == expected | {
+        "fields": prepared.groups["generic_parents"]["fields"]
     }
+
+
+@pytest.mark.parametrize(
+    ("metadata", "message"),
+    [
+        (
+            "identity_match: {threshold_attrs: [missing_attr]}",
+            "identity_match attributes must exist in group [generic_rows]",
+        ),
+        (
+            "identity_match: {threshold_attrs: [secondary_code]}",
+            "identity_match attributes must also be declared in unique_attrs",
+        ),
+        (
+            "identity_match: {threshold_attrs: [object_code], activate_threshold_at: -1}",
+            "activate_threshold_at must be a non-negative integer",
+        ),
+        (
+            "identity_match: {threshold_attrs: [object_code], activate_threshold_at: true}",
+            "activate_threshold_at must be a non-negative integer",
+        ),
+        (
+            "identity_match: {threshold_attrs: [object_code], minimum_threshold_matches: 2}",
+            "minimum_threshold_matches cannot exceed threshold_attrs",
+        ),
+        (
+            "identity_match: {threshold_attrs: [object_code], minimum_threshold_matches: true}",
+            "minimum_threshold_matches must be a non-negative integer",
+        ),
+        (
+            "identity_match: {equal_value_shortcuts: {object_code: [1]}}",
+            "equal_value_shortcuts values must be lists of strings",
+        ),
+        (
+            "passthrough_transform: {status_attr: object_code, provider_attr: missing_attr, passthrough_provider_attr: secondary_code}",
+            "passthrough_transform attributes must exist in group [generic_rows]",
+        ),
+    ],
+)
+def test_object_array_policy_metadata_rejects_invalid_contracts(
+    metadata: str,
+    message: str,
+) -> None:
+    raw = f"""
+extraction_policy_version: v1
+
+generic_rows:
+  unique_attrs: [object_code]
+  {metadata}
+  fields:
+    object_code:
+      prompt: {{instructions: Return the object code., type: str}}
+    secondary_code:
+      prompt: {{instructions: Return the secondary code., type: str}}
+"""
+
+    with pytest.raises(ValueError, match=message.replace("[", r"\[").replace("]", r"\]")):
+        _prepare(raw)
+
+
+def test_object_array_policy_rejects_unknown_unique_attr() -> None:
+    raw = """
+extraction_policy_version: v1
+
+generic_rows:
+  unique_attrs: [missing_attr]
+  fields:
+    object_code:
+      prompt: {instructions: Return the object code., type: str}
+"""
+
+    with pytest.raises(
+        ValueError,
+        match=r"unique_attrs fields must exist in group \[generic_rows\]",
+    ):
+        _prepare(raw)
+
+
+def test_persisted_canonical_v1_rejects_output_aliases() -> None:
+    persisted = copy.deepcopy(_prepare(POLICY_YAML).persisted_workflow_extract)
+    persisted["_groundx_persisted_extract"]["statement"]["final_value_aliases"] = {"amount_due": "total_due"}
+
+    with pytest.raises(
+        ValueError,
+        match="final_value_aliases.*not supported.*canonical v1",
+    ):
+        _prepare(persisted)
+
+
+def test_pure_legacy_preserves_output_aliases_as_metadata() -> None:
+    raw = """
+statement:
+  final_value_aliases:
+    statement_period_start_date: measurement_period_start_date
+  fields:
+    statement_period_start_date:
+      prompt:
+        instructions: Return the statement period start date.
+        type: str
+"""
+
+    prepared = prepare_extraction_yaml(raw)
+    reloaded = prepare_extraction_yaml(
+        json.loads(json.dumps(prepared.persisted_workflow_extract))
+    )
+    expected = {
+        "statement_period_start_date": "measurement_period_start_date"
+    }
+
+    assert prepared.final_group_metadata["statement"]["final_value_aliases"] == expected
+    assert reloaded.final_group_metadata["statement"]["final_value_aliases"] == expected
 
 
 def test_persisted_workflow_extract_round_trips_pseudo_group_metadata() -> None:
@@ -351,9 +528,34 @@ def test_persisted_custom_workflow_extract_round_trips_routes_and_leaf_fields() 
     assert workflow["leaf_fields"] == persisted["workflow"]["leaf_fields"]
     assert workflow["leaf_fields"][0]["final_path"] == "/line_items/*/description"
     assert workflow["leaf_fields"][0]["repetition_scope"] == "/line_items/*"
-    assert reloaded.workflow_field_paths["line_items"]["description"] == (
-        "/line_items/*/description"
-    )
+    assert reloaded.workflow_field_paths["line_items"]["description"] == ("/line_items/*/description")
+
+
+def test_persisted_relationship_round_trips_first_stable_match_strategy() -> None:
+    persisted = _persisted_custom_workflow_extract()
+    persisted["workflow"]["output_relationships"] = [
+        {
+            "parent_group": "parents",
+            "child_group": "children",
+            "parent_output_field": "children",
+            "match_attrs": ["record_key"],
+            "unmatched_child_group": "children",
+            "multiple_match_strategy": "first_stable",
+        }
+    ]
+
+    reloaded = prepare_extraction_yaml(persisted)
+
+    assert reloaded.persisted_workflow_extract["workflow"]["output_relationships"] == [
+        {
+            "parent_group": "parents",
+            "child_group": "children",
+            "parent_output_field": "children",
+            "match_attrs": ["record_key"],
+            "unmatched_child_group": "children",
+            "multiple_match_strategy": "first_stable",
+        }
+    ]
 
 
 def test_authored_output_relationships_persist_in_workflow_metadata() -> None:
@@ -399,9 +601,7 @@ transactions:
 """
 
     prepared = prepare_extraction_yaml(raw)
-    relationship = prepared.persisted_workflow_extract["workflow"][
-        "output_relationships"
-    ][0]
+    relationship = prepared.persisted_workflow_extract["workflow"]["output_relationships"][0]
 
     assert relationship == {
         "parent_group": "accounts",
@@ -454,9 +654,7 @@ transactions:
 
     prepared = prepare_extraction_yaml(raw)
 
-    assert prepared.persisted_workflow_extract["workflow"][
-        "output_relationships"
-    ] == [
+    assert prepared.persisted_workflow_extract["workflow"]["output_relationships"] == [
         {
             "parent_group": "accounts",
             "child_group": "transactions",
@@ -490,6 +688,45 @@ transactions:
     prepared = prepare_extraction_yaml(raw)
 
     assert "output_relationships" not in prepared.persisted_workflow_extract["workflow"]
+
+
+def test_final_group_passthrough_can_name_relationship_outputs() -> None:
+    raw = """
+extraction_policy_version: v1
+workflow:
+  custom_steps:
+    - {name: parent_rows, level: chunk, kind: keys}
+    - {name: child_rows, level: chunk, kind: keys}
+parents:
+  workflow_step: parent_rows
+  fields:
+    record_key:
+      workflow_output_key: record_key
+      prompt: {instructions: Return the key, type: str}
+children:
+  workflow_step: child_rows
+  match_attrs: [record_key]
+  passthrough:
+    from: parents
+    parent_output_field: nested_children
+    unmatched_child_group: unassigned_children
+  fields:
+    record_key:
+      workflow_output_key: record_key
+      prompt: {instructions: Return the key, type: str}
+"""
+
+    prepared = prepare_extraction_yaml(raw)
+
+    assert prepared.persisted_workflow_extract["workflow"]["output_relationships"] == [
+        {
+            "parent_group": "parents",
+            "child_group": "children",
+            "parent_output_field": "nested_children",
+            "match_attrs": ["record_key"],
+            "unmatched_child_group": "unassigned_children",
+        }
+    ]
 
 
 def test_persisted_custom_workflow_extract_rejects_unknown_version() -> None:
@@ -533,17 +770,86 @@ def test_persisted_custom_workflow_extract_hash_is_deterministic() -> None:
     second["workflow"]["custom_steps"][0]["required_template_keys"] = list(
         reversed(second["workflow"]["custom_steps"][0]["required_template_keys"])
     )
-    second["workflow"]["output_routes"] = list(
-        reversed(second["workflow"]["output_routes"])
-    )
+    second["workflow"]["output_routes"] = list(reversed(second["workflow"]["output_routes"]))
     second["workflow"]["leaf_fields"] = list(reversed(second["workflow"]["leaf_fields"]))
 
-    first_hash = prepare_extraction_yaml(first).persisted_workflow_extract["workflow"][
-        "schema_hash"
-    ]
-    second_hash = prepare_extraction_yaml(second).persisted_workflow_extract["workflow"][
-        "schema_hash"
-    ]
+    first_hash = prepare_extraction_yaml(first).persisted_workflow_extract["workflow"]["schema_hash"]
+    second_hash = prepare_extraction_yaml(second).persisted_workflow_extract["workflow"]["schema_hash"]
 
     assert first_hash == second_hash
     assert len(first_hash) == 64
+
+
+def test_relationship_match_strategy_changes_schema_hash() -> None:
+    first = _persisted_custom_workflow_extract()
+    second = copy.deepcopy(first)
+    relationship = {
+        "parent_group": "parents",
+        "child_group": "children",
+        "parent_output_field": "children",
+        "match_attrs": ["record_key"],
+        "unmatched_child_group": "children",
+    }
+    first["workflow"]["output_relationships"] = [relationship]
+    second["workflow"]["output_relationships"] = [
+        {**relationship, "multiple_match_strategy": "first_stable"}
+    ]
+
+    first_hash = prepare_extraction_yaml(first).persisted_workflow_extract["workflow"]["schema_hash"]
+    second_hash = prepare_extraction_yaml(second).persisted_workflow_extract["workflow"]["schema_hash"]
+
+    assert first_hash != second_hash
+
+
+def test_relationship_match_attr_order_does_not_change_schema_hash() -> None:
+    first = _persisted_custom_workflow_extract()
+    second = copy.deepcopy(first)
+    relationship = {
+        "parent_group": "parents",
+        "child_group": "children",
+        "parent_output_field": "children",
+        "match_attrs": ["record_key", "category"],
+        "unmatched_child_group": "children",
+    }
+    first["workflow"]["output_relationships"] = [relationship]
+    second["workflow"]["output_relationships"] = [
+        {**relationship, "match_attrs": list(reversed(relationship["match_attrs"]))}
+    ]
+
+    first_hash = prepare_extraction_yaml(first).persisted_workflow_extract["workflow"]["schema_hash"]
+    second_hash = prepare_extraction_yaml(second).persisted_workflow_extract["workflow"]["schema_hash"]
+
+    assert first_hash == second_hash
+
+
+def test_exact_identity_attrs_change_schema_hash() -> None:
+    first = _persisted_custom_workflow_extract()
+    first["line_items"]["unique_attrs"] = ["description"]
+    second = copy.deepcopy(first)
+    second["line_items"]["identity_match"] = {"exact_attrs": ["description"]}
+
+    first_prepared = prepare_extraction_yaml(first)
+    second_prepared = prepare_extraction_yaml(second)
+    first_hash = first_prepared.persisted_workflow_extract["workflow"]["schema_hash"]
+    second_hash = second_prepared.persisted_workflow_extract["workflow"]["schema_hash"]
+
+    assert first_hash != second_hash
+    assert second_prepared.persisted_workflow_extract["_groundx_persisted_extract"][
+        "line_items"
+    ]["identity_match"] == {"exact_attrs": ["description"]}
+
+
+def test_explicit_empty_exact_identity_attrs_change_schema_hash() -> None:
+    missing = _persisted_custom_workflow_extract()
+    missing["line_items"]["unique_attrs"] = ["description"]
+    explicit_empty = copy.deepcopy(missing)
+    explicit_empty["line_items"]["identity_match"] = {"exact_attrs": []}
+
+    missing_hash = prepare_extraction_yaml(missing).persisted_workflow_extract[
+        "workflow"
+    ]["schema_hash"]
+    explicit_empty_hash = prepare_extraction_yaml(
+        explicit_empty
+    ).persisted_workflow_extract["workflow"]["schema_hash"]
+
+    assert missing_hash != explicit_empty_hash

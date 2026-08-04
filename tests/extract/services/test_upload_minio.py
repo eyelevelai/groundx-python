@@ -40,6 +40,9 @@ class FakeMinioClient:
             {"etag": "etag-1", "last_modified": None},
         )()
 
+    def put_object(self, **kwargs: typing.Any) -> None:
+        self.put = kwargs
+
 
 class TestMinIOClient(unittest.TestCase):
     def test_minio_client_has_bounded_io_and_no_hidden_retries(self) -> None:
@@ -131,15 +134,64 @@ class TestMinIOClient(unittest.TestCase):
         with fake_minio_error_module():
             body, metadata = typing.cast(
                 typing.Tuple[bytes, typing.Dict[str, str]],
-                cl.get_object_and_metadata(
-                    "s3://eyelevel/workflows/extract/latest.yaml"
-                ),
+                cl.get_object_and_metadata("s3://eyelevel/workflows/extract/latest.yaml"),
             )
 
         self.assertEqual(body, b"statement: {}")
         self.assertEqual(metadata, {"ETag": "etag-1"})
         self.assertTrue(fake.response.closed)
         self.assertTrue(fake.response.released)
+
+    def test_put_json_stream_uses_single_attempt_bounded_client(self) -> None:
+        cl = self._client()
+        bounded = FakeMinioClient()
+        create_client = Mock(return_value=bounded)
+        setattr(cl, "_create_client", create_client)
+
+        with fake_minio_error_module():
+            cl.put_json_stream(
+                "eyelevel",
+                "trace.json",
+                b"{}",
+                "application/json",
+                connect_timeout_seconds=0.2,
+                read_timeout_seconds=0.5,
+                total_timeout_seconds=0.8,
+            )
+
+        create_client.assert_called_once_with(
+            connect_timeout_seconds=0.2,
+            read_timeout_seconds=0.5,
+            total_timeout_seconds=0.8,
+        )
+        self.assertEqual(bounded.put["bucket_name"], "eyelevel")
+        self.assertEqual(bounded.put["object_name"], "trace.json")
+        self.assertEqual(bounded.put["length"], 2)
+
+    def test_bounded_client_configures_socket_and_total_timeouts_without_retries(
+        self,
+    ) -> None:
+        cl = self._client()
+
+        with (
+            patch("minio.Minio") as create_client,
+            patch("urllib3.PoolManager") as create_pool,
+        ):
+            getattr(cl, "_create_client")(
+                connect_timeout_seconds=0.2,
+                read_timeout_seconds=0.5,
+                total_timeout_seconds=0.8,
+            )
+
+        timeout = create_pool.call_args.kwargs["timeout"]
+        self.assertEqual(timeout.connect_timeout, 0.2)
+        self.assertEqual(timeout.read_timeout, 0.5)
+        self.assertEqual(timeout.total, 0.8)
+        self.assertIs(create_pool.call_args.kwargs["retries"], False)
+        self.assertIs(
+            create_client.call_args.kwargs["http_client"],
+            create_pool.return_value,
+        )
 
 
 @contextlib.contextmanager

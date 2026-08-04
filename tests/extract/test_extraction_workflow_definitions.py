@@ -62,8 +62,8 @@ statement:
 POLICY_METADATA_YAML = """
 extraction_policy_version: v1
 statement:
-  final_value_aliases:
-    account_number: account_number
+  explanation_attrs:
+    - account_number
   fields:
     account_number:
       prompt:
@@ -258,20 +258,19 @@ def test_persisted_custom_workflow_authored_copy_is_runtime_safe() -> None:
     authored_copy = persisted["_groundx_persisted_extract"]
 
     assert authored_copy["workflow"]["metadata_version"] == 1
-    assert _find_mapping_keys(
-        authored_copy,
-        {"workflow_step", "workflow_output_key"},
-    ) == []
+    assert (
+        _find_mapping_keys(
+            authored_copy,
+            {"workflow_step", "workflow_output_key"},
+        )
+        == []
+    )
 
     reloaded = prepare_extraction_yaml(persisted)
     standalone = prepare_extraction_yaml(authored_copy)
 
-    assert reloaded.persisted_workflow_extract["workflow"]["output_routes"] == (
-        persisted["workflow"]["output_routes"]
-    )
-    assert standalone.persisted_workflow_extract["workflow"]["leaf_fields"] == (
-        persisted["workflow"]["leaf_fields"]
-    )
+    assert reloaded.persisted_workflow_extract["workflow"]["output_routes"] == (persisted["workflow"]["output_routes"])
+    assert standalone.persisted_workflow_extract["workflow"]["leaf_fields"] == (persisted["workflow"]["leaf_fields"])
 
 
 def test_load_extraction_definition_uses_yaml_path(tmp_path: Path) -> None:
@@ -804,10 +803,7 @@ async def test_async_create_and_update_yaml_path_accept_supported_policy_metadat
     create_extract = workflows.calls[0][1]["extract"]
     update_extract = workflows.calls[1][2]["extract"]
     assert create_extract == update_extract
-    assert (
-        create_extract["_groundx_persisted_extract"]["extraction_policy_version"]
-        == "v1"
-    )
+    assert create_extract["_groundx_persisted_extract"]["extraction_policy_version"] == "v1"
 
 
 def test_create_and_update_yaml_path_accept_supported_policy_metadata(

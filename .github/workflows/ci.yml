@@ -1,5 +1,5 @@
 name: ci
-on: [push]
+on: [pull_request, push]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -39,6 +39,9 @@ jobs:
 
       - name: Test
         run: poetry run pytest -rP -n auto .
+
+      - name: Extraction boundary replay
+        run: poetry run pytest -q tests/extract/test_extraction_boundary_reassembly.py tests/extract/test_extraction_boundary_evidence_contract.py
 
       - name: Install aiohttp extra
         run: poetry install --extras aiohttp
