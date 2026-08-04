@@ -50,8 +50,8 @@ class SheetsClient:
         creds = service_account.Credentials.from_service_account_info(
             creds_dict, scopes=scopes
         )
-        import httplib2
-        from google_auth_httplib2 import AuthorizedHttp  # type: ignore[import-untyped]
+        import httplib2  # type: ignore[import-untyped]
+        from google_auth_httplib2 import AuthorizedHttp  # type: ignore[import-untyped,import-not-found]
 
         drive_http = AuthorizedHttp(
             creds,
