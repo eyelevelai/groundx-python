@@ -19,6 +19,12 @@ a candidate diff separately, explain why the old behavior is wrong, and obtain
 Benjamin Fletcher's approval before replacing an accepted fixture. Never update
 an expected file merely because a new run differs.
 
+For an intentional reassembly change, declare the exact output paths allowed to change
+before editing SDK behavior. The old fixture remains the before-state, and a candidate
+may replace only those declared output differences. Every undeclared difference remains a regression.
+Current SDK output cannot approve itself; non-author review and guarded promotion are
+still required before accepted fixtures change.
+
 When the reviewed X-Ray input candidate changes, generate matching SDK output
 candidates with:
 
