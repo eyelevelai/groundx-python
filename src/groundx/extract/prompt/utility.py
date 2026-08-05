@@ -99,6 +99,7 @@ _PASSTHROUGH_TRANSFORM_KEYS = {
 _PASSTHROUGH_KEYS = {
     "fields",
     "from",
+    "multiple_match_strategy",
     "parent_output_field",
     "unmatched_child_group",
 }
@@ -687,6 +688,12 @@ def _validate_object_array_metadata(
                 raise ValueError(
                     f"[{group_name}.passthrough.{key}] must be a non-empty string"
                 )
+        multiple_match_strategy = passthrough.get("multiple_match_strategy")
+        if multiple_match_strategy is not None and multiple_match_strategy != "first_stable":
+            raise ValueError(
+                f"[{group_name}.passthrough.multiple_match_strategy] "
+                "must be [first_stable]"
+            )
 
     identity_match_value = metadata.get("identity_match")
     if identity_match_value is not None:
