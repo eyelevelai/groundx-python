@@ -2541,19 +2541,23 @@ def test_compiled_relationship_can_attach_ambiguous_child_to_first_parent() -> N
     ["first_stable", None],
     ids=["first-stable", "strict-ambiguity"],
 )
-def test_relationship_matching_bounds_key_computations(
-    monkeypatch: pytest.MonkeyPatch,
+def test_relationship_matching_at_scale_follows_declared_strategy(
     multiple_match_strategy: str | None,
 ) -> None:
-    key_computations = 0
-    original = custom_outputs._match_key
+    """Large parent/child sets follow only the declared ambiguity strategy.
 
-    def counted_key(*args, **kwargs):
-        nonlocal key_computations
-        key_computations += 1
-        return original(*args, **kwargs)
-
-    monkeypatch.setattr(custom_outputs, "_match_key", counted_key)
+    This test previously monkeypatched the `_match_key` index helper and
+    bounded its call count to O(parents + children).  Task 3.2a7b replaced
+    that index with the exported `select_relationship_parent` primitive,
+    whose per-child parent scan is legacy-faithful (the legacy matcher scans
+    every meter per charge, `internal-arcadia classes/statement.py@2797b5e:
+    3803-3817`), so `_match_key` was deleted and the key-computation bound
+    with it; no comparable budget exists on the primitive path to re-point
+    the guard at.  The behavioral half of the original test is retained:
+    at scale, multiple exact candidates follow a declared `first_stable`
+    strategy, and with no declared strategy every such child is reported
+    ambiguous and stays unmatched.
+    """
     relationship = {
         "parent_group": "parents",
         "child_group": "children",
@@ -2611,7 +2615,6 @@ def test_relationship_matching_bounds_key_computations(
         workflow_extract=workflow_extract,
     )
 
-    assert key_computations <= len(parents) + len(children)
     if multiple_match_strategy == "first_stable":
         assert result.diagnostics == []
         assert result.final_output["parents"][0]["children"] == [children[0]]

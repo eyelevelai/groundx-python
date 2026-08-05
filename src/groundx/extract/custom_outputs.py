@@ -1851,19 +1851,6 @@ def _is_mapping_list(value: typing.Any) -> bool:
     return isinstance(value, list) and all(isinstance(item, dict) for item in value)
 
 
-def _match_key(
-    record: typing.Mapping[str, typing.Any],
-    match_attrs: typing.Sequence[str],
-) -> typing.Tuple[typing.Tuple[str, typing.Any], ...]:
-    values: typing.List[typing.Tuple[str, typing.Any]] = []
-    for attr in match_attrs:
-        raw = record.get(attr)
-        if _match_value_absent(raw):
-            continue
-        values.append((attr, _normalize_match_value(raw)))
-    return tuple(values)
-
-
 def _match_value_absent(value: typing.Any) -> bool:
     unwrapped = _unwrap_match_value(value)
     if unwrapped is None:
