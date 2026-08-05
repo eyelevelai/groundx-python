@@ -10,6 +10,7 @@ in the linked docs, not in this entrypoint.
 | [`src/groundx/ingest.py`](src/groundx/ingest.py) | You are changing the hand-written ingest helper. |
 | [`src/groundx/extract/`](src/groundx/extract/) | You are changing the hand-written extract helper surface. |
 | [Extraction placement contract](openspec/specs/extraction-placement/spec.md) | You are changing extraction YAML parsing, compilation parity, route placement, or GroundX Python's relationship-aware X-Ray/custom-output reassembly. |
+| [Custom output readback contract](openspec/specs/custom-output-readback/spec.md) | You are changing custom-output readback, the relationship matcher, or the exported `select_relationship_parent` parent-selection primitive and its `<field>__conflicts` read-side convention. |
 | [Extraction boundary fixtures](tests/extract/fixtures/extraction-boundary/README.md) | You are investigating a protected boundary failure or proposing a reviewed fixture update. |
 | [`tests/custom/`](tests/custom/) | You are adding hand-written regression coverage around generated or preserved SDK behavior. |
 | [`eyelevel-fern-config`](https://github.com/eyelevelai/eyelevel-fern-config) | You need an API-shape, generated model, endpoint, package metadata, or SDK generation change. |
