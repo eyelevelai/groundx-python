@@ -14,7 +14,7 @@ cannot reach:
 4. end-to-end reassembly honours the passthrough fallback and the declared
    ambiguity strategy.
 
-Citations and the ASSERTION / DERIVED / MAIN_ONLY / PENDING provenance labels use
+Citations and the ASSERTION / DERIVED / MAIN_ADOPTED / RATIFIED / PENDING provenance labels use
 the same sources and conventions as `test_relationship_parent_selection_red.py`;
 markers are registered in `tests/extract/conftest.py`.
 Contract sources:
@@ -383,13 +383,13 @@ def test_output_names_default_to_the_child_group_name(omitted: str) -> None:
     )
 
 
-@pytest.mark.pending_decision
 def test_reassembly_reports_ambiguity_only_per_declared_strategy() -> None:
-    """PENDING_DECISION -- encodes behavior-table row R16, whose target is
-    unresolved (it diverges from legacy assertion
-    `classes/test_statement.py@2797b5e:5741`, and the accepted inputs disagree
-    on `multiple_match_strategy`).  Currently passes, so it is a guard, not a
-    red requirement.
+    """Encodes behavior-table row R16, RATIFIED by RULING 7b (2026-08-05):
+    an undeclared `multiple_match_strategy` makes multiple exact candidates
+    ambiguous.  The `pending_decision` tag this test carried in fix round 1 is
+    removed -- only the fixture-level declaration is still pending promotion
+    (see `test_pending_accepted_inputs_declare_one_ambiguity_strategy`).
+    Currently passes, so it is a regression guard rather than a red requirement.
 
     tasks.md:1365-1366 -- ambiguity follows only the packet's declared
     strategy.  Two exact candidates with no strategy are ambiguous and

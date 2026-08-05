@@ -32,16 +32,33 @@ Every row carries one provenance label, surfaced in its test id:
 * ``ASSERTION`` -- a named legacy test asserts this exact outcome.
 * ``DERIVED``   -- no legacy assertion covers it; the outcome follows from the
   cited implementation lines only.  Test id suffix ``__DERIVED``.
-* ``MAIN_ONLY`` -- the behavior comes from Internal Arcadia `main` @ `2797b5e`,
-  a revision `tasks.md:1358-1360` does not name (it scopes 3.2a7b to
-  `0c359e45` plus the later cases of `d4f8ead`/`24a490c`).  Adopting current
-  main needs plan-owner ratification.  Marked ``pending_authorization``.
-* ``PENDING``   -- the target outcome is genuinely unresolved and is on the
+* ``MAIN_ADOPTED`` -- the behavior comes from Internal Arcadia `main` @
+  `2797b5e`, a revision `tasks.md:1358-1360` does not name (it scopes 3.2a7b to
+  `0c359e45` plus the later cases of `d4f8ead`/`24a490c`).  **RULING 7a adopted
+  current-head matcher semantics**, so these rows are ratified targets; the
+  label and the per-row citations are retained only to record which revision
+  each behavior comes from.  Carries no marker.
+* ``RATIFIED``   -- contract-mandated and ratified by owner ruling, but
+  diverging from a legacy assertion, so not ``ASSERTION``.  Carries no marker.
+* ``PENDING``    -- the target outcome is genuinely unresolved and is on the
   plan-owner question list.  The assertion here is NOT a ratified target.
   Marked ``pending_decision``.
 
-Run ``pytest -m "not pending_decision and not pending_authorization"`` to see
-only the ratified rows.
+Run ``pytest -m "not pending_decision"`` to see only the ratified rows.  The
+``pending_authorization`` marker stays registered in
+``tests/extract/conftest.py`` after RULING 7a even though no row now carries
+it, so the documented slice commands keep working.
+
+OPEN AND DELIBERATELY UNTESTED
+------------------------------
+More than one **fallback** candidate with ``multiple_match_strategy:
+first_stable`` declared.  Legacy returns None for >1 fallback candidates
+unconditionally (`statement.py@2797b5e:3849-3850`) and no source case exercises
+the strategy on that pass, while `tasks.md:1365-1366` says ambiguity follows the
+declared strategy and `tasks.md:1366-1367` says "Do not generalize beyond the
+source cases".  Still open after the 2026-08-05 rulings; intentionally NOT
+asserted here.  Only the source-demonstrated row (R13, no strategy declared ->
+unmatched) is encoded.
 
 CONTRACT PINNED BY THESE TESTS
 ------------------------------
@@ -78,13 +95,15 @@ _MISSING = object()
 
 ASSERTION = "assertion"
 DERIVED = "derived"
-MAIN_ONLY = "main_only"
+MAIN_ADOPTED = "main_adopted"
+RATIFIED = "ratified"
 PENDING = "pending"
 
 _MARKS: typing.Mapping[str, typing.Tuple[typing.Any, ...]] = {
     ASSERTION: (),
     DERIVED: (),
-    MAIN_ONLY: (pytest.mark.pending_authorization,),
+    MAIN_ADOPTED: (),  # RULING 7a: ratified, marker removed
+    RATIFIED: (),
     PENDING: (pytest.mark.pending_decision,),
 }
 
@@ -194,28 +213,33 @@ _IMPL_24 = "internal-arcadia classes/statement.py@24a490c"
 #     `if len(keys) < 1: return`); and
 #   * treating an empty parent-side value as absent rather than as a mismatch
 #     (`2797b5e:3799`, `:3807-3812`).
-# Rows relying on either are labeled MAIN_ONLY.  Where the asserted outcome is
+# Rows relying on either are labeled MAIN_ADOPTED.  Where the asserted outcome is
 # nonetheless identical under `24a490c` (reached through the fallback pass
 # instead of the exact pass) the citation says so.
-_MAIN_ONLY_NOTE = (
-    "MAIN_ONLY: relies on the 2797b5e populated_keys/empty-is-absent semantics "
-    f"({_IMPL}:3785-3792, :3799, :3807-3812) which {_IMPL_24}:3114-3124 lacks; "
-    "tasks.md:1358-1360 names only 0c359e45/d4f8ead/24a490c, so adopting current "
-    "main needs plan-owner ratification"
+_MAIN_ADOPTED_NOTE = (
+    "MAIN_ADOPTED (RULING 7a, 2026-08-05: current-head matcher semantics are "
+    "ADOPTED, so this row is a ratified target): relies on the 2797b5e "
+    f"populated_keys/empty-is-absent semantics ({_IMPL}:3785-3792, :3799, "
+    f":3807-3812) which {_IMPL_24}:3114-3124 lacks; tasks.md:1358-1360 names only "
+    "0c359e45/d4f8ead/24a490c, which is why the revision is recorded per row"
 )
 
 # The accepted boundary inputs disagree on `multiple_match_strategy`:
 # arcadia_legacy declares `first_stable` on its persisted relationship while
-# arcadia_v1 and generic_v1 declare no strategy at all.  Under R16 that makes
-# the three surfaces produce different ambiguity outcomes on multi-exact input,
-# which contradicts the parity spec.md:374-375 requires.  Unresolved; on the
-# plan-owner question list.  See
-# `test_pending_accepted_inputs_declare_one_ambiguity_strategy` below.
-_PARITY_CONTRADICTION = (
-    "PENDING_DECISION: accepted inputs disagree on multiple_match_strategy "
-    "(arcadia_legacy declares first_stable; arcadia_v1 and generic_v1 declare "
-    "none), so under this row the three surfaces cannot satisfy the parity "
-    "spec.md:374-375 requires. Unresolved -- plan-owner question, not a target."
+# arcadia_v1 and generic_v1 declare no strategy at all.  RULING 7b (2026-08-05)
+# resolves this by DECLARING `multiple_match_strategy: first_stable` in the
+# arcadia_v1 and generic_v1 accepted inputs, routed through the Phase 4
+# promotion lifecycle (tasks 10.1b / 10.2a) -- NOT by editing those inputs now.
+# See `test_pending_accepted_inputs_declare_one_ambiguity_strategy` below, which
+# flips from failing to passing when that promotion lands.
+_PARITY_RULING = (
+    "RULING 7b (2026-08-05): the accepted inputs currently disagree on "
+    "multiple_match_strategy (arcadia_legacy declares first_stable; arcadia_v1 "
+    "and generic_v1 declare none). Resolution is to DECLARE first_stable in the "
+    "arcadia_v1 and generic_v1 accepted inputs through the Phase 4 promotion "
+    "lifecycle (10.1b/10.2a), not by editing them now. Until that promotion "
+    "lands the three surfaces cannot demonstrate the parity spec.md:374-375 "
+    "requires. The primitive-level contract in this row is ratified."
 )
 
 BEHAVIOR_TABLE: typing.Tuple[Row, ...] = (
@@ -266,8 +290,9 @@ BEHAVIOR_TABLE: typing.Tuple[Row, ...] = (
         0,
         "exact",
         f"{_STMT}:5743-5744 (asserted with first_stable declared); {_IMPL}:3818-3819; "
-        f"groundx/extract/classes/field.py:85-90 (case-insensitive). "
-        f"NOTE: fixture-level parity for this row is blocked -- {_PARITY_CONTRADICTION}",
+        f"groundx/extract/classes/field.py:85-90 (case-insensitive). RATIFIED "
+        f"primitive contract. NOTE: fixture-level parity for this row is pending "
+        f"promotion -- {_PARITY_RULING}",
         strategy="first_stable",
     ),
     _row(
@@ -276,13 +301,16 @@ BEHAVIOR_TABLE: typing.Tuple[Row, ...] = (
         {_M: "M-1", _P: "Utility", _S: "water"},
         None,
         "none",
-        "DELIBERATE DIVERGENCE from legacy assertion "
-        f"{_STMT}:5741, which returns the first candidate with NO declared strategy. "
+        "RATIFIED primitive contract per RULING 7b (2026-08-05): an undeclared "
+        "multiple_match_strategy makes multiple exact candidates AMBIGUOUS. This is "
+        "a DELIBERATE DIVERGENCE from legacy assertion "
+        f"{_STMT}:5741, which returns the first candidate with NO declared strategy; "
         "openspec tasks.md:1365-1366 'Ambiguity follows only the packet's declared "
         "strategy' and tasks.md:1381-1382 'Delete the unconditional direct_matches[0] "
-        f"result'. {_PARITY_CONTRADICTION}",
+        "result' mandate the divergence, so Internal Arcadia must update :5741 in "
+        f"3.2a7c. {_PARITY_RULING}",
         ambiguous=True,
-        provenance=PENDING,
+        provenance=RATIFIED,
     ),
     # --- reviewed available-identity matrix -------------------------------
     _row("R17_exact_full_match", [{_M: "M-1", _P: "Utility", _S: "water"}], {_M: "M-1", _P: "Utility", _S: "water"}, 0, "exact", f"{_STMT}:5754-5759"),
@@ -305,10 +333,10 @@ BEHAVIOR_TABLE: typing.Tuple[Row, ...] = (
         {_M: "M-1", _P: None, _S: "water"},
         0,
         "fallback",
-        f"{_STMT}:5801-5830; image_evidence.py:273-277. {_MAIN_ONLY_NOTE}. Under "
+        f"{_STMT}:5801-5830; image_evidence.py:273-277. {_MAIN_ADOPTED_NOTE}. Under "
         f"{_IMPL_24} a None-valued key reaches equal_to_value and raises "
         "(field.py:77-78), so this row has NO defined 24a490c outcome.",
-        provenance=MAIN_ONLY,
+        provenance=MAIN_ADOPTED,
     ),
     _row(
         "R22b_blank_child_side",
@@ -316,9 +344,9 @@ BEHAVIOR_TABLE: typing.Tuple[Row, ...] = (
         {_M: "M-1", _P: "", _S: "water"},
         0,
         "fallback",
-        f"{_STMT}:5801-5830; image_evidence.py:273-277. {_MAIN_ONLY_NOTE}. Same "
+        f"{_STMT}:5801-5830; image_evidence.py:273-277. {_MAIN_ADOPTED_NOTE}. Same "
         f"matched index under {_IMPL_24} via the fallback pass.",
-        provenance=MAIN_ONLY,
+        provenance=MAIN_ADOPTED,
     ),
     _row(
         "R22c_whitespace_child_side",
@@ -326,9 +354,9 @@ BEHAVIOR_TABLE: typing.Tuple[Row, ...] = (
         {_M: "M-1", _P: "   ", _S: "water"},
         0,
         "fallback",
-        f"{_STMT}:5801-5830; image_evidence.py:273-277. {_MAIN_ONLY_NOTE}. Same "
+        f"{_STMT}:5801-5830; image_evidence.py:273-277. {_MAIN_ADOPTED_NOTE}. Same "
         f"matched index under {_IMPL_24} via the fallback pass.",
-        provenance=MAIN_ONLY,
+        provenance=MAIN_ADOPTED,
     ),
     _row(
         "R23a_none_parent_side",
@@ -336,9 +364,9 @@ BEHAVIOR_TABLE: typing.Tuple[Row, ...] = (
         {_M: "M-1", _P: "Utility", _S: "water"},
         0,
         "fallback",
-        f"{_STMT}:5801-5830. {_MAIN_ONLY_NOTE}. Same matched index under "
+        f"{_STMT}:5801-5830. {_MAIN_ADOPTED_NOTE}. Same matched index under "
         f"{_IMPL_24} via the fallback pass.",
-        provenance=MAIN_ONLY,
+        provenance=MAIN_ADOPTED,
     ),
     _row(
         "R23b_blank_parent_side",
@@ -346,9 +374,9 @@ BEHAVIOR_TABLE: typing.Tuple[Row, ...] = (
         {_M: "M-1", _P: "Utility", _S: "water"},
         0,
         "fallback",
-        f"{_STMT}:5801-5830. {_MAIN_ONLY_NOTE}. Same matched index under "
+        f"{_STMT}:5801-5830. {_MAIN_ADOPTED_NOTE}. Same matched index under "
         f"{_IMPL_24} via the fallback pass.",
-        provenance=MAIN_ONLY,
+        provenance=MAIN_ADOPTED,
     ),
     _row(
         "R23c_whitespace_parent_side",
@@ -356,9 +384,9 @@ BEHAVIOR_TABLE: typing.Tuple[Row, ...] = (
         {_M: "M-1", _P: "Utility", _S: "water"},
         0,
         "fallback",
-        f"{_STMT}:5801-5830. {_MAIN_ONLY_NOTE}. Same matched index under "
+        f"{_STMT}:5801-5830. {_MAIN_ADOPTED_NOTE}. Same matched index under "
         f"{_IMPL_24} via the fallback pass.",
-        provenance=MAIN_ONLY,
+        provenance=MAIN_ADOPTED,
     ),
     _row(
         "R24a_none_both_sides",
@@ -366,9 +394,9 @@ BEHAVIOR_TABLE: typing.Tuple[Row, ...] = (
         {_M: "M-1", _P: None, _S: "water"},
         0,
         "exact",
-        f"{_STMT}:5801-5830. {_MAIN_ONLY_NOTE}. Under {_IMPL_24} the same index "
+        f"{_STMT}:5801-5830. {_MAIN_ADOPTED_NOTE}. Under {_IMPL_24} the same index "
         "matches through the FALLBACK pass, not the exact pass.",
-        provenance=MAIN_ONLY,
+        provenance=MAIN_ADOPTED,
     ),
     _row(
         "R24b_blank_both_sides",
@@ -376,9 +404,9 @@ BEHAVIOR_TABLE: typing.Tuple[Row, ...] = (
         {_M: "M-1", _P: "", _S: "water"},
         0,
         "exact",
-        f"{_STMT}:5801-5830. {_MAIN_ONLY_NOTE}. Under {_IMPL_24} the same index "
+        f"{_STMT}:5801-5830. {_MAIN_ADOPTED_NOTE}. Under {_IMPL_24} the same index "
         "matches through the FALLBACK pass, not the exact pass.",
-        provenance=MAIN_ONLY,
+        provenance=MAIN_ADOPTED,
     ),
     _row(
         "R24c_whitespace_both_sides",
@@ -386,9 +414,9 @@ BEHAVIOR_TABLE: typing.Tuple[Row, ...] = (
         {_M: "M-1", _P: "   ", _S: "water"},
         0,
         "exact",
-        f"{_STMT}:5801-5830. {_MAIN_ONLY_NOTE}. Under {_IMPL_24} the same index "
+        f"{_STMT}:5801-5830. {_MAIN_ADOPTED_NOTE}. Under {_IMPL_24} the same index "
         "matches through the FALLBACK pass, not the exact pass.",
-        provenance=MAIN_ONLY,
+        provenance=MAIN_ADOPTED,
     ),
     # --- comparison normalization ----------------------------------------
     _row(
@@ -769,22 +797,35 @@ def _accepted_relationship(surface: str) -> typing.Mapping[str, typing.Any]:
 
 @pytest.mark.pending_decision
 def test_pending_accepted_inputs_declare_one_ambiguity_strategy() -> None:
-    """PENDING_DECISION -- not a ratified target.
+    """PENDING PROMOTION -- fails until the Phase 4 fixture promotion lands.
 
     spec.md:374-375 requires Arcadia and renamed-generic parity as proof of the
-    general contract.  Under behavior-table row R16, a workflow with no declared
-    `multiple_match_strategy` treats multiple exact candidates as ambiguous,
-    while `first_stable` selects the first.  The accepted boundary inputs do not
-    agree on that declaration, so the three surfaces cannot produce identical
-    ambiguity outcomes on multi-exact input.  This is an input problem for
-    3.2a7b/3.2a7d, not a test bug, and it is on the plan-owner question list.
+    general contract.  Under behavior-table row R16 -- now the RATIFIED primitive
+    contract -- a workflow with no declared `multiple_match_strategy` treats
+    multiple exact candidates as ambiguous, while `first_stable` selects the
+    first.  The accepted boundary inputs do not agree on that declaration:
+    arcadia_legacy declares `first_stable`, arcadia_v1 and generic_v1 declare
+    none, so the three surfaces land on opposite sides of the R15/R16 boundary.
+
+    RULING 7b (2026-08-05) resolves this by DECLARING
+    `multiple_match_strategy: first_stable` in the arcadia_v1 and generic_v1
+    accepted inputs, routed through the Phase 4 promotion lifecycle (tasks 10.1b
+    and 10.2a).  It is explicitly NOT resolved by editing those accepted inputs
+    now, and this lane changes no fixture bytes.
+
+    This test therefore stays red on purpose and **flips to passing when that
+    promotion lands** -- it is the promotion's acceptance check, not a matcher
+    requirement.  It is marked `pending_decision` so it never reads as a 3.2a7b
+    implementation target.
     """
     declared = {
         surface: _accepted_relationship(surface).get("multiple_match_strategy")
         for surface in ("arcadia_legacy", "arcadia_v1", "generic_v1")
     }
 
-    assert len(set(declared.values())) == 1, (
-        "accepted inputs disagree on multiple_match_strategy, so the parity "
-        f"spec.md:374-375 requires cannot hold under R16: {declared}"
+    assert set(declared.values()) == {"first_stable"}, (
+        "RULING 7b: every accepted input must declare "
+        "multiple_match_strategy=first_stable once the Phase 4 promotion "
+        "(10.1b/10.2a) lands; until then the parity spec.md:374-375 requires "
+        f"cannot hold under R16. Current state: {declared}"
     )
