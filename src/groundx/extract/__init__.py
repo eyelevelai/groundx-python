@@ -23,8 +23,10 @@ if typing.TYPE_CHECKING:
         CustomOutputDiagnostic,
         CustomOutputReassemblyResult,
         CustomOutputSourceProvenance,
+        RelationshipParentSelection,
         reassemble_custom_outputs,
         reassemble_custom_outputs_from_xray,
+        select_relationship_parent,
     )
     from .prompt import (
         FinalFieldPath,
@@ -70,6 +72,7 @@ __all__ = [
     "Prompt",
     "PromptManager",
     "RateLimit",
+    "RelationshipParentSelection",
     "SheetsClient",
     "Source",
     "Status",
@@ -82,6 +85,7 @@ __all__ = [
     "prepare_extraction_yaml",
     "reassemble_custom_outputs",
     "reassemble_custom_outputs_from_xray",
+    "select_relationship_parent",
 ]
 
 _EXPORT_MODULES = {
@@ -110,6 +114,7 @@ _EXPORT_MODULES = {
     "Prompt": ".classes",
     "PromptManager": ".prompt.manager",
     "RateLimit": ".services",
+    "RelationshipParentSelection": ".custom_outputs",
     "SheetsClient": ".services",
     "Source": ".prompt.source",
     "Status": ".services",
@@ -122,6 +127,7 @@ _EXPORT_MODULES = {
     "prepare_extraction_yaml": ".prompt.utility",
     "reassemble_custom_outputs": ".custom_outputs",
     "reassemble_custom_outputs_from_xray": ".custom_outputs",
+    "select_relationship_parent": ".custom_outputs",
 }
 
 

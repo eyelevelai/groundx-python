@@ -41,10 +41,25 @@ class CustomOutputReassemblyResult:
 
 
 @dataclasses.dataclass(frozen=True)
+class RelationshipParentSelection:
+    """Result of :func:`select_relationship_parent` (task 3.2a7b).
+
+    ``parent`` is the selected parent record, or ``None`` when no parent was
+    selected.  ``ambiguous`` is ``True`` only when more than one parent matched
+    the child exactly and the relationship packet declared no
+    ``multiple_match_strategy`` to resolve the tie.
+    """
+
+    parent: typing.Optional[typing.Mapping[str, typing.Any]] = None
+    ambiguous: bool = False
+
+
+@dataclasses.dataclass(frozen=True)
 class _RouteValue:
     value: typing.Any
     record_index: typing.Optional[int]
     repeated: bool
+    conflicts: typing.Optional[typing.List[typing.Any]] = None
 
 
 @dataclasses.dataclass(frozen=True)
@@ -62,6 +77,12 @@ class _ScalarCandidate:
 
 _REPEATED_STEP_KINDS = {"keys", "summary"}
 _EXTRACTED_FIELD_VALUE_KEYS = {"value", "_raw_text", "confidence", "conflicts", "qa"}
+_CONFLICTS_SIBLING_SUFFIX = "__conflicts"
+_RELATIONSHIP_PACKET_CAMEL_KEYS = {
+    "match_attrs": "matchAttrs",
+    "parent_passthrough_attrs": "parentPassthroughAttrs",
+    "multiple_match_strategy": "multipleMatchStrategy",
+}
 _DEFAULT_CANDIDATE_VALUES = {
     "n/a",
     "na",
@@ -174,6 +195,21 @@ def reassemble_custom_outputs_from_xray(
                     scalar_candidates=scalar_candidates,
                     diagnostics=diagnostics,
                 )
+                if route_value.repeated and route_value.conflicts is not None:
+                    # Task 3.2a7b: carry the generic `<field>__conflicts`
+                    # record sibling next to its field so relationship parent
+                    # selection can read ignored-field conflict state.
+                    _set_pointer(
+                        final_output,
+                        f"{pointer}{_CONFLICTS_SIBLING_SUFFIX}",
+                        copy.deepcopy(route_value.conflicts),
+                        repeated_records=repeated_records,
+                        record_key=record_key,
+                        route=route_map,
+                        page_numbers=route_container.page_numbers,
+                        scalar_candidates=scalar_candidates,
+                        diagnostics=diagnostics,
+                    )
 
     _dedupe_repeated_group_outputs(
         final_output,
@@ -222,6 +258,139 @@ def reassemble_custom_outputs(
         xray,
         workflow_extract=workflow_extract,
     )
+
+
+def select_relationship_parent(
+    parents: typing.Sequence[typing.Mapping[str, typing.Any]],
+    child: typing.Mapping[str, typing.Any],
+    relationship: typing.Mapping[str, typing.Any],
+) -> RelationshipParentSelection:
+    """Select the parent record a child record belongs to (task 3.2a7b).
+
+    This is the one exported relationship parent-selection primitive.  It ports
+    the legacy charge-to-meter matcher
+    (``internal-arcadia classes/statement.py::Statement.get_charge_meter`` at
+    ``main`` @ ``2797b5e``, semantics adopted by owner RULING 7a, 2026-08-05)
+    onto the generic relationship packet:
+
+    * ``parents`` is an ordered sequence of parent records, ``child`` is one
+      child record, and ``relationship`` is the seven-field relationship packet
+      in either the persisted snake_case or the dispatched camelCase spelling.
+    * The child identity is the packet's ``match_attrs`` filtered to the
+      child's populated (non-empty) values; an empty value counts as absent.
+    * Exact pass: a parent is an exact candidate when it populates exactly the
+      same match attrs the child populates, with equal values.  A single exact
+      candidate wins.  Multiple exact candidates follow only the packet's
+      declared ``multiple_match_strategy`` (``first_stable`` selects the first
+      parent in order); with no declared strategy the outcome is ambiguous and
+      no parent is selected.
+    * Fallback pass: only the match attrs also named by the packet's
+      ``parent_passthrough_attrs`` are removed from comparison.  If that
+      removes nothing, or removes everything, there is no fallback.  A parent
+      whose ignored (removed) field carries conflict state -- read from the
+      generic ``<field>__conflicts`` record sibling -- is rejected.  Only a
+      unique surviving candidate wins; anything else stays unmatched.
+    * Value comparison is case-insensitive and int/float-normalized and does
+      NOT strip whitespace (legacy ``ExtractedField.equal_to_value``).
+    """
+    no_selection = RelationshipParentSelection(parent=None, ambiguous=False)
+    if not isinstance(relationship, typing.Mapping):
+        return no_selection
+    if not isinstance(child, typing.Mapping):
+        return no_selection
+
+    match_attrs = _relationship_attr_list(
+        _relationship_packet_value(relationship, "match_attrs")
+    )
+    if not match_attrs:
+        return no_selection
+
+    parent_list = [
+        parent
+        for parent in (parents or [])
+        if isinstance(parent, typing.Mapping)
+    ]
+    if not parent_list:
+        return no_selection
+
+    populated_keys = {
+        attr: child.get(attr)
+        for attr in match_attrs
+        if not _relationship_value_absent(child.get(attr))
+    }
+    if not populated_keys:
+        return no_selection
+
+    def matches_attrs(
+        parent: typing.Mapping[str, typing.Any],
+        attrs: typing.Sequence[str],
+    ) -> bool:
+        for attr in attrs:
+            if attr not in populated_keys:
+                return False
+            parent_value = parent.get(attr)
+            if _relationship_value_absent(parent_value):
+                return False
+            if _relationship_comparison_value(parent_value) != _relationship_comparison_value(populated_keys[attr]):
+                return False
+        return True
+
+    direct_matches: typing.List[typing.Mapping[str, typing.Any]] = []
+    for parent in parent_list:
+        parent_key_count = sum(
+            1
+            for attr in match_attrs
+            if not _relationship_value_absent(parent.get(attr))
+        )
+        if parent_key_count == len(populated_keys) and matches_attrs(
+            parent,
+            tuple(populated_keys),
+        ):
+            direct_matches.append(parent)
+    if len(direct_matches) == 1:
+        return RelationshipParentSelection(parent=direct_matches[0], ambiguous=False)
+    if len(direct_matches) > 1:
+        strategy = _relationship_packet_value(relationship, "multiple_match_strategy")
+        if strategy == "first_stable":
+            return RelationshipParentSelection(
+                parent=direct_matches[0],
+                ambiguous=False,
+            )
+        return RelationshipParentSelection(parent=None, ambiguous=True)
+
+    passthrough_attrs = _relationship_attr_list(
+        _relationship_packet_value(relationship, "parent_passthrough_attrs")
+    )
+    stable_match_attrs = tuple(
+        attr for attr in match_attrs if attr not in passthrough_attrs
+    )
+    if len(stable_match_attrs) == len(match_attrs):
+        return no_selection
+    if not stable_match_attrs:
+        return no_selection
+    ignored_match_attrs = tuple(
+        attr for attr in match_attrs if attr not in stable_match_attrs
+    )
+
+    def has_ignored_match_conflict(
+        parent: typing.Mapping[str, typing.Any],
+    ) -> bool:
+        for attr in ignored_match_attrs:
+            if parent.get(f"{attr}{_CONFLICTS_SIBLING_SUFFIX}"):
+                return True
+        return False
+
+    fallback_matches = [
+        parent
+        for parent in parent_list
+        if not has_ignored_match_conflict(parent) and matches_attrs(parent, stable_match_attrs)
+    ]
+    if len(fallback_matches) == 1:
+        return RelationshipParentSelection(
+            parent=fallback_matches[0],
+            ambiguous=False,
+        )
+    return no_selection
 
 
 def custom_output_payload_identity(value: typing.Any) -> str:
@@ -378,6 +547,7 @@ def _custom_route_values(
                         value=record[output_key],
                         record_index=index,
                         repeated=True,
+                        conflicts=_record_conflicts_sibling(record, output_key),
                     )
                 )
             if record_values:
@@ -407,6 +577,7 @@ def _custom_route_values(
                         value=record[output_key],
                         record_index=index,
                         repeated=True,
+                        conflicts=_record_conflicts_sibling(record, output_key),
                     )
                 )
             else:
@@ -422,6 +593,22 @@ def _custom_route_values(
             repeated=is_repeated_step,
         )
     ]
+
+
+def _record_conflicts_sibling(
+    record: typing.Mapping[str, typing.Any],
+    output_key: str,
+) -> typing.Optional[typing.List[typing.Any]]:
+    """Read a source record's generic ``<field>__conflicts`` sibling.
+
+    Task 3.2a7b transports ignored-field conflict state through reassembly so
+    relationship parent selection can read it (read side only; design.md
+    408-409, tasks.md:1368-1369).
+    """
+    sibling = record.get(f"{output_key}{_CONFLICTS_SIBLING_SUFFIX}")
+    if isinstance(sibling, list):
+        return typing.cast(typing.List[typing.Any], sibling)
+    return None
 
 
 def _iter_chunks(xray: typing.Any) -> typing.Iterator[typing.Any]:
@@ -970,7 +1157,6 @@ def _apply_relationships(
         parent_output_field = rel.get("parent_output_field")
         match_attrs = rel.get("match_attrs")
         unmatched_child_group = rel.get("unmatched_child_group")
-        multiple_match_strategy = rel.get("multiple_match_strategy")
         if not (
             isinstance(parent_group, str)
             and isinstance(child_group, str)
@@ -1013,28 +1199,14 @@ def _apply_relationships(
         )
         for parent in parent_list:
             parent.setdefault(parent_output_field, [])
-        relationship_index: typing.Dict[
-            typing.Tuple[typing.Tuple[str, typing.Any], ...],
-            typing.List[typing.Dict[str, typing.Any]],
-        ] = {}
-        for parent in parent_list:
-            parent_key = _match_key(
-                parent,
-                typing.cast(typing.List[str], match_attrs),
-            )
-            if parent_key:
-                relationship_index.setdefault(parent_key, []).append(parent)
 
         unmatched: typing.List[typing.Dict[str, typing.Any]] = []
         for child_index, child in enumerate(child_list):
-            child_key = _match_key(
-                child,
-                typing.cast(typing.List[str], match_attrs),
-            )
-            matches = relationship_index.get(child_key, []) if child_key else []
-            if len(matches) > 1 and multiple_match_strategy == "first_stable":
-                matches = matches[:1]
-            elif len(matches) > 1:
+            # Task 3.2a7b: every parent selection is delegated to the one
+            # exported primitive, resolved as a module global so the
+            # delegation is observable and monkeypatchable.
+            selection = select_relationship_parent(parent_list, child, rel)
+            if selection.ambiguous:
                 diagnostics.append(
                     CustomOutputDiagnostic(
                         code="ambiguous_relationship_match",
@@ -1046,8 +1218,9 @@ def _apply_relationships(
                 )
                 unmatched.append(child)
                 continue
-            if len(matches) == 1:
-                output = matches[0].setdefault(parent_output_field, [])
+            selected_parent = selection.parent
+            if isinstance(selected_parent, dict):
+                output = selected_parent.setdefault(parent_output_field, [])
                 if isinstance(output, list):
                     output.append(copy.deepcopy(child))
                 continue
@@ -1698,6 +1871,90 @@ def _match_value_absent(value: typing.Any) -> bool:
     if isinstance(unwrapped, str) and unwrapped.strip() == "":
         return True
     return False
+
+
+def _relationship_packet_value(
+    relationship: typing.Mapping[str, typing.Any],
+    key: str,
+) -> typing.Any:
+    """Read a relationship packet field in either the persisted snake_case or
+    the dispatched camelCase spelling (design.md:394-396)."""
+    if key in relationship:
+        return relationship[key]
+    camel_key = _RELATIONSHIP_PACKET_CAMEL_KEYS.get(key)
+    if camel_key is not None:
+        return relationship.get(camel_key)
+    return None
+
+
+def _relationship_attr_list(value: typing.Any) -> typing.List[str]:
+    if not isinstance(value, list):
+        return []
+    return [attr for attr in value if isinstance(attr, str) and attr != ""]
+
+
+def _relationship_value_absent(value: typing.Any) -> bool:
+    """Empty values count as absent for relationship matching.
+
+    Ported from legacy `internal-arcadia classes/image_evidence.py:273-285`
+    (`is_empty_source_value`), applied after unwrapping ExtractedField-style
+    value mappings.
+    """
+    unwrapped = _unwrap_match_value(value)
+    if unwrapped is None:
+        return True
+    if isinstance(unwrapped, str):
+        return unwrapped.strip() == ""
+    if isinstance(unwrapped, (list, tuple, set)):
+        items = typing.cast(typing.Iterable[typing.Any], unwrapped)
+        return all(_relationship_value_absent(item) for item in items)
+    if isinstance(unwrapped, typing.Mapping):
+        mapping = typing.cast(typing.Mapping[typing.Any, typing.Any], unwrapped)
+        if not mapping:
+            return True
+        return all(_relationship_value_absent(item) for item in mapping.values())
+    return False
+
+
+def _relationship_comparison_value(value: typing.Any) -> typing.Any:
+    """Normalize a match value for relationship comparison.
+
+    Ports legacy `ExtractedField.equal_to_value`
+    (`src/groundx/extract/classes/field.py:76-90`): strings compare
+    case-insensitively WITHOUT whitespace stripping, ints and floats compare as
+    numbers, and differently-typed values never compare equal.  Booleans stay
+    distinct from numbers, and structured values compare structurally with the
+    same string normalization.
+    """
+    unwrapped = _unwrap_match_value(value)
+    if isinstance(unwrapped, bool):
+        return ("boolean", unwrapped)
+    if isinstance(unwrapped, numbers.Integral):
+        return ("number", float(unwrapped))
+    if isinstance(unwrapped, numbers.Real):
+        return ("number", float(unwrapped))
+    if isinstance(unwrapped, str):
+        return ("string", unwrapped.lower())
+    if isinstance(unwrapped, typing.Mapping):
+        mapping = typing.cast(typing.Mapping[typing.Any, typing.Any], unwrapped)
+        return (
+            "object",
+            tuple(
+                sorted(
+                    (
+                        str(key),
+                        _relationship_comparison_value(item),
+                    )
+                    for key, item in mapping.items()
+                )
+            ),
+        )
+    if isinstance(unwrapped, (list, tuple)):
+        return (
+            "list",
+            tuple(_relationship_comparison_value(item) for item in unwrapped),
+        )
+    return unwrapped
 
 
 def _normalize_match_value(value: typing.Any) -> typing.Any:

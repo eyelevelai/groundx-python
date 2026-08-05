@@ -1550,18 +1550,44 @@ def _normalize_custom_leaf(
     return normalized
 
 
+# The persisted relationship packet is snake_case; the dispatched packet is
+# camelCase.  Both spellings carry the same seven fields (design.md:394-402).
+_RELATIONSHIP_CAMEL_KEYS = {
+    "parentGroup": "parent_group",
+    "childGroup": "child_group",
+    "parentOutputField": "parent_output_field",
+    "matchAttrs": "match_attrs",
+    "parentPassthroughAttrs": "parent_passthrough_attrs",
+    "unmatchedChildGroup": "unmatched_child_group",
+    "multipleMatchStrategy": "multiple_match_strategy",
+}
+
+
 def _normalize_custom_relationship(
     value: typing.Any,
     idx: int,
 ) -> typing.Dict[str, typing.Any]:
     path = f"{_CUSTOM_WORKFLOW_KEY}.output_relationships[{idx}]"
-    relationship = _ensure_mapping(value, path)
+    relationship = dict(_ensure_mapping(value, path))
+    for camel_key, snake_key in _RELATIONSHIP_CAMEL_KEYS.items():
+        if camel_key in relationship and snake_key not in relationship:
+            relationship[snake_key] = relationship[camel_key]
+
     normalized: typing.Dict[str, typing.Any] = {}
-    for key in ("parent_group", "child_group", "parent_output_field"):
+    for key in ("parent_group", "child_group"):
         raw_value = relationship.get(key)
         if not isinstance(raw_value, str) or raw_value == "":
             raise ValueError(f"custom workflow relationship is missing [{key}]")
         normalized[key] = raw_value
+
+    # design.md:384-388 -- both output names default to the child group name
+    # and do not change matching, identity, or direction.
+    parent_output_field = relationship.get("parent_output_field")
+    if parent_output_field is None:
+        parent_output_field = normalized["child_group"]
+    if not isinstance(parent_output_field, str) or parent_output_field == "":
+        raise ValueError("custom workflow relationship is missing [parent_output_field]")
+    normalized["parent_output_field"] = parent_output_field
 
     match_attrs_raw = relationship.get("match_attrs")
     if not isinstance(match_attrs_raw, list) or not match_attrs_raw:
@@ -1573,11 +1599,28 @@ def _normalize_custom_relationship(
         match_attrs.append(attr_raw)
     normalized["match_attrs"] = match_attrs
 
+    # The related parent's passthrough_attrs travel on the relationship packet
+    # (spec.md:350-352); an empty declaration normalizes to an empty list
+    # (design.md:404) and an absent one stays absent.
+    passthrough_raw = relationship.get("parent_passthrough_attrs")
+    if passthrough_raw is not None:
+        if not isinstance(passthrough_raw, list):
+            raise ValueError("custom workflow relationship parent_passthrough_attrs must be a list")
+        parent_passthrough_attrs: typing.List[str] = []
+        for attr_idx, attr_raw in enumerate(passthrough_raw):
+            if not isinstance(attr_raw, str) or attr_raw == "":
+                raise ValueError(
+                    f"custom workflow relationship parent_passthrough_attrs [{idx}][{attr_idx}] must be a non-empty string"
+                )
+            parent_passthrough_attrs.append(attr_raw)
+        normalized["parent_passthrough_attrs"] = parent_passthrough_attrs
+
     unmatched_raw = relationship.get("unmatched_child_group")
-    if unmatched_raw is not None:
-        if not isinstance(unmatched_raw, str) or unmatched_raw == "":
-            raise ValueError("custom workflow relationship unmatched_child_group must be a non-empty string")
-        normalized["unmatched_child_group"] = unmatched_raw
+    if unmatched_raw is None:
+        unmatched_raw = normalized["child_group"]
+    if not isinstance(unmatched_raw, str) or unmatched_raw == "":
+        raise ValueError("custom workflow relationship unmatched_child_group must be a non-empty string")
+    normalized["unmatched_child_group"] = unmatched_raw
 
     multiple_match_strategy = relationship.get("multiple_match_strategy")
     if multiple_match_strategy is not None:
@@ -1618,19 +1661,33 @@ def _relationships_from_final_group_metadata(
         if not isinstance(parent_group, str) or parent_group == "":
             continue
 
-        relationships.append(
-            {
-                "parent_group": parent_group,
-                "child_group": group_name,
-                "parent_output_field": passthrough.get(
-                    "parent_output_field", group_name
-                ),
-                "match_attrs": copy.deepcopy(match_attrs),
-                "unmatched_child_group": passthrough.get(
-                    "unmatched_child_group", group_name
-                ),
-            }
-        )
+        relationship: typing.Dict[str, typing.Any] = {
+            "parent_group": parent_group,
+            "child_group": group_name,
+            "parent_output_field": passthrough.get(
+                "parent_output_field", group_name
+            ),
+            "match_attrs": copy.deepcopy(match_attrs),
+            "unmatched_child_group": passthrough.get(
+                "unmatched_child_group", group_name
+            ),
+        }
+
+        # spec.md:350-352 -- the related parent's existing passthrough_attrs
+        # reach the derived relationship packet.
+        parent_metadata = final_group_metadata.get(parent_group)
+        if isinstance(parent_metadata, typing.Mapping):
+            parent_passthrough = parent_metadata.get("passthrough_attrs")
+            if isinstance(parent_passthrough, list):
+                relationship["parent_passthrough_attrs"] = copy.deepcopy(
+                    parent_passthrough
+                )
+
+        multiple_match_strategy = passthrough.get("multiple_match_strategy")
+        if multiple_match_strategy is not None:
+            relationship["multiple_match_strategy"] = multiple_match_strategy
+
+        relationships.append(relationship)
 
     return [_normalize_custom_relationship(relationship, idx) for idx, relationship in enumerate(relationships)]
 
