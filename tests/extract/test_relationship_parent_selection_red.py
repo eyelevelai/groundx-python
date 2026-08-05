@@ -268,6 +268,7 @@ BEHAVIOR_TABLE: typing.Tuple[Row, ...] = (
         f"{_STMT}:5743-5744 (asserted with first_stable declared); {_IMPL}:3818-3819; "
         f"groundx/extract/classes/field.py:85-90 (case-insensitive). "
         f"NOTE: fixture-level parity for this row is blocked -- {_PARITY_CONTRADICTION}",
+        strategy="first_stable",
     ),
     _row(
         "R16_multiple_exact_without_strategy_is_ambiguous",
