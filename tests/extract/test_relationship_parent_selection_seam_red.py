@@ -14,10 +14,12 @@ cannot reach:
 4. end-to-end reassembly honours the passthrough fallback and the declared
    ambiguity strategy.
 
-Citations use the same sources as `test_relationship_parent_selection_red.py`.
+Citations and the ASSERTION / DERIVED / MAIN_ONLY / PENDING provenance labels use
+the same sources and conventions as `test_relationship_parent_selection_red.py`;
+markers are registered in `tests/extract/conftest.py`.
 Contract sources:
 `openspec/changes/complete-extraction-boundary-regression-coverage/tasks.md`
-1355-1378, `design.md` 380-430, `specs/extraction-boundary-regression/spec.md`
+1355-1378, `design.md` 380-411, `specs/extraction-boundary-regression/spec.md`
 335-375, all in `/private/tmp/codex-internal-merge-20260803`.
 """
 
@@ -108,7 +110,7 @@ def _reassemble(
 
 
 def test_normalizer_carries_persisted_parent_passthrough_attrs() -> None:
-    """design.md:396-404 -- the packet is exactly seven fields, including
+    """design.md:396-402 -- the packet is exactly seven fields, including
     `parent_passthrough_attrs`.  The normalizer must not silently drop it.
     """
     normalized = prompt_utility._normalize_custom_relationship(
@@ -129,7 +131,7 @@ def test_normalizer_carries_persisted_parent_passthrough_attrs() -> None:
 
 
 def test_normalizer_accepts_dispatched_camel_case_parent_passthrough_attrs() -> None:
-    """design.md:396-399 -- Cashbot dispatches `parentPassthroughAttrs`."""
+    """design.md:394-396 -- Cashbot dispatches `parentPassthroughAttrs`."""
     normalized = prompt_utility._normalize_custom_relationship(
         {
             "parentGroup": "meters",
@@ -150,7 +152,7 @@ def test_normalizer_accepts_dispatched_camel_case_parent_passthrough_attrs() -> 
 
 
 def test_empty_parent_passthrough_attrs_normalize_to_empty_list() -> None:
-    """design.md:405 -- an empty parent `passthrough_attrs` becomes an empty list."""
+    """design.md:404 -- an empty parent `passthrough_attrs` becomes an empty list."""
     normalized = prompt_utility._normalize_custom_relationship(
         {
             "parent_group": "meters",
@@ -167,7 +169,7 @@ def test_empty_parent_passthrough_attrs_normalize_to_empty_list() -> None:
 
 
 def test_derived_relationship_copies_parent_passthrough_attrs() -> None:
-    """spec.md:355-357 -- the related parent's existing `passthrough_attrs`
+    """spec.md:350-352 -- the related parent's existing `passthrough_attrs`
     reaches the relationship; `_relationships_from_final_group_metadata` is the
     SDK-side derivation of that packet.
     """
@@ -194,7 +196,7 @@ def test_derived_relationship_copies_parent_passthrough_attrs() -> None:
 def test_apply_relationships_delegates_to_the_exported_primitive(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """tasks.md:1357-1359 and spec.md:365-372 -- every production caller
+    """tasks.md:1356-1358 and spec.md:366-371 -- every production caller
     delegates to the same matching implementation.  The initial X-Ray
     reassembly path must call the exported primitive, not an inline index.
     """
@@ -207,29 +209,38 @@ def test_apply_relationships_delegates_to_the_exported_primitive(
         "single-matcher delegation is observable and monkeypatchable"
     )
 
-    calls: typing.List[typing.Tuple[int, typing.Mapping[str, typing.Any]]] = []
+    calls: typing.List[typing.Mapping[str, typing.Any]] = []
 
     def _spy(
         parents: typing.Sequence[typing.Mapping[str, typing.Any]],
         child: typing.Mapping[str, typing.Any],
         relationship: typing.Mapping[str, typing.Any],
     ) -> typing.Any:
-        calls.append((len(parents), dict(child)))
+        calls.append(dict(child))
         return matcher(parents, child, relationship)
 
     monkeypatch.setattr(custom_outputs, _MATCHER_NAME, _spy)
 
+    children = [
+        {"meter_number": "12", "provider_name": "Test", "service_type": "water"},
+        {"meter_number": "99", "provider_name": "Test", "service_type": "water"},
+    ]
     _reassemble(
         [{"meter_number": "12", "provider_name": "Test", "service_type": "water"}],
-        [
-            {"meter_number": "12", "provider_name": "Test", "service_type": "water"},
-            {"meter_number": "99", "provider_name": "Test", "service_type": "water"},
-        ],
+        children,
     )
 
-    assert len(calls) == 2, (
-        "each child record must be routed through the one exported primitive"
+    # Per-child coverage rather than an exact call count: an implementation that
+    # groups or batches children by match key is still correct as long as every
+    # child's selection goes through the one exported primitive.
+    assert len(calls) >= 1, (
+        "relationship placement must route through the one exported primitive"
     )
+    for child in children:
+        assert any(
+            all(seen.get(key) == value for key, value in child.items())
+            for seen in calls
+        ), f"child {child!r} was not routed through {_MATCHER_NAME!r}"
 
 
 def test_reassembly_attaches_child_through_passthrough_fallback() -> None:
@@ -252,7 +263,7 @@ def test_reassembly_attaches_child_through_passthrough_fallback() -> None:
 def test_reassembly_keeps_child_unmatched_when_ignored_field_conflicts() -> None:
     """Behavior-table rows R11/R12: a conflicting ignored field rejects the
     parent from the fallback.  Conflict state is read from the generic
-    `<field>__conflicts` record sibling (design.md:409-411, tasks.md:1369-1370).
+    `<field>__conflicts` record sibling (design.md:408-409, tasks.md:1368-1369).
     """
     result = _reassemble(
         [
@@ -307,8 +318,80 @@ def test_reassembly_without_parent_passthrough_attrs_has_no_fallback() -> None:
     assert final["account_charges"] == [{"meter_number": "12", "service_type": "water"}]
 
 
+@pytest.mark.parametrize(
+    "rejected",
+    ["first_match", "first", "last_stable", "any", "", "FIRST_STABLE", True, 1],
+    ids=[
+        "first_match",
+        "first",
+        "last_stable",
+        "any",
+        "empty",
+        "wrong_case",
+        "bool",
+        "int",
+    ],
+)
+def test_normalizer_rejects_every_other_ambiguity_value(rejected: typing.Any) -> None:
+    """spec.md:348-349 and design.md:392-394 -- `first_stable` is the only
+    accepted ambiguity value; "no other ambiguity value is accepted".
+
+    Guard: the current normalizer already enforces this at
+    `prompt/utility.py:1582-1588`.  Nothing pinned it, so a 3.2a7b refactor of
+    that function could silently drop the check.
+    """
+    with pytest.raises(ValueError):
+        prompt_utility._normalize_custom_relationship(
+            {
+                "parent_group": "meters",
+                "child_group": "charges",
+                "parent_output_field": "meter_charges",
+                "match_attrs": list(_ARCADIA_MATCH_ATTRS),
+                "parent_passthrough_attrs": list(_ARCADIA_PARENT_PASSTHROUGH),
+                "unmatched_child_group": "account_charges",
+                "multiple_match_strategy": rejected,
+            },
+            0,
+        )
+
+
+@pytest.mark.parametrize(
+    "omitted",
+    ["parent_output_field", "unmatched_child_group"],
+)
+def test_output_names_default_to_the_child_group_name(omitted: str) -> None:
+    """design.md:384-388 -- `passthrough.parent_output_field` and
+    `passthrough.unmatched_child_group` "both default to the child group name".
+
+    The current normalizer instead *requires* `parent_output_field`
+    (`prompt/utility.py:1560-1564`), so the documented default is unimplemented.
+    """
+    relationship = {
+        "parent_group": "meters",
+        "child_group": "charges",
+        "parent_output_field": "meter_charges",
+        "match_attrs": list(_ARCADIA_MATCH_ATTRS),
+        "parent_passthrough_attrs": list(_ARCADIA_PARENT_PASSTHROUGH),
+        "unmatched_child_group": "account_charges",
+    }
+    relationship.pop(omitted)
+
+    normalized = prompt_utility._normalize_custom_relationship(relationship, 0)
+
+    assert normalized[omitted] == "charges", (
+        f"design.md:384-388 -- {omitted} defaults to the child group name"
+    )
+
+
+@pytest.mark.pending_decision
 def test_reassembly_reports_ambiguity_only_per_declared_strategy() -> None:
-    """tasks.md:1366-1367 -- ambiguity follows only the packet's declared
+    """PENDING_DECISION -- encodes behavior-table row R16, whose target is
+    unresolved (it diverges from legacy assertion
+    `classes/test_statement.py@2797b5e:5741`, and the accepted inputs disagree
+    on `multiple_match_strategy`).  Currently passes, so it is a guard, not a
+    red requirement.
+
+    tasks.md:1365-1366 -- ambiguity follows only the packet's declared
     strategy.  Two exact candidates with no strategy are ambiguous and
     unmatched; with `first_stable` the first parent in order wins.
     (Behavior-table rows R15/R16.)
