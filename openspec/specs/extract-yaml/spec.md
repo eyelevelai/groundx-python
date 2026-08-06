@@ -111,6 +111,15 @@ create or update.
   `extraction_policy_version: v1` is present
 - **AND** preparation fails clearly when that marker is absent.
 
+#### Scenario: Versionless output aliases fail fast
+
+- **GIVEN** authored YAML uses `final_value_aliases` without top-level
+  `extraction_policy_version: v1`
+- **WHEN** the SDK prepares the YAML
+- **THEN** preparation fails with an error that names `final_value_aliases` and
+  requires explicit v1 YAML
+- **AND** the author must use final field names in the explicit v1 definition.
+
 #### Scenario: Persisted workflow extract is not guessed from simple groups
 
 - **GIVEN** a mapping contains simple extraction group keys that could be either

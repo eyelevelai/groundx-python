@@ -156,20 +156,32 @@ def reassemble_custom_outputs_from_xray(
                 route_map,
                 step_kinds=step_kinds,
             ):
-                if _is_empty_output(route_value.value):
-                    continue
-                route_hits[route_index] = True
                 pointer = final_path
-                if route_value.repeated:
-                    _record_repeated_group_path(
-                        repeated_group_paths,
-                        pointer,
-                    )
                 record_key = (
                     *route_container.identity,
                     route_map.get("step_name"),
                     route_value.record_index,
                 )
+                if _is_empty_output(route_value.value):
+                    if route_value.repeated and route_value.conflicts:
+                        _set_pointer(
+                            final_output,
+                            f"{pointer}{_CONFLICTS_SIBLING_SUFFIX}",
+                            copy.deepcopy(route_value.conflicts),
+                            repeated_records=repeated_records,
+                            record_key=record_key,
+                            route=route_map,
+                            page_numbers=route_container.page_numbers,
+                            scalar_candidates=scalar_candidates,
+                            diagnostics=diagnostics,
+                        )
+                    continue
+                route_hits[route_index] = True
+                if route_value.repeated:
+                    _record_repeated_group_path(
+                        repeated_group_paths,
+                        pointer,
+                    )
                 _set_workflow_value(
                     workflow_output,
                     route_map,
@@ -290,8 +302,8 @@ def select_relationship_parent(
       whose ignored (removed) field carries conflict state -- read from the
       generic ``<field>__conflicts`` record sibling -- is rejected.  Only a
       unique surviving candidate wins; anything else stays unmatched.
-    * Value comparison is case-insensitive and int/float-normalized and does
-      NOT strip whitespace (legacy ``ExtractedField.equal_to_value``).
+    * String comparison trims only leading and trailing whitespace before
+      case-insensitive comparison. Ints and floats remain number-normalized.
     """
     no_selection = RelationshipParentSelection(parent=None, ambiguous=False)
     if not isinstance(relationship, typing.Mapping):
@@ -1906,12 +1918,11 @@ def _relationship_value_absent(value: typing.Any) -> bool:
 def _relationship_comparison_value(value: typing.Any) -> typing.Any:
     """Normalize a match value for relationship comparison.
 
-    Ports legacy `ExtractedField.equal_to_value`
-    (`src/groundx/extract/classes/field.py:76-90`): strings compare
-    case-insensitively WITHOUT whitespace stripping, ints and floats compare as
-    numbers, and differently-typed values never compare equal.  Booleans stay
-    distinct from numbers, and structured values compare structurally with the
-    same string normalization.
+    Strings trim only their leading and trailing whitespace before
+    case-insensitive comparison. Ints and floats compare as numbers, and
+    differently-typed values never compare equal. Booleans stay distinct from
+    numbers, and structured values compare structurally with the same string
+    normalization.
     """
     unwrapped = _unwrap_match_value(value)
     if isinstance(unwrapped, bool):
@@ -1921,7 +1932,7 @@ def _relationship_comparison_value(value: typing.Any) -> typing.Any:
     if isinstance(unwrapped, numbers.Real):
         return ("number", float(unwrapped))
     if isinstance(unwrapped, str):
-        return ("string", unwrapped.lower())
+        return ("string", unwrapped.strip().casefold())
     if isinstance(unwrapped, typing.Mapping):
         mapping = typing.cast(typing.Mapping[typing.Any, typing.Any], unwrapped)
         return (

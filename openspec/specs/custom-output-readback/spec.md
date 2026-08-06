@@ -321,12 +321,15 @@ selection = select_relationship_parent(parents, child, relationship)
 - **AND** the convention is read-side only: the SDK consumes
   `<field>__conflicts` for selection and defines no policy for writing it.
 
-Reassembly transport of `<field>__conflicts` on a field whose own value is empty
-is an **open ruling** (V4). Reassembly drops the sibling when the field's value
-is empty, so such a parent is not rejected, while a directly supplied sibling is
-rejected as specified above. No producer writes `<field>__conflicts` into custom
-output today, so no workflow reaches this difference; it is unresolved and routed
-to the fixture promotion tasks rather than pinned here.
+#### Scenario: Empty routed values retain non-empty conflict siblings
+
+- **GIVEN** a repeated custom-output record has an empty routed field value and
+  a non-empty `<field>__conflicts` sibling
+- **WHEN** the SDK reassembles custom output
+- **THEN** it omits the empty field value
+- **AND** it retains the conflict sibling on the same final record
+- **AND** fallback parent selection consumes that sibling exactly as it would
+  when supplied directly.
 
 ### Requirement: Relationship metadata is prepared and persisted with workflow metadata
 

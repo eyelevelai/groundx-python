@@ -398,7 +398,7 @@ def test_persisted_canonical_v1_rejects_output_aliases() -> None:
         _prepare(persisted)
 
 
-def test_pure_legacy_preserves_output_aliases_as_metadata() -> None:
+def test_versionless_authored_yaml_rejects_output_aliases() -> None:
     raw = """
 statement:
   final_value_aliases:
@@ -410,16 +410,11 @@ statement:
         type: str
 """
 
-    prepared = prepare_extraction_yaml(raw)
-    reloaded = prepare_extraction_yaml(
-        json.loads(json.dumps(prepared.persisted_workflow_extract))
-    )
-    expected = {
-        "statement_period_start_date": "measurement_period_start_date"
-    }
-
-    assert prepared.final_group_metadata["statement"]["final_value_aliases"] == expected
-    assert reloaded.final_group_metadata["statement"]["final_value_aliases"] == expected
+    with pytest.raises(
+        ValueError,
+        match="final_value_aliases.*extraction_policy_version: v1",
+    ):
+        prepare_extraction_yaml(raw)
 
 
 def test_persisted_workflow_extract_round_trips_pseudo_group_metadata() -> None:

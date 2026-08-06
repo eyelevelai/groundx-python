@@ -382,14 +382,16 @@ def _reject_v1_output_aliases(
     *,
     is_persisted: bool,
 ) -> None:
-    if data.get(_EXTRACTION_POLICY_VERSION_KEY) != "v1":
-        return
-
-    source = "persisted canonical v1" if is_persisted else "authored v1"
     for group_name, group in data.items():
         if group_name in _RESERVED_TOP_LEVEL_KEYS or not isinstance(group, dict):
             continue
         if "final_value_aliases" in group:
+            if data.get(_EXTRACTION_POLICY_VERSION_KEY) != "v1":
+                raise ValueError(
+                    "final_value_aliases requires extraction_policy_version: v1; "
+                    "authored field names are final output names"
+                )
+            source = "persisted canonical v1" if is_persisted else "authored v1"
             raise ValueError(
                 f"final_value_aliases is not supported in {source} extraction YAML; "
                 "authored field names are final output names"

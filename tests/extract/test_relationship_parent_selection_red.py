@@ -429,22 +429,15 @@ BEHAVIOR_TABLE: typing.Tuple[Row, ...] = (
         "equal); groundx/extract/classes/field.py:85-90 lowercases both sides",
     ),
     _row(
-        "R25b_whitespace_is_NOT_trimmed_in_legacy",
+        "R25b_whitespace_is_trimmed_before_comparison",
         [{_M: " 12 ", _P: "Test", _S: "water"}],
         {_M: "12", _P: "Test", _S: "water"},
-        None,
-        "none",
-        "PENDING_DECISION -- asserts the LEGACY outcome, which is UNMATCHED. "
-        "groundx/extract/classes/field.py:76-90 lowercases and int/float-normalizes "
-        "but does NOT strip, so ' 12 ' != '12'; the exact pass fails on M and the "
-        "fallback fails too because M is a stable attr. Internal Arcadia DOES trim "
-        f"in a different primitive ({_IMPL}:3852-3856 `_identity_key_value`), but "
-        "get_charge_meter never calls it. The SDK's own _normalize_match_value "
-        "(src/groundx/extract/custom_outputs.py:1703-1706) DOES strip, so building "
-        "the primitive on it would flip this row to matched. tasks.md:1366-1367 "
-        "'Do not generalize beyond the source cases' forbids adopting trimming "
-        "silently. Plan-owner question: legacy-exact or SDK-superset?",
-        provenance=PENDING,
+        0,
+        "exact",
+        "R25b ratified 2026-08-05: trim only surrounding string whitespace "
+        "before case-insensitive comparison; internal whitespace remains "
+        "significant. See custom-output-readback/spec.md relationship semantics.",
+        provenance=RATIFIED,
     ),
     # --- conflict handling is scoped to the ignored fields only -----------
     _row(
