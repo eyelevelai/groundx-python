@@ -2517,7 +2517,7 @@ client.groups.remove_bucket(
 <dl>
 <dd>
 
-Get all workflows associated with the API key.
+List workflow IDs, names, update times, and attachments. Use GET /v1/workflow/{id} to get the full workflow.
 </dd>
 </dl>
 </dd>

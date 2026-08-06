@@ -39,7 +39,7 @@ class WorkflowsClient:
 
     def list(self, *, request_options: typing.Optional[RequestOptions] = None) -> WorkflowsResponse:
         """
-        Get all workflows associated with the API key.
+        List workflow IDs, names, update times, and attachments. Use GET /v1/workflow/{id} to get the full workflow.
 
         Parameters
         ----------
@@ -554,7 +554,7 @@ class AsyncWorkflowsClient:
 
     async def list(self, *, request_options: typing.Optional[RequestOptions] = None) -> WorkflowsResponse:
         """
-        Get all workflows associated with the API key.
+        List workflow IDs, names, update times, and attachments. Use GET /v1/workflow/{id} to get the full workflow.
 
         Parameters
         ----------
