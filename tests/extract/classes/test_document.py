@@ -123,6 +123,62 @@ invoice:
 """
 
 
+CUSTOM_COMPLETE_PATH_WORKFLOW_YAML = """
+extraction_policy_version: v1
+
+workflow:
+  custom_steps:
+    - name: root_fields_step
+      level: chunk
+      kind: instruct
+    - name: grouped_fields_step
+      level: chunk
+      kind: instruct
+    - name: repeated_fields_step
+      level: chunk
+      kind: keys
+
+root_fields:
+  workflow_step: root_fields_step
+  output_scope: document_root
+  fields:
+    root_scalar:
+      workflow_output_key: root_scalar
+      prompt:
+        instructions: Return the root scalar.
+        type: str
+    root_object:
+      fields:
+        root_nested:
+          workflow_output_key: root_nested
+          prompt:
+            instructions: Return the nested root value.
+            type: str
+
+grouped_fields:
+  workflow_step: grouped_fields_step
+  fields:
+    grouped_object:
+      fields:
+        grouped_nested:
+          workflow_output_key: grouped_nested
+          prompt:
+            instructions: Return the grouped nested value.
+            type: str
+
+repeated_fields:
+  workflow_step: repeated_fields_step
+  fields:
+    repeated_object:
+      fields:
+        repeated_nested:
+          workflow_output_key: repeated_nested
+          prompt:
+            instructions: Return each repeated nested value.
+            type: str
+"""
+
+
 def DR(**data: typing.Any) -> DocumentRequest:
     return DocumentRequest.model_validate(data)
 
@@ -142,9 +198,7 @@ def _make_request() -> DocumentRequest:
 
 class TestDocument(unittest.TestCase):
     def setUp(self) -> None:
-        patcher = patch(
-            "groundx.extract.classes.document.GroundXDocument.xray", autospec=True
-        )
+        patcher = patch("groundx.extract.classes.document.GroundXDocument.xray", autospec=True)
         self.mock_xray = patcher.start()
         self.addCleanup(patcher.stop)
         self.mock_xray.return_value = TestXRay("http://test.co", [])
@@ -158,9 +212,7 @@ class TestDocument(unittest.TestCase):
         st2: Document = Document.from_request(
             base_url="",
             cache_dir=Path("./cache"),
-            req=DR(
-                documentID="D", fileName="F.pdf", modelID=1, processorID=1, taskID="T"
-            ),
+            req=DR(documentID="D", fileName="F.pdf", modelID=1, processorID=1, taskID="T"),
             prompt_manager=manager,
         )
         self.assertEqual(st2.invoice_name, "F.pdf")
@@ -360,23 +412,11 @@ class TestDocument(unittest.TestCase):
                         "chunkKeywords": '{"fixed_chunk":"yes"}',
                         "sectionSummary": '{"fixed_section":"yes"}',
                         "fileSummary": '{"fixed_file":"yes"}',
-                        "customChunkOutputs": {
-                            "line_item_labels": {
-                                "label": {"custom_chunk": "Water service"}
-                            }
-                        },
-                        "customSectionOutputs": {
-                            "section_codes": {
-                                "code": {"custom_section": "UTILITY"}
-                            }
-                        },
+                        "customChunkOutputs": {"line_item_labels": {"label": {"custom_chunk": "Water service"}}},
+                        "customSectionOutputs": {"section_codes": {"code": {"custom_section": "UTILITY"}}},
                     }
                 ],
-                "customDocumentOutputs": {
-                    "document_flags": {
-                        "needs_review": {"custom_document": False}
-                    }
-                },
+                "customDocumentOutputs": {"document_flags": {"needs_review": {"custom_document": False}}},
                 "documentPages": [],
                 "sourceUrl": "https://example.com/doc.pdf",
             }
@@ -425,12 +465,16 @@ class TestDocument(unittest.TestCase):
         self.assertNotIn("label", doc.fields)
         self.assertIn("line_items", doc.fields)
         line_items = doc.fields["line_items"]
-        self.assertIsInstance(line_items, Group)
-        if isinstance(line_items, Group):
-            description = line_items.fields["description"]
-            self.assertIsInstance(description, ExtractedField)
-            if isinstance(description, ExtractedField):
-                self.assertEqual(description.value, "Water service")
+        self.assertIsInstance(line_items, list)
+        if isinstance(line_items, list):
+            self.assertEqual(len(line_items), 1)
+            item = line_items[0]
+            self.assertIsInstance(item, Group)
+            if isinstance(item, Group):
+                description = item.fields["description"]
+                self.assertIsInstance(description, ExtractedField)
+                if isinstance(description, ExtractedField):
+                    self.assertEqual(description.value, "Water service")
 
     def test_document_routes_repeated_custom_outputs_to_one_row(self) -> None:
         source = TestSource(CUSTOM_REPEATED_WORKFLOW_YAML)
@@ -477,6 +521,82 @@ class TestDocument(unittest.TestCase):
                         charge.fields["amount"],
                         ExtractedField(value=12.34),
                     )
+
+    def test_document_reassembles_complete_compiled_destination_trees(self) -> None:
+        source = TestSource(CUSTOM_COMPLETE_PATH_WORKFLOW_YAML)
+        manager = PromptManager(cache_source=source, config_source=source)
+        xray = XRayDocument.model_validate(
+            {
+                "chunks": [
+                    {
+                        "customChunkOutputs": {
+                            "root_fields_step": {
+                                "root_scalar": "root scalar",
+                                "root_nested": "root nested",
+                            },
+                            "grouped_fields_step": {
+                                "grouped_nested": "grouped nested",
+                            },
+                            "repeated_fields_step": {
+                                "_records": [
+                                    {"repeated_nested": "first"},
+                                    {"repeated_nested": "second"},
+                                ]
+                            },
+                        }
+                    }
+                ],
+                "documentPages": [],
+                "sourceUrl": "https://example.com/doc.pdf",
+            }
+        )
+
+        doc = Document()
+        doc.load_xray(
+            req=_make_request(),
+            xray=xray,
+            prompt_manager=manager,
+        )
+
+        root_scalar = doc.fields["root_scalar"]
+        self.assertIsInstance(root_scalar, ExtractedField)
+        if isinstance(root_scalar, ExtractedField):
+            self.assertEqual(root_scalar.value, "root scalar")
+
+        root_object = doc.fields["root_object"]
+        self.assertIsInstance(root_object, Group)
+        if isinstance(root_object, Group):
+            root_nested = root_object.fields["root_nested"]
+            self.assertIsInstance(root_nested, ExtractedField)
+            if isinstance(root_nested, ExtractedField):
+                self.assertEqual(root_nested.value, "root nested")
+
+        grouped_fields = doc.fields["grouped_fields"]
+        self.assertIsInstance(grouped_fields, Group)
+        if isinstance(grouped_fields, Group):
+            grouped_object = grouped_fields.fields["grouped_object"]
+            self.assertIsInstance(grouped_object, Group)
+            if isinstance(grouped_object, Group):
+                grouped_nested = grouped_object.fields["grouped_nested"]
+                self.assertIsInstance(grouped_nested, ExtractedField)
+                if isinstance(grouped_nested, ExtractedField):
+                    self.assertEqual(grouped_nested.value, "grouped nested")
+
+        repeated_fields = doc.fields["repeated_fields"]
+        self.assertIsInstance(repeated_fields, list)
+        if isinstance(repeated_fields, list):
+            self.assertEqual(len(repeated_fields), 2)
+            repeated_values: typing.List[typing.Any] = []
+            for row in repeated_fields:
+                if not isinstance(row, Group):
+                    continue
+                repeated_object = row.fields.get("repeated_object")
+                if not isinstance(repeated_object, Group):
+                    continue
+                repeated_nested = repeated_object.fields.get("repeated_nested")
+                if isinstance(repeated_nested, ExtractedField):
+                    repeated_values.append(repeated_nested.value)
+            self.assertEqual(repeated_values, ["first", "second"])
 
     def test_document_routes_direct_list_custom_outputs_to_rows(self) -> None:
         source = TestSource(CUSTOM_REPEATED_WORKFLOW_YAML)

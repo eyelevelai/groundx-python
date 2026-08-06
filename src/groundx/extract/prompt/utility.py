@@ -16,8 +16,11 @@ _PERSISTED_WORKFLOW_EXTRACT_KEY = "_groundx_persisted_extract"
 _CUSTOM_WORKFLOW_KEY = "workflow"
 _CUSTOM_WORKFLOW_GROUP_METADATA_KEY = "workflow_step"
 _CUSTOM_WORKFLOW_FIELD_METADATA_KEY = "workflow_output_key"
+_CUSTOM_WORKFLOW_OUTPUT_SCOPE_KEY = "output_scope"
 _CUSTOM_WORKFLOW_METADATA_VERSION = 1
 _CUSTOM_WORKFLOW_MAX_FIELDS = 30
+_CUSTOM_WORKFLOW_REPEATED_KINDS = {"keys", "summary"}
+_CUSTOM_WORKFLOW_OUTPUT_SCOPES = {"document_root"}
 _CUSTOM_WORKFLOW_AGENT_CHAIN_KEY = "agent_chain"
 _CUSTOM_WORKFLOW_OUTPUT_MAPS = {
     "chunk": "customChunkOutputs",
@@ -64,16 +67,41 @@ _SUPPORTED_FINAL_GROUP_METADATA_KEYS = {
     "explanation_attrs",
     "fill_rules",
     "final_value_aliases",
+    "identity_match",
     "match_attrs",
     "not_required_service_types",
     "partial_pair_attrs",
     "passthrough",
     "passthrough_attrs",
+    "passthrough_transform",
     "passthrough_pair_attrs",
     "remaining_attrs",
     "required_any_attrs",
     "required_attrs",
     "unique_attrs",
+}
+_LEGACY_FINAL_GROUP_METADATA_KEYS = {"final_value_aliases"}
+_IDENTITY_MATCH_KEYS = {
+    "threshold_attrs",
+    "activate_threshold_at",
+    "minimum_threshold_matches",
+    "group_attrs",
+    "sort_attrs",
+    "equal_value_shortcuts",
+    "exact_attrs",
+}
+_PASSTHROUGH_TRANSFORM_KEYS = {
+    "status_attr",
+    "provider_attr",
+    "passthrough_provider_attr",
+    "clear_attrs",
+}
+_PASSTHROUGH_KEYS = {
+    "fields",
+    "from",
+    "multiple_match_strategy",
+    "parent_output_field",
+    "unmatched_child_group",
 }
 _UNSUPPORTED_TOP_LEVEL_KEYS = {"domain"}
 _UNSUPPORTED_WORKFLOW_GROUP_KEYS = {"slot"}
@@ -180,7 +208,7 @@ def _nested_metadata_factory() -> typing.Dict[str, typing.Dict[str, typing.Any]]
 @dataclasses.dataclass(frozen=True)
 class FinalFieldPath:
     pointer: str
-    segments: typing.Tuple[str, str]
+    segments: typing.Tuple[str, ...]
 
     @classmethod
     def parse(cls, pointer: str) -> "FinalFieldPath":
@@ -188,13 +216,10 @@ class FinalFieldPath:
             raise ValueError(f"invalid final field path [{pointer}]")
 
         raw_segments = pointer.split("/")[1:]
-        if len(raw_segments) != 2 or any(segment == "" for segment in raw_segments):
+        if not raw_segments or any(segment == "" for segment in raw_segments):
             raise ValueError(f"unsupported final field path [{pointer}]")
 
-        decoded = tuple(
-            _decode_pointer_segment(segment, pointer) for segment in raw_segments
-        )
-        segments = typing.cast(typing.Tuple[str, str], decoded)
+        segments = tuple(_decode_pointer_segment(segment, pointer) for segment in raw_segments)
         return cls(pointer=_encode_pointer(segments), segments=segments)
 
     def to_pointer(self) -> str:
@@ -210,18 +235,14 @@ class PreparedExtractionYaml:
     workflow_groups: typing.Dict[str, typing.Dict[str, typing.Any]]
     pseudo_groups: typing.Dict[str, typing.Dict[str, typing.Any]]
     workflow_field_paths: typing.Dict[str, typing.Dict[str, str]]
-    persisted_workflow_extract: typing.Dict[str, typing.Any] = dataclasses.field(
-        default_factory=_metadata_factory
+    persisted_workflow_extract: typing.Dict[str, typing.Any] = dataclasses.field(default_factory=_metadata_factory)
+    top_level_metadata: typing.Dict[str, typing.Any] = dataclasses.field(default_factory=_metadata_factory)
+    final_group_metadata: typing.Dict[str, typing.Dict[str, typing.Any]] = dataclasses.field(
+        default_factory=_nested_metadata_factory
     )
-    top_level_metadata: typing.Dict[str, typing.Any] = dataclasses.field(
-        default_factory=_metadata_factory
+    workflow_group_metadata: typing.Dict[str, typing.Dict[str, typing.Any]] = dataclasses.field(
+        default_factory=_nested_metadata_factory
     )
-    final_group_metadata: typing.Dict[
-        str, typing.Dict[str, typing.Any]
-    ] = dataclasses.field(default_factory=_nested_metadata_factory)
-    workflow_group_metadata: typing.Dict[
-        str, typing.Dict[str, typing.Any]
-    ] = dataclasses.field(default_factory=_nested_metadata_factory)
 
 
 def _decode_pointer_segment(segment: str, pointer: str) -> str:
@@ -356,6 +377,27 @@ def _reject_unsupported_authored_keys(data: typing.Dict[str, typing.Any]) -> Non
             )
 
 
+def _reject_v1_output_aliases(
+    data: typing.Dict[str, typing.Any],
+    *,
+    is_persisted: bool,
+) -> None:
+    for group_name, group in data.items():
+        if group_name in _RESERVED_TOP_LEVEL_KEYS or not isinstance(group, dict):
+            continue
+        if "final_value_aliases" in group:
+            if data.get(_EXTRACTION_POLICY_VERSION_KEY) != "v1":
+                raise ValueError(
+                    "final_value_aliases requires extraction_policy_version: v1; "
+                    "authored field names are final output names"
+                )
+            source = "persisted canonical v1" if is_persisted else "authored v1"
+            raise ValueError(
+                f"final_value_aliases is not supported in {source} extraction YAML; "
+                "authored field names are final output names"
+            )
+
+
 def _reject_unsupported_workflow_group_keys(
     mapping: typing.Dict[str, typing.Any],
     path: str,
@@ -383,24 +425,21 @@ def _validate_policy_version(
 
     if has_new_yaml_features:
         if data.get(_EXTRACTION_POLICY_VERSION_KEY) != "v1":
-            raise ValueError(
-                "new extraction workflow YAML must set "
-                "extraction_policy_version: v1"
-            )
+            raise ValueError("new extraction workflow YAML must set extraction_policy_version: v1")
         return
 
     if has_version:
-        raise ValueError(
-            "pure legacy extraction YAML must not declare "
-            "extraction_policy_version"
-        )
+        raise ValueError("pure legacy extraction YAML must not declare extraction_policy_version")
 
 
 def _has_supported_policy_metadata(data: typing.Dict[str, typing.Any]) -> bool:
     for key, value in data.items():
         if key in _RESERVED_TOP_LEVEL_KEYS or key in _SUPPORTED_TOP_LEVEL_METADATA_KEYS:
             continue
-        if isinstance(value, dict) and set(value) & _SUPPORTED_FINAL_GROUP_METADATA_KEYS:
+        if isinstance(value, dict) and set(value) & (
+            (_SUPPORTED_FINAL_GROUP_METADATA_KEYS - _LEGACY_FINAL_GROUP_METADATA_KEYS)
+            | {_CUSTOM_WORKFLOW_GROUP_METADATA_KEY, _CUSTOM_WORKFLOW_OUTPUT_SCOPE_KEY}
+        ):
             return True
     return False
 
@@ -410,9 +449,7 @@ def _has_persisted_workflow_metadata(data: typing.Dict[str, typing.Any]) -> bool
     return isinstance(workflow, dict) and "metadata_version" in workflow
 
 
-def _ensure_fields_mapping(
-    value: typing.Any, path: str
-) -> typing.Dict[str, typing.Any]:
+def _ensure_fields_mapping(value: typing.Any, path: str) -> typing.Dict[str, typing.Any]:
     if value is None:
         return {}
 
@@ -473,14 +510,10 @@ def _is_group_mapping(value: typing.Any) -> bool:
 
 
 def _is_field_mapping(value: typing.Any) -> bool:
-    return isinstance(value, dict) and any(
-        key in value for key in ("prompt", "value")
-    )
+    return isinstance(value, dict) and any(key in value for key in ("prompt", "value"))
 
 
-def _validate_prompt_shapes_in_fields(
-    fields: typing.Dict[str, typing.Any], path: str
-) -> None:
+def _validate_prompt_shapes_in_fields(fields: typing.Dict[str, typing.Any], path: str) -> None:
     for field_name, field_value in fields.items():
         field_path = f"{path}.{field_name}"
         if isinstance(field_value, list):
@@ -491,9 +524,7 @@ def _validate_prompt_shapes_in_fields(
                 _validate_prompt_shape(item_mapping, item_path)
                 if "fields" in item_mapping:
                     _validate_prompt_shapes_in_fields(
-                        _ensure_fields_mapping(
-                            item_mapping.get("fields"), f"{item_path}.fields"
-                        ),
+                        _ensure_fields_mapping(item_mapping.get("fields"), f"{item_path}.fields"),
                         item_path,
                     )
         elif isinstance(field_value, dict):
@@ -501,17 +532,13 @@ def _validate_prompt_shapes_in_fields(
             _validate_prompt_shape(field_mapping, field_path)
             if "fields" in field_mapping:
                 _validate_prompt_shapes_in_fields(
-                    _ensure_fields_mapping(
-                        field_mapping.get("fields"), f"{field_path}.fields"
-                    ),
+                    _ensure_fields_mapping(field_mapping.get("fields"), f"{field_path}.fields"),
                     field_path,
                 )
             elif not _is_field_mapping(field_mapping):
                 _validate_prompt_shapes_in_fields(field_mapping, field_path)
         else:
-            raise ValueError(
-                f"Unexpected YAML node type for field [{field_path}]: {type(field_value)}"
-            )
+            raise ValueError(f"Unexpected YAML node type for field [{field_path}]: {type(field_value)}")
 
 
 def _validate_group_shape(group: typing.Dict[str, typing.Any], path: str) -> None:
@@ -563,9 +590,7 @@ def _compose_def_fields(
     fragment = _ensure_mapping(defs[name], f"_defs.{name}")
     unsupported = set(fragment.keys()) - {"include", "fields"}
     if unsupported:
-        raise ValueError(
-            f"unsupported _defs keys at [_defs.{name}]: {sorted(unsupported)}"
-        )
+        raise ValueError(f"unsupported _defs keys at [_defs.{name}]: {sorted(unsupported)}")
 
     fields: typing.Dict[str, typing.Any] = {}
     for include_name in _normalize_include(fragment.get("include"), f"_defs.{name}.include"):
@@ -622,9 +647,146 @@ def _split_metadata(
     return body, metadata
 
 
-def _field_for_workflow(
-    field: typing.Dict[str, typing.Any], workflow_field_name: str
-) -> typing.Dict[str, typing.Any]:
+def _metadata_string_list(value: typing.Any, path: str) -> typing.List[str]:
+    if not isinstance(value, list) or not all(isinstance(item, str) and item for item in value):
+        raise ValueError(f"[{path}] must be a list of non-empty strings")
+    return typing.cast(typing.List[str], value)
+
+
+def _validate_object_array_metadata(
+    group_name: str,
+    group: typing.Mapping[str, typing.Any],
+    metadata: typing.Mapping[str, typing.Any],
+) -> None:
+    fields = _ensure_fields_mapping(group.get("fields"), f"{group_name}.fields")
+    field_names = set(fields)
+
+    unique_attrs_value = metadata.get("unique_attrs", [])
+    unique_attrs = set(
+        _metadata_string_list(unique_attrs_value, f"{group_name}.unique_attrs") if "unique_attrs" in metadata else []
+    )
+    missing_unique_attrs = unique_attrs - field_names
+    if missing_unique_attrs:
+        raise ValueError(
+            f"unique_attrs fields must exist in group [{group_name}]: "
+            + ", ".join(sorted(missing_unique_attrs))
+        )
+
+    passthrough_value = metadata.get("passthrough")
+    if passthrough_value is not None:
+        if not isinstance(passthrough_value, dict):
+            raise ValueError(f"[{group_name}.passthrough] must be a mapping")
+        passthrough = typing.cast(typing.Mapping[str, typing.Any], passthrough_value)
+        unsupported = set(passthrough) - _PASSTHROUGH_KEYS
+        if unsupported:
+            raise ValueError(
+                f"unsupported passthrough keys in group [{group_name}]: "
+                f"{sorted(unsupported)}"
+            )
+        for key in ("from", "parent_output_field", "unmatched_child_group"):
+            if key in passthrough and not (
+                isinstance(passthrough[key], str) and passthrough[key]
+            ):
+                raise ValueError(
+                    f"[{group_name}.passthrough.{key}] must be a non-empty string"
+                )
+        multiple_match_strategy = passthrough.get("multiple_match_strategy")
+        if multiple_match_strategy is not None and multiple_match_strategy != "first_stable":
+            raise ValueError(
+                f"[{group_name}.passthrough.multiple_match_strategy] "
+                "must be [first_stable]"
+            )
+
+    identity_match_value = metadata.get("identity_match")
+    if identity_match_value is not None:
+        if not isinstance(identity_match_value, dict):
+            raise ValueError(f"[{group_name}.identity_match] must be a mapping")
+        identity_match = typing.cast(typing.Mapping[str, typing.Any], identity_match_value)
+        unsupported = set(identity_match) - _IDENTITY_MATCH_KEYS
+        if unsupported:
+            raise ValueError(f"unsupported identity_match keys in group [{group_name}]: {sorted(unsupported)}")
+
+        attr_lists: typing.Dict[str, typing.List[str]] = {}
+        for key in ("threshold_attrs", "group_attrs", "sort_attrs", "exact_attrs"):
+            attr_lists[key] = (
+                _metadata_string_list(identity_match[key], f"{group_name}.identity_match.{key}")
+                if key in identity_match
+                else []
+            )
+
+        shortcuts_value = identity_match.get("equal_value_shortcuts", {})
+        if not isinstance(shortcuts_value, dict):
+            raise ValueError(f"[{group_name}.identity_match.equal_value_shortcuts] must be a mapping")
+        shortcuts = typing.cast(typing.Mapping[typing.Any, typing.Any], shortcuts_value)
+        if not all(isinstance(attr, str) and attr for attr in shortcuts):
+            raise ValueError("identity_match shortcut attributes must be non-empty strings")
+        if not all(
+            isinstance(values, list) and all(isinstance(value, str) for value in values)
+            for values in shortcuts.values()
+        ):
+            raise ValueError("identity_match equal_value_shortcuts values must be lists of strings")
+
+        referenced_attrs = set().union(*attr_lists.values(), shortcuts.keys())
+        missing_fields = referenced_attrs - field_names
+        if missing_fields:
+            raise ValueError(
+                f"identity_match attributes must exist in group [{group_name}]: "
+                + ", ".join(sorted(typing.cast(typing.Set[str], missing_fields)))
+            )
+        unique_identity_attrs = set().union(
+            attr_lists["exact_attrs"],
+            attr_lists["group_attrs"],
+            attr_lists["sort_attrs"],
+        )
+        undeclared_identity = unique_identity_attrs - unique_attrs
+        if undeclared_identity:
+            raise ValueError(
+                "identity_match attributes must also be declared in unique_attrs: "
+                + ", ".join(sorted(typing.cast(typing.Set[str], undeclared_identity)))
+            )
+        shortcut_attrs = set(typing.cast(typing.Iterable[str], shortcuts.keys()))
+        if shortcut_attrs - set(attr_lists["threshold_attrs"]):
+            raise ValueError("identity_match shortcut attributes must be threshold_attrs")
+
+        threshold_count = len(attr_lists["threshold_attrs"])
+        for key in ("activate_threshold_at", "minimum_threshold_matches"):
+            value = identity_match.get(key, 0)
+            if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+                raise ValueError(f"identity_match.{key} must be a non-negative integer")
+            if value > threshold_count:
+                raise ValueError(f"identity_match.{key} cannot exceed threshold_attrs")
+
+    transform_value = metadata.get("passthrough_transform")
+    if transform_value is not None:
+        if not isinstance(transform_value, dict):
+            raise ValueError(f"[{group_name}.passthrough_transform] must be a mapping")
+        transform = typing.cast(typing.Mapping[str, typing.Any], transform_value)
+        unsupported = set(transform) - _PASSTHROUGH_TRANSFORM_KEYS
+        if unsupported:
+            raise ValueError(f"unsupported passthrough_transform keys in group [{group_name}]: {sorted(unsupported)}")
+        required = ("status_attr", "provider_attr", "passthrough_provider_attr")
+        if not all(isinstance(transform.get(key), str) and transform.get(key) for key in required):
+            raise ValueError(
+                "passthrough_transform requires non-empty status_attr, provider_attr, and passthrough_provider_attr"
+            )
+        clear_attrs = (
+            _metadata_string_list(
+                transform["clear_attrs"],
+                f"{group_name}.passthrough_transform.clear_attrs",
+            )
+            if "clear_attrs" in transform
+            else []
+        )
+        transform_attrs = {typing.cast(str, transform[key]) for key in required} | set(clear_attrs)
+        missing_fields = transform_attrs - field_names
+        if missing_fields:
+            raise ValueError(
+                f"passthrough_transform attributes must exist in group [{group_name}]: "
+                + ", ".join(sorted(missing_fields))
+            )
+
+
+def _field_for_workflow(field: typing.Dict[str, typing.Any], workflow_field_name: str) -> typing.Dict[str, typing.Any]:
     field = _copy_mapping(field)
     prompt = field.get("prompt")
     if isinstance(prompt, dict):
@@ -649,16 +811,36 @@ def _resolve_final_field(
     groups: typing.Dict[str, typing.Dict[str, typing.Any]],
     final_path: FinalFieldPath,
 ) -> typing.Tuple[
-    typing.Tuple[str],
+    typing.Tuple[str, ...],
     typing.Dict[str, typing.Any],
     str,
     typing.Dict[str, typing.Any],
 ]:
-    root, field_name = final_path.segments
+    root, *remaining = final_path.segments
+    if not remaining:
+        raise ValueError(f"unknown final field path [{final_path}]")
     if root not in groups:
         raise ValueError(f"unknown final field path [{final_path}]")
 
     parent_group = groups[root]
+    parent_path = [root]
+    for segment in remaining[:-1]:
+        parent_path.append(segment)
+        if segment == "*":
+            continue
+        fields = _ensure_fields_mapping(parent_group.get("fields"), f"{'.'.join(parent_path[:-1])}.fields")
+        node = fields.get(segment)
+        if isinstance(node, list) and len(node) == 1 and isinstance(node[0], dict):
+            parent_group = typing.cast(typing.Dict[str, typing.Any], node[0])
+            continue
+        if isinstance(node, dict):
+            node_mapping = typing.cast(typing.Dict[str, typing.Any], node)
+            if _is_group_mapping(node_mapping) and not _is_field_mapping(node_mapping):
+                parent_group = node_mapping
+                continue
+        raise ValueError(f"unknown final field path [{final_path}]")
+
+    field_name = remaining[-1]
     fields = _ensure_fields_mapping(parent_group.get("fields"), f"{root}.fields")
     if field_name not in fields:
         raise ValueError(f"unknown final field path [{final_path}]")
@@ -671,18 +853,37 @@ def _resolve_final_field(
     if _is_group_mapping(node_mapping) and not _is_field_mapping(node_mapping):
         raise ValueError(f"final field path points to a group [{final_path}]")
 
-    return (root,), parent_group, field_name, node_mapping
+    return tuple(parent_path), parent_group, field_name, node_mapping
 
 
 def _remove_final_field_path(
     groups: typing.Dict[str, typing.Dict[str, typing.Any]],
     final_path: FinalFieldPath,
 ) -> None:
-    root, field_name = final_path.segments
+    root, *remaining = final_path.segments
+    if not remaining:
+        return
     if root not in groups:
         return
 
-    fields = _ensure_fields_mapping(groups[root].get("fields"), f"{root}.fields")
+    parent_group = groups[root]
+    for segment in remaining[:-1]:
+        if segment == "*":
+            continue
+        fields = _ensure_fields_mapping(parent_group.get("fields"), f"{root}.fields")
+        node = fields.get(segment)
+        if isinstance(node, list) and len(node) == 1 and isinstance(node[0], dict):
+            parent_group = typing.cast(typing.Dict[str, typing.Any], node[0])
+            continue
+        if isinstance(node, dict):
+            node_mapping = typing.cast(typing.Dict[str, typing.Any], node)
+            if _is_group_mapping(node_mapping) and not _is_field_mapping(node_mapping):
+                parent_group = node_mapping
+                continue
+        return
+
+    field_name = remaining[-1]
+    fields = _ensure_fields_mapping(parent_group.get("fields"), f"{root}.fields")
     fields.pop(field_name, None)
 
 
@@ -722,9 +923,9 @@ def _collect_field_paths(
                 )
             elif not _is_field_mapping(field_mapping):
                 for inner_name in field_mapping:
-                    routes[
-                        ".".join([*prefix, field_name, inner_name])
-                    ] = _encode_pointer((final_group_name, *prefix, field_name, inner_name))
+                    routes[".".join([*prefix, field_name, inner_name])] = _encode_pointer(
+                        (final_group_name, *prefix, field_name, inner_name)
+                    )
             else:
                 routes[workflow_key] = final_path
         else:
@@ -734,12 +935,9 @@ def _collect_field_paths(
 
 
 def _build_identity_route_map(
-    groups: typing.Dict[str, typing.Dict[str, typing.Any]]
+    groups: typing.Dict[str, typing.Dict[str, typing.Any]],
 ) -> typing.Dict[str, typing.Dict[str, str]]:
-    return {
-        group_name: _collect_field_paths(group, group_name)
-        for group_name, group in groups.items()
-    }
+    return {group_name: _collect_field_paths(group, group_name) for group_name, group in groups.items()}
 
 
 def _without_unset_metadata(
@@ -774,15 +972,11 @@ def _normalize_workflow_template(value: typing.Any) -> typing.Dict[str, str]:
     template = _ensure_mapping(value, f"{_CUSTOM_WORKFLOW_KEY}.template")
     normalized: typing.Dict[str, str] = {}
     for raw_key, raw_value in template.items():
-        key = _normalize_template_key(
-            raw_key, f"{_CUSTOM_WORKFLOW_KEY}.template.{raw_key}"
-        )
+        key = _normalize_template_key(raw_key, f"{_CUSTOM_WORKFLOW_KEY}.template.{raw_key}")
         if key in normalized:
             raise ValueError(f"duplicate template key [{key}] after normalization")
         if not isinstance(raw_value, str):
-            raise ValueError(
-                f"Expected string template value at [{_CUSTOM_WORKFLOW_KEY}.template.{raw_key}]"
-            )
+            raise ValueError(f"Expected string template value at [{_CUSTOM_WORKFLOW_KEY}.template.{raw_key}]")
         normalized[key] = raw_value
 
     return normalized
@@ -809,9 +1003,7 @@ def _validate_agent_chain(
 ) -> None:
     first_stage = raw_chain[0]
     if not isinstance(first_stage, dict) or set(first_stage.keys()) != {"parallel"}:
-        raise ValueError(
-            f"{_CUSTOM_WORKFLOW_KEY}.agent_chain must start with a parallel stage"
-        )
+        raise ValueError(f"{_CUSTOM_WORKFLOW_KEY}.agent_chain must start with a parallel stage")
 
     has_save = False
     serial_start_index = 1
@@ -827,29 +1019,19 @@ def _validate_agent_chain(
             continue
 
         if not isinstance(raw_stage, dict) or set(raw_stage.keys()) != {"parallel"}:
-            raise ValueError(
-                f"{_CUSTOM_WORKFLOW_KEY}.agent_chain stages must be task strings or "
-                "{parallel: [...]}"
-            )
+            raise ValueError(f"{_CUSTOM_WORKFLOW_KEY}.agent_chain stages must be task strings or {{parallel: [...]}}")
         if stage_index != 0:
-            raise ValueError(
-                "workflow.agent_chain parallel stages after the first stage are not supported"
-            )
+            raise ValueError("workflow.agent_chain parallel stages after the first stage are not supported")
 
         raw_branches = raw_stage["parallel"]
         if not isinstance(raw_branches, list) or not raw_branches:
-            raise ValueError(
-                f"{_CUSTOM_WORKFLOW_KEY}.agent_chain parallel stage must have branches"
-            )
+            raise ValueError(f"{_CUSTOM_WORKFLOW_KEY}.agent_chain parallel stage must have branches")
 
         branch_terminal_saves: typing.List[bool] = []
         branch_suffixes: typing.List[str] = []
 
         for branch_index, raw_branch in enumerate(raw_branches):
-            path = (
-                f"{_CUSTOM_WORKFLOW_KEY}.agent_chain"
-                f"[{stage_index}].parallel[{branch_index}]"
-            )
+            path = f"{_CUSTOM_WORKFLOW_KEY}.agent_chain[{stage_index}].parallel[{branch_index}]"
             if not isinstance(raw_branch, dict):
                 raise ValueError(f"{path} must be a mapping")
             if set(raw_branch.keys()) != {"group", "chain"}:
@@ -865,22 +1047,14 @@ def _validate_agent_chain(
             chain = raw_branch["chain"]
             if not isinstance(chain, list) or not chain:
                 raise ValueError(f"{path}.chain must be a non-empty list")
-            parsed_chain = [
-                _validate_agent_chain_task(task, f"{path}.chain")
-                for task in chain
-            ]
-            if any(
-                task in _CUSTOM_WORKFLOW_AGENT_CHAIN_SAVE_TASKS
-                for task in parsed_chain[:-1]
-            ):
+            parsed_chain = [_validate_agent_chain_task(task, f"{path}.chain") for task in chain]
+            if any(task in _CUSTOM_WORKFLOW_AGENT_CHAIN_SAVE_TASKS for task in parsed_chain[:-1]):
                 raise ValueError(f"{path}.chain save task must be last")
             suffixes = {_agent_chain_task_suffix(task) for task in parsed_chain}
             if len(suffixes) != 1:
                 raise ValueError(f"{path}.chain must use one processing suffix")
             branch_suffixes.append(suffixes.pop())
-            branch_terminal_saves.append(
-                parsed_chain[-1] in _CUSTOM_WORKFLOW_AGENT_CHAIN_SAVE_TASKS
-            )
+            branch_terminal_saves.append(parsed_chain[-1] in _CUSTOM_WORKFLOW_AGENT_CHAIN_SAVE_TASKS)
 
         terminal_save = _agent_chain_following_save_task(raw_chain, stage_index)
         if any(branch_terminal_saves):
@@ -907,8 +1081,7 @@ def _validate_agent_chain(
             for suffix in branch_suffixes:
                 if suffix != terminal_suffix:
                     raise ValueError(
-                        "workflow.agent_chain parallel branch processing suffix "
-                        "must match following save task"
+                        "workflow.agent_chain parallel branch processing suffix must match following save task"
                     )
 
     if not has_save:
@@ -931,25 +1104,20 @@ def _validate_agent_chain_serial_tasks(
         path = f"{_CUSTOM_WORKFLOW_KEY}.agent_chain[{stage_index}]"
         task = _validate_agent_chain_task(raw_chain[stage_index], path)
         if task in _CUSTOM_WORKFLOW_AGENT_CHAIN_SAVE_TASKS:
-            raise ValueError(
-                f"{path} top-level save task [{task}] must follow a matching "
-                "top-level agent task"
-            )
+            raise ValueError(f"{path} top-level save task [{task}] must follow a matching top-level agent task")
 
         expected_save = f"save_{_agent_chain_task_suffix(task)}"
         next_index = stage_index + 1
         if next_index >= len(raw_chain):
             raise ValueError(
-                f"{path} top-level agent task [{task}] must be followed by "
-                f"matching save task [{expected_save}]"
+                f"{path} top-level agent task [{task}] must be followed by matching save task [{expected_save}]"
             )
 
         next_path = f"{_CUSTOM_WORKFLOW_KEY}.agent_chain[{next_index}]"
         next_task = _validate_agent_chain_task(raw_chain[next_index], next_path)
         if next_task != expected_save:
             raise ValueError(
-                f"{path} top-level agent task [{task}] must be followed by "
-                f"matching save task [{expected_save}]"
+                f"{path} top-level agent task [{task}] must be followed by matching save task [{expected_save}]"
             )
         stage_index += 2
 
@@ -964,10 +1132,7 @@ def _validate_agent_chain_group_coverage(
     stage_index = serial_start_index
     while stage_index < len(raw_chain):
         raw_stage = raw_chain[stage_index]
-        if (
-            isinstance(raw_stage, str)
-            and raw_stage in _CUSTOM_WORKFLOW_AGENT_CHAIN_AGENT_TASKS
-        ):
+        if isinstance(raw_stage, str) and raw_stage in _CUSTOM_WORKFLOW_AGENT_CHAIN_AGENT_TASKS:
             suffix = _agent_chain_task_suffix(raw_stage)
             if suffix in workflow_groups:
                 covered_groups.add(suffix)
@@ -978,8 +1143,7 @@ def _validate_agent_chain_group_coverage(
     missing_groups = sorted(workflow_groups - covered_groups)
     if missing_groups:
         raise ValueError(
-            f"{_CUSTOM_WORKFLOW_KEY}.agent_chain does not cover workflow groups "
-            f"[{', '.join(missing_groups)}]"
+            f"{_CUSTOM_WORKFLOW_KEY}.agent_chain does not cover workflow groups [{', '.join(missing_groups)}]"
         )
 
 
@@ -999,10 +1163,7 @@ def _agent_chain_following_save_task(
     if next_index >= len(raw_chain):
         return None
     raw_next = raw_chain[next_index]
-    if (
-        isinstance(raw_next, str)
-        and raw_next in _CUSTOM_WORKFLOW_AGENT_CHAIN_SAVE_TASKS
-    ):
+    if isinstance(raw_next, str) and raw_next in _CUSTOM_WORKFLOW_AGENT_CHAIN_SAVE_TASKS:
         return raw_next
     return None
 
@@ -1042,9 +1203,7 @@ def _normalize_required_template_keys(
     return keys
 
 
-def _normalize_custom_step_config(
-    value: typing.Any, path: str
-) -> typing.Optional[typing.Dict[str, typing.Any]]:
+def _normalize_custom_step_config(value: typing.Any, path: str) -> typing.Optional[typing.Dict[str, typing.Any]]:
     if value is None:
         return None
 
@@ -1053,9 +1212,7 @@ def _normalize_custom_step_config(
     for element_name, raw_element_config in normalized.items():
         if raw_element_config is None:
             continue
-        element_config = _ensure_mapping(
-            raw_element_config, f"{path}.{element_name}"
-        )
+        element_config = _ensure_mapping(raw_element_config, f"{path}.{element_name}")
         if "field" in element_config:
             raise ValueError("custom workflow step config cannot set fixed field")
 
@@ -1137,9 +1294,7 @@ def _custom_workflow_output_map(level: str) -> str:
     return output_map
 
 
-def _custom_workflow_readback_path(
-    level: str, step_name: str, output_key: str
-) -> str:
+def _custom_workflow_readback_path(level: str, step_name: str, output_key: str) -> str:
     output_map = _custom_workflow_output_map(level)
     if level == "document":
         return f"/{output_map}/{step_name}/{output_key}"
@@ -1173,9 +1328,7 @@ def _repetition_scope(segments: typing.Tuple[str, ...]) -> str:
     return _encode_pointer(segments[: idx + 1])
 
 
-def _custom_workflow_field_name(
-    prefix: typing.Tuple[str, ...], field_name: str
-) -> str:
+def _custom_workflow_field_name(prefix: typing.Tuple[str, ...], field_name: str) -> str:
     return ".".join(segment for segment in (*prefix, field_name) if segment != "*")
 
 
@@ -1224,12 +1377,16 @@ def _custom_relationship_identity(relationship: typing.Dict[str, typing.Any]) ->
             relationship["parent_output_field"],
             ",".join(relationship["match_attrs"]),
             relationship.get("unmatched_child_group", ""),
+            relationship.get("multiple_match_strategy", ""),
         ]
     )
 
 
 def _custom_workflow_schema_hash(
-    metadata: typing.Dict[str, typing.Any]
+    metadata: typing.Dict[str, typing.Any],
+    final_group_metadata: typing.Optional[
+        typing.Mapping[str, typing.Mapping[str, typing.Any]]
+    ] = None,
 ) -> str:
     steps: typing.List[typing.Dict[str, typing.Any]] = []
     for step in metadata.get("custom_steps", []):
@@ -1275,14 +1432,34 @@ def _custom_workflow_schema_hash(
             "parent_group": relationship["parent_group"],
             "child_group": relationship["child_group"],
             "parent_output_field": relationship["parent_output_field"],
-            "match_attrs": list(relationship["match_attrs"]),
+            "match_attrs": sorted(relationship["match_attrs"]),
             **(
                 {"unmatched_child_group": relationship["unmatched_child_group"]}
                 if relationship.get("unmatched_child_group")
                 else {}
             ),
+            **(
+                {"multiple_match_strategy": relationship["multiple_match_strategy"]}
+                if relationship.get("multiple_match_strategy")
+                else {}
+            ),
         }
         for relationship in metadata.get("output_relationships", [])
+    ]
+    exact_identity_attrs = [
+        {
+            "group": group_name,
+            "exact_attrs": sorted(identity_match["exact_attrs"]),
+        }
+        for group_name, group_metadata in sorted((final_group_metadata or {}).items())
+        if isinstance(group_metadata.get("identity_match"), typing.Mapping)
+        for identity_match in [
+            typing.cast(
+                typing.Mapping[str, typing.Any],
+                group_metadata["identity_match"],
+            )
+        ]
+        if "exact_attrs" in identity_match
     ]
 
     steps.sort(key=lambda step: step["name"])
@@ -1291,9 +1468,7 @@ def _custom_workflow_schema_hash(
     relationships.sort(key=_custom_relationship_identity)
 
     payload: typing.Dict[str, typing.Any] = {
-        "metadata_version": metadata.get(
-            "metadata_version", _CUSTOM_WORKFLOW_METADATA_VERSION
-        )
+        "metadata_version": metadata.get("metadata_version", _CUSTOM_WORKFLOW_METADATA_VERSION)
     }
     if steps:
         payload["custom_steps"] = steps
@@ -1303,6 +1478,8 @@ def _custom_workflow_schema_hash(
         payload["leaf_fields"] = leaves
     if relationships:
         payload["output_relationships"] = relationships
+    if exact_identity_attrs:
+        payload["exact_identity_attrs"] = exact_identity_attrs
 
     encoded = json.dumps(payload, separators=(",", ":")).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
@@ -1337,13 +1514,9 @@ def _normalize_custom_route(
     if step is None:
         raise ValueError(f"unknown custom step [{normalized['step_name']}]")
     if normalized["level"] != step["level"]:
-        raise ValueError(
-            f"route level [{normalized['level']}] does not match step [{step['name']}]"
-        )
+        raise ValueError(f"route level [{normalized['level']}] does not match step [{step['name']}]")
     if normalized["output_map"] != _custom_workflow_output_map(normalized["level"]):
-        raise ValueError(
-            f"output map [{normalized['output_map']}] does not match level [{normalized['level']}]"
-        )
+        raise ValueError(f"output map [{normalized['output_map']}] does not match level [{normalized['level']}]")
 
     return normalized
 
@@ -1382,9 +1555,7 @@ def _normalize_custom_leaf(
     if step is None:
         raise ValueError(f"unknown custom step [{normalized['step_name']}]")
     if normalized["level"] != step["level"]:
-        raise ValueError(
-            f"leaf level [{normalized['level']}] does not match step [{step['name']}]"
-        )
+        raise ValueError(f"leaf level [{normalized['level']}] does not match step [{step['name']}]")
     if normalized["is_repeated"] and "*" not in segments:
         raise ValueError("repeated leaf field must use a literal * path segment")
     if not normalized["is_repeated"] and normalized["repetition_scope"] != "none":
@@ -1393,18 +1564,44 @@ def _normalize_custom_leaf(
     return normalized
 
 
+# The persisted relationship packet is snake_case; the dispatched packet is
+# camelCase.  Both spellings carry the same seven fields (design.md:394-402).
+_RELATIONSHIP_CAMEL_KEYS = {
+    "parentGroup": "parent_group",
+    "childGroup": "child_group",
+    "parentOutputField": "parent_output_field",
+    "matchAttrs": "match_attrs",
+    "parentPassthroughAttrs": "parent_passthrough_attrs",
+    "unmatchedChildGroup": "unmatched_child_group",
+    "multipleMatchStrategy": "multiple_match_strategy",
+}
+
+
 def _normalize_custom_relationship(
     value: typing.Any,
     idx: int,
 ) -> typing.Dict[str, typing.Any]:
     path = f"{_CUSTOM_WORKFLOW_KEY}.output_relationships[{idx}]"
-    relationship = _ensure_mapping(value, path)
+    relationship = dict(_ensure_mapping(value, path))
+    for camel_key, snake_key in _RELATIONSHIP_CAMEL_KEYS.items():
+        if camel_key in relationship and snake_key not in relationship:
+            relationship[snake_key] = relationship[camel_key]
+
     normalized: typing.Dict[str, typing.Any] = {}
-    for key in ("parent_group", "child_group", "parent_output_field"):
+    for key in ("parent_group", "child_group"):
         raw_value = relationship.get(key)
         if not isinstance(raw_value, str) or raw_value == "":
             raise ValueError(f"custom workflow relationship is missing [{key}]")
         normalized[key] = raw_value
+
+    # design.md:384-388 -- both output names default to the child group name
+    # and do not change matching, identity, or direction.
+    parent_output_field = relationship.get("parent_output_field")
+    if parent_output_field is None:
+        parent_output_field = normalized["child_group"]
+    if not isinstance(parent_output_field, str) or parent_output_field == "":
+        raise ValueError("custom workflow relationship is missing [parent_output_field]")
+    normalized["parent_output_field"] = parent_output_field
 
     match_attrs_raw = relationship.get("match_attrs")
     if not isinstance(match_attrs_raw, list) or not match_attrs_raw:
@@ -1412,21 +1609,40 @@ def _normalize_custom_relationship(
     match_attrs: typing.List[str] = []
     for attr_idx, attr_raw in enumerate(match_attrs_raw):
         if not isinstance(attr_raw, str) or attr_raw == "":
-            raise ValueError(
-                "custom workflow relationship match_attrs "
-                f"[{idx}][{attr_idx}] must be a non-empty string"
-            )
+            raise ValueError(f"custom workflow relationship match_attrs [{idx}][{attr_idx}] must be a non-empty string")
         match_attrs.append(attr_raw)
     normalized["match_attrs"] = match_attrs
 
+    # The related parent's passthrough_attrs travel on the relationship packet
+    # (spec.md:350-352); an empty declaration normalizes to an empty list
+    # (design.md:404) and an absent one stays absent.
+    passthrough_raw = relationship.get("parent_passthrough_attrs")
+    if passthrough_raw is not None:
+        if not isinstance(passthrough_raw, list):
+            raise ValueError("custom workflow relationship parent_passthrough_attrs must be a list")
+        parent_passthrough_attrs: typing.List[str] = []
+        for attr_idx, attr_raw in enumerate(passthrough_raw):
+            if not isinstance(attr_raw, str) or attr_raw == "":
+                raise ValueError(
+                    f"custom workflow relationship parent_passthrough_attrs [{idx}][{attr_idx}] must be a non-empty string"
+                )
+            parent_passthrough_attrs.append(attr_raw)
+        normalized["parent_passthrough_attrs"] = parent_passthrough_attrs
+
     unmatched_raw = relationship.get("unmatched_child_group")
-    if unmatched_raw is not None:
-        if not isinstance(unmatched_raw, str) or unmatched_raw == "":
+    if unmatched_raw is None:
+        unmatched_raw = normalized["child_group"]
+    if not isinstance(unmatched_raw, str) or unmatched_raw == "":
+        raise ValueError("custom workflow relationship unmatched_child_group must be a non-empty string")
+    normalized["unmatched_child_group"] = unmatched_raw
+
+    multiple_match_strategy = relationship.get("multiple_match_strategy")
+    if multiple_match_strategy is not None:
+        if multiple_match_strategy != "first_stable":
             raise ValueError(
-                "custom workflow relationship unmatched_child_group must be a "
-                "non-empty string"
+                "custom workflow relationship multiple_match_strategy must be [first_stable]"
             )
-        normalized["unmatched_child_group"] = unmatched_raw
+        normalized["multiple_match_strategy"] = multiple_match_strategy
 
     return normalized
 
@@ -1439,10 +1655,7 @@ def _normalize_custom_relationships(
     if not isinstance(value, list):
         raise ValueError(f"Expected list at [{_CUSTOM_WORKFLOW_KEY}.output_relationships]")
 
-    return [
-        _normalize_custom_relationship(relationship, idx)
-        for idx, relationship in enumerate(value)
-    ]
+    return [_normalize_custom_relationship(relationship, idx) for idx, relationship in enumerate(value)]
 
 
 def _relationships_from_final_group_metadata(
@@ -1462,20 +1675,49 @@ def _relationships_from_final_group_metadata(
         if not isinstance(parent_group, str) or parent_group == "":
             continue
 
-        relationships.append(
-            {
-                "parent_group": parent_group,
-                "child_group": group_name,
-                "parent_output_field": group_name,
-                "match_attrs": copy.deepcopy(match_attrs),
-                "unmatched_child_group": group_name,
-            }
-        )
+        relationship: typing.Dict[str, typing.Any] = {
+            "parent_group": parent_group,
+            "child_group": group_name,
+            "parent_output_field": passthrough.get(
+                "parent_output_field", group_name
+            ),
+            "match_attrs": copy.deepcopy(match_attrs),
+            "unmatched_child_group": passthrough.get(
+                "unmatched_child_group", group_name
+            ),
+        }
 
-    return [
-        _normalize_custom_relationship(relationship, idx)
-        for idx, relationship in enumerate(relationships)
-    ]
+        # spec.md:350-352 -- the related parent's existing passthrough_attrs
+        # reach the derived relationship packet.
+        parent_metadata = final_group_metadata.get(parent_group)
+        if isinstance(parent_metadata, typing.Mapping):
+            parent_passthrough = parent_metadata.get("passthrough_attrs")
+            if isinstance(parent_passthrough, list):
+                relationship["parent_passthrough_attrs"] = copy.deepcopy(
+                    parent_passthrough
+                )
+
+        multiple_match_strategy = passthrough.get("multiple_match_strategy")
+        if multiple_match_strategy is not None:
+            relationship["multiple_match_strategy"] = multiple_match_strategy
+
+        relationships.append(relationship)
+
+    return [_normalize_custom_relationship(relationship, idx) for idx, relationship in enumerate(relationships)]
+
+
+def _validate_final_path_collisions(
+    items: typing.Iterable[typing.Dict[str, typing.Any]],
+) -> None:
+    paths: typing.List[typing.Tuple[str, typing.Tuple[str, ...]]] = []
+    for item in items:
+        pointer = item["final_path"]
+        segments = _parse_pointer_segments(pointer, "final_path")
+        for other_pointer, other_segments in paths:
+            shared = min(len(segments), len(other_segments))
+            if segments[:shared] == other_segments[:shared]:
+                raise ValueError(f"conflicting final paths [{other_pointer}] and [{pointer}]")
+        paths.append((pointer, segments))
 
 
 def _validate_custom_workflow_routes_and_leaves(
@@ -1493,10 +1735,7 @@ def _validate_custom_workflow_routes_and_leaves(
             raise ValueError(f"duplicate route identity for [{route['final_path']}]")
         destination = (route["step_name"], route["output_key"])
         if destination in route_destinations:
-            raise ValueError(
-                "duplicate output destination "
-                f"[{route['step_name']}.{route['output_key']}]"
-            )
+            raise ValueError(f"duplicate output destination [{route['step_name']}.{route['output_key']}]")
         route_destinations.add(destination)
         route_by_match_key[match_key] = route
         counts[route["step_name"]] = counts.get(route["step_name"], 0) + 1
@@ -1506,6 +1745,9 @@ def _validate_custom_workflow_routes_and_leaves(
         if match_key in leaf_by_match_key:
             raise ValueError(f"duplicate leaf identity for [{leaf['final_path']}]")
         leaf_by_match_key[match_key] = leaf
+
+    _validate_final_path_collisions(routes)
+    _validate_final_path_collisions(leaves)
 
     for match_key, route in route_by_match_key.items():
         if match_key not in leaf_by_match_key:
@@ -1524,33 +1766,24 @@ def _validate_custom_workflow_routes_and_leaves(
     return dict(sorted(counts.items()))
 
 
-def _is_custom_workflow_authoring_metadata(
-    workflow: typing.Dict[str, typing.Any]
-) -> bool:
+def _is_custom_workflow_authoring_metadata(workflow: typing.Dict[str, typing.Any]) -> bool:
     return any(key in workflow for key in _CUSTOM_WORKFLOW_AUTHORING_KEYS)
 
 
-def _is_custom_workflow_persisted_metadata(
-    workflow: typing.Dict[str, typing.Any]
-) -> bool:
+def _is_custom_workflow_persisted_metadata(workflow: typing.Dict[str, typing.Any]) -> bool:
     return any(key in workflow for key in _CUSTOM_WORKFLOW_PERSISTED_KEYS - _CUSTOM_WORKFLOW_AUTHORING_KEYS)
 
 
 def _custom_workflow_input(
-    data: typing.Dict[str, typing.Any]
+    data: typing.Dict[str, typing.Any],
 ) -> typing.Optional[typing.Tuple[str, typing.Dict[str, typing.Any]]]:
     if _CUSTOM_WORKFLOW_KEY not in data:
         return None
 
     workflow = _ensure_mapping(data[_CUSTOM_WORKFLOW_KEY], _CUSTOM_WORKFLOW_KEY)
-    unsupported = set(workflow.keys()) - (
-        _CUSTOM_WORKFLOW_AUTHORING_KEYS | _CUSTOM_WORKFLOW_PERSISTED_KEYS
-    )
+    unsupported = set(workflow.keys()) - (_CUSTOM_WORKFLOW_AUTHORING_KEYS | _CUSTOM_WORKFLOW_PERSISTED_KEYS)
     if unsupported or "fields" in workflow:
-        raise ValueError(
-            "top-level [workflow] is reserved for custom workflow metadata; "
-            "rename the final output group"
-        )
+        raise ValueError("top-level [workflow] is reserved for custom workflow metadata; rename the final output group")
 
     is_persisted = _is_custom_workflow_persisted_metadata(workflow)
     is_authoring = _is_custom_workflow_authoring_metadata(workflow)
@@ -1559,34 +1792,27 @@ def _custom_workflow_input(
     if is_authoring:
         return "authoring", workflow
 
-    raise ValueError(
-        "top-level [workflow] is reserved for custom workflow metadata; "
-        "rename the final output group"
-    )
+    raise ValueError("top-level [workflow] is reserved for custom workflow metadata; rename the final output group")
 
 
 def _normalize_persisted_custom_workflow_metadata(
-    workflow: typing.Dict[str, typing.Any]
+    workflow: typing.Dict[str, typing.Any],
+    final_group_metadata: typing.Mapping[str, typing.Mapping[str, typing.Any]],
 ) -> typing.Dict[str, typing.Any]:
     version = workflow.get("metadata_version")
     if version != _CUSTOM_WORKFLOW_METADATA_VERSION:
         raise ValueError("unsupported custom workflow metadata_version")
 
     template = _normalize_workflow_template(workflow.get("template"))
-    custom_steps, steps_by_name = _normalize_custom_workflow_steps(
-        workflow.get("custom_steps"), template
-    )
+    custom_steps, steps_by_name = _normalize_custom_workflow_steps(workflow.get("custom_steps"), template)
     routes = [
         _normalize_custom_route(route, idx, steps_by_name)
         for idx, route in enumerate(workflow.get("output_routes") or [])
     ]
     leaves = [
-        _normalize_custom_leaf(leaf, idx, steps_by_name)
-        for idx, leaf in enumerate(workflow.get("leaf_fields") or [])
+        _normalize_custom_leaf(leaf, idx, steps_by_name) for idx, leaf in enumerate(workflow.get("leaf_fields") or [])
     ]
-    relationships = _normalize_custom_relationships(
-        workflow.get("output_relationships")
-    )
+    relationships = _normalize_custom_relationships(workflow.get("output_relationships"))
     if custom_steps and (not routes or not leaves):
         raise ValueError(
             "custom workflow steps require output routes and leaf fields; "
@@ -1625,7 +1851,10 @@ def _normalize_persisted_custom_workflow_metadata(
     # (proven live 2026-07-08: harness-dialect stores hard-failed every load).
     # Integrity at read time is the structural validation above; the hash carried
     # forward is this reader's canonical recompute, for downstream use only.
-    metadata["schema_hash"] = _custom_workflow_schema_hash(metadata)
+    metadata["schema_hash"] = _custom_workflow_schema_hash(
+        metadata,
+        final_group_metadata,
+    )
 
     return metadata
 
@@ -1637,6 +1866,7 @@ def _collect_custom_workflow_routes(
     steps_by_name: typing.Dict[str, typing.Dict[str, typing.Any]],
     prefix: typing.Tuple[str, ...] = (),
     document_root: bool = False,
+    repeated_group: bool = False,
 ) -> typing.Tuple[
     typing.List[typing.Dict[str, typing.Any]],
     typing.List[typing.Dict[str, typing.Any]],
@@ -1651,13 +1881,9 @@ def _collect_custom_workflow_routes(
             for item in field_items:
                 item_mapping = _ensure_mapping(item, field_path)
                 if _CUSTOM_WORKFLOW_GROUP_METADATA_KEY in item_mapping:
-                    raise ValueError(
-                        f"field-level workflow_step is not supported at [{field_path}]"
-                    )
+                    raise ValueError(f"field-level workflow_step is not supported at [{field_path}]")
                 if "fields" in item_mapping:
-                    item_fields = _ensure_fields_mapping(
-                        item_mapping.get("fields"), f"{field_path}.fields"
-                    )
+                    item_fields = _ensure_fields_mapping(item_mapping.get("fields"), f"{field_path}.fields")
                     nested_routes, nested_leaves = _collect_custom_workflow_routes(
                         item_fields,
                         group_name,
@@ -1665,6 +1891,7 @@ def _collect_custom_workflow_routes(
                         steps_by_name,
                         (*prefix, field_name, "*"),
                         document_root,
+                        repeated_group,
                     )
                     routes.extend(nested_routes)
                     leaves.extend(nested_leaves)
@@ -1675,15 +1902,11 @@ def _collect_custom_workflow_routes(
 
         field_mapping = typing.cast(typing.Dict[str, typing.Any], field_value)
         if _CUSTOM_WORKFLOW_GROUP_METADATA_KEY in field_mapping:
-            raise ValueError(
-                f"field-level workflow_step is not supported at [{field_path}]"
-            )
+            raise ValueError(f"field-level workflow_step is not supported at [{field_path}]")
         output_key_raw = field_mapping.pop(_CUSTOM_WORKFLOW_FIELD_METADATA_KEY, None)
         if output_key_raw is not None:
             if not step_name:
-                raise ValueError(
-                    f"field [{field_path}] declares workflow_output_key without workflow_step"
-                )
+                raise ValueError(f"field [{field_path}] declares workflow_output_key without workflow_step")
             if not isinstance(step_name, str):
                 raise ValueError(f"workflow_step for [{field_path}] must be a string")
             step = steps_by_name.get(step_name)
@@ -1693,11 +1916,12 @@ def _collect_custom_workflow_routes(
                 output_key_raw,
                 f"{field_path}.{_CUSTOM_WORKFLOW_FIELD_METADATA_KEY}",
             )
-            segments = (
-                (*prefix, field_name)
-                if document_root
-                else (group_name, *prefix, field_name)
-            )
+            if document_root:
+                segments = (*prefix, field_name)
+            elif repeated_group and "*" not in prefix:
+                segments = (group_name, "*", *prefix, field_name)
+            else:
+                segments = (group_name, *prefix, field_name)
             final_path = _encode_pointer(segments)
             level = typing.cast(str, step["level"])
             workflow_field = _custom_workflow_field_name(prefix, field_name)
@@ -1709,9 +1933,7 @@ def _collect_custom_workflow_routes(
                 "level": level,
                 "output_map": _custom_workflow_output_map(level),
                 "output_key": output_key,
-                "readback_path": _custom_workflow_readback_path(
-                    level, step_name, output_key
-                ),
+                "readback_path": _custom_workflow_readback_path(level, step_name, output_key),
             }
             leaf = {
                 "final_path": final_path,
@@ -1728,9 +1950,7 @@ def _collect_custom_workflow_routes(
             leaves.append(leaf)
 
         if _is_group_mapping(field_mapping) and not _is_field_mapping(field_mapping):
-            nested_fields = _ensure_fields_mapping(
-                field_mapping.get("fields"), f"{field_path}.fields"
-            )
+            nested_fields = _ensure_fields_mapping(field_mapping.get("fields"), f"{field_path}.fields")
             nested_routes, nested_leaves = _collect_custom_workflow_routes(
                 nested_fields,
                 group_name,
@@ -1738,6 +1958,7 @@ def _collect_custom_workflow_routes(
                 steps_by_name,
                 (*prefix, field_name),
                 document_root,
+                repeated_group,
             )
             routes.extend(nested_routes)
             leaves.extend(nested_leaves)
@@ -1749,6 +1970,7 @@ def _collect_custom_workflow_routes(
                 steps_by_name,
                 (*prefix, field_name),
                 document_root,
+                repeated_group,
             )
             routes.extend(nested_routes)
             leaves.extend(nested_leaves)
@@ -1756,44 +1978,12 @@ def _collect_custom_workflow_routes(
     return routes, leaves
 
 
-def _agent_chain_group_roles(raw_chain: typing.Any) -> typing.Dict[str, str]:
-    roles: typing.Dict[str, str] = {}
-    if not isinstance(raw_chain, list):
-        return roles
-
-    for raw_stage in raw_chain:
-        if not isinstance(raw_stage, dict) or set(raw_stage.keys()) != {"parallel"}:
-            continue
-        raw_branches = raw_stage["parallel"]
-        if not isinstance(raw_branches, list):
-            continue
-        for raw_branch in raw_branches:
-            if not isinstance(raw_branch, dict):
-                continue
-            group = raw_branch.get("group")
-            chain = raw_branch.get("chain")
-            if not isinstance(group, str) or not isinstance(chain, list):
-                continue
-            suffixes = {
-                _agent_chain_task_suffix(task)
-                for task in chain
-                if isinstance(task, str)
-                and task in _CUSTOM_WORKFLOW_AGENT_CHAIN_SUPPORTED_TASKS
-            }
-            if len(suffixes) == 1:
-                roles[group] = next(iter(suffixes))
-    return roles
-
-
-def _is_document_root_statement_group(
-    group_metadata: typing.Mapping[str, typing.Any],
-    group_role: typing.Optional[str],
-) -> bool:
-    if group_role != "statement":
-        return False
-    return isinstance(group_metadata.get("final_value_aliases"), dict) or isinstance(
-        group_metadata.get("fill_rules"), list
-    )
+def _normalize_output_scope(value: typing.Any, group_name: str) -> str:
+    if value is None:
+        return "grouped"
+    if not isinstance(value, str) or value not in _CUSTOM_WORKFLOW_OUTPUT_SCOPES:
+        raise ValueError(f"unsupported output_scope [{value}] for workflow group [{group_name}]")
+    return value
 
 
 def _collect_pseudo_custom_workflow_routes(
@@ -1823,9 +2013,7 @@ def _collect_pseudo_custom_workflow_routes(
             continue
         field_mapping = typing.cast(typing.Dict[str, typing.Any], field_value)
         if _CUSTOM_WORKFLOW_GROUP_METADATA_KEY in field_mapping:
-            raise ValueError(
-                f"field-level workflow_step is not supported at [{field_path}]"
-            )
+            raise ValueError(f"field-level workflow_step is not supported at [{field_path}]")
         if _CUSTOM_WORKFLOW_FIELD_METADATA_KEY in field_mapping:
             raise ValueError(
                 f"pseudo-routed field [{field_path}] cannot declare "
@@ -1834,9 +2022,7 @@ def _collect_pseudo_custom_workflow_routes(
         output_key = _validate_output_key(workflow_field, field_path)
         final_path = workflow_field_paths.get(workflow_field)
         if final_path is None:
-            raise ValueError(
-                f"pseudo group [{group_name}] has no final path for [{workflow_field}]"
-            )
+            raise ValueError(f"pseudo group [{group_name}] has no final path for [{workflow_field}]")
         level = typing.cast(str, step["level"])
         route = {
             "workflow_group": group_name,
@@ -1846,9 +2032,7 @@ def _collect_pseudo_custom_workflow_routes(
             "level": level,
             "output_map": _custom_workflow_output_map(level),
             "output_key": output_key,
-            "readback_path": _custom_workflow_readback_path(
-                level, step_name, output_key
-            ),
+            "readback_path": _custom_workflow_readback_path(level, step_name, output_key),
         }
         leaf = {
             "final_path": final_path,
@@ -1859,9 +2043,7 @@ def _collect_pseudo_custom_workflow_routes(
             "output_key": output_key,
             "field_type": _field_type(field_mapping),
             "is_repeated": "*" in _parse_pointer_segments(final_path, field_path),
-            "repetition_scope": _repetition_scope(
-                _parse_pointer_segments(final_path, field_path)
-            ),
+            "repetition_scope": _repetition_scope(_parse_pointer_segments(final_path, field_path)),
         }
         routes.append(route)
         leaves.append(leaf)
@@ -1878,21 +2060,15 @@ def _build_authored_custom_workflow_metadata(
     final_group_metadata: typing.Mapping[str, typing.Mapping[str, typing.Any]],
 ) -> typing.Dict[str, typing.Any]:
     template = _normalize_workflow_template(workflow.get("template"))
-    custom_steps, steps_by_name = _normalize_custom_workflow_steps(
-        workflow.get("custom_steps"), template
-    )
+    custom_steps, steps_by_name = _normalize_custom_workflow_steps(workflow.get("custom_steps"), template)
     if not custom_steps:
         raise ValueError("workflow.custom_steps is required for custom workflow metadata")
 
     routes: typing.List[typing.Dict[str, typing.Any]] = []
     leaves: typing.List[typing.Dict[str, typing.Any]] = []
-    agent_chain_group_roles = _agent_chain_group_roles(
-        workflow.get(_CUSTOM_WORKFLOW_AGENT_CHAIN_KEY)
-    )
     for group_name, group in workflow_groups.items():
-        group_step = workflow_group_metadata.get(group_name, {}).get(
-            _CUSTOM_WORKFLOW_GROUP_METADATA_KEY
-        )
+        group_metadata = workflow_group_metadata.get(group_name, {})
+        group_step = group_metadata.get(_CUSTOM_WORKFLOW_GROUP_METADATA_KEY)
         if group_step and group_step not in steps_by_name:
             raise ValueError(f"unknown custom step [{group_step}]")
         fields = _ensure_fields_mapping(group.get("fields"), f"{group_name}.fields")
@@ -1905,16 +2081,21 @@ def _build_authored_custom_workflow_metadata(
                 workflow_field_paths.get(group_name, {}),
             )
         else:
-            document_root = _is_document_root_statement_group(
-                final_group_metadata.get(group_name, {}),
-                agent_chain_group_roles.get(group_name),
+            output_scope = _normalize_output_scope(
+                group_metadata.get(_CUSTOM_WORKFLOW_OUTPUT_SCOPE_KEY),
+                group_name,
             )
+            step = steps_by_name.get(typing.cast(str, group_step))
+            repeated = bool(step and step.get("kind") in _CUSTOM_WORKFLOW_REPEATED_KINDS)
+            if output_scope == "document_root" and repeated:
+                raise ValueError(f"repeating group [{group_name}] cannot use output_scope [document_root]")
             group_routes, group_leaves = _collect_custom_workflow_routes(
                 fields,
                 group_name,
                 typing.cast(typing.Optional[str], group_step),
                 steps_by_name,
-                document_root=document_root,
+                document_root=output_scope == "document_root",
+                repeated_group=repeated,
             )
         routes.extend(group_routes)
         leaves.extend(group_leaves)
@@ -1925,9 +2106,7 @@ def _build_authored_custom_workflow_metadata(
             "add workflow_output_key metadata to routed fields"
         )
     field_counts = _validate_custom_workflow_routes_and_leaves(routes, leaves)
-    relationships = _normalize_custom_relationships(
-        workflow.get("output_relationships")
-    )
+    relationships = _normalize_custom_relationships(workflow.get("output_relationships"))
     if not relationships:
         relationships = _relationships_from_final_group_metadata(final_group_metadata)
     metadata: typing.Dict[str, typing.Any] = {
@@ -1950,7 +2129,10 @@ def _build_authored_custom_workflow_metadata(
     )
     if agent_chain is not None:
         metadata[_CUSTOM_WORKFLOW_AGENT_CHAIN_KEY] = agent_chain
-    metadata["schema_hash"] = _custom_workflow_schema_hash(metadata)
+    metadata["schema_hash"] = _custom_workflow_schema_hash(
+        metadata,
+        final_group_metadata,
+    )
     return metadata
 
 
@@ -1958,12 +2140,7 @@ def _apply_custom_workflow_field_paths(
     workflow_field_paths: typing.Dict[str, typing.Dict[str, str]],
     custom_workflow_metadata: typing.Optional[typing.Dict[str, typing.Any]],
 ) -> None:
-    # final_path is copied VERBATIM on purpose: `*` tokens are load-bearing for
-    # the SDK's own row routing (field-level lists like /group/list_field/*/sub
-    # — see test_prepare_extraction_yaml_routes_repeated_custom_fields_with_list_name).
-    # Consumers with a narrower path contract (the Arcadia reassembly parser
-    # requires 2-segment group/field pointers) normalize at THEIR export
-    # boundary when building reassembly metadata — never here.
+    # Preserve complete compiled paths, including repeated segments.
     if not custom_workflow_metadata:
         return
 
@@ -1990,9 +2167,7 @@ def _has_declared_metadata(
     for group_name, group_data in data.items():
         if group_name in _RESERVED_TOP_LEVEL_KEYS or group_name in top_metadata_keys:
             continue
-        if isinstance(group_data, dict) and any(
-            key in group_data for key in group_metadata_keys
-        ):
+        if isinstance(group_data, dict) and any(key in group_data for key in group_metadata_keys):
             return True
 
     return False
@@ -2078,7 +2253,8 @@ def prepare_extraction_yaml(
     pseudo_group_metadata_keys: typing.Optional[typing.Iterable[str]] = None,
 ) -> PreparedExtractionYaml:
     data = _load_extraction_mapping(raw_yaml)
-    if _PERSISTED_WORKFLOW_EXTRACT_KEY in data:
+    is_persisted_input = _PERSISTED_WORKFLOW_EXTRACT_KEY in data
+    if is_persisted_input:
         persisted_outer_data = _copy_mapping(data)
         data = _copy_mapping(
             _ensure_mapping(
@@ -2087,16 +2263,17 @@ def prepare_extraction_yaml(
             )
         )
         persisted_workflow = persisted_outer_data.get(_CUSTOM_WORKFLOW_KEY)
-        if isinstance(
-            persisted_workflow, dict
-        ) and _is_custom_workflow_persisted_metadata(persisted_workflow):
+        if isinstance(persisted_workflow, dict) and _is_custom_workflow_persisted_metadata(persisted_workflow):
             data[_CUSTOM_WORKFLOW_KEY] = _copy_mapping(persisted_workflow)
     custom_workflow_kind_and_input = _custom_workflow_input(data)
     is_persisted_custom_workflow = (
-        custom_workflow_kind_and_input is not None
-        and custom_workflow_kind_and_input[0] == "persisted"
+        custom_workflow_kind_and_input is not None and custom_workflow_kind_and_input[0] == "persisted"
     )
     _reject_unsupported_authored_keys(data)
+    _reject_v1_output_aliases(
+        data,
+        is_persisted=is_persisted_input or is_persisted_custom_workflow,
+    )
     has_persisted_workflow_metadata = _has_persisted_workflow_metadata(data)
     _validate_policy_version(
         data,
@@ -2113,7 +2290,8 @@ def prepare_extraction_yaml(
     final_metadata_key_set.update(final_group_metadata_keys or [])
     workflow_metadata_key_set = set(workflow_group_metadata_keys or [])
     effective_workflow_metadata_key_set = workflow_metadata_key_set | {
-        _CUSTOM_WORKFLOW_GROUP_METADATA_KEY
+        _CUSTOM_WORKFLOW_GROUP_METADATA_KEY,
+        _CUSTOM_WORKFLOW_OUTPUT_SCOPE_KEY,
     }
     effective_pseudo_metadata_key_set = (
         effective_workflow_metadata_key_set
@@ -2123,8 +2301,7 @@ def prepare_extraction_yaml(
     metadata_overlap = final_metadata_key_set & effective_workflow_metadata_key_set
     if metadata_overlap:
         raise ValueError(
-            "metadata keys cannot be both final-group and workflow-group scoped: "
-            f"{sorted(metadata_overlap)}"
+            f"metadata keys cannot be both final-group and workflow-group scoped: {sorted(metadata_overlap)}"
         )
 
     top_level_metadata: typing.Dict[str, typing.Any] = {}
@@ -2151,11 +2328,15 @@ def prepare_extraction_yaml(
         group = _ensure_mapping(raw_group, group_name)
         _reject_unsupported_workflow_group_keys(group, group_name)
         group, final_metadata = _split_metadata(group, final_metadata_key_set)
-        group, workflow_metadata = _split_metadata(
-            group, effective_workflow_metadata_key_set
-        )
+        group, workflow_metadata = _split_metadata(group, effective_workflow_metadata_key_set)
+        if _CUSTOM_WORKFLOW_OUTPUT_SCOPE_KEY in workflow_metadata:
+            workflow_metadata[_CUSTOM_WORKFLOW_OUTPUT_SCOPE_KEY] = _normalize_output_scope(
+                workflow_metadata[_CUSTOM_WORKFLOW_OUTPUT_SCOPE_KEY],
+                group_name,
+            )
         group = _compose_group_fields(group_name, group, defs)
         _validate_group_shape(group, group_name)
+        _validate_object_array_metadata(group_name, group, final_metadata)
         groups[group_name] = group
         if final_metadata:
             final_group_metadata[group_name] = final_metadata
@@ -2169,7 +2350,8 @@ def prepare_extraction_yaml(
         custom_workflow_kind, custom_workflow_input = custom_workflow_kind_and_input
         if custom_workflow_kind == "persisted":
             custom_workflow_metadata = _normalize_persisted_custom_workflow_metadata(
-                custom_workflow_input
+                custom_workflow_input,
+                final_group_metadata,
             )
         else:
             custom_workflow_authoring_input = custom_workflow_input
@@ -2185,20 +2367,14 @@ def prepare_extraction_yaml(
 
     for pseudo_group_name, raw_pseudo_group in raw_pseudo_groups.items():
         if pseudo_group_name in groups:
-            raise ValueError(
-                f"pseudo group [{pseudo_group_name}] collides with a final group"
-            )
+            raise ValueError(f"pseudo group [{pseudo_group_name}] collides with a final group")
 
-        pseudo_group = _ensure_mapping(
-            raw_pseudo_group, f"_pseudo_groups.{pseudo_group_name}"
-        )
+        pseudo_group = _ensure_mapping(raw_pseudo_group, f"_pseudo_groups.{pseudo_group_name}")
         _reject_unsupported_workflow_group_keys(
             pseudo_group,
             f"_pseudo_groups.{pseudo_group_name}",
         )
-        pseudo_group, explicit_workflow_metadata = _split_metadata(
-            pseudo_group, effective_pseudo_metadata_key_set
-        )
+        pseudo_group, explicit_workflow_metadata = _split_metadata(pseudo_group, effective_pseudo_metadata_key_set)
         unsupported_pseudo_keys = set(pseudo_group.keys()) - _PSEUDO_GROUP_BODY_KEYS
         if unsupported_pseudo_keys:
             raise ValueError(
@@ -2207,23 +2383,15 @@ def prepare_extraction_yaml(
             )
         _validate_prompt_shape(pseudo_group, f"_pseudo_groups.{pseudo_group_name}")
         if "fields" not in pseudo_group:
-            raise ValueError(
-                f"pseudo group [_pseudo_groups.{pseudo_group_name}] is missing fields"
-            )
+            raise ValueError(f"pseudo group [_pseudo_groups.{pseudo_group_name}] is missing fields")
 
-        pseudo_fields = _ensure_fields_mapping(
-            pseudo_group.get("fields"), f"_pseudo_groups.{pseudo_group_name}.fields"
-        )
+        pseudo_fields = _ensure_fields_mapping(pseudo_group.get("fields"), f"_pseudo_groups.{pseudo_group_name}.fields")
         if not pseudo_fields:
-            raise ValueError(
-                f"pseudo group [_pseudo_groups.{pseudo_group_name}] has empty fields"
-            )
+            raise ValueError(f"pseudo group [_pseudo_groups.{pseudo_group_name}] has empty fields")
         workflow_fields: typing.Dict[str, typing.Any] = {}
         route_map: typing.Dict[str, str] = {}
         parent_paths: typing.Set[typing.Tuple[str, ...]] = set()
-        parent_groups: typing.Dict[
-            typing.Tuple[str, ...], typing.Dict[str, typing.Any]
-        ] = {}
+        parent_groups: typing.Dict[typing.Tuple[str, ...], typing.Dict[str, typing.Any]] = {}
 
         for workflow_field_name, raw_pseudo_field in pseudo_fields.items():
             _validate_output_key(
@@ -2271,21 +2439,13 @@ def prepare_extraction_yaml(
             routed_final_paths[final_pointer] = final_field_path
             parent_paths.add(parent_path)
             parent_groups[parent_path] = parent_group
-            workflow_fields[workflow_field_name] = _field_for_workflow(
-                final_field, workflow_field_name
-            )
+            workflow_fields[workflow_field_name] = _field_for_workflow(final_field, workflow_field_name)
             route_map[workflow_field_name] = final_pointer
 
-        workflow_group = {
-            key: copy.deepcopy(value)
-            for key, value in pseudo_group.items()
-            if key != "fields"
-        }
+        workflow_group = {key: copy.deepcopy(value) for key, value in pseudo_group.items() if key != "fields"}
         if "prompt" not in workflow_group and len(parent_paths) == 1:
             inherited_parent_path = next(iter(parent_paths))
-            inherited_prompt = _group_prompt_for_workflow(
-                parent_groups[inherited_parent_path], pseudo_group_name
-            )
+            inherited_prompt = _group_prompt_for_workflow(parent_groups[inherited_parent_path], pseudo_group_name)
             if inherited_prompt:
                 workflow_group["prompt"] = inherited_prompt
         elif "prompt" not in workflow_group and len(parent_paths) > 1:
@@ -2358,9 +2518,7 @@ def prepare_extraction_yaml(
         workflow_groups[group_name] = group
         workflow_field_paths[group_name] = _collect_field_paths(group, group_name)
         if group_name in final_workflow_metadata:
-            workflow_group_metadata[group_name] = copy.deepcopy(
-                final_workflow_metadata[group_name]
-            )
+            workflow_group_metadata[group_name] = copy.deepcopy(final_workflow_metadata[group_name])
     _apply_custom_workflow_field_paths(
         workflow_field_paths,
         custom_workflow_metadata,
@@ -2407,9 +2565,7 @@ def element_from_mapping(data: typing.Dict[str, typing.Any]) -> Element:
     return ExtractedField(**data)
 
 
-def group_from_mapping(
-    data: typing.Dict[str, typing.Any], key: typing.Optional[str] = None
-) -> Group:
+def group_from_mapping(data: typing.Dict[str, typing.Any], key: typing.Optional[str] = None) -> Group:
     prompt_data = data.get("prompt")
     prompt: typing.Optional[Prompt] = None
 
@@ -2434,9 +2590,7 @@ def group_from_mapping(
             elements_list: typing.List[Element] = []
             for item in nl:
                 if not isinstance(item, dict):
-                    raise TypeError(
-                        f"Expected dict for list item under field '{name}', got {type(item)}"
-                    )
+                    raise TypeError(f"Expected dict for list item under field '{name}', got {type(item)}")
                 res = typing.cast(typing.Dict[str, typing.Any], item)
                 if "prompt" in res and "attr_name" not in res["prompt"]:
                     res["prompt"]["attr_name"] = name
@@ -2454,9 +2608,7 @@ def group_from_mapping(
                 inner_dict: typing.Dict[str, Element] = {}
                 for sub_name, sub_node in nd.items():
                     if not isinstance(sub_node, dict):
-                        raise TypeError(
-                            f"Expected dict for '{name}.{sub_name}', got {type(sub_node)}"
-                        )
+                        raise TypeError(f"Expected dict for '{name}.{sub_name}', got {type(sub_node)}")
                     res = typing.cast(typing.Dict[str, typing.Any], sub_node)
                     if "prompt" in res and "attr_name" not in res["prompt"]:
                         res["prompt"]["attr_name"] = sub_name

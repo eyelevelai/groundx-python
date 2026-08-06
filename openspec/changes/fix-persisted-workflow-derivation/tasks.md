@@ -2,9 +2,12 @@
 
 Execution note: this is the SDK implementation input for the consolidated
 extraction reliability plan in
-`internal-arcadia-agents/openspec/changes/2026-07-10-bound-workflow-cache-loads/consolidated-plan.md`.
-SDK release and runtime deployment proof are closed through that consolidated
-plan. Do not treat this as a separate live-certification finish path.
+`internal-arcadia-agents/openspec/changes/complete-extraction-boundary-regression-coverage/tasks.md`.
+The prior derivation release does not close the new placement work. Active tasks
+0.5, 2.2d, 2.2f, 3.2c0, and 9.1a own the remaining diagnosis, stored-route
+migration, `output_scope` parsing, complete-path reassembly, cross-repo proof,
+release, pinning, and deployed-version verification. Do not use this file as a
+separate certification finish path.
 
 ## 1. Failing tests first (TDD; both are red today)
 
@@ -30,8 +33,8 @@ plan. Do not treat this as a separate live-certification finish path.
       hash implementations (SDK `896b…` vs stored Go `f1a2…` over the same structures). The
       stored hash is writer-owned/opaque to readers; read-time integrity = structural
       validation (routes/leaves/steps well-formed); the recomputed canonical hash is attached
-      for runtime use only, never compared against the stored one. (Server-side hash authority
-      lands in cashbot-go `canonical-workflow-metadata` 2.3.)
+      for runtime use only, never compared against the stored one. (Consolidated task 2.2d
+      owns canonical Cashbot storage and route migration.)
 - [x] 2.3 Confirm `agent_chain` handling unchanged (hash never covered it; keep it that way,
       pinned by a test).
 
@@ -62,9 +65,9 @@ plan. Do not treat this as a separate live-certification finish path.
       never ran?); (c) root-cause legacy's all-empty values (legacy shape has no customSteps —
       is the standard pipeline expected to populate it at all, and if not, what should the API
       return?). Each becomes a test or a documented expected-behavior note.
-- [ ] 3.5 Tolerance lifetime: this dialect tolerance is deleted ONLY when the cashbot-go store
-      audit (canonical-workflow-metadata 4.2) shows zero non-canonical rows — not on a
-      schedule. Cross-linked there.
+- [ ] 3.5 Tolerance lifetime: this dialect tolerance is deleted ONLY when the
+      stored-route inventory and migration in consolidated task 2.2d show zero
+      non-canonical rows, not on a schedule.
 - [ ] 3.6 Redeploy extract pods; rerun the cashbot-go live proof matrix (legacy, v1, utility,
       scaffold + studio-demo control) with the rich utility PDF; require populated
       `meters`/`charges` rows, not just completion. Then delete test workflows/buckets

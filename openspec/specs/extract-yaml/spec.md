@@ -111,6 +111,15 @@ create or update.
   `extraction_policy_version: v1` is present
 - **AND** preparation fails clearly when that marker is absent.
 
+#### Scenario: Versionless output aliases fail fast
+
+- **GIVEN** authored YAML uses `final_value_aliases` without top-level
+  `extraction_policy_version: v1`
+- **WHEN** the SDK prepares the YAML
+- **THEN** preparation fails with an error that names `final_value_aliases` and
+  requires explicit v1 YAML
+- **AND** the author must use final field names in the explicit v1 definition.
+
 #### Scenario: Persisted workflow extract is not guessed from simple groups
 
 - **GIVEN** a mapping contains simple extraction group keys that could be either
@@ -151,6 +160,16 @@ trips and workflow helper loading.
 - **THEN** the SDK recovers the v1 top-level metadata, route metadata, workflow
   groups, and final groups
 - **AND** the loaded definition is not reclassified as pure legacy.
+
+#### Scenario: Identity thresholds can supplement unique attributes
+
+- **GIVEN** a v1 object-array group declares `identity_match.threshold_attrs`
+  that include group fields outside `unique_attrs`
+- **WHEN** the SDK prepares and reloads the extraction definition
+- **THEN** it accepts and preserves the supplemental threshold attributes
+- **AND** every identity-match attribute must still name a field in the group
+- **AND** `exact_attrs`, `group_attrs`, and `sort_attrs` must still name
+  declared `unique_attrs`.
 
 #### Scenario: Execution-only workflow extract stays opaque
 

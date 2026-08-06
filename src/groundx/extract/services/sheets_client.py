@@ -1,15 +1,29 @@
-import json, os, typing
+import json
+import os
+import typing
 from pathlib import Path
 
+import gspread
+from ..settings.settings import GCP_CREDENTIALS, ContainerSettings
 from google.oauth2 import service_account
 from googleapiclient.discovery import (
     build,  # pyright: ignore[reportUnknownVariableType]
 )
-import gspread
-
-from ..settings.settings import ContainerSettings, GCP_CREDENTIALS
+from gspread.http_client import HTTPClient
 
 SPREADSHEET_MIME = "application/vnd.google-apps.spreadsheet"
+SHEETS_CONNECT_TIMEOUT_SECONDS = 5.0
+SHEETS_READ_TIMEOUT_SECONDS = 30.0
+DRIVE_SOCKET_TIMEOUT_SECONDS = 30.0
+
+
+class _BoundedGspreadHTTPClient(HTTPClient):
+    def __init__(self, auth: typing.Any, session: typing.Any = None) -> None:
+        super().__init__(auth, session=session)
+        self.timeout = (
+            SHEETS_CONNECT_TIMEOUT_SECONDS,
+            SHEETS_READ_TIMEOUT_SECONDS,
+        )
 
 
 class SheetsClient:
@@ -36,13 +50,31 @@ class SheetsClient:
         creds = service_account.Credentials.from_service_account_info(
             creds_dict, scopes=scopes
         )
-        self.drive = build("drive", "v3", credentials=creds)
+        import httplib2  # type: ignore[import-untyped]
+        from google_auth_httplib2 import AuthorizedHttp  # type: ignore[import-untyped,import-not-found]
+
+        drive_http = AuthorizedHttp(
+            creds,
+            http=httplib2.Http(timeout=DRIVE_SOCKET_TIMEOUT_SECONDS),
+        )
+        self.drive = build(
+            "drive",
+            "v3",
+            http=drive_http,
+            cache_discovery=False,
+            num_retries=0,
+            static_discovery=True,
+        )
 
         auth_scopes = self.scopes
         if scopes:
             auth_scopes = scopes
 
-        self.client = gspread.service_account_from_dict(creds_dict, scopes=auth_scopes)
+        self.client = gspread.service_account_from_dict(
+            creds_dict,
+            scopes=auth_scopes,
+            http_client=_BoundedGspreadHTTPClient,
+        )
 
     def create_headers_if_missing(
         self, ws: gspread.Worksheet, headers: typing.List[str]
@@ -70,7 +102,7 @@ class SheetsClient:
                 supportsAllDrives=True,
                 fields="files(id, name)",
             )
-            .execute()
+            .execute(num_retries=0)
         )
         files = resp.get("files", [])
         return files[0].get("id") if files else None
@@ -94,7 +126,7 @@ class SheetsClient:
                     supportsAllDrives=True,
                     fields="id,name,parents,driveId",
                 )
-                .execute()
+                .execute(num_retries=0)
             )
         else:
             created = (
@@ -108,7 +140,7 @@ class SheetsClient:
                     supportsAllDrives=True,
                     fields="id,name,parents,driveId",
                 )
-                .execute()
+                .execute(num_retries=0)
             )
 
         cid = created.get("id")

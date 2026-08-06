@@ -251,9 +251,7 @@ class Document(Group):
         ] = {}
         parent = group_name
         for n, v in group.fields.items():
-            nv, new_fields[n] = self.add_prompt(
-                group_name=group_name, parent=parent, n=n, v=v
-            )
+            nv, new_fields[n] = self.add_prompt(group_name=group_name, parent=parent, n=n, v=v)
             if nv:
                 parent = nv
 
@@ -297,9 +295,7 @@ class Document(Group):
             try:
                 data = json.loads(stxt)
             except json.JSONDecodeError:
-                self.print(
-                    "ERROR", f"\njson.JSONDecodeError sectionSummary\n{stxt}\n\n"
-                )
+                self.print("ERROR", f"\njson.JSONDecodeError sectionSummary\n{stxt}\n\n")
                 continue
 
             for key, value in data.items():
@@ -326,9 +322,7 @@ class Document(Group):
                 try:
                     data = json.loads(ntxt)
                 except json.JSONDecodeError:
-                    self.print(
-                        "ERROR", f"\njson.JSONDecodeError chunkKeywords\n{ntxt}\n\n"
-                    )
+                    self.print("ERROR", f"\njson.JSONDecodeError chunkKeywords\n{ntxt}\n\n")
                     continue
 
                 for key, value in data.items():
@@ -342,9 +336,7 @@ class Document(Group):
                 try:
                     data = json.loads(ntxt)
                 except json.JSONDecodeError:
-                    self.print(
-                        "ERROR", f"\njson.JSONDecodeError sectionKeywords\n{ntxt}\n\n"
-                    )
+                    self.print("ERROR", f"\njson.JSONDecodeError sectionKeywords\n{ntxt}\n\n")
                     continue
 
                 for key, value in data.items():
@@ -358,9 +350,7 @@ class Document(Group):
                 try:
                     data = json.loads(ntxt)
                 except json.JSONDecodeError:
-                    self.print(
-                        "ERROR", f"\njson.JSONDecodeError fileKeywords\n{ntxt}\n\n"
-                    )
+                    self.print("ERROR", f"\njson.JSONDecodeError fileKeywords\n{ntxt}\n\n")
                     continue
 
                 for key, value in data.items():
@@ -374,9 +364,7 @@ class Document(Group):
                 try:
                     data = json.loads(ntxt)
                 except json.JSONDecodeError:
-                    self.print(
-                        "ERROR", f"\njson.JSONDecodeError fileSummary\n{ntxt}\n\n"
-                    )
+                    self.print("ERROR", f"\njson.JSONDecodeError fileSummary\n{ntxt}\n\n")
                     continue
 
                 for key, value in data.items():
@@ -398,9 +386,7 @@ class Document(Group):
                 )
             document_outputs = getattr(chunk, "customDocumentOutputs", None)
             if document_outputs:
-                document_output_identity = custom_output_payload_identity(
-                    document_outputs
-                )
+                document_output_identity = custom_output_payload_identity(document_outputs)
                 if document_output_identity not in seen_document_output_payloads:
                     seen_document_output_payloads.add(document_output_identity)
                     self.load_custom_outputs(
@@ -435,11 +421,7 @@ class Document(Group):
                 typing.Tuple[typing.Tuple[str, ...], int],
                 Group,
             ] = {}
-            output_mapping = (
-                typing.cast(typing.Dict[str, typing.Any], outputs)
-                if isinstance(outputs, dict)
-                else {}
-            )
+            output_mapping = typing.cast(typing.Dict[str, typing.Any], outputs) if isinstance(outputs, dict) else {}
             step_routes: typing.List[typing.Mapping[str, typing.Any]] = []
             for (route_step_name, _output_key), routes in route_index.items():
                 if route_step_name == step_name:
@@ -466,10 +448,7 @@ class Document(Group):
                         record_index=route_value.record_index or 0,
                     )
                     if err:
-                        raise Exception(
-                            f"\n\ninit {source} error for "
-                            f"[{step_name}.{route_output_key}]:\n\t{err}\n"
-                        )
+                        raise Exception(f"\n\ninit {source} error for [{step_name}.{route_output_key}]:\n\t{err}\n")
 
             for output_key, value in output_mapping.items():
                 if output_key == "_records":
@@ -488,26 +467,18 @@ class Document(Group):
                     for key, nested_value in data_mapping.items():
                         err = self.add(key, nested_value)
                         if err:
-                            raise Exception(
-                                f"\n\ninit {source} error for "
-                                f"[{step_name}.{output_key}]:\n\t{err}\n"
-                            )
+                            raise Exception(f"\n\ninit {source} error for [{step_name}.{output_key}]:\n\t{err}\n")
                     continue
 
                 err = self.add(output_key, data)
                 if err:
-                    raise Exception(
-                        f"\n\ninit {source} error for "
-                        f"[{step_name}.{output_key}]:\n\t{err}\n"
-                    )
+                    raise Exception(f"\n\ninit {source} error for [{step_name}.{output_key}]:\n\t{err}\n")
 
             for container_path, _record_index in sorted(repeated_rows):
                 row = repeated_rows[(container_path, _record_index)]
                 err = self.append_repeated_final_row(container_path, row)
                 if err:
-                    raise Exception(
-                        f"\n\ninit {source} error for [{step_name}]:\n\t{err}\n"
-                    )
+                    raise Exception(f"\n\ninit {source} error for [{step_name}]:\n\t{err}\n")
 
     def custom_output_route_index(
         self, source: str
@@ -565,9 +536,7 @@ class Document(Group):
         self,
         route: typing.Mapping[str, typing.Any],
         value: typing.Any,
-        repeated_rows: typing.Optional[
-            typing.Dict[typing.Tuple[typing.Tuple[str, ...], int], Group]
-        ] = None,
+        repeated_rows: typing.Optional[typing.Dict[typing.Tuple[typing.Tuple[str, ...], int], Group]] = None,
         record_index: int = 0,
     ) -> typing.Optional[str]:
         final_path = route.get("final_path")
@@ -579,20 +548,51 @@ class Document(Group):
         except ValueError as e:
             return str(e)
 
-        if len(segments) == 2:
-            group_name, field_name = segments
-            self.set_final_field(group_name, field_name, value)
-            return None
-
         if "*" in segments:
             return self.stage_repeated_final_field(
                 segments,
                 value,
                 repeated_rows,
                 record_index=record_index,
+                route=route,
             )
 
-        return f"unsupported custom workflow final path [{final_path}]"
+        self.set_final_path(segments, value, route=route)
+        return None
+
+    def set_final_path(
+        self,
+        segments: typing.Tuple[str, ...],
+        value: typing.Any,
+        *,
+        route: typing.Optional[typing.Mapping[str, typing.Any]] = None,
+    ) -> None:
+        parent: Group = self
+        parent_path: typing.List[str] = []
+        for segment in segments[:-1]:
+            parent_path.append(segment)
+            existing = parent.fields.get(segment)
+            if isinstance(existing, Group):
+                group = existing
+            else:
+                group = Group(prompt=self.final_group_prompt(".".join(parent_path)))
+                parent.fields[segment] = group
+            parent = group
+
+        field_name = segments[-1]
+        field = self.routed_extracted_field(route, segments, value)
+        existing_field = parent.fields.get(field_name)
+        if isinstance(existing_field, ExtractedField):
+            try:
+                if existing_field.equal_to_value(value):
+                    return
+            except Exception:
+                pass
+            if value not in existing_field.conflicts:
+                existing_field.conflicts.append(value)
+            parent.fields[field_name] = existing_field
+            return
+        parent.fields[field_name] = field
 
     def set_final_field(
         self,
@@ -600,37 +600,15 @@ class Document(Group):
         field_name: str,
         value: typing.Any,
     ) -> None:
-        existing_group = self.fields.get(group_name)
-        if isinstance(existing_group, Group):
-            group = existing_group
-        else:
-            group = Group(prompt=self.final_group_prompt(group_name))
-
-        field = self.final_extracted_field(group_name, field_name, value)
-        existing_field = group.fields.get(field_name)
-        if isinstance(existing_field, ExtractedField):
-            try:
-                if existing_field.equal_to_value(value):
-                    self.set(group_name, group)
-                    return
-            except Exception:
-                pass
-            if value not in existing_field.conflicts:
-                existing_field.conflicts.append(value)
-            group.fields[field_name] = existing_field
-        else:
-            group.fields[field_name] = field
-
-        self.set(group_name, group)
+        self.set_final_path((group_name, field_name), value)
 
     def stage_repeated_final_field(
         self,
         segments: typing.Tuple[str, ...],
         value: typing.Any,
-        repeated_rows: typing.Optional[
-            typing.Dict[typing.Tuple[typing.Tuple[str, ...], int], Group]
-        ],
+        repeated_rows: typing.Optional[typing.Dict[typing.Tuple[typing.Tuple[str, ...], int], Group]],
         record_index: int = 0,
+        route: typing.Optional[typing.Mapping[str, typing.Any]] = None,
     ) -> typing.Optional[str]:
         if repeated_rows is None:
             return f"unsupported custom workflow final path [/{'/'.join(segments)}]"
@@ -638,47 +616,80 @@ class Document(Group):
             return f"unsupported custom workflow final path [/{'/'.join(segments)}]"
 
         star_idx = segments.index("*")
-        if star_idx == 0 or star_idx != len(segments) - 2:
+        if star_idx == 0 or star_idx == len(segments) - 1:
             return f"unsupported custom workflow final path [/{'/'.join(segments)}]"
 
         container_path = segments[:star_idx]
-        field_name = segments[star_idx + 1]
+        field_path = segments[star_idx + 1 :]
         row = repeated_rows.setdefault(
             (container_path, record_index),
-            Group(prompt=self.final_group_prompt(container_path[-1])),
+            Group(prompt=self.final_group_prompt(".".join(container_path))),
         )
-        row.fields[field_name] = self.final_extracted_field(
-            container_path[-1], field_name, value
+        self.set_group_field_path(
+            row,
+            field_path,
+            self.routed_extracted_field(route, segments, value),
         )
         return None
 
-    def append_repeated_final_row(
-        self, container_path: typing.Tuple[str, ...], row: Group
-    ) -> typing.Optional[str]:
-        if len(container_path) == 1:
-            group_name = container_path[0]
-            existing = self.fields.get(group_name)
-            rows = list(existing) if isinstance(existing, list) else []
-            rows.append(row)
-            self.set(group_name, rows)
-            return None
-
-        if len(container_path) == 2:
-            group_name, list_name = container_path
-            existing_group = self.fields.get(group_name)
-            if isinstance(existing_group, Group):
-                group = existing_group
+    def set_group_field_path(
+        self,
+        parent: Group,
+        segments: typing.Tuple[str, ...],
+        field: ExtractedField,
+    ) -> None:
+        for segment in segments[:-1]:
+            existing = parent.fields.get(segment)
+            if isinstance(existing, Group):
+                group = existing
             else:
-                group = Group(prompt=self.final_group_prompt(group_name))
+                group = Group()
+                parent.fields[segment] = group
+            parent = group
+        parent.fields[segments[-1]] = field
 
-            existing_rows = group.fields.get(list_name)
-            rows = list(existing_rows) if isinstance(existing_rows, list) else []
-            rows.append(row)
-            group.fields[list_name] = rows
-            self.set(group_name, group)
-            return None
+    def append_repeated_final_row(self, container_path: typing.Tuple[str, ...], row: Group) -> typing.Optional[str]:
+        parent: Group = self
+        parent_path: typing.List[str] = []
+        for segment in container_path[:-1]:
+            parent_path.append(segment)
+            existing = parent.fields.get(segment)
+            if isinstance(existing, Group):
+                group = existing
+            else:
+                group = Group(prompt=self.final_group_prompt(".".join(parent_path)))
+                parent.fields[segment] = group
+            parent = group
 
-        return f"unsupported custom workflow repeated path [/{'/'.join(container_path)}/*]"
+        list_name = container_path[-1]
+        existing_rows = parent.fields.get(list_name)
+        rows = list(existing_rows) if isinstance(existing_rows, list) else []
+        rows.append(row)
+        parent.fields[list_name] = rows
+        return None
+
+    def routed_extracted_field(
+        self,
+        route: typing.Optional[typing.Mapping[str, typing.Any]],
+        segments: typing.Tuple[str, ...],
+        value: typing.Any,
+    ) -> ExtractedField:
+        prompt: typing.Optional[Prompt] = None
+        if route and self._prompt_manager:
+            workflow_group = route.get("workflow_group")
+            workflow_field = route.get("workflow_field")
+            if isinstance(workflow_group, str) and isinstance(workflow_field, str):
+                try:
+                    prompt = self._prompt_manager.get_prompt(
+                        f"{workflow_group}.{workflow_field}",
+                        file_name=self.prompt_file_name,
+                        workflow_id=self.workflow_id,
+                    )
+                except Exception:
+                    pass
+        if prompt is None and len(segments) >= 2:
+            prompt = self.final_field_prompt(segments[0], segments[-1])
+        return ExtractedField(prompt=prompt, value=value)
 
     def final_extracted_field(
         self,
@@ -741,9 +752,7 @@ class Document(Group):
     def finalize_init(self) -> None:
         self.print("WARNING", "finalize_init is not implemented")
 
-    def print(
-        self, level: str, msg: str, extras: typing.Dict[str, typing.Any] = {}
-    ) -> None:
+    def print(self, level: str, msg: str, extras: typing.Dict[str, typing.Any] = {}) -> None:
         if not self.logger:
             print(msg)
             return
@@ -799,10 +808,7 @@ def decode_final_path(final_path: str) -> typing.Tuple[str, ...]:
     if not final_path.startswith("/"):
         raise ValueError(f"invalid custom workflow final path [{final_path}]")
 
-    segments = tuple(
-        segment.replace("~1", "/").replace("~0", "~")
-        for segment in final_path.split("/")[1:]
-    )
+    segments = tuple(segment.replace("~1", "/").replace("~0", "~") for segment in final_path.split("/")[1:])
     if not segments or any(segment == "" for segment in segments):
         raise ValueError(f"invalid custom workflow final path [{final_path}]")
 
@@ -824,15 +830,9 @@ class DocumentRequest(BaseModel):
     _append_values: bool = PrivateAttr(default_factory=bool)
     _clear_cache: bool = PrivateAttr(default_factory=bool)
     _debug_path: typing.Optional[str] = PrivateAttr(default=None)
-    _page_image_dict: typing.Dict[str, int] = PrivateAttr(
-        default_factory=_new_page_image_dict
-    )
-    _page_images: typing.List[Image.Image] = PrivateAttr(
-        default_factory=_new_page_images
-    )
-    _start: int = PrivateAttr(
-        default_factory=lambda: int(datetime.now(timezone.utc).timestamp())
-    )
+    _page_image_dict: typing.Dict[str, int] = PrivateAttr(default_factory=_new_page_image_dict)
+    _page_images: typing.List[Image.Image] = PrivateAttr(default_factory=_new_page_images)
+    _start: int = PrivateAttr(default_factory=lambda: int(datetime.now(timezone.utc).timestamp()))
     _write_lock: typing.Optional[typing.Any] = PrivateAttr(default=None)
 
     @model_validator(mode="after")
@@ -941,7 +941,7 @@ class DocumentRequest(BaseModel):
 
     def clear_debug(self) -> None:
         if self.debug_path:
-            file_path = f"{self.debug_path}/{self.file_name.replace('.pdf','')}"
+            file_path = f"{self.debug_path}/{self.file_name.replace('.pdf', '')}"
             shutil.rmtree(file_path, ignore_errors=True)
 
     def load_images(
@@ -987,20 +987,14 @@ class DocumentRequest(BaseModel):
                     self.page_images.append(img)
                     pageImages.append(img)
             except BoundedRequestTimeout as e:
-                self.print(
-                    "ERROR", f"[{attempt}] Failed to load image from {page}: {e}"
-                )
+                self.print("ERROR", f"[{attempt}] Failed to load image from {page}: {e}")
                 raise RuntimeError(str(e)) from e
             except Exception as e:
-                self.print(
-                    "ERROR", f"[{attempt}] Failed to load image from {page}: {e}"
-                )
+                self.print("ERROR", f"[{attempt}] Failed to load image from {page}: {e}")
 
         return pageImages
 
-    def print(
-        self, level: str, msg: str, extras: typing.Dict[str, typing.Any] = {}
-    ) -> None:
+    def print(self, level: str, msg: str, extras: typing.Dict[str, typing.Any] = {}) -> None:
         if not self.logger:
             print(msg)
             return
@@ -1048,7 +1042,7 @@ class DocumentRequest(BaseModel):
             return
 
         os.makedirs(self.debug_path, exist_ok=True)
-        file_path = f"{self.debug_path}/{self.file_name.replace('.pdf','')}"
+        file_path = f"{self.debug_path}/{self.file_name.replace('.pdf', '')}"
         os.makedirs(file_path, exist_ok=True)
 
         if not isinstance(data, str):

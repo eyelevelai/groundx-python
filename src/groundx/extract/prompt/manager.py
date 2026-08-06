@@ -8,6 +8,7 @@ from ..classes.element import Element
 from ..classes.field import ExtractedField
 from ..classes.group import Group
 from ..classes.prompt import Prompt
+from ..services.http import bounded_generated_request_options
 from ..services.logger import Logger
 from .source import Source
 from .utility import (
@@ -108,7 +109,9 @@ class PromptManager:
         if self._default_workflow_id == "latest":
             res: typing.Optional[WorkflowResponse] = None
             try:
-                res = self._gx_client.workflows.get_account()
+                res = self._gx_client.workflows.get_account(
+                    request_options=bounded_generated_request_options()
+                )
             except Exception as e:
                 self.logger.debug_msg(
                     f"workflows.get_account exception: {e}",
@@ -136,7 +139,9 @@ class PromptManager:
 
         if "latest" in self._default_file_name:
             try:
-                ls = self._gx_client.workflows.list()
+                ls = self._gx_client.workflows.list(
+                    request_options=bounded_generated_request_options()
+                )
                 for wf in ls.workflows:
                     if wf.workflow_id and wf.relationships and wf.relationships.account:
                         self.default_workflow_id = wf.workflow_id
@@ -316,10 +321,10 @@ class PromptManager:
         if not callable(get_workflow):
             raise Exception("GroundX workflows.get is not available")
 
-        try:
-            response = get_workflow(id=workflow_id)
-        except TypeError:
-            response = get_workflow(workflow_id)
+        response = get_workflow(
+            id=workflow_id,
+            request_options=bounded_generated_request_options(),
+        )
 
         workflow = _object_value(response, "workflow")
         extract = _object_value(workflow, "extract")

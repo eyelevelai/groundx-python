@@ -36,12 +36,22 @@ class CustomOutputReassemblyResult:
     final_output: typing.Dict[str, typing.Any]
     relationship_output: typing.Optional[typing.Dict[str, typing.Any]]
     diagnostics: typing.List[CustomOutputDiagnostic]
-    workflow_output: typing.Dict[str, typing.Any] = dataclasses.field(
-        default_factory=dict
-    )
-    source_provenance: typing.List[CustomOutputSourceProvenance] = (
-        dataclasses.field(default_factory=list)
-    )
+    workflow_output: typing.Dict[str, typing.Any] = dataclasses.field(default_factory=dict)
+    source_provenance: typing.List[CustomOutputSourceProvenance] = dataclasses.field(default_factory=list)
+
+
+@dataclasses.dataclass(frozen=True)
+class RelationshipParentSelection:
+    """Result of :func:`select_relationship_parent` (task 3.2a7b).
+
+    ``parent`` is the selected parent record, or ``None`` when no parent was
+    selected.  ``ambiguous`` is ``True`` only when more than one parent matched
+    the child exactly and the relationship packet declared no
+    ``multiple_match_strategy`` to resolve the tie.
+    """
+
+    parent: typing.Optional[typing.Mapping[str, typing.Any]] = None
+    ambiguous: bool = False
 
 
 @dataclasses.dataclass(frozen=True)
@@ -49,6 +59,7 @@ class _RouteValue:
     value: typing.Any
     record_index: typing.Optional[int]
     repeated: bool
+    conflicts: typing.Optional[typing.List[typing.Any]] = None
 
 
 @dataclasses.dataclass(frozen=True)
@@ -66,6 +77,12 @@ class _ScalarCandidate:
 
 _REPEATED_STEP_KINDS = {"keys", "summary"}
 _EXTRACTED_FIELD_VALUE_KEYS = {"value", "_raw_text", "confidence", "conflicts", "qa"}
+_CONFLICTS_SIBLING_SUFFIX = "__conflicts"
+_RELATIONSHIP_PACKET_CAMEL_KEYS = {
+    "match_attrs": "matchAttrs",
+    "parent_passthrough_attrs": "parentPassthroughAttrs",
+    "multiple_match_strategy": "multipleMatchStrategy",
+}
 _DEFAULT_CANDIDATE_VALUES = {
     "n/a",
     "na",
@@ -118,6 +135,10 @@ def reassemble_custom_outputs_from_xray(
         typing.Tuple[str, typing.Tuple[typing.Any, ...]],
         typing.Dict[str, typing.Any],
     ] = {}
+    repeated_group_paths: typing.Dict[
+        str,
+        typing.Set[typing.Tuple[str, ...]],
+    ] = {}
     diagnostics: typing.List[CustomOutputDiagnostic] = []
 
     for route_index, route in enumerate(routes):
@@ -135,15 +156,32 @@ def reassemble_custom_outputs_from_xray(
                 route_map,
                 step_kinds=step_kinds,
             ):
-                if _is_empty_output(route_value.value):
-                    continue
-                route_hits[route_index] = True
-                pointer = _effective_pointer(final_path, repeated=route_value.repeated)
+                pointer = final_path
                 record_key = (
                     *route_container.identity,
                     route_map.get("step_name"),
                     route_value.record_index,
                 )
+                if _is_empty_output(route_value.value):
+                    if route_value.repeated and route_value.conflicts:
+                        _set_pointer(
+                            final_output,
+                            f"{pointer}{_CONFLICTS_SIBLING_SUFFIX}",
+                            copy.deepcopy(route_value.conflicts),
+                            repeated_records=repeated_records,
+                            record_key=record_key,
+                            route=route_map,
+                            page_numbers=route_container.page_numbers,
+                            scalar_candidates=scalar_candidates,
+                            diagnostics=diagnostics,
+                        )
+                    continue
+                route_hits[route_index] = True
+                if route_value.repeated:
+                    _record_repeated_group_path(
+                        repeated_group_paths,
+                        pointer,
+                    )
                 _set_workflow_value(
                     workflow_output,
                     route_map,
@@ -169,7 +207,27 @@ def reassemble_custom_outputs_from_xray(
                     scalar_candidates=scalar_candidates,
                     diagnostics=diagnostics,
                 )
+                if route_value.repeated and route_value.conflicts is not None:
+                    # Task 3.2a7b: carry the generic `<field>__conflicts`
+                    # record sibling next to its field so relationship parent
+                    # selection can read ignored-field conflict state.
+                    _set_pointer(
+                        final_output,
+                        f"{pointer}{_CONFLICTS_SIBLING_SUFFIX}",
+                        copy.deepcopy(route_value.conflicts),
+                        repeated_records=repeated_records,
+                        record_key=record_key,
+                        route=route_map,
+                        page_numbers=route_container.page_numbers,
+                        scalar_candidates=scalar_candidates,
+                        diagnostics=diagnostics,
+                    )
 
+    _dedupe_repeated_group_outputs(
+        final_output,
+        repeated_group_paths,
+        workflow_extract,
+    )
     relationships = workflow.get("output_relationships") if workflow else None
     relationship_output = None
     diagnostics.extend(
@@ -183,7 +241,6 @@ def reassemble_custom_outputs_from_xray(
         relationship_output, diagnostics = _apply_relationships(
             final_output,
             typing.cast(typing.Sequence[typing.Any], relationships),
-            workflow_extract=workflow_extract,
             diagnostics=diagnostics,
         )
         final_output = copy.deepcopy(relationship_output)
@@ -215,6 +272,139 @@ def reassemble_custom_outputs(
     )
 
 
+def select_relationship_parent(
+    parents: typing.Sequence[typing.Mapping[str, typing.Any]],
+    child: typing.Mapping[str, typing.Any],
+    relationship: typing.Mapping[str, typing.Any],
+) -> RelationshipParentSelection:
+    """Select the parent record a child record belongs to (task 3.2a7b).
+
+    This is the one exported relationship parent-selection primitive.  It ports
+    the legacy charge-to-meter matcher
+    (``internal-arcadia classes/statement.py::Statement.get_charge_meter`` at
+    ``main`` @ ``2797b5e``, semantics adopted by owner RULING 7a, 2026-08-05)
+    onto the generic relationship packet:
+
+    * ``parents`` is an ordered sequence of parent records, ``child`` is one
+      child record, and ``relationship`` is the seven-field relationship packet
+      in either the persisted snake_case or the dispatched camelCase spelling.
+    * The child identity is the packet's ``match_attrs`` filtered to the
+      child's populated (non-empty) values; an empty value counts as absent.
+    * Exact pass: a parent is an exact candidate when it populates exactly the
+      same match attrs the child populates, with equal values.  A single exact
+      candidate wins.  Multiple exact candidates follow only the packet's
+      declared ``multiple_match_strategy`` (``first_stable`` selects the first
+      parent in order); with no declared strategy the outcome is ambiguous and
+      no parent is selected.
+    * Fallback pass: only the match attrs also named by the packet's
+      ``parent_passthrough_attrs`` are removed from comparison.  If that
+      removes nothing, or removes everything, there is no fallback.  A parent
+      whose ignored (removed) field carries conflict state -- read from the
+      generic ``<field>__conflicts`` record sibling -- is rejected.  Only a
+      unique surviving candidate wins; anything else stays unmatched.
+    * String comparison trims only leading and trailing whitespace before
+      case-insensitive comparison. Ints and floats remain number-normalized.
+    """
+    no_selection = RelationshipParentSelection(parent=None, ambiguous=False)
+    if not isinstance(relationship, typing.Mapping):
+        return no_selection
+    if not isinstance(child, typing.Mapping):
+        return no_selection
+
+    match_attrs = _relationship_attr_list(
+        _relationship_packet_value(relationship, "match_attrs")
+    )
+    if not match_attrs:
+        return no_selection
+
+    parent_list = [
+        parent
+        for parent in (parents or [])
+        if isinstance(parent, typing.Mapping)
+    ]
+    if not parent_list:
+        return no_selection
+
+    populated_keys = {
+        attr: child.get(attr)
+        for attr in match_attrs
+        if not _relationship_value_absent(child.get(attr))
+    }
+    if not populated_keys:
+        return no_selection
+
+    def matches_attrs(
+        parent: typing.Mapping[str, typing.Any],
+        attrs: typing.Sequence[str],
+    ) -> bool:
+        for attr in attrs:
+            if attr not in populated_keys:
+                return False
+            parent_value = parent.get(attr)
+            if _relationship_value_absent(parent_value):
+                return False
+            if _relationship_comparison_value(parent_value) != _relationship_comparison_value(populated_keys[attr]):
+                return False
+        return True
+
+    direct_matches: typing.List[typing.Mapping[str, typing.Any]] = []
+    for parent in parent_list:
+        parent_key_count = sum(
+            1
+            for attr in match_attrs
+            if not _relationship_value_absent(parent.get(attr))
+        )
+        if parent_key_count == len(populated_keys) and matches_attrs(
+            parent,
+            tuple(populated_keys),
+        ):
+            direct_matches.append(parent)
+    if len(direct_matches) == 1:
+        return RelationshipParentSelection(parent=direct_matches[0], ambiguous=False)
+    if len(direct_matches) > 1:
+        strategy = _relationship_packet_value(relationship, "multiple_match_strategy")
+        if strategy == "first_stable":
+            return RelationshipParentSelection(
+                parent=direct_matches[0],
+                ambiguous=False,
+            )
+        return RelationshipParentSelection(parent=None, ambiguous=True)
+
+    passthrough_attrs = _relationship_attr_list(
+        _relationship_packet_value(relationship, "parent_passthrough_attrs")
+    )
+    stable_match_attrs = tuple(
+        attr for attr in match_attrs if attr not in passthrough_attrs
+    )
+    if len(stable_match_attrs) == len(match_attrs):
+        return no_selection
+    if not stable_match_attrs:
+        return no_selection
+    ignored_match_attrs = tuple(
+        attr for attr in match_attrs if attr not in stable_match_attrs
+    )
+
+    def has_ignored_match_conflict(
+        parent: typing.Mapping[str, typing.Any],
+    ) -> bool:
+        for attr in ignored_match_attrs:
+            if parent.get(f"{attr}{_CONFLICTS_SIBLING_SUFFIX}"):
+                return True
+        return False
+
+    fallback_matches = [
+        parent
+        for parent in parent_list
+        if not has_ignored_match_conflict(parent) and matches_attrs(parent, stable_match_attrs)
+    ]
+    if len(fallback_matches) == 1:
+        return RelationshipParentSelection(
+            parent=fallback_matches[0],
+            ambiguous=False,
+        )
+    return no_selection
+
+
 def custom_output_payload_identity(value: typing.Any) -> str:
     return _record_key(_plain(value))
 
@@ -231,9 +421,7 @@ def custom_output_section_identity(
     payload_identity = custom_output_payload_identity(output_payload)
     page_numbers = _page_numbers(chunk)
     if page_numbers:
-        return _record_key(
-            (output_map_name, "payload_pages", payload_identity, page_numbers)
-        )
+        return _record_key((output_map_name, "payload_pages", payload_identity, page_numbers))
     return _record_key((output_map_name, "payload", payload_identity))
 
 
@@ -357,22 +545,24 @@ def _custom_route_values(
     step_value = output_map.get(step_name)
     is_repeated_step = step_kinds.get(step_name) in _REPEATED_STEP_KINDS
     final_path = route.get("final_path")
-    route_repeats = is_repeated_step or (
-        isinstance(final_path, str) and "*" in final_path
-    )
+    route_repeats = is_repeated_step or (isinstance(final_path, str) and "*" in final_path)
 
     if isinstance(step_value, typing.Mapping):
         records = step_value.get("_records")
         if isinstance(records, list):
             record_values: typing.List[_RouteValue] = []
             for index, record in enumerate(records):
-                if not isinstance(record, typing.Mapping) or output_key not in record:
+                if not isinstance(record, typing.Mapping):
+                    continue
+                conflicts = _record_conflicts_sibling(record, output_key)
+                if output_key not in record and not conflicts:
                     continue
                 record_values.append(
                     _RouteValue(
-                        value=record[output_key],
+                        value=record.get(output_key),
                         record_index=index,
                         repeated=True,
+                        conflicts=conflicts,
                     )
                 )
             if record_values:
@@ -382,10 +572,7 @@ def _custom_route_values(
             return []
         value = step_value[output_key]
         if isinstance(value, list) and route_repeats:
-            return [
-                _RouteValue(value=item, record_index=index, repeated=True)
-                for index, item in enumerate(value)
-            ]
+            return [_RouteValue(value=item, record_index=index, repeated=True) for index, item in enumerate(value)]
         return [
             _RouteValue(
                 value=value,
@@ -398,19 +585,19 @@ def _custom_route_values(
         values: typing.List[_RouteValue] = []
         for index, record in enumerate(step_value):
             if isinstance(record, typing.Mapping):
-                if output_key not in record:
+                conflicts = _record_conflicts_sibling(record, output_key)
+                if output_key not in record and not conflicts:
                     continue
                 values.append(
                     _RouteValue(
-                        value=record[output_key],
+                        value=record.get(output_key),
                         record_index=index,
                         repeated=True,
+                        conflicts=conflicts,
                     )
                 )
             else:
-                values.append(
-                    _RouteValue(value=record, record_index=index, repeated=True)
-                )
+                values.append(_RouteValue(value=record, record_index=index, repeated=True))
         return values
 
     if step_value is None:
@@ -422,6 +609,22 @@ def _custom_route_values(
             repeated=is_repeated_step,
         )
     ]
+
+
+def _record_conflicts_sibling(
+    record: typing.Mapping[str, typing.Any],
+    output_key: str,
+) -> typing.Optional[typing.List[typing.Any]]:
+    """Read a source record's generic ``<field>__conflicts`` sibling.
+
+    Task 3.2a7b transports ignored-field conflict state through reassembly so
+    relationship parent selection can read it (read side only; design.md
+    408-409, tasks.md:1368-1369).
+    """
+    sibling = record.get(f"{output_key}{_CONFLICTS_SIBLING_SUFFIX}")
+    if isinstance(sibling, list):
+        return typing.cast(typing.List[typing.Any], sibling)
+    return None
 
 
 def _iter_chunks(xray: typing.Any) -> typing.Iterator[typing.Any]:
@@ -569,15 +772,6 @@ def _string_value(value: typing.Any) -> typing.Optional[str]:
     return value if isinstance(value, str) else None
 
 
-def _effective_pointer(pointer: str, *, repeated: bool) -> str:
-    if not repeated or "*" in pointer:
-        return pointer
-    parts = _pointer_parts(pointer)
-    if len(parts) < 2:
-        return pointer
-    return _encode_pointer((*parts[:-1], "*", parts[-1]))
-
-
 def _set_pointer(
     result: typing.Dict[str, typing.Any],
     pointer: str,
@@ -637,9 +831,7 @@ def _set_pointer(
         if candidate.quality < existing.quality:
             return
         if candidate.quality == existing.quality:
-            if _normalized_candidate_value(candidate.value) != _normalized_candidate_value(
-                existing.value
-            ):
+            if _normalized_candidate_value(candidate.value) != _normalized_candidate_value(existing.value):
                 diagnostics.append(
                     CustomOutputDiagnostic(
                         code="conflicting_output_candidates",
@@ -765,17 +957,13 @@ def _missing_required_route_diagnostics(
         final_path = route_map.get("final_path")
         code = (
             "missing_workflow_group"
-            if isinstance(workflow_group, str)
-            and workflow_group not in hit_workflow_groups
+            if isinstance(workflow_group, str) and workflow_group not in hit_workflow_groups
             else "missing_workflow_field"
         )
         diagnostics.append(
             CustomOutputDiagnostic(
                 code=code,
-                message=(
-                    f"required workflow output [{workflow_group}.{workflow_field}] "
-                    f"for [{final_path}] is missing"
-                ),
+                message=(f"required workflow output [{workflow_group}.{workflow_field}] for [{final_path}] is missing"),
                 workflow_group=workflow_group if isinstance(workflow_group, str) else None,
                 workflow_field=workflow_field if isinstance(workflow_field, str) else None,
                 final_path=final_path if isinstance(final_path, str) else None,
@@ -929,11 +1117,7 @@ def _field_spec_at_path(
         return field_spec
 
     if len(field_path) >= 3 and field_path[1] == "*":
-        item_spec = (
-            field_spec[0]
-            if isinstance(field_spec, list) and field_spec
-            else field_spec
-        )
+        item_spec = field_spec[0] if isinstance(field_spec, list) and field_spec else field_spec
         if isinstance(item_spec, typing.Mapping):
             return _field_spec_at_path(
                 typing.cast(typing.Mapping[str, typing.Any], item_spec),
@@ -967,9 +1151,7 @@ def _decode_pointer_part(part: str) -> str:
 
 
 def _encode_pointer(parts: typing.Sequence[str]) -> str:
-    return "/" + "/".join(
-        part.replace("~", "~0").replace("/", "~1") for part in parts
-    )
+    return "/" + "/".join(part.replace("~", "~0").replace("/", "~1") for part in parts)
 
 
 def _apply_relationships(
@@ -977,7 +1159,6 @@ def _apply_relationships(
     relationships: typing.Sequence[typing.Any],
     *,
     diagnostics: typing.Optional[typing.List[CustomOutputDiagnostic]] = None,
-    workflow_extract: typing.Optional[typing.Mapping[str, typing.Any]] = None,
 ) -> typing.Tuple[typing.Dict[str, typing.Any], typing.List[CustomOutputDiagnostic]]:
     result = copy.deepcopy(dict(final_output))
     diagnostics = diagnostics or []
@@ -1018,52 +1199,34 @@ def _apply_relationships(
             diagnostics.append(
                 CustomOutputDiagnostic(
                     code="invalid_relationship_output",
-                    message=(
-                        f"relationship {rel_name} requires list outputs for "
-                        f"{parent_group} and {child_group}"
-                    ),
+                    message=(f"relationship {rel_name} requires list outputs for {parent_group} and {child_group}"),
                     relationship=rel_name,
                 )
             )
             continue
 
-        parent_list = _dedupe_relationship_parents(
-            typing.cast(typing.List[typing.Dict[str, typing.Any]], parent_records),
-            typing.cast(typing.List[str], match_attrs),
+        parent_list = typing.cast(
+            typing.List[typing.Dict[str, typing.Any]],
+            parent_records,
         )
-        result[parent_group] = parent_list
-        child_list = _dedupe_relationship_children(
-            typing.cast(typing.List[typing.Dict[str, typing.Any]], child_records),
-            _relationship_child_unique_attrs(
-                workflow_extract,
-                child_group,
-                typing.cast(typing.List[str], match_attrs),
-            ),
+        child_list = typing.cast(
+            typing.List[typing.Dict[str, typing.Any]],
+            child_records,
         )
         for parent in parent_list:
             parent.setdefault(parent_output_field, [])
 
         unmatched: typing.List[typing.Dict[str, typing.Any]] = []
         for child_index, child in enumerate(child_list):
-            matches = [
-                parent
-                for parent in parent_list
-                if _records_match(parent, child, typing.cast(typing.List[str], match_attrs))
-            ]
-            if len(matches) > 1:
+            # Task 3.2a7b: every parent selection is delegated to the one
+            # exported primitive, resolved as a module global so the
+            # delegation is observable and monkeypatchable.
+            selection = select_relationship_parent(parent_list, child, rel)
+            if selection.ambiguous:
                 diagnostics.append(
                     CustomOutputDiagnostic(
                         code="ambiguous_relationship_match",
-                        message=(
-                            f"relationship {rel_name} child record {child_index} "
-                            "matches more than one parent"
-                        ),
-                        # Ambiguity is a HANDLED data condition: the child is
-                        # routed to the unmatched group (rendered account-level
-                        # per the relationship algorithm), so it must not fail
-                        # the document. Live prod 2026-07-08: a real utility
-                        # bill whose meters share match-attr values failed
-                        # entirely under the default severity="error".
+                        message=(f"relationship {rel_name} child record {child_index} matches more than one parent"),
                         severity="warning",
                         relationship=rel_name,
                         child_record_index=child_index,
@@ -1071,8 +1234,9 @@ def _apply_relationships(
                 )
                 unmatched.append(child)
                 continue
-            if len(matches) == 1:
-                output = matches[0].setdefault(parent_output_field, [])
+            selected_parent = selection.parent
+            if isinstance(selected_parent, dict):
+                output = selected_parent.setdefault(parent_output_field, [])
                 if isinstance(output, list):
                     output.append(copy.deepcopy(child))
                 continue
@@ -1087,79 +1251,544 @@ def _apply_relationships(
     return result, diagnostics
 
 
-def _dedupe_relationship_parents(
-    parent_list: typing.List[typing.Dict[str, typing.Any]],
-    match_attrs: typing.Sequence[str],
-) -> typing.List[typing.Dict[str, typing.Any]]:
-    deduped: typing.List[typing.Dict[str, typing.Any]] = []
-    by_key: typing.Dict[str, typing.Dict[str, typing.Any]] = {}
-    for parent in parent_list:
-        parent_key = _relationship_record_key(parent, match_attrs)
-        if parent_key is None:
-            deduped.append(parent)
-            continue
-        existing = by_key.get(parent_key)
-        if existing is None:
-            by_key[parent_key] = parent
-            deduped.append(parent)
-            continue
-        _merge_relationship_parent(existing, parent)
-    return deduped
+def _record_repeated_group_path(
+    repeated_group_paths: typing.Dict[
+        str,
+        typing.Set[typing.Tuple[str, ...]],
+    ],
+    pointer: str,
+) -> None:
+    parts = _pointer_parts(pointer)
+    if "*" not in parts:
+        return
+    if not parts:
+        return
+    final_group = parts[0]
+    repeated_path = parts[: parts.index("*")]
+    if repeated_path:
+        repeated_group_paths.setdefault(final_group, set()).add(repeated_path)
 
 
-def _dedupe_relationship_children(
-    child_list: typing.List[typing.Dict[str, typing.Any]],
+def _dedupe_repeated_group_outputs(
+    final_output: typing.Dict[str, typing.Any],
+    repeated_group_paths: typing.Mapping[
+        str,
+        typing.Set[typing.Tuple[str, ...]],
+    ],
+    workflow_extract: typing.Optional[typing.Mapping[str, typing.Any]],
+) -> None:
+    for workflow_group, paths in repeated_group_paths.items():
+        unique_attrs, identity_match = _group_identity_policy(
+            workflow_extract,
+            workflow_group,
+        )
+        if not unique_attrs:
+            continue
+        for path in paths:
+            records = _value_at_path(final_output, path)
+            if not _is_mapping_list(records):
+                continue
+            record_list = typing.cast(
+                typing.List[typing.Dict[str, typing.Any]],
+                records,
+            )
+            record_list[:] = _dedupe_repeated_records(
+                record_list,
+                unique_attrs,
+                identity_match,
+            )
+
+
+def _value_at_path(
+    output: typing.Mapping[str, typing.Any],
+    path: typing.Sequence[str],
+) -> typing.Any:
+    value: typing.Any = output
+    for part in path:
+        if not isinstance(value, typing.Mapping):
+            return None
+        value = value.get(part)
+    return value
+
+
+def _dedupe_repeated_records(
+    records: typing.List[typing.Dict[str, typing.Any]],
     unique_attrs: typing.Sequence[str],
+    identity_match: typing.Optional[typing.Mapping[str, typing.Any]] = None,
 ) -> typing.List[typing.Dict[str, typing.Any]]:
-    deduped: typing.List[typing.Dict[str, typing.Any]] = []
-    by_key: typing.Dict[str, typing.Dict[str, typing.Any]] = {}
-    for child in child_list:
-        child_key = _relationship_child_dedupe_key(child, unique_attrs)
-        existing = by_key.get(child_key)
-        if existing is None:
-            by_key[child_key] = child
-            deduped.append(child)
+    if not unique_attrs:
+        return records
+
+    if identity_match is not None:
+        deduped: typing.List[typing.Dict[str, typing.Any]] = []
+        exact_attrs = _identity_exact_attrs(identity_match, unique_attrs)
+        threshold_attrs = set(
+            _unique_strings(
+                typing.cast(
+                    typing.Iterable[typing.Any],
+                    identity_match.get("threshold_attrs", []),
+                )
+            )
+        )
+        fixed_attrs = tuple(attr for attr in unique_attrs if attr not in threshold_attrs)
+        indexes_by_fixed_identity: typing.Dict[
+            typing.Tuple[typing.Tuple[str, typing.Any], ...],
+            _AdvancedIdentityIndex,
+        ] = {}
+        for record in records:
+            fixed_identity = _identity_partition_key(
+                record,
+                fixed_attrs,
+                exact_attrs,
+            )
+            index = indexes_by_fixed_identity.get(fixed_identity)
+            if index is None:
+                index = _AdvancedIdentityIndex(identity_match, unique_attrs)
+                indexes_by_fixed_identity[fixed_identity] = index
+            match = index.first_match(record, unique_attrs)
+            if match is None:
+                deduped.append(record)
+                index.add(record)
+            else:
+                existing_index, existing = match
+                _merge_identity_record(existing, record)
+                index.refresh(existing_index)
+        return deduped
+
+    exact_deduped: typing.List[typing.Dict[str, typing.Any]] = []
+    by_key: typing.Dict[
+        typing.Tuple[typing.Tuple[str, typing.Any], ...],
+        typing.Dict[str, typing.Any],
+    ] = {}
+    for record in records:
+        identity_key = _identity_key(record, unique_attrs)
+        if identity_key is None:
+            exact_deduped.append(record)
             continue
-        _merge_relationship_parent(existing, child)
-    return deduped
+        exact_existing = by_key.get(identity_key)
+        if exact_existing is None:
+            by_key[identity_key] = record
+            exact_deduped.append(record)
+            continue
+        _merge_identity_record(exact_existing, record)
+    return exact_deduped
 
 
-def _relationship_child_dedupe_key(
-    child: typing.Mapping[str, typing.Any],
+class _AdvancedIdentityIndex:
+    def __init__(
+        self,
+        identity_match: typing.Mapping[str, typing.Any],
+        unique_attrs: typing.Sequence[str],
+    ) -> None:
+        self.identity_match = identity_match
+        self.threshold_attrs = _unique_strings(
+            typing.cast(
+                typing.Iterable[typing.Any],
+                identity_match.get("threshold_attrs", []),
+            )
+        )
+        self.activate_threshold_at = _identity_threshold(
+            identity_match,
+            "activate_threshold_at",
+        )
+        self.minimum_threshold_matches = _identity_threshold(
+            identity_match,
+            "minimum_threshold_matches",
+        )
+        self.exact_attrs = _identity_exact_attrs(identity_match, unique_attrs)
+        self.records: typing.List[typing.Dict[str, typing.Any]] = []
+        self.presence_bits = {attr: 0 for attr in self.threshold_attrs}
+        self.value_bits: typing.Dict[str, typing.Dict[typing.Any, int]] = {
+            attr: {} for attr in self.threshold_attrs
+        }
+        self.indexed_values: typing.List[
+            typing.Dict[str, typing.Tuple[bool, typing.Any]]
+        ] = []
+        shortcuts = identity_match.get("equal_value_shortcuts", {})
+        shortcut_map = (
+            typing.cast(typing.Mapping[str, typing.Any], shortcuts)
+            if isinstance(shortcuts, typing.Mapping)
+            else {}
+        )
+        self.shortcut_values = {
+            attr: {
+                _identity_index_value(value, exact=attr in self.exact_attrs)
+                for value in typing.cast(typing.Iterable[typing.Any], values)
+            }
+            for attr, values in shortcut_map.items()
+            if isinstance(values, list)
+        }
+
+    def add(self, record: typing.Dict[str, typing.Any]) -> None:
+        index = len(self.records)
+        self.records.append(record)
+        self.indexed_values.append({})
+        self._index(index)
+
+    def refresh(self, index: int) -> None:
+        bit = 1 << index
+        for attr, (present, value_key) in self.indexed_values[index].items():
+            if present:
+                self.presence_bits[attr] &= ~bit
+            value_index = self.value_bits[attr]
+            remaining = value_index[value_key] & ~bit
+            if remaining:
+                value_index[value_key] = remaining
+            else:
+                del value_index[value_key]
+        self.indexed_values[index] = {}
+        self._index(index)
+
+    def first_match(
+        self,
+        record: typing.Mapping[str, typing.Any],
+        unique_attrs: typing.Sequence[str],
+    ) -> typing.Optional[typing.Tuple[int, typing.Dict[str, typing.Any]]]:
+        candidates = self._candidate_bits(record)
+        while candidates:
+            candidate_bit = candidates & -candidates
+            candidate_index = candidate_bit.bit_length() - 1
+            candidate = self.records[candidate_index]
+            if _records_share_identity(
+                candidate,
+                record,
+                unique_attrs,
+                self.identity_match,
+            ):
+                return candidate_index, candidate
+            candidates ^= candidate_bit
+        return None
+
+    def _index(self, index: int) -> None:
+        record = self.records[index]
+        bit = 1 << index
+        indexed_values: typing.Dict[str, typing.Tuple[bool, typing.Any]] = {}
+        for attr in self.threshold_attrs:
+            present = attr in record
+            value_key = _identity_index_value(
+                record.get(attr),
+                exact=attr in self.exact_attrs,
+            )
+            indexed_values[attr] = present, value_key
+            if present:
+                self.presence_bits[attr] |= bit
+            attr_values = self.value_bits[attr]
+            attr_values[value_key] = attr_values.get(value_key, 0) | bit
+        self.indexed_values[index] = indexed_values
+
+    def _candidate_bits(self, record: typing.Mapping[str, typing.Any]) -> int:
+        universe = (1 << len(self.records)) - 1
+        if not universe:
+            return 0
+
+        equality_bits: typing.List[int] = []
+        shortcut_bits = 0
+        present_attrs: typing.Set[str] = set()
+        for attr in self.threshold_attrs:
+            present = attr in record
+            if present:
+                present_attrs.add(attr)
+            value_key = _identity_index_value(
+                record.get(attr),
+                exact=attr in self.exact_attrs,
+            )
+            equal = self.value_bits[attr].get(value_key, 0)
+            if not present:
+                equal &= self.presence_bits[attr]
+            equality_bits.append(equal)
+            if present and value_key in self.shortcut_values.get(attr, set()):
+                shortcut_bits |= equal & self.presence_bits[attr]
+
+        threshold_bits = _at_least_count_bits(
+            equality_bits,
+            self.minimum_threshold_matches,
+            universe,
+        )
+        remaining_presence_limit = self.activate_threshold_at - len(present_attrs) - 1
+        underactivation_bits = _at_most_count_bits(
+            [
+                self.presence_bits[attr]
+                for attr in self.threshold_attrs
+                if attr not in present_attrs
+            ],
+            remaining_presence_limit,
+            universe,
+        )
+        return shortcut_bits | threshold_bits | underactivation_bits
+
+
+def _at_least_count_bits(
+    value_bits: typing.Sequence[int],
+    minimum: int,
+    universe: int,
+) -> int:
+    if minimum <= 0:
+        return universe
+    if minimum > len(value_bits):
+        return 0
+    at_least = [universe, *([0] * minimum)]
+    for bits in value_bits:
+        for count in range(minimum, 0, -1):
+            at_least[count] |= at_least[count - 1] & bits
+    return at_least[minimum]
+
+
+def _at_most_count_bits(
+    value_bits: typing.Sequence[int],
+    maximum: int,
+    universe: int,
+) -> int:
+    if maximum < 0:
+        return 0
+    if maximum >= len(value_bits):
+        return universe
+    exact = [universe, *([0] * maximum)]
+    for bits in value_bits:
+        without_bits = universe ^ bits
+        next_exact = [0] * (maximum + 1)
+        next_exact[0] = exact[0] & without_bits
+        for count in range(1, maximum + 1):
+            next_exact[count] = (exact[count] & without_bits) | (
+                exact[count - 1] & bits
+            )
+        exact = next_exact
+    result = 0
+    for bits in exact:
+        result |= bits
+    return result
+
+
+def _identity_index_value(value: typing.Any, *, exact: bool = False) -> typing.Any:
+    if _match_value_absent(value):
+        return ("absent",)
+    return ("value", _hashable_identity_value(value, exact=exact))
+
+
+def _records_share_identity(
+    first: typing.Mapping[str, typing.Any],
+    second: typing.Mapping[str, typing.Any],
     unique_attrs: typing.Sequence[str],
-) -> str:
-    if unique_attrs:
-        child_key = _relationship_record_key(child, unique_attrs)
-        if child_key is not None:
-            return child_key
-    return _record_key(_plain(child))
+    identity_match: typing.Mapping[str, typing.Any],
+) -> bool:
+    threshold_attrs = _unique_strings(
+        typing.cast(typing.Iterable[typing.Any], identity_match.get("threshold_attrs", []))
+    )
+    threshold_attr_set = set(threshold_attrs)
+    exact_attrs = _identity_exact_attrs(identity_match, unique_attrs)
+    for attr in unique_attrs:
+        if attr in threshold_attr_set:
+            continue
+        if not _identity_values_match(
+            first.get(attr),
+            second.get(attr),
+            match_absent=True,
+            exact=attr in exact_attrs,
+        ):
+            return False
+
+    shortcuts_value = identity_match.get("equal_value_shortcuts", {})
+    shortcuts = (
+        typing.cast(typing.Mapping[str, typing.Any], shortcuts_value)
+        if isinstance(shortcuts_value, typing.Mapping)
+        else {}
+    )
+    threshold_values = 0
+    threshold_matches = 0
+    for attr in threshold_attrs:
+        first_value = first.get(attr)
+        second_value = second.get(attr)
+        first_present = attr in first
+        second_present = attr in second
+        if first_present or second_present:
+            threshold_values += 1
+        if (first_present or second_present) and _identity_values_match(
+            first_value,
+            second_value,
+            match_absent=True,
+            exact=attr in exact_attrs,
+        ):
+            threshold_matches += 1
+
+        shortcut_values = shortcuts.get(attr, [])
+        if (
+            isinstance(shortcut_values, list)
+            and first_present
+            and second_present
+            and _identity_comparison_value(
+                first_value,
+                exact=attr in exact_attrs,
+            )
+            == _identity_comparison_value(
+                second_value,
+                exact=attr in exact_attrs,
+            )
+            and any(
+                _identity_comparison_value(
+                    first_value,
+                    exact=attr in exact_attrs,
+                )
+                == _identity_comparison_value(
+                    shortcut,
+                    exact=attr in exact_attrs,
+                )
+                for shortcut in shortcut_values
+            )
+        ):
+            return True
+
+    activate_threshold_at = _identity_threshold(
+        identity_match,
+        "activate_threshold_at",
+    )
+    minimum_threshold_matches = _identity_threshold(
+        identity_match,
+        "minimum_threshold_matches",
+    )
+    return not (threshold_values >= activate_threshold_at and threshold_matches < minimum_threshold_matches)
 
 
-def _relationship_record_key(
+def _identity_values_match(
+    first: typing.Any,
+    second: typing.Any,
+    *,
+    match_absent: bool,
+    exact: bool = False,
+) -> bool:
+    first_absent = _match_value_absent(first)
+    second_absent = _match_value_absent(second)
+    if first_absent or second_absent:
+        return match_absent and first_absent and second_absent
+    return _identity_comparison_value(
+        first,
+        exact=exact,
+    ) == _identity_comparison_value(second, exact=exact)
+
+
+def _identity_key(
+    record: typing.Mapping[str, typing.Any],
+    unique_attrs: typing.Sequence[str],
+    exact_attrs: typing.AbstractSet[str] = frozenset(),
+) -> typing.Optional[typing.Tuple[typing.Tuple[str, typing.Any], ...]]:
+    values: typing.List[typing.Tuple[str, typing.Any]] = []
+    for attr in unique_attrs:
+        raw = record.get(attr)
+        if _match_value_absent(raw):
+            return None
+        values.append(
+            (
+                attr,
+                _hashable_identity_value(raw, exact=attr in exact_attrs),
+            )
+        )
+    return tuple(values)
+
+
+def _identity_partition_key(
     record: typing.Mapping[str, typing.Any],
     attrs: typing.Sequence[str],
-) -> typing.Optional[str]:
-    match_key = _match_key(record, attrs)
-    return _record_key(match_key) if match_key else None
+    exact_attrs: typing.AbstractSet[str] = frozenset(),
+) -> typing.Tuple[typing.Tuple[str, typing.Any], ...]:
+    return tuple(
+        (
+            attr,
+            ("absent",)
+            if _match_value_absent(record.get(attr))
+            else (
+                "value",
+                _hashable_identity_value(
+                    record.get(attr),
+                    exact=attr in exact_attrs,
+                ),
+            ),
+        )
+        for attr in attrs
+    )
 
 
-def _relationship_child_unique_attrs(
+def _hashable_identity_value(value: typing.Any, *, exact: bool = False) -> typing.Any:
+    normalized = _identity_comparison_value(value, exact=exact)
+    try:
+        hash(normalized)
+    except TypeError:
+        return (
+            "structured",
+            type(normalized).__name__,
+            _record_key(_plain(normalized)),
+        )
+    return normalized
+
+
+def _identity_comparison_value(value: typing.Any, *, exact: bool) -> typing.Any:
+    if not exact:
+        return _normalize_match_value(value)
+    unwrapped = _unwrap_match_value(value)
+    if isinstance(unwrapped, bool):
+        return ("bool", unwrapped)
+    if isinstance(unwrapped, int):
+        return ("number", unwrapped)
+    if isinstance(unwrapped, float):
+        if unwrapped.is_integer():
+            return ("number", int(unwrapped))
+        return ("float", unwrapped)
+    return unwrapped
+
+
+def _identity_exact_attrs(
+    identity_match: typing.Mapping[str, typing.Any],
+    unique_attrs: typing.Sequence[str],
+) -> typing.FrozenSet[str]:
+    configured = (
+        identity_match["exact_attrs"]
+        if "exact_attrs" in identity_match
+        else unique_attrs
+    )
+    return frozenset(
+        _unique_strings(
+            typing.cast(typing.Iterable[typing.Any], configured),
+        )
+    )
+
+
+def _identity_threshold(
+    identity_match: typing.Mapping[str, typing.Any],
+    key: str,
+) -> int:
+    value = identity_match.get(key, 0)
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise ValueError(f"identity_match.{key} must be an integer")
+    if value < 0:
+        raise ValueError(f"identity_match.{key} must be non-negative")
+    return value
+
+
+def _group_identity_policy(
     workflow_extract: typing.Optional[typing.Mapping[str, typing.Any]],
-    child_group: str,
-    match_attrs: typing.Sequence[str],
-) -> typing.Tuple[str, ...]:
+    group_name: str,
+) -> typing.Tuple[
+    typing.Tuple[str, ...],
+    typing.Optional[typing.Mapping[str, typing.Any]],
+]:
     if not isinstance(workflow_extract, typing.Mapping):
-        return ()
+        return (), None
 
-    group_spec = _group_spec(workflow_extract, child_group)
+    group_spec = _group_spec(workflow_extract, group_name)
     if not isinstance(group_spec, typing.Mapping):
-        return ()
+        return (), None
 
     unique_attrs = group_spec.get("unique_attrs")
     if not isinstance(unique_attrs, list) or not unique_attrs:
-        return ()
+        return (), None
 
-    return _unique_strings((*match_attrs, *unique_attrs))
+    identity_match = group_spec.get("identity_match")
+    if isinstance(identity_match, typing.Mapping):
+        _identity_threshold(identity_match, "activate_threshold_at")
+        _identity_threshold(identity_match, "minimum_threshold_matches")
+    return (
+        _unique_strings(unique_attrs),
+        typing.cast(typing.Mapping[str, typing.Any], identity_match)
+        if isinstance(identity_match, typing.Mapping)
+        else None,
+    )
 
 
 def _unique_strings(values: typing.Iterable[typing.Any]) -> typing.Tuple[str, ...]:
@@ -1173,7 +1802,7 @@ def _unique_strings(values: typing.Iterable[typing.Any]) -> typing.Tuple[str, ..
     return tuple(result)
 
 
-def _merge_relationship_parent(
+def _merge_identity_record(
     target: typing.Dict[str, typing.Any],
     source: typing.Mapping[str, typing.Any],
 ) -> None:
@@ -1183,7 +1812,7 @@ def _merge_relationship_parent(
             continue
         target_value = target.get(key)
         if isinstance(target_value, dict) and isinstance(value, typing.Mapping):
-            _merge_relationship_parent(
+            _merge_identity_record(
                 target_value,
                 typing.cast(typing.Mapping[str, typing.Any], value),
             )
@@ -1238,31 +1867,6 @@ def _is_mapping_list(value: typing.Any) -> bool:
     return isinstance(value, list) and all(isinstance(item, dict) for item in value)
 
 
-def _records_match(
-    parent: typing.Mapping[str, typing.Any],
-    child: typing.Mapping[str, typing.Any],
-    match_attrs: typing.Sequence[str],
-) -> bool:
-    parent_key = _match_key(parent, match_attrs)
-    child_key = _match_key(child, match_attrs)
-    if not parent_key or not child_key:
-        return False
-    return parent_key == child_key
-
-
-def _match_key(
-    record: typing.Mapping[str, typing.Any],
-    match_attrs: typing.Sequence[str],
-) -> typing.Tuple[typing.Tuple[str, typing.Any], ...]:
-    values: typing.List[typing.Tuple[str, typing.Any]] = []
-    for attr in match_attrs:
-        raw = record.get(attr)
-        if _match_value_absent(raw):
-            continue
-        values.append((attr, _normalize_match_value(raw)))
-    return tuple(values)
-
-
 def _match_value_absent(value: typing.Any) -> bool:
     unwrapped = _unwrap_match_value(value)
     if unwrapped is None:
@@ -1272,14 +1876,102 @@ def _match_value_absent(value: typing.Any) -> bool:
     return False
 
 
+def _relationship_packet_value(
+    relationship: typing.Mapping[str, typing.Any],
+    key: str,
+) -> typing.Any:
+    """Read a relationship packet field in either the persisted snake_case or
+    the dispatched camelCase spelling (design.md:394-396)."""
+    if key in relationship:
+        return relationship[key]
+    camel_key = _RELATIONSHIP_PACKET_CAMEL_KEYS.get(key)
+    if camel_key is not None:
+        return relationship.get(camel_key)
+    return None
+
+
+def _relationship_attr_list(value: typing.Any) -> typing.List[str]:
+    if not isinstance(value, list):
+        return []
+    return [attr for attr in value if isinstance(attr, str) and attr != ""]
+
+
+def _relationship_value_absent(value: typing.Any) -> bool:
+    """Empty values count as absent for relationship matching.
+
+    Ported from legacy `internal-arcadia classes/image_evidence.py:273-285`
+    (`is_empty_source_value`), applied after unwrapping ExtractedField-style
+    value mappings.
+    """
+    unwrapped = _unwrap_match_value(value)
+    if unwrapped is None:
+        return True
+    if isinstance(unwrapped, str):
+        return unwrapped.strip() == ""
+    if isinstance(unwrapped, (list, tuple, set)):
+        items = typing.cast(typing.Iterable[typing.Any], unwrapped)
+        return all(_relationship_value_absent(item) for item in items)
+    if isinstance(unwrapped, typing.Mapping):
+        mapping = typing.cast(typing.Mapping[typing.Any, typing.Any], unwrapped)
+        if not mapping:
+            return True
+        return all(_relationship_value_absent(item) for item in mapping.values())
+    return False
+
+
+def _relationship_comparison_value(value: typing.Any) -> typing.Any:
+    """Normalize a match value for relationship comparison.
+
+    Strings trim only their leading and trailing whitespace before
+    case-insensitive comparison. Ints and floats compare as numbers, and
+    differently-typed values never compare equal. Booleans stay distinct from
+    numbers, and structured values compare structurally with the same string
+    normalization.
+    """
+    unwrapped = _unwrap_match_value(value)
+    if isinstance(unwrapped, bool):
+        return ("boolean", unwrapped)
+    if isinstance(unwrapped, numbers.Integral):
+        return ("number", float(unwrapped))
+    if isinstance(unwrapped, numbers.Real):
+        return ("number", float(unwrapped))
+    if isinstance(unwrapped, str):
+        return ("string", unwrapped.strip().lower())
+    if isinstance(unwrapped, typing.Mapping):
+        mapping = typing.cast(typing.Mapping[typing.Any, typing.Any], unwrapped)
+        return (
+            "object",
+            tuple(
+                sorted(
+                    (
+                        str(key),
+                        _relationship_comparison_value(item),
+                    )
+                    for key, item in mapping.items()
+                )
+            ),
+        )
+    if isinstance(unwrapped, (list, tuple)):
+        return (
+            "list",
+            tuple(_relationship_comparison_value(item) for item in unwrapped),
+        )
+    return unwrapped
+
+
 def _normalize_match_value(value: typing.Any) -> typing.Any:
     unwrapped = _unwrap_match_value(value)
     if isinstance(unwrapped, str):
         return unwrapped.strip().casefold()
     if isinstance(unwrapped, bool):
         return ("boolean", unwrapped)
+    if isinstance(unwrapped, numbers.Integral):
+        return ("number", int(unwrapped))
     if isinstance(unwrapped, numbers.Real):
-        return ("number", float(unwrapped))
+        numeric = float(unwrapped)
+        if numeric.is_integer():
+            return ("number", int(numeric))
+        return ("float", numeric)
     if isinstance(unwrapped, typing.Mapping):
         return (
             "object",
@@ -1304,9 +1996,7 @@ def _normalize_match_value(value: typing.Any) -> typing.Any:
 def _unwrap_match_value(value: typing.Any) -> typing.Any:
     if isinstance(value, typing.Mapping):
         value_map = typing.cast(typing.Mapping[str, typing.Any], value)
-        if "value" in value_map and set(value_map.keys()).issubset(
-            _EXTRACTED_FIELD_VALUE_KEYS
-        ):
+        if "value" in value_map and set(value_map.keys()).issubset(_EXTRACTED_FIELD_VALUE_KEYS):
             return value_map.get("value")
     return value
 

@@ -457,7 +457,12 @@ Special Instructions:
             def __init__(self) -> None:
                 self.requested_ids: typing.List[str] = []
 
-            def get(self, id: str) -> typing.Any:
+            def get(
+                self,
+                id: str,
+                *,
+                request_options: typing.Optional[typing.Dict[str, typing.Any]] = None,
+            ) -> typing.Any:
                 self.requested_ids.append(id)
                 return types.SimpleNamespace(
                     workflow=types.SimpleNamespace(
@@ -497,9 +502,7 @@ Special Instructions:
             workflow_extract["_groundx_persisted_extract"],
         )
         self.assertEqual(
-            persisted["statement_identity"]["fields"]["provider_name"]["prompt"][
-                "attr_name"
-            ],
+            persisted["statement_identity"]["fields"]["provider_name"]["prompt"]["attr_name"],
             "provider_name",
         )
 
@@ -545,7 +548,12 @@ Special Instructions:
             def __init__(self) -> None:
                 self.requested_ids: typing.List[str] = []
 
-            def get(self, id: str) -> typing.Any:
+            def get(
+                self,
+                id: str,
+                *,
+                request_options: typing.Optional[typing.Dict[str, typing.Any]] = None,
+            ) -> typing.Any:
                 self.requested_ids.append(id)
                 return types.SimpleNamespace(
                     workflow=types.SimpleNamespace(
@@ -566,12 +574,12 @@ Special Instructions:
             top_level_metadata_keys={"extraction_policy_version"},
         )
 
-        workflow_extract["statement_identity"]["fields"]["provider_name"]["prompt"][
+        workflow_extract["statement_identity"]["fields"]["provider_name"]["prompt"]["instructions"] = (
+            "Return the updated provider name."
+        )
+        workflow_extract["_groundx_persisted_extract"]["statement"]["fields"]["provider_name"]["prompt"][
             "instructions"
         ] = "Return the updated provider name."
-        workflow_extract["_groundx_persisted_extract"]["statement"]["fields"][
-            "provider_name"
-        ]["prompt"]["instructions"] = "Return the updated provider name."
 
         manager.reload_if_changed("wf-1")
 
@@ -730,9 +738,7 @@ Special Instructions:
 
         data_groups = manager.get_fields_for_data_object("latest")
 
-        self.assertEqual(
-            list(data_groups.keys()), ["statement", "customer", "service_address"]
-        )
+        self.assertEqual(list(data_groups.keys()), ["statement", "customer", "service_address"])
         self.assertEqual(
             list(data_groups["statement"].fields.keys()),
             ["account_number", "bill_start_date", "total_amount_due", "late_fee"],
@@ -828,8 +834,8 @@ statement:
             """
 extraction_policy_version: v1
 statement:
-  final_value_aliases:
-    account_number: account_number
+  explanation_attrs:
+    - account_number
   fields:
     account_number:
       prompt:
@@ -1125,8 +1131,8 @@ _pseudo_groups:
     def test_final_field_path_rejects_malformed_or_unsupported_paths(self) -> None:
         for pointer in (
             "statement.account_number",
-            "/statement",
-            "/statement/account/extra",
+            "/",
+            "/statement//account",
             "/statement/account~2number",
             "/statement/account~",
         ):
@@ -1143,8 +1149,6 @@ statement:
   workflow_step: chunk-instruct
   unique_attrs:
     - account_number
-  final_value_aliases:
-    account_number: account_number
   fields:
     account_number:
       prompt:
@@ -1169,7 +1173,7 @@ _pseudo_groups:
       total_amount_due:
         path: /statement/total_amount_due
 """,
-            final_group_metadata_keys={"unique_attrs", "final_value_aliases"},
+            final_group_metadata_keys={"unique_attrs"},
             workflow_group_metadata_keys={"workflow_step"},
         )
 
@@ -1182,7 +1186,6 @@ _pseudo_groups:
             {
                 "statement": {
                     "unique_attrs": ["account_number"],
-                    "final_value_aliases": {"account_number": "account_number"},
                 }
             },
         )
@@ -1372,9 +1375,7 @@ statement:
         )
 
         account_prompt = prepared.groups["statement"]["fields"]["account_number"]["prompt"]
-        alternate_prompt = prepared.groups["statement"]["fields"][
-            "alternate_account_number"
-        ]["prompt"]
+        alternate_prompt = prepared.groups["statement"]["fields"]["alternate_account_number"]["prompt"]
 
         self.assertEqual(account_prompt, alternate_prompt)
         self.assertIsNot(account_prompt, alternate_prompt)
@@ -1702,14 +1703,12 @@ _pseudo_groups:
                 {
                     "workflow_group": "line_items",
                     "workflow_field": "description",
-                    "final_path": "/line_items/description",
+                    "final_path": "/line_items/*/description",
                     "step_name": "line_item_labels",
                     "level": "chunk",
                     "output_map": "customChunkOutputs",
                     "output_key": "label",
-                    "readback_path": (
-                        "/chunks/*/customChunkOutputs/line_item_labels/label"
-                    ),
+                    "readback_path": ("/chunks/*/customChunkOutputs/line_item_labels/label"),
                 }
             ],
         )
@@ -1717,15 +1716,15 @@ _pseudo_groups:
             workflow["leaf_fields"],
             [
                 {
-                    "final_path": "/line_items/description",
+                    "final_path": "/line_items/*/description",
                     "workflow_group": "line_items",
                     "workflow_field": "description",
                     "step_name": "line_item_labels",
                     "level": "chunk",
                     "output_key": "label",
                     "field_type": "str",
-                    "is_repeated": False,
-                    "repetition_scope": "none",
+                    "is_repeated": True,
+                    "repetition_scope": "/line_items/*",
                 }
             ],
         )
@@ -1771,7 +1770,7 @@ invoice:
             "/invoice/charges/*",
         )
 
-    def test_prepare_extraction_yaml_routes_direct_statement_role_fields_to_root(
+    def test_prepare_extraction_yaml_does_not_use_role_for_placement(
         self,
     ) -> None:
         prepared = prepare_extraction_yaml(
@@ -1795,8 +1794,6 @@ workflow:
 
 generic_group_a:
   workflow_step: generic_step_a
-  final_value_aliases:
-    generic_attr_01: generic_attr_99
   fields:
     generic_attr_01:
       workflow_output_key: generic_attr_01
@@ -1822,11 +1819,11 @@ generic_group_b:
         }
         self.assertEqual(
             paths_by_group[("generic_group_a", "generic_attr_01")],
-            "/generic_attr_01",
+            "/generic_group_a/generic_attr_01",
         )
         self.assertEqual(
             paths_by_group[("generic_group_b", "generic_attr_15")],
-            "/generic_group_b/generic_attr_15",
+            "/generic_group_b/*/generic_attr_15",
         )
 
     def test_prepare_extraction_yaml_rejects_slot_metadata(
@@ -1882,9 +1879,7 @@ workflow:
         self,
     ) -> None:
         with self.assertRaises(ValueError) as exc:
-            prepare_extraction_yaml(
-                CUSTOM_WORKFLOW_YAML.replace("line_item_labels", "line-item-labels")
-            )
+            prepare_extraction_yaml(CUSTOM_WORKFLOW_YAML.replace("line_item_labels", "line-item-labels"))
 
         self.assertIn("invalid custom step name", str(exc.exception))
         self.assertIn("line-item-labels", str(exc.exception))
@@ -1893,9 +1888,7 @@ workflow:
         self,
     ) -> None:
         with self.assertRaises(ValueError) as exc:
-            prepare_extraction_yaml(
-                CUSTOM_WORKFLOW_YAML.replace("line_item_labels", "LineItemLabels")
-            )
+            prepare_extraction_yaml(CUSTOM_WORKFLOW_YAML.replace("line_item_labels", "LineItemLabels"))
 
         self.assertIn("invalid custom step name", str(exc.exception))
         self.assertIn("LineItemLabels", str(exc.exception))
@@ -1934,9 +1927,7 @@ line_items:
         self,
     ) -> None:
         with self.assertRaises(ValueError) as exc:
-            prepare_extraction_yaml(
-                CUSTOM_WORKFLOW_YAML.replace("line_item_labels", "chunk_keys")
-            )
+            prepare_extraction_yaml(CUSTOM_WORKFLOW_YAML.replace("line_item_labels", "chunk_keys"))
 
         self.assertIn("reserved custom step name", str(exc.exception))
         self.assertIn("chunk_keys", str(exc.exception))
@@ -1946,9 +1937,7 @@ line_items:
     ) -> None:
         with self.assertRaises(ValueError) as exc:
             prepare_extraction_yaml(
-                CUSTOM_WORKFLOW_YAML.replace(
-                    "    BILLING_HINT: Prefer values from the charge table.\n", ""
-                )
+                CUSTOM_WORKFLOW_YAML.replace("    BILLING_HINT: Prefer values from the charge table.\n", "")
             )
 
         self.assertIn("missing template key", str(exc.exception))
@@ -2088,9 +2077,7 @@ invoice:
                 "yaml": SAMPLE_YAML_1,
             },
             {
-                "expect": Exception(
-                    "[latest] [latest.yaml] is missing a [meter] entry"
-                ),
+                "expect": Exception("[latest] [latest.yaml] is missing a [meter] entry"),
                 "name": "meter",
                 "yaml": SAMPLE_YAML_1,
             },
@@ -2100,9 +2087,7 @@ invoice:
                 "yaml": SAMPLE_YAML_2,
             },
             {
-                "expect": Exception(
-                    "[latest] [latest.yaml] is missing a [meter] entry at [statement.meter]"
-                ),
+                "expect": Exception("[latest] [latest.yaml] is missing a [meter] entry at [statement.meter]"),
                 "name": "statement.meter",
                 "yaml": SAMPLE_YAML_2,
             },
@@ -2118,9 +2103,7 @@ invoice:
                 "yaml": SAMPLE_YAML_2,
             },
             {
-                "expect": Exception(
-                    "[latest] [latest.yaml] entry at [statement.statement_date] is not a group"
-                ),
+                "expect": Exception("[latest] [latest.yaml] entry at [statement.statement_date] is not a group"),
                 "name": "statement.statement_date.meters",
                 "yaml": SAMPLE_YAML_2,
             },
@@ -2136,9 +2119,7 @@ invoice:
                 "yaml": SAMPLE_YAML_2,
             },
             {
-                "expect": Exception(
-                    "[latest] [latest.yaml] is missing a [meter] entry at [statement.meters.meter]"
-                ),
+                "expect": Exception("[latest] [latest.yaml] is missing a [meter] entry at [statement.meters.meter]"),
                 "name": "statement.meters.meter",
                 "yaml": SAMPLE_YAML_2,
             },
@@ -2235,9 +2216,7 @@ Special Instructions:
         self.assertEqual(js, ym)
 
 
-def check_value(
-    key: str, mn: TestPromptManager, pmp: Prompt, expect: typing.Dict[str, typing.Any]
-):
+def check_value(key: str, mn: TestPromptManager, pmp: Prompt, expect: typing.Dict[str, typing.Any]):
     if key in expect:
         mn.assertEqual(pmp.__getattribute__(key), expect[key])
     else:

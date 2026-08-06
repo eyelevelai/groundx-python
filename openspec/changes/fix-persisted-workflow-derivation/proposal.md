@@ -1,5 +1,13 @@
 # Proposal — fix-persisted-workflow-derivation
 
+## Execution route
+
+This active SDK input is governed by
+`internal-arcadia-agents/openspec/changes/complete-extraction-boundary-regression-coverage/tasks.md`.
+Tasks 0.5, 2.2d, 2.2f, 3.2c0, and 9.1a own the remaining diagnosis, stored-route
+migration, SDK placement, cross-repo proof, release, pinning, and deployment
+work. This proposal is not a separate completion or certification path.
+
 ## Why
 
 Live prod testing (2026-07-08, cashbot-go `accept-workflow-yaml-source` E2E) proved that **any
@@ -27,8 +35,8 @@ Root context: two long-standing compiled dialects exist (harness `compile_workfl
 3-segment + `is_repeated: true`; SDK `prepare_extraction_yaml`: 2-segment + flags), documented
 in cashbot-go `pkg/testdata/workflowyaml/goldens/FINDINGS.md`. Production deploys the harness
 dialect; the extraction runtime reads the SDK dialect. This change makes the SDK reader
-**dialect-tolerant** so every already-stored workflow works; the companion cashbot-go change
-(`canonical-workflow-metadata`) makes the API store a single canonical form going forward.
+**dialect-tolerant** so every already-stored workflow works; consolidated task 2.2d owns the
+Cashbot API's canonical stored-route behavior going forward.
 
 ## What changes
 
@@ -41,7 +49,7 @@ dialect; the extraction runtime reads the SDK dialect. This change makes the SDK
   recompute diverges across hash implementations — proven SDK `896b…` vs stored Go `f1a2…`
   over identical structures). The stored `schema_hash` is writer-owned and opaque; read-time
   integrity is structural validation; the server becomes the only hash authority
-  (cashbot-go `canonical-workflow-metadata` 2.3).
+  (consolidated task 2.2d).
 - Regression tests pinned to **both dialect goldens** (harness-dialect and SDK-dialect
   persisted extracts) must derive byte-identical `workflow_field_paths` and pass reassembly
   preflight; plus an end-to-end repeated-group reassembly test — the exact case production
@@ -55,5 +63,5 @@ dialect; the extraction runtime reads the SDK dialect. This change makes the SDK
 - Consumers: internal-arcadia-agents (extract pods) via `prepare_arcadia_extraction_yaml`.
   Rollout = SDK release → internal-arcadia-agents pin bump → extract pod redeploy → rerun the
   cashbot-go live proof matrix (repeated-group population).
-- Out of scope here: what the API stores (cashbot-go `canonical-workflow-metadata`), the
+- Out of scope here: what the API stores (consolidated task 2.2d), the
   internal-arcadia-agents exception-swallowing (follow-up noted in tasks).

@@ -5,6 +5,7 @@ from groundx.extract.services.http import (
     BoundedRequestTimeout,
     bounded_get,
     bounded_head,
+    bounded_post,
 )
 
 
@@ -97,3 +98,23 @@ def test_bounded_head_uses_remaining_shared_deadline() -> None:
         bounded_head("https://example.test/page", operation="page metadata")
 
     assert head.call_args.kwargs["timeout"] == (2.0, 2.0)
+
+
+def test_bounded_post_uses_remaining_shared_deadline() -> None:
+    now = [100.0]
+
+    with (
+        patch(
+            "groundx.extract.services.deadline.time.monotonic",
+            side_effect=lambda: now[0],
+        ),
+        patch(
+            "groundx.extract.services.http.time.monotonic",
+            side_effect=lambda: now[0],
+        ),
+        patch("requests.post", return_value=_Response()) as post,
+        operation_deadline(2.0),
+    ):
+        bounded_post("https://example.test/callback", json={"code": 200})
+
+    assert post.call_args.kwargs["timeout"] == (2.0, 2.0)

@@ -18,7 +18,6 @@ it mirrors the structure of the 2026-07-08 failed prod deploy without any
 production prompt or schema content.
 """
 
-import copy
 import json
 import pathlib
 import typing
@@ -79,7 +78,7 @@ def test_recomputed_hash_is_attached_not_compared() -> None:
     attached = prepared.persisted_workflow_extract["workflow"]["schema_hash"]
     assert attached  # present for downstream use
     # The live divergence: stored f1a2… (Go writer) vs SDK recompute — both valid.
-    assert stored_hash != attached or stored_hash == attached  # never an error either way
+    assert stored_hash != attached
 
 
 def test_structural_corruption_still_fails() -> None:

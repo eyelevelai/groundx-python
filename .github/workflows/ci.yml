@@ -1,5 +1,5 @@
 name: ci
-on: [push]
+on: [pull_request, push]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -19,7 +19,7 @@ jobs:
         run: |
           curl -sSL https://install.python-poetry.org | python - -y --version 1.5.1
       - name: Install dependencies
-        run: poetry install
+        run: poetry install --extras extract
       - name: Compile
         run: poetry run mypy .
   test:
@@ -35,10 +35,13 @@ jobs:
         run: |
           curl -sSL https://install.python-poetry.org | python - -y --version 1.5.1
       - name: Install dependencies
-        run: poetry install
+        run: poetry install --extras extract
 
-      - name: Test
-        run: poetry run pytest -rP -n auto .
+      - name: Test pre-promotion code
+        run: poetry run pytest -rP -n auto -m "not pending_decision and not pending_fixture_promotion" .
+
+      - name: Extraction boundary pre-promotion checks
+        run: poetry run pytest -q -m "not pending_fixture_promotion" tests/extract/test_extraction_boundary_reassembly.py tests/extract/test_extraction_boundary_evidence_contract.py
 
       - name: Install aiohttp extra
         run: poetry install --extras aiohttp

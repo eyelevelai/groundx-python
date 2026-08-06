@@ -1,7 +1,8 @@
 import typing
 
-from .logger import Logger
 from ..settings.settings import ContainerSettings
+from .logger import Logger
+from .upload import validate_upload_timeouts
 
 
 class MinIOClient:
@@ -12,31 +13,17 @@ class MinIOClient:
     ) -> None:
         self.settings = settings
         self.client = None
+        self._timeout_clients: typing.Dict[typing.Tuple[float, float, float], typing.Any] = {}
         self.logger = logger
         if self.settings.upload.type == "minio":
             import json
-            import urllib3
-            from minio import Minio
 
-            self.client = Minio(
-                self.settings.upload.base_domain,
-                access_key=self.settings.upload.get_key(),
-                secret_key=self.settings.upload.get_secret(),
-                region=self.settings.upload.get_region(),
-                session_token=self.settings.upload.get_token(),
-                secure=self.settings.upload.ssl,
-                http_client=urllib3.PoolManager(
-                    retries=False,
-                    timeout=urllib3.Timeout(connect=5, read=20),
-                ),
-            )
+            self.client = self._create_client()
 
             if not self.client.bucket_exists(self.settings.upload.bucket):
                 try:
                     self.client.make_bucket(self.settings.upload.bucket)
-                    self.logger.info_msg(
-                        f"Bucket '{self.settings.upload.bucket}' created."
-                    )
+                    self.logger.info_msg(f"Bucket '{self.settings.upload.bucket}' created.")
 
                     self.client.set_bucket_policy(
                         self.settings.upload.bucket,
@@ -48,9 +35,7 @@ class MinIOClient:
                                         "Effect": "Allow",
                                         "Principal": {"AWS": ["*"]},
                                         "Action": ["s3:GetObject"],
-                                        "Resource": [
-                                            f"arn:aws:s3:::{self.settings.upload.bucket}/*"
-                                        ],
+                                        "Resource": [f"arn:aws:s3:::{self.settings.upload.bucket}/*"],
                                     }
                                 ],
                             }
@@ -58,9 +43,74 @@ class MinIOClient:
                     )
                 except Exception as e:
                     self.logger.warning_msg(str(e))
-                    self.logger.warning_msg(
-                        f"error creating bucket [{self.settings.upload.bucket}]"
-                    )
+                    self.logger.warning_msg(f"error creating bucket [{self.settings.upload.bucket}]")
+
+    def _create_client(
+        self,
+        *,
+        connect_timeout_seconds: typing.Optional[float] = None,
+        read_timeout_seconds: typing.Optional[float] = None,
+        total_timeout_seconds: typing.Optional[float] = None,
+    ) -> typing.Any:
+        import urllib3
+        from minio import Minio
+
+        timeout = validate_upload_timeouts(
+            connect_timeout_seconds=connect_timeout_seconds,
+            read_timeout_seconds=read_timeout_seconds,
+            total_timeout_seconds=total_timeout_seconds,
+        )
+        if timeout is None:
+            connect, read, total = 5.0, 20.0, None
+        else:
+            connect, read, total = timeout
+
+        pool_kwargs: typing.Dict[str, typing.Any] = {
+            "timeout": urllib3.Timeout(
+                connect=connect,
+                read=read,
+                total=total,
+            ),
+            "retries": False,
+        }
+        if self.settings.upload.ssl:
+            import certifi
+
+            pool_kwargs.update(
+                cert_reqs="CERT_REQUIRED",
+                ca_certs=certifi.where(),
+            )
+        return Minio(
+            self.settings.upload.base_domain,
+            access_key=self.settings.upload.get_key(),
+            secret_key=self.settings.upload.get_secret(),
+            region=self.settings.upload.get_region(),
+            session_token=self.settings.upload.get_token(),
+            secure=self.settings.upload.ssl,
+            http_client=urllib3.PoolManager(**pool_kwargs),
+        )
+
+    def _client_for_timeouts(
+        self,
+        *,
+        connect_timeout_seconds: typing.Optional[float],
+        read_timeout_seconds: typing.Optional[float],
+        total_timeout_seconds: typing.Optional[float],
+    ) -> typing.Any:
+        timeout = validate_upload_timeouts(
+            connect_timeout_seconds=connect_timeout_seconds,
+            read_timeout_seconds=read_timeout_seconds,
+            total_timeout_seconds=total_timeout_seconds,
+        )
+        if timeout is None:
+            return self.client
+        if timeout not in self._timeout_clients:
+            self._timeout_clients[timeout] = self._create_client(
+                connect_timeout_seconds=timeout[0],
+                read_timeout_seconds=timeout[1],
+                total_timeout_seconds=timeout[2],
+            )
+        return self._timeout_clients[timeout]
 
     def get_object(self, url: str) -> typing.Optional[bytes]:
         if not self.client:
@@ -79,14 +129,10 @@ class MinIOClient:
             finally:
                 self._close_response(response)
         except S3Error as e:
-            self.logger.error_msg(
-                f"Failed to get object from [{url}] [{self.parse_url(url)}]: {str(e)}"
-            )
+            self.logger.error_msg(f"Failed to get object from [{url}] [{self.parse_url(url)}]: {str(e)}")
             raise
 
-    def get_object_and_metadata(
-        self, url: str
-    ) -> typing.Optional[typing.Tuple[bytes, typing.Dict[str, str]]]:
+    def get_object_and_metadata(self, url: str) -> typing.Optional[typing.Tuple[bytes, typing.Dict[str, str]]]:
         if not self.client:
             return None
 
@@ -112,9 +158,7 @@ class MinIOClient:
 
             return body, meta
         except S3Error as e:
-            self.logger.error_msg(
-                f"Failed to get object from [{url}] [{self.parse_url(url)}]: {str(e)}"
-            )
+            self.logger.error_msg(f"Failed to get object from [{url}] [{self.parse_url(url)}]: {str(e)}")
             raise
 
     def head_object(self, url: str) -> typing.Optional[typing.Dict[str, str]]:
@@ -139,9 +183,7 @@ class MinIOClient:
 
             return res
         except S3Error as e:
-            self.logger.error_msg(
-                f"Failed to get object from [{url}] [{self.parse_url(url)}]: {str(e)}"
-            )
+            self.logger.error_msg(f"Failed to get object from [{url}] [{self.parse_url(url)}]: {str(e)}")
             raise
 
     def parse_url(self, ur: str) -> str:
@@ -212,13 +254,24 @@ class MinIOClient:
         key: str,
         data: bytes,
         content_type: str = "application/octet-stream",
+        *,
+        connect_timeout_seconds: typing.Optional[float] = None,
+        read_timeout_seconds: typing.Optional[float] = None,
+        total_timeout_seconds: typing.Optional[float] = None,
     ) -> None:
-        if not self.client:
+        client = self._client_for_timeouts(
+            connect_timeout_seconds=connect_timeout_seconds,
+            read_timeout_seconds=read_timeout_seconds,
+            total_timeout_seconds=total_timeout_seconds,
+        )
+        if not client:
             return
+        import io
 
-        self.put_object(
-            bucket,
-            key,
-            data,
-            content_type,
+        client.put_object(
+            bucket_name=bucket,
+            object_name=key,
+            data=io.BytesIO(data),
+            length=len(data),
+            content_type=content_type,
         )

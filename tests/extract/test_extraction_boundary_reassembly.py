@@ -3,6 +3,7 @@ import hashlib
 import json
 import pathlib
 import re
+import shutil
 import typing
 import urllib.parse
 
@@ -26,7 +27,7 @@ BOUNDARY_ROOT = ROOT / "tests" / "extract" / "fixtures" / "extraction-boundary"
 BOUNDARY_INPUT_ROOT = BOUNDARY_ROOT / "inputs"
 BOUNDARY_GOLDENS_ROOT = BOUNDARY_ROOT / "boundary-goldens"
 CATALOG_PATH = ROOT / "tests" / "extract" / "fixtures" / "extraction-boundary" / "catalog.json"
-CATALOG_SHA256 = "6ecc41e2a8ea0bfb3c397a3668d2beef34e05b02ee6a8d8decfa614ba4379ec1"
+CATALOG_SHA256 = "db48b716cfe7ae9d363920c407c513d5f3feb7d1c84d4ef30ed5d69b0082e31f"
 ADP_EXPECTED_SECTION_COUNT = 11
 ADP_EXPECTED_FIELD_COUNT = 159
 ADP_MIN_POPULATED_FIELDS = 100
@@ -54,7 +55,7 @@ def test_extraction_boundary_catalog_is_pinned() -> None:
     assert catalog["catalog_version"] == "2026-07-23.1"
     assert catalog["surfaces"] == SURFACES
     assert catalog["source_artifact_catalog_sha256"] == (
-        "c403a6593b7ec672e957789b133152015af4da3854ff77b41d422adb6d37e5b8"
+        "8e76f15d40cb70070fc17c145afe3c0f5fb219f71759d9eacbef747e3ad18192"
     )
     assert catalog["artifacts"] == [
         {
@@ -84,52 +85,71 @@ def test_extraction_boundary_catalog_is_pinned() -> None:
     ]
 
 
+@pytest.mark.parametrize(
+    "surface",
+    [
+        pytest.param(
+            surface,
+            marks=(pytest.mark.pending_fixture_promotion if surface != "adp_v1" else ()),
+        )
+        for surface in SURFACES
+    ],
+)
 def test_sdk_reassembly_expected_answer_projection_diagnostic_packets(
     tmp_path: pathlib.Path,
+    surface: str,
 ) -> None:
-    for surface in SURFACES:
-        actual, actual_path, expected_path, diff_path, previous_path, handoff_path = (
-            _write_boundary_artifacts(tmp_path, surface)
-        )
-        expected = _stable_boundary_output(actual)
-        golden = _read_json(expected_path)
-        expected_handoff_sha = _sha256_file(handoff_path)
-        actual_handoff_sha = actual["artifacts"]["handoff"]["sha256"]
-        handoff = _read_json(pathlib.Path(actual["artifacts"]["handoff"]["path"]))
-        if (
-            _is_expected_answer_projection_diagnostic(actual)
-            or _is_expected_answer_projection_diagnostic(handoff)
-            or _has_projection_marker(actual)
-            or _has_projection_marker(handoff)
-        ):
-            _assert_expected_answer_projection_diagnostic(actual)
-            _assert_expected_answer_projection_diagnostic(handoff)
-        else:
-            _assert_no_synthetic_protected_marker(actual)
-            _assert_no_synthetic_protected_marker(handoff)
-        diff: typing.Dict[str, typing.Any] = {
+    actual, actual_path, expected_path, diff_path, previous_path, handoff_path = (
+        _write_boundary_artifacts(tmp_path, surface)
+    )
+    expected = _stable_boundary_output(actual)
+    golden = _read_json(expected_path)
+    expected_handoff_sha = _sha256_file(handoff_path)
+    actual_handoff_sha = actual["artifacts"]["handoff"]["sha256"]
+    handoff = _read_json(pathlib.Path(actual["artifacts"]["handoff"]["path"]))
+    if (
+        _is_expected_answer_projection_diagnostic(actual)
+        or _is_expected_answer_projection_diagnostic(handoff)
+        or _has_projection_marker(actual)
+        or _has_projection_marker(handoff)
+    ):
+        _assert_expected_answer_projection_diagnostic(actual)
+        _assert_expected_answer_projection_diagnostic(handoff)
+    else:
+        _assert_no_synthetic_protected_marker(actual)
+        _assert_no_synthetic_protected_marker(handoff)
+    diff: typing.Dict[str, typing.Any] = {
+        "kind": "machine_readable_json_diff",
+        "status": "passed",
+    }
+    if golden != expected or expected_handoff_sha != actual_handoff_sha:
+        diff = {
             "kind": "machine_readable_json_diff",
-            "status": "passed",
+            "status": "failed",
+            "expected": golden,
+            "actual": expected,
+            "handoff_expected_sha256": expected_handoff_sha,
+            "handoff_actual_sha256": actual_handoff_sha,
         }
-        if golden != expected or expected_handoff_sha != actual_handoff_sha:
-            diff = {
-                "kind": "machine_readable_json_diff",
-                "status": "failed",
-                "expected": golden,
-                "actual": expected,
-                "handoff_expected_sha256": expected_handoff_sha,
-                "handoff_actual_sha256": actual_handoff_sha,
-            }
-            _write_json(diff_path, diff)
-            pytest.fail(
-                "SDK X-Ray reassembly proof drifted for "
-                f"{surface}; stage reviewed replacements through the Harness "
-                "fixture promotion flow"
-            )
         _write_json(diff_path, diff)
+        pytest.fail(
+            "SDK X-Ray reassembly proof drifted for "
+            f"{surface}; stage reviewed replacements through the Harness "
+            "fixture promotion flow"
+        )
+    _write_json(diff_path, diff)
 
 
-@pytest.mark.parametrize("surface", REAL_BOUNDARY_SURFACES)
+@pytest.mark.parametrize(
+    "surface",
+    [
+        pytest.param(
+            surface,
+            marks=(pytest.mark.pending_fixture_promotion if surface != "adp_v1" else ()),
+        )
+        for surface in REAL_BOUNDARY_SURFACES
+    ],
+)
 def test_sdk_xray_reassembly_real_boundary_packets(
     tmp_path: pathlib.Path,
     surface: str,
@@ -159,6 +179,93 @@ def test_sdk_xray_reassembly_real_boundary_packets(
             )
     _write_json(diff_path, diff)
     _assert_reviewed_expected_output_sidecar(expected_path)
+
+
+def test_adp_boundary_reassembly_detects_corrupted_real_input(
+    tmp_path: pathlib.Path,
+) -> None:
+    handoff_path, xray_path, expected_path = _copy_adp_boundary_packet(tmp_path)
+    handoff = _read_json(handoff_path)
+    xray_packet = _read_json(xray_path)
+    expected = _read_json(expected_path)
+    corrupted_employer_name = "CORRUPTED-ADP-EMPLOYER"
+    xray_packet["xray"]["chunks"][0]["customSectionOutputs"][
+        "adp_f1_employer_and_plan_information"
+    ]["employer_name"] = corrupted_employer_name
+    _write_json(xray_path, xray_packet)
+
+    result = reassemble_custom_outputs_from_xray(
+        _read_json(xray_path)["xray"],
+        workflow_extract=handoff["workflow_extract"],
+    )
+
+    assert result.final_output["employer_information"]["employer_name"] == (
+        corrupted_employer_name
+    )
+    with pytest.raises(
+        AssertionError,
+        match="reviewed final-output digest mismatch",
+    ):
+        _assert_reviewed_final_output_digest(result.final_output, expected)
+
+
+def test_adp_boundary_reassembly_detects_corrupted_expected_output(
+    tmp_path: pathlib.Path,
+) -> None:
+    handoff_path, xray_path, expected_path = _copy_adp_boundary_packet(tmp_path)
+    handoff = _read_json(handoff_path)
+    xray_packet = _read_json(xray_path)
+    result = reassemble_custom_outputs_from_xray(
+        xray_packet["xray"],
+        workflow_extract=handoff["workflow_extract"],
+    )
+    expected = _read_json(expected_path)
+    _assert_reviewed_final_output_digest(result.final_output, expected)
+
+    expected["output"]["final_output_sha256"] = "0" * 64
+    _write_json(expected_path, expected)
+
+    with pytest.raises(
+        AssertionError,
+        match="reviewed final-output digest mismatch",
+    ):
+        _assert_reviewed_final_output_digest(
+            result.final_output,
+            _read_json(expected_path),
+        )
+
+
+def test_adp_boundary_reassembly_rejects_invalid_identity_threshold_metadata(
+    tmp_path: pathlib.Path,
+) -> None:
+    handoff_path, xray_path, _expected_path = _copy_adp_boundary_packet(tmp_path)
+    handoff = _read_json(handoff_path)
+    workflow_extract = handoff["workflow_extract"]
+    employer_group = workflow_extract["_groundx_persisted_extract"][
+        "employer_information"
+    ]
+    employer_group["unique_attrs"] = ["employer_name"]
+    employer_group["identity_match"] = {
+        "threshold_attrs": ["employer_name"],
+        "activate_threshold_at": True,
+        "minimum_threshold_matches": 1,
+    }
+    employer_name_route = next(
+        route
+        for route in workflow_extract["workflow"]["output_routes"]
+        if route["final_path"] == "/employer_information/employer_name"
+    )
+    employer_name_route["final_path"] = "/employer_information/*/employer_name"
+    _write_json(handoff_path, handoff)
+
+    with pytest.raises(
+        ValueError,
+        match=r"identity_match\.activate_threshold_at must be an integer",
+    ):
+        reassemble_custom_outputs_from_xray(
+            _read_json(xray_path)["xray"],
+            workflow_extract=_read_json(handoff_path)["workflow_extract"],
+        )
 
 
 def test_repo_evidence_path_accepts_canonical_repo_prefix(
@@ -513,6 +620,24 @@ def _real_xray_sidecar_path(surface: str) -> pathlib.Path:
         / surface
         / "groundx_python_xray_reassembly.xray.json"
     )
+
+
+def _copy_adp_boundary_packet(
+    tmp_path: pathlib.Path,
+) -> typing.Tuple[pathlib.Path, pathlib.Path, pathlib.Path]:
+    sources = (
+        _real_download_workflow_load_input_path("adp_v1"),
+        _real_xray_sidecar_path("adp_v1"),
+        BOUNDARY_GOLDENS_ROOT
+        / "adp_v1"
+        / "groundx_python_xray_reassembly.expected.json",
+    )
+    copies = []
+    for source in sources:
+        destination = tmp_path / source.name
+        shutil.copyfile(source, destination)
+        copies.append(destination)
+    return copies[0], copies[1], copies[2]
 
 
 def _source_run_id_for_surface(
@@ -1347,3 +1472,15 @@ def _sha256_file(path: pathlib.Path) -> str:
 def _sha256_json(data: typing.Any) -> str:
     encoded = json.dumps(data, sort_keys=True, separators=(",", ":")).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
+
+
+def _assert_reviewed_final_output_digest(
+    final_output: typing.Mapping[str, typing.Any],
+    expected: typing.Mapping[str, typing.Any],
+) -> None:
+    actual_sha = _sha256_json(final_output)
+    expected_sha = expected["output"]["final_output_sha256"]
+    assert actual_sha == expected_sha, (
+        "reviewed final-output digest mismatch: "
+        f"expected {expected_sha}, got {actual_sha}"
+    )
