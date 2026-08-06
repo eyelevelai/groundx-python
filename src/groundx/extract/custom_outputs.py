@@ -1932,7 +1932,7 @@ def _relationship_comparison_value(value: typing.Any) -> typing.Any:
     if isinstance(unwrapped, numbers.Real):
         return ("number", float(unwrapped))
     if isinstance(unwrapped, str):
-        return ("string", unwrapped.strip().casefold())
+        return ("string", unwrapped.strip().lower())
     if isinstance(unwrapped, typing.Mapping):
         mapping = typing.cast(typing.Mapping[typing.Any, typing.Any], unwrapped)
         return (

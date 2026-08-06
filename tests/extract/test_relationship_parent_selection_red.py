@@ -439,6 +439,16 @@ BEHAVIOR_TABLE: typing.Tuple[Row, ...] = (
         "significant. See custom-output-readback/spec.md relationship semantics.",
         provenance=RATIFIED,
     ),
+    _row(
+        "R25c_case_insensitive_equality_remains_lowercase_only",
+        [{_M: "Straße", _P: "Test", _S: "water"}],
+        {_M: "STRASSE", _P: "Test", _S: "water"},
+        None,
+        "none",
+        "The R25b ruling permits only outer-whitespace trimming; it preserves "
+        "the matcher's pre-existing lowercase-only equality semantics.",
+        provenance=RATIFIED,
+    ),
     # --- conflict handling is scoped to the ignored fields only -----------
     _row(
         "R26_conflict_on_stable_field_does_not_block",
