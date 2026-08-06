@@ -151,18 +151,19 @@ metadata rather than hardcoded final group names.
 - **WHEN** the SDK applies relationship metadata
 - **THEN** extracted-field wrappers are compared by their `value`
 - **AND** strings compare case-insensitively
-- **AND** strings are compared without whitespace stripping, matching the cited
-  legacy comparison on this path
+- **AND** leading and trailing string whitespace is removed before comparison
+- **AND** internal string whitespace remains significant
 - **AND** integers and floats compare by numeric value
 - **AND** blank or missing fields do not participate
 - **AND** the parent and child only match when they have the same non-empty set
   of present match fields
 - **AND** date-style strings are not normalized by the relationship matcher.
 
-Whitespace handling on this path is an **open ruling** (R25b). The implemented
-and specified behavior is the legacy no-stripping comparison above. Whether the
-SDK should instead trim as a superset is unresolved and routed to the fixture
-promotion tasks; do not change the comparison without that ruling.
+Benjamin Fletcher resolved R25b on 2026-08-05: surrounding extraction
+whitespace is formatting noise, not identifier identity. The matcher trims only
+leading and trailing string whitespace. If trimming creates multiple parent
+matches, the existing ambiguity behavior remains authoritative unless the
+relationship explicitly declares `multiple_match_strategy: first_stable`.
 
 #### Scenario: Match attrs without a present key do not match
 
