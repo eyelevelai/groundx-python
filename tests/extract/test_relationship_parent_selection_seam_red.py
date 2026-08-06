@@ -310,6 +310,71 @@ def test_reassembly_keeps_empty_value_conflict_sibling_for_fallback_selection() 
     ]
 
 
+def test_reassembly_keeps_omitted_value_conflict_sibling_from_records() -> None:
+    result = _reassemble(
+        [
+            {
+                "meter_number": "12",
+                "provider_name__conflicts": ["Other"],
+                "service_type": "water",
+            },
+            {"meter_number": "99", "service_type": "water"},
+        ],
+        [{"meter_number": "12", "provider_name": "Unknown", "service_type": "water"}],
+    )
+    final = result.final_output
+
+    assert final["meters"][0]["provider_name__conflicts"] == ["Other"]
+    assert "provider_name" not in final["meters"][0]
+    assert "provider_name" not in final["meters"][1]
+    assert "provider_name__conflicts" not in final["meters"][1]
+    assert final["meters"][0]["meter_charges"] == []
+    assert final["account_charges"] == [
+        {"meter_number": "12", "provider_name": "Unknown", "service_type": "water"}
+    ]
+
+
+def test_reassembly_keeps_omitted_value_conflict_sibling_from_list_output() -> None:
+    result = reassemble_custom_outputs_from_xray(
+        {
+            "chunks": [
+                {
+                    "customChunkOutputs": {
+                        "meter_step": [
+                            {
+                                "meter_number": "12",
+                                "provider_name__conflicts": ["Other"],
+                                "service_type": "water",
+                            },
+                            {"meter_number": "99", "service_type": "water"},
+                        ],
+                        "charge_step": {
+                            "_records": [
+                                {
+                                    "meter_number": "12",
+                                    "provider_name": "Unknown",
+                                    "service_type": "water",
+                                }
+                            ]
+                        },
+                    }
+                }
+            ]
+        },
+        workflow_extract=_workflow_extract(),
+    )
+    final = result.final_output
+
+    assert final["meters"][0]["provider_name__conflicts"] == ["Other"]
+    assert "provider_name" not in final["meters"][0]
+    assert "provider_name" not in final["meters"][1]
+    assert "provider_name__conflicts" not in final["meters"][1]
+    assert final["meters"][0]["meter_charges"] == []
+    assert final["account_charges"] == [
+        {"meter_number": "12", "provider_name": "Unknown", "service_type": "water"}
+    ]
+
+
 def test_reassembly_requires_a_unique_fallback_parent() -> None:
     """Behavior-table row R13: two parents sharing the stable identity are not
     a unique fallback candidate (`classes/statement.py@2797b5e:3843-3850`).

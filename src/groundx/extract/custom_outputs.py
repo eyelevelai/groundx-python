@@ -552,14 +552,17 @@ def _custom_route_values(
         if isinstance(records, list):
             record_values: typing.List[_RouteValue] = []
             for index, record in enumerate(records):
-                if not isinstance(record, typing.Mapping) or output_key not in record:
+                if not isinstance(record, typing.Mapping):
+                    continue
+                conflicts = _record_conflicts_sibling(record, output_key)
+                if output_key not in record and not conflicts:
                     continue
                 record_values.append(
                     _RouteValue(
-                        value=record[output_key],
+                        value=record.get(output_key),
                         record_index=index,
                         repeated=True,
-                        conflicts=_record_conflicts_sibling(record, output_key),
+                        conflicts=conflicts,
                     )
                 )
             if record_values:
@@ -582,14 +585,15 @@ def _custom_route_values(
         values: typing.List[_RouteValue] = []
         for index, record in enumerate(step_value):
             if isinstance(record, typing.Mapping):
-                if output_key not in record:
+                conflicts = _record_conflicts_sibling(record, output_key)
+                if output_key not in record and not conflicts:
                     continue
                 values.append(
                     _RouteValue(
-                        value=record[output_key],
+                        value=record.get(output_key),
                         record_index=index,
                         repeated=True,
-                        conflicts=_record_conflicts_sibling(record, output_key),
+                        conflicts=conflicts,
                     )
                 )
             else:
