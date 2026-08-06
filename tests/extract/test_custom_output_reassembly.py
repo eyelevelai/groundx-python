@@ -823,7 +823,17 @@ def test_renamed_parent_and_child_groups_use_declared_identity_match() -> None:
     }
 
 
-@pytest.mark.parametrize("case", _custom_output_reassembly_cases(), ids=lambda case: case["id"])
+@pytest.mark.parametrize(
+    "case",
+    [
+        pytest.param(
+            case,
+            marks=(pytest.mark.pending_fixture_promotion if case["id"] != "adp-v1" else ()),
+        )
+        for case in _custom_output_reassembly_cases()
+    ],
+    ids=lambda case: case["id"],
+)
 def test_certification_fixture_reassembles_custom_outputs(case: dict) -> None:
     result = reassemble_custom_outputs_from_xray(
         case["xray"],

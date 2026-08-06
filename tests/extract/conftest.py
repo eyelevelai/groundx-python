@@ -28,3 +28,8 @@ def pytest_configure(config: pytest.Config) -> None:
         "pending_authorization: behavior taken from a revision the plan does not "
         "name; needs plan-owner ratification (currently unused -- see RULING 7a)",
     )
+    config.addinivalue_line(
+        "markers",
+        "pending_fixture_promotion: accepted fixture assertion remains intentionally "
+        "red until the guarded post-deployment promotion removes this marker",
+    )

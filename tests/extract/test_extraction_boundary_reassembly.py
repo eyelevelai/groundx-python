@@ -85,52 +85,71 @@ def test_extraction_boundary_catalog_is_pinned() -> None:
     ]
 
 
+@pytest.mark.parametrize(
+    "surface",
+    [
+        pytest.param(
+            surface,
+            marks=(pytest.mark.pending_fixture_promotion if surface != "adp_v1" else ()),
+        )
+        for surface in SURFACES
+    ],
+)
 def test_sdk_reassembly_expected_answer_projection_diagnostic_packets(
     tmp_path: pathlib.Path,
+    surface: str,
 ) -> None:
-    for surface in SURFACES:
-        actual, actual_path, expected_path, diff_path, previous_path, handoff_path = (
-            _write_boundary_artifacts(tmp_path, surface)
-        )
-        expected = _stable_boundary_output(actual)
-        golden = _read_json(expected_path)
-        expected_handoff_sha = _sha256_file(handoff_path)
-        actual_handoff_sha = actual["artifacts"]["handoff"]["sha256"]
-        handoff = _read_json(pathlib.Path(actual["artifacts"]["handoff"]["path"]))
-        if (
-            _is_expected_answer_projection_diagnostic(actual)
-            or _is_expected_answer_projection_diagnostic(handoff)
-            or _has_projection_marker(actual)
-            or _has_projection_marker(handoff)
-        ):
-            _assert_expected_answer_projection_diagnostic(actual)
-            _assert_expected_answer_projection_diagnostic(handoff)
-        else:
-            _assert_no_synthetic_protected_marker(actual)
-            _assert_no_synthetic_protected_marker(handoff)
-        diff: typing.Dict[str, typing.Any] = {
+    actual, actual_path, expected_path, diff_path, previous_path, handoff_path = (
+        _write_boundary_artifacts(tmp_path, surface)
+    )
+    expected = _stable_boundary_output(actual)
+    golden = _read_json(expected_path)
+    expected_handoff_sha = _sha256_file(handoff_path)
+    actual_handoff_sha = actual["artifacts"]["handoff"]["sha256"]
+    handoff = _read_json(pathlib.Path(actual["artifacts"]["handoff"]["path"]))
+    if (
+        _is_expected_answer_projection_diagnostic(actual)
+        or _is_expected_answer_projection_diagnostic(handoff)
+        or _has_projection_marker(actual)
+        or _has_projection_marker(handoff)
+    ):
+        _assert_expected_answer_projection_diagnostic(actual)
+        _assert_expected_answer_projection_diagnostic(handoff)
+    else:
+        _assert_no_synthetic_protected_marker(actual)
+        _assert_no_synthetic_protected_marker(handoff)
+    diff: typing.Dict[str, typing.Any] = {
+        "kind": "machine_readable_json_diff",
+        "status": "passed",
+    }
+    if golden != expected or expected_handoff_sha != actual_handoff_sha:
+        diff = {
             "kind": "machine_readable_json_diff",
-            "status": "passed",
+            "status": "failed",
+            "expected": golden,
+            "actual": expected,
+            "handoff_expected_sha256": expected_handoff_sha,
+            "handoff_actual_sha256": actual_handoff_sha,
         }
-        if golden != expected or expected_handoff_sha != actual_handoff_sha:
-            diff = {
-                "kind": "machine_readable_json_diff",
-                "status": "failed",
-                "expected": golden,
-                "actual": expected,
-                "handoff_expected_sha256": expected_handoff_sha,
-                "handoff_actual_sha256": actual_handoff_sha,
-            }
-            _write_json(diff_path, diff)
-            pytest.fail(
-                "SDK X-Ray reassembly proof drifted for "
-                f"{surface}; stage reviewed replacements through the Harness "
-                "fixture promotion flow"
-            )
         _write_json(diff_path, diff)
+        pytest.fail(
+            "SDK X-Ray reassembly proof drifted for "
+            f"{surface}; stage reviewed replacements through the Harness "
+            "fixture promotion flow"
+        )
+    _write_json(diff_path, diff)
 
 
-@pytest.mark.parametrize("surface", REAL_BOUNDARY_SURFACES)
+@pytest.mark.parametrize(
+    "surface",
+    [
+        pytest.param(
+            surface,
+            marks=(pytest.mark.pending_fixture_promotion if surface != "adp_v1" else ()),
+        )
+        for surface in REAL_BOUNDARY_SURFACES
+    ],
+)
 def test_sdk_xray_reassembly_real_boundary_packets(
     tmp_path: pathlib.Path,
     surface: str,
