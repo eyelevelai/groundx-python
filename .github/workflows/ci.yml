@@ -44,7 +44,7 @@ jobs:
         run: poetry run pytest -q -m "not pending_fixture_promotion" tests/extract/test_extraction_boundary_reassembly.py tests/extract/test_extraction_boundary_evidence_contract.py
 
       - name: Install aiohttp extra
-        run: poetry install --extras aiohttp
+        run: poetry install --extras extract --extras aiohttp
 
       - name: Test (aiohttp)
         run: poetry run pytest -rP -n auto -m aiohttp .
