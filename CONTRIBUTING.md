@@ -104,6 +104,17 @@ This approach is best for:
 7. Commit your changes with a clear commit message
 8. Push your branch and create a pull request
 
+### Release Handoff
+
+This repository does not own generated Python SDK releases. Releases are generated from
+[`eyelevel-fern-config`](https://github.com/eyelevelai/eyelevel-fern-config) and its
+release workflow is run by a human release owner.
+
+Contributors and agents must stop after preparing a validated, merge-ready pull request.
+When a release is required, the handoff must name the requested version, merged commit,
+validation evidence, and downstream consumers that need the new version. Do not create a
+release tag, dispatch a release workflow, or publish the package from this repository.
+
 ### Commit Messages
 
 Write clear, descriptive commit messages that explain what changed and why.
