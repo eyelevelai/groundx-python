@@ -1,5 +1,6 @@
 # Specify files that shouldn't be modified by Fern
 README.md
+CONTRIBUTING.md
 AGENTS.md
 src/groundx/ingest.py
 src/groundx/csv_splitter.py
@@ -17,4 +18,5 @@ CLAUDE.md
 .gitattributes
 .editorconfig
 scripts/check-line-endings.sh
+.github/workflows/ci.yml
 .github/workflows/line-endings.yml
