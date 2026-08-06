@@ -733,7 +733,12 @@ def _validate_object_array_metadata(
                 f"identity_match attributes must exist in group [{group_name}]: "
                 + ", ".join(sorted(typing.cast(typing.Set[str], missing_fields)))
             )
-        undeclared_identity = referenced_attrs - unique_attrs
+        unique_identity_attrs = set().union(
+            attr_lists["exact_attrs"],
+            attr_lists["group_attrs"],
+            attr_lists["sort_attrs"],
+        )
+        undeclared_identity = unique_identity_attrs - unique_attrs
         if undeclared_identity:
             raise ValueError(
                 "identity_match attributes must also be declared in unique_attrs: "

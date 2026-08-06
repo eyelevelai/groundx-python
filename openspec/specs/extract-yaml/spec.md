@@ -161,6 +161,16 @@ trips and workflow helper loading.
   groups, and final groups
 - **AND** the loaded definition is not reclassified as pure legacy.
 
+#### Scenario: Identity thresholds can supplement unique attributes
+
+- **GIVEN** a v1 object-array group declares `identity_match.threshold_attrs`
+  that include group fields outside `unique_attrs`
+- **WHEN** the SDK prepares and reloads the extraction definition
+- **THEN** it accepts and preserves the supplemental threshold attributes
+- **AND** every identity-match attribute must still name a field in the group
+- **AND** `exact_attrs`, `group_attrs`, and `sort_attrs` must still name
+  declared `unique_attrs`.
+
 #### Scenario: Execution-only workflow extract stays opaque
 
 - **GIVEN** a workflow `extract` mapping lacks authored persisted metadata

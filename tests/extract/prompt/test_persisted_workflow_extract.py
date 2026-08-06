@@ -311,6 +311,53 @@ generic_parents:
     }
 
 
+def test_object_array_policy_accepts_supplemental_threshold_attrs() -> None:
+    raw = """
+extraction_policy_version: v1
+
+generic_objects:
+  unique_attrs: [object_code, object_kind, object_status]
+  identity_match:
+    exact_attrs: [object_code, object_kind, object_status]
+    threshold_attrs: [object_status, primary_party, alternate_party, source_party]
+    activate_threshold_at: 2
+    minimum_threshold_matches: 3
+    group_attrs: [object_code, object_kind, object_status]
+    sort_attrs: [object_code]
+    equal_value_shortcuts:
+      object_status: [combined]
+  fields:
+    object_code:
+      prompt: {instructions: Return the object code., type: str}
+    object_kind:
+      prompt: {instructions: Return the object kind., type: str}
+    object_status:
+      prompt: {instructions: Return the object status., type: str}
+    primary_party:
+      prompt: {instructions: Return the primary party., type: str}
+    alternate_party:
+      prompt: {instructions: Return the alternate party., type: str}
+    source_party:
+      prompt: {instructions: Return the source party., type: str}
+"""
+
+    prepared = _prepare(raw)
+    reloaded = _prepare(json.loads(json.dumps(prepared.persisted_workflow_extract)))
+
+    expected_thresholds = [
+        "object_status",
+        "primary_party",
+        "alternate_party",
+        "source_party",
+    ]
+    assert prepared.final_group_metadata["generic_objects"]["identity_match"][
+        "threshold_attrs"
+    ] == expected_thresholds
+    assert reloaded.final_group_metadata["generic_objects"]["identity_match"][
+        "threshold_attrs"
+    ] == expected_thresholds
+
+
 @pytest.mark.parametrize(
     ("metadata", "message"),
     [
@@ -319,7 +366,15 @@ generic_parents:
             "identity_match attributes must exist in group [generic_rows]",
         ),
         (
-            "identity_match: {threshold_attrs: [secondary_code]}",
+            "identity_match: {exact_attrs: [secondary_code]}",
+            "identity_match attributes must also be declared in unique_attrs",
+        ),
+        (
+            "identity_match: {group_attrs: [secondary_code]}",
+            "identity_match attributes must also be declared in unique_attrs",
+        ),
+        (
+            "identity_match: {sort_attrs: [secondary_code]}",
             "identity_match attributes must also be declared in unique_attrs",
         ),
         (
