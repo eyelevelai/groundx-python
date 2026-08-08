@@ -4,6 +4,7 @@ import typing
 
 import pytest
 
+import groundx.extract as extract
 import groundx.extract.custom_outputs as custom_outputs
 from groundx.extract import prepare_extraction_yaml, reassemble_custom_outputs
 from groundx.extract.custom_outputs import reassemble_custom_outputs_from_xray
@@ -2217,6 +2218,147 @@ def test_adp_scalar_reducer_prefers_source_backed_positive_over_later_default() 
     assert [diagnostic.code for diagnostic in result.diagnostics] == ["conflicting_output_candidates"]
     assert result.diagnostics[0].severity == "warning"
     assert result.diagnostics[0].final_path == "/eligibility_requirements/entry_date"
+
+
+def test_scalar_candidate_sidecar_preserves_equal_quality_conflicts_and_pages() -> None:
+    workflow_extract = {
+        "workflow": {
+            "custom_steps": [
+                {"name": "eligibility", "level": "section", "kind": "instruct"},
+            ],
+            "output_routes": [
+                {
+                    "workflow_group": "eligibility_requirements",
+                    "workflow_field": "entry_date",
+                    "final_path": "/eligibility_requirements/entry_date",
+                    "step_name": "eligibility",
+                    "level": "section",
+                    "output_map": "customSectionOutputs",
+                    "output_key": "entry_date",
+                },
+            ],
+        }
+    }
+    xray = {
+        "chunks": [
+            {
+                "chunkId": "first",
+                "pageNumbers": [12, 12],
+                "customSectionOutputs": {"eligibility": {"entry_date": "January 1"}},
+            },
+            {
+                "chunkId": "duplicate",
+                "pageNumbers": [14, 12],
+                "customSectionOutputs": {"eligibility": {"entry_date": " january   1 "}},
+            },
+            {
+                "chunkId": "conflict",
+                "pageNumbers": [9],
+                "customSectionOutputs": {"eligibility": {"entry_date": "April 8"}},
+            },
+        ]
+    }
+
+    result = reassemble_custom_outputs_from_xray(
+        xray,
+        workflow_extract=workflow_extract,
+    )
+
+    assert result.final_output == {"eligibility_requirements": {"entry_date": "January 1"}}
+    assert len(result.scalar_candidate_sets) == 1
+    candidate_set = result.scalar_candidate_sets[0]
+    assert candidate_set.output_source == "customSectionOutputs"
+    assert candidate_set.workflow_group == "eligibility_requirements"
+    assert candidate_set.workflow_field == "entry_date"
+    assert candidate_set.final_path == "/eligibility_requirements/entry_date"
+    assert candidate_set.selected.value == "January 1"
+    assert candidate_set.selected.page_numbers == (12, 14)
+    assert [(candidate.value, candidate.page_numbers) for candidate in candidate_set.alternatives] == [
+        ("April 8", (9,)),
+    ]
+
+
+def test_scalar_candidate_sidecar_clears_inferior_candidates_after_replacement() -> None:
+    workflow_extract = {
+        "workflow": {
+            "custom_steps": [
+                {"name": "eligibility", "level": "section", "kind": "instruct"},
+            ],
+            "output_routes": [
+                {
+                    "workflow_group": "eligibility_requirements",
+                    "workflow_field": "entry_date",
+                    "final_path": "/eligibility_requirements/entry_date",
+                    "step_name": "eligibility",
+                    "level": "section",
+                    "output_map": "customSectionOutputs",
+                    "output_key": "entry_date",
+                },
+            ],
+        }
+    }
+    xray = {
+        "chunks": [
+            {
+                "chunkId": "low-confidence-selected",
+                "pageNumbers": [1],
+                "customSectionOutputs": {
+                    "eligibility": {"entry_date": {"value": "January 1", "confidence": 0.4}}
+                },
+            },
+            {
+                "chunkId": "low-confidence-conflict",
+                "pageNumbers": [2],
+                "customSectionOutputs": {
+                    "eligibility": {"entry_date": {"value": "April 8", "confidence": 0.4}}
+                },
+            },
+            {
+                "chunkId": "high-confidence-selected",
+                "pageNumbers": [3],
+                "customSectionOutputs": {
+                    "eligibility": {"entry_date": {"value": "July 1", "confidence": 0.9}}
+                },
+            },
+            {
+                "chunkId": "high-confidence-conflict",
+                "pageNumbers": [4],
+                "customSectionOutputs": {
+                    "eligibility": {"entry_date": {"value": "October 1", "confidence": 0.9}}
+                },
+            },
+        ]
+    }
+
+    result = reassemble_custom_outputs_from_xray(
+        xray,
+        workflow_extract=workflow_extract,
+    )
+
+    candidate_set = result.scalar_candidate_sets[0]
+    assert candidate_set.selected.value == {"value": "July 1", "confidence": 0.9}
+    assert candidate_set.selected.page_numbers == (3,)
+    assert [(candidate.value, candidate.page_numbers) for candidate in candidate_set.alternatives] == [
+        ({"value": "October 1", "confidence": 0.9}, (4,)),
+    ]
+    assert result.final_output == {
+        "eligibility_requirements": {
+            "entry_date": {"value": "July 1", "confidence": 0.9},
+        }
+    }
+
+
+def test_scalar_candidate_sidecar_types_are_public_exports() -> None:
+    assert "CustomOutputScalarCandidate" in extract.__all__
+    assert "CustomOutputScalarCandidateSet" in extract.__all__
+    assert (
+        extract.CustomOutputScalarCandidate
+        is custom_outputs.CustomOutputScalarCandidate
+    )
+    assert (
+        extract.CustomOutputScalarCandidateSet
+        is custom_outputs.CustomOutputScalarCandidateSet
+    )
 
 
 def test_non_repeated_section_list_value_remains_scalar_field() -> None:

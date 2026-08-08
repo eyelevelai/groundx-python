@@ -32,12 +32,29 @@ class CustomOutputSourceProvenance:
 
 
 @dataclasses.dataclass(frozen=True)
+class CustomOutputScalarCandidate:
+    value: typing.Any
+    page_numbers: typing.Tuple[int, ...] = ()
+
+
+@dataclasses.dataclass(frozen=True)
+class CustomOutputScalarCandidateSet:
+    output_source: str
+    workflow_group: str
+    workflow_field: str
+    final_path: str
+    selected: CustomOutputScalarCandidate
+    alternatives: typing.Tuple[CustomOutputScalarCandidate, ...] = ()
+
+
+@dataclasses.dataclass(frozen=True)
 class CustomOutputReassemblyResult:
     final_output: typing.Dict[str, typing.Any]
     relationship_output: typing.Optional[typing.Dict[str, typing.Any]]
     diagnostics: typing.List[CustomOutputDiagnostic]
     workflow_output: typing.Dict[str, typing.Any] = dataclasses.field(default_factory=dict)
     source_provenance: typing.List[CustomOutputSourceProvenance] = dataclasses.field(default_factory=list)
+    scalar_candidate_sets: typing.List[CustomOutputScalarCandidateSet] = dataclasses.field(default_factory=list)
 
 
 @dataclasses.dataclass(frozen=True)
@@ -73,6 +90,14 @@ class _RouteContainer:
 class _ScalarCandidate:
     value: typing.Any
     quality: typing.Tuple[int, int, float]
+    page_numbers: typing.Tuple[int, ...]
+
+
+@dataclasses.dataclass(frozen=True)
+class _ScalarCandidateState:
+    selected: _ScalarCandidate
+    alternatives: typing.Tuple[_ScalarCandidate, ...]
+    route: typing.Mapping[str, typing.Any]
 
 
 _REPEATED_STEP_KINDS = {"keys", "summary"}
@@ -130,7 +155,7 @@ def reassemble_custom_outputs_from_xray(
         typing.Tuple[typing.Tuple[str, ...], typing.Tuple[typing.Any, ...]],
         typing.Dict[str, typing.Any],
     ] = {}
-    scalar_candidates: typing.Dict[str, _ScalarCandidate] = {}
+    scalar_candidates: typing.Dict[str, _ScalarCandidateState] = {}
     workflow_repeated_records: typing.Dict[
         typing.Tuple[str, typing.Tuple[typing.Any, ...]],
         typing.Dict[str, typing.Any],
@@ -258,6 +283,7 @@ def reassemble_custom_outputs_from_xray(
         diagnostics=diagnostics,
         workflow_output=workflow_output,
         source_provenance=source_provenance,
+        scalar_candidate_sets=_public_scalar_candidate_sets(scalar_candidates),
     )
 
 
@@ -729,6 +755,7 @@ def _scalar_candidate(
     return _ScalarCandidate(
         value=value,
         quality=_scalar_candidate_quality(value, page_numbers),
+        page_numbers=page_numbers,
     )
 
 
@@ -784,7 +811,7 @@ def _set_pointer(
     record_key: typing.Tuple[typing.Any, ...],
     route: typing.Mapping[str, typing.Any],
     page_numbers: typing.Tuple[int, ...],
-    scalar_candidates: typing.Dict[str, _ScalarCandidate],
+    scalar_candidates: typing.Dict[str, _ScalarCandidateState],
     diagnostics: typing.List[CustomOutputDiagnostic],
 ) -> None:
     parts = _pointer_parts(pointer)
@@ -826,25 +853,98 @@ def _set_pointer(
             return
         current = next_value
     candidate = _scalar_candidate(value, page_numbers)
-    existing = scalar_candidates.get(pointer)
-    if existing is not None:
+    state = scalar_candidates.get(pointer)
+    if state is not None:
+        existing = state.selected
         if candidate.quality < existing.quality:
             return
         if candidate.quality == existing.quality:
-            if _normalized_candidate_value(candidate.value) != _normalized_candidate_value(existing.value):
-                diagnostics.append(
-                    CustomOutputDiagnostic(
-                        code="conflicting_output_candidates",
-                        message=f"multiple equal-quality candidates for [{pointer}]",
-                        severity="warning",
-                        workflow_group=_string_value(route.get("workflow_group")),
-                        workflow_field=_string_value(route.get("workflow_field")),
-                        final_path=pointer,
-                    )
+            normalized_candidate = _normalized_candidate_value(candidate.value)
+            if normalized_candidate == _normalized_candidate_value(existing.value):
+                scalar_candidates[pointer] = dataclasses.replace(
+                    state,
+                    selected=dataclasses.replace(
+                        existing,
+                        page_numbers=_merge_page_numbers(existing.page_numbers, candidate.page_numbers),
+                    ),
                 )
+                return
+
+            diagnostics.append(
+                CustomOutputDiagnostic(
+                    code="conflicting_output_candidates",
+                    message=f"multiple equal-quality candidates for [{pointer}]",
+                    severity="warning",
+                    workflow_group=_string_value(route.get("workflow_group")),
+                    workflow_field=_string_value(route.get("workflow_field")),
+                    final_path=pointer,
+                )
+            )
+            for index, alternative in enumerate(state.alternatives):
+                if normalized_candidate != _normalized_candidate_value(alternative.value):
+                    continue
+                alternatives = list(state.alternatives)
+                alternatives[index] = dataclasses.replace(
+                    alternative,
+                    page_numbers=_merge_page_numbers(alternative.page_numbers, candidate.page_numbers),
+                )
+                scalar_candidates[pointer] = dataclasses.replace(
+                    state,
+                    alternatives=tuple(alternatives),
+                )
+                return
+            scalar_candidates[pointer] = dataclasses.replace(
+                state,
+                alternatives=(*state.alternatives, candidate),
+            )
             return
     current[parts[-1]] = value
-    scalar_candidates[pointer] = candidate
+    scalar_candidates[pointer] = _ScalarCandidateState(
+        selected=candidate,
+        alternatives=(),
+        route=dict(route),
+    )
+
+
+def _merge_page_numbers(
+    first: typing.Sequence[int],
+    second: typing.Sequence[int],
+) -> typing.Tuple[int, ...]:
+    return tuple(dict.fromkeys((*first, *second)))
+
+
+def _public_scalar_candidate_sets(
+    scalar_candidates: typing.Mapping[str, _ScalarCandidateState],
+) -> typing.List[CustomOutputScalarCandidateSet]:
+    candidate_sets: typing.List[CustomOutputScalarCandidateSet] = []
+    for final_path, state in scalar_candidates.items():
+        output_source = state.route.get("output_map")
+        workflow_group = state.route.get("workflow_group")
+        workflow_field = state.route.get("workflow_field")
+        if not isinstance(output_source, str):
+            continue
+        if not isinstance(workflow_group, str):
+            continue
+        if not isinstance(workflow_field, str):
+            continue
+        candidate_sets.append(
+            CustomOutputScalarCandidateSet(
+                output_source=output_source,
+                workflow_group=workflow_group,
+                workflow_field=workflow_field,
+                final_path=final_path,
+                selected=_public_scalar_candidate(state.selected),
+                alternatives=tuple(_public_scalar_candidate(candidate) for candidate in state.alternatives),
+            )
+        )
+    return candidate_sets
+
+
+def _public_scalar_candidate(candidate: _ScalarCandidate) -> CustomOutputScalarCandidate:
+    return CustomOutputScalarCandidate(
+        value=copy.deepcopy(candidate.value),
+        page_numbers=candidate.page_numbers,
+    )
 
 
 def _set_workflow_value(
