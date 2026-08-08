@@ -122,10 +122,10 @@
     "package_name": "groundx",
     "pyproject_toml": "[[tool.mypy.overrides]]\nmodule = [\"dateparser.*\"]\nignore_missing_imports = true\n\n[[tool.mypy.overrides]]\nmodule = [\"boto3.*\", \"botocore.*\"]\nignore_missing_imports = true\n\n[[tool.mypy.overrides]]\nmodule = [\"fastapi.*\", \"starlette.*\", \"redis.*\"]\nignore_missing_imports = true\n\n[[tool.mypy.overrides]]\nmodule = [\"google.*\", \"googleapiclient.*\", \"gspread.*\"]\nignore_missing_imports = true\n\n[[tool.mypy.overrides]]\nmodule = [\"minio.*\"]\nignore_missing_imports = true\n\n[[tool.mypy.overrides]]\nmodule = [\"openai.*\"]\nignore_missing_imports = true\n\n[[tool.mypy.overrides]]\nmodule = [\"PIL.*\"]\nignore_missing_imports = true\n\n[[tool.mypy.overrides]]\nmodule = [\"smolagents.*\"]\nignore_missing_imports = true\n\n[[tool.mypy.overrides]]\nmodule = [\"yaml.*\"]\nignore_missing_imports = true\n\n[[tool.mypy.overrides]]\nmodule = [\"groundx.extract.classes.document\"]\ndisable_error_code = [\"call-arg\"]\n\n[[tool.mypy.overrides]]\nmodule = [\"groundx.extract.tasks.utility\"]\ndisable_error_code = [\"call-arg\"]\n"
   },
-  "originGitCommit": "8d201a746b6ac54c6ec7ea9c96ee6c1d23b7da49",
+  "originGitCommit": "5a517a018a0d84429d0749d3edb8c664f1bee67c",
   "originGitCommitIsDirty": false,
   "invokedBy": "ci",
-  "requestedVersion": "3.9.1",
+  "requestedVersion": "3.9.2",
   "ciProvider": "github",
-  "sdkVersion": "3.9.1"
+  "sdkVersion": "3.9.2"
 }
