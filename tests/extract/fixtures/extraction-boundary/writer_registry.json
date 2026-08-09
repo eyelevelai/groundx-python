@@ -17,6 +17,7 @@
       "s3_path_template": "layout/processed/{task_id}/{document_id}-extract-trace/internal-arcadia-agents/{stage_run}/output.full_json.json",
       "consumer_boundary": "internal_arcadia_download_workflow_load",
       "fixture_path_template": "groundx-python/tests/extract/fixtures/extraction-boundary/boundary-goldens/{surface}/groundx_python_xray_reassembly.expected.json",
+      "fixture_policy": "commit_sanitized_fixture",
       "applicability": "all protected cases during Internal Arcadia X-Ray load",
       "ci_test": "tests/extract/test_extraction_boundary_reassembly.py",
       "required_ci_check": "Test",
