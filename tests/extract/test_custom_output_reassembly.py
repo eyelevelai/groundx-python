@@ -10,11 +10,35 @@ from groundx.extract import prepare_extraction_yaml, reassemble_custom_outputs
 from groundx.extract.custom_outputs import reassemble_custom_outputs_from_xray
 
 FIXTURE_DIR = pathlib.Path(__file__).parent / "fixtures"
+BOUNDARY_PROJECTION_PATH = FIXTURE_DIR / "extraction-boundary" / "catalog.json"
 
 
 def _custom_output_reassembly_cases() -> list[dict]:
     fixture = FIXTURE_DIR / "custom_output_reassembly_cases.json"
     return json.loads(fixture.read_text())["cases"]
+
+
+def _projection_case_statuses() -> dict[str, str]:
+    projection = json.loads(BOUNDARY_PROJECTION_PATH.read_text())
+    return {case["id"]: case["fixture_status"] for case in projection["cases"]}
+
+
+def _certification_case_params() -> list:
+    statuses = _projection_case_statuses()
+    cases = {case["id"]: case for case in _custom_output_reassembly_cases()}
+    return [
+        pytest.param(
+            cases[case_id],
+            id=case_id,
+            marks=(
+                (pytest.mark.pending_fixture_promotion,)
+                if status == "pending"
+                else ()
+            ),
+        )
+        for case_id, status in statuses.items()
+        if case_id in cases
+    ]
 
 
 def _provenance_dicts(result) -> list[dict]:
@@ -824,17 +848,31 @@ def test_renamed_parent_and_child_groups_use_declared_identity_match() -> None:
     }
 
 
-@pytest.mark.parametrize(
-    "case",
-    [
-        pytest.param(
-            case,
-            marks=(pytest.mark.pending_fixture_promotion if case["id"] != "adp-v1" else ()),
-        )
-        for case in _custom_output_reassembly_cases()
-    ],
-    ids=lambda case: case["id"],
-)
+def test_custom_output_case_membership_matches_owner_projection() -> None:
+    statuses = _projection_case_statuses()
+    present = {case["id"] for case in _custom_output_reassembly_cases()}
+
+    assert present <= set(statuses)
+    missing_complete = sorted(
+        case_id
+        for case_id, status in statuses.items()
+        if status == "complete" and case_id not in present
+    )
+    assert missing_complete == []
+
+
+def test_pending_projection_case_payloads_are_marked_for_promotion() -> None:
+    statuses = _projection_case_statuses()
+
+    for param in _certification_case_params():
+        marks = [mark.name for mark in param.marks]
+        if statuses[param.values[0]["id"]] == "pending":
+            assert marks == ["pending_fixture_promotion"]
+        else:
+            assert marks == []
+
+
+@pytest.mark.parametrize("case", _certification_case_params())
 def test_certification_fixture_reassembles_custom_outputs(case: dict) -> None:
     result = reassemble_custom_outputs_from_xray(
         case["xray"],

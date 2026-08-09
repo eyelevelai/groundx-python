@@ -14,9 +14,10 @@ CONTRACT_ROOT = (
 )
 SCHEMA_PATH = CONTRACT_ROOT / "evidence.schema.json"
 VECTORS_PATH = CONTRACT_ROOT / "evidence.vectors.json"
-SCHEMA_SHA256 = "08bf7755b5585ff602c31d7fe733a70cbb01edcc464f3eb6a989e24df3797f30"
-VECTORS_SHA256 = "bb05cd0e224f26ea40b3b956c8ee4291c6c94092c823ff4604d433131d8d0e71"
+SCHEMA_SHA256 = "02dccc8db917fb50e3e91c49e7cc84574c74d7b2e176f41c5c0b6aff35ed0a5e"
+VECTORS_SHA256 = "781cefd5af441c567a22cc1555ebb2f4a14e46e90df2480f4de004bb68de75f6"
 SHA256_RE = re.compile(r"^[a-f0-9]{64}$")
+SURFACE_RE = re.compile(r"^[A-Za-z0-9_.-]+$")
 
 
 def test_extraction_boundary_evidence_contract_vectors() -> None:
@@ -65,13 +66,7 @@ def _validate_evidence(value: dict[str, Any]) -> None:
         raise ValueError("unexpected evidence fields")
     if value["schema_version"] != "extraction_boundary_evidence_v1":
         raise ValueError("invalid schema version")
-    if value["surface"] not in {
-        "arcadia_legacy",
-        "arcadia_v1",
-        "generic_v1",
-        "adp_v1",
-        "current_repro",
-    }:
+    if not SURFACE_RE.fullmatch(value["surface"]):
         raise ValueError("invalid surface")
     if not value["boundary_events"]:
         raise ValueError("boundary events required")

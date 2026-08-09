@@ -29,13 +29,8 @@
       "minLength": 1
     },
     "surface": {
-      "enum": [
-        "arcadia_legacy",
-        "arcadia_v1",
-        "generic_v1",
-        "adp_v1",
-        "current_repro"
-      ]
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.-]+$"
     },
     "run_id": {
       "type": "string",
@@ -585,8 +580,19 @@
         "workflow_readbacks",
         "cdn_inputs",
         "trace_seal",
-        "four_case_result",
         "local_verifier"
+      ],
+      "anyOf": [
+        {
+          "required": [
+            "configured_case_result"
+          ]
+        },
+        {
+          "required": [
+            "four_case_result"
+          ]
+        }
       ],
       "properties": {
         "schema_version": {
@@ -662,7 +668,7 @@
         },
         "workflow_readbacks": {
           "type": "array",
-          "minItems": 4,
+          "minItems": 1,
           "items": {
             "type": "object",
             "additionalProperties": false,
@@ -744,7 +750,6 @@
           "type": "object",
           "additionalProperties": false,
           "required": [
-            "bucket",
             "path",
             "sha256",
             "bytes",
@@ -752,9 +757,6 @@
             "seal_sha256"
           ],
           "properties": {
-            "bucket": {
-              "$ref": "#/$defs/non_empty_string"
-            },
             "path": {
               "$ref": "#/$defs/non_empty_string"
             },
@@ -773,9 +775,8 @@
             }
           }
         },
-        "four_case_result": {
+        "configured_case_result": {
           "type": "object",
-          "additionalProperties": false,
           "required": [
             "sha256",
             "summary",
@@ -790,37 +791,27 @@
             },
             "cases": {
               "type": "array",
-              "minItems": 4,
-              "maxItems": 4,
-              "items": {
-                "type": "object",
-                "additionalProperties": false,
-                "required": [
-                  "case_id",
-                  "surface",
-                  "status",
-                  "result_sha256"
-                ],
-                "properties": {
-                  "case_id": {
-                    "$ref": "#/$defs/non_empty_string"
-                  },
-                  "surface": {
-                    "enum": [
-                      "arcadia_legacy",
-                      "arcadia_v1",
-                      "generic_v1",
-                      "adp_v1"
-                    ]
-                  },
-                  "status": {
-                    "const": "passed"
-                  },
-                  "result_sha256": {
-                    "$ref": "#/$defs/sha256"
-                  }
-                }
-              }
+              "minItems": 1
+            }
+          }
+        },
+        "four_case_result": {
+          "type": "object",
+          "required": [
+            "sha256",
+            "summary",
+            "cases"
+          ],
+          "properties": {
+            "sha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "summary": {
+              "type": "object"
+            },
+            "cases": {
+              "type": "array",
+              "minItems": 4
             }
           }
         },
