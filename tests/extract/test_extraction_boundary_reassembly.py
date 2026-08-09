@@ -1,5 +1,6 @@
 import copy
 import hashlib
+import importlib.util
 import json
 import pathlib
 import re
@@ -14,6 +15,14 @@ import pytest
 from groundx.extract.custom_outputs import reassemble_custom_outputs_from_xray
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
+_REPLAY_INPUTS_SPEC = importlib.util.spec_from_file_location(
+    "boundary_replay_inputs",
+    pathlib.Path(__file__).with_name("_boundary_replay_inputs.py"),
+)
+assert _REPLAY_INPUTS_SPEC is not None and _REPLAY_INPUTS_SPEC.loader is not None
+_replay_inputs = importlib.util.module_from_spec(_REPLAY_INPUTS_SPEC)
+_REPLAY_INPUTS_SPEC.loader.exec_module(_replay_inputs)
+replay_inputs_are_locally_coherent = _replay_inputs.replay_inputs_are_locally_coherent
 DIAGNOSTIC_ROOT = (
     ROOT
     / "tests"
@@ -44,23 +53,22 @@ SOURCE_RUN_ID_RE = re.compile(r"live-\d{8}T\d{6}Z[^/\\\s\"]*")
 _PROJECTION = json.loads(CATALOG_PATH.read_text(encoding="utf-8"))
 SURFACES = [case["surface"] for case in _PROJECTION["cases"]]
 REAL_BOUNDARY_SURFACES = tuple(SURFACES)
-PENDING_SURFACES = frozenset(
-    case["surface"]
-    for case in _PROJECTION["cases"]
-    if case["fixture_status"] == "pending"
-)
-
-
-def _pending_marked_surface_params(
+def _replay_surface_params(
     surfaces: typing.Sequence[str],
-    pending: typing.AbstractSet[str],
+    *,
+    input_root: pathlib.Path = BOUNDARY_INPUT_ROOT,
+    goldens_root: pathlib.Path = BOUNDARY_GOLDENS_ROOT,
 ) -> typing.List[typing.Any]:
     return [
         pytest.param(
             surface,
             marks=(
                 (pytest.mark.pending_fixture_promotion,)
-                if surface in pending
+                if not replay_inputs_are_locally_coherent(
+                    surface=surface,
+                    input_root=input_root,
+                    goldens_root=goldens_root,
+                )
                 else ()
             ),
         )
@@ -103,25 +111,84 @@ def test_extraction_boundary_owner_projection_is_pinned() -> None:
     assert artifact["writer"] == "groundx-python/src/groundx/extract"
 
 
-def test_pending_projection_case_marks_replay_params() -> None:
-    cases = [
-        {"surface": "complete_v1", "fixture_status": "complete"},
-        {"surface": "fifth_v1", "fixture_status": "pending"},
+def test_replay_input_gate_marks_only_stale_real_cases() -> None:
+    params = _replay_surface_params(SURFACES)
+    marked = {
+        param.values[0]
+        for param in params
+        if [mark.name for mark in param.marks] == ["pending_fixture_promotion"]
+    }
+
+    assert marked == {"arcadia_legacy", "arcadia_v1", "generic_v1"}
+    assert _PROJECTION["cases"][-1]["fixture_status"] == "pending"
+
+
+def test_replay_input_gate_marks_synthetic_pending_cases_with_absent_or_incoherent_inputs(
+    tmp_path: pathlib.Path,
+) -> None:
+    input_root = tmp_path / "inputs"
+    goldens_root = tmp_path / "goldens"
+    surface = "synthetic_pending"
+    assert not replay_inputs_are_locally_coherent(
+        surface=surface,
+        input_root=input_root,
+        goldens_root=goldens_root,
+    )
+    [absent_param] = _replay_surface_params(
+        [surface],
+        input_root=input_root,
+        goldens_root=goldens_root,
+    )
+    assert [mark.name for mark in absent_param.marks] == ["pending_fixture_promotion"]
+
+    handoff_path = input_root / surface / "internal_arcadia_download_workflow_load.handoff.json"
+    xray_path = input_root / surface / "groundx_python_xray_reassembly.xray.json"
+    expected_path = goldens_root / surface / "groundx_python_xray_reassembly.expected.json"
+    _write_json(
+        handoff_path,
+        {
+            "surface": surface,
+            "stage": "internal_arcadia_download_workflow_load",
+            "request": {},
+            "workflow_extract": {},
+        },
+    )
+    _write_json(
+        xray_path,
+        {
+            "surface": surface,
+            "schema_version": "groundx_python_xray_reassembly_sidecar_v1",
+            "xray": {},
+        },
+    )
+    _write_json(
+        expected_path,
+        {
+            "surface": surface,
+            "input_sha256": "0" * 64,
+            "artifacts": {
+                "previous_download_workflow_load": {"sha256": "0" * 64},
+                "xray_sidecar": {"sha256": "0" * 64},
+            },
+        },
+    )
+
+    assert not replay_inputs_are_locally_coherent(
+        surface=surface,
+        input_root=input_root,
+        goldens_root=goldens_root,
+    )
+    [incoherent_param] = _replay_surface_params(
+        [surface],
+        input_root=input_root,
+        goldens_root=goldens_root,
+    )
+    assert [mark.name for mark in incoherent_param.marks] == [
+        "pending_fixture_promotion"
     ]
-    pending = frozenset(
-        case["surface"] for case in cases if case["fixture_status"] == "pending"
-    )
-
-    complete_param, fifth_param = _pending_marked_surface_params(
-        [case["surface"] for case in cases],
-        pending,
-    )
-
-    assert [mark.name for mark in fifth_param.marks] == ["pending_fixture_promotion"]
-    assert complete_param.marks == ()
 
 
-def test_pending_case_marked_tests_deselect_under_ci_filter() -> None:
+def test_replay_input_gate_deselects_only_stale_pending_cases_under_ci_filter() -> None:
     result = subprocess.run(
         [
             sys.executable,
@@ -150,15 +217,15 @@ def test_pending_case_marked_tests_deselect_under_ci_filter() -> None:
         surface_tests = {
             line.split("::")[1].split("[")[0] for line in surface_ids
         }
-        if surface in PENDING_SURFACES:
-            assert not surface_tests & replay_tests, surface
-        else:
+        if surface == "adp_v1":
             assert surface_tests >= replay_tests, surface
+        else:
+            assert not surface_tests & replay_tests, surface
 
 
 @pytest.mark.parametrize(
     "surface",
-    _pending_marked_surface_params(SURFACES, PENDING_SURFACES),
+    _replay_surface_params(SURFACES),
 )
 def test_sdk_reassembly_expected_answer_projection_diagnostic_packets(
     tmp_path: pathlib.Path,
@@ -207,7 +274,7 @@ def test_sdk_reassembly_expected_answer_projection_diagnostic_packets(
 
 @pytest.mark.parametrize(
     "surface",
-    _pending_marked_surface_params(REAL_BOUNDARY_SURFACES, PENDING_SURFACES),
+    _replay_surface_params(REAL_BOUNDARY_SURFACES),
 )
 def test_sdk_xray_reassembly_real_boundary_packets(
     tmp_path: pathlib.Path,

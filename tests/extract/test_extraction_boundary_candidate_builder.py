@@ -22,6 +22,34 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _load_builder_module():
+    spec = importlib.util.spec_from_file_location(
+        "extraction_boundary_candidate_builder",
+        SCRIPT,
+    )
+    assert spec is not None and spec.loader is not None
+    builder = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(builder)
+    return builder
+
+
+def test_builder_default_surfaces_follow_projection_order(monkeypatch) -> None:
+    projection = {"cases": [{"surface": "third"}, {"surface": "first"}]}
+    original_read_text = Path.read_text
+    catalog_path = BOUNDARY_ROOT / "catalog.json"
+
+    def read_text(path: Path, *args, **kwargs):
+        if path == catalog_path:
+            return json.dumps(projection)
+        return original_read_text(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", read_text)
+    builder = _load_builder_module()
+
+    assert builder.SURFACES == ("third", "first")
+    assert builder._selected_surfaces(None) == ("third", "first")
+
+
 def test_builder_writes_review_candidates_without_touching_accepted_fixtures(
     tmp_path: Path,
 ) -> None:
@@ -210,13 +238,7 @@ def test_builder_records_reassembly_when_quality_assertions_fail(
         ),
         _stable_boundary_output=lambda value: value,
     )
-    spec = importlib.util.spec_from_file_location(
-        "extraction_boundary_candidate_builder",
-        SCRIPT,
-    )
-    assert spec is not None and spec.loader is not None
-    builder = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(builder)
+    builder = _load_builder_module()
     monkeypatch.setattr(builder, "_load_replay_module", lambda _repo_root: replay)
     candidate_root = tmp_path / "sdk-candidates"
 

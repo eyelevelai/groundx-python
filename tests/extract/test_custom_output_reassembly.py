@@ -1,3 +1,4 @@
+import importlib.util
 import json
 import pathlib
 import typing
@@ -10,6 +11,14 @@ from groundx.extract import prepare_extraction_yaml, reassemble_custom_outputs
 from groundx.extract.custom_outputs import reassemble_custom_outputs_from_xray
 
 FIXTURE_DIR = pathlib.Path(__file__).parent / "fixtures"
+_REPLAY_INPUTS_SPEC = importlib.util.spec_from_file_location(
+    "boundary_replay_inputs",
+    pathlib.Path(__file__).with_name("_boundary_replay_inputs.py"),
+)
+assert _REPLAY_INPUTS_SPEC is not None and _REPLAY_INPUTS_SPEC.loader is not None
+_replay_inputs = importlib.util.module_from_spec(_REPLAY_INPUTS_SPEC)
+_REPLAY_INPUTS_SPEC.loader.exec_module(_replay_inputs)
+replay_inputs_are_locally_coherent = _replay_inputs.replay_inputs_are_locally_coherent
 BOUNDARY_PROJECTION_PATH = FIXTURE_DIR / "extraction-boundary" / "catalog.json"
 
 
@@ -18,13 +27,13 @@ def _custom_output_reassembly_cases() -> list[dict]:
     return json.loads(fixture.read_text())["cases"]
 
 
-def _projection_case_statuses() -> dict[str, str]:
+def _projection_cases() -> dict[str, dict]:
     projection = json.loads(BOUNDARY_PROJECTION_PATH.read_text())
-    return {case["id"]: case["fixture_status"] for case in projection["cases"]}
+    return {case["id"]: case for case in projection["cases"]}
 
 
 def _certification_case_params() -> list:
-    statuses = _projection_case_statuses()
+    projection_cases = _projection_cases()
     cases = {case["id"]: case for case in _custom_output_reassembly_cases()}
     return [
         pytest.param(
@@ -32,11 +41,15 @@ def _certification_case_params() -> list:
             id=case_id,
             marks=(
                 (pytest.mark.pending_fixture_promotion,)
-                if status == "pending"
+                if not replay_inputs_are_locally_coherent(
+                    surface=projection_case["surface"],
+                    input_root=BOUNDARY_PROJECTION_PATH.parent / "inputs",
+                    goldens_root=BOUNDARY_PROJECTION_PATH.parent / "boundary-goldens",
+                )
                 else ()
             ),
         )
-        for case_id, status in statuses.items()
+        for case_id, projection_case in projection_cases.items()
         if case_id in cases
     ]
 
@@ -849,27 +862,29 @@ def test_renamed_parent_and_child_groups_use_declared_identity_match() -> None:
 
 
 def test_custom_output_case_membership_matches_owner_projection() -> None:
-    statuses = _projection_case_statuses()
+    projection_cases = _projection_cases()
     present = {case["id"] for case in _custom_output_reassembly_cases()}
 
-    assert present <= set(statuses)
+    assert present <= set(projection_cases)
     missing_complete = sorted(
         case_id
-        for case_id, status in statuses.items()
-        if status == "complete" and case_id not in present
+        for case_id, projection_case in projection_cases.items()
+        if projection_case["fixture_status"] == "complete" and case_id not in present
     )
     assert missing_complete == []
 
 
-def test_pending_projection_case_payloads_are_marked_for_promotion() -> None:
-    statuses = _projection_case_statuses()
+def test_replay_input_gate_marks_only_stale_custom_output_cases() -> None:
+    projection_cases = _projection_cases()
 
     for param in _certification_case_params():
         marks = [mark.name for mark in param.marks]
-        if statuses[param.values[0]["id"]] == "pending":
-            assert marks == ["pending_fixture_promotion"]
-        else:
+        case_id = param.values[0]["id"]
+        if case_id == "adp-v1":
             assert marks == []
+            assert projection_cases[case_id]["fixture_status"] == "pending"
+        else:
+            assert marks == ["pending_fixture_promotion"]
 
 
 @pytest.mark.parametrize("case", _certification_case_params())
