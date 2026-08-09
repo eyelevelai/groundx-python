@@ -187,6 +187,54 @@ def test_replay_input_gate_marks_synthetic_pending_cases_with_absent_or_incohere
         "pending_fixture_promotion"
     ]
 
+    _write_json(
+        expected_path,
+        {
+            "surface": surface,
+            "input_sha256": _sha256_file(handoff_path),
+            "artifacts": {
+                "previous_download_workflow_load": {
+                    "sha256": _sha256_file(handoff_path)
+                },
+                "xray_sidecar": {"sha256": _sha256_file(xray_path)},
+            },
+        },
+    )
+    assert not replay_inputs_are_locally_coherent(
+        surface=surface,
+        input_root=input_root,
+        goldens_root=goldens_root,
+    )
+
+    _write_json(
+        xray_path,
+        {
+            "surface": surface,
+            "schema_version": "groundx_python_xray_reassembly_sidecar_v1",
+            "input_for": "wrong_replay",
+            "source_handoff": "wrong.handoff.json",
+            "xray": {},
+        },
+    )
+    _write_json(
+        expected_path,
+        {
+            "surface": surface,
+            "input_sha256": _sha256_file(handoff_path),
+            "artifacts": {
+                "previous_download_workflow_load": {
+                    "sha256": _sha256_file(handoff_path)
+                },
+                "xray_sidecar": {"sha256": _sha256_file(xray_path)},
+            },
+        },
+    )
+    assert not replay_inputs_are_locally_coherent(
+        surface=surface,
+        input_root=input_root,
+        goldens_root=goldens_root,
+    )
+
 
 def test_replay_input_gate_deselects_only_stale_pending_cases_under_ci_filter() -> None:
     result = subprocess.run(

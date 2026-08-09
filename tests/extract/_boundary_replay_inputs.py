@@ -31,6 +31,9 @@ def replay_inputs_are_locally_coherent(
             and xray_sidecar["surface"] == surface
             and xray_sidecar["schema_version"]
             == "groundx_python_xray_reassembly_sidecar_v1"
+            and xray_sidecar["input_for"] == "groundx_python_xray_reassembly"
+            and xray_sidecar["source_handoff"]
+            == "internal_arcadia_download_workflow_load.handoff.json"
             and isinstance(xray_sidecar["xray"], dict)
             and expected["surface"] == surface
             and expected["input_sha256"] == _sha256(handoff_path)
