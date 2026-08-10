@@ -28,6 +28,18 @@ def test_extraction_boundary_evidence_contract_vectors() -> None:
     assert schema["$id"].endswith("/extraction-boundary/evidence.schema.json")
     assert vectors["schema_version"] == "extraction_boundary_evidence_vectors_v1"
 
+    _run_evidence_vectors(vectors)
+
+
+def _run_evidence_vectors(vectors: dict[str, Any]) -> None:
+    supported_groups = {"valid", "invalid", "live_reference_trace_seal"}
+    declared_groups = set(vectors) - {"schema_version"}
+    unhandled_groups = declared_groups - supported_groups
+    if unhandled_groups:
+        raise AssertionError(
+            "unhandled evidence vector groups: " + ", ".join(sorted(unhandled_groups))
+        )
+
     for vector in vectors["valid"]:
         _validate_evidence(vector["value"])
 
@@ -43,6 +55,68 @@ def test_extraction_boundary_evidence_contract_vectors() -> None:
         except ValueError:
             continue
         raise AssertionError(f"invalid vector accepted: {vector['name']}")
+
+    seal_vectors = vectors["live_reference_trace_seal"]
+    for vector in seal_vectors["valid"]:
+        _validate_live_reference_trace_seal(vector["value"])
+    for vector in seal_vectors["invalid"]:
+        try:
+            _validate_live_reference_trace_seal(vector["value"])
+        except ValueError:
+            continue
+        raise AssertionError(
+            f"invalid live_reference_trace_seal vector accepted: {vector['name']}"
+        )
+
+
+def test_live_reference_trace_seal_vectors_have_expected_validity() -> None:
+    vectors = _read_json(VECTORS_PATH)["live_reference_trace_seal"]
+
+    for vector in vectors["valid"]:
+        _validate_live_reference_trace_seal(vector["value"])
+
+    for vector in vectors["invalid"]:
+        try:
+            _validate_live_reference_trace_seal(vector["value"])
+        except ValueError:
+            continue
+        raise AssertionError(
+            f"invalid live_reference_trace_seal vector accepted: {vector['name']}"
+        )
+
+
+def test_evidence_vector_runner_rejects_unknown_groups() -> None:
+    vectors = _read_json(VECTORS_PATH)
+    vectors["future_contract_group"] = {"valid": [], "invalid": []}
+
+    try:
+        _run_evidence_vectors(vectors)
+    except AssertionError as error:
+        assert "unhandled evidence vector groups: future_contract_group" in str(error)
+    else:
+        raise AssertionError("unknown evidence vector group was ignored")
+
+
+def _validate_live_reference_trace_seal(value: dict[str, Any]) -> None:
+    required = {"path", "sha256", "bytes", "modified_at", "seal_sha256"}
+    fields = set(value)
+    if fields != required and fields != required | {"bucket"}:
+        raise ValueError("unexpected live reference trace seal fields")
+    for field in ("path", "modified_at"):
+        if not isinstance(value[field], str) or not value[field]:
+            raise ValueError(f"invalid trace seal {field}")
+    if "bucket" in value and (
+        not isinstance(value["bucket"], str) or not value["bucket"]
+    ):
+        raise ValueError("invalid trace seal bucket")
+    for field in ("sha256", "seal_sha256"):
+        _require_sha(value[field])
+    if (
+        not isinstance(value["bytes"], int)
+        or isinstance(value["bytes"], bool)
+        or value["bytes"] < 0
+    ):
+        raise ValueError("invalid trace seal bytes")
 
 
 def _validate_evidence(value: dict[str, Any]) -> None:
