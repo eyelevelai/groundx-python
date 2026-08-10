@@ -44,6 +44,6 @@ X-Ray input without its matching SDK output candidate.
 Only the external model/provider response may be replaced by a fixed fixture.
 Tests must call production reassembly functions unchanged.
 
-Capture, review, promotion, and certification lifecycle detail lives in the
-canonical private Studio Harness certification guide
-(`groundx-extraction-workflows` skill, `references/certification.private.md`).
+Fixture capture, diagnosis, updates, and final certification use the canonical
+private Studio Harness guide only: `groundx-extraction-workflows`,
+`references/certification.private.md`.
