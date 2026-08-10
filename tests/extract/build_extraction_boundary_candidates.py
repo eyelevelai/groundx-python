@@ -84,6 +84,35 @@ def _selected_surfaces(value: str | None) -> tuple[str, ...]:
     return selected
 
 
+def _producer_handoff_candidates(
+    *,
+    candidate_manifest: dict[str, typing.Any],
+    candidate_root: Path,
+) -> dict[str, Path]:
+    handoffs: dict[str, Path] = {}
+    expected_suffix = "/internal_arcadia_download_workflow_load.handoff.json"
+    for entry in candidate_manifest["candidates"]:
+        if entry.get("artifact_name") != "internal_arcadia_download_workflow_load":
+            continue
+        surface = str(entry.get("surface") or "")
+        matching = [
+            value
+            for value in entry.get("next_boundary_inputs", [])
+            if str(value.get("candidate_path") or "").startswith("groundx-python/")
+            and str(value.get("candidate_path") or "").endswith(expected_suffix)
+        ]
+        if len(matching) != 1:
+            raise ValueError(f"proposed producer handoff missing for {surface}")
+        candidate = matching[0]
+        path = _resolve_inside(candidate_root, candidate["candidate_path"])
+        if not path.exists() or _sha256(path) != candidate.get("sha256"):
+            raise ValueError(f"proposed producer handoff hash does not match for {surface}")
+        if surface in handoffs:
+            raise ValueError(f"duplicate proposed producer handoff for {surface}")
+        handoffs[surface] = path
+    return handoffs
+
+
 def _candidate_entry(
     *,
     surface: str,
@@ -147,12 +176,20 @@ def build_candidates(
         if not sidecar_path.exists() or _sha256(sidecar_path) != entry["sha256"]:
             raise ValueError(f"X-Ray candidate hash does not match for {surface}")
         sidecars[surface] = entry
-    missing = sorted(set(surfaces) - set(sidecars))
-    if missing:
-        raise ValueError(f"X-Ray candidates missing surfaces: {', '.join(missing)}")
+    producer_handoffs = _producer_handoff_candidates(
+        candidate_manifest=sidecar_manifest,
+        candidate_root=sidecar_root,
+    )
+    missing_sidecars = sorted(set(surfaces) - set(sidecars))
+    if missing_sidecars:
+        raise ValueError(f"X-Ray candidates missing surfaces: {', '.join(missing_sidecars)}")
+    missing_handoffs = sorted(set(surfaces) - set(producer_handoffs))
+    if missing_handoffs:
+        raise ValueError("proposed producer handoffs missing surfaces: " + ", ".join(missing_handoffs))
 
     replay = _load_replay_module(repo_root)
     replay._real_xray_sidecar_path = lambda surface: _resolve_inside(sidecar_root, sidecars[surface]["candidate_path"])
+    replay._real_download_workflow_load_input_path = lambda surface: producer_handoffs[surface]
     candidates = []
     for surface in surfaces:
         actual, accepted_path, _unused_diff_path = replay._build_xray_reassembly_boundary_artifact(

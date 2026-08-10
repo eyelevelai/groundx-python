@@ -37,9 +37,13 @@ poetry run python tests/extract/build_extraction_boundary_candidates.py \
 ```
 
 This command calls `reassemble_custom_outputs_from_xray` and writes only to the
-candidate root. Candidate generation freezes observed behavior; human review
-decides whether that behavior replaces the accepted fixture. Do not promote an
-X-Ray input without its matching SDK output candidate.
+candidate root. For each selected surface, it must replay both the proposed X-Ray
+and the proposed `internal_arcadia_download_workflow_load` successor input from
+that same provider candidate manifest. Mixing a proposed X-Ray with the accepted
+old producer handoff is invalid lineage and must fail candidate generation.
+Candidate generation freezes observed behavior; human review decides whether
+that behavior replaces the accepted fixture. Do not promote an X-Ray input
+without its matching SDK output candidate.
 
 Only the external model/provider response may be replaced by a fixed fixture.
 Tests must call production reassembly functions unchanged.
