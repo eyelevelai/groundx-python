@@ -15,4 +15,4 @@ in the linked docs, not in this entrypoint.
 | [`tests/custom/`](tests/custom/) | You are adding hand-written regression coverage around generated or preserved SDK behavior. |
 | [`eyelevel-fern-config`](https://github.com/eyelevelai/eyelevel-fern-config) | You need an API-shape, generated model, endpoint, package metadata, or SDK generation change. |
 | [`scripts/check-line-endings.sh`](scripts/check-line-endings.sh) | You need to verify tracked files use LF line endings (run before pushing; also enforced in CI). |
-| Private Studio Harness `openspec-plan-review` skill | Before approving or executing a nontrivial plan. OpenSpec validation proves structure, not executability or behavioral protection. |
+| Private Studio Harness `engineering-review` skill | Before approving or executing a nontrivial plan, and before reviewing a ticket, comment thread, or pull request. A passing validator proves structure, not executability or behavioral protection. |
