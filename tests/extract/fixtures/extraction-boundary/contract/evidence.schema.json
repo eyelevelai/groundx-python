@@ -582,7 +582,7 @@
         "trace_seal",
         "local_verifier"
       ],
-      "anyOf": [
+      "oneOf": [
         {
           "required": [
             "configured_case_result"

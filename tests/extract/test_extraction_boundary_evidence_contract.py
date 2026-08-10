@@ -14,7 +14,7 @@ CONTRACT_ROOT = (
 )
 SCHEMA_PATH = CONTRACT_ROOT / "evidence.schema.json"
 VECTORS_PATH = CONTRACT_ROOT / "evidence.vectors.json"
-SCHEMA_SHA256 = "149cbfea1a67a1c6569d12c91e95a1d88254f2f11b2d6d22490f6c7c4118d8fe"
+SCHEMA_SHA256 = "f5cedbb5eecd90ed24c8286e51aa7d5aa14625566ef8ea302b58e9eed44b683c"
 VECTORS_SHA256 = "d4777a6f0df08c0404b96982804c6d726361a4e6ca1a9fa666474bc621336e01"
 SHA256_RE = re.compile(r"^[a-f0-9]{64}$")
 SURFACE_RE = re.compile(r"^[A-Za-z0-9_.-]+$")
