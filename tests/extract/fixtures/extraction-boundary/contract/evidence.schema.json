@@ -757,6 +757,9 @@
             "seal_sha256"
           ],
           "properties": {
+            "bucket": {
+              "$ref": "#/$defs/non_empty_string"
+            },
             "path": {
               "$ref": "#/$defs/non_empty_string"
             },

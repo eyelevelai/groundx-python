@@ -351,5 +351,43 @@
         }
       }
     }
-  ]
+  ],
+  "live_reference_trace_seal": {
+    "valid": [
+      {
+        "name": "historical_bucket_bearing",
+        "value": {
+          "bucket": "eyelevel-upload",
+          "path": "certification/run/evidence_seal.json",
+          "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "bytes": 512,
+          "modified_at": "2026-07-28T00:00:00Z",
+          "seal_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        }
+      },
+      {
+        "name": "current_bucketless",
+        "value": {
+          "path": "certification/run/evidence_seal.json",
+          "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "bytes": 512,
+          "modified_at": "2026-08-09T00:00:00Z",
+          "seal_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        }
+      }
+    ],
+    "invalid": [
+      {
+        "name": "unknown_property",
+        "value": {
+          "path": "certification/run/evidence_seal.json",
+          "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "bytes": 512,
+          "modified_at": "2026-08-09T00:00:00Z",
+          "seal_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "unreviewed_location": "must-not-pass"
+        }
+      }
+    ]
+  }
 }
