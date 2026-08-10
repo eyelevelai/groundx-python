@@ -41,10 +41,14 @@ def _certification_case_params() -> list:
             id=case_id,
             marks=(
                 (pytest.mark.pending_fixture_promotion,)
-                if not replay_inputs_are_locally_coherent(
-                    surface=projection_case["surface"],
-                    input_root=BOUNDARY_PROJECTION_PATH.parent / "inputs",
-                    goldens_root=BOUNDARY_PROJECTION_PATH.parent / "boundary-goldens",
+                if (
+                    projection_case["fixture_status"] == "pending"
+                    and not replay_inputs_are_locally_coherent(
+                        surface=projection_case["surface"],
+                        input_root=BOUNDARY_PROJECTION_PATH.parent / "inputs",
+                        goldens_root=BOUNDARY_PROJECTION_PATH.parent
+                        / "boundary-goldens",
+                    )
                 )
                 else ()
             ),
@@ -885,6 +889,28 @@ def test_replay_input_gate_marks_only_stale_custom_output_cases() -> None:
             assert projection_cases[case_id]["fixture_status"] == "pending"
         else:
             assert marks == ["pending_fixture_promotion"]
+
+
+def test_replay_input_gate_never_marks_complete_custom_output_cases_with_missing_inputs(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    case_id = "synthetic-complete"
+    projection_case = {
+        "id": case_id,
+        "surface": "synthetic_complete",
+        "fixture_status": "complete",
+    }
+    custom_output_case = {"id": case_id}
+    monkeypatch.setitem(globals(), "_projection_cases", lambda: {case_id: projection_case})
+    monkeypatch.setitem(
+        globals(),
+        "_custom_output_reassembly_cases",
+        lambda: [custom_output_case],
+    )
+
+    [param] = _certification_case_params()
+
+    assert [mark.name for mark in param.marks] == []
 
 
 @pytest.mark.parametrize("case", _certification_case_params())

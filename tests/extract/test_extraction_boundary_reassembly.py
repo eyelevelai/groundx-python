@@ -59,15 +59,21 @@ def _replay_surface_params(
     input_root: pathlib.Path = BOUNDARY_INPUT_ROOT,
     goldens_root: pathlib.Path = BOUNDARY_GOLDENS_ROOT,
 ) -> typing.List[typing.Any]:
+    fixture_status_by_surface = {
+        case["surface"]: case["fixture_status"] for case in _PROJECTION["cases"]
+    }
     return [
         pytest.param(
             surface,
             marks=(
                 (pytest.mark.pending_fixture_promotion,)
-                if not replay_inputs_are_locally_coherent(
-                    surface=surface,
-                    input_root=input_root,
-                    goldens_root=goldens_root,
+                if (
+                    fixture_status_by_surface.get(surface) == "pending"
+                    and not replay_inputs_are_locally_coherent(
+                        surface=surface,
+                        input_root=input_root,
+                        goldens_root=goldens_root,
+                    )
                 )
                 else ()
             ),
@@ -123,12 +129,38 @@ def test_replay_input_gate_marks_only_stale_real_cases() -> None:
     assert _PROJECTION["cases"][-1]["fixture_status"] == "pending"
 
 
+def test_replay_input_gate_never_marks_complete_cases_with_missing_inputs(
+    tmp_path: pathlib.Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    surface = "synthetic_complete"
+    monkeypatch.setitem(
+        _PROJECTION,
+        "cases",
+        [{"surface": surface, "fixture_status": "complete"}],
+    )
+
+    [param] = _replay_surface_params(
+        [surface],
+        input_root=tmp_path / "inputs",
+        goldens_root=tmp_path / "goldens",
+    )
+
+    assert [mark.name for mark in param.marks] == []
+
+
 def test_replay_input_gate_marks_synthetic_pending_cases_with_absent_or_incoherent_inputs(
     tmp_path: pathlib.Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     input_root = tmp_path / "inputs"
     goldens_root = tmp_path / "goldens"
     surface = "synthetic_pending"
+    monkeypatch.setitem(
+        _PROJECTION,
+        "cases",
+        [{"surface": surface, "fixture_status": "pending"}],
+    )
     assert not replay_inputs_are_locally_coherent(
         surface=surface,
         input_root=input_root,

@@ -8,12 +8,8 @@ import json
 import typing
 from pathlib import Path
 
-_PROJECTION_PATH = (
-    Path(__file__).resolve().parent / "fixtures" / "extraction-boundary" / "catalog.json"
-)
-SURFACES = tuple(
-    case["surface"] for case in json.loads(_PROJECTION_PATH.read_text())["cases"]
-)
+_PROJECTION_PATH = Path(__file__).resolve().parent / "fixtures" / "extraction-boundary" / "catalog.json"
+SURFACES = tuple(case["surface"] for case in json.loads(_PROJECTION_PATH.read_text())["cases"])
 
 
 def _read_json(path: Path) -> dict[str, typing.Any]:
