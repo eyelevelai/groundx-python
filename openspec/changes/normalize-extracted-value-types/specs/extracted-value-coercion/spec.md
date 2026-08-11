@@ -77,7 +77,9 @@ targets before conversion.
 - **WHEN** numeric text, including comma-formatted or decimal text, is supplied
   for an `int` target
 - **THEN** the helper returns an integer and retains the current truncation
-  toward zero for decimal values.
+  toward zero for decimal values
+- **AND** integer text is not routed through binary floating point or changed by
+  floating-point precision limits.
 
 #### Scenario: Numeric text targets a float
 

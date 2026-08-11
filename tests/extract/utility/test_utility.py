@@ -135,6 +135,15 @@ class TestUtilCoerceValue(unittest.TestCase):
         self.assert_result(coerce_value(3.14, ["int", "float"]), 3.14, float, True, False)
         self.assert_result(coerce_value(3, ["float", "int"]), 3, int, True, False)
 
+    def test_integer_text_does_not_lose_precision_through_float(self) -> None:
+        self.assert_result(
+            coerce_value("9007199254740993", "int"),
+            9007199254740993,
+            int,
+            True,
+            True,
+        )
+
     def test_impossible_conversions_return_content_free_warning(self) -> None:
         cases = [
             (True, "int", "bool", "int"),

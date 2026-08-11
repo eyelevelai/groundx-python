@@ -18,6 +18,8 @@
   empty numeric text becoming null rather than zero. For every declared type,
   prove a missing or unmatched field remains present as null instead of becoming
   an empty string, list, or dict.
+- [x] 1.2a Add a large integer-text regression proving integer coercion does not
+  lose precision through a binary floating-point conversion.
 - [x] 1.3 Run
   `poetry run pytest -q tests/extract/utility/test_utility.py` and confirm the
   tests fail because the shared interface does not exist.

@@ -1,4 +1,5 @@
 import dataclasses
+import decimal
 import json
 import typing
 
@@ -41,8 +42,8 @@ def _coerce_to_type(value: typing.Any, target: str) -> typing.Tuple[typing.Any, 
             if not normalized:
                 return None, False
             try:
-                number = float(normalized)
-            except (OverflowError, ValueError):
+                number = decimal.Decimal(normalized) if target_type is int else float(normalized)
+            except (decimal.InvalidOperation, OverflowError, ValueError):
                 return None, False
         elif type(value) in (int, float):
             number = value

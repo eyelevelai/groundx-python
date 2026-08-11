@@ -93,7 +93,7 @@ could break it on an automatic minor upgrade.
 | Target | Accepted conversion |
 | --- | --- |
 | `str` | JSON scalar text for bool and numbers; compact JSON text for list and dict |
-| `int` | int, float, numeric text; decimal truncation remains toward zero |
+| `int` | int, float, numeric text parsed without a binary-float round trip; decimal truncation remains toward zero |
 | `float` | int, float, numeric text |
 | `list` | list unchanged; JSON array text parsed |
 | `dict` | dict unchanged; JSON object text parsed |
