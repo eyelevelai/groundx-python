@@ -30,6 +30,6 @@ def pytest_configure(config: pytest.Config) -> None:
     )
     config.addinivalue_line(
         "markers",
-        "pending_fixture_promotion: accepted fixture assertion remains intentionally "
-        "red until the guarded post-deployment promotion removes this marker",
+        "pending_fixture_promotion: committed replay inputs are absent or locally "
+        "incoherent; owner fixture lifecycle status is tracked separately",
     )

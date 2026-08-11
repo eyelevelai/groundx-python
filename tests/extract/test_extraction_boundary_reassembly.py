@@ -1,9 +1,12 @@
 import copy
 import hashlib
+import importlib.util
 import json
 import pathlib
 import re
 import shutil
+import subprocess
+import sys
 import typing
 import urllib.parse
 
@@ -12,6 +15,14 @@ import pytest
 from groundx.extract.custom_outputs import reassemble_custom_outputs_from_xray
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
+_REPLAY_INPUTS_SPEC = importlib.util.spec_from_file_location(
+    "boundary_replay_inputs",
+    pathlib.Path(__file__).with_name("_boundary_replay_inputs.py"),
+)
+assert _REPLAY_INPUTS_SPEC is not None and _REPLAY_INPUTS_SPEC.loader is not None
+_replay_inputs = importlib.util.module_from_spec(_REPLAY_INPUTS_SPEC)
+_REPLAY_INPUTS_SPEC.loader.exec_module(_replay_inputs)
+replay_inputs_are_locally_coherent = _replay_inputs.replay_inputs_are_locally_coherent
 DIAGNOSTIC_ROOT = (
     ROOT
     / "tests"
@@ -27,7 +38,8 @@ BOUNDARY_ROOT = ROOT / "tests" / "extract" / "fixtures" / "extraction-boundary"
 BOUNDARY_INPUT_ROOT = BOUNDARY_ROOT / "inputs"
 BOUNDARY_GOLDENS_ROOT = BOUNDARY_ROOT / "boundary-goldens"
 CATALOG_PATH = ROOT / "tests" / "extract" / "fixtures" / "extraction-boundary" / "catalog.json"
-CATALOG_SHA256 = "db48b716cfe7ae9d363920c407c513d5f3feb7d1c84d4ef30ed5d69b0082e31f"
+CATALOG_SHA256 = "5b50451ebc434a3933c31f13121c5c00c0183008c66d494c551b9e883f94f648"
+WRITER_REGISTRY_PATH = BOUNDARY_ROOT / "writer_registry.json"
 ADP_EXPECTED_SECTION_COUNT = 11
 ADP_EXPECTED_FIELD_COUNT = 159
 ADP_MIN_POPULATED_FIELDS = 100
@@ -38,62 +50,262 @@ ADP_MIN_SECTION_POPULATED_RATIO = 0.6
 SOURCE_RUN_ID_RE = re.compile(r"live-\d{8}T\d{6}Z[^/\\\s\"]*")
 
 
-SURFACES = [
-    "arcadia_legacy",
-    "arcadia_v1",
-    "generic_v1",
-    "adp_v1",
-]
+_PROJECTION = json.loads(CATALOG_PATH.read_text(encoding="utf-8"))
+SURFACES = [case["surface"] for case in _PROJECTION["cases"]]
 REAL_BOUNDARY_SURFACES = tuple(SURFACES)
+def _replay_surface_params(
+    surfaces: typing.Sequence[str],
+    *,
+    input_root: pathlib.Path = BOUNDARY_INPUT_ROOT,
+    goldens_root: pathlib.Path = BOUNDARY_GOLDENS_ROOT,
+) -> typing.List[typing.Any]:
+    fixture_status_by_surface = {
+        case["surface"]: case["fixture_status"] for case in _PROJECTION["cases"]
+    }
+    return [
+        pytest.param(
+            surface,
+            marks=(
+                (pytest.mark.pending_fixture_promotion,)
+                if (
+                    fixture_status_by_surface.get(surface) == "pending"
+                    and not replay_inputs_are_locally_coherent(
+                        surface=surface,
+                        input_root=input_root,
+                        goldens_root=goldens_root,
+                    )
+                )
+                else ()
+            ),
+        )
+        for surface in surfaces
+    ]
 
 
-def test_extraction_boundary_catalog_is_pinned() -> None:
+def test_extraction_boundary_owner_projection_is_pinned() -> None:
     catalog = _read_json(CATALOG_PATH)
 
     assert _sha256_file(CATALOG_PATH) == CATALOG_SHA256
-    assert catalog["schema_version"] == "groundx_python_extraction_boundary_catalog_v1"
+    assert catalog["schema_version"] == "extraction_boundary_owner_projection_v1"
     assert catalog["catalog_version"] == "2026-07-23.1"
+    assert catalog["owner"] == "groundx-python"
     assert catalog["surfaces"] == SURFACES
-    assert catalog["source_artifact_catalog_sha256"] == (
-        "8e76f15d40cb70070fc17c145afe3c0f5fb219f71759d9eacbef747e3ad18192"
+    assert "source_artifact_catalog_sha256" not in catalog
+    assert catalog["writer_registry_sha256"] == _sha256_file(WRITER_REGISTRY_PATH)
+    for case in catalog["cases"]:
+        assert case["fixture_status"] in {"complete", "pending"}
+        assert case["required_stage_ids"]
+        assert case["trace_preset"] in catalog["trace_stage_presets"]
+    [artifact] = catalog["artifacts"]
+    assert artifact["name"] == "groundx_python_xray_reassembly"
+    assert artifact["owner"] == "groundx-python"
+    assert artifact["required"] is True
+    assert artifact["fixture_policy"] == "commit_sanitized_fixture"
+    assert artifact["input_from"] == "internal_arcadia_download_workflow_load"
+    assert artifact["input_path_template"] == (
+        "groundx-python/tests/extract/fixtures/extraction-boundary/"
+        "inputs/{surface}/internal_arcadia_download_workflow_load.handoff.json"
     )
-    assert catalog["artifacts"] == [
+    assert artifact["path_template"] == (
+        "groundx-python/tests/extract/fixtures/extraction-boundary/"
+        "boundary-goldens/{surface}/groundx_python_xray_reassembly.expected.json"
+    )
+    assert artifact["stage"] == "sdk_xray_reassembly"
+    assert artifact["validator"] == (
+        "groundx-python/tests/extract/test_extraction_boundary_reassembly.py"
+    )
+    assert artifact["writer"] == "groundx-python/src/groundx/extract"
+
+
+def test_replay_input_gate_marks_only_stale_real_cases() -> None:
+    params = _replay_surface_params(SURFACES)
+    marked = {
+        param.values[0]
+        for param in params
+        if [mark.name for mark in param.marks] == ["pending_fixture_promotion"]
+    }
+
+    assert marked == {"arcadia_legacy", "arcadia_v1", "generic_v1"}
+    assert _PROJECTION["cases"][-1]["fixture_status"] == "pending"
+
+
+def test_replay_input_gate_never_marks_complete_cases_with_missing_inputs(
+    tmp_path: pathlib.Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    surface = "synthetic_complete"
+    monkeypatch.setitem(
+        _PROJECTION,
+        "cases",
+        [{"surface": surface, "fixture_status": "complete"}],
+    )
+
+    [param] = _replay_surface_params(
+        [surface],
+        input_root=tmp_path / "inputs",
+        goldens_root=tmp_path / "goldens",
+    )
+
+    assert [mark.name for mark in param.marks] == []
+
+
+def test_replay_input_gate_marks_synthetic_pending_cases_with_absent_or_incoherent_inputs(
+    tmp_path: pathlib.Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    input_root = tmp_path / "inputs"
+    goldens_root = tmp_path / "goldens"
+    surface = "synthetic_pending"
+    monkeypatch.setitem(
+        _PROJECTION,
+        "cases",
+        [{"surface": surface, "fixture_status": "pending"}],
+    )
+    assert not replay_inputs_are_locally_coherent(
+        surface=surface,
+        input_root=input_root,
+        goldens_root=goldens_root,
+    )
+    [absent_param] = _replay_surface_params(
+        [surface],
+        input_root=input_root,
+        goldens_root=goldens_root,
+    )
+    assert [mark.name for mark in absent_param.marks] == ["pending_fixture_promotion"]
+
+    handoff_path = input_root / surface / "internal_arcadia_download_workflow_load.handoff.json"
+    xray_path = input_root / surface / "groundx_python_xray_reassembly.xray.json"
+    expected_path = goldens_root / surface / "groundx_python_xray_reassembly.expected.json"
+    _write_json(
+        handoff_path,
         {
-            "capture_cardinality": "one_per_case",
-            "case_applicability": "all",
-            "input_from": "internal_arcadia_download_workflow_load",
-            "input_path_template": (
-                "groundx-python/tests/extract/fixtures/extraction-boundary/"
-                "inputs/{surface}/internal_arcadia_download_workflow_load.handoff.json"
-            ),
-            "name": "groundx_python_xray_reassembly",
-            "output_for": "sdk_reassembly_proof",
-            "owner": "groundx-python",
-            "path_template": (
-                "groundx-python/tests/extract/fixtures/extraction-boundary/"
-                "boundary-goldens/{surface}/groundx_python_xray_reassembly.expected.json"
-            ),
-            "required": True,
-            "source_log_required": False,
-            "stage": "sdk_xray_reassembly",
-            "validator": (
-                "groundx-python/tests/extract/"
-                "test_extraction_boundary_reassembly.py"
-            ),
-            "writer": "groundx-python/src/groundx/extract",
-        }
+            "surface": surface,
+            "stage": "internal_arcadia_download_workflow_load",
+            "request": {},
+            "workflow_extract": {},
+        },
+    )
+    _write_json(
+        xray_path,
+        {
+            "surface": surface,
+            "schema_version": "groundx_python_xray_reassembly_sidecar_v1",
+            "xray": {},
+        },
+    )
+    _write_json(
+        expected_path,
+        {
+            "surface": surface,
+            "input_sha256": "0" * 64,
+            "artifacts": {
+                "previous_download_workflow_load": {"sha256": "0" * 64},
+                "xray_sidecar": {"sha256": "0" * 64},
+            },
+        },
+    )
+
+    assert not replay_inputs_are_locally_coherent(
+        surface=surface,
+        input_root=input_root,
+        goldens_root=goldens_root,
+    )
+    [incoherent_param] = _replay_surface_params(
+        [surface],
+        input_root=input_root,
+        goldens_root=goldens_root,
+    )
+    assert [mark.name for mark in incoherent_param.marks] == [
+        "pending_fixture_promotion"
     ]
+
+    _write_json(
+        expected_path,
+        {
+            "surface": surface,
+            "input_sha256": _sha256_file(handoff_path),
+            "artifacts": {
+                "previous_download_workflow_load": {
+                    "sha256": _sha256_file(handoff_path)
+                },
+                "xray_sidecar": {"sha256": _sha256_file(xray_path)},
+            },
+        },
+    )
+    assert not replay_inputs_are_locally_coherent(
+        surface=surface,
+        input_root=input_root,
+        goldens_root=goldens_root,
+    )
+
+    _write_json(
+        xray_path,
+        {
+            "surface": surface,
+            "schema_version": "groundx_python_xray_reassembly_sidecar_v1",
+            "input_for": "wrong_replay",
+            "source_handoff": "wrong.handoff.json",
+            "xray": {},
+        },
+    )
+    _write_json(
+        expected_path,
+        {
+            "surface": surface,
+            "input_sha256": _sha256_file(handoff_path),
+            "artifacts": {
+                "previous_download_workflow_load": {
+                    "sha256": _sha256_file(handoff_path)
+                },
+                "xray_sidecar": {"sha256": _sha256_file(xray_path)},
+            },
+        },
+    )
+    assert not replay_inputs_are_locally_coherent(
+        surface=surface,
+        input_root=input_root,
+        goldens_root=goldens_root,
+    )
+
+
+def test_replay_input_gate_deselects_only_stale_pending_cases_under_ci_filter() -> None:
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pytest",
+            "--collect-only",
+            "-q",
+            "-m",
+            "not pending_decision and not pending_fixture_promotion",
+            str(pathlib.Path(__file__)),
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr
+    collected = [line for line in result.stdout.splitlines() if "::" in line]
+    replay_tests = {
+        "test_sdk_reassembly_expected_answer_projection_diagnostic_packets",
+        "test_sdk_xray_reassembly_real_boundary_packets",
+    }
+    for surface in SURFACES:
+        surface_ids = [line for line in collected if line.endswith(f"[{surface}]")]
+        surface_tests = {
+            line.split("::")[1].split("[")[0] for line in surface_ids
+        }
+        if surface == "adp_v1":
+            assert surface_tests >= replay_tests, surface
+        else:
+            assert not surface_tests & replay_tests, surface
 
 
 @pytest.mark.parametrize(
     "surface",
-    [
-        pytest.param(
-            surface,
-            marks=(pytest.mark.pending_fixture_promotion if surface != "adp_v1" else ()),
-        )
-        for surface in SURFACES
-    ],
+    _replay_surface_params(SURFACES),
 )
 def test_sdk_reassembly_expected_answer_projection_diagnostic_packets(
     tmp_path: pathlib.Path,
@@ -142,13 +354,7 @@ def test_sdk_reassembly_expected_answer_projection_diagnostic_packets(
 
 @pytest.mark.parametrize(
     "surface",
-    [
-        pytest.param(
-            surface,
-            marks=(pytest.mark.pending_fixture_promotion if surface != "adp_v1" else ()),
-        )
-        for surface in REAL_BOUNDARY_SURFACES
-    ],
+    _replay_surface_params(REAL_BOUNDARY_SURFACES),
 )
 def test_sdk_xray_reassembly_real_boundary_packets(
     tmp_path: pathlib.Path,

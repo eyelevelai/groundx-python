@@ -89,6 +89,95 @@
         "interactive_approval": null,
         "live_certification": null
       }
+    },
+    {
+      "name": "registry_safe_fifth_surface",
+      "value": {
+        "schema_version": "extraction_boundary_evidence_v1",
+        "case_id": "fifth-v1",
+        "surface": "fifth_v1",
+        "run_id": "live-example",
+        "workflow_plan_nodes": [
+          {
+            "node_id": "reconcile-statement",
+            "stage": "reconcile_statement",
+            "owner": "internal-arcadia-agents",
+            "workflow_schema_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          }
+        ],
+        "planned_executions": [
+          {
+            "execution_id": "reconcile-statement-1",
+            "node_id": "reconcile-statement",
+            "ordinal": 1,
+            "input_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        ],
+        "boundary_events": [
+          {
+            "event_id": "before-reconcile-statement",
+            "stage": "reconcile_statement",
+            "owner_repo": "internal-arcadia-agents",
+            "owner_service": "extract-agent",
+            "entrypoint": "StatementRequest.reconcile_statement",
+            "input_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "output_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "artifact_path": "layout/processed/task/document-extract-trace/internal-arcadia-agents/reconcile_statement.json"
+          },
+          {
+            "event_id": "after-reconcile-statement",
+            "stage": "reconcile_statement",
+            "owner_repo": "internal-arcadia-agents",
+            "owner_service": "extract-agent",
+            "entrypoint": "StatementRequest.reconcile_statement",
+            "input_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "output_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            "artifact_path": "layout/processed/task/document-extract-trace/internal-arcadia-agents/reconcile_statement_after.json"
+          }
+        ],
+        "provider_bodies": {
+          "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee": {
+            "sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+            "artifact_path": "layout/processed/task/document-extract-trace/internal-arcadia-agents/provider_request.json"
+          }
+        },
+        "provider_executions": [
+          {
+            "execution_id": "reconcile-statement-1",
+            "stage": "reconcile_statement",
+            "attempts": [
+              {
+                "attempt": 1,
+                "request_body_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+                "response_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+                "status": "success"
+              }
+            ]
+          }
+        ],
+        "not_applicable": [],
+        "lineage": [
+          {
+            "kind": "handoff",
+            "edge": {
+              "from_event_id": "before-reconcile-statement",
+              "to_event_id": "after-reconcile-statement",
+              "artifact_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            }
+          },
+          {
+            "kind": "terminal",
+            "event_id": "after-reconcile-statement",
+            "reason": "success"
+          }
+        ],
+        "candidate_review": {
+          "status": "unreviewed",
+          "candidate_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+        },
+        "interactive_approval": null,
+        "live_certification": null
+      }
     }
   ],
   "invalid": [
@@ -100,7 +189,7 @@
       "name": "invalid_surface",
       "set": {
         "path": "surface",
-        "value": "arcadia"
+        "value": "arcadia legacy!"
       }
     },
     {
@@ -262,5 +351,43 @@
         }
       }
     }
-  ]
+  ],
+  "live_reference_trace_seal": {
+    "valid": [
+      {
+        "name": "historical_bucket_bearing",
+        "value": {
+          "bucket": "eyelevel-upload",
+          "path": "certification/run/evidence_seal.json",
+          "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "bytes": 512,
+          "modified_at": "2026-07-28T00:00:00Z",
+          "seal_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        }
+      },
+      {
+        "name": "current_bucketless",
+        "value": {
+          "path": "certification/run/evidence_seal.json",
+          "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "bytes": 512,
+          "modified_at": "2026-08-09T00:00:00Z",
+          "seal_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        }
+      }
+    ],
+    "invalid": [
+      {
+        "name": "unknown_property",
+        "value": {
+          "path": "certification/run/evidence_seal.json",
+          "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "bytes": 512,
+          "modified_at": "2026-08-09T00:00:00Z",
+          "seal_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "unreviewed_location": "must-not-pass"
+        }
+      }
+    ]
+  }
 }

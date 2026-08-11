@@ -1,12 +1,14 @@
 # Extraction Boundary Fixtures
 
-These fixtures freeze GroundX Python's X-Ray-to-structured-output reassembly
-behavior for Arcadia legacy, Arcadia v1, generic v1, and ADP v1.
+This repository's writer registry (`writer_registry.json`) owns one artifact,
+`groundx_python_xray_reassembly`: the committed sanitized expected output of
+GroundX Python's X-Ray-to-structured-output reassembly for each protected
+extraction case.
 
-Each case consumes the committed handoff produced by the previous pipeline
-boundary. `test_extraction_boundary_reassembly.py` passes that input through the
-same reassembly functions used by the SDK and compares the complete stable
-result with the reviewed expected output.
+`tests/extract/test_extraction_boundary_reassembly.py` is the replay consumer.
+Each case passes the committed handoff produced by the previous pipeline
+boundary through the same reassembly functions used by the SDK and compares
+the complete stable result with the reviewed expected output.
 
 Accepted fixtures must be real-derived, privacy-reviewed, and sanitized with
 recorded source hashes and transformations. The adjacent review records and
@@ -35,11 +37,17 @@ poetry run python tests/extract/build_extraction_boundary_candidates.py \
 ```
 
 This command calls `reassemble_custom_outputs_from_xray` and writes only to the
-candidate root. It records shape and diagnostic assertions but does not require
-them to pass; candidate generation freezes observed behavior, while human review
-decides whether that behavior should replace the accepted fixture. Review and
-approve both candidate-manifest hashes before using the Studio Harness promotion
-command. Do not promote an X-Ray input without its matching SDK output candidate.
+candidate root. For each selected surface, it must replay both the proposed X-Ray
+and the proposed `internal_arcadia_download_workflow_load` successor input from
+that same provider candidate manifest. Mixing a proposed X-Ray with the accepted
+old producer handoff is invalid lineage and must fail candidate generation.
+Candidate generation freezes observed behavior; human review decides whether
+that behavior replaces the accepted fixture. Do not promote an X-Ray input
+without its matching SDK output candidate.
 
 Only the external model/provider response may be replaced by a fixed fixture.
 Tests must call production reassembly functions unchanged.
+
+Fixture capture, diagnosis, updates, and final certification use the canonical
+private Studio Harness guide only: `groundx-extraction-workflows`,
+`references/certification.private.md`.
