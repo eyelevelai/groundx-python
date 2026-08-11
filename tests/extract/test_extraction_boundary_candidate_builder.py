@@ -1,3 +1,4 @@
+import base64
 import hashlib
 import importlib.util
 import json
@@ -15,7 +16,7 @@ BOUNDARY_ROOT = REPO_ROOT / "tests" / "extract" / "fixtures" / "extraction-bound
 RUN_ID = "20260810T201159Z"
 RUN_MODE = "fixture_seeding"
 BOUNDARY_MANIFEST_SHA256 = "b" * 64
-XRAY_ARTIFACT = "groundx_python_xray_reassembly_xray_sidecar"
+XRAY_ARTIFACT = "internal_arcadia_load_xray_predecessor"
 HANDOFF_ARTIFACT = "internal_arcadia_download_workflow_load"
 
 
@@ -59,15 +60,25 @@ def _proposed_handoff_candidate(
     *,
     packet: dict[str, object] | None = None,
 ) -> tuple[dict[str, object], Path]:
+    source_relative = Path(
+        "internal-arcadia-agents/testdata/extraction-boundary/"
+        f"boundary-goldens/{surface}/internal_arcadia_download_workflow_load.expected.json"
+    )
     relative = Path(
         "groundx-python/tests/extract/fixtures/extraction-boundary/"
         f"inputs/{surface}/internal_arcadia_download_workflow_load.handoff.json"
     )
     target = root / relative
     if packet is None:
-        packet = json.loads(
-            (BOUNDARY_ROOT / "inputs" / surface / "internal_arcadia_download_workflow_load.handoff.json").read_text()
-        )
+        packet = {
+            "schema_version": "internal-arcadia-download-workflow-load-v1",
+            "surface": surface,
+            "stage": "internal_arcadia_download_workflow_load",
+            "request": {},
+            "statement": {},
+            "workflow_extract": {"workflow": {"output_routes": []}},
+            "workflow_schema_hash": "f" * 64,
+        }
     packet["surface"] = surface
     capture_identity = _capture_identity(surface)
     request = packet.setdefault("request", {})
@@ -76,12 +87,20 @@ def _proposed_handoff_candidate(
     assert isinstance(statement, dict)
     request["workflow_capture"] = capture_identity
     statement["workflow_capture"] = dict(capture_identity)
+    request["task_id"] = "task-1"
+    request["document_id"] = "document-1"
+    statement["task_id"] = "task-1"
+    statement["document_id"] = "document-1"
     _write_json(target, packet)
+    source_target = root / source_relative
+    source_target.parent.mkdir(parents=True, exist_ok=True)
+    source_target.write_bytes(target.read_bytes())
     entry: dict[str, object] = {
         "surface": surface,
         "artifact_name": HANDOFF_ARTIFACT,
-        "candidate_path": "internal-arcadia-agents/expected.json",
-        "sha256": "d" * 64,
+        "candidate_path": str(source_relative),
+        "sha256": _sha256(source_target),
+        "source_sha256": _sha256(source_target),
         "source_run_id": RUN_ID,
         "source_run_mode": RUN_MODE,
         "source_boundary_manifest_sha256": BOUNDARY_MANIFEST_SHA256,
@@ -101,40 +120,68 @@ def _proposed_xray_candidate(
     *,
     xray: object | None = None,
 ) -> tuple[dict[str, object], Path]:
+    source_relative = Path(
+        "internal-arcadia-agents/testdata/extraction-boundary/"
+        f"inputs/{surface}/internal_arcadia_agent_load_xray.xray.json"
+    )
     relative = Path(
         "groundx-python/tests/extract/fixtures/extraction-boundary/"
-        f"inputs/{surface}/groundx_python_xray_reassembly.xray.json"
+        f"inputs/{surface}/internal_arcadia_agent_load_xray.xray.json"
     )
     target = root / relative
     if xray is None:
-        packet = json.loads(
-            (BOUNDARY_ROOT / "inputs" / surface / "groundx_python_xray_reassembly.xray.json").read_text()
-        )
-    else:
-        packet = {"xray": xray}
-    packet.update(
-        {
-            "schema_version": "groundx_python_xray_reassembly_sidecar_v1",
-            "surface": surface,
-            "input_for": "groundx_python_xray_reassembly",
-            "source_handoff": "internal_arcadia_download_workflow_load.handoff.json",
-            "xray_fixture": {
-                "source_case": surface.replace("_", "-"),
-                "source_run_id": RUN_ID,
-            },
+        xray = {
+            "sourceUrl": "https://upload.test/document.json",
+            "documentPages": [
+                {
+                    "pageNumber": 1,
+                    "pageUrl": "https://upload.test/page-1.png",
+                    "height": 100,
+                    "width": 80,
+                    "customSectionOutputs": {"complete": {"value": "kept"}},
+                }
+            ],
         }
-    )
+    raw_xray = json.dumps(
+        xray,
+        ensure_ascii=False,
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("utf-8")
+    packet = {
+        "kind": "xray_predecessor",
+        "metadata": {},
+        "raw_xray_model_base64": base64.b64encode(raw_xray).decode("ascii"),
+        "raw_xray_model_bytes": len(raw_xray),
+        "raw_xray_model_sha256": hashlib.sha256(raw_xray).hexdigest(),
+        "source": {
+            "source_kind": "live_capture",
+            "run_id": _capture_identity(surface)["run_id"],
+            "process_id": "task-1",
+            "document_id": "document-1",
+        },
+        "value": xray,
+    }
     _write_json(target, packet)
+    source_target = root / source_relative
+    source_target.parent.mkdir(parents=True, exist_ok=True)
+    source_target.write_bytes(target.read_bytes())
     entry: dict[str, object] = {
         "surface": surface,
         "artifact_name": XRAY_ARTIFACT,
-        "candidate_path": str(relative),
-        "sha256": _sha256(target),
-        "source_sha256": "c" * 64,
+        "candidate_path": str(source_relative),
+        "sha256": _sha256(source_target),
+        "source_sha256": _sha256(source_target),
         "source_run_id": RUN_ID,
         "source_run_mode": RUN_MODE,
-        "source_hosted_path": "layout/processed/task/document-xray.json",
+        "source_hosted_path": "layout/processed/task/document-trace/input.xray.json",
         "source_boundary_manifest_sha256": BOUNDARY_MANIFEST_SHA256,
+        "next_boundary_inputs": [
+            {
+                "candidate_path": str(relative),
+                "sha256": _sha256(target),
+            }
+        ],
     }
     return entry, target
 
@@ -182,14 +229,37 @@ def _refresh_candidate_hash(
     manifest: dict[str, object],
     artifact_name: str,
     path: Path,
+    *,
+    sync_xray_source: bool = True,
+    sync_handoff_source: bool = True,
 ) -> None:
     entry = _candidate_entry(manifest, artifact_name)
     if artifact_name == XRAY_ARTIFACT:
-        entry["sha256"] = _sha256(path)
+        next_inputs = entry["next_boundary_inputs"]
+        assert isinstance(next_inputs, list) and isinstance(next_inputs[0], dict)
+        next_inputs[0]["sha256"] = _sha256(path)
+        if sync_xray_source:
+            consumer_relative = Path(str(next_inputs[0]["candidate_path"]))
+            candidate_root = path
+            for _part in consumer_relative.parts:
+                candidate_root = candidate_root.parent
+            source_path = candidate_root / str(entry["candidate_path"])
+            source_path.write_bytes(path.read_bytes())
+            entry["sha256"] = _sha256(source_path)
+            entry["source_sha256"] = _sha256(source_path)
         return
     next_inputs = entry["next_boundary_inputs"]
     assert isinstance(next_inputs, list) and isinstance(next_inputs[0], dict)
     next_inputs[0]["sha256"] = _sha256(path)
+    if sync_handoff_source:
+        consumer_relative = Path(str(next_inputs[0]["candidate_path"]))
+        candidate_root = path
+        for _part in consumer_relative.parts:
+            candidate_root = candidate_root.parent
+        source_path = candidate_root / str(entry["candidate_path"])
+        source_path.write_bytes(path.read_bytes())
+        entry["sha256"] = _sha256(source_path)
+        entry["source_sha256"] = _sha256(source_path)
 
 
 def _assert_rejected_before_writes(
@@ -254,15 +324,8 @@ def test_builder_default_surfaces_follow_projection_order(monkeypatch) -> None:
 def test_builder_writes_review_candidates_without_touching_accepted_fixtures(
     tmp_path: Path,
 ) -> None:
-    accepted_sidecar = BOUNDARY_ROOT / "inputs" / SURFACE / "groundx_python_xray_reassembly.xray.json"
-    accepted_expected = BOUNDARY_ROOT / "boundary-goldens" / SURFACE / "groundx_python_xray_reassembly.expected.json"
-    accepted_hashes = {
-        accepted_sidecar: _sha256(accepted_sidecar),
-        accepted_expected: _sha256(accepted_expected),
-    }
-
-    sidecar_root = tmp_path / "sidecars"
-    sidecar_manifest, _manifest, candidate_sidecar, _handoff_path = _coherent_candidate_manifest(sidecar_root, SURFACE)
+    capture_root = tmp_path / "captured-boundaries"
+    capture_manifest, _manifest, candidate_xray, _handoff_path = _coherent_candidate_manifest(capture_root, SURFACE)
 
     candidate_root = tmp_path / "sdk-candidates"
     result = subprocess.run(
@@ -270,7 +333,7 @@ def test_builder_writes_review_candidates_without_touching_accepted_fixtures(
             sys.executable,
             str(SCRIPT),
             "--xray-candidate-manifest",
-            str(sidecar_manifest),
+            str(capture_manifest),
             "--candidate-root",
             str(candidate_root),
             "--surfaces",
@@ -301,17 +364,16 @@ def test_builder_writes_review_candidates_without_touching_accepted_fixtures(
     assert candidate_packet["surface"] == SURFACE
     assert candidate_review["status"] == "pending_review"
     assert candidate_review["candidate_sha256"] == _sha256(candidate_expected)
-    assert candidate_review["current_accepted_sha256"] == _sha256(accepted_expected)
+    assert candidate_review["current_accepted_sha256"] is None
     assert isinstance(candidate_review["changes"], list)
-    assert {path: _sha256(path) for path in accepted_hashes} == accepted_hashes
 
-    candidate_sidecar.write_text("{}\n")
+    candidate_xray.write_text("{}\n")
     mismatch = subprocess.run(
         [
             sys.executable,
             str(SCRIPT),
             "--xray-candidate-manifest",
-            str(sidecar_manifest),
+            str(capture_manifest),
             "--candidate-root",
             str(tmp_path / "mismatch-candidates"),
             "--surfaces",
@@ -323,7 +385,7 @@ def test_builder_writes_review_candidates_without_touching_accepted_fixtures(
         text=True,
     )
     assert mismatch.returncode != 0
-    assert "X-Ray candidate hash does not match" in mismatch.stderr
+    assert "X-Ray predecessor hash does not match" in mismatch.stderr
 
 
 def test_builder_rejects_a_nonempty_candidate_root(tmp_path: Path) -> None:
@@ -354,9 +416,12 @@ def test_builder_rejects_a_nonempty_candidate_root(tmp_path: Path) -> None:
 @pytest.mark.parametrize(
     ("provenance_source", "expected_error"),
     [
-        (XRAY_ARTIFACT, "X-Ray candidate source_run_id does not match manifest"),
+        (
+            XRAY_ARTIFACT,
+            "X-Ray predecessor candidate source_run_id does not match manifest",
+        ),
         (HANDOFF_ARTIFACT, "producer handoff source_run_id does not match manifest"),
-        ("xray_fixture", "X-Ray sidecar source_run_id does not match manifest"),
+        ("xray_source", "X-Ray predecessor source.run_id does not match handoff"),
         ("workflow_capture", "producer handoff capture identity does not agree"),
     ],
 )
@@ -373,9 +438,9 @@ def test_builder_rejects_cross_run_candidate_pairs_before_writes(
     )
     if provenance_source in {XRAY_ARTIFACT, HANDOFF_ARTIFACT}:
         _candidate_entry(manifest, provenance_source)["source_run_id"] = "older-run"
-    elif provenance_source == "xray_fixture":
+    elif provenance_source == "xray_source":
         packet = json.loads(xray_path.read_text())
-        packet["xray_fixture"]["source_run_id"] = "older-run"
+        packet["source"]["run_id"] = "older-run"
         _write_json(xray_path, packet)
         _refresh_candidate_hash(manifest, XRAY_ARTIFACT, xray_path)
     else:
@@ -395,7 +460,7 @@ def test_builder_rejects_cross_run_candidate_pairs_before_writes(
 
 @pytest.mark.parametrize(
     "surface_source",
-    ["sidecar", "handoff", "workflow_capture"],
+    ["handoff", "workflow_capture"],
 )
 def test_builder_rejects_wrong_surface_candidate_pairs_before_writes(
     tmp_path: Path,
@@ -407,23 +472,16 @@ def test_builder_rejects_wrong_surface_candidate_pairs_before_writes(
         sidecar_root,
         SURFACE,
     )
-    if surface_source == "sidecar":
-        packet = json.loads(xray_path.read_text())
+    packet = json.loads(handoff_path.read_text())
+    if surface_source == "handoff":
         packet["surface"] = "generic_v1"
-        _write_json(xray_path, packet)
-        _refresh_candidate_hash(manifest, XRAY_ARTIFACT, xray_path)
-        expected_error = "X-Ray sidecar surface does not match candidate"
+        expected_error = "producer handoff surface does not match candidate"
     else:
-        packet = json.loads(handoff_path.read_text())
-        if surface_source == "handoff":
-            packet["surface"] = "generic_v1"
-            expected_error = "producer handoff surface does not match candidate"
-        else:
-            packet["request"]["workflow_capture"]["surface"] = "generic_v1"
-            packet["statement"]["workflow_capture"]["surface"] = "generic_v1"
-            expected_error = "producer handoff capture surface does not match candidate"
-        _write_json(handoff_path, packet)
-        _refresh_candidate_hash(manifest, HANDOFF_ARTIFACT, handoff_path)
+        packet["request"]["workflow_capture"]["surface"] = "generic_v1"
+        packet["statement"]["workflow_capture"]["surface"] = "generic_v1"
+        expected_error = "producer handoff capture surface does not match candidate"
+    _write_json(handoff_path, packet)
+    _refresh_candidate_hash(manifest, HANDOFF_ARTIFACT, handoff_path)
 
     _assert_rejected_before_writes(
         tmp_path=tmp_path,
@@ -435,17 +493,37 @@ def test_builder_rejects_wrong_surface_candidate_pairs_before_writes(
 
 
 @pytest.mark.parametrize(
-    ("field", "value"),
+    ("field_path", "value", "expected_error"),
     [
-        ("source_handoff", "internal_arcadia_extract_chain.handoff.json"),
-        ("input_for", "internal_arcadia_agent_load_xray"),
+        (("kind",), "rebuilt_sidecar", "X-Ray predecessor kind is invalid"),
+        (
+            ("source", "source_kind"),
+            "repo_fixture",
+            "X-Ray predecessor is not a live capture",
+        ),
+        (
+            ("raw_xray_model_sha256",),
+            "0" * 64,
+            "X-Ray predecessor raw model digest changed",
+        ),
+        (
+            ("raw_xray_model_bytes",),
+            1,
+            "X-Ray predecessor raw model byte count changed",
+        ),
+        (
+            ("value", "documentPages", 0, "customSectionOutputs"),
+            {},
+            "X-Ray predecessor value differs from captured bytes",
+        ),
     ],
 )
-def test_builder_rejects_wrong_sidecar_binding_before_writes(
+def test_builder_rejects_rebuilt_or_changed_xray_envelopes_before_writes(
     tmp_path: Path,
     monkeypatch,
-    field: str,
-    value: str,
+    field_path: tuple[object, ...],
+    value: object,
+    expected_error: str,
 ) -> None:
     sidecar_root = tmp_path / "provider-candidates"
     manifest_path, manifest, xray_path, _handoff_path = _coherent_candidate_manifest(
@@ -453,7 +531,23 @@ def test_builder_rejects_wrong_sidecar_binding_before_writes(
         SURFACE,
     )
     packet = json.loads(xray_path.read_text())
-    packet[field] = value
+    cursor: object = packet
+    for key in field_path[:-1]:
+        if isinstance(cursor, list):
+            assert isinstance(key, int)
+            cursor = cursor[key]
+        else:
+            assert isinstance(cursor, dict)
+            assert isinstance(key, str)
+            cursor = cursor[key]
+    final = field_path[-1]
+    if isinstance(cursor, list):
+        assert isinstance(final, int)
+        cursor[final] = value
+    else:
+        assert isinstance(cursor, dict)
+        assert isinstance(final, str)
+        cursor[final] = value
     _write_json(xray_path, packet)
     _refresh_candidate_hash(manifest, XRAY_ARTIFACT, xray_path)
 
@@ -462,7 +556,72 @@ def test_builder_rejects_wrong_sidecar_binding_before_writes(
         monkeypatch=monkeypatch,
         manifest=manifest,
         manifest_path=manifest_path,
-        expected_error=f"X-Ray sidecar {field} does not match candidate",
+        expected_error=expected_error,
+    )
+
+
+def test_builder_rejects_a_consumer_xray_copy_that_differs_from_its_source(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    source_root = tmp_path / "provider-candidates"
+    manifest_path, manifest, xray_path, _handoff_path = _coherent_candidate_manifest(
+        source_root,
+        SURFACE,
+    )
+    packet = json.loads(xray_path.read_text())
+    packet["value"]["documentPages"][0]["customSectionOutputs"] = {"omitted": True}
+    raw = json.dumps(
+        packet["value"],
+        ensure_ascii=False,
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("utf-8")
+    packet["raw_xray_model_base64"] = base64.b64encode(raw).decode("ascii")
+    packet["raw_xray_model_bytes"] = len(raw)
+    packet["raw_xray_model_sha256"] = hashlib.sha256(raw).hexdigest()
+    _write_json(xray_path, packet)
+    _refresh_candidate_hash(
+        manifest,
+        XRAY_ARTIFACT,
+        xray_path,
+        sync_xray_source=False,
+    )
+
+    _assert_rejected_before_writes(
+        tmp_path=tmp_path,
+        monkeypatch=monkeypatch,
+        manifest=manifest,
+        manifest_path=manifest_path,
+        expected_error="X-Ray predecessor consumer bytes differ from captured source",
+    )
+
+
+def test_builder_rejects_a_consumer_handoff_copy_that_differs_from_its_source(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    source_root = tmp_path / "provider-candidates"
+    manifest_path, manifest, _xray_path, handoff_path = _coherent_candidate_manifest(
+        source_root,
+        SURFACE,
+    )
+    packet = json.loads(handoff_path.read_text())
+    packet["workflow_schema_hash"] = "0" * 64
+    _write_json(handoff_path, packet)
+    _refresh_candidate_hash(
+        manifest,
+        HANDOFF_ARTIFACT,
+        handoff_path,
+        sync_handoff_source=False,
+    )
+
+    _assert_rejected_before_writes(
+        tmp_path=tmp_path,
+        monkeypatch=monkeypatch,
+        manifest=manifest,
+        manifest_path=manifest_path,
+        expected_error="producer handoff consumer bytes differ from captured source",
     )
 
 
@@ -483,7 +642,7 @@ def test_builder_rejects_entry_manifest_provenance_mismatches_before_writes(
         SURFACE,
     )
     _candidate_entry(manifest, artifact_name)[field] = "mismatch"
-    label = "X-Ray candidate" if artifact_name == XRAY_ARTIFACT else "producer handoff"
+    label = "X-Ray predecessor candidate" if artifact_name == XRAY_ARTIFACT else "producer handoff"
 
     _assert_rejected_before_writes(
         tmp_path=tmp_path,
@@ -495,16 +654,17 @@ def test_builder_rejects_entry_manifest_provenance_mismatches_before_writes(
 
 
 @pytest.mark.parametrize(
-    ("source_case", "expected_error"),
+    ("field", "expected_error"),
     [
-        (None, "sidecar.xray_fixture.source_case is required"),
-        ("generic-v1", "X-Ray sidecar source_case does not match producer handoff"),
+        ("run_id", "X-Ray predecessor source.run_id is required"),
+        ("process_id", "X-Ray predecessor source.process_id is required"),
+        ("document_id", "X-Ray predecessor source.document_id is required"),
     ],
 )
-def test_builder_binds_sidecar_case_to_producer_capture_before_writes(
+def test_builder_requires_complete_xray_source_identity_before_writes(
     tmp_path: Path,
     monkeypatch,
-    source_case: str | None,
+    field: str,
     expected_error: str,
 ) -> None:
     sidecar_root = tmp_path / "provider-candidates"
@@ -513,10 +673,7 @@ def test_builder_binds_sidecar_case_to_producer_capture_before_writes(
         SURFACE,
     )
     packet = json.loads(xray_path.read_text())
-    if source_case is None:
-        del packet["xray_fixture"]["source_case"]
-    else:
-        packet["xray_fixture"]["source_case"] = source_case
+    del packet["source"][field]
     _write_json(xray_path, packet)
     _refresh_candidate_hash(manifest, XRAY_ARTIFACT, xray_path)
 
@@ -577,10 +734,12 @@ def test_builder_requires_complete_producer_capture_identity_before_writes(
         "handoff_entry.source_run_id",
         "handoff_entry.source_run_mode",
         "handoff_entry.source_boundary_manifest_sha256",
-        "sidecar.surface",
-        "sidecar.input_for",
-        "sidecar.source_handoff",
-        "sidecar.xray_fixture.source_run_id",
+        "envelope.kind",
+        "envelope.source.run_id",
+        "envelope.raw_xray_model_base64",
+        "envelope.raw_xray_model_sha256",
+        "envelope.raw_xray_model_bytes",
+        "envelope.value",
         "handoff.surface",
         "handoff.request.workflow_capture",
         "handoff.statement.workflow_capture",
@@ -597,15 +756,15 @@ def test_builder_requires_complete_coherence_metadata_before_writes(
         SURFACE,
     )
     owner, *path = missing_field.split(".")
-    if owner in {"sidecar", "handoff"}:
-        payload_path = xray_path if owner == "sidecar" else handoff_path
+    if owner in {"envelope", "handoff"}:
+        payload_path = xray_path if owner == "envelope" else handoff_path
         packet = json.loads(payload_path.read_text())
         cursor = packet
         for key in path[:-1]:
             cursor = cursor[key]
         del cursor[path[-1]]
         _write_json(payload_path, packet)
-        artifact_name = XRAY_ARTIFACT if owner == "sidecar" else HANDOFF_ARTIFACT
+        artifact_name = XRAY_ARTIFACT if owner == "envelope" else HANDOFF_ARTIFACT
         _refresh_candidate_hash(manifest, artifact_name, payload_path)
     else:
         target = (
@@ -621,16 +780,19 @@ def test_builder_requires_complete_coherence_metadata_before_writes(
             cursor = cursor[key]
         del cursor[path[-1]]
     expected_owner = {
-        "xray_entry": "X-Ray candidate",
+        "xray_entry": "X-Ray predecessor candidate",
         "handoff_entry": "producer handoff",
     }.get(owner, owner)
+    expected_path = f"{expected_owner}.{'.'.join(path)} is required"
+    if missing_field == "envelope.source.run_id":
+        expected_path = "X-Ray predecessor source.run_id is required"
 
     _assert_rejected_before_writes(
         tmp_path=tmp_path,
         monkeypatch=monkeypatch,
         manifest=manifest,
         manifest_path=manifest_path,
-        expected_error=f"{expected_owner}.{'.'.join(path)} is required",
+        expected_error=expected_path,
     )
 
 
@@ -639,8 +801,8 @@ def test_builder_records_reassembly_when_quality_assertions_fail(
     monkeypatch,
 ) -> None:
     surface = "adp_v1"
-    sidecar_root = tmp_path / "sidecars"
-    sidecar_manifest, _manifest, _sidecar_path, _handoff_path = _coherent_candidate_manifest(sidecar_root, surface)
+    capture_root = tmp_path / "captured-boundaries"
+    capture_manifest, _manifest, _xray_path, _handoff_path = _coherent_candidate_manifest(capture_root, surface)
     accepted_output = tmp_path / "accepted.json"
     _write_json(
         accepted_output,
@@ -669,7 +831,7 @@ def test_builder_records_reassembly_when_quality_assertions_fail(
 
     manifest_path = builder.build_candidates(
         repo_root=REPO_ROOT,
-        xray_candidate_manifest_path=sidecar_manifest,
+        xray_candidate_manifest_path=capture_manifest,
         candidate_root=candidate_root,
         surfaces=(surface,),
     )
@@ -697,9 +859,9 @@ def test_builder_replays_the_proposed_producer_handoff_with_the_proposed_xray(
     monkeypatch,
 ) -> None:
     surface = "adp_v1"
-    sidecar_root = tmp_path / "provider-candidates"
-    sidecar_manifest, _manifest, candidate_sidecar, candidate_handoff = _coherent_candidate_manifest(
-        sidecar_root,
+    capture_root = tmp_path / "provider-candidates"
+    capture_manifest, _manifest, candidate_xray, candidate_handoff = _coherent_candidate_manifest(
+        capture_root,
         surface,
         xray={"source": "proposed"},
         handoff={"request": {"source": "proposed"}},
@@ -710,7 +872,7 @@ def test_builder_replays_the_proposed_producer_handoff_with_the_proposed_xray(
 
     def build_candidate(_candidate_root: Path, selected_surface: str):
         producer_path = replay._real_download_workflow_load_input_path(selected_surface)
-        xray_path = replay._real_xray_sidecar_path(selected_surface)
+        xray_path = replay._real_xray_predecessor_path(selected_surface)
         return (
             {
                 "input_sha256": _sha256(producer_path),
@@ -728,7 +890,7 @@ def test_builder_replays_the_proposed_producer_handoff_with_the_proposed_xray(
     candidate_root = tmp_path / "sdk-candidates"
     builder.build_candidates(
         repo_root=REPO_ROOT,
-        xray_candidate_manifest_path=sidecar_manifest,
+        xray_candidate_manifest_path=capture_manifest,
         candidate_root=candidate_root,
         surfaces=(surface,),
     )
@@ -747,4 +909,4 @@ def test_builder_replays_the_proposed_producer_handoff_with_the_proposed_xray(
         ).read_text()
     )
     assert packet["input_sha256"] == _sha256(candidate_handoff)
-    assert packet["xray_sha256"] == _sha256(candidate_sidecar)
+    assert packet["xray_sha256"] == _sha256(candidate_xray)

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import base64
 import datetime
 import hashlib
 import importlib.util
@@ -12,10 +13,8 @@ _PROJECTION_PATH = Path(__file__).resolve().parent / "fixtures" / "extraction-bo
 _PROJECTION = json.loads(_PROJECTION_PATH.read_text())
 SURFACES = tuple(case["surface"] for case in _PROJECTION["cases"])
 _CASE_IDS = {case["surface"]: case["id"] for case in _PROJECTION["cases"]}
-_XRAY_ARTIFACT = "groundx_python_xray_reassembly_xray_sidecar"
+_XRAY_ARTIFACT = "internal_arcadia_load_xray_predecessor"
 _HANDOFF_ARTIFACT = "internal_arcadia_download_workflow_load"
-_EXPECTED_INPUT_FOR = "groundx_python_xray_reassembly"
-_EXPECTED_SOURCE_HANDOFF = "internal_arcadia_download_workflow_load.handoff.json"
 _CAPTURE_IDENTITY_FIELDS = (
     "schema_version",
     "run_id",
@@ -157,15 +156,15 @@ def _validate_candidate_pair(
     *,
     manifest: dict[str, typing.Any],
     surface: str,
-    sidecar_entry: dict[str, typing.Any],
-    sidecar_path: Path,
+    xray_entry: dict[str, typing.Any],
+    xray_path: Path,
     handoff_entry: dict[str, typing.Any],
     handoff_path: Path,
 ) -> None:
     _validate_entry_provenance(
-        entry=sidecar_entry,
+        entry=xray_entry,
         manifest=manifest,
-        label="X-Ray candidate",
+        label="X-Ray predecessor candidate",
     )
     _validate_entry_provenance(
         entry=handoff_entry,
@@ -173,20 +172,42 @@ def _validate_candidate_pair(
         label="producer handoff",
     )
 
-    sidecar = _read_json(sidecar_path)
-    sidecar_surface = _required(sidecar, "surface", "sidecar")
-    if sidecar_surface != surface:
-        raise ValueError(f"X-Ray sidecar surface does not match candidate for {surface}")
-    input_for = _required(sidecar, "input_for", "sidecar")
-    if input_for != _EXPECTED_INPUT_FOR:
-        raise ValueError(f"X-Ray sidecar input_for does not match candidate for {surface}")
-    source_handoff = _required(sidecar, "source_handoff", "sidecar")
-    if source_handoff != _EXPECTED_SOURCE_HANDOFF:
-        raise ValueError(f"X-Ray sidecar source_handoff does not match candidate for {surface}")
-    xray_fixture = _required_mapping(sidecar, "xray_fixture", "sidecar")
-    sidecar_run_id = _required(xray_fixture, "source_run_id", "sidecar.xray_fixture")
-    if sidecar_run_id != manifest["run_id"]:
-        raise ValueError(f"X-Ray sidecar source_run_id does not match manifest for {surface}")
+    envelope = _read_json(xray_path)
+    if _required(envelope, "kind", "envelope") != "xray_predecessor":
+        raise ValueError("X-Ray predecessor kind is invalid")
+    xray = _required_mapping(envelope, "value", "envelope")
+    source = _required_mapping(envelope, "source", "envelope")
+    if _required(source, "source_kind", "envelope.source") != "live_capture":
+        raise ValueError("X-Ray predecessor is not a live capture")
+    for field in ("run_id", "process_id", "document_id"):
+        _required(source, field, "X-Ray predecessor source")
+    encoded = _required(envelope, "raw_xray_model_base64", "envelope")
+    digest = _required(envelope, "raw_xray_model_sha256", "envelope")
+    byte_count = _required(envelope, "raw_xray_model_bytes", "envelope")
+    if not isinstance(encoded, str) or not isinstance(digest, str):
+        raise ValueError("X-Ray predecessor raw model bytes are invalid")
+    try:
+        raw_xray = base64.b64decode(encoded, validate=True)
+    except ValueError as error:
+        raise ValueError("X-Ray predecessor raw model base64 is invalid") from error
+    if hashlib.sha256(raw_xray).hexdigest() != digest:
+        raise ValueError("X-Ray predecessor raw model digest changed")
+    if len(raw_xray) != byte_count:
+        raise ValueError("X-Ray predecessor raw model byte count changed")
+    try:
+        parsed_xray = json.loads(raw_xray)
+    except (UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise ValueError("X-Ray predecessor raw model is not JSON") from error
+    canonical = json.dumps(
+        parsed_xray,
+        ensure_ascii=False,
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("utf-8")
+    if canonical != raw_xray:
+        raise ValueError("X-Ray predecessor uses an unknown serializer")
+    if parsed_xray != xray:
+        raise ValueError("X-Ray predecessor value differs from captured bytes")
 
     handoff = _read_json(handoff_path)
     handoff_surface = _required(handoff, "surface", "handoff")
@@ -200,9 +221,53 @@ def _validate_candidate_pair(
         _required(request_capture, field, "handoff.request.workflow_capture")
     if request_capture["surface"] != surface:
         raise ValueError(f"producer handoff capture surface does not match candidate for {surface}")
-    source_case = _required(xray_fixture, "source_case", "sidecar.xray_fixture")
-    if source_case != request_capture["case_id"] or source_case != _CASE_IDS[surface]:
-        raise ValueError(f"X-Ray sidecar source_case does not match producer handoff for {surface}")
+    if request_capture["case_id"] != _CASE_IDS[surface]:
+        raise ValueError(f"producer handoff case does not match candidate for {surface}")
+    for source_field, handoff_value in (
+        ("run_id", request_capture["run_id"]),
+        ("process_id", _required(handoff["request"], "task_id", "handoff.request")),
+        (
+            "document_id",
+            _required(handoff["request"], "document_id", "handoff.request"),
+        ),
+    ):
+        if source[source_field] != handoff_value:
+            raise ValueError(f"X-Ray predecessor source.{source_field} does not match handoff")
+
+
+def _xray_predecessor_candidates(
+    *,
+    candidate_manifest: dict[str, typing.Any],
+    candidate_root: Path,
+) -> dict[str, tuple[dict[str, typing.Any], Path]]:
+    candidates: dict[str, tuple[dict[str, typing.Any], Path]] = {}
+    expected_suffix = "/internal_arcadia_agent_load_xray.xray.json"
+    for entry in candidate_manifest["candidates"]:
+        if entry.get("artifact_name") != _XRAY_ARTIFACT:
+            continue
+        surface = str(entry.get("surface") or "")
+        source_path = _resolve_inside(candidate_root, entry["candidate_path"])
+        source_digest = _sha256(source_path) if source_path.exists() else None
+        if source_digest != entry.get("sha256") or source_digest != entry.get("source_sha256"):
+            raise ValueError(f"X-Ray predecessor source hash does not match for {surface}")
+        matching = [
+            value
+            for value in entry.get("next_boundary_inputs", [])
+            if str(value.get("candidate_path") or "").startswith("groundx-python/")
+            and str(value.get("candidate_path") or "").endswith(expected_suffix)
+        ]
+        if len(matching) != 1:
+            raise ValueError(f"X-Ray predecessor consumer input missing for {surface}")
+        consumer = matching[0]
+        consumer_path = _resolve_inside(candidate_root, consumer["candidate_path"])
+        if not consumer_path.exists() or _sha256(consumer_path) != consumer.get("sha256"):
+            raise ValueError(f"X-Ray predecessor hash does not match for {surface}")
+        if consumer_path.read_bytes() != source_path.read_bytes():
+            raise ValueError("X-Ray predecessor consumer bytes differ from captured source")
+        if surface in candidates:
+            raise ValueError(f"duplicate X-Ray predecessor candidate for {surface}")
+        candidates[surface] = (entry, consumer_path)
+    return candidates
 
 
 def _producer_handoff_candidates(
@@ -216,6 +281,10 @@ def _producer_handoff_candidates(
         if entry.get("artifact_name") != _HANDOFF_ARTIFACT:
             continue
         surface = str(entry.get("surface") or "")
+        source_path = _resolve_inside(candidate_root, entry["candidate_path"])
+        source_digest = _sha256(source_path) if source_path.exists() else None
+        if source_digest != entry.get("sha256") or source_digest != entry.get("source_sha256"):
+            raise ValueError(f"producer handoff source hash does not match for {surface}")
         matching = [
             value
             for value in entry.get("next_boundary_inputs", [])
@@ -228,6 +297,8 @@ def _producer_handoff_candidates(
         path = _resolve_inside(candidate_root, candidate["candidate_path"])
         if not path.exists() or _sha256(path) != candidate.get("sha256"):
             raise ValueError(f"proposed producer handoff hash does not match for {surface}")
+        if path.read_bytes() != source_path.read_bytes():
+            raise ValueError("producer handoff consumer bytes differ from captured source")
         if surface in handoffs:
             raise ValueError(f"duplicate proposed producer handoff for {surface}")
         handoffs[surface] = (entry, path)
@@ -240,7 +311,7 @@ def _candidate_entry(
     packet_path: Path,
     diff_path: Path,
     source: dict[str, typing.Any],
-    sidecar_manifest: dict[str, typing.Any],
+    capture_manifest: dict[str, typing.Any],
 ) -> dict[str, typing.Any]:
     relative_packet = (
         "groundx-python/tests/extract/fixtures/extraction-boundary/"
@@ -260,11 +331,11 @@ def _candidate_entry(
         "seed_policy": "commit_sanitized_fixture",
         "sha256": _sha256(packet_path),
         "source_sha256": source["source_sha256"],
-        "source_run_id": sidecar_manifest["run_id"],
-        "source_run_mode": sidecar_manifest["run_mode"],
+        "source_run_id": capture_manifest["run_id"],
+        "source_run_mode": capture_manifest["run_mode"],
         "source_hosted_path": source["source_hosted_path"],
         "source_path": None,
-        "source_boundary_manifest_sha256": sidecar_manifest["source_boundary_manifest_sha256"],
+        "source_boundary_manifest_sha256": capture_manifest["source_boundary_manifest_sha256"],
         "test_path": ("groundx-python/tests/extract/test_extraction_boundary_reassembly.py"),
     }
 
@@ -279,49 +350,42 @@ def build_candidates(
     if candidate_root.exists() and any(candidate_root.iterdir()):
         raise ValueError("candidate root must be empty")
 
-    sidecar_manifest = _read_json(xray_candidate_manifest_path)
-    if sidecar_manifest.get("schema_version") != "extraction_boundary_fixture_candidate_v1":
+    capture_manifest = _read_json(xray_candidate_manifest_path)
+    if capture_manifest.get("schema_version") != "extraction_boundary_fixture_candidate_v1":
         raise ValueError("invalid X-Ray candidate manifest schema")
-    if sidecar_manifest.get("status") != "pending_review":
+    if capture_manifest.get("status") != "pending_review":
         raise ValueError("X-Ray candidate manifest must be pending review")
-    sidecar_root = xray_candidate_manifest_path.parent
-    sidecars: dict[str, tuple[dict[str, typing.Any], Path]] = {}
-    for entry in sidecar_manifest["candidates"]:
-        if entry["artifact_name"] != _XRAY_ARTIFACT:
-            continue
-        surface = entry["surface"]
-        if surface in sidecars:
-            raise ValueError(f"duplicate X-Ray candidate for {surface}")
-        sidecar_path = _resolve_inside(sidecar_root, entry["candidate_path"])
-        if not sidecar_path.exists() or _sha256(sidecar_path) != entry["sha256"]:
-            raise ValueError(f"X-Ray candidate hash does not match for {surface}")
-        sidecars[surface] = (entry, sidecar_path)
-    producer_handoffs = _producer_handoff_candidates(
-        candidate_manifest=sidecar_manifest,
-        candidate_root=sidecar_root,
+    capture_root = xray_candidate_manifest_path.parent
+    xray_predecessors = _xray_predecessor_candidates(
+        candidate_manifest=capture_manifest,
+        candidate_root=capture_root,
     )
-    missing_sidecars = sorted(set(surfaces) - set(sidecars))
-    if missing_sidecars:
-        raise ValueError(f"X-Ray candidates missing surfaces: {', '.join(missing_sidecars)}")
+    producer_handoffs = _producer_handoff_candidates(
+        candidate_manifest=capture_manifest,
+        candidate_root=capture_root,
+    )
+    missing_xray = sorted(set(surfaces) - set(xray_predecessors))
+    if missing_xray:
+        raise ValueError(f"X-Ray predecessors missing surfaces: {', '.join(missing_xray)}")
     missing_handoffs = sorted(set(surfaces) - set(producer_handoffs))
     if missing_handoffs:
         raise ValueError("proposed producer handoffs missing surfaces: " + ", ".join(missing_handoffs))
 
     for surface in surfaces:
-        sidecar_entry, sidecar_path = sidecars[surface]
+        xray_entry, xray_path = xray_predecessors[surface]
         handoff_entry, handoff_path = producer_handoffs[surface]
         _validate_candidate_pair(
-            manifest=sidecar_manifest,
+            manifest=capture_manifest,
             surface=surface,
-            sidecar_entry=sidecar_entry,
-            sidecar_path=sidecar_path,
+            xray_entry=xray_entry,
+            xray_path=xray_path,
             handoff_entry=handoff_entry,
             handoff_path=handoff_path,
         )
 
     candidate_root.mkdir(parents=True, exist_ok=True)
     replay = _load_replay_module(repo_root)
-    replay._real_xray_sidecar_path = lambda surface: sidecars[surface][1]
+    replay._real_xray_predecessor_path = lambda surface: xray_predecessors[surface][1]
     replay._real_download_workflow_load_input_path = lambda surface: producer_handoffs[surface][1]
     candidates = []
     for surface in surfaces:
@@ -336,7 +400,7 @@ def build_candidates(
         packet_path = candidate_root / relative_packet
         _write_json(packet_path, packet)
 
-        accepted = _read_json(accepted_path)
+        accepted = _read_json(accepted_path) if accepted_path.exists() else None
         diff_path = packet_path.with_name("groundx_python_xray_reassembly.expected.diff.json")
         _write_json(
             diff_path,
@@ -345,9 +409,9 @@ def build_candidates(
                 "status": "pending_review",
                 "artifact_name": "groundx_python_xray_reassembly",
                 "candidate_sha256": _sha256(packet_path),
-                "current_accepted_sha256": _sha256(accepted_path),
-                "source_artifact_sha256": sidecars[surface][0]["source_sha256"],
-                "source_run_id": sidecar_manifest["run_id"],
+                "current_accepted_sha256": (_sha256(accepted_path) if accepted_path.exists() else None),
+                "source_artifact_sha256": xray_predecessors[surface][0]["source_sha256"],
+                "source_run_id": capture_manifest["run_id"],
                 "changes": _changes(accepted, packet),
             },
         )
@@ -356,8 +420,8 @@ def build_candidates(
                 surface=surface,
                 packet_path=packet_path,
                 diff_path=diff_path,
-                source=sidecars[surface][0],
-                sidecar_manifest=sidecar_manifest,
+                source=xray_predecessors[surface][0],
+                capture_manifest=capture_manifest,
             )
         )
 
@@ -367,12 +431,12 @@ def build_candidates(
         {
             "schema_version": "extraction_boundary_fixture_candidate_v1",
             "status": "pending_review",
-            "run_id": sidecar_manifest["run_id"],
-            "run_mode": sidecar_manifest["run_mode"],
+            "run_id": capture_manifest["run_id"],
+            "run_mode": capture_manifest["run_mode"],
             "generated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
-            "artifact_catalog_version": sidecar_manifest["artifact_catalog_version"],
-            "artifact_catalog_sha256": sidecar_manifest["artifact_catalog_sha256"],
-            "source_boundary_manifest_sha256": sidecar_manifest["source_boundary_manifest_sha256"],
+            "artifact_catalog_version": capture_manifest["artifact_catalog_version"],
+            "artifact_catalog_sha256": capture_manifest["artifact_catalog_sha256"],
+            "source_boundary_manifest_sha256": capture_manifest["source_boundary_manifest_sha256"],
             "upstream_candidate_manifest_sha256": _sha256(xray_candidate_manifest_path),
             "generator": {
                 "candidate_builder_sha256": _sha256(Path(__file__)),

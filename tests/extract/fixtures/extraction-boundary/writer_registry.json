@@ -3,8 +3,10 @@
   "owner": "groundx-python",
   "artifacts": [
     {
-      "input_from": "internal_arcadia_download_workflow_load",
-      "input_path_template": "groundx-python/tests/extract/fixtures/extraction-boundary/inputs/{surface}/internal_arcadia_download_workflow_load.handoff.json",
+      "input_from": "internal_arcadia_load_xray_predecessor",
+      "input_path_template": "groundx-python/tests/extract/fixtures/extraction-boundary/inputs/{surface}/internal_arcadia_agent_load_xray.xray.json",
+      "companion_input_from": "internal_arcadia_download_workflow_load",
+      "companion_input_path_template": "groundx-python/tests/extract/fixtures/extraction-boundary/inputs/{surface}/internal_arcadia_download_workflow_load.handoff.json",
       "name": "groundx_python_xray_reassembly",
       "output_for": "sdk_reassembly_proof",
       "path_template": "groundx-python/tests/extract/fixtures/extraction-boundary/boundary-goldens/{surface}/groundx_python_xray_reassembly.expected.json",
@@ -15,7 +17,7 @@
       "after_boundary_function": "classes.statement.Statement._load_xray_with_trace",
       "evidence_writer_function": "classes.pipeline_trace.capture_load_xray_after",
       "s3_path_template": "layout/processed/{task_id}/{document_id}-extract-trace/internal-arcadia-agents/{stage_run}/output.full_json.json",
-      "consumer_boundary": "internal_arcadia_download_workflow_load",
+      "consumer_boundary": "internal_arcadia_load_xray_predecessor plus internal_arcadia_download_workflow_load",
       "fixture_path_template": "groundx-python/tests/extract/fixtures/extraction-boundary/boundary-goldens/{surface}/groundx_python_xray_reassembly.expected.json",
       "fixture_policy": "commit_sanitized_fixture",
       "applicability": "all protected cases during Internal Arcadia X-Ray load",

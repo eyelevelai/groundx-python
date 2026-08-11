@@ -248,15 +248,38 @@ BEHAVIOR_TABLE: typing.Tuple[Row, ...] = (
     _row("R02_stable_m_only", [_P0], {_M: "12"}, None, "none", f"{_STMT}:5641-5642; {_IMPL}:3794-3797"),
     _row("R03_passthrough_only", [_P0], {_P: "Test"}, None, "none", f"{_STMT}:5643-5644"),
     _row("R04_stable_s_only", [_P0], {_S: "water"}, None, "none", f"{_STMT}:5645-5646"),
-    _row("R05_both_stable_fields", [_P0], {_M: "12", _S: "water"}, 0, "fallback", f"{_STMT}:5647-5648; {_IMPL}:3821-3850"),
+    _row(
+        "R05_both_stable_fields", [_P0], {_M: "12", _S: "water"}, 0, "fallback", f"{_STMT}:5647-5648; {_IMPL}:3821-3850"
+    ),
     _row("R06_passthrough_and_one_stable", [_P0], {_P: "Test", _S: "water"}, None, "none", f"{_STMT}:5649-5650"),
     _row("R07_other_passthrough_and_stable", [_P0], {_M: "12", _P: "Test"}, None, "none", f"{_STMT}:5651-5652"),
     _row("R08_exact_full_identity", [_P0], dict(_P0), 0, "exact", f"{_STMT}:5653-5656; {_IMPL}:3805-3819"),
     _row("R09_wrong_stable_value", [_P0], {_M: "123", _P: "Test", _S: "water"}, None, "none", f"{_STMT}:5657-5660"),
-    _row("R10_differing_passthrough_value", [_P0], {_M: "12", _P: "Test Utility", _S: "water"}, 0, "fallback", f"{_STMT}:5661-5668; {_IMPL}:3821-3850"),
+    _row(
+        "R10_differing_passthrough_value",
+        [_P0],
+        {_M: "12", _P: "Test Utility", _S: "water"},
+        0,
+        "fallback",
+        f"{_STMT}:5661-5668; {_IMPL}:3821-3850",
+    ),
     # --- conflicting ignored (passthrough) field blocks the fallback -------
-    _row("R11_conflicted_ignored_field_unknown_value", [_P0_CONFLICTED], {_M: "12", _P: "Unknown", _S: "water"}, None, "none", f"{_STMT}:5686-5693; {_IMPL}:3836-3841"),
-    _row("R12_conflicted_ignored_field_rival_value", [_P0_CONFLICTED], {_M: "12", _P: "Other", _S: "water"}, None, "none", f"{_STMT}:5694-5701; {_IMPL}:3836-3841"),
+    _row(
+        "R11_conflicted_ignored_field_unknown_value",
+        [_P0_CONFLICTED],
+        {_M: "12", _P: "Unknown", _S: "water"},
+        None,
+        "none",
+        f"{_STMT}:5686-5693; {_IMPL}:3836-3841",
+    ),
+    _row(
+        "R12_conflicted_ignored_field_rival_value",
+        [_P0_CONFLICTED],
+        {_M: "12", _P: "Other", _S: "water"},
+        None,
+        "none",
+        f"{_STMT}:5694-5701; {_IMPL}:3836-3841",
+    ),
     # --- two parents sharing the stable identity --------------------------
     _row(
         "R13_two_fallback_candidates_are_not_unique",
@@ -313,11 +336,41 @@ BEHAVIOR_TABLE: typing.Tuple[Row, ...] = (
         provenance=RATIFIED,
     ),
     # --- reviewed available-identity matrix -------------------------------
-    _row("R17_exact_full_match", [{_M: "M-1", _P: "Utility", _S: "water"}], {_M: "M-1", _P: "Utility", _S: "water"}, 0, "exact", f"{_STMT}:5754-5759"),
-    _row("R18_passthrough_mismatch_unique_stable", [{_M: "M-1", _P: "Utility", _S: "water"}], {_M: "M-1", _P: "Other Utility", _S: "water"}, 0, "fallback", f"{_STMT}:5760-5773"),
-    _row("R19_missing_child_side", [{_M: "M-1", _P: "Utility", _S: "water"}], {_M: "M-1", _S: "water"}, 0, "fallback", f"{_STMT}:5774-5783"),
-    _row("R20_missing_parent_side", [{_M: "M-1", _S: "water"}], {_M: "M-1", _P: "Utility", _S: "water"}, 0, "fallback", f"{_STMT}:5784-5793"),
-    _row("R21_missing_both_sides", [{_M: "M-1", _S: "water"}], {_M: "M-1", _S: "water"}, 0, "exact", f"{_STMT}:5794-5799"),
+    _row(
+        "R17_exact_full_match",
+        [{_M: "M-1", _P: "Utility", _S: "water"}],
+        {_M: "M-1", _P: "Utility", _S: "water"},
+        0,
+        "exact",
+        f"{_STMT}:5754-5759",
+    ),
+    _row(
+        "R18_passthrough_mismatch_unique_stable",
+        [{_M: "M-1", _P: "Utility", _S: "water"}],
+        {_M: "M-1", _P: "Other Utility", _S: "water"},
+        0,
+        "fallback",
+        f"{_STMT}:5760-5773",
+    ),
+    _row(
+        "R19_missing_child_side",
+        [{_M: "M-1", _P: "Utility", _S: "water"}],
+        {_M: "M-1", _S: "water"},
+        0,
+        "fallback",
+        f"{_STMT}:5774-5783",
+    ),
+    _row(
+        "R20_missing_parent_side",
+        [{_M: "M-1", _S: "water"}],
+        {_M: "M-1", _P: "Utility", _S: "water"},
+        0,
+        "fallback",
+        f"{_STMT}:5784-5793",
+    ),
+    _row(
+        "R21_missing_both_sides", [{_M: "M-1", _S: "water"}], {_M: "M-1", _S: "water"}, 0, "exact", f"{_STMT}:5794-5799"
+    ),
     # --- empty passthrough values are absent, not mismatching -------------
     # `24a490c` divergence, verified by reading `24a490c:3114-3124`:
     #   * a None-valued key reaches `equal_to_value`, which raises at
@@ -364,8 +417,7 @@ BEHAVIOR_TABLE: typing.Tuple[Row, ...] = (
         {_M: "M-1", _P: "Utility", _S: "water"},
         0,
         "fallback",
-        f"{_STMT}:5801-5830. {_MAIN_ADOPTED_NOTE}. Same matched index under "
-        f"{_IMPL_24} via the fallback pass.",
+        f"{_STMT}:5801-5830. {_MAIN_ADOPTED_NOTE}. Same matched index under {_IMPL_24} via the fallback pass.",
         provenance=MAIN_ADOPTED,
     ),
     _row(
@@ -374,8 +426,7 @@ BEHAVIOR_TABLE: typing.Tuple[Row, ...] = (
         {_M: "M-1", _P: "Utility", _S: "water"},
         0,
         "fallback",
-        f"{_STMT}:5801-5830. {_MAIN_ADOPTED_NOTE}. Same matched index under "
-        f"{_IMPL_24} via the fallback pass.",
+        f"{_STMT}:5801-5830. {_MAIN_ADOPTED_NOTE}. Same matched index under {_IMPL_24} via the fallback pass.",
         provenance=MAIN_ADOPTED,
     ),
     _row(
@@ -384,8 +435,7 @@ BEHAVIOR_TABLE: typing.Tuple[Row, ...] = (
         {_M: "M-1", _P: "Utility", _S: "water"},
         0,
         "fallback",
-        f"{_STMT}:5801-5830. {_MAIN_ADOPTED_NOTE}. Same matched index under "
-        f"{_IMPL_24} via the fallback pass.",
+        f"{_STMT}:5801-5830. {_MAIN_ADOPTED_NOTE}. Same matched index under {_IMPL_24} via the fallback pass.",
         provenance=MAIN_ADOPTED,
     ),
     _row(
@@ -466,8 +516,7 @@ BEHAVIOR_TABLE: typing.Tuple[Row, ...] = (
         {_M: "12", _S: "water"},
         0,
         "fallback",
-        f"{_IMPL}:3839 -- truthiness of Field.conflicts. DERIVED: no legacy "
-        "assertion covers an empty conflicts list.",
+        f"{_IMPL}:3839 -- truthiness of Field.conflicts. DERIVED: no legacy assertion covers an empty conflicts list.",
         provenance=DERIVED,
     ),
 )
@@ -598,8 +647,7 @@ def _selection(
         )
     if ambiguous_raw is _MISSING:
         raise AssertionError(
-            "task 3.2a7b contract: the selection result must report declared "
-            f"ambiguity as `ambiguous`; got {result!r}"
+            f"task 3.2a7b contract: the selection result must report declared ambiguity as `ambiguous`; got {result!r}"
         )
     ambiguous = bool(ambiguous_raw)
     if parent is _MISSING or parent is None:
@@ -773,9 +821,7 @@ def test_renamed_generic_parity(row: Row) -> None:
     for naming in NAMINGS:
         parents = [_render(parent, naming) for parent in row.parents]
         child = _render(row.child, naming)
-        results.append(
-            _selection(matcher(parents, child, _packet(naming, strategy=row.strategy)), parents)
-        )
+        results.append(_selection(matcher(parents, child, _packet(naming, strategy=row.strategy)), parents))
 
     assert results[0] == results[1] == (row.expected_index, row.ambiguous), (
         f"{row.row_id} arcadia/generic parity; cite: {row.cite}"
@@ -783,17 +829,14 @@ def test_renamed_generic_parity(row: Row) -> None:
 
 
 _BOUNDARY_INPUTS = pathlib.Path(__file__).parent / "fixtures" / "extraction-boundary" / "inputs"
+_BOUNDARY_CATALOG = _BOUNDARY_INPUTS.parent / "catalog.json"
 
 
 def _accepted_relationship(surface: str) -> typing.Mapping[str, typing.Any]:
     payload = json.loads(
-        (
-            _BOUNDARY_INPUTS / surface / "internal_arcadia_download_workflow_load.handoff.json"
-        ).read_text()
+        (_BOUNDARY_INPUTS / surface / "internal_arcadia_download_workflow_load.handoff.json").read_text()
     )
-    relationships = payload["workflow_extract"]["_groundx_persisted_extract"]["workflow"][
-        "output_relationships"
-    ]
+    relationships = payload["workflow_extract"]["_groundx_persisted_extract"]["workflow"]["output_relationships"]
     assert len(relationships) == 1, surface
     return relationships[0]
 
@@ -821,10 +864,17 @@ def test_pending_accepted_inputs_declare_one_ambiguity_strategy() -> None:
     requirement.  It is marked `pending_decision` so it never reads as a 3.2a7b
     implementation target.
     """
-    declared = {
-        surface: _accepted_relationship(surface).get("multiple_match_strategy")
-        for surface in ("arcadia_legacy", "arcadia_v1", "generic_v1")
-    }
+    surfaces = ("arcadia_legacy", "arcadia_v1", "generic_v1")
+    accepted_paths = [
+        _BOUNDARY_INPUTS / surface / "internal_arcadia_download_workflow_load.handoff.json" for surface in surfaces
+    ]
+    if not any(path.exists() for path in accepted_paths):
+        projection = json.loads(_BOUNDARY_CATALOG.read_text())
+        statuses = {case["surface"]: case["fixture_status"] for case in projection["cases"]}
+        assert all(statuses.get(surface) == "pending" for surface in surfaces)
+        pytest.skip("accepted relationship fixtures are pending governed capture")
+
+    declared = {surface: _accepted_relationship(surface).get("multiple_match_strategy") for surface in surfaces}
 
     assert set(declared.values()) == {"first_stable"}, (
         "RULING 7b: every accepted input must declare "
