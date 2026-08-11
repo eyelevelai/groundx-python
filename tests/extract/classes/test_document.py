@@ -197,6 +197,21 @@ def _make_request() -> DocumentRequest:
 
 
 class TestDocument(unittest.TestCase):
+    def test_injected_prompt_coerces_value_before_serialization(self) -> None:
+        source = TestSource(SAMPLE_YAML_1)
+        manager = PromptManager(cache_source=source, config_source=source)
+
+        doc = Document.model_validate(
+            {"fields": {"statement_date": {"value": True}}},
+            context={"prompt_manager": manager},
+        )
+
+        field = doc.fields["statement_date"]
+        self.assertIsInstance(field, ExtractedField)
+        assert isinstance(field, ExtractedField)
+        self.assertEqual(field.get_value(), "true")
+        self.assertEqual(field.model_dump(exclude_none=False)["value"], "true")
+
     def setUp(self) -> None:
         patcher = patch("groundx.extract.classes.document.GroundXDocument.xray", autospec=True)
         self.mock_xray = patcher.start()

@@ -1,8 +1,7 @@
 import typing
 
+from ..utility import coerce_value
 from pydantic import BaseModel, ConfigDict
-
-from ..utility import str_to_type_sequence
 
 
 class Prompt(BaseModel):
@@ -28,21 +27,5 @@ class Prompt(BaseModel):
         if not ty:
             return True
 
-        types: typing.List[typing.Type[typing.Any]] = []
-        if isinstance(ty, list):
-            for t in ty:
-                if t == "int" or t == "float":
-                    types.extend([int, float])
-                elif t == "str":
-                    types.append(str)
-
-            return isinstance(value, tuple(types))
-
-        exp = str_to_type_sequence(ty)
-        for et in exp:
-            if et in (int, float):
-                types.extend([int, float])
-            else:
-                types.append(et)
-        types = list(dict.fromkeys(types))
-        return isinstance(value, tuple(types))
+        result = coerce_value(value, ty)
+        return result.matched and not result.converted

@@ -1,4 +1,5 @@
-import typing, unittest
+import typing
+import unittest
 
 from groundx.extract.classes.prompt import Prompt
 
@@ -27,16 +28,18 @@ class TestPromptValidValue(unittest.TestCase):
         p = TestPrompt("field1", "int")
         self.assertFalse(p.valid_value("hello"))
         self.assertTrue(p.valid_value(123))
-        self.assertTrue(p.valid_value(12.3))
+        self.assertFalse(p.valid_value(12.3))
+        self.assertFalse(p.valid_value(True))
         self.assertFalse(p.valid_value((1, 2, 3)))
         self.assertFalse(p.valid_value([1, 2, 3]))
 
     def test_single_type_float(self):
         p = TestPrompt("field1", "float")
         self.assertFalse(p.valid_value("hello"))
-        self.assertTrue(p.valid_value(123))
+        self.assertFalse(p.valid_value(123))
         self.assertTrue(p.valid_value(12.3))
         self.assertTrue(p.valid_value(123.0))
+        self.assertFalse(p.valid_value(False))
         self.assertFalse(p.valid_value((1, 2, 3)))
         self.assertFalse(p.valid_value([1, 2, 3]))
 
@@ -52,11 +55,20 @@ class TestPromptValidValue(unittest.TestCase):
     def test_list_of_types_success_and_failure(self):
         p = TestPrompt("field2", ["str", "float"])
         self.assertTrue(p.valid_value("hello"))
-        self.assertTrue(p.valid_value(123))
+        self.assertFalse(p.valid_value(123))
         self.assertTrue(p.valid_value(12.3))
         self.assertTrue(p.valid_value(123.0))
         self.assertFalse(p.valid_value((1, 2, 3)))
         self.assertFalse(p.valid_value([1, 2, 3]))
+
+    def test_container_and_numeric_union_types_are_exact(self):
+        self.assertTrue(TestPrompt("field", "dict").valid_value({"a": 1}))
+        self.assertFalse(TestPrompt("field", "dict").valid_value([1]))
+        numeric = TestPrompt("field", ["int", "float"])
+        self.assertTrue(numeric.valid_value(1))
+        self.assertTrue(numeric.valid_value(1.5))
+        self.assertFalse(numeric.valid_value(True))
+        self.assertFalse(TestPrompt("field", "date").valid_value("2025-01-01"))
 
     def test_repr_contains_fields(self):
         p = TestPrompt("field_5", "int")
