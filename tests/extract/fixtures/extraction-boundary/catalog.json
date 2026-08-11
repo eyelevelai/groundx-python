@@ -127,6 +127,7 @@
   "catalog_version": "2026-07-23.1",
   "owner": "groundx-python",
   "schema_version": "extraction_boundary_owner_projection_v1",
+  "stage_transitions": [],
   "surfaces": [
     "arcadia_legacy",
     "arcadia_v1",
