@@ -144,6 +144,15 @@ class TestUtilCoerceValue(unittest.TestCase):
             True,
         )
 
+    def test_excessive_integer_exponent_is_unmatched(self) -> None:
+        self.assert_result(
+            coerce_value("1e100000000", "int"),
+            None,
+            type(None),
+            False,
+            False,
+        )
+
     def test_impossible_conversions_return_content_free_warning(self) -> None:
         cases = [
             (True, "int", "bool", "int"),

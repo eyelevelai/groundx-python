@@ -98,6 +98,12 @@ targets before conversion.
 - **WHEN** text cannot be parsed for an `int` or `float` target
 - **THEN** the helper returns null, marks it unmatched, and returns a warning.
 
+#### Scenario: Numeric text exceeds the target representation
+
+- **WHEN** numeric text cannot be represented by the target type without
+  excessive expansion
+- **THEN** the helper returns null, marks it unmatched, and returns a warning.
+
 ### Requirement: Container conversion uses JSON semantics
 
 The helper SHALL use JSON encoding and decoding for conversions between string
