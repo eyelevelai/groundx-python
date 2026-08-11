@@ -20,6 +20,24 @@ status. These are standard CI inputs, not a live test or scoring rule.
 Document-specific meter, charge, or field counts must never enter SDK runtime
 behavior.
 
+A protected case with `fixture_status: pending` is intentionally RED in standard
+CI. Pending is lifecycle metadata, never permission to skip or deselect replay.
+Remove a protected case only from the canonical Harness certification registry,
+then regenerate owner projections. Never remove a failure by adding a skip.
+
+The reviewed expected output is canonical JSON containing exactly
+`workflow_output`, `relationship_output`, `final_output`, `diagnostics`, and
+`source_provenance`. Owner replay canonical-serializes the production SDK result
+and compares those bytes exactly. A remote alternative must identify one
+downloadable reviewed complete JSON file by a clean HTTPS URL, byte count, and
+SHA-256. Replay fetches that exact URL through its injected downloader, verifies
+the returned byte count and whole-file SHA-256, parses the complete JSON,
+requires all five members, and recomputes the declared workflow, relationship,
+and final-output hashes before exact comparison. An unavailable download fails.
+Counts, shapes, semantic summaries, hashes without that reviewed file, empty
+evidence markers, and locally reconstructed X-Ray or JSON are not
+expected-output evidence.
+
 Expected output may change only after the behavior change is reviewed. Generate
 a candidate diff separately, explain why the old behavior is wrong, and obtain
 Benjamin Fletcher's approval before replacing an accepted fixture. Never update
@@ -41,12 +59,17 @@ poetry run python tests/extract/build_extraction_boundary_candidates.py \
 ```
 
 This command calls `reassemble_custom_outputs_from_xray` and writes only to the
-candidate root. For each selected surface, it must replay both exact inputs from
-the same capture candidate manifest. It rejects changed consumer copies,
-cross-run pairs, invalid raw-model hashes, incomplete identity, and parsed values
-that differ from the captured bytes. Candidate generation freezes observed
-behavior; human review decides whether that behavior replaces the accepted
-fixture. Do not promote either input without its matching SDK output candidate.
+candidate root. For each selected surface, it must replay both exact inputs and
+consume a same-run `internal_arcadia_sdk_reassembly_output` capture from the source
+manifest. Arcadia writes that capture immediately after the production SDK call
+as canonical JSON containing exactly the five complete members above. The
+builder rejects changed consumer copies, cross-run pairs, invalid raw-model
+hashes, incomplete identity, parsed values that differ from captured bytes,
+missing complete captures, and production output that differs from the captured
+complete bytes. It copies the captured complete file byte-for-byte to the SDK
+candidate path. It never constructs expected output from the current replay.
+Human review decides whether that candidate replaces the accepted fixture. Do
+not promote either input without its matching SDK output candidate.
 
 Only the external model/provider response may be replaced by a fixed fixture.
 Tests must call production reassembly functions unchanged.
