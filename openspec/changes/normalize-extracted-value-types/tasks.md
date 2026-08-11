@@ -89,8 +89,11 @@
   Changed files pass Ruff. The repository-wide Ruff check still reports 29
   pre-existing import-order and f-string findings outside this change. Mypy,
   parallel pytest, line endings, and diff checks pass.
-- [ ] 4.4 Build one candidate wheel with `poetry build`. Record its SHA-256 and
+- [x] 4.4 Build one candidate wheel with `poetry build`. Record its SHA-256 and
   source commit. Do not release it.
+  Candidate: `groundx-3.9.2-py3-none-any.whl`, source commit
+  `870fa2d817c26466d94259002e3145868e9f285a`, SHA-256
+  `b1c4861b59aa73f80a84b7134828b03c42788ed7688f5f1b0d63b6d1c6ed6d96`.
 
 ## 5. Prove The Internal Arcadia Consumer
 
