@@ -167,19 +167,10 @@ def _canonical_json_bytes(value: typing.Any) -> bytes:
 
 def _hash_backed_expected_packet(
     complete_output_bytes: bytes,
-    complete_output: typing.Mapping[str, typing.Any],
     *,
     url: str = REVIEWED_COMPLETE_OUTPUT_URL,
 ) -> typing.Dict[str, typing.Any]:
     return {
-        "surface": "arcadia_v1",
-        "output": {
-            "workflow_output_sha256": _sha256_json(complete_output["workflow_output"]),
-            "relationship_output_sha256": _sha256_json(complete_output["relationship_output"]),
-            "final_output_sha256": _sha256_json(complete_output["final_output"]),
-            "diagnostic_count": len(complete_output["diagnostics"]),
-            "source_provenance_count": len(complete_output["source_provenance"]),
-        },
         "reviewed_complete_output": {
             "url": url,
             "bytes": len(complete_output_bytes),
@@ -241,8 +232,11 @@ def _assert_replay_matches_reviewed_complete_output(
     return reviewed
 
 
-def _download_not_configured(_url: str) -> bytes:
-    raise OSError("reviewed complete output downloader is not configured")
+def _download_reviewed_complete_output(url: str) -> bytes:
+    downloader = getattr(_replay_inputs, "download_reviewed_complete_output", None)
+    if not callable(downloader):
+        pytest.fail("INTENTIONAL RED: protected replay has no bounded HTTPS downloader")
+    return typing.cast(bytes, downloader(url))
 
 
 def _assert_resolver_rejects(
@@ -256,10 +250,10 @@ def _assert_resolver_rejects(
     assert str(error.value) == expected_error
 
 
-def test_hash_backed_expected_output_downloads_exact_url_and_rehashes_components() -> None:
+def test_hash_backed_expected_output_downloads_exact_url_without_reconstructed_summary() -> None:
     complete_output = _complete_reviewed_output()
     downloaded = _canonical_json_bytes(complete_output)
-    expected = _hash_backed_expected_packet(downloaded, complete_output)
+    expected = _hash_backed_expected_packet(downloaded)
     requested_urls: typing.List[str] = []
 
     def download(url: str) -> bytes:
@@ -270,6 +264,102 @@ def test_hash_backed_expected_output_downloads_exact_url_and_rehashes_components
 
     assert requested_urls == [REVIEWED_COMPLETE_OUTPUT_URL]
     assert resolved == complete_output
+
+
+def test_reviewed_complete_output_downloader_bounds_timeout_and_response_size() -> None:
+    downloader = getattr(_replay_inputs, "download_reviewed_complete_output", None)
+    if not callable(downloader):
+        pytest.fail("INTENTIONAL RED: protected replay has no bounded HTTPS downloader")
+
+    class Response:
+        def __init__(self, payload: bytes) -> None:
+            self.payload = payload
+            self.requested_bytes: int | None = None
+
+        def __enter__(self) -> "Response":
+            return self
+
+        def __exit__(self, *_args: typing.Any) -> None:
+            return None
+
+        def read(self, byte_count: int) -> bytes:
+            self.requested_bytes = byte_count
+            return self.payload[:byte_count]
+
+    response = Response(b"1234")
+    opened: typing.List[typing.Tuple[str, float]] = []
+
+    def open_url(url: str, *, timeout: float) -> Response:
+        opened.append((url, timeout))
+        return response
+
+    downloaded = downloader(
+        REVIEWED_COMPLETE_OUTPUT_URL,
+        opener=open_url,
+        timeout_seconds=2.5,
+        max_bytes=4,
+    )
+
+    assert downloaded == b"1234"
+    assert opened == [(REVIEWED_COMPLETE_OUTPUT_URL, 2.5)]
+    assert response.requested_bytes == 5
+
+
+def test_reviewed_complete_output_downloader_rejects_oversized_response() -> None:
+    downloader = getattr(_replay_inputs, "download_reviewed_complete_output", None)
+    if not callable(downloader):
+        pytest.fail("INTENTIONAL RED: protected replay has no bounded HTTPS downloader")
+
+    class Response:
+        def __enter__(self) -> "Response":
+            return self
+
+        def __exit__(self, *_args: typing.Any) -> None:
+            return None
+
+        def read(self, byte_count: int) -> bytes:
+            return b"12345"[:byte_count]
+
+    with pytest.raises(ValueError, match="reviewed complete output exceeds 4-byte limit"):
+        downloader(
+            REVIEWED_COMPLETE_OUTPUT_URL,
+            opener=lambda _url, *, timeout: Response(),
+            timeout_seconds=2.5,
+            max_bytes=4,
+        )
+
+
+def test_reviewed_complete_output_downloader_rejects_unsafe_redirect_before_read() -> None:
+    downloader = getattr(_replay_inputs, "download_reviewed_complete_output", None)
+    if not callable(downloader):
+        pytest.fail("INTENTIONAL RED: protected replay has no bounded HTTPS downloader")
+
+    class RedirectedResponse:
+        def __init__(self) -> None:
+            self.read_called = False
+
+        def __enter__(self) -> "RedirectedResponse":
+            return self
+
+        def __exit__(self, *_args: typing.Any) -> None:
+            return None
+
+        def geturl(self) -> str:
+            return "http://fixtures.groundx.ai/reviewed/redirected.json"
+
+        def read(self, _byte_count: int) -> bytes:
+            self.read_called = True
+            return b"unsafe"
+
+    response = RedirectedResponse()
+    with pytest.raises(ValueError, match="reviewed complete output URL must use HTTPS"):
+        downloader(
+            REVIEWED_COMPLETE_OUTPUT_URL,
+            opener=lambda _url, *, timeout: response,
+            timeout_seconds=2.5,
+            max_bytes=64,
+        )
+    assert response.read_called is False
 
 
 def test_inline_expected_output_resolves_complete_bytes_without_download() -> None:
@@ -305,7 +395,7 @@ def test_inline_expected_output_rejects_noncanonical_bytes() -> None:
 def test_hash_backed_expected_output_rejects_unsafe_url(url: str, error: str) -> None:
     complete_output = _complete_reviewed_output()
     downloaded = _canonical_json_bytes(complete_output)
-    expected = _hash_backed_expected_packet(downloaded, complete_output, url=url)
+    expected = _hash_backed_expected_packet(downloaded, url=url)
 
     _assert_resolver_rejects(
         expected,
@@ -317,7 +407,7 @@ def test_hash_backed_expected_output_rejects_unsafe_url(url: str, error: str) ->
 def test_hash_backed_expected_output_rejects_unavailable_download() -> None:
     complete_output = _complete_reviewed_output()
     downloaded = _canonical_json_bytes(complete_output)
-    expected = _hash_backed_expected_packet(downloaded, complete_output)
+    expected = _hash_backed_expected_packet(downloaded)
 
     def unavailable(_url: str) -> bytes:
         raise OSError("fixture unavailable")
@@ -343,7 +433,7 @@ def test_hash_backed_expected_output_rejects_byte_or_hash_mismatch(
 ) -> None:
     complete_output = _complete_reviewed_output()
     downloaded = _canonical_json_bytes(complete_output)
-    expected = _hash_backed_expected_packet(downloaded, complete_output)
+    expected = _hash_backed_expected_packet(downloaded)
     expected["reviewed_complete_output"][metadata_field] = metadata_value
 
     _assert_resolver_rejects(
@@ -355,7 +445,7 @@ def test_hash_backed_expected_output_rejects_byte_or_hash_mismatch(
 
 def test_hash_backed_expected_output_rejects_invalid_json() -> None:
     downloaded = b"not json"
-    expected = _hash_backed_expected_packet(downloaded, _complete_reviewed_output())
+    expected = _hash_backed_expected_packet(downloaded)
 
     _assert_resolver_rejects(
         expected,
@@ -369,33 +459,12 @@ def test_hash_backed_expected_output_requires_every_complete_member(missing_memb
     complete_output = _complete_reviewed_output()
     del complete_output[missing_member]
     downloaded = _canonical_json_bytes(complete_output)
-    expected = _hash_backed_expected_packet(downloaded, _complete_reviewed_output())
+    expected = _hash_backed_expected_packet(downloaded)
 
     _assert_resolver_rejects(
         expected,
         downloader=lambda _url: downloaded,
         expected_error=f"reviewed complete output is missing required member: {missing_member}",
-    )
-
-
-@pytest.mark.parametrize(
-    ("member", "hash_field"),
-    (
-        ("workflow_output", "workflow_output_sha256"),
-        ("relationship_output", "relationship_output_sha256"),
-        ("final_output", "final_output_sha256"),
-    ),
-)
-def test_hash_backed_expected_output_recomputes_component_hashes(member: str, hash_field: str) -> None:
-    complete_output = _complete_reviewed_output()
-    downloaded = _canonical_json_bytes(complete_output)
-    expected = _hash_backed_expected_packet(downloaded, complete_output)
-    expected["output"][hash_field] = "0" * 64
-
-    _assert_resolver_rejects(
-        expected,
-        downloader=lambda _url: downloaded,
-        expected_error=f"reviewed complete output {member} SHA-256 mismatch",
     )
 
 
@@ -468,7 +537,7 @@ def test_sdk_xray_reassembly_real_boundary_packets(
     _assert_replay_matches_reviewed_complete_output(
         expected,
         expected_path,
-        downloader=_download_not_configured,
+        downloader=_download_reviewed_complete_output,
         diff_path=diff_path,
     )
     _write_json(diff_path, {"kind": "machine_readable_json_diff", "status": "passed"})
@@ -501,7 +570,7 @@ def test_adp_boundary_reassembly_detects_corrupted_real_input(
         _assert_replay_matches_reviewed_complete_output(
             _complete_reassembly_output(result),
             expected_path,
-            downloader=_download_not_configured,
+            downloader=_download_reviewed_complete_output,
         )
 
 
@@ -520,7 +589,7 @@ def test_adp_boundary_reassembly_detects_corrupted_expected_output(
     _assert_replay_matches_reviewed_complete_output(
         actual,
         expected_path,
-        downloader=_download_not_configured,
+        downloader=_download_reviewed_complete_output,
     )
 
     expected = _read_json(expected_path)
@@ -534,7 +603,7 @@ def test_adp_boundary_reassembly_detects_corrupted_expected_output(
         _assert_replay_matches_reviewed_complete_output(
             actual,
             expected_path,
-            downloader=_download_not_configured,
+            downloader=_download_reviewed_complete_output,
         )
 
 

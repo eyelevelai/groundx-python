@@ -251,8 +251,7 @@ def _captured_complete_output_candidate(
     complete_output: object,
 ) -> tuple[dict[str, object], Path]:
     relative = Path(
-        "internal-arcadia-agents/testdata/extraction-boundary/"
-        f"captured/{surface}/internal_arcadia_sdk_reassembly_output.output.full_json.json"
+        f"internal-arcadia-agents/testdata/extraction-boundary/captured/{surface}/sdk.reassembly_output.json"
     )
     target = root / relative
     _write_canonical_json(target, complete_output)
@@ -265,7 +264,8 @@ def _captured_complete_output_candidate(
         "source_run_id": RUN_ID,
         "source_run_mode": RUN_MODE,
         "source_hosted_path": (
-            f"layout/processed/task-1/document-1-extract-trace/internal-arcadia-agents/{surface}/output.full_json.json"
+            f"layout/processed/task-1/document-1-extract-trace/internal-arcadia-agents/"
+            f"{surface}/sdk.reassembly_output.json"
         ),
         "source_boundary_manifest_sha256": BOUNDARY_MANIFEST_SHA256,
         "next_boundary_inputs": [],
@@ -445,7 +445,7 @@ def test_builder_is_intentionally_red_without_captured_complete_output(
     assert (
         "INTENTIONAL RED: captured SDK complete outputs missing surfaces: arcadia_legacy; "
         "capture canonical five-member internal_arcadia_sdk_reassembly_output "
-        "output.full_json.json from the same Arcadia run"
+        "sdk.reassembly_output.json from the same Arcadia run"
     ) in result.stderr
     assert not candidate_root.exists()
     assert candidate_xray.exists()

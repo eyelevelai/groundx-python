@@ -338,7 +338,7 @@ def _captured_complete_output_candidates(
         if source_digest != entry.get("sha256") or source_digest != entry.get("source_sha256"):
             raise ValueError(f"captured SDK complete output hash does not match for {surface}")
         hosted_path = entry.get("source_hosted_path")
-        if not isinstance(hosted_path, str) or not hosted_path.endswith("/output.full_json.json"):
+        if not isinstance(hosted_path, str) or not hosted_path.endswith("/sdk.reassembly_output.json"):
             raise ValueError(f"captured SDK complete output hosted path is invalid for {surface}")
         if surface in outputs:
             raise ValueError(f"duplicate captured SDK complete output for {surface}")
@@ -527,7 +527,7 @@ def build_candidates(
             "INTENTIONAL RED: captured SDK complete outputs missing surfaces: "
             + ", ".join(missing_outputs)
             + "; capture canonical five-member internal_arcadia_sdk_reassembly_output "
-            "output.full_json.json from the same Arcadia run"
+            "sdk.reassembly_output.json from the same Arcadia run"
         )
 
     replay = _load_replay_module(repo_root)

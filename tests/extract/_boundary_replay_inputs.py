@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 from typing import Any, Callable, Mapping
 from urllib.parse import urlsplit
+from urllib.request import urlopen
 
 COMPLETE_OUTPUT_MEMBERS = (
     "workflow_output",
@@ -13,11 +14,8 @@ COMPLETE_OUTPUT_MEMBERS = (
     "diagnostics",
     "source_provenance",
 )
-_COMPONENT_HASH_FIELDS = (
-    ("workflow_output", "workflow_output_sha256"),
-    ("relationship_output", "relationship_output_sha256"),
-    ("final_output", "final_output_sha256"),
-)
+DEFAULT_DOWNLOAD_TIMEOUT_SECONDS = 15.0
+MAX_REVIEWED_OUTPUT_BYTES = 64 * 1024 * 1024
 
 
 def read_exact_xray_predecessor(
@@ -107,18 +105,34 @@ def _resolve_reviewed_complete_output_bytes(
 
     complete = _parse_complete_output(raw)
 
-    summary = expected.get("output")
-    if not isinstance(summary, Mapping):
-        raise ValueError("reviewed complete output component summary is missing")
-    for member, hash_field in _COMPONENT_HASH_FIELDS:
-        if summary.get(hash_field) != _sha256_json(complete[member]):
-            raise ValueError(f"reviewed complete output {member} SHA-256 mismatch")
-    if summary.get("diagnostic_count") != len(complete["diagnostics"]):
-        raise ValueError("reviewed complete output diagnostics count mismatch")
-    if summary.get("source_provenance_count") != len(complete["source_provenance"]):
-        raise ValueError("reviewed complete output source provenance count mismatch")
-
     return complete, raw
+
+
+def download_reviewed_complete_output(
+    url: str,
+    *,
+    opener: Callable[..., Any] = urlopen,
+    timeout_seconds: float = DEFAULT_DOWNLOAD_TIMEOUT_SECONDS,
+    max_bytes: int = MAX_REVIEWED_OUTPUT_BYTES,
+) -> bytes:
+    _validate_reviewed_url(url)
+    if timeout_seconds <= 0:
+        raise ValueError("reviewed complete output timeout must be positive")
+    if max_bytes <= 0:
+        raise ValueError("reviewed complete output byte limit must be positive")
+    with opener(url, timeout=timeout_seconds) as response:
+        get_final_url = getattr(response, "geturl", None)
+        if callable(get_final_url):
+            final_url = get_final_url()
+            if not isinstance(final_url, str):
+                raise ValueError("reviewed complete output URL must be clean")
+            _validate_reviewed_url(final_url)
+        raw = response.read(max_bytes + 1)
+    if not isinstance(raw, bytes):
+        raise ValueError("reviewed complete output downloader must return bytes")
+    if len(raw) > max_bytes:
+        raise ValueError(f"reviewed complete output exceeds {max_bytes}-byte limit")
+    return raw
 
 
 def assert_reassembly_matches_reviewed_output(
@@ -185,11 +199,6 @@ def _validate_reviewed_url(url: str) -> None:
         or port not in (None, 443)
     ):
         raise ValueError("reviewed complete output URL must be clean")
-
-
-def _sha256_json(value: Any) -> str:
-    raw = json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
-    return hashlib.sha256(raw).hexdigest()
 
 
 def _read_json(path: Path) -> dict[str, Any]:

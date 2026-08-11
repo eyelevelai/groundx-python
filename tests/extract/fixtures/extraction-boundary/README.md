@@ -31,9 +31,11 @@ The reviewed expected output is canonical JSON containing exactly
 and compares those bytes exactly. A remote alternative must identify one
 downloadable reviewed complete JSON file by a clean HTTPS URL, byte count, and
 SHA-256. Replay fetches that exact URL through its injected downloader, verifies
-the returned byte count and whole-file SHA-256, parses the complete JSON,
-requires all five members, and recomputes the declared workflow, relationship,
-and final-output hashes before exact comparison. An unavailable download fails.
+the requested and final response URLs are clean HTTPS, verifies the returned
+byte count and whole-file SHA-256, parses the complete JSON,
+requires all five members, and compares the complete production result. The
+downloader has a 15-second timeout and a 64 MiB response limit. An unavailable
+or oversized download fails.
 Counts, shapes, semantic summaries, hashes without that reviewed file, empty
 evidence markers, and locally reconstructed X-Ray or JSON are not
 expected-output evidence.
@@ -62,7 +64,8 @@ This command calls `reassemble_custom_outputs_from_xray` and writes only to the
 candidate root. For each selected surface, it must replay both exact inputs and
 consume a same-run `internal_arcadia_sdk_reassembly_output` capture from the source
 manifest. Arcadia writes that capture immediately after the production SDK call
-as canonical JSON containing exactly the five complete members above. The
+to `sdk.reassembly_output.json` as canonical JSON containing exactly the five
+complete members above. The
 builder rejects changed consumer copies, cross-run pairs, invalid raw-model
 hashes, incomplete identity, parsed values that differ from captured bytes,
 missing complete captures, and production output that differs from the captured
