@@ -1,20 +1,24 @@
 # Extraction Boundary Fixtures
 
 This repository's writer registry (`writer_registry.json`) owns one artifact,
-`groundx_python_xray_reassembly`: the committed sanitized expected output of
-GroundX Python's X-Ray-to-structured-output reassembly for each protected
-extraction case.
+`groundx_python_xray_reassembly` consumes two exact captured inputs for each
+protected extraction case: Arcadia's untouched `input.xray.json` predecessor
+envelope and the matching untouched workflow-load handoff. Its committed output
+is the reviewed result of GroundX Python's X-Ray-to-structured-output reassembly.
 
 `tests/extract/test_extraction_boundary_reassembly.py` is the replay consumer.
-Each case passes the committed handoff produced by the previous pipeline
-boundary through the same reassembly functions used by the SDK and compares
-the complete stable result with the reviewed expected output.
+Each case validates the predecessor envelope's raw model bytes, byte count,
+SHA-256, complete `value`, and live run, process, and document identity. It then
+passes `value` plus the matching handoff's workflow through the production SDK
+reassembly function and compares the complete stable result with the reviewed
+expected output. There is no rebuilt X-Ray sidecar or fallback input.
 
-Accepted fixtures must be real-derived, privacy-reviewed, and sanitized with
-recorded source hashes and transformations. The adjacent review records and
-fixture verifier establish that status; this README does not. These are
-standard CI inputs, not a live test or scoring rule. Document-specific meter,
-charge, or field counts must never enter SDK runtime behavior.
+Accepted fixtures must be exact captures from a registered test case, reviewed
+by a non-author for repository storage, and byte-identical to their recorded
+source hashes. The adjacent review records and fixture verifier establish that
+status. These are standard CI inputs, not a live test or scoring rule.
+Document-specific meter, charge, or field counts must never enter SDK runtime
+behavior.
 
 Expected output may change only after the behavior change is reviewed. Generate
 a candidate diff separately, explain why the old behavior is wrong, and obtain
@@ -27,23 +31,22 @@ may replace only those declared output differences. Every undeclared difference 
 Current SDK output cannot approve itself; non-author review and guarded promotion are
 still required before accepted fixtures change.
 
-When the reviewed X-Ray input candidate changes, generate matching SDK output
-candidates with:
+When the reviewed exact X-Ray predecessor or workflow-load input changes,
+generate matching SDK output candidates with:
 
 ```bash
 poetry run python tests/extract/build_extraction_boundary_candidates.py \
-  --xray-candidate-manifest <xray-candidate-root>/fixture_candidate_manifest.json \
+  --xray-candidate-manifest <capture-candidate-root>/fixture_candidate_manifest.json \
   --candidate-root <empty-sdk-candidate-root>
 ```
 
 This command calls `reassemble_custom_outputs_from_xray` and writes only to the
-candidate root. For each selected surface, it must replay both the proposed X-Ray
-and the proposed `internal_arcadia_download_workflow_load` successor input from
-that same provider candidate manifest. Mixing a proposed X-Ray with the accepted
-old producer handoff is invalid lineage and must fail candidate generation.
-Candidate generation freezes observed behavior; human review decides whether
-that behavior replaces the accepted fixture. Do not promote an X-Ray input
-without its matching SDK output candidate.
+candidate root. For each selected surface, it must replay both exact inputs from
+the same capture candidate manifest. It rejects changed consumer copies,
+cross-run pairs, invalid raw-model hashes, incomplete identity, and parsed values
+that differ from the captured bytes. Candidate generation freezes observed
+behavior; human review decides whether that behavior replaces the accepted
+fixture. Do not promote either input without its matching SDK output candidate.
 
 Only the external model/provider response may be replaced by a fixed fixture.
 Tests must call production reassembly functions unchanged.

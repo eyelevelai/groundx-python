@@ -1,6 +1,5 @@
 import copy
 import inspect
-import json
 import typing
 from pathlib import Path
 
@@ -71,14 +70,39 @@ statement:
         type: str
 """
 
-ADP_WORKFLOW_HANDOFF = (
-    Path(__file__).parent
-    / "fixtures"
-    / "extraction-boundary"
-    / "inputs"
-    / "adp_v1"
-    / "internal_arcadia_download_workflow_load.handoff.json"
-)
+ADP_WORKFLOW_SOURCE: dict[str, typing.Any] = {
+    "extraction_policy_version": "v1",
+    "_groundx_internal_capture": {"enabled": True},
+    "workflow": {
+        "section_strategy": "page",
+        "custom_steps": [
+            {
+                "name": "adp_f1",
+                "level": "section",
+                "kind": "keys",
+                "config": {"all": {"includes": {"text": True}}},
+            }
+        ],
+    },
+    "plan_information": {
+        "role": "statement",
+        "fields": {
+            "plan_name": {
+                "prompt": {
+                    "instructions": "Return the plan name.",
+                    "type": "str",
+                }
+            }
+        },
+    },
+    "_pseudo_groups": {
+        "adp_f1_employer_and_plan_information": {
+            "role": "statement",
+            "workflow_step": "adp_f1",
+            "fields": {"plan_name": {"path": "/plan_information/plan_name"}},
+        }
+    },
+}
 
 
 EXECUTION_ONLY_EXTRACT = {
@@ -561,8 +585,7 @@ def test_load_definition_from_workflow_requires_extract() -> None:
 
 
 def test_load_adp_workflow_readback_preserves_section_strategy() -> None:
-    handoff = json.loads(ADP_WORKFLOW_HANDOFF.read_text(encoding="utf-8"))
-    extract = copy.deepcopy(handoff["workflow_extract"])
+    extract = copy.deepcopy(prepare_extraction_yaml(ADP_WORKFLOW_SOURCE).persisted_workflow_extract)
     response = WorkflowResponse(
         workflow=WorkflowDetail(
             workflow_id="adp-v1",
@@ -584,8 +607,8 @@ def test_load_adp_workflow_readback_preserves_section_strategy() -> None:
 
 
 def test_prepare_adp_persisted_source_preserves_runtime_metadata() -> None:
-    handoff = json.loads(ADP_WORKFLOW_HANDOFF.read_text(encoding="utf-8"))
-    persisted_source = handoff["workflow_extract"]["_groundx_persisted_extract"]
+    workflow_extract = prepare_extraction_yaml(ADP_WORKFLOW_SOURCE).persisted_workflow_extract
+    persisted_source = workflow_extract["_groundx_persisted_extract"]
 
     prepared = prepare_extraction_yaml(persisted_source)
     client = _client(RecordingWorkflows())
@@ -599,9 +622,7 @@ def test_prepare_adp_persisted_source_preserves_runtime_metadata() -> None:
     assert prepared_definition.section_strategy == "page"
     assert persisted_definition.section_strategy == "page"
     assert prepared.top_level_metadata["_groundx_internal_capture"]["enabled"] is True
-    assert prepared.workflow_group_metadata[
-        "adp_f1_employer_and_plan_information"
-    ]["role"] == "statement"
+    assert prepared.workflow_group_metadata["adp_f1_employer_and_plan_information"]["role"] == "statement"
 
 
 def test_create_and_update_use_definition_before_yaml_sources() -> None:
