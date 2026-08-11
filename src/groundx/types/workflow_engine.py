@@ -44,6 +44,14 @@ class WorkflowEngine(UniversalBaseModel):
             description="An enumerated value that conforms to OpenAI '/chat/completion' specifications",
         ),
     ] = None
+    request_headers: typing_extensions.Annotated[
+        typing.Optional[typing.Dict[str, str]],
+        FieldMetadata(alias="requestHeaders"),
+        pydantic.Field(
+            alias="requestHeaders",
+            description="Headers added to the LLM request, for example 'OpenAI-Project' to attribute usage. Values must be strings. Your header wins if it collides with one GroundX sets. Requires apiKey on the same engine: without it the request uses GroundX's credential, so a workflow create or update that sets requestHeaders and omits apiKey is rejected. Headers are sent as-is; GroundX does not guarantee a provider acts on any given header.",
+        ),
+    ] = None
     request_passthrough: typing_extensions.Annotated[
         typing.Optional[typing.Dict[str, typing.Any]],
         FieldMetadata(alias="requestPassthrough"),
