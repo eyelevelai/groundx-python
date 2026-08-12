@@ -45,9 +45,9 @@ complete value-to-page mapping.
   select, order, filter, or branch on candidate values.
 - Reconciliation remains single-pass. Arcadia attaches at least one available
   page for each candidate, then fills remaining slots fairly up to the existing
-  30-image limit. Full source-page lists remain in the prompt. A field requiring
-  more than 30 distinct candidate images fails clearly instead of hiding a
-  candidate.
+  30-image limit. Full source-page lists remain in the prompt. A field with more
+  than 30 candidates that each require a distinct available image fails clearly
+  instead of hiding a candidate.
 
 ## Capabilities
 
@@ -86,17 +86,20 @@ complete value-to-page mapping.
 
 ## Release order
 
-1. Implement and test the SDK contract on Python 3.11. Build an unpublished
-   source-candidate wheel using the repository's generated package version and
-   record its source commit and SHA-256.
-2. Install that source candidate in isolated Internal Arcadia and Studio
+1. Implement and test Tasks 0 through 2 in this change on Python 3.11.
+2. Implement and test Tasks 1 and 2 in the companion
+   `complete-scalar-candidate-provenance` change on top of the same branch.
+3. Only after both SDK changes are complete, build one unpublished
+   source-candidate wheel from the combined commit using the repository's
+   generated package version. Record that commit, filename, and SHA-256.
+4. Install only that source candidate in isolated Internal Arcadia and Studio
    Harness checkouts. Internal Arcadia implements its consumer contract only
    through `complete-scalar-reconcile-disposition`.
-3. Merge the SDK changes and give the merged handwritten source commit and
+5. Merge both SDK changes and give the merged handwritten source commit and
    validation evidence to the human release owner for requested version 3.9.7.
-4. After 3.9.7 is published, verify that it contains the tested handwritten
+6. After 3.9.7 is published, verify that it contains the tested handwritten
    source change. Clean-install the published artifact and rerun both consumer
    gates. Do not require wheel-byte identity across different package versions.
-5. Pin the published SDK in both Internal Arcadia dependency writers, rerun
+7. Pin the published SDK in both Internal Arcadia dependency writers, rerun
    protected tests, build and inspect the extract container, then merge and
    deploy Internal Arcadia.

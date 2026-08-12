@@ -275,9 +275,11 @@ treat SDK `final_output` as agent-resolved may observe a different value. The
 public type shape remains compatible, but release notes must call out the
 semantic change.
 
-Internal Arcadia and Studio Harness must test an unpublished source candidate
-built from the recorded SDK commit on Python 3.11 before the release is
-published. After the human release owner publishes requested version 3.9.7,
+Internal Arcadia and Studio Harness must test one unpublished source candidate
+built on Python 3.11 from the combined commit after this change's Tasks 0
+through 2 and `complete-scalar-candidate-provenance` Tasks 1 and 2 are complete.
+No earlier SDK wheel is a consumer candidate. After the human release owner
+publishes requested version 3.9.7,
 both consumers verify that the published package contains the same handwritten
 source change and rerun their gates from clean installs. Candidate and published
 wheels may differ in version metadata and bytes. Deploy only after the current
@@ -293,7 +295,9 @@ stored data needs migration or repair.
 parser-output safety. This change must not duplicate or weaken that contract.
 Its confidence conversion is metadata validation only and cannot be reused for
 candidate ranking. Candidate implementation may share the same released SDK
-only if both plans pass their isolated and combined consumer gates.
+only if both plans pass their isolated and combined consumer gates. The
+companion provenance work must be present before the single unpublished
+consumer candidate is built.
 
 ## No ADR
 

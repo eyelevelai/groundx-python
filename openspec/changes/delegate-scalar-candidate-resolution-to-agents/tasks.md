@@ -68,12 +68,15 @@
 
 ## 3. Build and prove an SDK source candidate
 
+- [ ] 3.0 Complete and validate Tasks 1 and 2 in
+  `complete-scalar-candidate-provenance` on top of this change. Record the one
+  combined SDK commit. Do not build or certify an earlier wheel.
 - [ ] 3.1 Run changed-file Ruff checks and formatting checks, focused extraction
-  tests, the full hand-written extraction test suite, Mypy, line-ending checks,
-  and `git diff --check`.
+  tests from both SDK changes, the full hand-written extraction test suite,
+  Mypy, line-ending checks, and `git diff --check`.
 - [ ] 3.2 Build one candidate wheel on Python 3.11 without publishing it. Keep
-  the repository's generated package version unchanged. Record source commit,
-  filename, and SHA-256.
+  the repository's generated package version unchanged. Build only from the
+  combined commit recorded in 3.0. Record source commit, filename, and SHA-256.
 - [ ] 3.3 Install that source candidate into isolated Internal Arcadia and
   Studio Harness environments based on their required pushed refs. Verify the
   installed candidate hash in both environments.
@@ -100,7 +103,9 @@
   authorized diagnostics without entering customer JSON.
 - [ ] 5.3 Require Arcadia end-to-end cases for a sole required null, sole
   nullable null, two competing candidates, novel reconcile and QA values, and
-  more than 30 candidate images.
+  more than 30 combined candidate pages. Prove it caps fairly without error,
+  and separately prove more than 30 candidates needing distinct images fails
+  before the model call.
 - [ ] 5.4 Accept the consumer handoff only after the Arcadia plan records its
   exact pushed commit and passing focused, full-suite, protected-case, payload,
   type, and line-ending gates.
@@ -120,7 +125,8 @@
   their evidence, and its selected value reaches final output.
 - [ ] 6.5 Prove the 30-image request contains no duplicate page images, records
   total document pages, total candidate source pages, attached page count, and
-  the exact page numbers attached.
+  the exact page numbers attached. Prove `provided_pages` matches only attached
+  images and every omitted page remains in `source_pages`.
 - [ ] 6.6 Strictly validate this producer OpenSpec change and any consumer
   tracking plan created during implementation. Confirm no customer documents,
   X-Rays, prompts, responses, credentials, or local run artifacts are
@@ -140,8 +146,10 @@
   `requirements.txt` and `Dockerfile.extract`, to the released SDK version.
   Accept the release gate only after that plan builds `Dockerfile.extract`,
   inspects the installed GroundX version, and records the image identity.
-- [ ] 7.4 Merge and deploy Internal Arcadia. Record the new and prior image
-  identities before rollout.
+- [ ] 7.4 Merge Internal Arcadia, then complete its Task 7 operator handoff
+  against `groundx-on-prem` `origin/0.2.7`. Require one immutable image identity
+  across all four extract workloads, the prior Helm revision and image digest,
+  readiness and installed-SDK proof, and the exact rollback receipt.
 - [ ] 7.5 Rerun the ADP side-by-side extraction and capture exact reconcile and
   QA requests, responses, candidate mappings, total document pages, candidate
   source pages, attached pages, and final field values.
