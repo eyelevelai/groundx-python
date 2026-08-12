@@ -113,7 +113,16 @@ def test_extraction_boundary_owner_projection_is_pinned() -> None:
     )
     assert artifact["stage"] == "sdk_xray_reassembly"
     assert artifact["validator"] == ("groundx-python/tests/extract/test_extraction_boundary_reassembly.py")
-    assert artifact["writer"] == "groundx-python/src/groundx/extract"
+    assert artifact["production_entrypoint"] == ("groundx.extract.custom_outputs.reassemble_custom_outputs")
+    assert artifact["evidence_writer_function"] == ("classes.pipeline_trace.capture_sdk_reassembly_output")
+    assert artifact["writer"] == (
+        "classes/statement.py _sdk_custom_output_reassembly_result -> "
+        "classes/pipeline_trace.py capture_sdk_reassembly_output"
+    )
+    assert artifact["s3_path_template"] == (
+        "layout/processed/{task_id}/{document_id}-extract-trace/"
+        "internal-arcadia-agents/{stage_run}/sdk.reassembly_output.json"
+    )
 
 
 def test_protected_replay_cases_are_never_marked_or_skipped() -> None:

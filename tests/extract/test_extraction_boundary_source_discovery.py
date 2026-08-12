@@ -4,7 +4,6 @@ import ast
 import json
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE_PATH = ROOT / "src" / "groundx" / "extract" / "custom_outputs.py"
 CATALOG_PATH = (
@@ -88,6 +87,25 @@ def test_reassembly_boundary_declarations_match_production_source() -> None:
         for rule in discovery["rules"]
         for stage in rule["catalog_stages"]
     } == {"sdk_xray_reassembly"}
+
+
+def test_reassembly_registry_names_the_real_arcadia_capture_writer() -> None:
+    [artifact] = _catalog()["artifacts"]
+
+    assert artifact["production_entrypoint"] == (
+        "groundx.extract.custom_outputs.reassemble_custom_outputs"
+    )
+    assert artifact["evidence_writer_function"] == (
+        "classes.pipeline_trace.capture_sdk_reassembly_output"
+    )
+    assert artifact["writer"] == (
+        "classes/statement.py _sdk_custom_output_reassembly_result -> "
+        "classes/pipeline_trace.py capture_sdk_reassembly_output"
+    )
+    assert artifact["s3_path_template"] == (
+        "layout/processed/{task_id}/{document_id}-extract-trace/"
+        "internal-arcadia-agents/{stage_run}/sdk.reassembly_output.json"
+    )
 
 
 def test_source_discovery_rejects_an_undeclared_reassembly_call() -> None:
