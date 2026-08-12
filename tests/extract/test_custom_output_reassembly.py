@@ -2371,25 +2371,36 @@ def test_repeated_document_route_still_deduplicates_copied_payloads(
             ],
         }
     }
-    copied_document_outputs = {
-        "line_item_rows": {
-            "_records": [
-                {"description": "Admin fee"},
-            ]
-        }
-    }
     xray = {
-        "customDocumentOutputs": copied_document_outputs,
+        "customDocumentOutputs": {
+            "line_item_rows": {
+                "_records": [
+                    {"description": "Admin fee"},
+                ]
+            }
+        },
         "chunks": [
             {
                 "chunkId": "chunk-12",
                 "pageNumbers": [12],
-                "customDocumentOutputs": copied_document_outputs,
+                "customDocumentOutputs": {
+                    "line_item_rows": {
+                        "_records": [
+                            {"description": "Admin fee"},
+                        ]
+                    }
+                },
             },
             {
                 "chunkId": "chunk-14",
                 "pageNumbers": [14],
-                "customDocumentOutputs": copied_document_outputs,
+                "customDocumentOutputs": {
+                    "line_item_rows": {
+                        "_records": [
+                            {"description": "Admin fee"},
+                        ]
+                    }
+                },
             },
         ],
     }
