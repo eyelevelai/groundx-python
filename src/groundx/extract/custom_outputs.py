@@ -39,6 +39,13 @@ class CustomOutputScalarCandidate:
 
 @dataclasses.dataclass(frozen=True)
 class CustomOutputScalarCandidateSet:
+    """Observed values for one singular route in traversal order.
+
+    ``selected`` is the first observed candidate and remains provisional when
+    ``alternatives`` is non-empty. Later unique observations appear in
+    ``alternatives`` without SDK value selection.
+    """
+
     output_source: str
     workflow_group: str
     workflow_field: str
@@ -49,6 +56,12 @@ class CustomOutputScalarCandidateSet:
 
 @dataclasses.dataclass(frozen=True)
 class CustomOutputReassemblyResult:
+    """Custom-output route reassembly and diagnostic evidence.
+
+    ``final_output`` contains the first observed scalar candidate. A scalar
+    value remains provisional when its candidate set has alternatives.
+    """
+
     final_output: typing.Dict[str, typing.Any]
     relationship_output: typing.Optional[typing.Dict[str, typing.Any]]
     diagnostics: typing.List[CustomOutputDiagnostic]
@@ -89,7 +102,6 @@ class _RouteContainer:
 @dataclasses.dataclass(frozen=True)
 class _ScalarCandidate:
     value: typing.Any
-    quality: typing.Tuple[int, int, float]
     page_numbers: typing.Tuple[int, ...]
 
 
@@ -107,19 +119,6 @@ _RELATIONSHIP_PACKET_CAMEL_KEYS = {
     "match_attrs": "matchAttrs",
     "parent_passthrough_attrs": "parentPassthroughAttrs",
     "multiple_match_strategy": "multipleMatchStrategy",
-}
-_DEFAULT_CANDIDATE_VALUES = {
-    "n/a",
-    "na",
-    "none",
-    "not applicable",
-    "not found",
-    "not indicated",
-    "not provided",
-    "not specified",
-    "not stated",
-    "null",
-    "unknown",
 }
 _GET_ALIASES = {
     "chunkId": ("chunk_id",),
@@ -150,7 +149,7 @@ def reassemble_custom_outputs_from_xray(
     final_output: typing.Dict[str, typing.Any] = {}
     workflow_output: typing.Dict[str, typing.Any] = {}
     source_provenance: typing.List[CustomOutputSourceProvenance] = []
-    route_hits: typing.Dict[int, bool] = {}
+    route_satisfied: typing.Dict[int, bool] = {}
     repeated_records: typing.Dict[
         typing.Tuple[typing.Tuple[str, ...], typing.Tuple[typing.Any, ...]],
         typing.Dict[str, typing.Any],
@@ -167,15 +166,20 @@ def reassemble_custom_outputs_from_xray(
     diagnostics: typing.List[CustomOutputDiagnostic] = []
 
     for route_index, route in enumerate(routes):
-        route_hits[route_index] = False
+        route_satisfied[route_index] = False
         if not isinstance(route, dict):
             continue
         route_map = typing.cast(typing.Mapping[str, typing.Any], route)
         final_path = route_map.get("final_path")
         if not isinstance(final_path, str):
             continue
+        route_repeats = _repeated_route(route_map, step_kinds)
 
-        for route_container in _route_containers(xray, route_map):
+        for route_container in _route_containers(
+            xray,
+            route_map,
+            repeated=route_repeats,
+        ):
             for route_value in _custom_route_values(
                 route_container.value,
                 route_map,
@@ -187,8 +191,8 @@ def reassemble_custom_outputs_from_xray(
                     route_map.get("step_name"),
                     route_value.record_index,
                 )
-                if _is_empty_output(route_value.value):
-                    if route_value.repeated and route_value.conflicts:
+                if route_value.repeated and _is_empty_output(route_value.value):
+                    if route_value.conflicts:
                         _set_pointer(
                             final_output,
                             f"{pointer}{_CONFLICTS_SIBLING_SUFFIX}",
@@ -199,10 +203,12 @@ def reassemble_custom_outputs_from_xray(
                             page_numbers=route_container.page_numbers,
                             scalar_candidates=scalar_candidates,
                             diagnostics=diagnostics,
+                            repeated=route_repeats,
                         )
                     continue
-                route_hits[route_index] = True
-                if route_value.repeated:
+                if route_value.repeated or _unwrap_match_value(route_value.value) is not None:
+                    route_satisfied[route_index] = True
+                if route_repeats:
                     _record_repeated_group_path(
                         repeated_group_paths,
                         pointer,
@@ -231,6 +237,7 @@ def reassemble_custom_outputs_from_xray(
                     page_numbers=route_container.page_numbers,
                     scalar_candidates=scalar_candidates,
                     diagnostics=diagnostics,
+                    repeated=route_repeats,
                 )
                 if route_value.repeated and route_value.conflicts is not None:
                     # Task 3.2a7b: carry the generic `<field>__conflicts`
@@ -246,6 +253,7 @@ def reassemble_custom_outputs_from_xray(
                         page_numbers=route_container.page_numbers,
                         scalar_candidates=scalar_candidates,
                         diagnostics=diagnostics,
+                        repeated=route_repeats,
                     )
 
     _dedupe_repeated_group_outputs(
@@ -258,7 +266,7 @@ def reassemble_custom_outputs_from_xray(
     diagnostics.extend(
         _missing_required_route_diagnostics(
             typing.cast(typing.Sequence[typing.Any], routes),
-            route_hits,
+            route_satisfied,
             workflow_extract,
         )
     )
@@ -337,25 +345,15 @@ def select_relationship_parent(
     if not isinstance(child, typing.Mapping):
         return no_selection
 
-    match_attrs = _relationship_attr_list(
-        _relationship_packet_value(relationship, "match_attrs")
-    )
+    match_attrs = _relationship_attr_list(_relationship_packet_value(relationship, "match_attrs"))
     if not match_attrs:
         return no_selection
 
-    parent_list = [
-        parent
-        for parent in (parents or [])
-        if isinstance(parent, typing.Mapping)
-    ]
+    parent_list = [parent for parent in (parents or []) if isinstance(parent, typing.Mapping)]
     if not parent_list:
         return no_selection
 
-    populated_keys = {
-        attr: child.get(attr)
-        for attr in match_attrs
-        if not _relationship_value_absent(child.get(attr))
-    }
+    populated_keys = {attr: child.get(attr) for attr in match_attrs if not _relationship_value_absent(child.get(attr))}
     if not populated_keys:
         return no_selection
 
@@ -375,11 +373,7 @@ def select_relationship_parent(
 
     direct_matches: typing.List[typing.Mapping[str, typing.Any]] = []
     for parent in parent_list:
-        parent_key_count = sum(
-            1
-            for attr in match_attrs
-            if not _relationship_value_absent(parent.get(attr))
-        )
+        parent_key_count = sum(1 for attr in match_attrs if not _relationship_value_absent(parent.get(attr)))
         if parent_key_count == len(populated_keys) and matches_attrs(
             parent,
             tuple(populated_keys),
@@ -396,19 +390,13 @@ def select_relationship_parent(
             )
         return RelationshipParentSelection(parent=None, ambiguous=True)
 
-    passthrough_attrs = _relationship_attr_list(
-        _relationship_packet_value(relationship, "parent_passthrough_attrs")
-    )
-    stable_match_attrs = tuple(
-        attr for attr in match_attrs if attr not in passthrough_attrs
-    )
+    passthrough_attrs = _relationship_attr_list(_relationship_packet_value(relationship, "parent_passthrough_attrs"))
+    stable_match_attrs = tuple(attr for attr in match_attrs if attr not in passthrough_attrs)
     if len(stable_match_attrs) == len(match_attrs):
         return no_selection
     if not stable_match_attrs:
         return no_selection
-    ignored_match_attrs = tuple(
-        attr for attr in match_attrs if attr not in stable_match_attrs
-    )
+    ignored_match_attrs = tuple(attr for attr in match_attrs if attr not in stable_match_attrs)
 
     def has_ignored_match_conflict(
         parent: typing.Mapping[str, typing.Any],
@@ -494,9 +482,22 @@ def _custom_step_kinds(workflow: typing.Mapping[str, typing.Any]) -> typing.Dict
     return step_kinds
 
 
+def _repeated_route(
+    route: typing.Mapping[str, typing.Any],
+    step_kinds: typing.Mapping[str, str],
+) -> bool:
+    step_name = route.get("step_name")
+    final_path = route.get("final_path")
+    return (isinstance(step_name, str) and step_kinds.get(step_name) in _REPEATED_STEP_KINDS) or (
+        isinstance(final_path, str) and "*" in _pointer_parts(final_path)
+    )
+
+
 def _route_containers(
     xray: typing.Any,
     route: typing.Mapping[str, typing.Any],
+    *,
+    repeated: bool,
 ) -> typing.List[_RouteContainer]:
     level = route.get("level")
     output_map_name = route.get("output_map")
@@ -504,6 +505,27 @@ def _route_containers(
         if not isinstance(output_map_name, str):
             return [_RouteContainer(identity=("document",), value=xray)]
         document_containers: typing.List[_RouteContainer] = []
+        if not repeated:
+            root_output_payload = _get(xray, output_map_name)
+            if isinstance(root_output_payload, typing.Mapping):
+                document_containers.append(
+                    _RouteContainer(
+                        identity=("document", output_map_name, "root"),
+                        value=xray,
+                    )
+                )
+            for chunk in _iter_chunks(xray):
+                output_payload = _get(chunk, output_map_name)
+                if not isinstance(output_payload, typing.Mapping):
+                    continue
+                document_containers.append(
+                    _RouteContainer(
+                        identity=("document", output_map_name, _chunk_identity(chunk)),
+                        value=chunk,
+                        page_numbers=_page_numbers(chunk),
+                    )
+                )
+            return document_containers
         document_seen: typing.Set[str] = set()
         for container in [xray, *_iter_chunks(xray)]:
             output_payload = _get(container, output_map_name)
@@ -530,6 +552,15 @@ def _route_containers(
             for chunk in _iter_chunks(xray)
         ]
     if level == "section" and isinstance(output_map_name, str):
+        if not repeated:
+            return [
+                _RouteContainer(
+                    identity=("section", output_map_name, _chunk_identity(chunk)),
+                    value=chunk,
+                    page_numbers=_page_numbers(chunk),
+                )
+                for chunk in _iter_chunks(xray)
+            ]
         section_containers: typing.List[_RouteContainer] = []
         section_seen: typing.Set[str] = set()
         for chunk in _iter_chunks(xray):
@@ -568,10 +599,10 @@ def _custom_route_values(
     if not isinstance(output_map, typing.Mapping):
         return []
 
-    step_value = output_map.get(step_name)
-    is_repeated_step = step_kinds.get(step_name) in _REPEATED_STEP_KINDS
-    final_path = route.get("final_path")
-    route_repeats = is_repeated_step or (isinstance(final_path, str) and "*" in final_path)
+    if step_name not in output_map:
+        return []
+    step_value = output_map[step_name]
+    route_repeats = _repeated_route(route, step_kinds)
 
     if isinstance(step_value, typing.Mapping):
         records = step_value.get("_records")
@@ -608,6 +639,14 @@ def _custom_route_values(
         ]
 
     if isinstance(step_value, list):
+        if not route_repeats:
+            return [
+                _RouteValue(
+                    value=step_value,
+                    record_index=None,
+                    repeated=False,
+                )
+            ]
         values: typing.List[_RouteValue] = []
         for index, record in enumerate(step_value):
             if isinstance(record, typing.Mapping):
@@ -626,13 +665,11 @@ def _custom_route_values(
                 values.append(_RouteValue(value=record, record_index=index, repeated=True))
         return values
 
-    if step_value is None:
-        return []
     return [
         _RouteValue(
             value=step_value,
-            record_index=0 if is_repeated_step else None,
-            repeated=is_repeated_step,
+            record_index=0 if route_repeats else None,
+            repeated=route_repeats,
         )
     ]
 
@@ -752,47 +789,55 @@ def _scalar_candidate(
     value: typing.Any,
     page_numbers: typing.Tuple[int, ...],
 ) -> _ScalarCandidate:
+    retained_value = value
+    if isinstance(value, str):
+        retained_value = value.strip()
+    elif isinstance(value, typing.Mapping) and _unwrap_match_value(value) is not value:
+        retained_value = copy.deepcopy(dict(value))
+        inner_value = retained_value.get("value")
+        if isinstance(inner_value, str):
+            retained_value["value"] = inner_value.strip()
     return _ScalarCandidate(
-        value=value,
-        quality=_scalar_candidate_quality(value, page_numbers),
+        value=retained_value,
         page_numbers=page_numbers,
     )
 
 
-def _scalar_candidate_quality(
-    value: typing.Any,
-    page_numbers: typing.Tuple[int, ...],
-) -> typing.Tuple[int, int, float]:
-    normalized = _normalized_candidate_value(value)
-    is_specific = 0 if _is_default_candidate_value(normalized) else 1
-    has_source_pages = 1 if page_numbers else 0
-    return (is_specific, has_source_pages, _candidate_confidence(value))
-
-
-def _normalized_candidate_value(value: typing.Any) -> typing.Any:
+def _scalar_candidate_identity(value: typing.Any) -> typing.Any:
+    """Return transport-only identity for one scalar candidate value."""
     unwrapped = _unwrap_match_value(value)
     if isinstance(unwrapped, str):
-        return " ".join(unwrapped.strip().casefold().split())
-    if isinstance(unwrapped, numbers.Real):
-        return float(unwrapped)
-    return unwrapped
+        return ("string", unwrapped.strip().casefold())
 
+    def exact_json_identity(item: typing.Any) -> typing.Any:
+        if item is None:
+            return ("null",)
+        if type(item) is bool:
+            return ("boolean", item)
+        if type(item) is int:
+            return ("integer", item)
+        if type(item) is float:
+            return ("float", item)
+        if isinstance(item, str):
+            return ("string", item)
+        if isinstance(item, list):
+            return ("list", tuple(exact_json_identity(value) for value in item))
+        if isinstance(item, typing.Mapping):
+            return (
+                "object",
+                tuple(
+                    sorted(
+                        (
+                            (type(key).__name__, repr(key)),
+                            exact_json_identity(nested_value),
+                        )
+                        for key, nested_value in item.items()
+                    )
+                ),
+            )
+        return (type(item).__module__, type(item).__qualname__, repr(item))
 
-def _is_default_candidate_value(value: typing.Any) -> bool:
-    if value is None:
-        return True
-    if isinstance(value, str):
-        return value in _DEFAULT_CANDIDATE_VALUES
-    return False
-
-
-def _candidate_confidence(value: typing.Any) -> float:
-    if not isinstance(value, typing.Mapping):
-        return 0.0
-    confidence = value.get("confidence")
-    if not isinstance(confidence, numbers.Real):
-        return 0.0
-    return max(0.0, min(1.0, float(confidence)))
+    return exact_json_identity(unwrapped)
 
 
 def _string_value(value: typing.Any) -> typing.Optional[str]:
@@ -813,6 +858,7 @@ def _set_pointer(
     page_numbers: typing.Tuple[int, ...],
     scalar_candidates: typing.Dict[str, _ScalarCandidateState],
     diagnostics: typing.List[CustomOutputDiagnostic],
+    repeated: bool,
 ) -> None:
     parts = _pointer_parts(pointer)
     if not parts:
@@ -846,6 +892,20 @@ def _set_pointer(
             _set_nested_value(record, field_path, value)
         return
 
+    if repeated:
+        records = result.setdefault(parts[0], [])
+        if not isinstance(records, list):
+            return
+        item_key = ((parts[0],), record_key)
+        record = repeated_records.get(item_key)
+        if record is None:
+            record = {}
+            repeated_records[item_key] = record
+            records.append(record)
+        if len(parts) > 1:
+            _set_nested_value(record, parts[1:], value)
+        return
+
     current = result
     for part in parts[:-1]:
         next_value = current.setdefault(part, {})
@@ -856,49 +916,45 @@ def _set_pointer(
     state = scalar_candidates.get(pointer)
     if state is not None:
         existing = state.selected
-        if candidate.quality < existing.quality:
-            return
-        if candidate.quality == existing.quality:
-            normalized_candidate = _normalized_candidate_value(candidate.value)
-            if normalized_candidate == _normalized_candidate_value(existing.value):
-                scalar_candidates[pointer] = dataclasses.replace(
-                    state,
-                    selected=dataclasses.replace(
-                        existing,
-                        page_numbers=_merge_page_numbers(existing.page_numbers, candidate.page_numbers),
-                    ),
-                )
-                return
-
-            diagnostics.append(
-                CustomOutputDiagnostic(
-                    code="conflicting_output_candidates",
-                    message=f"multiple equal-quality candidates for [{pointer}]",
-                    severity="warning",
-                    workflow_group=_string_value(route.get("workflow_group")),
-                    workflow_field=_string_value(route.get("workflow_field")),
-                    final_path=pointer,
-                )
-            )
-            for index, alternative in enumerate(state.alternatives):
-                if normalized_candidate != _normalized_candidate_value(alternative.value):
-                    continue
-                alternatives = list(state.alternatives)
-                alternatives[index] = dataclasses.replace(
-                    alternative,
-                    page_numbers=_merge_page_numbers(alternative.page_numbers, candidate.page_numbers),
-                )
-                scalar_candidates[pointer] = dataclasses.replace(
-                    state,
-                    alternatives=tuple(alternatives),
-                )
-                return
+        candidate_identity = _scalar_candidate_identity(candidate.value)
+        if candidate_identity == _scalar_candidate_identity(existing.value):
             scalar_candidates[pointer] = dataclasses.replace(
                 state,
-                alternatives=(*state.alternatives, candidate),
+                selected=dataclasses.replace(
+                    existing,
+                    page_numbers=_merge_page_numbers(existing.page_numbers, candidate.page_numbers),
+                ),
             )
             return
-    current[parts[-1]] = value
+        for index, alternative in enumerate(state.alternatives):
+            if candidate_identity != _scalar_candidate_identity(alternative.value):
+                continue
+            alternatives = list(state.alternatives)
+            alternatives[index] = dataclasses.replace(
+                alternative,
+                page_numbers=_merge_page_numbers(alternative.page_numbers, candidate.page_numbers),
+            )
+            scalar_candidates[pointer] = dataclasses.replace(
+                state,
+                alternatives=tuple(alternatives),
+            )
+            return
+        diagnostics.append(
+            CustomOutputDiagnostic(
+                code="conflicting_output_candidates",
+                message=f"multiple candidates for [{pointer}]",
+                severity="warning",
+                workflow_group=_string_value(route.get("workflow_group")),
+                workflow_field=_string_value(route.get("workflow_field")),
+                final_path=pointer,
+            )
+        )
+        scalar_candidates[pointer] = dataclasses.replace(
+            state,
+            alternatives=(*state.alternatives, candidate),
+        )
+        return
+    current[parts[-1]] = copy.deepcopy(candidate.value)
     scalar_candidates[pointer] = _ScalarCandidateState(
         selected=candidate,
         alternatives=(),
@@ -1031,7 +1087,7 @@ def _set_nested_value(
 
 def _missing_required_route_diagnostics(
     routes: typing.Sequence[typing.Any],
-    route_hits: typing.Mapping[int, bool],
+    route_satisfied: typing.Mapping[int, bool],
     workflow_extract: typing.Optional[typing.Mapping[str, typing.Any]],
 ) -> typing.List[CustomOutputDiagnostic]:
     if not isinstance(workflow_extract, typing.Mapping):
@@ -1040,11 +1096,11 @@ def _missing_required_route_diagnostics(
     hit_workflow_groups = {
         str(route.get("workflow_group"))
         for index, route in enumerate(routes)
-        if route_hits.get(index) and isinstance(route, typing.Mapping)
+        if route_satisfied.get(index) and isinstance(route, typing.Mapping)
     }
     diagnostics: typing.List[CustomOutputDiagnostic] = []
     for index, route in enumerate(routes):
-        if route_hits.get(index):
+        if route_satisfied.get(index):
             continue
         if not isinstance(route, typing.Mapping):
             continue
@@ -1498,17 +1554,11 @@ class _AdvancedIdentityIndex:
         self.exact_attrs = _identity_exact_attrs(identity_match, unique_attrs)
         self.records: typing.List[typing.Dict[str, typing.Any]] = []
         self.presence_bits = {attr: 0 for attr in self.threshold_attrs}
-        self.value_bits: typing.Dict[str, typing.Dict[typing.Any, int]] = {
-            attr: {} for attr in self.threshold_attrs
-        }
-        self.indexed_values: typing.List[
-            typing.Dict[str, typing.Tuple[bool, typing.Any]]
-        ] = []
+        self.value_bits: typing.Dict[str, typing.Dict[typing.Any, int]] = {attr: {} for attr in self.threshold_attrs}
+        self.indexed_values: typing.List[typing.Dict[str, typing.Tuple[bool, typing.Any]]] = []
         shortcuts = identity_match.get("equal_value_shortcuts", {})
         shortcut_map = (
-            typing.cast(typing.Mapping[str, typing.Any], shortcuts)
-            if isinstance(shortcuts, typing.Mapping)
-            else {}
+            typing.cast(typing.Mapping[str, typing.Any], shortcuts) if isinstance(shortcuts, typing.Mapping) else {}
         )
         self.shortcut_values = {
             attr: {
@@ -1606,11 +1656,7 @@ class _AdvancedIdentityIndex:
         )
         remaining_presence_limit = self.activate_threshold_at - len(present_attrs) - 1
         underactivation_bits = _at_most_count_bits(
-            [
-                self.presence_bits[attr]
-                for attr in self.threshold_attrs
-                if attr not in present_attrs
-            ],
+            [self.presence_bits[attr] for attr in self.threshold_attrs if attr not in present_attrs],
             remaining_presence_limit,
             universe,
         )
@@ -1648,9 +1694,7 @@ def _at_most_count_bits(
         next_exact = [0] * (maximum + 1)
         next_exact[0] = exact[0] & without_bits
         for count in range(1, maximum + 1):
-            next_exact[count] = (exact[count] & without_bits) | (
-                exact[count - 1] & bits
-            )
+            next_exact[count] = (exact[count] & without_bits) | (exact[count - 1] & bits)
         exact = next_exact
     result = 0
     for bits in exact:
@@ -1837,11 +1881,7 @@ def _identity_exact_attrs(
     identity_match: typing.Mapping[str, typing.Any],
     unique_attrs: typing.Sequence[str],
 ) -> typing.FrozenSet[str]:
-    configured = (
-        identity_match["exact_attrs"]
-        if "exact_attrs" in identity_match
-        else unique_attrs
-    )
+    configured = identity_match["exact_attrs"] if "exact_attrs" in identity_match else unique_attrs
     return frozenset(
         _unique_strings(
             typing.cast(typing.Iterable[typing.Any], configured),

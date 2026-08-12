@@ -1,3 +1,4 @@
+import dataclasses
 import json
 import pathlib
 import typing
@@ -67,6 +68,81 @@ def _provenance_dicts(result) -> list[dict]:
         }
         for provenance in result.source_provenance
     ]
+
+
+def _scalar_candidate_workflow(*, required: bool = False) -> dict:
+    workflow_extract: dict[str, typing.Any] = {
+        "workflow": {
+            "custom_steps": [
+                {"name": "scalar_step", "level": "chunk", "kind": "instruct"},
+            ],
+            "output_routes": [
+                {
+                    "workflow_group": "scalar_group",
+                    "workflow_field": "scalar_field",
+                    "final_path": "/scalar_group/scalar_field",
+                    "step_name": "scalar_step",
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": "scalar_field",
+                },
+            ],
+        }
+    }
+    if required:
+        workflow_extract["_groundx_persisted_extract"] = {
+            "scalar_group": {
+                "fields": {
+                    "scalar_field": {"required": True},
+                }
+            }
+        }
+    return workflow_extract
+
+
+def _reassemble_scalar_observations(
+    observations: typing.Sequence[typing.Tuple[typing.Mapping[str, typing.Any], typing.Sequence[int]]],
+    *,
+    required: bool = False,
+):
+    return reassemble_custom_outputs_from_xray(
+        {
+            "chunks": [
+                {
+                    "chunkId": f"chunk-{index}",
+                    "pageNumbers": list(page_numbers),
+                    "customChunkOutputs": {"scalar_step": dict(step_output)},
+                }
+                for index, (step_output, page_numbers) in enumerate(observations)
+            ]
+        },
+        workflow_extract=_scalar_candidate_workflow(required=required),
+    )
+
+
+def _reassemble_direct_scalar_value(
+    value: typing.Any,
+    *,
+    required: bool = False,
+):
+    return reassemble_custom_outputs_from_xray(
+        {
+            "chunks": [
+                {
+                    "chunkId": "direct-value",
+                    "pageNumbers": [7],
+                    "customChunkOutputs": {"scalar_step": value},
+                }
+            ]
+        },
+        workflow_extract=_scalar_candidate_workflow(required=required),
+    )
+
+
+def _candidate_values(result) -> list[typing.Any]:
+    assert len(result.scalar_candidate_sets) == 1
+    candidate_set = result.scalar_candidate_sets[0]
+    return [candidate_set.selected.value, *(candidate.value for candidate in candidate_set.alternatives)]
 
 
 def test_reassemble_custom_outputs_public_alias() -> None:
@@ -177,7 +253,7 @@ def test_reassembles_complete_destination_trees_without_depth_inference(
     assert result.final_output == expected
 
 
-def test_compiled_final_path_does_not_infer_repetition_from_observed_records() -> None:
+def test_compiled_final_path_uses_declared_repeated_step_kind() -> None:
     workflow_extract = {
         "workflow": {
             "custom_steps": [
@@ -212,7 +288,7 @@ def test_compiled_final_path_does_not_infer_repetition_from_observed_records() -
     )
 
     assert result.final_output == {
-        "group": {"object": {"field": "compiled scalar"}},
+        "group": [{"object": {"field": "compiled scalar"}}],
     }
 
 
@@ -1947,7 +2023,7 @@ def test_records_wrapper_preserves_direct_outputs_next_to_records() -> None:
     )
 
     assert result.final_output == {
-        "statement": {"account_number": "A-123"},
+        "statement": [{"account_number": "A-123"}],
         "charges": [{"description": "Admin fee"}],
     }
 
@@ -2117,6 +2193,330 @@ def test_identical_section_payloads_on_different_pages_are_not_collapsed() -> No
     assert [provenance.page_numbers for provenance in result.source_provenance] == [(1,), (2,)]
 
 
+def test_singular_section_route_preserves_candidates_and_pages_across_shared_section_id() -> None:
+    workflow_extract = {
+        "workflow": {
+            "custom_steps": [
+                {"name": "eligibility", "level": "section", "kind": "instruct"},
+            ],
+            "output_routes": [
+                {
+                    "workflow_group": "eligibility",
+                    "workflow_field": "entry_date",
+                    "final_path": "/eligibility/entry_date",
+                    "step_name": "eligibility",
+                    "level": "section",
+                    "output_map": "customSectionOutputs",
+                    "output_key": "entry_date",
+                },
+            ],
+        }
+    }
+    xray = {
+        "chunks": [
+            {
+                "chunkId": "chunk-12",
+                "sectionId": "section-1",
+                "pageNumbers": [12],
+                "customSectionOutputs": {"eligibility": {"entry_date": "A"}},
+            },
+            {
+                "chunkId": "chunk-14",
+                "sectionId": "section-1",
+                "pageNumbers": [14],
+                "customSectionOutputs": {"eligibility": {"entry_date": "A"}},
+            },
+            {
+                "chunkId": "chunk-16",
+                "sectionId": "section-1",
+                "pageNumbers": [16],
+                "customSectionOutputs": {"eligibility": {"entry_date": "B"}},
+            },
+        ]
+    }
+
+    result = reassemble_custom_outputs_from_xray(
+        xray,
+        workflow_extract=workflow_extract,
+    )
+
+    assert len(result.scalar_candidate_sets) == 1
+    candidate_set = result.scalar_candidate_sets[0]
+    assert (candidate_set.selected.value, candidate_set.selected.page_numbers) == (
+        "A",
+        (12, 14),
+    )
+    assert [(candidate.value, candidate.page_numbers) for candidate in candidate_set.alternatives] == [
+        ("B", (16,)),
+    ]
+    assert result.final_output == {"eligibility": {"entry_date": "A"}}
+
+
+def test_repeated_section_route_still_deduplicates_shared_section_id() -> None:
+    workflow_extract = {
+        "workflow": {
+            "custom_steps": [
+                {"name": "line_item_rows", "level": "section", "kind": "keys"},
+            ],
+            "output_routes": [
+                {
+                    "workflow_group": "line_items",
+                    "workflow_field": "description",
+                    "final_path": "/line_items/description",
+                    "step_name": "line_item_rows",
+                    "level": "section",
+                    "output_map": "customSectionOutputs",
+                    "output_key": "description",
+                },
+            ],
+        }
+    }
+    copied_section_outputs = {
+        "line_item_rows": {
+            "_records": [
+                {"description": "Admin fee"},
+            ]
+        }
+    }
+    xray = {
+        "chunks": [
+            {
+                "chunkId": "chunk-12",
+                "sectionId": "section-1",
+                "pageNumbers": [12],
+                "customSectionOutputs": copied_section_outputs,
+            },
+            {
+                "chunkId": "chunk-14",
+                "sectionId": "section-1",
+                "pageNumbers": [14],
+                "customSectionOutputs": copied_section_outputs,
+            },
+        ]
+    }
+
+    result = reassemble_custom_outputs_from_xray(
+        xray,
+        workflow_extract=workflow_extract,
+    )
+
+    assert result.final_output == {
+        "line_items": [{"description": "Admin fee"}],
+    }
+
+
+def test_direct_repeated_route_uses_destination_root_when_workflow_group_differs() -> None:
+    workflow_extract = {
+        "workflow": {
+            "custom_steps": [
+                {"name": "line_item_rows", "level": "chunk", "kind": "keys"},
+            ],
+            "output_routes": [
+                {
+                    "workflow_group": "source_records",
+                    "workflow_field": "description",
+                    "final_path": "/line_items/description",
+                    "step_name": "line_item_rows",
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": "description",
+                },
+            ],
+        }
+    }
+    xray = {
+        "chunks": [
+            {
+                "customChunkOutputs": {
+                    "line_item_rows": {
+                        "_records": [{"description": "Admin fee"}],
+                    }
+                }
+            }
+        ]
+    }
+
+    result = reassemble_custom_outputs_from_xray(
+        xray,
+        workflow_extract=workflow_extract,
+    )
+
+    assert result.final_output == {
+        "line_items": [{"description": "Admin fee"}],
+    }
+
+
+def test_direct_repeated_route_uses_sibling_fallback_when_records_do_not_match() -> None:
+    workflow_extract = {
+        "workflow": {
+            "custom_steps": [
+                {"name": "line_item_rows", "level": "chunk", "kind": "keys"},
+            ],
+            "output_routes": [
+                {
+                    "workflow_group": "line_items",
+                    "workflow_field": "code",
+                    "final_path": "/line_items/code",
+                    "step_name": "line_item_rows",
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": "code",
+                },
+            ],
+        }
+    }
+    xray = {
+        "chunks": [
+            {
+                "customChunkOutputs": {
+                    "line_item_rows": {
+                        "code": "A-1",
+                        "_records": [{"description": "Admin fee"}],
+                    }
+                }
+            }
+        ]
+    }
+
+    result = reassemble_custom_outputs_from_xray(
+        xray,
+        workflow_extract=workflow_extract,
+    )
+
+    assert result.final_output == {
+        "line_items": [{"code": "A-1"}],
+    }
+
+
+def test_singular_document_route_preserves_candidates_and_chunk_pages() -> None:
+    workflow_extract = {
+        "workflow": {
+            "custom_steps": [
+                {"name": "document_summary", "level": "document", "kind": "instruct"},
+            ],
+            "output_routes": [
+                {
+                    "workflow_group": "document",
+                    "workflow_field": "status",
+                    "final_path": "/document/status",
+                    "step_name": "document_summary",
+                    "level": "document",
+                    "output_map": "customDocumentOutputs",
+                    "output_key": "status",
+                },
+            ],
+        }
+    }
+    xray = {
+        "customDocumentOutputs": {"document_summary": {"status": "A"}},
+        "chunks": [
+            {
+                "chunkId": "chunk-12",
+                "pageNumbers": [12],
+                "customDocumentOutputs": {"document_summary": {"status": "A"}},
+            },
+            {
+                "chunkId": "chunk-14",
+                "pageNumbers": [14],
+                "customDocumentOutputs": {"document_summary": {"status": "A"}},
+            },
+            {
+                "chunkId": "chunk-16",
+                "pageNumbers": [16],
+                "customDocumentOutputs": {"document_summary": {"status": "B"}},
+            },
+        ],
+    }
+
+    result = reassemble_custom_outputs_from_xray(
+        xray,
+        workflow_extract=workflow_extract,
+    )
+
+    assert len(result.scalar_candidate_sets) == 1
+    candidate_set = result.scalar_candidate_sets[0]
+    assert (candidate_set.selected.value, candidate_set.selected.page_numbers) == (
+        "A",
+        (12, 14),
+    )
+    assert [(candidate.value, candidate.page_numbers) for candidate in candidate_set.alternatives] == [
+        ("B", (16,)),
+    ]
+    assert result.final_output == {"document": {"status": "A"}}
+
+
+@pytest.mark.parametrize(
+    "final_path",
+    [
+        "/line_items/*/description",
+        "/line_items/description",
+    ],
+)
+def test_repeated_document_route_still_deduplicates_copied_payloads(
+    final_path: str,
+) -> None:
+    workflow_extract = {
+        "workflow": {
+            "custom_steps": [
+                {"name": "line_item_rows", "level": "document", "kind": "keys"},
+            ],
+            "output_routes": [
+                {
+                    "workflow_group": "line_items",
+                    "workflow_field": "description",
+                    "final_path": final_path,
+                    "step_name": "line_item_rows",
+                    "level": "document",
+                    "output_map": "customDocumentOutputs",
+                    "output_key": "description",
+                },
+            ],
+        }
+    }
+    xray = {
+        "customDocumentOutputs": {
+            "line_item_rows": {
+                "_records": [
+                    {"description": "Admin fee"},
+                ]
+            }
+        },
+        "chunks": [
+            {
+                "chunkId": "chunk-12",
+                "pageNumbers": [12],
+                "customDocumentOutputs": {
+                    "line_item_rows": {
+                        "_records": [
+                            {"description": "Admin fee"},
+                        ]
+                    }
+                },
+            },
+            {
+                "chunkId": "chunk-14",
+                "pageNumbers": [14],
+                "customDocumentOutputs": {
+                    "line_item_rows": {
+                        "_records": [
+                            {"description": "Admin fee"},
+                        ]
+                    }
+                },
+            },
+        ],
+    }
+
+    result = reassemble_custom_outputs_from_xray(
+        xray,
+        workflow_extract=workflow_extract,
+    )
+
+    assert result.final_output == {
+        "line_items": [{"description": "Admin fee"}],
+    }
+
+
 def test_reassembly_reports_source_provenance_for_routed_outputs() -> None:
     workflow_extract = {
         "workflow": {
@@ -2197,7 +2597,7 @@ def test_reassembly_reports_source_provenance_for_routed_outputs() -> None:
     ]
 
 
-def test_adp_scalar_reducer_prefers_source_backed_positive_over_later_default() -> None:
+def test_adp_scalar_candidates_preserve_source_backed_and_default_like_values() -> None:
     workflow_extract = {
         "workflow": {
             "custom_steps": [
@@ -2277,9 +2677,37 @@ def test_adp_scalar_reducer_prefers_source_backed_positive_over_later_default() 
             "entry_date": "2026-01-01",
         }
     }
-    assert [diagnostic.code for diagnostic in result.diagnostics] == ["conflicting_output_candidates"]
-    assert result.diagnostics[0].severity == "warning"
-    assert result.diagnostics[0].final_path == "/eligibility_requirements/entry_date"
+    assert [
+        (
+            candidate_set.final_path,
+            candidate_set.selected.value,
+            [candidate.value for candidate in candidate_set.alternatives],
+        )
+        for candidate_set in result.scalar_candidate_sets
+    ] == [
+        (
+            "/eligibility_requirements/predecessor_service",
+            "Service with predecessor employer counts",
+            [
+                "Not specified",
+                {
+                    "value": "Not Indicated",
+                    "_raw_text": "No predecessor-service section visible.",
+                },
+            ],
+        ),
+        (
+            "/eligibility_requirements/entry_date",
+            "2026-01-01",
+            ["2026-02-01"],
+        ),
+    ]
+    assert [diagnostic.code for diagnostic in result.diagnostics] == [
+        "conflicting_output_candidates",
+        "conflicting_output_candidates",
+        "conflicting_output_candidates",
+    ]
+    assert all(diagnostic.severity == "warning" for diagnostic in result.diagnostics)
 
 
 def test_scalar_candidate_sidecar_preserves_equal_quality_conflicts_and_pages() -> None:
@@ -2311,7 +2739,7 @@ def test_scalar_candidate_sidecar_preserves_equal_quality_conflicts_and_pages() 
             {
                 "chunkId": "duplicate",
                 "pageNumbers": [14, 12],
-                "customSectionOutputs": {"eligibility": {"entry_date": " january   1 "}},
+                "customSectionOutputs": {"eligibility": {"entry_date": " january 1 "}},
             },
             {
                 "chunkId": "conflict",
@@ -2340,7 +2768,7 @@ def test_scalar_candidate_sidecar_preserves_equal_quality_conflicts_and_pages() 
     ]
 
 
-def test_scalar_candidate_sidecar_clears_inferior_candidates_after_replacement() -> None:
+def test_scalar_candidate_sidecar_keeps_first_observation_and_all_later_unique_values() -> None:
     workflow_extract = {
         "workflow": {
             "custom_steps": [
@@ -2390,16 +2818,383 @@ def test_scalar_candidate_sidecar_clears_inferior_candidates_after_replacement()
     )
 
     candidate_set = result.scalar_candidate_sets[0]
-    assert candidate_set.selected.value == {"value": "July 1", "confidence": 0.9}
-    assert candidate_set.selected.page_numbers == (3,)
+    assert candidate_set.selected.value == {"value": "January 1", "confidence": 0.4}
+    assert candidate_set.selected.page_numbers == (1,)
     assert [(candidate.value, candidate.page_numbers) for candidate in candidate_set.alternatives] == [
+        ({"value": "April 8", "confidence": 0.4}, (2,)),
+        ({"value": "July 1", "confidence": 0.9}, (3,)),
         ({"value": "October 1", "confidence": 0.9}, (4,)),
     ]
     assert result.final_output == {
         "eligibility_requirements": {
-            "entry_date": {"value": "July 1", "confidence": 0.9},
+            "entry_date": {"value": "January 1", "confidence": 0.4},
         }
     }
+
+
+def test_scalar_candidate_selection_ignores_later_source_page_presence() -> None:
+    result = _reassemble_scalar_observations(
+        [
+            ({"scalar_field": "first without a page"}, []),
+            ({"scalar_field": "later with a page"}, [8]),
+        ]
+    )
+
+    assert len(result.scalar_candidate_sets) == 1
+    candidate_set = result.scalar_candidate_sets[0]
+    assert (candidate_set.selected.value, candidate_set.selected.page_numbers) == (
+        "first without a page",
+        (),
+    )
+    assert [(candidate.value, candidate.page_numbers) for candidate in candidate_set.alternatives] == [
+        ("later with a page", (8,)),
+    ]
+    assert result.final_output == {"scalar_group": {"scalar_field": "first without a page"}}
+
+
+def test_scalar_candidate_selection_ignores_default_like_value_meaning() -> None:
+    result = _reassemble_scalar_observations(
+        [
+            ({"scalar_field": "N/A"}, [3]),
+            ({"scalar_field": "100% immediate"}, [5]),
+        ]
+    )
+
+    assert len(result.scalar_candidate_sets) == 1
+    candidate_set = result.scalar_candidate_sets[0]
+    assert (candidate_set.selected.value, candidate_set.selected.page_numbers) == ("N/A", (3,))
+    assert [(candidate.value, candidate.page_numbers) for candidate in candidate_set.alternatives] == [
+        ("100% immediate", (5,)),
+    ]
+    assert result.final_output == {"scalar_group": {"scalar_field": "N/A"}}
+
+
+@pytest.mark.parametrize(
+    ("observations", "expected_values", "expected_pages"),
+    [
+        (
+            [
+                ({"scalar_field": " Alpha "}, [1]),
+                ({"scalar_field": "alpha"}, [2]),
+            ],
+            ["Alpha"],
+            [(1, 2)],
+        ),
+        (
+            [
+                ({"scalar_field": "first  value"}, [3]),
+                ({"scalar_field": " FIRST VALUE "}, [4]),
+            ],
+            ["first  value", "FIRST VALUE"],
+            [(3,), (4,)],
+        ),
+    ],
+    ids=["outer-whitespace-casefold-first-casing", "internal-whitespace-significant"],
+)
+def test_scalar_candidate_string_identity_is_transport_only(
+    observations: list[tuple[dict, list[int]]],
+    expected_values: list[str],
+    expected_pages: list[tuple[int, ...]],
+) -> None:
+    result = _reassemble_scalar_observations(observations)
+
+    assert len(result.scalar_candidate_sets) == 1
+    candidate_set = result.scalar_candidate_sets[0]
+    candidates = [candidate_set.selected, *candidate_set.alternatives]
+    assert [candidate.value for candidate in candidates] == expected_values
+    assert [candidate.page_numbers for candidate in candidates] == expected_pages
+    assert result.final_output == {"scalar_group": {"scalar_field": expected_values[0]}}
+
+
+def test_scalar_candidate_json_identity_is_exact_and_type_sensitive() -> None:
+    result = _reassemble_scalar_observations(
+        [
+            ({"scalar_field": None}, [1]),
+            ({"scalar_field": False}, [2]),
+            ({"scalar_field": 0}, [3]),
+            ({"scalar_field": 0.0}, [4]),
+            ({"scalar_field": True}, [5]),
+            ({"scalar_field": 1}, [6]),
+            ({"scalar_field": 1.0}, [7]),
+            ({"scalar_field": ["item", 1]}, [8]),
+            ({"scalar_field": ["item", 1.0]}, [9]),
+            ({"scalar_field": {"count": 1, "flags": [True]}}, [10]),
+            ({"scalar_field": {"flags": [True], "count": 1}}, [11]),
+            ({"scalar_field": {"count": 1, "flags": [1]}}, [12]),
+        ]
+    )
+
+    assert len(result.scalar_candidate_sets) == 1
+    candidate_set = result.scalar_candidate_sets[0]
+    candidates = [candidate_set.selected, *candidate_set.alternatives]
+    assert len(candidates) == 11
+    assert candidates[0].value is None
+    assert candidates[1].value is False
+    assert type(candidates[2].value) is int and candidates[2].value == 0
+    assert type(candidates[3].value) is float and candidates[3].value == 0.0
+    assert candidates[4].value is True
+    assert type(candidates[5].value) is int and candidates[5].value == 1
+    assert type(candidates[6].value) is float and candidates[6].value == 1.0
+    assert candidates[7].value == ["item", 1]
+    assert type(candidates[7].value[1]) is int
+    assert candidates[8].value == ["item", 1.0]
+    assert type(candidates[8].value[1]) is float
+    assert candidates[9].value == {"count": 1, "flags": [True]}
+    assert candidates[9].page_numbers == (10, 11)
+    assert candidates[10].value == {"count": 1, "flags": [1]}
+    assert [candidate.page_numbers for candidate in candidates] == [
+        (1,),
+        (2,),
+        (3,),
+        (4,),
+        (5,),
+        (6,),
+        (7,),
+        (8,),
+        (9,),
+        (10, 11),
+        (12,),
+    ]
+
+
+def test_scalar_candidate_envelope_identity_uses_inner_value_and_retains_first_envelope() -> None:
+    result = _reassemble_scalar_observations(
+        [
+            (
+                {
+                    "scalar_field": {
+                        "value": " Alpha ",
+                        "confidence": 0.2,
+                        "_raw_text": "first observation",
+                    }
+                },
+                [4],
+            ),
+            (
+                {
+                    "scalar_field": {
+                        "value": "alpha",
+                        "confidence": 0.99,
+                        "_raw_text": "later duplicate",
+                    }
+                },
+                [7],
+            ),
+            (
+                {
+                    "scalar_field": {
+                        "value": "Beta",
+                        "confidence": 0.1,
+                    }
+                },
+                [9],
+            ),
+        ]
+    )
+
+    assert len(result.scalar_candidate_sets) == 1
+    candidate_set = result.scalar_candidate_sets[0]
+    assert candidate_set.selected.value == {
+        "value": "Alpha",
+        "confidence": 0.2,
+        "_raw_text": "first observation",
+    }
+    assert candidate_set.selected.page_numbers == (4, 7)
+    assert [(candidate.value, candidate.page_numbers) for candidate in candidate_set.alternatives] == [
+        ({"value": "Beta", "confidence": 0.1}, (9,)),
+    ]
+    assert result.final_output == {
+        "scalar_group": {
+            "scalar_field": {
+                "value": "Alpha",
+                "confidence": 0.2,
+                "_raw_text": "first observation",
+            }
+        }
+    }
+
+
+def test_scalar_candidate_presence_distinguishes_missing_from_explicit_empty_values() -> None:
+    result = _reassemble_scalar_observations(
+        [
+            ({}, [1]),
+            ({"scalar_field": None}, [2]),
+            ({"scalar_field": ""}, [3]),
+            ({"scalar_field": []}, [4]),
+        ]
+    )
+
+    assert len(result.scalar_candidate_sets) == 1
+    candidate_set = result.scalar_candidate_sets[0]
+    candidates = [candidate_set.selected, *candidate_set.alternatives]
+    assert [candidate.value for candidate in candidates] == [None, "", []]
+    assert [candidate.page_numbers for candidate in candidates] == [(2,), (3,), (4,)]
+
+
+def test_scalar_candidate_direct_step_presence_distinguishes_missing_null_and_false() -> None:
+    result = reassemble_custom_outputs_from_xray(
+        {
+            "chunks": [
+                {
+                    "chunkId": "missing-step",
+                    "pageNumbers": [1],
+                    "customChunkOutputs": {},
+                },
+                {
+                    "chunkId": "null-step",
+                    "pageNumbers": [2],
+                    "customChunkOutputs": {"scalar_step": None},
+                },
+                {
+                    "chunkId": "false-step",
+                    "pageNumbers": [3],
+                    "customChunkOutputs": {"scalar_step": False},
+                },
+            ]
+        },
+        workflow_extract=_scalar_candidate_workflow(),
+    )
+
+    assert len(result.scalar_candidate_sets) == 1
+    candidate_set = result.scalar_candidate_sets[0]
+    candidates = [candidate_set.selected, *candidate_set.alternatives]
+    assert [candidate.value for candidate in candidates] == [None, False]
+    assert [candidate.page_numbers for candidate in candidates] == [(2,), (3,)]
+
+
+def test_direct_singular_empty_list_is_retained_as_one_candidate() -> None:
+    result = _reassemble_direct_scalar_value([])
+
+    assert _candidate_values(result) == [[]]
+    assert result.scalar_candidate_sets[0].selected.page_numbers == (7,)
+    assert result.final_output == {"scalar_group": {"scalar_field": []}}
+
+
+def test_direct_singular_nonempty_list_preserves_list_identity() -> None:
+    result = _reassemble_direct_scalar_value(["first", "second"])
+
+    assert _candidate_values(result) == [["first", "second"]]
+    assert result.scalar_candidate_sets[0].selected.page_numbers == (7,)
+    assert result.final_output == {"scalar_group": {"scalar_field": ["first", "second"]}}
+
+
+def test_required_direct_singular_empty_list_satisfies_route() -> None:
+    result = _reassemble_direct_scalar_value([], required=True)
+
+    assert _candidate_values(result) == [[]]
+    assert not [diagnostic for diagnostic in result.diagnostics if diagnostic.code.startswith("missing_workflow_")]
+
+
+@pytest.mark.parametrize(
+    "value",
+    ["", False, 0, []],
+    ids=["empty-string", "false", "zero", "empty-list"],
+)
+def test_required_scalar_route_does_not_use_generic_truthiness(value: typing.Any) -> None:
+    result = _reassemble_scalar_observations(
+        [({"scalar_field": value}, [1])],
+        required=True,
+    )
+
+    assert _candidate_values(result) == [value]
+    assert not [diagnostic for diagnostic in result.diagnostics if diagnostic.code.startswith("missing_workflow_")]
+
+
+@pytest.mark.parametrize("observation_count", [1, 3])
+def test_required_scalar_route_keeps_null_evidence_but_reports_missing_independently_of_observation_count(
+    observation_count: int,
+) -> None:
+    result = _reassemble_scalar_observations(
+        [({"scalar_field": None}, [page]) for page in range(1, observation_count + 1)],
+        required=True,
+    )
+
+    assert len(result.scalar_candidate_sets) == 1
+    candidate_set = result.scalar_candidate_sets[0]
+    assert candidate_set.selected.value is None
+    assert candidate_set.selected.page_numbers == tuple(range(1, observation_count + 1))
+    assert candidate_set.alternatives == ()
+    assert [diagnostic.code for diagnostic in result.diagnostics] == ["missing_workflow_group"]
+
+
+def test_required_scalar_route_keeps_null_envelope_evidence_but_reports_missing() -> None:
+    null_envelope = {"value": None, "confidence": 0.8}
+    result = _reassemble_scalar_observations(
+        [({"scalar_field": null_envelope}, [6])],
+        required=True,
+    )
+
+    assert len(result.scalar_candidate_sets) == 1
+    candidate_set = result.scalar_candidate_sets[0]
+    assert candidate_set.selected.value == null_envelope
+    assert candidate_set.selected.page_numbers == (6,)
+    assert candidate_set.alternatives == ()
+    assert [diagnostic.code for diagnostic in result.diagnostics] == ["missing_workflow_group"]
+
+
+def test_repeated_route_empty_record_handling_is_unchanged() -> None:
+    workflow_extract = {
+        "workflow": {
+            "custom_steps": [
+                {"name": "rows", "level": "chunk", "kind": "keys"},
+            ],
+            "output_routes": [
+                {
+                    "workflow_group": "rows",
+                    "workflow_field": "value",
+                    "final_path": "/rows/*/value",
+                    "step_name": "rows",
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": "value",
+                }
+            ],
+        }
+    }
+    result = reassemble_custom_outputs_from_xray(
+        {
+            "chunks": [
+                {
+                    "customChunkOutputs": {
+                        "rows": {
+                            "_records": [
+                                {"value": None},
+                                {"value": ""},
+                                {"value": []},
+                                {"value": False},
+                                {"value": 0},
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        workflow_extract=workflow_extract,
+    )
+
+    assert result.final_output == {"rows": [{"value": False}, {"value": 0}]}
+    assert result.scalar_candidate_sets == []
+
+
+def test_duplicate_scalar_observations_merge_pages_for_selected_and_every_alternative() -> None:
+    result = _reassemble_scalar_observations(
+        [
+            ({"scalar_field": "Alpha"}, [3, 1, 3]),
+            ({"scalar_field": "Beta"}, [5]),
+            ({"scalar_field": " alpha "}, [1, 4]),
+            ({"scalar_field": "beta"}, [6, 5]),
+            ({"scalar_field": "Gamma"}, [7]),
+            ({"scalar_field": "GAMMA"}, [8, 7]),
+        ]
+    )
+
+    assert len(result.scalar_candidate_sets) == 1
+    candidate_set = result.scalar_candidate_sets[0]
+    assert (candidate_set.selected.value, candidate_set.selected.page_numbers) == ("Alpha", (3, 1, 4))
+    assert [(candidate.value, candidate.page_numbers) for candidate in candidate_set.alternatives] == [
+        ("Beta", (5, 6)),
+        ("Gamma", (7, 8)),
+    ]
 
 
 def test_scalar_candidate_sidecar_types_are_public_exports() -> None:
@@ -2407,6 +3202,35 @@ def test_scalar_candidate_sidecar_types_are_public_exports() -> None:
     assert "CustomOutputScalarCandidateSet" in extract.__all__
     assert extract.CustomOutputScalarCandidate is custom_outputs.CustomOutputScalarCandidate
     assert extract.CustomOutputScalarCandidateSet is custom_outputs.CustomOutputScalarCandidateSet
+
+
+def test_scalar_candidate_public_dataclass_contract_and_provisional_output_are_unchanged() -> None:
+    assert [field.name for field in dataclasses.fields(custom_outputs.CustomOutputScalarCandidate)] == [
+        "value",
+        "page_numbers",
+    ]
+    assert [field.name for field in dataclasses.fields(custom_outputs.CustomOutputScalarCandidateSet)] == [
+        "output_source",
+        "workflow_group",
+        "workflow_field",
+        "final_path",
+        "selected",
+        "alternatives",
+    ]
+
+    result = _reassemble_scalar_observations(
+        [
+            ({"scalar_field": "first"}, [1]),
+            ({"scalar_field": "second"}, [2]),
+            ({"scalar_field": "third"}, [3]),
+        ]
+    )
+
+    assert len(result.scalar_candidate_sets) == 1
+    candidate_set = result.scalar_candidate_sets[0]
+    assert candidate_set.selected.value == "first"
+    assert [candidate.value for candidate in candidate_set.alternatives] == ["second", "third"]
+    assert result.final_output == {"scalar_group": {"scalar_field": candidate_set.selected.value}}
 
 
 def test_non_repeated_section_list_value_remains_scalar_field() -> None:

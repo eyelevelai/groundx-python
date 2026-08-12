@@ -3,6 +3,37 @@
 ## Purpose
 TBD - created by archiving change generalize-v1-custom-output-reassembly. Update Purpose after archive.
 ## Requirements
+### Requirement: Scalar candidate readback is provisional and transport-only
+
+For each singular routed field, the SDK SHALL keep the first observed unique
+candidate in `selected` and `final_output`, and SHALL keep every later unique
+candidate in `alternatives` in observation order. When alternatives exist,
+`selected` and `final_output` are provisional inputs to downstream
+reconciliation, not SDK-resolved values.
+
+Candidate identity SHALL use only outer trimming and case-insensitive comparison
+for string candidates, or exact type-sensitive JSON equality for other values.
+Known extracted-field envelopes compare by their inner `value` and retain the
+first envelope. Duplicate observations merge all unique source pages in
+first-seen order. Value meaning, default-like text, page presence, confidence,
+and other envelope metadata SHALL NOT select, replace, filter, order, or
+deduplicate candidates.
+
+#### Scenario: Multiple singular values remain available
+
+- **GIVEN** one singular route observes distinct values in multiple output containers
+- **WHEN** the SDK reassembles custom output
+- **THEN** the first value remains in `selected` and `final_output`
+- **AND** every later unique value appears in `alternatives` in observation order
+- **AND** downstream reconciliation receives the complete candidate evidence.
+
+#### Scenario: Duplicate values merge provenance without replacement
+
+- **GIVEN** equivalent candidate values occur on different source pages
+- **WHEN** the SDK reassembles custom output
+- **THEN** the first value or extracted-field envelope remains retained
+- **AND** its source pages contain every unique observed page in first-seen order.
+
 ### Requirement: Custom output readback treats records-wrapped rows as generic v1 output
 
 The SDK SHALL treat `_records[]` inside custom output maps as a supported
