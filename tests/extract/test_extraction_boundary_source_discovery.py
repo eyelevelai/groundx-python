@@ -108,6 +108,36 @@ def test_reassembly_registry_names_the_real_arcadia_capture_writer() -> None:
     )
 
 
+def test_reassembly_replay_mock_policy_uses_only_the_production_reassembly_path() -> None:
+    policy = _catalog()["replay_mock_policy"]
+
+    assert policy == {
+        "allowed_external_io_seams": [],
+        "certifying_replay_files": [
+            "tests/extract/test_extraction_boundary_reassembly.py",
+        ],
+        "protected_production_symbols": [
+            {
+                "role": "reassembly",
+                "symbol": (
+                    "groundx.extract.custom_outputs."
+                    "reassemble_custom_outputs_from_xray"
+                ),
+            },
+        ],
+        "required_replay_calls": [
+            {
+                "caller": "_build_xray_reassembly_boundary_artifact",
+                "call": "reassemble_custom_outputs_from_xray",
+                "role": "reassembly",
+            },
+        ],
+        "required_replay_callers": [
+            "_build_xray_reassembly_boundary_artifact",
+        ],
+    }
+
+
 def test_source_discovery_rejects_an_undeclared_reassembly_call() -> None:
     source = SOURCE_PATH.read_text(encoding="utf-8")
     source += (
