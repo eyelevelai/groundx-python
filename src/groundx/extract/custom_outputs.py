@@ -173,8 +173,13 @@ def reassemble_custom_outputs_from_xray(
         final_path = route_map.get("final_path")
         if not isinstance(final_path, str):
             continue
+        route_repeats = _repeated_route(route_map, step_kinds)
 
-        for route_container in _route_containers(xray, route_map):
+        for route_container in _route_containers(
+            xray,
+            route_map,
+            repeated=route_repeats,
+        ):
             for route_value in _custom_route_values(
                 route_container.value,
                 route_map,
@@ -198,6 +203,7 @@ def reassemble_custom_outputs_from_xray(
                             page_numbers=route_container.page_numbers,
                             scalar_candidates=scalar_candidates,
                             diagnostics=diagnostics,
+                            repeated=route_repeats and route_value.repeated,
                         )
                     continue
                 if route_value.repeated or _unwrap_match_value(route_value.value) is not None:
@@ -231,6 +237,7 @@ def reassemble_custom_outputs_from_xray(
                     page_numbers=route_container.page_numbers,
                     scalar_candidates=scalar_candidates,
                     diagnostics=diagnostics,
+                    repeated=route_repeats and route_value.repeated,
                 )
                 if route_value.repeated and route_value.conflicts is not None:
                     # Task 3.2a7b: carry the generic `<field>__conflicts`
@@ -246,6 +253,7 @@ def reassemble_custom_outputs_from_xray(
                         page_numbers=route_container.page_numbers,
                         scalar_candidates=scalar_candidates,
                         diagnostics=diagnostics,
+                        repeated=route_repeats and route_value.repeated,
                     )
 
     _dedupe_repeated_group_outputs(
@@ -337,25 +345,15 @@ def select_relationship_parent(
     if not isinstance(child, typing.Mapping):
         return no_selection
 
-    match_attrs = _relationship_attr_list(
-        _relationship_packet_value(relationship, "match_attrs")
-    )
+    match_attrs = _relationship_attr_list(_relationship_packet_value(relationship, "match_attrs"))
     if not match_attrs:
         return no_selection
 
-    parent_list = [
-        parent
-        for parent in (parents or [])
-        if isinstance(parent, typing.Mapping)
-    ]
+    parent_list = [parent for parent in (parents or []) if isinstance(parent, typing.Mapping)]
     if not parent_list:
         return no_selection
 
-    populated_keys = {
-        attr: child.get(attr)
-        for attr in match_attrs
-        if not _relationship_value_absent(child.get(attr))
-    }
+    populated_keys = {attr: child.get(attr) for attr in match_attrs if not _relationship_value_absent(child.get(attr))}
     if not populated_keys:
         return no_selection
 
@@ -375,11 +373,7 @@ def select_relationship_parent(
 
     direct_matches: typing.List[typing.Mapping[str, typing.Any]] = []
     for parent in parent_list:
-        parent_key_count = sum(
-            1
-            for attr in match_attrs
-            if not _relationship_value_absent(parent.get(attr))
-        )
+        parent_key_count = sum(1 for attr in match_attrs if not _relationship_value_absent(parent.get(attr)))
         if parent_key_count == len(populated_keys) and matches_attrs(
             parent,
             tuple(populated_keys),
@@ -396,19 +390,13 @@ def select_relationship_parent(
             )
         return RelationshipParentSelection(parent=None, ambiguous=True)
 
-    passthrough_attrs = _relationship_attr_list(
-        _relationship_packet_value(relationship, "parent_passthrough_attrs")
-    )
-    stable_match_attrs = tuple(
-        attr for attr in match_attrs if attr not in passthrough_attrs
-    )
+    passthrough_attrs = _relationship_attr_list(_relationship_packet_value(relationship, "parent_passthrough_attrs"))
+    stable_match_attrs = tuple(attr for attr in match_attrs if attr not in passthrough_attrs)
     if len(stable_match_attrs) == len(match_attrs):
         return no_selection
     if not stable_match_attrs:
         return no_selection
-    ignored_match_attrs = tuple(
-        attr for attr in match_attrs if attr not in stable_match_attrs
-    )
+    ignored_match_attrs = tuple(attr for attr in match_attrs if attr not in stable_match_attrs)
 
     def has_ignored_match_conflict(
         parent: typing.Mapping[str, typing.Any],
@@ -494,9 +482,22 @@ def _custom_step_kinds(workflow: typing.Mapping[str, typing.Any]) -> typing.Dict
     return step_kinds
 
 
+def _repeated_route(
+    route: typing.Mapping[str, typing.Any],
+    step_kinds: typing.Mapping[str, str],
+) -> bool:
+    step_name = route.get("step_name")
+    final_path = route.get("final_path")
+    return (isinstance(step_name, str) and step_kinds.get(step_name) in _REPEATED_STEP_KINDS) or (
+        isinstance(final_path, str) and "*" in _pointer_parts(final_path)
+    )
+
+
 def _route_containers(
     xray: typing.Any,
     route: typing.Mapping[str, typing.Any],
+    *,
+    repeated: bool,
 ) -> typing.List[_RouteContainer]:
     level = route.get("level")
     output_map_name = route.get("output_map")
@@ -504,6 +505,27 @@ def _route_containers(
         if not isinstance(output_map_name, str):
             return [_RouteContainer(identity=("document",), value=xray)]
         document_containers: typing.List[_RouteContainer] = []
+        if not repeated:
+            root_output_payload = _get(xray, output_map_name)
+            if isinstance(root_output_payload, typing.Mapping):
+                document_containers.append(
+                    _RouteContainer(
+                        identity=("document", output_map_name, "root"),
+                        value=xray,
+                    )
+                )
+            for chunk in _iter_chunks(xray):
+                output_payload = _get(chunk, output_map_name)
+                if not isinstance(output_payload, typing.Mapping):
+                    continue
+                document_containers.append(
+                    _RouteContainer(
+                        identity=("document", output_map_name, _chunk_identity(chunk)),
+                        value=chunk,
+                        page_numbers=_page_numbers(chunk),
+                    )
+                )
+            return document_containers
         document_seen: typing.Set[str] = set()
         for container in [xray, *_iter_chunks(xray)]:
             output_payload = _get(container, output_map_name)
@@ -530,6 +552,15 @@ def _route_containers(
             for chunk in _iter_chunks(xray)
         ]
     if level == "section" and isinstance(output_map_name, str):
+        if not repeated:
+            return [
+                _RouteContainer(
+                    identity=("section", output_map_name, _chunk_identity(chunk)),
+                    value=chunk,
+                    page_numbers=_page_numbers(chunk),
+                )
+                for chunk in _iter_chunks(xray)
+            ]
         section_containers: typing.List[_RouteContainer] = []
         section_seen: typing.Set[str] = set()
         for chunk in _iter_chunks(xray):
@@ -569,9 +600,7 @@ def _custom_route_values(
         return []
 
     step_value = output_map.get(step_name)
-    is_repeated_step = step_kinds.get(step_name) in _REPEATED_STEP_KINDS
-    final_path = route.get("final_path")
-    route_repeats = is_repeated_step or (isinstance(final_path, str) and "*" in final_path)
+    route_repeats = _repeated_route(route, step_kinds)
 
     if isinstance(step_value, typing.Mapping):
         records = step_value.get("_records")
@@ -631,8 +660,8 @@ def _custom_route_values(
     return [
         _RouteValue(
             value=step_value,
-            record_index=0 if is_repeated_step else None,
-            repeated=is_repeated_step,
+            record_index=0 if route_repeats else None,
+            repeated=route_repeats,
         )
     ]
 
@@ -821,6 +850,7 @@ def _set_pointer(
     page_numbers: typing.Tuple[int, ...],
     scalar_candidates: typing.Dict[str, _ScalarCandidateState],
     diagnostics: typing.List[CustomOutputDiagnostic],
+    repeated: bool,
 ) -> None:
     parts = _pointer_parts(pointer)
     if not parts:
@@ -852,6 +882,20 @@ def _set_pointer(
         field_path = parts[star_index + 1 :]
         if field_path:
             _set_nested_value(record, field_path, value)
+        return
+
+    if repeated and parts[0] == route.get("workflow_group"):
+        records = result.setdefault(parts[0], [])
+        if not isinstance(records, list):
+            return
+        item_key = ((parts[0],), record_key)
+        record = repeated_records.get(item_key)
+        if record is None:
+            record = {}
+            repeated_records[item_key] = record
+            records.append(record)
+        if len(parts) > 1:
+            _set_nested_value(record, parts[1:], value)
         return
 
     current = result
@@ -1502,17 +1546,11 @@ class _AdvancedIdentityIndex:
         self.exact_attrs = _identity_exact_attrs(identity_match, unique_attrs)
         self.records: typing.List[typing.Dict[str, typing.Any]] = []
         self.presence_bits = {attr: 0 for attr in self.threshold_attrs}
-        self.value_bits: typing.Dict[str, typing.Dict[typing.Any, int]] = {
-            attr: {} for attr in self.threshold_attrs
-        }
-        self.indexed_values: typing.List[
-            typing.Dict[str, typing.Tuple[bool, typing.Any]]
-        ] = []
+        self.value_bits: typing.Dict[str, typing.Dict[typing.Any, int]] = {attr: {} for attr in self.threshold_attrs}
+        self.indexed_values: typing.List[typing.Dict[str, typing.Tuple[bool, typing.Any]]] = []
         shortcuts = identity_match.get("equal_value_shortcuts", {})
         shortcut_map = (
-            typing.cast(typing.Mapping[str, typing.Any], shortcuts)
-            if isinstance(shortcuts, typing.Mapping)
-            else {}
+            typing.cast(typing.Mapping[str, typing.Any], shortcuts) if isinstance(shortcuts, typing.Mapping) else {}
         )
         self.shortcut_values = {
             attr: {
@@ -1610,11 +1648,7 @@ class _AdvancedIdentityIndex:
         )
         remaining_presence_limit = self.activate_threshold_at - len(present_attrs) - 1
         underactivation_bits = _at_most_count_bits(
-            [
-                self.presence_bits[attr]
-                for attr in self.threshold_attrs
-                if attr not in present_attrs
-            ],
+            [self.presence_bits[attr] for attr in self.threshold_attrs if attr not in present_attrs],
             remaining_presence_limit,
             universe,
         )
@@ -1652,9 +1686,7 @@ def _at_most_count_bits(
         next_exact = [0] * (maximum + 1)
         next_exact[0] = exact[0] & without_bits
         for count in range(1, maximum + 1):
-            next_exact[count] = (exact[count] & without_bits) | (
-                exact[count - 1] & bits
-            )
+            next_exact[count] = (exact[count] & without_bits) | (exact[count - 1] & bits)
         exact = next_exact
     result = 0
     for bits in exact:
@@ -1841,11 +1873,7 @@ def _identity_exact_attrs(
     identity_match: typing.Mapping[str, typing.Any],
     unique_attrs: typing.Sequence[str],
 ) -> typing.FrozenSet[str]:
-    configured = (
-        identity_match["exact_attrs"]
-        if "exact_attrs" in identity_match
-        else unique_attrs
-    )
+    configured = identity_match["exact_attrs"] if "exact_attrs" in identity_match else unique_attrs
     return frozenset(
         _unique_strings(
             typing.cast(typing.Iterable[typing.Any], configured),
