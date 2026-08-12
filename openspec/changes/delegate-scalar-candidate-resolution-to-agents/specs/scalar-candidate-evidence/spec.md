@@ -79,6 +79,24 @@ each present value as a candidate.
 - **THEN** each present value is retained according to candidate identity rules
 - **AND** none is discarded as absence.
 
+#### Scenario: Required route contains only explicit null
+
+- **GIVEN** a singular routed field is required by the authored field contract
+- **AND** its only observed value is explicit null
+- **WHEN** the SDK reassembles the routed scalar field
+- **THEN** null remains in candidate evidence
+- **AND** null does not satisfy the required route
+- **AND** the SDK emits its required-field diagnostic independently of
+  candidate count.
+
+#### Scenario: Required route contains a contract-valid falsey value
+
+- **GIVEN** a singular routed field is required
+- **AND** its observed value is empty string, `false`, `0`, or empty list
+- **WHEN** the SDK reassembles the routed scalar field
+- **THEN** generic truthiness does not classify the value as missing
+- **AND** validity remains governed by the authored field contract.
+
 ### Requirement: Duplicate observations retain all source pages
 
 The SDK SHALL merge every unique source page associated with duplicate
@@ -215,6 +233,23 @@ v1, generic v1, and ADP protected cases.
 - **WHEN** the coordinated pipeline runs
 - **THEN** candidate conflict alone does not invoke reconciliation
 - **AND** existing routing and output behavior remains unchanged.
+
+#### Scenario: Sole nullable null is omitted from customer output
+
+- **GIVEN** a protected extraction field is nullable
+- **AND** its only candidate is explicit null
+- **WHEN** the coordinated pipeline completes
+- **THEN** null remains available as diagnostic evidence
+- **AND** the consumer omits the field from customer JSON without invoking
+  scalar value-selection logic.
+
+#### Scenario: Sole required null fails independently of reconciliation
+
+- **GIVEN** a protected extraction field is required
+- **AND** its only candidate is explicit null
+- **WHEN** the coordinated pipeline validates required output
+- **THEN** the run cannot succeed
+- **AND** the absence of a multi-candidate conflict does not bypass requiredness.
 
 #### Scenario: Field has competing candidates
 

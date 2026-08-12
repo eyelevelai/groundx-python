@@ -24,6 +24,9 @@ complete value-to-page mapping.
   No other normalization is used to decide whether values are duplicates.
 - Explicit null, empty-string, and empty-list outputs remain candidates. A
   missing field remains no candidate.
+- Explicit null remains diagnostic evidence but does not satisfy a required
+  route. A sole nullable null is omitted from customer output by the consumer
+  from the authored field contract, without an agent value decision.
 - Duplicate values merge all source page numbers into the retained candidate.
 - The existing public `selected` and `alternatives` shape remains unchanged.
   `selected` means first observed, not best or final.
@@ -66,7 +69,9 @@ complete value-to-page mapping.
   candidate. The dataclass shape and imports do not change.
 - Consumer implementation: Internal Arcadia statement load, reconcile, QA,
   candidate-evidence serialization, image selection, prompt rendering, and
-  tests.
+  tests are owned only by its `complete-scalar-reconcile-disposition` change.
+  This SDK change owns the producer contract and coordinated acceptance gates,
+  not Arcadia code.
 - Downstream consumers: `internal-arcadia-agents` must pin the released SDK
   before deploying this behavior. Other consumers receive the same public
   types but may observe different `selected`, `alternatives`, and provisional
@@ -81,11 +86,17 @@ complete value-to-page mapping.
 
 ## Release order
 
-1. Implement and test the SDK contract on a candidate wheel.
-2. Install that exact wheel in an isolated Internal Arcadia checkout based on
-   the pushed branch containing PR 102.
-3. Implement and test the consumer contract against the candidate wheel.
-4. Merge the SDK change and hand the tested commit and wheel evidence to the
-   human release owner.
-5. Pin the released SDK version in Internal Arcadia, rerun protected tests, then
-   merge and deploy Internal Arcadia.
+1. Implement and test the SDK contract on Python 3.11. Build an unpublished
+   source-candidate wheel using the repository's generated package version and
+   record its source commit and SHA-256.
+2. Install that source candidate in isolated Internal Arcadia and Studio
+   Harness checkouts. Internal Arcadia implements its consumer contract only
+   through `complete-scalar-reconcile-disposition`.
+3. Merge the SDK changes and give the merged handwritten source commit and
+   validation evidence to the human release owner for requested version 3.9.7.
+4. After 3.9.7 is published, verify that it contains the tested handwritten
+   source change. Clean-install the published artifact and rerun both consumer
+   gates. Do not require wheel-byte identity across different package versions.
+5. Pin the published SDK in both Internal Arcadia dependency writers, rerun
+   protected tests, build and inspect the extract container, then merge and
+   deploy Internal Arcadia.

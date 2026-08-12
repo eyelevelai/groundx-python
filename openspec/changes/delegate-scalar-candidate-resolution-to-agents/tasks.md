@@ -31,6 +31,10 @@
 - [ ] 1.5 Add presence tests proving a missing key creates no candidate while an
   explicit null, empty string, or empty list does. Prove repeated-row empty
   handling is unchanged.
+- [ ] 1.5a Add requiredness tests proving a sole explicit null remains candidate
+  evidence but does not satisfy a required route. Prove a required-field
+  diagnostic is emitted independently of candidate count, while empty string,
+  `false`, `0`, and empty list are not rejected by generic truthiness.
 - [ ] 1.6 Add duplicate-observation tests proving all unique source pages merge
   in first-seen order for the selected candidate and every alternative.
 - [ ] 1.7 Add public contract tests proving dataclass fields and imports remain
@@ -49,7 +53,8 @@
   envelope metadata outside the identity decision.
 - [ ] 2.3 Make singular route loading presence-aware so explicit null, empty
   string, and empty list reach candidate collection while missing keys do not.
-  Keep repeated route behavior unchanged.
+  Track required-route satisfaction separately so a sole null still emits the
+  existing required-field diagnostic. Keep repeated route behavior unchanged.
 - [ ] 2.4 Keep the first unique candidate as selected and provisional
   `final_output`. Append all later unique candidates without semantic ranking.
 - [ ] 2.5 Merge all unique source pages for duplicate observations without
@@ -61,80 +66,50 @@
   `final_output` are described as provisional when alternatives exist.
 - [ ] 2.8 Run focused custom-output and route-reassembly tests until green.
 
-## 3. Build and prove an exact SDK candidate wheel
+## 3. Build and prove an SDK source candidate
 
 - [ ] 3.1 Run changed-file Ruff checks and formatting checks, focused extraction
   tests, the full hand-written extraction test suite, Mypy, line-ending checks,
   and `git diff --check`.
-- [ ] 3.2 Build one candidate wheel without publishing it. Record source commit,
+- [ ] 3.2 Build one candidate wheel on Python 3.11 without publishing it. Keep
+  the repository's generated package version unchanged. Record source commit,
   filename, and SHA-256.
-- [ ] 3.3 Install the exact wheel into an isolated Internal Arcadia environment
-  based on the pushed PR 102 branch and verify the installed wheel hash.
+- [ ] 3.3 Install that source candidate into isolated Internal Arcadia and
+  Studio Harness environments based on their required pushed refs. Verify the
+  installed candidate hash in both environments.
 
-## 4. Lock the Internal Arcadia consumer contract with failing tests
+## 4. Hand off Internal Arcadia implementation to its owning plan
 
-- [ ] 4.1 Add SDK handoff tests proving every candidate and all page numbers
-  survive `_sdk_scalar_candidate_sets`, Celery serialization, statement branch
-  copies, reconcile, QA, and save diagnostics.
-- [ ] 4.2 Add prompt snapshot tests proving each conflicted field renders an
-  ordered candidate object array with `value`, complete `source_pages`, and
-  exact `provided_pages`.
-- [ ] 4.3 Add reconcile-trigger tests for default-like and empty candidates.
-  Prove two unique candidates always invoke reconcile and one unique candidate
-  does not.
-- [ ] 4.4 Add image-selection tests proving canonical page dedupe, one available
-  page per candidate first, round-robin fill, complete source-page metadata,
-  and a hard maximum of 30 attached images.
-- [ ] 4.5 Add a failure test for more than 30 candidates requiring distinct
-  images. Assert no model call occurs and the error names the field, candidate
-  count, and limit.
-- [ ] 4.6 Add reconcile-application tests proving an existing or novel returned
-  value becomes current, the provisional value remains in candidate history,
-  pending conflicts clear only after valid application, and no source page is
-  invented for an agent-created value.
-- [ ] 4.7 Add QA tests proving candidate history survives unchanged and a novel
-  QA value is appended without invented source pages.
-- [ ] 4.8 Add a trace test proving exact prompt, candidate mapping, attached
-  image count, source page count, agent response, current value, and candidate
-  history can be reconstructed without exposing candidate history in customer
-  JSON.
-- [ ] 4.9 Run the focused tests and confirm they fail for the current plain value
-  array, first-page-only evidence selection, and history-clearing behavior.
+- [ ] 4.1 Record the pushed `complete-scalar-reconcile-disposition` branch and
+  commit used for consumer implementation. That plan is the sole owner of
+  Arcadia code, prompts, tests, serialization, container pins, and terminal-save
+  behavior.
+- [ ] 4.2 Confirm the Arcadia plan covers candidate arrays and pages, image
+  selection, reconcile and QA disposition, sole-null handling, branch merge,
+  compact terminal-save evidence, persistence, and confidence neutrality.
+- [ ] 4.3 Do not implement or commit Internal Arcadia files from this SDK plan.
+  Use the SDK source candidate and this plan's cross-repository contract as the
+  Arcadia plan's inputs.
 
-## 5. Implement agent-owned reconciliation in Internal Arcadia
+## 5. Accept the Internal Arcadia consumer implementation
 
-- [ ] 5.1 Keep `_routed_final_candidate_evidence` as durable runtime candidate
-  history and `_routed_final_conflicts` as pending reconciliation state. Do not
-  use one structure for both meanings.
-- [ ] 5.2 Build reconciliation fields directly from complete candidate history.
-  Trigger on more than one unique candidate without semantic or confidence
-  filtering.
-- [ ] 5.3 Render each candidate with `value`, `source_pages`, and
-  `provided_pages`. Update the reconcile prompt to explain that only provided
-  pages are visible. Keep the existing plain JSON response shape.
-- [ ] 5.4 Replace first-page-only selection with candidate-first, round-robin
-  page selection. Deduplicate actual images and retain every source-page number
-  in prompt metadata.
-- [ ] 5.5 Reuse PR 102 field batching. Keep the existing 30-image maximum. Fail
-  one oversized field before the model call rather than adding multi-pass
-  orchestration or silently hiding evidence.
-- [ ] 5.6 Apply a valid reconcile response through one helper that sets the
-  current routed value, preserves all prior candidates, appends a novel agent
-  value with `origin: reconcile_agent`, and clears only pending conflict state.
-- [ ] 5.7 Reuse the same evidence-preservation helper for QA updates, using
-  `origin: qa_agent` for novel values.
-- [ ] 5.8 Preserve candidate history across `to_celery`, `from_celery`, branch
-  merges, save, and authorized diagnostic traces. Do not add it to customer
-  final JSON.
-- [ ] 5.9 Audit statement candidate, reconcile, QA, image, and save code for
-  confidence-based decisions. Confidence may be copied as metadata but must not
-  affect any branch.
+- [ ] 5.1 Install the recorded SDK source candidate in the Arcadia plan's clean
+  environment and verify its hash before consumer tests run.
+- [ ] 5.2 Require the Arcadia plan's focused tests to prove all candidate values
+  and pages survive reconcile, QA, branch merge, compact terminal save, and
+  authorized diagnostics without entering customer JSON.
+- [ ] 5.3 Require Arcadia end-to-end cases for a sole required null, sole
+  nullable null, two competing candidates, novel reconcile and QA values, and
+  more than 30 candidate images.
+- [ ] 5.4 Accept the consumer handoff only after the Arcadia plan records its
+  exact pushed commit and passing focused, full-suite, protected-case, payload,
+  type, and line-ending gates.
 
 ## 6. Verify the coordinated behavior
 
 - [ ] 6.1 Run focused Internal Arcadia statement, reconcile prompt, image
-  selection, serialization, route merge, save, and trace tests against the exact
-  candidate wheel.
+  selection, serialization, route merge, save, and trace tests against the
+  recorded SDK source candidate.
 - [ ] 6.2 Run the full Internal Arcadia unit suite, Pyright checks, line-ending
   checks, and `git diff --check`.
 - [ ] 6.3 Run protected offline regressions for the current reproduction,
@@ -153,19 +128,24 @@
 
 ## 7. Release, pin, and deploy reversibly
 
-- [ ] 7.1 Merge the SDK PR only after the exact candidate wheel passes the
-  consumer gates. Give the human Fern release owner the requested next version,
-  merged commit, wheel hash, validation evidence, semantic compatibility note,
-  and Internal Arcadia pin requirement. Do not publish from this repo.
-- [ ] 7.2 Pin the released SDK version in Internal Arcadia and reinstall from
-  the package index. Repeat focused, full-suite, protected-case, type,
-  line-ending, and container checks from a clean environment.
-- [ ] 7.3 Merge and deploy Internal Arcadia. Record the new and prior image
+- [ ] 7.1 Merge the SDK PR only after the source candidate passes both consumer
+  gates. Give the human Fern release owner requested version 3.9.7, the merged
+  handwritten source commit, candidate hash, validation evidence, semantic
+  compatibility note, and consumer pin requirements. Do not publish from this
+  repo.
+- [ ] 7.2 After 3.9.7 is published, verify it contains the tested handwritten
+  source change. Clean-install it in both consumers and rerun their gates. Do
+  not require byte identity with the differently versioned source candidate.
+- [ ] 7.3 Require the Internal Arcadia plan to update both dependency writers,
+  `requirements.txt` and `Dockerfile.extract`, to the released SDK version.
+  Accept the release gate only after that plan builds `Dockerfile.extract`,
+  inspects the installed GroundX version, and records the image identity.
+- [ ] 7.4 Merge and deploy Internal Arcadia. Record the new and prior image
   identities before rollout.
-- [ ] 7.4 Rerun the ADP side-by-side extraction and capture exact reconcile and
+- [ ] 7.5 Rerun the ADP side-by-side extraction and capture exact reconcile and
   QA requests, responses, candidate mappings, total document pages, candidate
   source pages, attached pages, and final field values.
-- [ ] 7.5 Roll Internal Arcadia back to the prior image and SDK pin if the
+- [ ] 7.6 Roll Internal Arcadia back to the prior image and both SDK pins if the
   current reproduction or any protected surface regresses. No data rollback is
   required.
 

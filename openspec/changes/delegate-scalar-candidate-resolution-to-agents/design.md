@@ -39,10 +39,14 @@
 GroundX Python owns generic candidate collection because it reads all X-Ray
 custom-output observations and applies workflow routes. Internal Arcadia owns
 business interpretation because it has the field prompt, source images,
-reconciliation agent, and QA agent.
+reconciliation agent, and QA agent. Its
+`complete-scalar-reconcile-disposition` change is the sole owner of Arcadia
+code, prompts, tests, and terminal-save behavior.
 
-The cross-repository contract lives in this producer plan. Internal Arcadia
-implements the consumer tasks after testing the exact candidate wheel.
+The cross-repository contract and release order live in this producer plan.
+Internal Arcadia implements the consumer tasks after testing the source
+candidate built from the recorded SDK commit. This plan does not duplicate
+those implementation tasks.
 
 ## Current behavior
 
@@ -104,6 +108,13 @@ Presence is determined before value filtering:
 - an output key present with null produces a null candidate;
 - an output key present with empty string produces an empty-string candidate;
 - an output key present with empty list produces an empty-list candidate.
+
+Candidate presence and required-route satisfaction are separate. Explicit null
+remains in candidate evidence, but it does not satisfy a required route. The SDK
+must still emit its existing required-field diagnostic when null is the only
+observation for a required route. Empty string, `false`, `0`, and empty list are
+not rejected by generic truthiness checks; their validity comes from the
+authored field contract.
 
 This change applies to singular routed scalar fields. Existing repeated-row
 empty-record handling remains unchanged.
@@ -240,6 +251,9 @@ sequenceDiagram
 ## Error handling
 
 - Missing field: no candidate and no reconcile trigger.
+- One explicit null candidate: preserve the null candidate. It does not satisfy
+  a required route. For a nullable route, the consumer omits the field from
+  customer output without treating null as a selected business value.
 - One unique candidate: no reconcile trigger for candidate conflict alone.
 - More than one unique candidate: reconciliation is required regardless of
   value content or confidence.
@@ -261,10 +275,14 @@ treat SDK `final_output` as agent-resolved may observe a different value. The
 public type shape remains compatible, but release notes must call out the
 semantic change.
 
-Internal Arcadia must test the exact candidate wheel before the SDK release is
-published. After release, it pins that version and reruns the same tests from a
-clean install. Deploy only after current reproduction, Arcadia legacy, Arcadia
-v1, generic v1, and ADP protected cases pass.
+Internal Arcadia and Studio Harness must test an unpublished source candidate
+built from the recorded SDK commit on Python 3.11 before the release is
+published. After the human release owner publishes requested version 3.9.7,
+both consumers verify that the published package contains the same handwritten
+source change and rerun their gates from clean installs. Candidate and published
+wheels may differ in version metadata and bytes. Deploy only after the current
+reproduction, Arcadia legacy, Arcadia v1, generic v1, and ADP protected cases
+pass.
 
 Rollback uses the prior SDK pin and prior Internal Arcadia container image. No
 stored data needs migration or repair.
