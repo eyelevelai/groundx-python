@@ -2174,6 +2174,236 @@ def test_identical_section_payloads_on_different_pages_are_not_collapsed() -> No
     assert [provenance.page_numbers for provenance in result.source_provenance] == [(1,), (2,)]
 
 
+def test_singular_section_route_preserves_candidates_and_pages_across_shared_section_id() -> None:
+    workflow_extract = {
+        "workflow": {
+            "custom_steps": [
+                {"name": "eligibility", "level": "section", "kind": "instruct"},
+            ],
+            "output_routes": [
+                {
+                    "workflow_group": "eligibility",
+                    "workflow_field": "entry_date",
+                    "final_path": "/eligibility/entry_date",
+                    "step_name": "eligibility",
+                    "level": "section",
+                    "output_map": "customSectionOutputs",
+                    "output_key": "entry_date",
+                },
+            ],
+        }
+    }
+    xray = {
+        "chunks": [
+            {
+                "chunkId": "chunk-12",
+                "sectionId": "section-1",
+                "pageNumbers": [12],
+                "customSectionOutputs": {"eligibility": {"entry_date": "A"}},
+            },
+            {
+                "chunkId": "chunk-14",
+                "sectionId": "section-1",
+                "pageNumbers": [14],
+                "customSectionOutputs": {"eligibility": {"entry_date": "A"}},
+            },
+            {
+                "chunkId": "chunk-16",
+                "sectionId": "section-1",
+                "pageNumbers": [16],
+                "customSectionOutputs": {"eligibility": {"entry_date": "B"}},
+            },
+        ]
+    }
+
+    result = reassemble_custom_outputs_from_xray(
+        xray,
+        workflow_extract=workflow_extract,
+    )
+
+    assert len(result.scalar_candidate_sets) == 1
+    candidate_set = result.scalar_candidate_sets[0]
+    assert (candidate_set.selected.value, candidate_set.selected.page_numbers) == (
+        "A",
+        (12, 14),
+    )
+    assert [(candidate.value, candidate.page_numbers) for candidate in candidate_set.alternatives] == [
+        ("B", (16,)),
+    ]
+    assert result.final_output == {"eligibility": {"entry_date": "A"}}
+
+
+def test_repeated_section_route_still_deduplicates_shared_section_id() -> None:
+    workflow_extract = {
+        "workflow": {
+            "custom_steps": [
+                {"name": "line_item_rows", "level": "section", "kind": "keys"},
+            ],
+            "output_routes": [
+                {
+                    "workflow_group": "line_items",
+                    "workflow_field": "description",
+                    "final_path": "/line_items/description",
+                    "step_name": "line_item_rows",
+                    "level": "section",
+                    "output_map": "customSectionOutputs",
+                    "output_key": "description",
+                },
+            ],
+        }
+    }
+    copied_section_outputs = {
+        "line_item_rows": {
+            "_records": [
+                {"description": "Admin fee"},
+            ]
+        }
+    }
+    xray = {
+        "chunks": [
+            {
+                "chunkId": "chunk-12",
+                "sectionId": "section-1",
+                "pageNumbers": [12],
+                "customSectionOutputs": copied_section_outputs,
+            },
+            {
+                "chunkId": "chunk-14",
+                "sectionId": "section-1",
+                "pageNumbers": [14],
+                "customSectionOutputs": copied_section_outputs,
+            },
+        ]
+    }
+
+    result = reassemble_custom_outputs_from_xray(
+        xray,
+        workflow_extract=workflow_extract,
+    )
+
+    assert result.final_output == {
+        "line_items": [{"description": "Admin fee"}],
+    }
+
+
+def test_singular_document_route_preserves_candidates_and_chunk_pages() -> None:
+    workflow_extract = {
+        "workflow": {
+            "custom_steps": [
+                {"name": "document_summary", "level": "document", "kind": "instruct"},
+            ],
+            "output_routes": [
+                {
+                    "workflow_group": "document",
+                    "workflow_field": "status",
+                    "final_path": "/document/status",
+                    "step_name": "document_summary",
+                    "level": "document",
+                    "output_map": "customDocumentOutputs",
+                    "output_key": "status",
+                },
+            ],
+        }
+    }
+    xray = {
+        "customDocumentOutputs": {"document_summary": {"status": "A"}},
+        "chunks": [
+            {
+                "chunkId": "chunk-12",
+                "pageNumbers": [12],
+                "customDocumentOutputs": {"document_summary": {"status": "A"}},
+            },
+            {
+                "chunkId": "chunk-14",
+                "pageNumbers": [14],
+                "customDocumentOutputs": {"document_summary": {"status": "A"}},
+            },
+            {
+                "chunkId": "chunk-16",
+                "pageNumbers": [16],
+                "customDocumentOutputs": {"document_summary": {"status": "B"}},
+            },
+        ],
+    }
+
+    result = reassemble_custom_outputs_from_xray(
+        xray,
+        workflow_extract=workflow_extract,
+    )
+
+    assert len(result.scalar_candidate_sets) == 1
+    candidate_set = result.scalar_candidate_sets[0]
+    assert (candidate_set.selected.value, candidate_set.selected.page_numbers) == (
+        "A",
+        (12, 14),
+    )
+    assert [(candidate.value, candidate.page_numbers) for candidate in candidate_set.alternatives] == [
+        ("B", (16,)),
+    ]
+    assert result.final_output == {"document": {"status": "A"}}
+
+
+@pytest.mark.parametrize(
+    "final_path",
+    [
+        "/line_items/*/description",
+        "/line_items/description",
+    ],
+)
+def test_repeated_document_route_still_deduplicates_copied_payloads(
+    final_path: str,
+) -> None:
+    workflow_extract = {
+        "workflow": {
+            "custom_steps": [
+                {"name": "line_item_rows", "level": "document", "kind": "keys"},
+            ],
+            "output_routes": [
+                {
+                    "workflow_group": "line_items",
+                    "workflow_field": "description",
+                    "final_path": final_path,
+                    "step_name": "line_item_rows",
+                    "level": "document",
+                    "output_map": "customDocumentOutputs",
+                    "output_key": "description",
+                },
+            ],
+        }
+    }
+    copied_document_outputs = {
+        "line_item_rows": {
+            "_records": [
+                {"description": "Admin fee"},
+            ]
+        }
+    }
+    xray = {
+        "customDocumentOutputs": copied_document_outputs,
+        "chunks": [
+            {
+                "chunkId": "chunk-12",
+                "pageNumbers": [12],
+                "customDocumentOutputs": copied_document_outputs,
+            },
+            {
+                "chunkId": "chunk-14",
+                "pageNumbers": [14],
+                "customDocumentOutputs": copied_document_outputs,
+            },
+        ],
+    }
+
+    result = reassemble_custom_outputs_from_xray(
+        xray,
+        workflow_extract=workflow_extract,
+    )
+
+    assert result.final_output == {
+        "line_items": [{"description": "Admin fee"}],
+    }
+
+
 def test_reassembly_reports_source_provenance_for_routed_outputs() -> None:
     workflow_extract = {
         "workflow": {
