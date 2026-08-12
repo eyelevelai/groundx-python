@@ -177,6 +177,38 @@ class TestMinIOClient(unittest.TestCase):
                     total_timeout_seconds=0.8,
                 )
 
+    def test_timeout_client_cache_closes_evicted_http_pool(self) -> None:
+        class Pool:
+            def __init__(self) -> None:
+                self.cleared = False
+
+            def clear(self) -> None:
+                self.cleared = True
+
+        class Client:
+            def __init__(self) -> None:
+                setattr(self, "_http", Pool())
+
+        cl = self._client()
+        created: typing.List[Client] = []
+
+        def create_client(**_kwargs: float) -> Client:
+            client = Client()
+            created.append(client)
+            return client
+
+        setattr(cl, "_create_client", create_client)
+        for total in range(1, 10):
+            getattr(cl, "_client_for_timeouts")(
+                connect_timeout_seconds=0.2,
+                read_timeout_seconds=0.5,
+                total_timeout_seconds=float(total),
+            )
+
+        self.assertEqual(len(created), 9)
+        self.assertTrue(typing.cast(Pool, getattr(created[0], "_http")).cleared)
+        self.assertFalse(typing.cast(Pool, getattr(created[-1], "_http")).cleared)
+
     def test_get_object_total_deadline_includes_body_read_and_closes_response(
         self,
     ) -> None:

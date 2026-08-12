@@ -1,8 +1,10 @@
 import sys
+import threading
 import time
 import types
 import typing
 import unittest
+from concurrent.futures import ThreadPoolExecutor
 from unittest.mock import Mock, patch
 
 from groundx.extract.services.logger import Logger
@@ -25,6 +27,7 @@ class FakeBody:
 class FakeS3Client:
     def __init__(self) -> None:
         self.body = FakeBody(b"statement: {}")
+        self.closed = False
 
     def get_object(self, Bucket: str, Key: str) -> typing.Dict[str, typing.Any]:
         return {
@@ -37,6 +40,9 @@ class FakeS3Client:
 
     def put_object(self, **kwargs: typing.Any) -> None:
         self.put = kwargs
+
+    def close(self) -> None:
+        self.closed = True
 
 
 class FakeConfig:
@@ -155,6 +161,56 @@ class TestS3Client(unittest.TestCase):
                 read_timeout_seconds=0.5,
                 total_timeout_seconds=0.8,
             )
+
+    def test_timeout_client_cache_is_bounded_and_closes_evicted_client(self) -> None:
+        cl = self._client()
+        created: typing.List[FakeS3Client] = []
+
+        def create_client(**_kwargs: float) -> FakeS3Client:
+            client = FakeS3Client()
+            created.append(client)
+            return client
+
+        setattr(cl, "_create_client", create_client)
+        for total in range(1, 10):
+            getattr(cl, "_client_for_timeouts")(
+                connect_timeout_seconds=0.2,
+                read_timeout_seconds=0.5,
+                total_timeout_seconds=float(total),
+            )
+
+        self.assertEqual(len(created), 9)
+        self.assertTrue(created[0].closed)
+        self.assertFalse(created[-1].closed)
+
+    def test_timeout_client_cache_creates_one_client_for_concurrent_key(self) -> None:
+        cl = self._client()
+        ready = threading.Barrier(8)
+        created: typing.List[FakeS3Client] = []
+        created_lock = threading.Lock()
+
+        def create_client(**_kwargs: float) -> FakeS3Client:
+            time.sleep(0.03)
+            client = FakeS3Client()
+            with created_lock:
+                created.append(client)
+            return client
+
+        setattr(cl, "_create_client", create_client)
+
+        def load(_index: int) -> typing.Any:
+            ready.wait(timeout=1)
+            return getattr(cl, "_client_for_timeouts")(
+                connect_timeout_seconds=0.2,
+                read_timeout_seconds=0.5,
+                total_timeout_seconds=0.8,
+            )
+
+        with ThreadPoolExecutor(max_workers=8) as executor:
+            clients = list(executor.map(load, range(8)))
+
+        self.assertEqual(len(created), 1)
+        self.assertEqual(len({id(client) for client in clients}), 1)
 
     def test_get_object_total_deadline_includes_body_read(self) -> None:
         class StalledBody(FakeBody):

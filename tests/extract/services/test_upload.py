@@ -1,6 +1,9 @@
+import math
 import typing
 
-from groundx.extract.services.upload import Upload
+import pytest
+
+from groundx.extract.services.upload import Upload, validate_upload_timeouts
 
 
 class _Client:
@@ -75,3 +78,27 @@ def test_upload_preserves_unbounded_object_read_call() -> None:
 
     assert body == b"workflow"
     assert client.kwargs == {}
+
+
+@pytest.mark.parametrize("invalid", [math.nan, math.inf, -math.inf])
+@pytest.mark.parametrize(
+    "component",
+    [
+        "connect_timeout_seconds",
+        "read_timeout_seconds",
+        "total_timeout_seconds",
+    ],
+)
+def test_upload_timeout_components_must_be_finite(
+    component: str,
+    invalid: float,
+) -> None:
+    values = {
+        "connect_timeout_seconds": 0.2,
+        "read_timeout_seconds": 0.5,
+        "total_timeout_seconds": 0.8,
+    }
+    values[component] = invalid
+
+    with pytest.raises(ValueError, match="finite"):
+        validate_upload_timeouts(**values)

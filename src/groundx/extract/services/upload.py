@@ -1,7 +1,43 @@
+import math
+import threading
 import typing
+from collections import OrderedDict
 
 from ..settings.settings import ContainerSettings
 from .logger import Logger
+
+OBJECT_STORE_CONNECT_TIMEOUT_SECONDS = 5.0
+OBJECT_STORE_READ_TIMEOUT_SECONDS = 20.0
+OBJECT_STORE_TOTAL_TIMEOUT_SECONDS = 25.0
+MAX_CACHED_TIMEOUT_CLIENTS = 8
+
+
+class TimeoutClientCache:
+    def __init__(self, close_client: typing.Callable[[typing.Any], None]) -> None:
+        self._clients: OrderedDict[typing.Tuple[float, float, float], typing.Any] = OrderedDict()
+        self._close_client = close_client
+        self._lock = threading.Lock()
+
+    def get_or_create(
+        self,
+        timeout: typing.Tuple[float, float, float],
+        create_client: typing.Callable[[], typing.Any],
+    ) -> typing.Any:
+        evicted: typing.Optional[typing.Any] = None
+        with self._lock:
+            client = self._clients.pop(timeout, None)
+            if client is None:
+                client = create_client()
+            self._clients[timeout] = client
+            if len(self._clients) > MAX_CACHED_TIMEOUT_CLIENTS:
+                _, evicted = self._clients.popitem(last=False)
+
+        if evicted is not None:
+            try:
+                self._close_client(evicted)
+            except Exception:
+                pass
+        return client
 
 
 @typing.runtime_checkable
@@ -140,6 +176,8 @@ def validate_upload_timeouts(
     connect = typing.cast(float, connect_timeout_seconds)
     read = typing.cast(float, read_timeout_seconds)
     total = typing.cast(float, total_timeout_seconds)
+    if not all(math.isfinite(value) for value in (connect, read, total)):
+        raise ValueError("upload timeouts must be finite")
     if connect <= 0 or read <= 0 or total <= 0:
         raise ValueError("upload timeouts must be positive")
     if connect + read > total:

@@ -77,6 +77,44 @@ class TestGroundX(unittest.TestCase):
 
         self.assertEqual(get.call_args.kwargs["timeout"], (5.0, 30.0))
 
+    def test_download_uses_bounded_object_store_timeout(self):
+        payload: typing.Dict[str, typing.Any] = {
+            "chunks": [],
+            "documentPages": [],
+            "sourceUrl": "https://example.com/foo.pdf",
+        }
+
+        class RecordingUpload:
+            def __init__(self) -> None:
+                self.kwargs: typing.Dict[str, float] = {}
+
+            def get_object(self, _path: str, **kwargs: float) -> bytes:
+                import json
+
+                self.kwargs = kwargs
+                return json.dumps(payload).encode("utf-8")
+
+        upload = RecordingUpload()
+        gx = GD(base_url="", documentID="D", taskID="T")
+        with patch("requests.get") as get:
+            xdoc = XRayDocument.download(
+                gx,
+                cache_dir=Path("./cache"),
+                upload=typing.cast(typing.Any, upload),
+                is_test=True,
+            )
+
+        self.assertEqual(xdoc.sourceUrl, payload["sourceUrl"])
+        self.assertEqual(
+            upload.kwargs,
+            {
+                "connect_timeout_seconds": 5.0,
+                "read_timeout_seconds": 20.0,
+                "total_timeout_seconds": 25.0,
+            },
+        )
+        get.assert_not_called()
+
     def test_download_timeout_is_bounded(self):
         with (
             patch("requests.get", side_effect=requests.Timeout("stalled")) as get,

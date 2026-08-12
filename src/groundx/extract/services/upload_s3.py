@@ -3,14 +3,14 @@ import typing
 from ..settings.settings import ContainerSettings
 from .http import wall_clock_operation_deadline
 from .logger import Logger
-from .upload import validate_upload_timeouts
+from .upload import TimeoutClientCache, validate_upload_timeouts
 
 
 class S3Client:
     def __init__(self, settings: ContainerSettings, logger: Logger) -> None:
         self.settings = settings
         self.client = None
-        self._timeout_clients: typing.Dict[typing.Tuple[float, float, float], typing.Any] = {}
+        self._timeout_clients = TimeoutClientCache(self._close_client)
         self.logger = logger
         if self.settings.upload.type == "s3":
             self.client = self._create_client()
@@ -67,13 +67,20 @@ class S3Client:
         )
         if timeout is None:
             return self.client
-        if timeout not in self._timeout_clients:
-            self._timeout_clients[timeout] = self._create_client(
+        return self._timeout_clients.get_or_create(
+            timeout,
+            lambda: self._create_client(
                 connect_timeout_seconds=timeout[0],
                 read_timeout_seconds=timeout[1],
                 total_timeout_seconds=timeout[2],
-            )
-        return self._timeout_clients[timeout]
+            ),
+        )
+
+    @staticmethod
+    def _close_client(client: typing.Any) -> None:
+        close = getattr(client, "close", None)
+        if callable(close):
+            close()
 
     def get_object(
         self,
