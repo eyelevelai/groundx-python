@@ -41,7 +41,8 @@ value.
 
 #### Scenario: Unknown target type is declared
 
-- **WHEN** the helper receives an unsupported declared type name
+- **WHEN** the helper receives an unsupported declared type name, alone or in a
+  union
 - **THEN** it returns null and an unmatched warning instead of guessing a
   conversion.
 
@@ -102,6 +103,11 @@ targets before conversion.
 
 - **WHEN** numeric text cannot be represented by the target type without
   excessive expansion
+- **THEN** the helper returns null, marks it unmatched, and returns a warning.
+
+#### Scenario: Non-finite number targets a numeric type
+
+- **WHEN** a numeric value or numeric text would produce infinity or NaN
 - **THEN** the helper returns null, marks it unmatched, and returns a warning.
 
 ### Requirement: Container conversion uses JSON semantics

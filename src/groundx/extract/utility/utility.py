@@ -1,5 +1,6 @@
 import dataclasses
 import json
+import math
 import typing
 
 
@@ -53,6 +54,9 @@ def _coerce_to_type(value: typing.Any, target: str) -> typing.Tuple[typing.Any, 
         else:
             return None, False
 
+        if type(number) is float and not math.isfinite(number):
+            return None, False
+
         try:
             if target_type is int:
                 return int(number), True
@@ -88,10 +92,6 @@ def coerce_value(
         )
 
     supported_targets = [target for target in targets if target in _SUPPORTED_TYPES]
-    for target in supported_targets:
-        if type(value) is _SUPPORTED_TYPES[target]:
-            return CoercionResult(value=value, matched=True, converted=False)
-
     if len(supported_targets) != len(targets):
         return CoercionResult(
             value=None,
@@ -99,6 +99,18 @@ def coerce_value(
             converted=False,
             warning=_coercion_warning(value, targets),
         )
+
+    if type(value) is float and not math.isfinite(value):
+        return CoercionResult(
+            value=None,
+            matched=False,
+            converted=False,
+            warning=_coercion_warning(value, targets),
+        )
+
+    for target in supported_targets:
+        if type(value) is _SUPPORTED_TYPES[target]:
+            return CoercionResult(value=value, matched=True, converted=False)
 
     if value is None:
         return CoercionResult(value=None, matched=True, converted=False)

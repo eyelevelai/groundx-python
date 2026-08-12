@@ -153,6 +153,31 @@ class TestUtilCoerceValue(unittest.TestCase):
             False,
         )
 
+    def test_non_finite_numeric_text_is_unmatched(self) -> None:
+        cases = [
+            ("1e100000000", "float"),
+            ("1e100000000", ["int", "float"]),
+            (float("inf"), "float"),
+        ]
+        for value, target in cases:
+            with self.subTest(value=value, target=target):
+                self.assert_result(
+                    coerce_value(value, target),
+                    None,
+                    type(None),
+                    False,
+                    False,
+                )
+
+    def test_union_with_unknown_target_is_unmatched(self) -> None:
+        self.assert_result(
+            coerce_value("text", ["str", "unsupported"]),
+            None,
+            type(None),
+            False,
+            False,
+        )
+
     def test_impossible_conversions_return_content_free_warning(self) -> None:
         cases = [
             (True, "int", "bool", "int"),
