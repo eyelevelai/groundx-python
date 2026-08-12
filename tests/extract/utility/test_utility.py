@@ -154,7 +154,7 @@ class TestUtilCoerceValue(unittest.TestCase):
         )
 
     def test_non_finite_numeric_text_is_unmatched(self) -> None:
-        cases = [
+        cases: typing.List[typing.Tuple[typing.Any, typing.Union[str, typing.List[str]]]] = [
             ("1e100000000", "float"),
             ("1e100000000", ["int", "float"]),
             (float("inf"), "float"),
