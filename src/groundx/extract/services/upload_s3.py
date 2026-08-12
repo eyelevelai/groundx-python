@@ -5,7 +5,12 @@ import typing
 from ..settings.settings import ContainerSettings
 from .http import read_response_body_with_deadline, wall_clock_operation_deadline
 from .logger import Logger
-from .upload import TimeoutClientCache, validate_upload_timeouts
+from .upload import (
+    TimeoutClientCache,
+    resolve_transport_total_timeout,
+    validate_transport_timeouts,
+    validate_upload_timeouts,
+)
 
 
 class S3Client:
@@ -28,19 +33,24 @@ class S3Client:
         import certifi
         from botocore.config import Config
 
-        timeout = validate_upload_timeouts(
+        transport = validate_transport_timeouts(
             connect_timeout_seconds=connect_timeout_seconds,
             read_timeout_seconds=read_timeout_seconds,
-            total_timeout_seconds=total_timeout_seconds,
         )
+        if total_timeout_seconds is not None:
+            validate_upload_timeouts(
+                connect_timeout_seconds=connect_timeout_seconds,
+                read_timeout_seconds=read_timeout_seconds,
+                total_timeout_seconds=total_timeout_seconds,
+            )
         config: typing.Dict[str, typing.Any] = {
             "connect_timeout": 5.0,
             "read_timeout": 20.0,
             "max_pool_connections": 50,
             "retries": {"total_max_attempts": 1, "mode": "standard"},
         }
-        if timeout is not None:
-            connect, read, _ = timeout
+        if transport is not None:
+            connect, read = transport
             config.update(
                 connect_timeout=connect,
                 read_timeout=read,
@@ -62,19 +72,24 @@ class S3Client:
         read_timeout_seconds: typing.Optional[float],
         total_timeout_seconds: typing.Optional[float],
     ) -> typing.ContextManager[typing.Any]:
-        timeout = validate_upload_timeouts(
+        transport = validate_transport_timeouts(
             connect_timeout_seconds=connect_timeout_seconds,
             read_timeout_seconds=read_timeout_seconds,
-            total_timeout_seconds=total_timeout_seconds,
         )
-        if timeout is None:
+        if total_timeout_seconds is not None:
+            validate_upload_timeouts(
+                connect_timeout_seconds=connect_timeout_seconds,
+                read_timeout_seconds=read_timeout_seconds,
+                total_timeout_seconds=total_timeout_seconds,
+            )
+        if transport is None:
             return contextlib.nullcontext(self.client)
         return self._timeout_clients.lease(
-            timeout,
+            (transport[0], transport[1], total_timeout_seconds),
             lambda: self._create_client(
-                connect_timeout_seconds=timeout[0],
-                read_timeout_seconds=timeout[1],
-                total_timeout_seconds=timeout[2],
+                connect_timeout_seconds=transport[0],
+                read_timeout_seconds=transport[1],
+                total_timeout_seconds=total_timeout_seconds,
             ),
         )
 
@@ -83,6 +98,10 @@ class S3Client:
         close = getattr(client, "close", None)
         if callable(close):
             close()
+
+    def provision_bucket(self) -> None:
+        """S3 bucket provisioning is owned outside this SDK."""
+        raise NotImplementedError("S3 bucket provisioning is not supported")
 
     def get_object(
         self,
@@ -185,19 +204,17 @@ class S3Client:
         *,
         connect_timeout_seconds: typing.Optional[float] = None,
         read_timeout_seconds: typing.Optional[float] = None,
-        total_timeout_seconds: typing.Optional[float] = None,
     ) -> typing.Optional[typing.Dict[str, str]]:
-        timeout = validate_upload_timeouts(
+        validate_transport_timeouts(
             connect_timeout_seconds=connect_timeout_seconds,
             read_timeout_seconds=read_timeout_seconds,
-            total_timeout_seconds=total_timeout_seconds,
         )
 
         def head() -> typing.Optional[typing.Dict[str, str]]:
             client_context = self._client_for_timeouts(
                 connect_timeout_seconds=connect_timeout_seconds,
                 read_timeout_seconds=read_timeout_seconds,
-                total_timeout_seconds=total_timeout_seconds,
+                total_timeout_seconds=None,
             )
             with client_context as client:
                 if not client:
@@ -212,13 +229,7 @@ class S3Client:
                     self.logger.error_msg(f"[{url}] exception: {e}")
                     raise
 
-        if timeout is None:
-            return head()
-        with wall_clock_operation_deadline(
-            timeout[2],
-            operation="S3 head_object",
-        ):
-            return head()
+        return head()
 
     def parse_url(self, key: str) -> typing.Tuple[str, str]:
         if key.startswith("s3://"):
@@ -297,18 +308,30 @@ class S3Client:
         connect_timeout_seconds: typing.Optional[float] = None,
         read_timeout_seconds: typing.Optional[float] = None,
         total_timeout_seconds: typing.Optional[float] = None,
+        transport_total_timeout_seconds: typing.Optional[float] = None,
     ) -> None:
-        timeout = validate_upload_timeouts(
+        """Write with native connect/read bounds and no hard wall-clock claim.
+
+        Botocore has no operation-total setting.
+        ``transport_total_timeout_seconds`` is preferred. The legacy
+        ``total_timeout_seconds`` alias is retained for compatibility. Botocore
+        does not enforce either; callers own the surrounding hard deadline.
+        """
+        transport_total = resolve_transport_total_timeout(
+            total_timeout_seconds=total_timeout_seconds,
+            transport_total_timeout_seconds=transport_total_timeout_seconds,
+        )
+        validate_upload_timeouts(
             connect_timeout_seconds=connect_timeout_seconds,
             read_timeout_seconds=read_timeout_seconds,
-            total_timeout_seconds=total_timeout_seconds,
+            total_timeout_seconds=transport_total,
         )
 
         def put() -> None:
             client_context = self._client_for_timeouts(
                 connect_timeout_seconds=connect_timeout_seconds,
                 read_timeout_seconds=read_timeout_seconds,
-                total_timeout_seconds=total_timeout_seconds,
+                total_timeout_seconds=transport_total,
             )
             with client_context as client:
                 if not client:
@@ -320,11 +343,4 @@ class S3Client:
                     ContentType=content_type,
                 )
 
-        if timeout is None:
-            put()
-            return
-        with wall_clock_operation_deadline(
-            timeout[2],
-            operation="S3 put_object",
-        ):
-            put()
+        put()

@@ -5,7 +5,12 @@ import typing
 from ..settings.settings import ContainerSettings
 from .http import read_response_body_with_deadline, wall_clock_operation_deadline
 from .logger import Logger
-from .upload import TimeoutClientCache, validate_upload_timeouts
+from .upload import (
+    TimeoutClientCache,
+    resolve_transport_total_timeout,
+    validate_transport_timeouts,
+    validate_upload_timeouts,
+)
 
 
 class MinIOClient:
@@ -19,34 +24,37 @@ class MinIOClient:
         self._timeout_clients = TimeoutClientCache(self._close_client)
         self.logger = logger
         if self.settings.upload.type == "minio":
-            import json
-
             self.client = self._create_client()
 
-            if not self.client.bucket_exists(self.settings.upload.bucket):
-                try:
-                    self.client.make_bucket(self.settings.upload.bucket)
-                    self.logger.info_msg(f"Bucket '{self.settings.upload.bucket}' created.")
+    def provision_bucket(self) -> None:
+        """Explicitly create and publish the configured MinIO bucket."""
+        if not self.client or self.client.bucket_exists(self.settings.upload.bucket):
+            return
 
-                    self.client.set_bucket_policy(
-                        self.settings.upload.bucket,
-                        json.dumps(
+        import json
+
+        try:
+            self.client.make_bucket(self.settings.upload.bucket)
+            self.logger.info_msg(f"Bucket '{self.settings.upload.bucket}' created.")
+            self.client.set_bucket_policy(
+                self.settings.upload.bucket,
+                json.dumps(
+                    {
+                        "Version": "2012-10-17",
+                        "Statement": [
                             {
-                                "Version": "2012-10-17",
-                                "Statement": [
-                                    {
-                                        "Effect": "Allow",
-                                        "Principal": {"AWS": ["*"]},
-                                        "Action": ["s3:GetObject"],
-                                        "Resource": [f"arn:aws:s3:::{self.settings.upload.bucket}/*"],
-                                    }
-                                ],
+                                "Effect": "Allow",
+                                "Principal": {"AWS": ["*"]},
+                                "Action": ["s3:GetObject"],
+                                "Resource": [f"arn:aws:s3:::{self.settings.upload.bucket}/*"],
                             }
-                        ),
-                    )
-                except Exception as e:
-                    self.logger.warning_msg(str(e))
-                    self.logger.warning_msg(f"error creating bucket [{self.settings.upload.bucket}]")
+                        ],
+                    }
+                ),
+            )
+        except Exception as e:
+            self.logger.warning_msg(str(e))
+            self.logger.warning_msg(f"error creating bucket [{self.settings.upload.bucket}]")
 
     def _create_client(
         self,
@@ -58,15 +66,21 @@ class MinIOClient:
         import urllib3
         from minio import Minio
 
-        timeout = validate_upload_timeouts(
+        transport = validate_transport_timeouts(
             connect_timeout_seconds=connect_timeout_seconds,
             read_timeout_seconds=read_timeout_seconds,
-            total_timeout_seconds=total_timeout_seconds,
         )
-        if timeout is None:
+        if total_timeout_seconds is not None:
+            validate_upload_timeouts(
+                connect_timeout_seconds=connect_timeout_seconds,
+                read_timeout_seconds=read_timeout_seconds,
+                total_timeout_seconds=total_timeout_seconds,
+            )
+        if transport is None:
             connect, read, total = 5.0, 20.0, None
         else:
-            connect, read, total = timeout
+            connect, read = transport
+            total = total_timeout_seconds
 
         pool_kwargs: typing.Dict[str, typing.Any] = {
             "timeout": urllib3.Timeout(
@@ -100,19 +114,24 @@ class MinIOClient:
         read_timeout_seconds: typing.Optional[float],
         total_timeout_seconds: typing.Optional[float],
     ) -> typing.ContextManager[typing.Any]:
-        timeout = validate_upload_timeouts(
+        transport = validate_transport_timeouts(
             connect_timeout_seconds=connect_timeout_seconds,
             read_timeout_seconds=read_timeout_seconds,
-            total_timeout_seconds=total_timeout_seconds,
         )
-        if timeout is None:
+        if total_timeout_seconds is not None:
+            validate_upload_timeouts(
+                connect_timeout_seconds=connect_timeout_seconds,
+                read_timeout_seconds=read_timeout_seconds,
+                total_timeout_seconds=total_timeout_seconds,
+            )
+        if transport is None:
             return contextlib.nullcontext(self.client)
         return self._timeout_clients.lease(
-            timeout,
+            (transport[0], transport[1], total_timeout_seconds),
             lambda: self._create_client(
-                connect_timeout_seconds=timeout[0],
-                read_timeout_seconds=timeout[1],
-                total_timeout_seconds=timeout[2],
+                connect_timeout_seconds=transport[0],
+                read_timeout_seconds=transport[1],
+                total_timeout_seconds=total_timeout_seconds,
             ),
         )
 
@@ -234,19 +253,17 @@ class MinIOClient:
         *,
         connect_timeout_seconds: typing.Optional[float] = None,
         read_timeout_seconds: typing.Optional[float] = None,
-        total_timeout_seconds: typing.Optional[float] = None,
     ) -> typing.Optional[typing.Dict[str, str]]:
-        timeout = validate_upload_timeouts(
+        validate_transport_timeouts(
             connect_timeout_seconds=connect_timeout_seconds,
             read_timeout_seconds=read_timeout_seconds,
-            total_timeout_seconds=total_timeout_seconds,
         )
 
         def head() -> typing.Optional[typing.Dict[str, str]]:
             client_context = self._client_for_timeouts(
                 connect_timeout_seconds=connect_timeout_seconds,
                 read_timeout_seconds=read_timeout_seconds,
-                total_timeout_seconds=total_timeout_seconds,
+                total_timeout_seconds=None,
             )
             with client_context as client:
                 if not client:
@@ -272,13 +289,7 @@ class MinIOClient:
                     self.logger.error_msg(f"Failed to get object from [{url}] [{self.parse_url(url)}]: {str(e)}")
                     raise
 
-        if timeout is None:
-            return head()
-        with wall_clock_operation_deadline(
-            timeout[2],
-            operation="MinIO head_object",
-        ):
-            return head()
+        return head()
 
     def parse_url(self, ur: str) -> str:
         minio_uri_parts = ur.replace("s3://", "").split("/")
@@ -367,18 +378,29 @@ class MinIOClient:
         connect_timeout_seconds: typing.Optional[float] = None,
         read_timeout_seconds: typing.Optional[float] = None,
         total_timeout_seconds: typing.Optional[float] = None,
+        transport_total_timeout_seconds: typing.Optional[float] = None,
     ) -> None:
-        timeout = validate_upload_timeouts(
+        """Write with native transport bounds, never a hard Python deadline.
+
+        ``transport_total_timeout_seconds`` configures urllib3. The legacy
+        ``total_timeout_seconds`` alias is retained for compatibility. Neither
+        is a Python hard deadline; callers own the surrounding deadline.
+        """
+        transport_total = resolve_transport_total_timeout(
+            total_timeout_seconds=total_timeout_seconds,
+            transport_total_timeout_seconds=transport_total_timeout_seconds,
+        )
+        validate_upload_timeouts(
             connect_timeout_seconds=connect_timeout_seconds,
             read_timeout_seconds=read_timeout_seconds,
-            total_timeout_seconds=total_timeout_seconds,
+            total_timeout_seconds=transport_total,
         )
 
         def put() -> None:
             client_context = self._client_for_timeouts(
                 connect_timeout_seconds=connect_timeout_seconds,
                 read_timeout_seconds=read_timeout_seconds,
-                total_timeout_seconds=total_timeout_seconds,
+                total_timeout_seconds=transport_total,
             )
             with client_context as client:
                 if not client:
@@ -393,11 +415,4 @@ class MinIOClient:
                     content_type=content_type,
                 )
 
-        if timeout is None:
-            put()
-            return
-        with wall_clock_operation_deadline(
-            timeout[2],
-            operation="MinIO put_object",
-        ):
-            put()
+        put()

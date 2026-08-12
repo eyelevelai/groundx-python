@@ -349,12 +349,7 @@ class TestS3Client(unittest.TestCase):
 
         self.assertLess(time.monotonic() - started, 0.15)
         self.assertTrue(bounded.body.closed)
-        self.assertFalse(
-            any(
-                isinstance(thread, threading.Timer)
-                for thread in threading.enumerate()
-            )
-        )
+        self.assertFalse(any(isinstance(thread, threading.Timer) for thread in threading.enumerate()))
 
     def test_worker_timeout_does_not_close_shared_client_or_other_response(
         self,
@@ -474,14 +469,13 @@ class TestS3Client(unittest.TestCase):
             "s3://eyelevel/workflows/extract/latest.yaml",
             connect_timeout_seconds=0.2,
             read_timeout_seconds=0.5,
-            total_timeout_seconds=0.8,
         )
 
         self.assertEqual(metadata, {"ETag": '"etag-1"'})
         create_client.assert_called_once_with(
             connect_timeout_seconds=0.2,
             read_timeout_seconds=0.5,
-            total_timeout_seconds=0.8,
+            total_timeout_seconds=None,
         )
 
     def test_worker_thread_head_and_put_use_transport_bounded_client(self) -> None:
@@ -496,7 +490,6 @@ class TestS3Client(unittest.TestCase):
                 "s3://eyelevel/workflow.yaml",
                 connect_timeout_seconds=0.2,
                 read_timeout_seconds=0.5,
-                total_timeout_seconds=0.8,
             )
             put = executor.submit(
                 cl.put_json_stream,
@@ -512,12 +505,120 @@ class TestS3Client(unittest.TestCase):
             self.assertEqual(head.result(timeout=1), {"ETag": '"etag-1"'})
             put.result(timeout=1)
 
-        create_client.assert_called_once_with(
+        self.assertEqual(create_client.call_count, 2)
+        create_client.assert_any_call(
+            connect_timeout_seconds=0.2,
+            read_timeout_seconds=0.5,
+            total_timeout_seconds=None,
+        )
+        create_client.assert_any_call(
             connect_timeout_seconds=0.2,
             read_timeout_seconds=0.5,
             total_timeout_seconds=0.8,
         )
         self.assertEqual(bounded.put["Key"], "trace.json")
+
+    def test_worker_thread_slow_head_has_no_false_hard_total_deadline(self) -> None:
+        class SlowS3Client(FakeS3Client):
+            def head_object(
+                self,
+                Bucket: str,
+                Key: str,
+            ) -> typing.Dict[str, typing.Any]:
+                time.sleep(0.20)
+                return super().head_object(Bucket=Bucket, Key=Key)
+
+        cl = self._client()
+        bounded = SlowS3Client()
+        setattr(cl, "_create_client", Mock(return_value=bounded))
+
+        started = time.monotonic()
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            metadata = executor.submit(
+                cl.head_object,
+                "s3://eyelevel/workflow.yaml",
+                connect_timeout_seconds=0.01,
+                read_timeout_seconds=0.01,
+            ).result(timeout=1)
+
+        self.assertEqual(metadata, {"ETag": '"etag-1"'})
+        self.assertGreaterEqual(time.monotonic() - started, 0.18)
+
+    def test_worker_thread_slow_put_has_no_false_hard_total_deadline(self) -> None:
+        class SlowS3Client(FakeS3Client):
+            def put_object(self, **kwargs: typing.Any) -> None:
+                time.sleep(0.20)
+                super().put_object(**kwargs)
+
+        cl = self._client()
+        bounded = SlowS3Client()
+        setattr(cl, "_create_client", Mock(return_value=bounded))
+
+        started = time.monotonic()
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            executor.submit(
+                cl.put_json_stream,
+                "eyelevel",
+                "trace.json",
+                b"{}",
+                "application/json",
+                connect_timeout_seconds=0.01,
+                read_timeout_seconds=0.01,
+                transport_total_timeout_seconds=0.06,
+            ).result(timeout=1)
+
+        self.assertGreaterEqual(time.monotonic() - started, 0.18)
+        self.assertEqual(bounded.put["Key"], "trace.json")
+
+    def test_s3_bucket_provisioning_is_explicitly_unsupported(self) -> None:
+        cl = self._client()
+
+        with self.assertRaisesRegex(NotImplementedError, "S3 bucket provisioning"):
+            cl.provision_bucket()
+
+    def test_main_thread_without_setitimer_closes_stalled_body_at_deadline(
+        self,
+    ) -> None:
+        class StalledBody(FakeBody):
+            def __init__(self) -> None:
+                super().__init__(b"statement: {}")
+                self.closed_event = threading.Event()
+
+            def read(self) -> bytes:
+                if not self.closed_event.wait(timeout=2):
+                    raise AssertionError("deadline did not close stalled S3 body")
+                return super().read()
+
+            def close(self) -> None:
+                super().close()
+                self.closed_event.set()
+
+        class StalledS3Client(FakeS3Client):
+            def __init__(self) -> None:
+                self.body = StalledBody()
+                self.closed = False
+
+        cl = self._client()
+        bounded = StalledS3Client()
+        setattr(cl, "_create_client", Mock(return_value=bounded))
+
+        started = time.monotonic()
+        with (
+            patch("groundx.extract.services.http.signal.setitimer", None),
+            self.assertRaisesRegex(
+                WallClockDeadlineExceeded,
+                "S3 get_object exceeded",
+            ),
+        ):
+            cl.get_object(
+                "s3://eyelevel/workflow.yaml",
+                connect_timeout_seconds=0.01,
+                read_timeout_seconds=0.01,
+                total_timeout_seconds=0.06,
+            )
+
+        self.assertLess(time.monotonic() - started, 0.15)
+        self.assertTrue(bounded.body.closed)
 
     def test_put_json_stream_uses_single_attempt_bounded_client(self) -> None:
         cl = self._client()
@@ -579,7 +680,7 @@ class TestS3Client(unittest.TestCase):
         self.assertEqual(config.read_timeout, 0.5)
         self.assertEqual(config.retries["total_max_attempts"], 1)
 
-    def test_put_json_stream_enforces_total_wall_clock_deadline(self) -> None:
+    def test_legacy_put_total_is_native_not_hard_deadline(self) -> None:
         class StalledS3Client:
             def put_object(self, **kwargs: typing.Any) -> None:
                 time.sleep(0.03)
@@ -590,15 +691,14 @@ class TestS3Client(unittest.TestCase):
         setattr(cl, "_create_client", Mock(return_value=bounded))
 
         started = time.monotonic()
-        with self.assertRaisesRegex(TimeoutError, "S3 put_object exceeded"):
-            cl.put_json_stream(
-                "eyelevel",
-                "trace.json",
-                b"{}",
-                "application/json",
-                connect_timeout_seconds=0.01,
-                read_timeout_seconds=0.01,
-                total_timeout_seconds=0.06,
-            )
+        cl.put_json_stream(
+            "eyelevel",
+            "trace.json",
+            b"{}",
+            "application/json",
+            connect_timeout_seconds=0.01,
+            read_timeout_seconds=0.01,
+            total_timeout_seconds=0.06,
+        )
 
-        self.assertLess(time.monotonic() - started, 0.15)
+        self.assertGreaterEqual(time.monotonic() - started, 0.18)

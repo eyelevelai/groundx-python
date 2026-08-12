@@ -73,6 +73,31 @@ def test_object_store_fetch_uses_complete_bounded_read_contract() -> None:
     )
 
 
+def test_object_store_minio_reads_do_not_provision_bucket() -> None:
+    with patch("minio.Minio") as create_client:
+        client = create_client.return_value
+        response = Mock()
+        response.read.return_value = b"statement: {}"
+        response.headers = {"ETag": '"workflow-v1"'}
+        client.get_object.return_value = response
+        client.stat_object.return_value = type(
+            "Stat",
+            (),
+            {"etag": "workflow-v1", "last_modified": None},
+        )()
+        store = ObjectStore(
+            settings=_settings(upload_type="minio"),
+            logger=Logger("test", "debug"),
+        )
+        assert store.fetch("workflow-1") == ("statement: {}", "workflow-v1")
+        assert store.peek("workflow-1") == "workflow-v1"
+
+    assert create_client.call_count == 3
+    client.bucket_exists.assert_not_called()
+    client.make_bucket.assert_not_called()
+    client.set_bucket_policy.assert_not_called()
+
+
 def test_object_store_peek_uses_complete_bounded_head_contract() -> None:
     client = RecordingClient()
     with patch(
@@ -87,7 +112,6 @@ def test_object_store_peek_uses_complete_bounded_head_contract() -> None:
         {
             "connect_timeout_seconds": 5.0,
             "read_timeout_seconds": 20.0,
-            "total_timeout_seconds": 25.0,
         },
     )
 

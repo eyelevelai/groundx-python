@@ -29,9 +29,7 @@ class ObjectStore(Source):
             total_timeout_seconds=OBJECT_STORE_TOTAL_TIMEOUT_SECONDS,
         )
         if not res:
-            raise Exception(
-                f"failed to get prompt yaml [{self.workflow_path(workflow_id)}]"
-            )
+            raise Exception(f"failed to get prompt yaml [{self.workflow_path(workflow_id)}]")
 
         body_bytes, meta = res
 
@@ -45,7 +43,6 @@ class ObjectStore(Source):
             self.workflow_path(workflow_id),
             connect_timeout_seconds=OBJECT_STORE_CONNECT_TIMEOUT_SECONDS,
             read_timeout_seconds=OBJECT_STORE_READ_TIMEOUT_SECONDS,
-            total_timeout_seconds=OBJECT_STORE_TOTAL_TIMEOUT_SECONDS,
         )
         if not meta:
             return None

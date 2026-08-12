@@ -78,6 +78,18 @@ class TestMinIOClient(unittest.TestCase):
         self.assertEqual(timeout.read_timeout, 20)
         self.assertFalse(http_client.connection_pool_kw["retries"].total)
 
+    def test_bucket_provisioning_is_explicit(self) -> None:
+        cl = self._client()
+        client = Mock()
+        client.bucket_exists.return_value = False
+        cl.client = client
+
+        cl.provision_bucket()
+
+        client.bucket_exists.assert_called_once_with("eyelevel")
+        client.make_bucket.assert_called_once_with("eyelevel")
+        client.set_bucket_policy.assert_called_once()
+
     def _client(self) -> MinIOClient:
         logger = Logger("parse_url", "debug")
         return MinIOClient(
@@ -318,9 +330,7 @@ class TestMinIOClient(unittest.TestCase):
         with fake_minio_error_module():
             _body, metadata = typing.cast(
                 typing.Tuple[bytes, typing.Dict[str, str]],
-                cl.get_object_and_metadata(
-                    "s3://eyelevel/workflows/extract/latest.yaml"
-                ),
+                cl.get_object_and_metadata("s3://eyelevel/workflows/extract/latest.yaml"),
             )
 
         self.assertEqual(metadata["LastModified"], "1786514400.0")
@@ -363,14 +373,13 @@ class TestMinIOClient(unittest.TestCase):
                 "s3://eyelevel/workflows/extract/latest.yaml",
                 connect_timeout_seconds=0.2,
                 read_timeout_seconds=0.5,
-                total_timeout_seconds=0.8,
             )
 
         self.assertEqual(metadata, {"ETag": "etag-1"})
         create_client.assert_called_once_with(
             connect_timeout_seconds=0.2,
             read_timeout_seconds=0.5,
-            total_timeout_seconds=0.8,
+            total_timeout_seconds=None,
         )
 
     def test_worker_thread_head_and_put_use_transport_bounded_client(self) -> None:
@@ -385,7 +394,6 @@ class TestMinIOClient(unittest.TestCase):
                 "s3://eyelevel/workflow.yaml",
                 connect_timeout_seconds=0.2,
                 read_timeout_seconds=0.5,
-                total_timeout_seconds=0.8,
             )
             put = executor.submit(
                 cl.put_json_stream,
@@ -401,11 +409,65 @@ class TestMinIOClient(unittest.TestCase):
             self.assertEqual(head.result(timeout=1), {"ETag": "etag-1"})
             put.result(timeout=1)
 
-        create_client.assert_called_once_with(
+        self.assertEqual(create_client.call_count, 2)
+        create_client.assert_any_call(
+            connect_timeout_seconds=0.2,
+            read_timeout_seconds=0.5,
+            total_timeout_seconds=None,
+        )
+        create_client.assert_any_call(
             connect_timeout_seconds=0.2,
             read_timeout_seconds=0.5,
             total_timeout_seconds=0.8,
         )
+        self.assertEqual(bounded.put["object_name"], "trace.json")
+
+    def test_worker_thread_slow_head_has_no_false_hard_total_deadline(self) -> None:
+        class SlowMinioClient(FakeMinioClient):
+            def stat_object(self, bucket: str, key: str) -> typing.Any:
+                time.sleep(0.20)
+                return super().stat_object(bucket, key)
+
+        cl = self._client()
+        bounded = SlowMinioClient()
+        setattr(cl, "_create_client", Mock(return_value=bounded))
+
+        started = time.monotonic()
+        with fake_minio_error_module(), ThreadPoolExecutor(max_workers=1) as executor:
+            metadata = executor.submit(
+                cl.head_object,
+                "s3://eyelevel/workflow.yaml",
+                connect_timeout_seconds=0.01,
+                read_timeout_seconds=0.01,
+            ).result(timeout=1)
+
+        self.assertEqual(metadata, {"ETag": "etag-1"})
+        self.assertGreaterEqual(time.monotonic() - started, 0.18)
+
+    def test_worker_thread_slow_put_has_no_false_hard_total_deadline(self) -> None:
+        class SlowMinioClient(FakeMinioClient):
+            def put_object(self, **kwargs: typing.Any) -> None:
+                time.sleep(0.20)
+                super().put_object(**kwargs)
+
+        cl = self._client()
+        bounded = SlowMinioClient()
+        setattr(cl, "_create_client", Mock(return_value=bounded))
+
+        started = time.monotonic()
+        with fake_minio_error_module(), ThreadPoolExecutor(max_workers=1) as executor:
+            executor.submit(
+                cl.put_json_stream,
+                "eyelevel",
+                "trace.json",
+                b"{}",
+                "application/json",
+                connect_timeout_seconds=0.01,
+                read_timeout_seconds=0.01,
+                transport_total_timeout_seconds=0.06,
+            ).result(timeout=1)
+
+        self.assertGreaterEqual(time.monotonic() - started, 0.18)
         self.assertEqual(bounded.put["object_name"], "trace.json")
 
     def test_put_json_stream_uses_single_attempt_bounded_client(self) -> None:
@@ -477,7 +539,7 @@ class TestMinIOClient(unittest.TestCase):
             create_pool.return_value,
         )
 
-    def test_put_json_stream_enforces_total_wall_clock_deadline(self) -> None:
+    def test_legacy_put_total_is_native_not_hard_deadline(self) -> None:
         class StalledMinioClient(FakeMinioClient):
             def put_object(self, **kwargs: typing.Any) -> None:
                 time.sleep(0.03)
@@ -488,18 +550,17 @@ class TestMinIOClient(unittest.TestCase):
         setattr(cl, "_create_client", Mock(return_value=bounded))
 
         started = time.monotonic()
-        with self.assertRaisesRegex(TimeoutError, "MinIO put_object exceeded"):
-            cl.put_json_stream(
-                "eyelevel",
-                "trace.json",
-                b"{}",
-                "application/json",
-                connect_timeout_seconds=0.01,
-                read_timeout_seconds=0.01,
-                total_timeout_seconds=0.06,
-            )
+        cl.put_json_stream(
+            "eyelevel",
+            "trace.json",
+            b"{}",
+            "application/json",
+            connect_timeout_seconds=0.01,
+            read_timeout_seconds=0.01,
+            total_timeout_seconds=0.06,
+        )
 
-        self.assertLess(time.monotonic() - started, 0.15)
+        self.assertGreaterEqual(time.monotonic() - started, 0.18)
 
 
 @contextlib.contextmanager

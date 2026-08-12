@@ -43,6 +43,9 @@ class _Client:
     ) -> None:
         self.kwargs = kwargs
 
+    def provision_bucket(self) -> None:
+        self.provisioned = True
+
 
 class _CachedClient:
     def __init__(self) -> None:
@@ -72,6 +75,56 @@ def test_upload_forwards_network_timeout_budget() -> None:
         "read_timeout_seconds": 0.5,
         "total_timeout_seconds": 0.8,
     }
+
+
+def test_upload_forwards_preferred_transport_total_timeout() -> None:
+    client = _Client()
+    upload = Upload.__new__(Upload)
+    upload.client = typing.cast(typing.Any, client)
+
+    upload.put_json_stream(
+        "eyelevel",
+        "trace.json",
+        b"{}",
+        "application/json",
+        connect_timeout_seconds=0.2,
+        read_timeout_seconds=0.5,
+        transport_total_timeout_seconds=0.8,
+    )
+
+    assert client.kwargs == {
+        "connect_timeout_seconds": 0.2,
+        "read_timeout_seconds": 0.5,
+        "transport_total_timeout_seconds": 0.8,
+    }
+
+
+def test_put_rejects_both_legacy_and_transport_total_timeouts() -> None:
+    client = _Client()
+    upload = Upload.__new__(Upload)
+    upload.client = typing.cast(typing.Any, client)
+
+    with pytest.raises(ValueError, match="mutually exclusive"):
+        upload.put_json_stream(
+            "eyelevel",
+            "trace.json",
+            b"{}",
+            "application/json",
+            connect_timeout_seconds=0.2,
+            read_timeout_seconds=0.5,
+            total_timeout_seconds=0.8,
+            transport_total_timeout_seconds=0.8,
+        )
+
+
+def test_upload_provisions_bucket_only_when_explicitly_requested() -> None:
+    client = _Client()
+    upload = Upload.__new__(Upload)
+    upload.client = typing.cast(typing.Any, client)
+
+    upload.provision_bucket()
+
+    assert client.provisioned
 
 
 def test_upload_forwards_object_read_timeout_budget() -> None:
@@ -126,7 +179,7 @@ def test_upload_forwards_metadata_read_timeout_budget() -> None:
     }
 
 
-def test_upload_forwards_head_read_timeout_budget() -> None:
+def test_upload_forwards_head_transport_timeout_bounds() -> None:
     client = _Client()
     upload = Upload.__new__(Upload)
     upload.client = typing.cast(typing.Any, client)
@@ -135,14 +188,12 @@ def test_upload_forwards_head_read_timeout_budget() -> None:
         "s3://eyelevel/workflow.yaml",
         connect_timeout_seconds=0.2,
         read_timeout_seconds=0.5,
-        total_timeout_seconds=0.8,
     )
 
     assert result == {"ETag": '"version"'}
     assert client.kwargs == {
         "connect_timeout_seconds": 0.2,
         "read_timeout_seconds": 0.5,
-        "total_timeout_seconds": 0.8,
     }
 
 

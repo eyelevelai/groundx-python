@@ -35,9 +35,7 @@ class BoundedRequestError(RuntimeError):
         self.url = url
         self.attempts = attempts
         self.cause = cause
-        super().__init__(
-            f"Error fetching {operation} from {url} after {attempts} attempts: {cause}"
-        )
+        super().__init__(f"Error fetching {operation} from {url} after {attempts} attempts: {cause}")
 
 
 class BoundedRequestTimeout(BoundedRequestError):
@@ -75,30 +73,36 @@ def wall_clock_operation_deadline(
     """
     if seconds <= 0:
         raise ValueError("operation deadline must be greater than zero")
-    if threading.current_thread() is not threading.main_thread() or not hasattr(
-        signal,
-        "setitimer",
+    set_timer = getattr(signal, "setitimer", None)
+    get_timer = getattr(signal, "getitimer", None)
+    alarm_signal = getattr(signal, "SIGALRM", None)
+    if (
+        threading.current_thread() is not threading.main_thread()
+        or not callable(set_timer)
+        or not callable(get_timer)
+        or alarm_signal is None
     ):
         yield
         return
 
-    previous_delay, _ = signal.getitimer(signal.ITIMER_REAL)
+    previous_delay, _ = typing.cast(
+        typing.Tuple[float, float],
+        get_timer(signal.ITIMER_REAL),
+    )
     if previous_delay > 0:
         raise RuntimeError("wall-clock deadline cannot replace an active alarm")
-    previous_handler = signal.getsignal(signal.SIGALRM)
+    previous_handler = signal.getsignal(alarm_signal)
 
     def raise_timeout(_signum: int, _frame: typing.Any) -> typing.NoReturn:
-        raise WallClockDeadlineExceeded(
-            f"{operation} exceeded {seconds} second deadline"
-        )
+        raise WallClockDeadlineExceeded(f"{operation} exceeded {seconds} second deadline")
 
-    signal.signal(signal.SIGALRM, raise_timeout)
-    signal.setitimer(signal.ITIMER_REAL, seconds)
+    signal.signal(alarm_signal, raise_timeout)
+    set_timer(signal.ITIMER_REAL, seconds)
     try:
         yield
     finally:
-        signal.setitimer(signal.ITIMER_REAL, 0)
-        signal.signal(signal.SIGALRM, previous_handler)
+        set_timer(signal.ITIMER_REAL, 0)
+        signal.signal(alarm_signal, previous_handler)
 
 
 def read_response_body_with_deadline(
@@ -111,8 +115,9 @@ def read_response_body_with_deadline(
 ) -> bytes:
     """Read and close one response within its operation's remaining budget.
 
-    In worker threads, a joined non-daemon timer closes only this response. It
-    never closes the leased client or affects unrelated requests.
+    A joined non-daemon timer closes only this response if the body stalls. On
+    the main thread, SIGALRM also bounds the complete operation when available.
+    Neither mechanism closes the leased client or affects unrelated requests.
     """
     if total_timeout_seconds is None:
         try:
@@ -126,15 +131,7 @@ def read_response_body_with_deadline(
     remaining = total_timeout_seconds - (time.monotonic() - started_at)
     if remaining <= 0:
         close_response()
-        raise WallClockDeadlineExceeded(
-            f"{operation} exceeded {total_timeout_seconds} second deadline"
-        )
-
-    if threading.current_thread() is threading.main_thread():
-        try:
-            return read_body()
-        finally:
-            close_response()
+        raise WallClockDeadlineExceeded(f"{operation} exceeded {total_timeout_seconds} second deadline")
 
     state_lock = threading.Lock()
     close_lock = threading.Lock()
@@ -178,9 +175,7 @@ def read_response_body_with_deadline(
                 completed = True
                 did_expire = expired
             if did_expire:
-                raise WallClockDeadlineExceeded(
-                    f"{operation} exceeded {total_timeout_seconds} second deadline"
-                )
+                raise WallClockDeadlineExceeded(f"{operation} exceeded {total_timeout_seconds} second deadline")
             return result
     finally:
         timer.cancel()
@@ -224,12 +219,8 @@ def _bounded_request(
         remaining = remaining_operation_seconds(local_remaining)
         assert remaining is not None
         if remaining <= 0:
-            cause = requests.Timeout(
-                f"{operation} exceeded {operation_deadline_seconds} second deadline"
-            )
-            raise BoundedRequestTimeout(
-                operation=operation, url=url, attempts=attempt, cause=cause
-            ) from cause
+            cause = requests.Timeout(f"{operation} exceeded {operation_deadline_seconds} second deadline")
+            raise BoundedRequestTimeout(operation=operation, url=url, attempts=attempt, cause=cause) from cause
 
         try:
             return method(
@@ -243,11 +234,7 @@ def _bounded_request(
         except requests.RequestException as exc:
             last_exc = exc
             if attempt == attempts - 1:
-                error_type = (
-                    BoundedRequestTimeout
-                    if isinstance(exc, requests.Timeout)
-                    else BoundedRequestError
-                )
+                error_type = BoundedRequestTimeout if isinstance(exc, requests.Timeout) else BoundedRequestError
                 raise error_type(
                     operation=operation,
                     url=url,
@@ -266,9 +253,7 @@ def _bounded_request(
                 time.sleep(min(backoff, remaining_after_attempt))
 
     assert last_exc is not None
-    raise BoundedRequestError(
-        operation=operation, url=url, attempts=attempts, cause=last_exc
-    ) from last_exc
+    raise BoundedRequestError(operation=operation, url=url, attempts=attempts, cause=last_exc) from last_exc
 
 
 def bounded_get(

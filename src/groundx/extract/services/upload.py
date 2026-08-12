@@ -21,15 +21,18 @@ class _TimeoutClientEntry:
         self.closed = False
 
 
+TimeoutClientKey = typing.Tuple[float, float, typing.Optional[float]]
+
+
 class TimeoutClientCache:
     def __init__(self, close_client: typing.Callable[[typing.Any], None]) -> None:
-        self._clients: OrderedDict[typing.Tuple[float, float, float], _TimeoutClientEntry] = OrderedDict()
+        self._clients: OrderedDict[TimeoutClientKey, _TimeoutClientEntry] = OrderedDict()
         self._close_client = close_client
         self._lock = threading.Lock()
 
     def _get_or_create_locked(
         self,
-        timeout: typing.Tuple[float, float, float],
+        timeout: TimeoutClientKey,
         create_client: typing.Callable[[], typing.Any],
     ) -> typing.Tuple[_TimeoutClientEntry, typing.Optional[typing.Any]]:
         entry = self._clients.pop(timeout, None)
@@ -62,7 +65,7 @@ class TimeoutClientCache:
     @contextlib.contextmanager
     def lease(
         self,
-        timeout: typing.Tuple[float, float, float],
+        timeout: TimeoutClientKey,
         create_client: typing.Callable[[], typing.Any],
     ) -> typing.Iterator[typing.Any]:
         with self._lock:
@@ -83,6 +86,8 @@ class TimeoutClientCache:
 
 @typing.runtime_checkable
 class UploadClient(typing.Protocol):
+    def provision_bucket(self) -> None: ...
+
     def get_object(
         self,
         url: str,
@@ -107,7 +112,6 @@ class UploadClient(typing.Protocol):
         *,
         connect_timeout_seconds: typing.Optional[float] = None,
         read_timeout_seconds: typing.Optional[float] = None,
-        total_timeout_seconds: typing.Optional[float] = None,
     ) -> typing.Optional[typing.Dict[str, str]]: ...
 
     def put_object(
@@ -128,6 +132,7 @@ class UploadClient(typing.Protocol):
         connect_timeout_seconds: typing.Optional[float] = None,
         read_timeout_seconds: typing.Optional[float] = None,
         total_timeout_seconds: typing.Optional[float] = None,
+        transport_total_timeout_seconds: typing.Optional[float] = None,
     ) -> None: ...
 
 
@@ -162,6 +167,7 @@ class Upload:
         read_timeout_seconds: typing.Optional[float] = None,
         total_timeout_seconds: typing.Optional[float] = None,
     ) -> typing.Optional[bytes]:
+        """Read with native connect/read bounds and a cancellable body deadline."""
         timeout_kwargs: typing.Dict[str, float] = {}
         if connect_timeout_seconds is not None or read_timeout_seconds is not None or total_timeout_seconds is not None:
             timeout_kwargs = {
@@ -171,6 +177,10 @@ class Upload:
             }
         return self.client.get_object(url, **timeout_kwargs)
 
+    def provision_bucket(self) -> None:
+        """Run backend provisioning only when the caller requests it."""
+        self.client.provision_bucket()
+
     def get_object_and_metadata(
         self,
         url: str,
@@ -179,6 +189,7 @@ class Upload:
         read_timeout_seconds: typing.Optional[float] = None,
         total_timeout_seconds: typing.Optional[float] = None,
     ) -> typing.Optional[typing.Tuple[bytes, typing.Dict[str, str]]]:
+        """Read body and metadata with the complete GET timeout contract."""
         timeout_kwargs: typing.Dict[str, float] = {}
         if connect_timeout_seconds is not None or read_timeout_seconds is not None or total_timeout_seconds is not None:
             timeout_kwargs = {
@@ -194,14 +205,13 @@ class Upload:
         *,
         connect_timeout_seconds: typing.Optional[float] = None,
         read_timeout_seconds: typing.Optional[float] = None,
-        total_timeout_seconds: typing.Optional[float] = None,
     ) -> typing.Optional[typing.Dict[str, str]]:
+        """Read metadata with native connect/read bounds, not a hard total."""
         timeout_kwargs: typing.Dict[str, float] = {}
-        if connect_timeout_seconds is not None or read_timeout_seconds is not None or total_timeout_seconds is not None:
+        if connect_timeout_seconds is not None or read_timeout_seconds is not None:
             timeout_kwargs = {
                 "connect_timeout_seconds": typing.cast(float, connect_timeout_seconds),
                 "read_timeout_seconds": typing.cast(float, read_timeout_seconds),
-                "total_timeout_seconds": typing.cast(float, total_timeout_seconds),
             }
         return self.client.head_object(url, **timeout_kwargs)
 
@@ -224,14 +234,34 @@ class Upload:
         connect_timeout_seconds: typing.Optional[float] = None,
         read_timeout_seconds: typing.Optional[float] = None,
         total_timeout_seconds: typing.Optional[float] = None,
+        transport_total_timeout_seconds: typing.Optional[float] = None,
     ) -> None:
+        """Write with transport-native bounds, not a hard wall-clock deadline.
+
+        ``transport_total_timeout_seconds`` names the preferred transport
+        setting. ``total_timeout_seconds`` remains a compatibility alias.
+        Neither is a Python hard deadline; S3 supports only connect/read bounds.
+        """
+        transport_total = resolve_transport_total_timeout(
+            total_timeout_seconds=total_timeout_seconds,
+            transport_total_timeout_seconds=transport_total_timeout_seconds,
+        )
         timeout_kwargs: typing.Dict[str, float] = {}
-        if connect_timeout_seconds is not None or read_timeout_seconds is not None or total_timeout_seconds is not None:
+        if connect_timeout_seconds is not None or read_timeout_seconds is not None or transport_total is not None:
             timeout_kwargs = {
                 "connect_timeout_seconds": typing.cast(float, connect_timeout_seconds),
                 "read_timeout_seconds": typing.cast(float, read_timeout_seconds),
-                "total_timeout_seconds": typing.cast(float, total_timeout_seconds),
             }
+            if transport_total_timeout_seconds is not None:
+                timeout_kwargs["transport_total_timeout_seconds"] = typing.cast(
+                    float,
+                    transport_total,
+                )
+            elif total_timeout_seconds is not None:
+                timeout_kwargs["total_timeout_seconds"] = typing.cast(
+                    float,
+                    transport_total,
+                )
         self.client.put_json_stream(
             bucket,
             key,
@@ -266,3 +296,34 @@ def validate_upload_timeouts(
     if connect + read > total:
         raise ValueError("connect and read upload timeouts exceed total timeout")
     return connect, read, total
+
+
+def validate_transport_timeouts(
+    *,
+    connect_timeout_seconds: typing.Optional[float],
+    read_timeout_seconds: typing.Optional[float],
+) -> typing.Optional[typing.Tuple[float, float]]:
+    values = (connect_timeout_seconds, read_timeout_seconds)
+    if all(value is None for value in values):
+        return None
+    if any(value is None for value in values):
+        raise ValueError("connect and read upload timeouts are both required")
+    connect = typing.cast(float, connect_timeout_seconds)
+    read = typing.cast(float, read_timeout_seconds)
+    if not all(math.isfinite(value) for value in (connect, read)):
+        raise ValueError("upload timeouts must be finite")
+    if connect <= 0 or read <= 0:
+        raise ValueError("upload timeouts must be positive")
+    return connect, read
+
+
+def resolve_transport_total_timeout(
+    *,
+    total_timeout_seconds: typing.Optional[float],
+    transport_total_timeout_seconds: typing.Optional[float],
+) -> typing.Optional[float]:
+    if total_timeout_seconds is not None and transport_total_timeout_seconds is not None:
+        raise ValueError("total_timeout_seconds and transport_total_timeout_seconds are mutually exclusive")
+    if transport_total_timeout_seconds is not None:
+        return transport_total_timeout_seconds
+    return total_timeout_seconds
