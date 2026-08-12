@@ -186,7 +186,7 @@ def process_response(
     if not _matches_expected_type(candidate, expected_types):
         if type(candidate) is list and _expects_dict(expected_types) and len(candidate) == 1:
             pass
-        elif type(candidate) is str:
+        elif isinstance(candidate, str):
             candidate = json.loads(clean_json(candidate))
         else:
             _raise_response_type_error(candidate, expected_types)

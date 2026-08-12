@@ -4,6 +4,7 @@ import pytest
 
 try:
     from smolagents import CodeAgent, ToolCallingAgent
+    from smolagents.agent_types import AgentText
 except ModuleNotFoundError:
     pytest.skip("smolagents extra is not installed", allow_module_level=True)
 
@@ -39,6 +40,12 @@ def test_process_response_preserves_an_exact_list_union_member() -> None:
     response = [{"answer": {"type": {"ok": True}}}]
 
     assert process_response(response, (dict, list)) == response
+
+
+def test_process_response_parses_agent_text_string_subclass() -> None:
+    response = AgentText('{"answer":{"type":{"ok":true}}}')
+
+    assert process_response(response, dict) == {"ok": True}
 
 
 def test_agent_tool_retries_one_parser_failure_without_ordinary_output(
