@@ -35,9 +35,7 @@ class BoundedRequestError(RuntimeError):
         self.url = url
         self.attempts = attempts
         self.cause = cause
-        super().__init__(
-            f"Error fetching {operation} from {url} after {attempts} attempts: {cause}"
-        )
+        super().__init__(f"Error fetching {operation} from {url} after {attempts} attempts: {cause}")
 
 
 class BoundedRequestTimeout(BoundedRequestError):
@@ -67,30 +65,126 @@ def wall_clock_operation_deadline(
     *,
     operation: str,
 ) -> typing.Iterator[None]:
+    """Use SIGALRM for a hard main-thread deadline.
+
+    Worker threads rely on transport-native connect/read limits. Streaming
+    response bodies add a per-response abort timer through
+    ``read_response_body_with_deadline``.
+    """
     if seconds <= 0:
         raise ValueError("operation deadline must be greater than zero")
-    if threading.current_thread() is not threading.main_thread():
-        raise RuntimeError("wall-clock deadline requires the main thread")
-    if not hasattr(signal, "setitimer"):
-        raise RuntimeError("wall-clock deadline is unavailable on this platform")
+    set_timer = getattr(signal, "setitimer", None)
+    get_timer = getattr(signal, "getitimer", None)
+    alarm_signal = getattr(signal, "SIGALRM", None)
+    if (
+        threading.current_thread() is not threading.main_thread()
+        or not callable(set_timer)
+        or not callable(get_timer)
+        or alarm_signal is None
+    ):
+        yield
+        return
 
-    previous_delay, _ = signal.getitimer(signal.ITIMER_REAL)
+    previous_delay, _ = typing.cast(
+        typing.Tuple[float, float],
+        get_timer(signal.ITIMER_REAL),
+    )
     if previous_delay > 0:
         raise RuntimeError("wall-clock deadline cannot replace an active alarm")
-    previous_handler = signal.getsignal(signal.SIGALRM)
+    previous_handler = signal.getsignal(alarm_signal)
 
     def raise_timeout(_signum: int, _frame: typing.Any) -> typing.NoReturn:
-        raise WallClockDeadlineExceeded(
-            f"{operation} exceeded {seconds} second deadline"
-        )
+        raise WallClockDeadlineExceeded(f"{operation} exceeded {seconds} second deadline")
 
-    signal.signal(signal.SIGALRM, raise_timeout)
-    signal.setitimer(signal.ITIMER_REAL, seconds)
+    signal.signal(alarm_signal, raise_timeout)
+    set_timer(signal.ITIMER_REAL, seconds)
     try:
         yield
     finally:
-        signal.setitimer(signal.ITIMER_REAL, 0)
-        signal.signal(signal.SIGALRM, previous_handler)
+        set_timer(signal.ITIMER_REAL, 0)
+        signal.signal(alarm_signal, previous_handler)
+
+
+def read_response_body_with_deadline(
+    read_body: typing.Callable[[], bytes],
+    close_response: typing.Callable[[], None],
+    *,
+    abort_response: typing.Optional[typing.Callable[[], None]] = None,
+    total_timeout_seconds: typing.Optional[float],
+    started_at: typing.Optional[float],
+    operation: str,
+) -> bytes:
+    """Read and close one response within its operation's remaining budget.
+
+    A joined non-daemon timer aborts only this response if the body stalls. On
+    the main thread, SIGALRM also bounds the complete operation when available.
+    Neither mechanism closes the leased client or affects unrelated requests.
+    """
+    if total_timeout_seconds is None:
+        try:
+            return read_body()
+        finally:
+            close_response()
+
+    if started_at is None:
+        raise ValueError("started_at is required for a bounded response read")
+
+    remaining = total_timeout_seconds - (time.monotonic() - started_at)
+    if remaining <= 0:
+        close_response()
+        raise WallClockDeadlineExceeded(f"{operation} exceeded {total_timeout_seconds} second deadline")
+
+    state_lock = threading.Lock()
+    close_lock = threading.Lock()
+    completed = False
+    expired = False
+    closed = False
+
+    def close_once(*, abort: bool = False) -> None:
+        nonlocal closed
+        with close_lock:
+            if closed:
+                return
+            closed = True
+        if abort and abort_response is not None:
+            abort_response()
+        else:
+            close_response()
+
+    def expire() -> None:
+        nonlocal expired
+        with state_lock:
+            if completed:
+                return
+            expired = True
+        close_once(abort=True)
+
+    timer = threading.Timer(remaining, expire)
+    timer.daemon = False
+    timer.start()
+    try:
+        try:
+            result = read_body()
+        except BaseException as exc:
+            with state_lock:
+                completed = True
+                did_expire = expired
+            if did_expire:
+                raise WallClockDeadlineExceeded(
+                    f"{operation} exceeded {total_timeout_seconds} second deadline"
+                ) from exc
+            raise
+        else:
+            with state_lock:
+                completed = True
+                did_expire = expired
+            if did_expire:
+                raise WallClockDeadlineExceeded(f"{operation} exceeded {total_timeout_seconds} second deadline")
+            return result
+    finally:
+        timer.cancel()
+        timer.join()
+        close_once()
 
 
 def _env_float(name: str, default: float) -> float:
@@ -129,12 +223,8 @@ def _bounded_request(
         remaining = remaining_operation_seconds(local_remaining)
         assert remaining is not None
         if remaining <= 0:
-            cause = requests.Timeout(
-                f"{operation} exceeded {operation_deadline_seconds} second deadline"
-            )
-            raise BoundedRequestTimeout(
-                operation=operation, url=url, attempts=attempt, cause=cause
-            ) from cause
+            cause = requests.Timeout(f"{operation} exceeded {operation_deadline_seconds} second deadline")
+            raise BoundedRequestTimeout(operation=operation, url=url, attempts=attempt, cause=cause) from cause
 
         try:
             return method(
@@ -148,11 +238,7 @@ def _bounded_request(
         except requests.RequestException as exc:
             last_exc = exc
             if attempt == attempts - 1:
-                error_type = (
-                    BoundedRequestTimeout
-                    if isinstance(exc, requests.Timeout)
-                    else BoundedRequestError
-                )
+                error_type = BoundedRequestTimeout if isinstance(exc, requests.Timeout) else BoundedRequestError
                 raise error_type(
                     operation=operation,
                     url=url,
@@ -171,9 +257,7 @@ def _bounded_request(
                 time.sleep(min(backoff, remaining_after_attempt))
 
     assert last_exc is not None
-    raise BoundedRequestError(
-        operation=operation, url=url, attempts=attempts, cause=last_exc
-    ) from last_exc
+    raise BoundedRequestError(operation=operation, url=url, attempts=attempts, cause=last_exc) from last_exc
 
 
 def bounded_get(

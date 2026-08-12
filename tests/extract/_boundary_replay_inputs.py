@@ -1,42 +1,21 @@
 import base64
+import copy
 import hashlib
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable, Mapping
+from urllib.parse import urlsplit
+from urllib.request import urlopen
 
-
-def replay_inputs_are_locally_coherent(
-    *,
-    surface: str,
-    input_root: Path,
-    goldens_root: Path,
-) -> bool:
-    handoff_path = input_root / surface / "internal_arcadia_download_workflow_load.handoff.json"
-    xray_path = input_root / surface / "internal_arcadia_agent_load_xray.xray.json"
-    expected_path = goldens_root / surface / "groundx_python_xray_reassembly.expected.json"
-    if not all(path.is_file() for path in (handoff_path, xray_path, expected_path)):
-        return False
-
-    try:
-        handoff = _read_json(handoff_path)
-        xray_envelope, _xray = read_exact_xray_predecessor(xray_path)
-        expected = _read_json(expected_path)
-        artifacts = expected["artifacts"]
-        return (
-            handoff["surface"] == surface
-            and handoff["stage"] == "internal_arcadia_download_workflow_load"
-            and isinstance(handoff["request"], dict)
-            and isinstance(handoff["workflow_extract"], dict)
-            and xray_envelope["source"]["run_id"] == handoff["request"]["workflow_capture"]["run_id"]
-            and xray_envelope["source"]["process_id"] == handoff["request"]["task_id"]
-            and xray_envelope["source"]["document_id"] == handoff["request"]["document_id"]
-            and expected["surface"] == surface
-            and expected["input_sha256"] == _sha256(handoff_path)
-            and artifacts["previous_download_workflow_load"]["sha256"] == _sha256(handoff_path)
-            and artifacts["xray_predecessor"]["sha256"] == _sha256(xray_path)
-        )
-    except (KeyError, TypeError, ValueError, json.JSONDecodeError):
-        return False
+COMPLETE_OUTPUT_MEMBERS = (
+    "workflow_output",
+    "relationship_output",
+    "final_output",
+    "diagnostics",
+    "source_provenance",
+)
+DEFAULT_DOWNLOAD_TIMEOUT_SECONDS = 15.0
+MAX_REVIEWED_OUTPUT_BYTES = 64 * 1024 * 1024
 
 
 def read_exact_xray_predecessor(
@@ -84,9 +63,143 @@ def read_exact_xray_predecessor(
     return envelope, value
 
 
+def resolve_reviewed_complete_output(
+    expected: Mapping[str, Any] | bytes,
+    *,
+    downloader: Callable[[str], bytes],
+) -> dict[str, Any]:
+    complete, _raw = _resolve_reviewed_complete_output_bytes(expected, downloader=downloader)
+    return complete
+
+
+def _resolve_reviewed_complete_output_bytes(
+    expected: Mapping[str, Any] | bytes,
+    *,
+    downloader: Callable[[str], bytes],
+) -> tuple[dict[str, Any], bytes]:
+    if isinstance(expected, bytes):
+        complete = _parse_complete_output(expected)
+        return complete, expected
+
+    evidence = expected.get("reviewed_complete_output")
+    if not isinstance(evidence, Mapping):
+        raise ValueError("SDK expected output is summary-only; complete reviewed output bytes are required")
+
+    url = evidence.get("url")
+    if not isinstance(url, str) or not url:
+        raise ValueError("reviewed complete output must be exact inline bytes or one HTTPS URL")
+    _validate_reviewed_url(url)
+    try:
+        raw = downloader(url)
+    except Exception as error:
+        raise ValueError("reviewed complete output download failed") from error
+    if not isinstance(raw, bytes):
+        raise ValueError("reviewed complete output downloader must return bytes")
+
+    byte_count = evidence.get("bytes")
+    if isinstance(byte_count, bool) or not isinstance(byte_count, int) or byte_count != len(raw):
+        raise ValueError("reviewed complete output byte count mismatch")
+    digest = evidence.get("sha256")
+    if not isinstance(digest, str) or hashlib.sha256(raw).hexdigest() != digest:
+        raise ValueError("reviewed complete output SHA-256 mismatch")
+
+    complete = _parse_complete_output(raw)
+
+    return complete, raw
+
+
+def download_reviewed_complete_output(
+    url: str,
+    *,
+    opener: Callable[..., Any] = urlopen,
+    timeout_seconds: float = DEFAULT_DOWNLOAD_TIMEOUT_SECONDS,
+    max_bytes: int = MAX_REVIEWED_OUTPUT_BYTES,
+) -> bytes:
+    _validate_reviewed_url(url)
+    if timeout_seconds <= 0:
+        raise ValueError("reviewed complete output timeout must be positive")
+    if max_bytes <= 0:
+        raise ValueError("reviewed complete output byte limit must be positive")
+    with opener(url, timeout=timeout_seconds) as response:
+        get_final_url = getattr(response, "geturl", None)
+        if callable(get_final_url):
+            final_url = get_final_url()
+            if not isinstance(final_url, str):
+                raise ValueError("reviewed complete output URL must be clean")
+            _validate_reviewed_url(final_url)
+        raw = response.read(max_bytes + 1)
+    if not isinstance(raw, bytes):
+        raise ValueError("reviewed complete output downloader must return bytes")
+    if len(raw) > max_bytes:
+        raise ValueError(f"reviewed complete output exceeds {max_bytes}-byte limit")
+    return raw
+
+
+def assert_reassembly_matches_reviewed_output(
+    actual: Mapping[str, Any],
+    expected: Mapping[str, Any] | bytes,
+    *,
+    downloader: Callable[[str], bytes],
+) -> dict[str, Any]:
+    reviewed, reviewed_bytes = _resolve_reviewed_complete_output_bytes(expected, downloader=downloader)
+    missing = [member for member in COMPLETE_OUTPUT_MEMBERS if member not in actual]
+    if missing:
+        raise AssertionError("protected SDK replay actual output is missing complete members: " + ", ".join(missing))
+    actual_complete = {member: copy.deepcopy(actual[member]) for member in COMPLETE_OUTPUT_MEMBERS}
+    if _canonical_json_bytes(actual_complete) != reviewed_bytes:
+        raise AssertionError("complete reviewed SDK reassembly output mismatch")
+    return reviewed
+
+
+def _parse_complete_output(raw: bytes) -> dict[str, Any]:
+    try:
+        complete = json.loads(raw)
+    except (UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise ValueError("reviewed complete output is not valid JSON") from error
+    if not isinstance(complete, dict):
+        raise ValueError("reviewed complete output JSON must be an object")
+    missing = [member for member in COMPLETE_OUTPUT_MEMBERS if member not in complete]
+    if missing:
+        raise ValueError(f"reviewed complete output is missing required member: {missing[0]}")
+    extras = sorted(set(complete) - set(COMPLETE_OUTPUT_MEMBERS))
+    if extras:
+        raise ValueError(f"reviewed complete output has unexpected member: {extras[0]}")
+    if not isinstance(complete["diagnostics"], list):
+        raise ValueError("reviewed complete output diagnostics must be an array")
+    if not isinstance(complete["source_provenance"], list):
+        raise ValueError("reviewed complete output source_provenance must be an array")
+    if raw != _canonical_json_bytes(complete):
+        raise ValueError("reviewed complete output is not canonical JSON")
+    return {member: copy.deepcopy(complete[member]) for member in COMPLETE_OUTPUT_MEMBERS}
+
+
+def _canonical_json_bytes(value: Any) -> bytes:
+    return json.dumps(
+        value,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+
+
+def _validate_reviewed_url(url: str) -> None:
+    try:
+        parsed = urlsplit(url)
+        port = parsed.port
+    except ValueError as error:
+        raise ValueError("reviewed complete output URL must be clean") from error
+    if parsed.scheme != "https":
+        raise ValueError("reviewed complete output URL must use HTTPS")
+    if (
+        not parsed.hostname
+        or parsed.username is not None
+        or parsed.password is not None
+        or parsed.query
+        or parsed.fragment
+        or port not in (None, 443)
+    ):
+        raise ValueError("reviewed complete output URL must be clean")
+
+
 def _read_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
-
-
-def _sha256(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()

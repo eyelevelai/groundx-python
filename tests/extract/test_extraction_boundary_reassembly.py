@@ -5,8 +5,6 @@ import json
 import pathlib
 import re
 import shutil
-import subprocess
-import sys
 import typing
 import urllib.parse
 
@@ -22,7 +20,6 @@ _REPLAY_INPUTS_SPEC = importlib.util.spec_from_file_location(
 assert _REPLAY_INPUTS_SPEC is not None and _REPLAY_INPUTS_SPEC.loader is not None
 _replay_inputs = importlib.util.module_from_spec(_REPLAY_INPUTS_SPEC)
 _REPLAY_INPUTS_SPEC.loader.exec_module(_replay_inputs)
-replay_inputs_are_locally_coherent = _replay_inputs.replay_inputs_are_locally_coherent
 read_exact_xray_predecessor = _replay_inputs.read_exact_xray_predecessor
 DIAGNOSTIC_ROOT = ROOT / "tests" / "extract" / "fixtures" / "extraction-diagnostics" / "expected-answer-projection"
 DIAGNOSTIC_GOLDENS_ROOT = DIAGNOSTIC_ROOT / "boundary-goldens"
@@ -32,7 +29,7 @@ BOUNDARY_ROOT = ROOT / "tests" / "extract" / "fixtures" / "extraction-boundary"
 BOUNDARY_INPUT_ROOT = BOUNDARY_ROOT / "inputs"
 BOUNDARY_GOLDENS_ROOT = BOUNDARY_ROOT / "boundary-goldens"
 CATALOG_PATH = ROOT / "tests" / "extract" / "fixtures" / "extraction-boundary" / "catalog.json"
-CATALOG_SHA256 = "9a6b106a834a9bc760631968a1d161b7bd60465b0943cc02dde26c0487937e37"
+CATALOG_SHA256 = "98c198436c00548fd2de34cb7bf42bbf9698d9690b4e9672b1ecc1ac5c450466"
 WRITER_REGISTRY_PATH = BOUNDARY_ROOT / "writer_registry.json"
 ADP_EXPECTED_SECTION_COUNT = 11
 ADP_EXPECTED_FIELD_COUNT = 159
@@ -41,46 +38,44 @@ ADP_MAX_POPULATED_FIELDS = 159
 ADP_MIN_NULL_FIELDS = 0
 ADP_MAX_NULL_FIELDS = 59
 ADP_MIN_SECTION_POPULATED_RATIO = 0.6
-SOURCE_RUN_ID_RE = re.compile(r"live-\d{8}T\d{6}Z[^/\\\s\"]*")
-
-
 _PROJECTION = json.loads(CATALOG_PATH.read_text(encoding="utf-8"))
 SURFACES = [case["surface"] for case in _PROJECTION["cases"]]
 REAL_BOUNDARY_SURFACES = tuple(SURFACES)
 
 
-def _replay_surface_params(
-    surfaces: typing.Sequence[str],
-    *,
-    input_root: pathlib.Path = BOUNDARY_INPUT_ROOT,
-    goldens_root: pathlib.Path = BOUNDARY_GOLDENS_ROOT,
-) -> typing.List[typing.Any]:
-    fixture_status_by_surface = {case["surface"]: case["fixture_status"] for case in _PROJECTION["cases"]}
-    return [
-        pytest.param(
-            surface,
-            marks=(
-                (
-                    pytest.mark.pending_fixture_promotion,
-                    pytest.mark.skip(reason=f"{surface} exact boundary pack is pending"),
-                )
-                if (
-                    fixture_status_by_surface.get(surface) == "pending"
-                    and not any(
-                        candidate.is_file()
-                        for root in (
-                            input_root / surface,
-                            goldens_root / surface,
-                        )
-                        if root.exists()
-                        for candidate in root.rglob("*")
-                    )
-                )
-                else ()
-            ),
-        )
-        for surface in surfaces
-    ]
+GOVERNED_REMOVAL_CONDITION = (
+    "Remove this protected case only from the canonical Harness certification "
+    "registry, then regenerate the owner projections. Never add a skip."
+)
+REVIEWED_COMPLETE_OUTPUT_URL = "https://fixtures.groundx.ai/reviewed/groundx-python-sdk-reassembly.json"
+COMPLETE_OUTPUT_MEMBERS = (
+    "workflow_output",
+    "relationship_output",
+    "final_output",
+    "diagnostics",
+    "source_provenance",
+)
+
+
+def _protected_fixture_paths(surface: str) -> typing.Tuple[pathlib.Path, ...]:
+    expected = BOUNDARY_GOLDENS_ROOT / surface / "groundx_python_xray_reassembly.expected.json"
+    return (
+        BOUNDARY_INPUT_ROOT / surface / "internal_arcadia_download_workflow_load.handoff.json",
+        BOUNDARY_INPUT_ROOT / surface / "internal_arcadia_agent_load_xray.xray.json",
+        expected,
+        expected.with_name("groundx_python_xray_reassembly.expected.diff.json"),
+        expected.with_name("groundx_python_xray_reassembly.expected.review.json"),
+    )
+
+
+def _require_protected_fixture_pack(surface: str) -> None:
+    for path in _protected_fixture_paths(surface):
+        if not path.is_file():
+            display_path = path.relative_to(ROOT) if path.is_relative_to(ROOT) else path
+            pytest.fail(
+                "INTENTIONAL RED: protected extraction boundary fixture is missing: "
+                f"{display_path}. {GOVERNED_REMOVAL_CONDITION}"
+            )
 
 
 def test_extraction_boundary_owner_projection_is_pinned() -> None:
@@ -118,200 +113,453 @@ def test_extraction_boundary_owner_projection_is_pinned() -> None:
     )
     assert artifact["stage"] == "sdk_xray_reassembly"
     assert artifact["validator"] == ("groundx-python/tests/extract/test_extraction_boundary_reassembly.py")
-    assert artifact["writer"] == "groundx-python/src/groundx/extract"
+    assert artifact["production_entrypoint"] == ("groundx.extract.custom_outputs.reassemble_custom_outputs")
+    assert artifact["evidence_writer_function"] == ("classes.pipeline_trace.capture_sdk_reassembly_output")
+    assert artifact["writer"] == (
+        "classes/statement.py _sdk_custom_output_reassembly_result -> "
+        "classes/pipeline_trace.py capture_sdk_reassembly_output"
+    )
+    assert artifact["s3_path_template"] == (
+        "layout/processed/{task_id}/{document_id}-extract-trace/"
+        "internal-arcadia-agents/{stage_run}/sdk.reassembly_output.json"
+    )
 
 
-def test_replay_input_gate_marks_only_stale_real_cases() -> None:
-    params = _replay_surface_params(SURFACES)
-    marked = {param.values[0] for param in params if "pending_fixture_promotion" in [mark.name for mark in param.marks]}
+def test_protected_replay_cases_are_never_marked_or_skipped() -> None:
+    params = [pytest.param(surface, id=surface) for surface in SURFACES]
 
-    assert marked == set(SURFACES)
-    assert _PROJECTION["cases"][-1]["fixture_status"] == "pending"
+    assert [param.values[0] for param in params] == SURFACES
+    assert all(param.marks == () for param in params)
 
 
-def test_replay_input_gate_never_marks_complete_cases_with_missing_inputs(
-    tmp_path: pathlib.Path,
+def test_missing_protected_fixture_names_exact_path_and_governed_removal(
     monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    surface = "synthetic_complete"
-    monkeypatch.setitem(
-        _PROJECTION,
-        "cases",
-        [{"surface": surface, "fixture_status": "complete"}],
-    )
-
-    [param] = _replay_surface_params(
-        [surface],
-        input_root=tmp_path / "inputs",
-        goldens_root=tmp_path / "goldens",
-    )
-
-    assert [mark.name for mark in param.marks] == []
-
-
-def test_replay_input_gate_skips_only_absent_pending_packs(
     tmp_path: pathlib.Path,
-    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    input_root = tmp_path / "inputs"
-    goldens_root = tmp_path / "goldens"
-    surface = "synthetic_pending"
-    monkeypatch.setitem(
-        _PROJECTION,
-        "cases",
-        [{"surface": surface, "fixture_status": "pending"}],
-    )
-    assert not replay_inputs_are_locally_coherent(
-        surface=surface,
-        input_root=input_root,
-        goldens_root=goldens_root,
-    )
-    [absent_param] = _replay_surface_params(
-        [surface],
-        input_root=input_root,
-        goldens_root=goldens_root,
-    )
-    assert [mark.name for mark in absent_param.marks] == [
-        "pending_fixture_promotion",
-        "skip",
-    ]
+    monkeypatch.setitem(globals(), "BOUNDARY_INPUT_ROOT", tmp_path / "inputs")
+    monkeypatch.setitem(globals(), "BOUNDARY_GOLDENS_ROOT", tmp_path / "boundary-goldens")
 
-    handoff_path = input_root / surface / "internal_arcadia_download_workflow_load.handoff.json"
-    handoff_path.parent.mkdir(parents=True, exist_ok=True)
-    handoff_path.write_text("{}\n")
-    [incoherent_param] = _replay_surface_params(
-        [surface],
-        input_root=input_root,
-        goldens_root=goldens_root,
-    )
-    assert [mark.name for mark in incoherent_param.marks] == []
+    with pytest.raises(pytest.fail.Exception) as error:
+        _require_protected_fixture_pack("arcadia_v1")
+
+    message = str(error.value)
+    assert "INTENTIONAL RED" in message
+    assert "inputs/arcadia_v1/internal_arcadia_download_workflow_load.handoff.json" in message
+    assert GOVERNED_REMOVAL_CONDITION in message
 
 
-def test_replay_input_gate_deselects_only_stale_pending_cases_under_ci_filter() -> None:
-    result = subprocess.run(
-        [
-            sys.executable,
-            "-m",
-            "pytest",
-            "--collect-only",
-            "-q",
-            "-m",
-            "not pending_decision and not pending_fixture_promotion",
-            str(pathlib.Path(__file__)),
+def _complete_reviewed_output() -> typing.Dict[str, typing.Any]:
+    return {
+        "workflow_output": {"statement": {"account_number": "reviewed"}},
+        "relationship_output": {"meters": [{"charges": []}]},
+        "final_output": {
+            "statement": {"account_number": "reviewed"},
+            "meters": [{"charges": []}],
+        },
+        "diagnostics": [],
+        "source_provenance": [
+            {
+                "final_path": "/statement/account_number",
+                "output_source": "customChunkOutputs",
+                "page_numbers": [1],
+                "record_index": None,
+                "workflow_field": "account_number",
+                "workflow_group": "statement",
+            }
         ],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-        check=False,
+    }
+
+
+def _canonical_json_bytes(value: typing.Any) -> bytes:
+    return json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
+
+
+def _hash_backed_expected_packet(
+    complete_output_bytes: bytes,
+    *,
+    url: str = REVIEWED_COMPLETE_OUTPUT_URL,
+) -> typing.Dict[str, typing.Any]:
+    return {
+        "reviewed_complete_output": {
+            "url": url,
+            "bytes": len(complete_output_bytes),
+            "sha256": hashlib.sha256(complete_output_bytes).hexdigest(),
+        },
+    }
+
+
+def _resolve_reviewed_complete_output(
+    expected: typing.Mapping[str, typing.Any] | bytes,
+    *,
+    downloader: typing.Callable[[str], bytes],
+) -> typing.Dict[str, typing.Any]:
+    resolver = getattr(_replay_inputs, "resolve_reviewed_complete_output", None)
+    if not callable(resolver):
+        pytest.fail("INTENTIONAL RED: hash-only SDK expected output has no executable download-and-rehash resolver")
+    return typing.cast(
+        typing.Dict[str, typing.Any],
+        resolver(expected, downloader=downloader),
     )
 
-    assert result.returncode == 0, result.stderr
-    collected = [line for line in result.stdout.splitlines() if "::" in line]
-    replay_tests = {
-        "test_sdk_reassembly_expected_answer_projection_diagnostic_packets",
-        "test_sdk_xray_reassembly_real_boundary_packets",
-    }
-    for surface in SURFACES:
-        surface_ids = [line for line in collected if line.endswith(f"[{surface}]")]
-        surface_tests = {line.split("::")[1].split("[")[0] for line in surface_ids}
-        assert not surface_tests & replay_tests, surface
+
+def _reviewed_output_evidence(expected_path: pathlib.Path) -> typing.Mapping[str, typing.Any] | bytes:
+    raw = expected_path.read_bytes()
+    parsed = json.loads(raw)
+    if isinstance(parsed, dict) and set(parsed) == set(COMPLETE_OUTPUT_MEMBERS):
+        return raw
+    return typing.cast(typing.Mapping[str, typing.Any], parsed)
 
 
-@pytest.mark.parametrize(
-    "surface",
-    _replay_surface_params(SURFACES),
-)
-def test_sdk_reassembly_expected_answer_projection_diagnostic_packets(
-    tmp_path: pathlib.Path,
-    surface: str,
-) -> None:
-    actual, actual_path, expected_path, diff_path, previous_path, handoff_path = _write_boundary_artifacts(
-        tmp_path, surface
-    )
-    expected = _stable_boundary_output(actual)
-    golden = _read_json(expected_path)
-    expected_handoff_sha = _sha256_file(handoff_path)
-    actual_handoff_sha = actual["artifacts"]["handoff"]["sha256"]
-    handoff = _read_json(pathlib.Path(actual["artifacts"]["handoff"]["path"]))
-    if (
-        _is_expected_answer_projection_diagnostic(actual)
-        or _is_expected_answer_projection_diagnostic(handoff)
-        or _has_projection_marker(actual)
-        or _has_projection_marker(handoff)
-    ):
-        _assert_expected_answer_projection_diagnostic(actual)
-        _assert_expected_answer_projection_diagnostic(handoff)
-    else:
-        _assert_no_synthetic_protected_marker(actual)
-        _assert_no_synthetic_protected_marker(handoff)
-    diff: typing.Dict[str, typing.Any] = {
-        "kind": "machine_readable_json_diff",
-        "status": "passed",
-    }
-    if golden != expected or expected_handoff_sha != actual_handoff_sha:
-        diff = {
-            "kind": "machine_readable_json_diff",
-            "status": "failed",
-            "expected": golden,
-            "actual": expected,
-            "handoff_expected_sha256": expected_handoff_sha,
-            "handoff_actual_sha256": actual_handoff_sha,
-        }
-        _write_json(diff_path, diff)
-        pytest.fail(
-            "SDK X-Ray reassembly proof drifted for "
-            f"{surface}; stage reviewed replacements through the Harness "
-            "fixture promotion flow"
+def _assert_replay_matches_reviewed_complete_output(
+    actual: typing.Mapping[str, typing.Any],
+    expected_path: pathlib.Path,
+    *,
+    downloader: typing.Callable[[str], bytes],
+    diff_path: pathlib.Path | None = None,
+) -> typing.Dict[str, typing.Any]:
+    expected = _reviewed_output_evidence(expected_path)
+    assert_matches = getattr(_replay_inputs, "assert_reassembly_matches_reviewed_output", None)
+    if not callable(assert_matches):
+        pytest.fail("INTENTIONAL RED: protected replay has no shared complete-output comparison")
+    try:
+        reviewed = typing.cast(
+            typing.Dict[str, typing.Any],
+            assert_matches(actual, expected, downloader=downloader),
         )
-    _write_json(diff_path, diff)
+    except AssertionError:
+        if diff_path is not None:
+            _write_json(
+                diff_path,
+                {
+                    "kind": "machine_readable_json_diff",
+                    "status": "failed",
+                    "expected": _resolve_reviewed_complete_output(expected, downloader=downloader),
+                    "actual": {member: copy.deepcopy(actual.get(member)) for member in COMPLETE_OUTPUT_MEMBERS},
+                },
+            )
+        raise
+    return reviewed
+
+
+def _download_reviewed_complete_output(url: str) -> bytes:
+    downloader = getattr(_replay_inputs, "download_reviewed_complete_output", None)
+    if not callable(downloader):
+        pytest.fail("INTENTIONAL RED: protected replay has no bounded HTTPS downloader")
+    return typing.cast(bytes, downloader(url))
+
+
+def _assert_resolver_rejects(
+    expected: typing.Mapping[str, typing.Any] | bytes,
+    *,
+    downloader: typing.Callable[[str], bytes],
+    expected_error: str,
+) -> None:
+    with pytest.raises(ValueError) as error:
+        _resolve_reviewed_complete_output(expected, downloader=downloader)
+    assert str(error.value) == expected_error
+
+
+def test_hash_backed_expected_output_downloads_exact_url_without_reconstructed_summary() -> None:
+    complete_output = _complete_reviewed_output()
+    downloaded = _canonical_json_bytes(complete_output)
+    expected = _hash_backed_expected_packet(downloaded)
+    requested_urls: typing.List[str] = []
+
+    def download(url: str) -> bytes:
+        requested_urls.append(url)
+        return downloaded
+
+    resolved = _resolve_reviewed_complete_output(expected, downloader=download)
+
+    assert requested_urls == [REVIEWED_COMPLETE_OUTPUT_URL]
+    assert resolved == complete_output
+
+
+def test_reviewed_complete_output_downloader_bounds_timeout_and_response_size() -> None:
+    downloader = getattr(_replay_inputs, "download_reviewed_complete_output", None)
+    if not callable(downloader):
+        pytest.fail("INTENTIONAL RED: protected replay has no bounded HTTPS downloader")
+
+    class Response:
+        def __init__(self, payload: bytes) -> None:
+            self.payload = payload
+            self.requested_bytes: int | None = None
+
+        def __enter__(self) -> "Response":
+            return self
+
+        def __exit__(self, *_args: typing.Any) -> None:
+            return None
+
+        def read(self, byte_count: int) -> bytes:
+            self.requested_bytes = byte_count
+            return self.payload[:byte_count]
+
+    response = Response(b"1234")
+    opened: typing.List[typing.Tuple[str, float]] = []
+
+    def open_url(url: str, *, timeout: float) -> Response:
+        opened.append((url, timeout))
+        return response
+
+    downloaded = downloader(
+        REVIEWED_COMPLETE_OUTPUT_URL,
+        opener=open_url,
+        timeout_seconds=2.5,
+        max_bytes=4,
+    )
+
+    assert downloaded == b"1234"
+    assert opened == [(REVIEWED_COMPLETE_OUTPUT_URL, 2.5)]
+    assert response.requested_bytes == 5
+
+
+def test_reviewed_complete_output_downloader_rejects_oversized_response() -> None:
+    downloader = getattr(_replay_inputs, "download_reviewed_complete_output", None)
+    if not callable(downloader):
+        pytest.fail("INTENTIONAL RED: protected replay has no bounded HTTPS downloader")
+
+    class Response:
+        def __enter__(self) -> "Response":
+            return self
+
+        def __exit__(self, *_args: typing.Any) -> None:
+            return None
+
+        def read(self, byte_count: int) -> bytes:
+            return b"12345"[:byte_count]
+
+    with pytest.raises(ValueError, match="reviewed complete output exceeds 4-byte limit"):
+        downloader(
+            REVIEWED_COMPLETE_OUTPUT_URL,
+            opener=lambda _url, *, timeout: Response(),
+            timeout_seconds=2.5,
+            max_bytes=4,
+        )
+
+
+def test_reviewed_complete_output_downloader_rejects_unsafe_redirect_before_read() -> None:
+    downloader = getattr(_replay_inputs, "download_reviewed_complete_output", None)
+    if not callable(downloader):
+        pytest.fail("INTENTIONAL RED: protected replay has no bounded HTTPS downloader")
+
+    class RedirectedResponse:
+        def __init__(self) -> None:
+            self.read_called = False
+
+        def __enter__(self) -> "RedirectedResponse":
+            return self
+
+        def __exit__(self, *_args: typing.Any) -> None:
+            return None
+
+        def geturl(self) -> str:
+            return "http://fixtures.groundx.ai/reviewed/redirected.json"
+
+        def read(self, _byte_count: int) -> bytes:
+            self.read_called = True
+            return b"unsafe"
+
+    response = RedirectedResponse()
+    with pytest.raises(ValueError, match="reviewed complete output URL must use HTTPS"):
+        downloader(
+            REVIEWED_COMPLETE_OUTPUT_URL,
+            opener=lambda _url, *, timeout: response,
+            timeout_seconds=2.5,
+            max_bytes=64,
+        )
+    assert response.read_called is False
+
+
+def test_inline_expected_output_resolves_complete_bytes_without_download() -> None:
+    complete_output = _complete_reviewed_output()
+    inline_bytes = _canonical_json_bytes(complete_output)
+
+    resolved = _resolve_reviewed_complete_output(
+        inline_bytes,
+        downloader=lambda _url: pytest.fail("inline reviewed output must not use the downloader"),
+    )
+
+    assert resolved == complete_output
+
+
+def test_inline_expected_output_rejects_noncanonical_bytes() -> None:
+    noncanonical = json.dumps(_complete_reviewed_output(), indent=2, sort_keys=True).encode("utf-8")
+
+    _assert_resolver_rejects(
+        noncanonical,
+        downloader=lambda _url: pytest.fail("inline reviewed output must not use the downloader"),
+        expected_error="reviewed complete output is not canonical JSON",
+    )
+
+
+@pytest.mark.parametrize(
+    ("url", "error"),
+    (
+        ("http://fixtures.groundx.ai/reviewed/output.json", "reviewed complete output URL must use HTTPS"),
+        ("https://fixtures.groundx.ai/reviewed/output.json?token=secret", "reviewed complete output URL must be clean"),
+        ("https://user:secret@fixtures.groundx.ai/reviewed/output.json", "reviewed complete output URL must be clean"),
+    ),
+)
+def test_hash_backed_expected_output_rejects_unsafe_url(url: str, error: str) -> None:
+    complete_output = _complete_reviewed_output()
+    downloaded = _canonical_json_bytes(complete_output)
+    expected = _hash_backed_expected_packet(downloaded, url=url)
+
+    _assert_resolver_rejects(
+        expected,
+        downloader=lambda _url: pytest.fail("unsafe URL must fail before download"),
+        expected_error=error,
+    )
+
+
+def test_hash_backed_expected_output_rejects_unavailable_download() -> None:
+    complete_output = _complete_reviewed_output()
+    downloaded = _canonical_json_bytes(complete_output)
+    expected = _hash_backed_expected_packet(downloaded)
+
+    def unavailable(_url: str) -> bytes:
+        raise OSError("fixture unavailable")
+
+    _assert_resolver_rejects(
+        expected,
+        downloader=unavailable,
+        expected_error="reviewed complete output download failed",
+    )
+
+
+@pytest.mark.parametrize(
+    ("metadata_field", "metadata_value", "expected_error"),
+    (
+        ("bytes", 1, "reviewed complete output byte count mismatch"),
+        ("sha256", "0" * 64, "reviewed complete output SHA-256 mismatch"),
+    ),
+)
+def test_hash_backed_expected_output_rejects_byte_or_hash_mismatch(
+    metadata_field: str,
+    metadata_value: typing.Any,
+    expected_error: str,
+) -> None:
+    complete_output = _complete_reviewed_output()
+    downloaded = _canonical_json_bytes(complete_output)
+    expected = _hash_backed_expected_packet(downloaded)
+    expected["reviewed_complete_output"][metadata_field] = metadata_value
+
+    _assert_resolver_rejects(
+        expected,
+        downloader=lambda _url: downloaded,
+        expected_error=expected_error,
+    )
+
+
+def test_hash_backed_expected_output_rejects_invalid_json() -> None:
+    downloaded = b"not json"
+    expected = _hash_backed_expected_packet(downloaded)
+
+    _assert_resolver_rejects(
+        expected,
+        downloader=lambda _url: downloaded,
+        expected_error="reviewed complete output is not valid JSON",
+    )
+
+
+@pytest.mark.parametrize("missing_member", COMPLETE_OUTPUT_MEMBERS)
+def test_hash_backed_expected_output_requires_every_complete_member(missing_member: str) -> None:
+    complete_output = _complete_reviewed_output()
+    del complete_output[missing_member]
+    downloaded = _canonical_json_bytes(complete_output)
+    expected = _hash_backed_expected_packet(downloaded)
+
+    _assert_resolver_rejects(
+        expected,
+        downloader=lambda _url: downloaded,
+        expected_error=f"reviewed complete output is missing required member: {missing_member}",
+    )
+
+
+def test_replay_shared_comparison_detects_nested_drift(tmp_path: pathlib.Path) -> None:
+    reviewed = _complete_reviewed_output()
+    downloaded = _canonical_json_bytes(reviewed)
+    expected_path = tmp_path / "reviewed.expected.json"
+    expected_path.write_bytes(downloaded)
+    actual = copy.deepcopy(reviewed)
+    actual["final_output"]["meters"][0]["charges"].append({"amount": "drift"})
+
+    with pytest.raises(AssertionError, match="complete reviewed SDK reassembly output mismatch"):
+        _assert_replay_matches_reviewed_complete_output(
+            actual,
+            expected_path,
+            downloader=lambda _url: downloaded,
+        )
+
+
+def test_replay_requires_all_five_complete_actual_members(tmp_path: pathlib.Path) -> None:
+    reviewed = _complete_reviewed_output()
+    downloaded = _canonical_json_bytes(reviewed)
+    expected_path = tmp_path / "reviewed.expected.json"
+    expected_path.write_bytes(downloaded)
+    actual = copy.deepcopy(reviewed)
+    del actual["source_provenance"]
+
+    with pytest.raises(
+        AssertionError,
+        match="actual output is missing complete members: source_provenance",
+    ):
+        _assert_replay_matches_reviewed_complete_output(
+            actual,
+            expected_path,
+            downloader=lambda _url: downloaded,
+        )
 
 
 @pytest.mark.parametrize(
     "surface",
-    _replay_surface_params(REAL_BOUNDARY_SURFACES),
+    SURFACES,
+)
+def test_sdk_reassembly_expected_answer_projection_is_diagnostic_only(surface: str) -> None:
+    previous = _read_json(_diagnostic_previous_boundary_input_path(surface))
+
+    _assert_expected_answer_projection_diagnostic(previous)
+    result = reassemble_custom_outputs_from_xray(
+        previous["xray"],
+        workflow_extract=previous["workflow_extract"],
+    )
+
+    assert isinstance(result.final_output, dict)
+    assert previous["certification_eligible"] is False
+
+
+@pytest.mark.parametrize(
+    "surface",
+    REAL_BOUNDARY_SURFACES,
 )
 def test_sdk_xray_reassembly_real_boundary_packets(
     tmp_path: pathlib.Path,
     surface: str,
 ) -> None:
+    _require_protected_fixture_pack(surface)
     actual, expected_path, diff_path = _write_xray_reassembly_boundary_artifact(
         tmp_path,
         surface,
     )
     expected = _stable_boundary_output(actual)
-    golden = _read_json(expected_path)
-    diff: typing.Dict[str, typing.Any] = {
-        "kind": "machine_readable_json_diff",
-        "status": "passed",
-    }
-    if golden != expected:
-        diff = {
-            "kind": "machine_readable_json_diff",
-            "status": "failed",
-            "expected": golden,
-            "actual": expected,
-        }
-        _write_json(diff_path, diff)
-        pytest.fail(
-            "SDK X-Ray reassembly real boundary proof drifted for "
-            f"{surface}; stage reviewed replacements through the Harness "
-            "fixture promotion flow"
-        )
-    _write_json(diff_path, diff)
+    _assert_replay_matches_reviewed_complete_output(
+        expected,
+        expected_path,
+        downloader=_download_reviewed_complete_output,
+        diff_path=diff_path,
+    )
+    _write_json(diff_path, {"kind": "machine_readable_json_diff", "status": "passed"})
     _assert_reviewed_expected_output_sidecar(expected_path)
 
 
-@pytest.mark.skipif(
-    not (BOUNDARY_INPUT_ROOT / "adp_v1" / "internal_arcadia_agent_load_xray.xray.json").is_file(),
-    reason="adp_v1 exact boundary pack is pending",
-)
 def test_adp_boundary_reassembly_detects_corrupted_real_input(
     tmp_path: pathlib.Path,
 ) -> None:
+    _require_protected_fixture_pack("adp_v1")
     handoff_path, xray_path, expected_path = _copy_adp_boundary_packet(tmp_path)
     handoff = _read_json(handoff_path)
     xray_packet = _read_json(xray_path)
-    expected = _read_json(expected_path)
     corrupted_employer_name = "CORRUPTED-ADP-EMPLOYER"
     xray_packet["value"]["chunks"][0]["customSectionOutputs"]["adp_f1_employer_and_plan_information"][
         "employer_name"
@@ -326,18 +574,19 @@ def test_adp_boundary_reassembly_detects_corrupted_real_input(
     assert result.final_output["employer_information"]["employer_name"] == (corrupted_employer_name)
     with pytest.raises(
         AssertionError,
-        match="reviewed final-output digest mismatch",
+        match="complete reviewed output mismatch",
     ):
-        _assert_reviewed_final_output_digest(result.final_output, expected)
+        _assert_replay_matches_reviewed_complete_output(
+            _complete_reassembly_output(result),
+            expected_path,
+            downloader=_download_reviewed_complete_output,
+        )
 
 
-@pytest.mark.skipif(
-    not (BOUNDARY_INPUT_ROOT / "adp_v1" / "internal_arcadia_agent_load_xray.xray.json").is_file(),
-    reason="adp_v1 exact boundary pack is pending",
-)
 def test_adp_boundary_reassembly_detects_corrupted_expected_output(
     tmp_path: pathlib.Path,
 ) -> None:
+    _require_protected_fixture_pack("adp_v1")
     handoff_path, xray_path, expected_path = _copy_adp_boundary_packet(tmp_path)
     handoff = _read_json(handoff_path)
     xray_packet = _read_json(xray_path)
@@ -345,29 +594,32 @@ def test_adp_boundary_reassembly_detects_corrupted_expected_output(
         xray_packet["value"],
         workflow_extract=handoff["workflow_extract"],
     )
-    expected = _read_json(expected_path)
-    _assert_reviewed_final_output_digest(result.final_output, expected)
+    actual = _complete_reassembly_output(result)
+    _assert_replay_matches_reviewed_complete_output(
+        actual,
+        expected_path,
+        downloader=_download_reviewed_complete_output,
+    )
 
-    expected["output"]["final_output_sha256"] = "0" * 64
-    _write_json(expected_path, expected)
+    expected = _read_json(expected_path)
+    expected["final_output"]["__corrupted__"] = True
+    expected_path.write_bytes(_canonical_json_bytes(expected))
 
     with pytest.raises(
         AssertionError,
-        match="reviewed final-output digest mismatch",
+        match="complete reviewed output mismatch",
     ):
-        _assert_reviewed_final_output_digest(
-            result.final_output,
-            _read_json(expected_path),
+        _assert_replay_matches_reviewed_complete_output(
+            actual,
+            expected_path,
+            downloader=_download_reviewed_complete_output,
         )
 
 
-@pytest.mark.skipif(
-    not (BOUNDARY_INPUT_ROOT / "adp_v1" / "internal_arcadia_agent_load_xray.xray.json").is_file(),
-    reason="adp_v1 exact boundary pack is pending",
-)
 def test_adp_boundary_reassembly_rejects_invalid_identity_threshold_metadata(
     tmp_path: pathlib.Path,
 ) -> None:
+    _require_protected_fixture_pack("adp_v1")
     handoff_path, xray_path, _expected_path = _copy_adp_boundary_packet(tmp_path)
     handoff = _read_json(handoff_path)
     workflow_extract = handoff["workflow_extract"]
@@ -732,35 +984,6 @@ def _copy_adp_boundary_packet(
     return copies[0], copies[1], copies[2]
 
 
-def _source_run_id_for_surface(
-    surface: str,
-    source_packet: typing.Any,
-) -> str:
-    candidates = _source_run_ids(source_packet)
-    xray_predecessor_path = _real_xray_predecessor_path(surface)
-    if xray_predecessor_path.exists():
-        candidates.update(_source_run_ids(_read_json(xray_predecessor_path)))
-    assert candidates, f"no live source run id found for {surface}"
-    assert len(candidates) == 1, f"ambiguous source run ids for {surface}: {candidates}"
-    return next(iter(candidates))
-
-
-def _source_run_ids(value: typing.Any) -> typing.Set[str]:
-    if isinstance(value, dict):
-        candidates: typing.Set[str] = set()
-        for item in value.values():
-            candidates.update(_source_run_ids(item))
-        return candidates
-    if isinstance(value, list):
-        candidates = set()
-        for item in value:
-            candidates.update(_source_run_ids(item))
-        return candidates
-    if isinstance(value, str):
-        return set(SOURCE_RUN_ID_RE.findall(value))
-    return set()
-
-
 def _build_xray_reassembly_boundary_artifact(
     tmp_path: pathlib.Path,
     surface: str,
@@ -780,31 +1003,10 @@ def _build_xray_reassembly_boundary_artifact(
         xray_payload,
         workflow_extract=previous["workflow_extract"],
     )
-    diagnostics = [
-        {
-            "child_record_index": diagnostic.child_record_index,
-            "code": diagnostic.code,
-            "final_path": diagnostic.final_path,
-            "message": diagnostic.message,
-            "relationship": diagnostic.relationship,
-            "severity": diagnostic.severity,
-            "workflow_field": diagnostic.workflow_field,
-            "workflow_group": diagnostic.workflow_group,
-        }
-        for diagnostic in result.diagnostics
-    ]
-    source_provenance = [
-        {
-            "final_path": provenance.final_path,
-            "output_source": provenance.output_source,
-            "page_numbers": list(provenance.page_numbers),
-            "record_index": provenance.record_index,
-            "workflow_field": provenance.workflow_field,
-            "workflow_group": provenance.workflow_group,
-        }
-        for provenance in result.source_provenance
-    ]
-    final_output = copy.deepcopy(result.final_output)
+    complete_output = _complete_reassembly_output(result)
+    diagnostics = complete_output["diagnostics"]
+    source_provenance = complete_output["source_provenance"]
+    final_output = complete_output["final_output"]
     assertions = _xray_reassembly_shape_assertions(
         surface,
         final_output,
@@ -821,6 +1023,7 @@ def _build_xray_reassembly_boundary_artifact(
         "workflow_schema_hash": _workflow_schema_hash(previous),
         "request": previous["request"],
         "input_sha256": _sha256_file(previous_path),
+        **complete_output,
         "output": {
             "diagnostic_count": len(diagnostics),
             "final_output_sha256": _sha256_json(final_output),
@@ -882,73 +1085,6 @@ def _workflow_schema_hash(previous: typing.Mapping[str, typing.Any]) -> str:
     raise KeyError("workflow_schema_hash")
 
 
-def _write_reviewed_expected_output_sidecars(
-    *,
-    surface: str,
-    packet_path: pathlib.Path,
-    source_path: pathlib.Path,
-    reviewed_field_count_summary: typing.Mapping[str, typing.Any],
-) -> None:
-    packet_sha = _sha256_file(packet_path)
-    source_sha = _sha256_file(source_path)
-    catalog = _read_json(CATALOG_PATH)
-    source_packet = _read_json(source_path)
-    source_run_id = _source_run_id_for_surface(surface, source_packet)
-    diff_path = packet_path.with_name(packet_path.name.replace(".expected.json", ".expected.diff.json"))
-    review_path = packet_path.with_name(packet_path.name.replace(".expected.json", ".expected.review.json"))
-    _write_json(
-        diff_path,
-        {
-            "accepted_actual_as_expected": True,
-            "acceptance_reason": (
-                "Accepted as deterministic SDK X-Ray reassembly behavior from "
-                "the reviewed hosted fixture-seeding run. This freezes behavior, "
-                "not extraction quality."
-            ),
-            "actual_sha256": packet_sha,
-            "artifact_catalog_sha256": _sha256_file(CATALOG_PATH),
-            "artifact_name": "groundx_python_xray_reassembly",
-            "expected_sha256": packet_sha,
-            "kind": "machine_readable_json_diff",
-            "reviewed_field_count_summary": dict(reviewed_field_count_summary),
-            "source_artifact_sha256": source_sha,
-            "source_lineage": "repo_fixture",
-            "source_run_id": source_run_id,
-            "status": "passed",
-            "surface": surface,
-        },
-    )
-    _write_json(
-        review_path,
-        {
-            "reviewed_expected_output": {
-                "accepted_actual_as_expected": True,
-                "acceptance_reason": (
-                    "Accepted as deterministic SDK X-Ray reassembly behavior "
-                    "from the reviewed hosted fixture-seeding run. This freezes "
-                    "behavior, not extraction quality."
-                ),
-                "artifact_catalog_sha256": _sha256_file(CATALOG_PATH),
-                "artifact_catalog_version": catalog["catalog_version"],
-                "author_identity": "Codex",
-                "diff_path": str(diff_path.relative_to(ROOT)),
-                "diff_status": "passed",
-                "expected_path": str(packet_path.relative_to(ROOT)),
-                "expected_sha256": packet_sha,
-                "packet_sha256": packet_sha,
-                "reviewed_at": "2026-07-26T15:25:00Z",
-                "reviewed_field_count_summary": dict(reviewed_field_count_summary),
-                "reviewer_identity": "Benjamin Fletcher",
-                "reviewer_role": "product owner and human fixture reviewer",
-                "source_path": str(source_path.relative_to(ROOT)),
-                "source_lineage": "repo_fixture",
-                "source_run_id": source_run_id,
-                "source_sha256": source_sha,
-            },
-        },
-    )
-
-
 def _assert_reviewed_expected_output_sidecar(packet_path: pathlib.Path) -> None:
     review_path = packet_path.with_name(packet_path.name.replace(".expected.json", ".expected.review.json"))
     diff_path = packet_path.with_name(packet_path.name.replace(".expected.json", ".expected.diff.json"))
@@ -968,10 +1104,6 @@ def _assert_reviewed_expected_output_sidecar(packet_path: pathlib.Path) -> None:
         source_path = ROOT / _repo_evidence_path(evidence["source_path"])
         assert source_path.exists()
         assert evidence["source_sha256"] == _sha256_file(source_path)
-        assert evidence["source_run_id"] == _source_run_id_for_surface(
-            packet_path.parent.name,
-            _read_json(source_path),
-        )
     else:
         source_url = urllib.parse.urlsplit(evidence["source_url"])
         assert source_url.scheme == "https"
@@ -982,6 +1114,8 @@ def _assert_reviewed_expected_output_sidecar(packet_path: pathlib.Path) -> None:
     assert diff["status"] == "passed"
     assert diff["actual_sha256"] == _sha256_file(packet_path)
     assert diff["expected_sha256"] == _sha256_file(packet_path)
+    assert isinstance(evidence["source_run_id"], str)
+    assert evidence["source_run_id"]
 
 
 def _repo_evidence_path(value: str) -> pathlib.Path:
@@ -1490,6 +1624,38 @@ def _json_round_trip(data: typing.Any) -> typing.Any:
     return json.loads(json.dumps(data, sort_keys=True))
 
 
+def _complete_reassembly_output(result: typing.Any) -> typing.Dict[str, typing.Any]:
+    return {
+        "workflow_output": copy.deepcopy(result.workflow_output),
+        "relationship_output": copy.deepcopy(result.relationship_output),
+        "final_output": copy.deepcopy(result.final_output),
+        "diagnostics": [
+            {
+                "child_record_index": diagnostic.child_record_index,
+                "code": diagnostic.code,
+                "final_path": diagnostic.final_path,
+                "message": diagnostic.message,
+                "relationship": diagnostic.relationship,
+                "severity": diagnostic.severity,
+                "workflow_field": diagnostic.workflow_field,
+                "workflow_group": diagnostic.workflow_group,
+            }
+            for diagnostic in result.diagnostics
+        ],
+        "source_provenance": [
+            {
+                "final_path": provenance.final_path,
+                "output_source": provenance.output_source,
+                "page_numbers": list(provenance.page_numbers),
+                "record_index": provenance.record_index,
+                "workflow_field": provenance.workflow_field,
+                "workflow_group": provenance.workflow_group,
+            }
+            for provenance in result.source_provenance
+        ],
+    }
+
+
 def _sha256_file(path: pathlib.Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
@@ -1497,14 +1663,3 @@ def _sha256_file(path: pathlib.Path) -> str:
 def _sha256_json(data: typing.Any) -> str:
     encoded = json.dumps(data, sort_keys=True, separators=(",", ":")).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
-
-
-def _assert_reviewed_final_output_digest(
-    final_output: typing.Mapping[str, typing.Any],
-    expected: typing.Mapping[str, typing.Any],
-) -> None:
-    actual_sha = _sha256_json(final_output)
-    expected_sha = expected["output"]["final_output_sha256"]
-    assert actual_sha == expected_sha, (
-        f"reviewed final-output digest mismatch: expected {expected_sha}, got {actual_sha}"
-    )

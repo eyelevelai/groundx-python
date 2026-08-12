@@ -25,8 +25,67 @@ def _write_json(path: Path, value: object) -> None:
     path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n")
 
 
+def _write_canonical_json(path: Path, value: object) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(
+        json.dumps(
+            value,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    )
+
+
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _sha256_json(value: object) -> str:
+    raw = json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(raw).hexdigest()
+
+
+def _complete_output_values() -> dict[str, object]:
+    return {
+        "workflow_output": {"statement": {"value": "candidate"}},
+        "relationship_output": {"relationships": []},
+        "final_output": {"statement": {"value": "candidate"}},
+        "diagnostics": [],
+        "source_provenance": [],
+    }
+
+
+def _complete_candidate_packet(
+    *,
+    surface: str,
+    handoff_path: Path,
+    xray_path: Path,
+) -> dict[str, object]:
+    complete_output = _complete_output_values()
+    return {
+        "schema_version": "groundx-python-xray-reassembly-boundary-v1",
+        "surface": surface,
+        "stage": "groundx_python_xray_reassembly",
+        "input_from": "internal_arcadia_download_workflow_load",
+        "input_sha256": _sha256(handoff_path),
+        **complete_output,
+        "output": {
+            "workflow_output_sha256": _sha256_json(complete_output["workflow_output"]),
+            "relationship_output_sha256": _sha256_json(complete_output["relationship_output"]),
+            "final_output_sha256": _sha256_json(complete_output["final_output"]),
+            "diagnostic_count": 0,
+            "source_provenance_count": 0,
+        },
+        "artifacts": {
+            "previous_download_workflow_load": {"sha256": _sha256(handoff_path)},
+            "xray_predecessor": {"sha256": _sha256(xray_path)},
+        },
+        "assertions": {
+            "consumes_download_workflow_load_handoff": True,
+            "consumes_exact_xray_predecessor": True,
+        },
+    }
 
 
 def _load_builder_module():
@@ -186,12 +245,41 @@ def _proposed_xray_candidate(
     return entry, target
 
 
+def _captured_complete_output_candidate(
+    root: Path,
+    surface: str,
+    complete_output: object,
+) -> tuple[dict[str, object], Path]:
+    relative = Path(
+        f"internal-arcadia-agents/testdata/extraction-boundary/captured/{surface}/sdk.reassembly_output.json"
+    )
+    target = root / relative
+    _write_canonical_json(target, complete_output)
+    entry: dict[str, object] = {
+        "surface": surface,
+        "artifact_name": "internal_arcadia_sdk_reassembly_output",
+        "candidate_path": str(relative),
+        "sha256": _sha256(target),
+        "source_sha256": _sha256(target),
+        "source_run_id": RUN_ID,
+        "source_run_mode": RUN_MODE,
+        "source_hosted_path": (
+            f"layout/processed/task-1/document-1-extract-trace/internal-arcadia-agents/"
+            f"{surface}/sdk.reassembly_output.json"
+        ),
+        "source_boundary_manifest_sha256": BOUNDARY_MANIFEST_SHA256,
+        "next_boundary_inputs": [],
+    }
+    return entry, target
+
+
 def _coherent_candidate_manifest(
     root: Path,
     surface: str,
     *,
     xray: object | None = None,
     handoff: dict[str, object] | None = None,
+    captured_complete_output: object | None = None,
 ) -> tuple[Path, dict[str, object], Path, Path]:
     xray_entry, xray_path = _proposed_xray_candidate(root, surface, xray=xray)
     handoff_entry, handoff_path = _proposed_handoff_candidate(
@@ -199,6 +287,14 @@ def _coherent_candidate_manifest(
         surface,
         packet=handoff,
     )
+    candidates = [xray_entry, handoff_entry]
+    if captured_complete_output is not None:
+        output_entry, _output_path = _captured_complete_output_candidate(
+            root,
+            surface,
+            captured_complete_output,
+        )
+        candidates.append(output_entry)
     manifest: dict[str, object] = {
         "schema_version": "extraction_boundary_fixture_candidate_v1",
         "status": "pending_review",
@@ -207,7 +303,7 @@ def _coherent_candidate_manifest(
         "artifact_catalog_version": "2026-07-23.1",
         "artifact_catalog_sha256": "a" * 64,
         "source_boundary_manifest_sha256": BOUNDARY_MANIFEST_SHA256,
-        "candidates": [xray_entry, handoff_entry],
+        "candidates": candidates,
     }
     path = root / "fixture_candidate_manifest.json"
     _write_json(path, manifest)
@@ -321,7 +417,7 @@ def test_builder_default_surfaces_follow_projection_order(monkeypatch) -> None:
     assert builder._selected_surfaces(None) == ("third", "first")
 
 
-def test_builder_writes_review_candidates_without_touching_accepted_fixtures(
+def test_builder_is_intentionally_red_without_captured_complete_output(
     tmp_path: Path,
 ) -> None:
     capture_root = tmp_path / "captured-boundaries"
@@ -345,47 +441,14 @@ def test_builder_writes_review_candidates_without_touching_accepted_fixtures(
         text=True,
     )
 
-    assert result.returncode == 0, result.stderr
-    manifest = json.loads((candidate_root / "fixture_candidate_manifest.json").read_text())
-    assert len(manifest["candidates"]) == 1
-    assert set(manifest["generator"]) == {
-        "boundary_replay_sha256",
-        "candidate_builder_sha256",
-        "production_reassembly_sha256",
-    }
-    assert all(len(value) == 64 for value in manifest["generator"].values())
-    candidate = manifest["candidates"][0]
-    assert candidate["artifact_name"] == "groundx_python_xray_reassembly"
-    assert candidate["surface"] == SURFACE
-    candidate_expected = candidate_root / candidate["candidate_path"]
-    candidate_diff = candidate_root / candidate["candidate_diff_path"]
-    candidate_packet = json.loads(candidate_expected.read_text())
-    candidate_review = json.loads(candidate_diff.read_text())
-    assert candidate_packet["surface"] == SURFACE
-    assert candidate_review["status"] == "pending_review"
-    assert candidate_review["candidate_sha256"] == _sha256(candidate_expected)
-    assert candidate_review["current_accepted_sha256"] is None
-    assert isinstance(candidate_review["changes"], list)
-
-    candidate_xray.write_text("{}\n")
-    mismatch = subprocess.run(
-        [
-            sys.executable,
-            str(SCRIPT),
-            "--xray-candidate-manifest",
-            str(capture_manifest),
-            "--candidate-root",
-            str(tmp_path / "mismatch-candidates"),
-            "--surfaces",
-            SURFACE,
-        ],
-        cwd=REPO_ROOT,
-        capture_output=True,
-        check=False,
-        text=True,
-    )
-    assert mismatch.returncode != 0
-    assert "X-Ray predecessor hash does not match" in mismatch.stderr
+    assert result.returncode != 0
+    assert (
+        "INTENTIONAL RED: captured SDK complete outputs missing surfaces: arcadia_legacy; "
+        "capture canonical five-member internal_arcadia_sdk_reassembly_output "
+        "sdk.reassembly_output.json from the same Arcadia run"
+    ) in result.stderr
+    assert not candidate_root.exists()
+    assert candidate_xray.exists()
 
 
 def test_builder_rejects_a_nonempty_candidate_root(tmp_path: Path) -> None:
@@ -802,7 +865,12 @@ def test_builder_records_reassembly_when_quality_assertions_fail(
 ) -> None:
     surface = "adp_v1"
     capture_root = tmp_path / "captured-boundaries"
-    capture_manifest, _manifest, _xray_path, _handoff_path = _coherent_candidate_manifest(capture_root, surface)
+    captured_complete_output = _complete_output_values()
+    capture_manifest, _manifest, xray_path, handoff_path = _coherent_candidate_manifest(
+        capture_root,
+        surface,
+        captured_complete_output=captured_complete_output,
+    )
     accepted_output = tmp_path / "accepted.json"
     _write_json(
         accepted_output,
@@ -811,10 +879,15 @@ def test_builder_records_reassembly_when_quality_assertions_fail(
             "shape_assertions": {"has_adp_core_fields_populated_by_section": True},
         },
     )
-    actual = {
-        "assertions": {"shape_contract_passed": False},
-        "shape_assertions": {"has_adp_core_fields_populated_by_section": False},
-    }
+    actual = _complete_candidate_packet(
+        surface=surface,
+        handoff_path=handoff_path,
+        xray_path=xray_path,
+    )
+    assertions = actual["assertions"]
+    assert isinstance(assertions, dict)
+    assertions["shape_contract_passed"] = False
+    actual["shape_assertions"] = {"has_adp_core_fields_populated_by_section": False}
     replay = types.SimpleNamespace(
         _build_xray_reassembly_boundary_artifact=(
             lambda _candidate_root, _surface: (
@@ -850,8 +923,151 @@ def test_builder_records_reassembly_when_quality_assertions_fail(
             / "groundx_python_xray_reassembly.expected.json"
         ).read_text()
     )
-    assert candidate["assertions"]["shape_contract_passed"] is False
-    assert candidate["shape_assertions"]["has_adp_core_fields_populated_by_section"] is False
+    assert candidate == captured_complete_output
+    captured_entry = _candidate_entry(_manifest, "internal_arcadia_sdk_reassembly_output")
+    assert (
+        candidate_root
+        / "groundx-python"
+        / "tests"
+        / "extract"
+        / "fixtures"
+        / "extraction-boundary"
+        / "boundary-goldens"
+        / surface
+        / "groundx_python_xray_reassembly.expected.json"
+    ).read_bytes() == (capture_root / str(captured_entry["candidate_path"])).read_bytes()
+
+
+@pytest.mark.parametrize(
+    ("captured_output", "expected_error"),
+    [
+        (
+            {"surface": SURFACE, "output": {"final_output_sha256": "0" * 64}},
+            "SDK expected output is summary-only; complete reviewed output bytes are required",
+        ),
+        (
+            {
+                "surface": SURFACE,
+                "workflow_output": {"statement": {"value": "reconstructed"}},
+                "relationship_output": {"statement": {"value": "reconstructed"}},
+                "final_output": {"statement": {"value": "reconstructed"}},
+                "diagnostics": [],
+                "source_provenance": [],
+                "output": {
+                    "workflow_output_sha256": "1" * 64,
+                    "relationship_output_sha256": "2" * 64,
+                    "final_output_sha256": "3" * 64,
+                },
+                "reviewed_complete_output": {},
+            },
+            "SDK expected output is reconstructed; exact reviewed output bytes are required",
+        ),
+        (
+            {
+                "surface": SURFACE,
+                "workflow_output": {"statement": {"value": "reconstructed"}},
+                "relationship_output": {"statement": {"value": "reconstructed"}},
+                "final_output": {"statement": {"value": "reconstructed"}},
+                "diagnostics": [],
+                "source_provenance": [],
+                "output": {
+                    "workflow_output_sha256": "1" * 64,
+                    "relationship_output_sha256": "2" * 64,
+                    "final_output_sha256": "3" * 64,
+                },
+                "evidence_origin": "reviewed",
+            },
+            "SDK expected output is reconstructed; exact reviewed output bytes are required",
+        ),
+    ],
+)
+def test_builder_rejects_incomplete_or_reconstructed_expected_output(
+    tmp_path: Path,
+    monkeypatch,
+    captured_output: dict[str, object],
+    expected_error: str,
+) -> None:
+    capture_root = tmp_path / "captured-boundaries"
+    capture_manifest, _manifest, xray_path, handoff_path = _coherent_candidate_manifest(
+        capture_root,
+        SURFACE,
+        captured_complete_output=captured_output,
+    )
+    accepted_output = tmp_path / "accepted.json"
+    _write_json(accepted_output, {"surface": SURFACE})
+    actual = _complete_candidate_packet(
+        surface=SURFACE,
+        handoff_path=handoff_path,
+        xray_path=xray_path,
+    )
+    replay = types.SimpleNamespace(
+        _build_xray_reassembly_boundary_artifact=(
+            lambda _candidate_root, _surface: (
+                actual,
+                accepted_output,
+                tmp_path / "unused.diff.json",
+            )
+        ),
+        _stable_boundary_output=lambda value: value,
+    )
+    builder = _load_builder_module()
+    monkeypatch.setattr(builder, "_load_replay_module", lambda _repo_root: replay)
+    candidate_root = tmp_path / "sdk-candidates"
+
+    with pytest.raises(ValueError) as error:
+        builder.build_candidates(
+            repo_root=REPO_ROOT,
+            xray_candidate_manifest_path=capture_manifest,
+            candidate_root=candidate_root,
+            surfaces=(SURFACE,),
+        )
+
+    assert str(error.value) == expected_error
+    assert not candidate_root.exists() or not any(candidate_root.rglob("*"))
+
+
+def test_builder_rejects_self_generated_complete_output_without_captured_oracle(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    capture_root = tmp_path / "captured-boundaries"
+    capture_manifest, _manifest, xray_path, handoff_path = _coherent_candidate_manifest(
+        capture_root,
+        SURFACE,
+    )
+    actual = _complete_candidate_packet(
+        surface=SURFACE,
+        handoff_path=handoff_path,
+        xray_path=xray_path,
+    )
+    replay_called = False
+
+    def build_from_current_replay(_candidate_root: Path, _surface: str):
+        nonlocal replay_called
+        replay_called = True
+        return actual, tmp_path / "accepted.json", tmp_path / "unused.diff.json"
+
+    replay = types.SimpleNamespace(
+        _build_xray_reassembly_boundary_artifact=build_from_current_replay,
+        _stable_boundary_output=lambda value: value,
+    )
+    builder = _load_builder_module()
+    monkeypatch.setattr(builder, "_load_replay_module", lambda _repo_root: replay)
+    candidate_root = tmp_path / "sdk-candidates"
+
+    with pytest.raises(
+        ValueError,
+        match="INTENTIONAL RED: captured SDK complete outputs missing surfaces: arcadia_legacy",
+    ):
+        builder.build_candidates(
+            repo_root=REPO_ROOT,
+            xray_candidate_manifest_path=capture_manifest,
+            candidate_root=candidate_root,
+            surfaces=(SURFACE,),
+        )
+
+    assert replay_called is False
+    assert not candidate_root.exists()
 
 
 def test_builder_replays_the_proposed_producer_handoff_with_the_proposed_xray(
@@ -865,19 +1081,25 @@ def test_builder_replays_the_proposed_producer_handoff_with_the_proposed_xray(
         surface,
         xray={"source": "proposed"},
         handoff={"request": {"source": "proposed"}},
+        captured_complete_output=_complete_output_values(),
     )
     accepted_output = tmp_path / "accepted.json"
     _write_json(accepted_output, {"input_sha256": "accepted"})
     replay = types.SimpleNamespace()
+    consumed: dict[str, str] = {}
 
     def build_candidate(_candidate_root: Path, selected_surface: str):
         producer_path = replay._real_download_workflow_load_input_path(selected_surface)
         xray_path = replay._real_xray_predecessor_path(selected_surface)
+        consumed["handoff_sha256"] = _sha256(producer_path)
+        consumed["xray_sha256"] = _sha256(xray_path)
+        packet = _complete_candidate_packet(
+            surface=selected_surface,
+            handoff_path=producer_path,
+            xray_path=xray_path,
+        )
         return (
-            {
-                "input_sha256": _sha256(producer_path),
-                "xray_sha256": _sha256(xray_path),
-            },
+            packet,
             accepted_output,
             tmp_path / "unused.diff.json",
         )
@@ -908,5 +1130,8 @@ def test_builder_replays_the_proposed_producer_handoff_with_the_proposed_xray(
             / "groundx_python_xray_reassembly.expected.json"
         ).read_text()
     )
-    assert packet["input_sha256"] == _sha256(candidate_handoff)
-    assert packet["xray_sha256"] == _sha256(candidate_xray)
+    assert packet == _complete_output_values()
+    assert consumed == {
+        "handoff_sha256": _sha256(candidate_handoff),
+        "xray_sha256": _sha256(candidate_xray),
+    }

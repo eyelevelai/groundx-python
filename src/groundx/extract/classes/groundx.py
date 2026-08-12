@@ -4,7 +4,12 @@ from pathlib import Path
 
 import requests
 from ..services.http import bounded_get
-from ..services.upload import Upload
+from ..services.upload import (
+    OBJECT_STORE_CONNECT_TIMEOUT_SECONDS,
+    OBJECT_STORE_READ_TIMEOUT_SECONDS,
+    OBJECT_STORE_TOTAL_TIMEOUT_SECONDS,
+    Upload,
+)
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from typing_extensions import Annotated
 
@@ -185,7 +190,12 @@ class XRayDocument(BaseModel):
 
         if upload:
             path = gx_doc.xray_path()
-            ru = upload.get_object(path)
+            ru = upload.get_object(
+                path,
+                connect_timeout_seconds=OBJECT_STORE_CONNECT_TIMEOUT_SECONDS,
+                read_timeout_seconds=OBJECT_STORE_READ_TIMEOUT_SECONDS,
+                total_timeout_seconds=OBJECT_STORE_TOTAL_TIMEOUT_SECONDS,
+            )
             if ru:
                 try:
                     payload = json.loads(ru.decode("utf-8"))

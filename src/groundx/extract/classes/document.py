@@ -15,7 +15,12 @@ from ..custom_outputs import (
 from ..prompt.manager import PromptManager
 from ..services.http import BoundedRequestTimeout, bounded_get
 from ..services.logger import Logger
-from ..services.upload import Upload
+from ..services.upload import (
+    OBJECT_STORE_CONNECT_TIMEOUT_SECONDS,
+    OBJECT_STORE_READ_TIMEOUT_SECONDS,
+    OBJECT_STORE_TOTAL_TIMEOUT_SECONDS,
+    Upload,
+)
 from ..utility import clean_json
 from .element import Element
 from .field import ExtractedField
@@ -966,7 +971,12 @@ class DocumentRequest(BaseModel):
             if upload:
                 parsed = urlparse(page)
                 path = parsed.path + ("?" + parsed.query if parsed.query else "")
-                ru = upload.get_object(path)
+                ru = upload.get_object(
+                    path,
+                    connect_timeout_seconds=OBJECT_STORE_CONNECT_TIMEOUT_SECONDS,
+                    read_timeout_seconds=OBJECT_STORE_READ_TIMEOUT_SECONDS,
+                    total_timeout_seconds=OBJECT_STORE_TOTAL_TIMEOUT_SECONDS,
+                )
                 if ru:
                     img = Image.open(BytesIO(ru))
                     if img:

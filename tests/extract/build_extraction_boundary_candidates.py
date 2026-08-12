@@ -15,6 +15,14 @@ SURFACES = tuple(case["surface"] for case in _PROJECTION["cases"])
 _CASE_IDS = {case["surface"]: case["id"] for case in _PROJECTION["cases"]}
 _XRAY_ARTIFACT = "internal_arcadia_load_xray_predecessor"
 _HANDOFF_ARTIFACT = "internal_arcadia_download_workflow_load"
+_COMPLETE_OUTPUT_ARTIFACT = "internal_arcadia_sdk_reassembly_output"
+_COMPLETE_OUTPUT_MEMBERS = (
+    "workflow_output",
+    "relationship_output",
+    "final_output",
+    "diagnostics",
+    "source_provenance",
+)
 _CAPTURE_IDENTITY_FIELDS = (
     "schema_version",
     "run_id",
@@ -81,6 +89,16 @@ def _load_replay_module(repo_root: Path) -> typing.Any:
     spec = importlib.util.spec_from_file_location("extraction_boundary_replay", path)
     if spec is None or spec.loader is None:
         raise RuntimeError(f"cannot load boundary replay from {path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def _load_replay_inputs_module(repo_root: Path) -> typing.Any:
+    path = repo_root / "tests" / "extract" / "_boundary_replay_inputs.py"
+    spec = importlib.util.spec_from_file_location("extraction_boundary_replay_inputs", path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"cannot load boundary replay inputs from {path}")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -305,6 +323,29 @@ def _producer_handoff_candidates(
     return handoffs
 
 
+def _captured_complete_output_candidates(
+    *,
+    candidate_manifest: dict[str, typing.Any],
+    candidate_root: Path,
+) -> dict[str, tuple[dict[str, typing.Any], Path]]:
+    outputs: dict[str, tuple[dict[str, typing.Any], Path]] = {}
+    for entry in candidate_manifest["candidates"]:
+        if entry.get("artifact_name") != _COMPLETE_OUTPUT_ARTIFACT:
+            continue
+        surface = str(entry.get("surface") or "")
+        source_path = _resolve_inside(candidate_root, entry["candidate_path"])
+        source_digest = _sha256(source_path) if source_path.exists() else None
+        if source_digest != entry.get("sha256") or source_digest != entry.get("source_sha256"):
+            raise ValueError(f"captured SDK complete output hash does not match for {surface}")
+        hosted_path = entry.get("source_hosted_path")
+        if not isinstance(hosted_path, str) or not hosted_path.endswith("/sdk.reassembly_output.json"):
+            raise ValueError(f"captured SDK complete output hosted path is invalid for {surface}")
+        if surface in outputs:
+            raise ValueError(f"duplicate captured SDK complete output for {surface}")
+        outputs[surface] = (entry, source_path)
+    return outputs
+
+
 def _candidate_entry(
     *,
     surface: str,
@@ -340,6 +381,93 @@ def _candidate_entry(
     }
 
 
+def _complete_actual_output_bytes(
+    packet: dict[str, typing.Any],
+    *,
+    surface: str,
+    handoff_path: Path,
+    xray_path: Path,
+    resolve_reviewed_complete_output: typing.Callable[..., dict[str, typing.Any]],
+) -> bytes:
+    present = [member for member in _COMPLETE_OUTPUT_MEMBERS if member in packet]
+    if not present:
+        raise ValueError("SDK expected output is summary-only; complete reviewed output bytes are required")
+
+    output = packet.get("output")
+    artifacts = packet.get("artifacts")
+    assertions = packet.get("assertions")
+    complete = len(present) == len(_COMPLETE_OUTPUT_MEMBERS)
+    previous_artifact = artifacts.get("previous_download_workflow_load") if isinstance(artifacts, dict) else None
+    xray_artifact = artifacts.get("xray_predecessor") if isinstance(artifacts, dict) else None
+    exact_binding = (
+        packet.get("schema_version") == "groundx-python-xray-reassembly-boundary-v1"
+        and packet.get("surface") == surface
+        and packet.get("stage") == "groundx_python_xray_reassembly"
+        and packet.get("input_from") == "internal_arcadia_download_workflow_load"
+        and packet.get("input_sha256") == _sha256(handoff_path)
+        and isinstance(previous_artifact, dict)
+        and previous_artifact.get("sha256") == _sha256(handoff_path)
+        and isinstance(xray_artifact, dict)
+        and xray_artifact.get("sha256") == _sha256(xray_path)
+        and isinstance(assertions, dict)
+        and assertions.get("consumes_download_workflow_load_handoff") is True
+        and assertions.get("consumes_exact_xray_predecessor") is True
+    )
+    exact_summary = (
+        isinstance(output, dict)
+        and output.get("workflow_output_sha256") == _sha256_json(packet.get("workflow_output"))
+        and output.get("relationship_output_sha256") == _sha256_json(packet.get("relationship_output"))
+        and output.get("final_output_sha256") == _sha256_json(packet.get("final_output"))
+        and isinstance(packet.get("diagnostics"), list)
+        and output.get("diagnostic_count") == len(packet["diagnostics"])
+        and isinstance(packet.get("source_provenance"), list)
+        and output.get("source_provenance_count") == len(packet["source_provenance"])
+    )
+    if not complete or not exact_binding or not exact_summary:
+        raise ValueError("SDK expected output is reconstructed; exact reviewed output bytes are required")
+    complete_output = {member: packet[member] for member in _COMPLETE_OUTPUT_MEMBERS}
+    raw = _canonical_json_bytes(complete_output)
+    resolved = resolve_reviewed_complete_output(raw, downloader=_reject_remote_candidate)
+    if resolved != complete_output:
+        raise ValueError("SDK expected output is reconstructed; exact reviewed output bytes are required")
+    return raw
+
+
+def _validate_captured_complete_output(
+    raw: bytes,
+    *,
+    resolve_reviewed_complete_output: typing.Callable[..., dict[str, typing.Any]],
+) -> dict[str, typing.Any]:
+    try:
+        parsed = json.loads(raw)
+    except (UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise ValueError("SDK expected output is reconstructed; exact reviewed output bytes are required") from error
+    if not isinstance(parsed, dict) or not any(member in parsed for member in _COMPLETE_OUTPUT_MEMBERS):
+        raise ValueError("SDK expected output is summary-only; complete reviewed output bytes are required")
+    try:
+        return resolve_reviewed_complete_output(raw, downloader=_reject_remote_candidate)
+    except ValueError as error:
+        raise ValueError("SDK expected output is reconstructed; exact reviewed output bytes are required") from error
+
+
+def _sha256_json(value: typing.Any) -> str:
+    encoded = json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def _canonical_json_bytes(value: typing.Any) -> bytes:
+    return json.dumps(
+        value,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+
+
+def _reject_remote_candidate(_url: str) -> bytes:
+    raise OSError("candidate generation is offline")
+
+
 def build_candidates(
     *,
     repo_root: Path,
@@ -364,6 +492,10 @@ def build_candidates(
         candidate_manifest=capture_manifest,
         candidate_root=capture_root,
     )
+    captured_outputs = _captured_complete_output_candidates(
+        candidate_manifest=capture_manifest,
+        candidate_root=capture_root,
+    )
     missing_xray = sorted(set(surfaces) - set(xray_predecessors))
     if missing_xray:
         raise ValueError(f"X-Ray predecessors missing surfaces: {', '.join(missing_xray)}")
@@ -382,23 +514,59 @@ def build_candidates(
             handoff_entry=handoff_entry,
             handoff_path=handoff_path,
         )
+        if surface in captured_outputs:
+            _validate_entry_provenance(
+                entry=captured_outputs[surface][0],
+                manifest=capture_manifest,
+                label="captured SDK complete output",
+            )
 
-    candidate_root.mkdir(parents=True, exist_ok=True)
+    missing_outputs = sorted(set(surfaces) - set(captured_outputs))
+    if missing_outputs:
+        raise ValueError(
+            "INTENTIONAL RED: captured SDK complete outputs missing surfaces: "
+            + ", ".join(missing_outputs)
+            + "; capture canonical five-member internal_arcadia_sdk_reassembly_output "
+            "sdk.reassembly_output.json from the same Arcadia run"
+        )
+
     replay = _load_replay_module(repo_root)
+    replay_inputs = _load_replay_inputs_module(repo_root)
     replay._real_xray_predecessor_path = lambda surface: xray_predecessors[surface][1]
     replay._real_download_workflow_load_input_path = lambda surface: producer_handoffs[surface][1]
-    candidates = []
+    prepared = []
     for surface in surfaces:
         actual, accepted_path, _unused_diff_path = replay._build_xray_reassembly_boundary_artifact(
             candidate_root, surface
         )
         packet = replay._stable_boundary_output(actual)
+        actual_complete_bytes = _complete_actual_output_bytes(
+            packet,
+            surface=surface,
+            handoff_path=producer_handoffs[surface][1],
+            xray_path=xray_predecessors[surface][1],
+            resolve_reviewed_complete_output=replay_inputs.resolve_reviewed_complete_output,
+        )
+        captured_entry, captured_path = captured_outputs[surface]
+        captured_bytes = captured_path.read_bytes()
+        captured_packet = _validate_captured_complete_output(
+            captured_bytes,
+            resolve_reviewed_complete_output=replay_inputs.resolve_reviewed_complete_output,
+        )
+        if actual_complete_bytes != captured_bytes:
+            raise ValueError(f"SDK production reassembly differs from captured complete output for {surface}")
+        prepared.append((surface, captured_packet, captured_bytes, accepted_path, captured_entry))
+
+    candidate_root.mkdir(parents=True, exist_ok=True)
+    candidates = []
+    for surface, packet, packet_bytes, accepted_path, captured_entry in prepared:
         relative_packet = Path(
             "groundx-python/tests/extract/fixtures/extraction-boundary/"
             f"boundary-goldens/{surface}/groundx_python_xray_reassembly.expected.json"
         )
         packet_path = candidate_root / relative_packet
-        _write_json(packet_path, packet)
+        packet_path.parent.mkdir(parents=True, exist_ok=True)
+        packet_path.write_bytes(packet_bytes)
 
         accepted = _read_json(accepted_path) if accepted_path.exists() else None
         diff_path = packet_path.with_name("groundx_python_xray_reassembly.expected.diff.json")
@@ -420,7 +588,7 @@ def build_candidates(
                 surface=surface,
                 packet_path=packet_path,
                 diff_path=diff_path,
-                source=xray_predecessors[surface][0],
+                source=captured_entry,
                 capture_manifest=capture_manifest,
             )
         )
