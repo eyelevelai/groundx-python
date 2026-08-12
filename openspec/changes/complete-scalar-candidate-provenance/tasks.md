@@ -12,7 +12,7 @@ repeated-route predicate with route-value loading. Singular section and document
 routes emit every observation. Existing candidate collection deduplicates
 values and merges pages. Repeated routes retain producer-copy deduplication.
 
-**Tech stack:** Python 3.9+, pytest, Ruff, Mypy, Poetry, OpenSpec 1.3.1.
+**Tech stack:** Python 3.11, pytest, Ruff, Mypy, Poetry, OpenSpec 1.3.1.
 
 ## Global constraints
 
@@ -109,8 +109,13 @@ metadata or one precomputed repeated flag. No public interface changes.
 - [ ] Run `bash scripts/check-line-endings.sh` and `git diff --check`.
 - [ ] Run
   `OPENSPEC_TELEMETRY=0 npx -y @fission-ai/openspec@1.3.1 validate complete-scalar-candidate-provenance --strict`.
-- [ ] Build the same unpublished candidate wheel used by
-  `delegate-scalar-candidate-resolution-to-agents`. Record its source commit,
-  filename, and SHA-256 in the consumer test handoff. Do not publish it.
-- [ ] Hand the exact wheel to the Internal Arcadia and Studio Harness companion
-  changes. Do not request release 3.9.7 until both consumer gates pass.
+- [ ] Build the same unpublished source candidate used by
+  `delegate-scalar-candidate-resolution-to-agents` on Python 3.11. Keep the
+  generated package version unchanged. Record its source commit, filename, and
+  SHA-256 in the consumer test handoff. Do not publish it.
+- [ ] Hand the source candidate to the Internal Arcadia and Studio Harness
+  companion changes. Do not request release 3.9.7 until both consumer gates
+  pass.
+- [ ] After 3.9.7 is published, verify it contains the tested handwritten source
+  change and rerun the clean-install consumer gates. Do not require byte
+  identity with the differently versioned source candidate.

@@ -87,7 +87,12 @@ relationship, and repeated-route behavior.
 
 ## Release dependency
 
-This change joins the exact candidate wheel produced for
-`delegate-scalar-candidate-resolution-to-agents`. Internal Arcadia and Studio
-Harness test that wheel before the human release owner publishes requested
-version 3.9.7. This repository does not publish the package.
+This change joins the unpublished source candidate produced for
+`delegate-scalar-candidate-resolution-to-agents`. The candidate keeps the
+repository's generated package version and records its source commit and
+SHA-256. Internal Arcadia and Studio Harness test it on Python 3.11 before the
+human release owner publishes requested version 3.9.7. After publication, both
+consumers verify the released package contains the same handwritten source
+change and rerun their gates from a clean install. The differently versioned
+wheels are not required to be byte-identical. This repository does not publish
+the package.
