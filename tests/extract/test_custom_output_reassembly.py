@@ -3012,6 +3012,37 @@ def test_scalar_candidate_presence_distinguishes_missing_from_explicit_empty_val
     assert [candidate.page_numbers for candidate in candidates] == [(2,), (3,), (4,)]
 
 
+def test_scalar_candidate_direct_step_presence_distinguishes_missing_null_and_false() -> None:
+    result = reassemble_custom_outputs_from_xray(
+        {
+            "chunks": [
+                {
+                    "chunkId": "missing-step",
+                    "pageNumbers": [1],
+                    "customChunkOutputs": {},
+                },
+                {
+                    "chunkId": "null-step",
+                    "pageNumbers": [2],
+                    "customChunkOutputs": {"scalar_step": None},
+                },
+                {
+                    "chunkId": "false-step",
+                    "pageNumbers": [3],
+                    "customChunkOutputs": {"scalar_step": False},
+                },
+            ]
+        },
+        workflow_extract=_scalar_candidate_workflow(),
+    )
+
+    assert len(result.scalar_candidate_sets) == 1
+    candidate_set = result.scalar_candidate_sets[0]
+    candidates = [candidate_set.selected, *candidate_set.alternatives]
+    assert [candidate.value for candidate in candidates] == [None, False]
+    assert [candidate.page_numbers for candidate in candidates] == [(2,), (3,)]
+
+
 @pytest.mark.parametrize(
     "value",
     ["", False, 0, []],

@@ -599,7 +599,9 @@ def _custom_route_values(
     if not isinstance(output_map, typing.Mapping):
         return []
 
-    step_value = output_map.get(step_name)
+    if step_name not in output_map:
+        return []
+    step_value = output_map[step_name]
     route_repeats = _repeated_route(route, step_kinds)
 
     if isinstance(step_value, typing.Mapping):
@@ -655,8 +657,6 @@ def _custom_route_values(
                 values.append(_RouteValue(value=record, record_index=index, repeated=True))
         return values
 
-    if step_value is None:
-        return []
     return [
         _RouteValue(
             value=step_value,
