@@ -200,7 +200,7 @@ def reassemble_custom_outputs_from_xray(
                             diagnostics=diagnostics,
                         )
                     continue
-                if route_value.repeated or route_value.value is not None:
+                if route_value.repeated or _unwrap_match_value(route_value.value) is not None:
                     route_satisfied[route_index] = True
                 if route_value.repeated:
                     _record_repeated_group_path(

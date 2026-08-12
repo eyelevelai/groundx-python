@@ -2720,6 +2720,21 @@ def test_required_scalar_route_keeps_null_evidence_but_reports_missing_independe
     assert [diagnostic.code for diagnostic in result.diagnostics] == ["missing_workflow_group"]
 
 
+def test_required_scalar_route_keeps_null_envelope_evidence_but_reports_missing() -> None:
+    null_envelope = {"value": None, "confidence": 0.8}
+    result = _reassemble_scalar_observations(
+        [({"scalar_field": null_envelope}, [6])],
+        required=True,
+    )
+
+    assert len(result.scalar_candidate_sets) == 1
+    candidate_set = result.scalar_candidate_sets[0]
+    assert candidate_set.selected.value == null_envelope
+    assert candidate_set.selected.page_numbers == (6,)
+    assert candidate_set.alternatives == ()
+    assert [diagnostic.code for diagnostic in result.diagnostics] == ["missing_workflow_group"]
+
+
 def test_repeated_route_empty_record_handling_is_unchanged() -> None:
     workflow_extract = {
         "workflow": {
