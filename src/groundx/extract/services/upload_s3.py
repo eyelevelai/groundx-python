@@ -1,3 +1,4 @@
+import contextlib
 import typing
 
 from ..settings.settings import ContainerSettings
@@ -59,15 +60,15 @@ class S3Client:
         connect_timeout_seconds: typing.Optional[float],
         read_timeout_seconds: typing.Optional[float],
         total_timeout_seconds: typing.Optional[float],
-    ) -> typing.Any:
+    ) -> typing.ContextManager[typing.Any]:
         timeout = validate_upload_timeouts(
             connect_timeout_seconds=connect_timeout_seconds,
             read_timeout_seconds=read_timeout_seconds,
             total_timeout_seconds=total_timeout_seconds,
         )
         if timeout is None:
-            return self.client
-        return self._timeout_clients.get_or_create(
+            return contextlib.nullcontext(self.client)
+        return self._timeout_clients.lease(
             timeout,
             lambda: self._create_client(
                 connect_timeout_seconds=timeout[0],
@@ -97,22 +98,23 @@ class S3Client:
         )
 
         def get() -> typing.Optional[bytes]:
-            client = self._client_for_timeouts(
+            client_context = self._client_for_timeouts(
                 connect_timeout_seconds=connect_timeout_seconds,
                 read_timeout_seconds=read_timeout_seconds,
                 total_timeout_seconds=total_timeout_seconds,
             )
-            if not client:
-                self.logger.warning_msg("get_object no client")
-                return None
+            with client_context as client:
+                if not client:
+                    self.logger.warning_msg("get_object no client")
+                    return None
 
-            try:
-                s3_bucket, s3_key = self.parse_url(url)
-                response = client.get_object(Bucket=s3_bucket, Key=s3_key)
-                return self._read_body(response)
-            except Exception as e:
-                self.logger.error_msg(f"[{url}] exception: {e}")
-                raise
+                try:
+                    s3_bucket, s3_key = self.parse_url(url)
+                    response = client.get_object(Bucket=s3_bucket, Key=s3_key)
+                    return self._read_body(response)
+                except Exception as e:
+                    self.logger.error_msg(f"[{url}] exception: {e}")
+                    raise
 
         if timeout is None:
             return get()
@@ -228,19 +230,20 @@ class S3Client:
         )
 
         def put() -> None:
-            client = self._client_for_timeouts(
+            client_context = self._client_for_timeouts(
                 connect_timeout_seconds=connect_timeout_seconds,
                 read_timeout_seconds=read_timeout_seconds,
                 total_timeout_seconds=total_timeout_seconds,
             )
-            if not client:
-                return
-            client.put_object(
-                Bucket=bucket,
-                Key=key,
-                Body=data,
-                ContentType=content_type,
-            )
+            with client_context as client:
+                if not client:
+                    return
+                client.put_object(
+                    Bucket=bucket,
+                    Key=key,
+                    Body=data,
+                    ContentType=content_type,
+                )
 
         if timeout is None:
             put()

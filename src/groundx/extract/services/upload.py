@@ -1,3 +1,4 @@
+import contextlib
 import math
 import threading
 import typing
@@ -12,32 +13,72 @@ OBJECT_STORE_TOTAL_TIMEOUT_SECONDS = 25.0
 MAX_CACHED_TIMEOUT_CLIENTS = 8
 
 
+class _TimeoutClientEntry:
+    def __init__(self, client: typing.Any) -> None:
+        self.client = client
+        self.active_leases = 0
+        self.close_pending = False
+        self.closed = False
+
+
 class TimeoutClientCache:
     def __init__(self, close_client: typing.Callable[[typing.Any], None]) -> None:
-        self._clients: OrderedDict[typing.Tuple[float, float, float], typing.Any] = OrderedDict()
+        self._clients: OrderedDict[typing.Tuple[float, float, float], _TimeoutClientEntry] = OrderedDict()
         self._close_client = close_client
         self._lock = threading.Lock()
 
-    def get_or_create(
+    def _get_or_create_locked(
         self,
         timeout: typing.Tuple[float, float, float],
         create_client: typing.Callable[[], typing.Any],
-    ) -> typing.Any:
-        evicted: typing.Optional[typing.Any] = None
-        with self._lock:
-            client = self._clients.pop(timeout, None)
-            if client is None:
-                client = create_client()
-            self._clients[timeout] = client
-            if len(self._clients) > MAX_CACHED_TIMEOUT_CLIENTS:
-                _, evicted = self._clients.popitem(last=False)
+    ) -> typing.Tuple[_TimeoutClientEntry, typing.Optional[typing.Any]]:
+        entry = self._clients.pop(timeout, None)
+        if entry is None:
+            entry = _TimeoutClientEntry(create_client())
+        self._clients[timeout] = entry
 
-        if evicted is not None:
-            try:
-                self._close_client(evicted)
-            except Exception:
-                pass
-        return client
+        close_client: typing.Optional[typing.Any] = None
+        if len(self._clients) > MAX_CACHED_TIMEOUT_CLIENTS:
+            _, evicted = self._clients.popitem(last=False)
+            close_client = self._retire_locked(evicted)
+        return entry, close_client
+
+    @staticmethod
+    def _retire_locked(entry: _TimeoutClientEntry) -> typing.Optional[typing.Any]:
+        entry.close_pending = True
+        if entry.active_leases == 0 and not entry.closed:
+            entry.closed = True
+            return entry.client
+        return None
+
+    def _close_safely(self, client: typing.Optional[typing.Any]) -> None:
+        if client is None:
+            return
+        try:
+            self._close_client(client)
+        except Exception:
+            pass
+
+    @contextlib.contextmanager
+    def lease(
+        self,
+        timeout: typing.Tuple[float, float, float],
+        create_client: typing.Callable[[], typing.Any],
+    ) -> typing.Iterator[typing.Any]:
+        with self._lock:
+            entry, close_client = self._get_or_create_locked(timeout, create_client)
+            entry.active_leases += 1
+        self._close_safely(close_client)
+
+        try:
+            yield entry.client
+        finally:
+            close_client = None
+            with self._lock:
+                entry.active_leases -= 1
+                if entry.close_pending:
+                    close_client = self._retire_locked(entry)
+            self._close_safely(close_client)
 
 
 @typing.runtime_checkable

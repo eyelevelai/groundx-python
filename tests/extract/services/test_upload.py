@@ -3,7 +3,7 @@ import typing
 
 import pytest
 
-from groundx.extract.services.upload import Upload, validate_upload_timeouts
+from groundx.extract.services.upload import TimeoutClientCache, Upload, validate_upload_timeouts
 
 
 class _Client:
@@ -24,6 +24,14 @@ class _Client:
         **kwargs: typing.Any,
     ) -> None:
         self.kwargs = kwargs
+
+
+class _CachedClient:
+    def __init__(self) -> None:
+        self.closed = False
+
+    def close(self) -> None:
+        self.closed = True
 
 
 def test_upload_forwards_network_timeout_budget() -> None:
@@ -78,6 +86,29 @@ def test_upload_preserves_unbounded_object_read_call() -> None:
 
     assert body == b"workflow"
     assert client.kwargs == {}
+
+
+def test_timeout_client_cache_closes_evicted_client_after_last_lease() -> None:
+    cache = TimeoutClientCache(lambda client: client.close())
+    created: typing.List[_CachedClient] = []
+
+    def create_client() -> _CachedClient:
+        client = _CachedClient()
+        created.append(client)
+        return client
+
+    first_lease = cache.lease((0.2, 0.5, 0.8), create_client)
+    second_lease = cache.lease((0.2, 0.5, 0.8), create_client)
+    with first_lease as first:
+        with second_lease as second:
+            assert first is second
+            for total in range(1, 10):
+                with cache.lease((0.2, 0.5, float(total)), create_client):
+                    pass
+            assert not first.closed
+        assert not first.closed
+
+    assert first.closed
 
 
 @pytest.mark.parametrize("invalid", [math.nan, math.inf, -math.inf])

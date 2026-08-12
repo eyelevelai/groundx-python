@@ -198,14 +198,18 @@ class TestMinIOClient(unittest.TestCase):
             return client
 
         setattr(cl, "_create_client", create_client)
+        cache = getattr(cl, "_timeout_clients")
         for total in range(1, 10):
-            getattr(cl, "_client_for_timeouts")(
+            client_context = getattr(cl, "_client_for_timeouts")(
                 connect_timeout_seconds=0.2,
                 read_timeout_seconds=0.5,
                 total_timeout_seconds=float(total),
             )
+            with client_context:
+                pass
 
         self.assertEqual(len(created), 9)
+        self.assertEqual(len(getattr(cache, "_clients")), 8)
         self.assertTrue(typing.cast(Pool, getattr(created[0], "_http")).cleared)
         self.assertFalse(typing.cast(Pool, getattr(created[-1], "_http")).cleared)
 
@@ -281,6 +285,24 @@ class TestMinIOClient(unittest.TestCase):
         self.assertEqual(bounded.put["object_name"], "trace.json")
         self.assertEqual(bounded.put["length"], 2)
 
+    def test_put_json_stream_without_timeouts_preserves_default_client(self) -> None:
+        cl = self._client()
+        default = FakeMinioClient()
+        create_client = Mock()
+        cl.client = typing.cast(typing.Any, default)
+        setattr(cl, "_create_client", create_client)
+
+        cl.put_json_stream(
+            "eyelevel",
+            "trace.json",
+            b"{}",
+            "application/json",
+        )
+
+        create_client.assert_not_called()
+        self.assertEqual(default.put["object_name"], "trace.json")
+        self.assertEqual(default.put["length"], 2)
+
     def test_bounded_client_configures_socket_and_total_timeouts_without_retries(
         self,
     ) -> None:
@@ -305,6 +327,30 @@ class TestMinIOClient(unittest.TestCase):
             create_client.call_args.kwargs["http_client"],
             create_pool.return_value,
         )
+
+    def test_put_json_stream_enforces_total_wall_clock_deadline(self) -> None:
+        class StalledMinioClient(FakeMinioClient):
+            def put_object(self, **kwargs: typing.Any) -> None:
+                time.sleep(0.03)
+                time.sleep(0.20)
+
+        cl = self._client()
+        bounded = StalledMinioClient()
+        setattr(cl, "_create_client", Mock(return_value=bounded))
+
+        started = time.monotonic()
+        with self.assertRaisesRegex(TimeoutError, "MinIO put_object exceeded"):
+            cl.put_json_stream(
+                "eyelevel",
+                "trace.json",
+                b"{}",
+                "application/json",
+                connect_timeout_seconds=0.01,
+                read_timeout_seconds=0.01,
+                total_timeout_seconds=0.06,
+            )
+
+        self.assertLess(time.monotonic() - started, 0.15)
 
 
 @contextlib.contextmanager

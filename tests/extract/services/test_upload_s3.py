@@ -172,14 +172,18 @@ class TestS3Client(unittest.TestCase):
             return client
 
         setattr(cl, "_create_client", create_client)
+        cache = getattr(cl, "_timeout_clients")
         for total in range(1, 10):
-            getattr(cl, "_client_for_timeouts")(
+            client_context = getattr(cl, "_client_for_timeouts")(
                 connect_timeout_seconds=0.2,
                 read_timeout_seconds=0.5,
                 total_timeout_seconds=float(total),
             )
+            with client_context:
+                pass
 
         self.assertEqual(len(created), 9)
+        self.assertEqual(len(getattr(cache, "_clients")), 8)
         self.assertTrue(created[0].closed)
         self.assertFalse(created[-1].closed)
 
@@ -200,17 +204,82 @@ class TestS3Client(unittest.TestCase):
 
         def load(_index: int) -> typing.Any:
             ready.wait(timeout=1)
-            return getattr(cl, "_client_for_timeouts")(
+            client_context = getattr(cl, "_client_for_timeouts")(
                 connect_timeout_seconds=0.2,
                 read_timeout_seconds=0.5,
                 total_timeout_seconds=0.8,
             )
+            with client_context as client:
+                return client
 
         with ThreadPoolExecutor(max_workers=8) as executor:
             clients = list(executor.map(load, range(8)))
 
         self.assertEqual(len(created), 1)
         self.assertEqual(len({id(client) for client in clients}), 1)
+
+    def test_timeout_client_cache_defers_close_while_read_is_active(self) -> None:
+        reading = threading.Event()
+        churn_complete = threading.Event()
+
+        class BlockingBody(FakeBody):
+            def __init__(self, owner: "BlockingS3Client") -> None:
+                super().__init__(b"statement: {}")
+                self.owner = owner
+                self.owner_closed_while_reading = False
+
+            def read(self) -> bytes:
+                reading.set()
+                if not churn_complete.wait(timeout=2):
+                    raise TimeoutError("cache churn did not complete")
+                self.owner_closed_while_reading = self.owner.closed
+                return super().read()
+
+        class BlockingS3Client(FakeS3Client):
+            def __init__(self) -> None:
+                self.closed = False
+                self.body: BlockingBody = BlockingBody(self)
+
+        cl = self._client()
+        active = BlockingS3Client()
+        created: typing.List[FakeS3Client] = []
+
+        def create_client(**_kwargs: float) -> FakeS3Client:
+            client: FakeS3Client = active if not created else FakeS3Client()
+            created.append(client)
+            return client
+
+        setattr(cl, "_create_client", create_client)
+
+        def churn_cache() -> None:
+            if not reading.wait(timeout=2):
+                return
+            cache = getattr(cl, "_timeout_clients")
+            for total in range(1, 10):
+                client_context = cache.lease(
+                    (0.2, 0.5, float(total)),
+                    lambda: create_client(),
+                )
+                with client_context:
+                    pass
+            churn_complete.set()
+
+        churn = threading.Thread(target=churn_cache)
+        churn.start()
+        try:
+            body = cl.get_object(
+                "s3://eyelevel/workflows/extract/latest.yaml",
+                connect_timeout_seconds=0.2,
+                read_timeout_seconds=0.5,
+                total_timeout_seconds=0.8,
+            )
+        finally:
+            churn_complete.set()
+            churn.join(timeout=2)
+
+        self.assertEqual(body, b"statement: {}")
+        self.assertFalse(active.body.owner_closed_while_reading)
+        self.assertTrue(active.closed)
 
     def test_get_object_total_deadline_includes_body_read(self) -> None:
         class StalledBody(FakeBody):
@@ -284,6 +353,24 @@ class TestS3Client(unittest.TestCase):
         self.assertEqual(bounded.put["Bucket"], "eyelevel")
         self.assertEqual(bounded.put["Key"], "trace.json")
         self.assertEqual(bounded.put["Body"], b"{}")
+
+    def test_put_json_stream_without_timeouts_preserves_default_client(self) -> None:
+        cl = self._client()
+        default = FakeS3Client()
+        create_client = Mock()
+        cl.client = typing.cast(typing.Any, default)
+        setattr(cl, "_create_client", create_client)
+
+        cl.put_json_stream(
+            "eyelevel",
+            "trace.json",
+            b"{}",
+            "application/json",
+        )
+
+        create_client.assert_not_called()
+        self.assertEqual(default.put["Key"], "trace.json")
+        self.assertEqual(default.put["Body"], b"{}")
 
     def test_bounded_client_configures_socket_timeouts_without_sdk_retries(
         self,

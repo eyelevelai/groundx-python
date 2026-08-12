@@ -1,3 +1,4 @@
+import contextlib
 import typing
 
 from ..settings.settings import ContainerSettings
@@ -97,15 +98,15 @@ class MinIOClient:
         connect_timeout_seconds: typing.Optional[float],
         read_timeout_seconds: typing.Optional[float],
         total_timeout_seconds: typing.Optional[float],
-    ) -> typing.Any:
+    ) -> typing.ContextManager[typing.Any]:
         timeout = validate_upload_timeouts(
             connect_timeout_seconds=connect_timeout_seconds,
             read_timeout_seconds=read_timeout_seconds,
             total_timeout_seconds=total_timeout_seconds,
         )
         if timeout is None:
-            return self.client
-        return self._timeout_clients.get_or_create(
+            return contextlib.nullcontext(self.client)
+        return self._timeout_clients.lease(
             timeout,
             lambda: self._create_client(
                 connect_timeout_seconds=timeout[0],
@@ -136,29 +137,30 @@ class MinIOClient:
         )
 
         def get() -> typing.Optional[bytes]:
-            client = self._client_for_timeouts(
+            client_context = self._client_for_timeouts(
                 connect_timeout_seconds=connect_timeout_seconds,
                 read_timeout_seconds=read_timeout_seconds,
                 total_timeout_seconds=total_timeout_seconds,
             )
-            if not client:
-                return None
+            with client_context as client:
+                if not client:
+                    return None
 
-            from minio.error import S3Error
-
-            try:
-                response = client.get_object(
-                    self.settings.upload.bucket,
-                    self.parse_url(url),
-                )
+                from minio.error import S3Error
 
                 try:
-                    return response.read()
-                finally:
-                    self._close_response(response)
-            except S3Error as e:
-                self.logger.error_msg(f"Failed to get object from [{url}] [{self.parse_url(url)}]: {str(e)}")
-                raise
+                    response = client.get_object(
+                        self.settings.upload.bucket,
+                        self.parse_url(url),
+                    )
+
+                    try:
+                        return response.read()
+                    finally:
+                        self._close_response(response)
+                except S3Error as e:
+                    self.logger.error_msg(f"Failed to get object from [{url}] [{self.parse_url(url)}]: {str(e)}")
+                    raise
 
         if timeout is None:
             return get()
@@ -295,19 +297,36 @@ class MinIOClient:
         read_timeout_seconds: typing.Optional[float] = None,
         total_timeout_seconds: typing.Optional[float] = None,
     ) -> None:
-        client = self._client_for_timeouts(
+        timeout = validate_upload_timeouts(
             connect_timeout_seconds=connect_timeout_seconds,
             read_timeout_seconds=read_timeout_seconds,
             total_timeout_seconds=total_timeout_seconds,
         )
-        if not client:
-            return
-        import io
 
-        client.put_object(
-            bucket_name=bucket,
-            object_name=key,
-            data=io.BytesIO(data),
-            length=len(data),
-            content_type=content_type,
-        )
+        def put() -> None:
+            client_context = self._client_for_timeouts(
+                connect_timeout_seconds=connect_timeout_seconds,
+                read_timeout_seconds=read_timeout_seconds,
+                total_timeout_seconds=total_timeout_seconds,
+            )
+            with client_context as client:
+                if not client:
+                    return
+                import io
+
+                client.put_object(
+                    bucket_name=bucket,
+                    object_name=key,
+                    data=io.BytesIO(data),
+                    length=len(data),
+                    content_type=content_type,
+                )
+
+        if timeout is None:
+            put()
+            return
+        with wall_clock_operation_deadline(
+            timeout[2],
+            operation="MinIO put_object",
+        ):
+            put()
