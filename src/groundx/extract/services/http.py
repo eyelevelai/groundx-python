@@ -67,12 +67,20 @@ def wall_clock_operation_deadline(
     *,
     operation: str,
 ) -> typing.Iterator[None]:
+    """Use SIGALRM for a hard main-thread deadline.
+
+    Worker threads rely on transport-native connect/read limits. Streaming
+    response bodies add a per-response close timer through
+    ``read_response_body_with_deadline``.
+    """
     if seconds <= 0:
         raise ValueError("operation deadline must be greater than zero")
-    if threading.current_thread() is not threading.main_thread():
-        raise RuntimeError("wall-clock deadline requires the main thread")
-    if not hasattr(signal, "setitimer"):
-        raise RuntimeError("wall-clock deadline is unavailable on this platform")
+    if threading.current_thread() is not threading.main_thread() or not hasattr(
+        signal,
+        "setitimer",
+    ):
+        yield
+        return
 
     previous_delay, _ = signal.getitimer(signal.ITIMER_REAL)
     if previous_delay > 0:
@@ -91,6 +99,93 @@ def wall_clock_operation_deadline(
     finally:
         signal.setitimer(signal.ITIMER_REAL, 0)
         signal.signal(signal.SIGALRM, previous_handler)
+
+
+def read_response_body_with_deadline(
+    read_body: typing.Callable[[], bytes],
+    close_response: typing.Callable[[], None],
+    *,
+    total_timeout_seconds: typing.Optional[float],
+    started_at: typing.Optional[float],
+    operation: str,
+) -> bytes:
+    """Read and close one response within its operation's remaining budget.
+
+    In worker threads, a joined non-daemon timer closes only this response. It
+    never closes the leased client or affects unrelated requests.
+    """
+    if total_timeout_seconds is None:
+        try:
+            return read_body()
+        finally:
+            close_response()
+
+    if started_at is None:
+        raise ValueError("started_at is required for a bounded response read")
+
+    remaining = total_timeout_seconds - (time.monotonic() - started_at)
+    if remaining <= 0:
+        close_response()
+        raise WallClockDeadlineExceeded(
+            f"{operation} exceeded {total_timeout_seconds} second deadline"
+        )
+
+    if threading.current_thread() is threading.main_thread():
+        try:
+            return read_body()
+        finally:
+            close_response()
+
+    state_lock = threading.Lock()
+    close_lock = threading.Lock()
+    completed = False
+    expired = False
+    closed = False
+
+    def close_once() -> None:
+        nonlocal closed
+        with close_lock:
+            if closed:
+                return
+            closed = True
+        close_response()
+
+    def expire() -> None:
+        nonlocal expired
+        with state_lock:
+            if completed:
+                return
+            expired = True
+        close_once()
+
+    timer = threading.Timer(remaining, expire)
+    timer.daemon = False
+    timer.start()
+    try:
+        try:
+            result = read_body()
+        except BaseException as exc:
+            with state_lock:
+                completed = True
+                did_expire = expired
+            if did_expire:
+                raise WallClockDeadlineExceeded(
+                    f"{operation} exceeded {total_timeout_seconds} second deadline"
+                ) from exc
+            raise
+        else:
+            with state_lock:
+                completed = True
+                did_expire = expired
+            if did_expire:
+                raise WallClockDeadlineExceeded(
+                    f"{operation} exceeded {total_timeout_seconds} second deadline"
+                )
+            return result
+    finally:
+        timer.cancel()
+        timer.join()
+        close_once()
 
 
 def _env_float(name: str, default: float) -> float:

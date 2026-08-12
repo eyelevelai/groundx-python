@@ -92,9 +92,23 @@ class UploadClient(typing.Protocol):
         total_timeout_seconds: typing.Optional[float] = None,
     ) -> typing.Optional[bytes]: ...
 
-    def get_object_and_metadata(self, url: str) -> typing.Optional[typing.Tuple[bytes, typing.Dict[str, str]]]: ...
+    def get_object_and_metadata(
+        self,
+        url: str,
+        *,
+        connect_timeout_seconds: typing.Optional[float] = None,
+        read_timeout_seconds: typing.Optional[float] = None,
+        total_timeout_seconds: typing.Optional[float] = None,
+    ) -> typing.Optional[typing.Tuple[bytes, typing.Dict[str, str]]]: ...
 
-    def head_object(self, url: str) -> typing.Optional[typing.Dict[str, str]]: ...
+    def head_object(
+        self,
+        url: str,
+        *,
+        connect_timeout_seconds: typing.Optional[float] = None,
+        read_timeout_seconds: typing.Optional[float] = None,
+        total_timeout_seconds: typing.Optional[float] = None,
+    ) -> typing.Optional[typing.Dict[str, str]]: ...
 
     def put_object(
         self,
@@ -157,11 +171,39 @@ class Upload:
             }
         return self.client.get_object(url, **timeout_kwargs)
 
-    def get_object_and_metadata(self, url: str) -> typing.Optional[typing.Tuple[bytes, typing.Dict[str, str]]]:
-        return self.client.get_object_and_metadata(url)
+    def get_object_and_metadata(
+        self,
+        url: str,
+        *,
+        connect_timeout_seconds: typing.Optional[float] = None,
+        read_timeout_seconds: typing.Optional[float] = None,
+        total_timeout_seconds: typing.Optional[float] = None,
+    ) -> typing.Optional[typing.Tuple[bytes, typing.Dict[str, str]]]:
+        timeout_kwargs: typing.Dict[str, float] = {}
+        if connect_timeout_seconds is not None or read_timeout_seconds is not None or total_timeout_seconds is not None:
+            timeout_kwargs = {
+                "connect_timeout_seconds": typing.cast(float, connect_timeout_seconds),
+                "read_timeout_seconds": typing.cast(float, read_timeout_seconds),
+                "total_timeout_seconds": typing.cast(float, total_timeout_seconds),
+            }
+        return self.client.get_object_and_metadata(url, **timeout_kwargs)
 
-    def head_object(self, url: str) -> typing.Optional[typing.Dict[str, str]]:
-        return self.client.head_object(url)
+    def head_object(
+        self,
+        url: str,
+        *,
+        connect_timeout_seconds: typing.Optional[float] = None,
+        read_timeout_seconds: typing.Optional[float] = None,
+        total_timeout_seconds: typing.Optional[float] = None,
+    ) -> typing.Optional[typing.Dict[str, str]]:
+        timeout_kwargs: typing.Dict[str, float] = {}
+        if connect_timeout_seconds is not None or read_timeout_seconds is not None or total_timeout_seconds is not None:
+            timeout_kwargs = {
+                "connect_timeout_seconds": typing.cast(float, connect_timeout_seconds),
+                "read_timeout_seconds": typing.cast(float, read_timeout_seconds),
+                "total_timeout_seconds": typing.cast(float, total_timeout_seconds),
+            }
+        return self.client.head_object(url, **timeout_kwargs)
 
     def put_object(
         self,

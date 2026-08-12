@@ -1,8 +1,9 @@
 import contextlib
+import time
 import typing
 
 from ..settings.settings import ContainerSettings
-from .http import wall_clock_operation_deadline
+from .http import read_response_body_with_deadline, wall_clock_operation_deadline
 from .logger import Logger
 from .upload import TimeoutClientCache, validate_upload_timeouts
 
@@ -96,6 +97,7 @@ class S3Client:
             read_timeout_seconds=read_timeout_seconds,
             total_timeout_seconds=total_timeout_seconds,
         )
+        started_at = time.monotonic() if timeout is not None else None
 
         def get() -> typing.Optional[bytes]:
             client_context = self._client_for_timeouts(
@@ -111,7 +113,12 @@ class S3Client:
                 try:
                     s3_bucket, s3_key = self.parse_url(url)
                     response = client.get_object(Bucket=s3_bucket, Key=s3_key)
-                    return self._read_body(response)
+                    return self._read_body(
+                        response,
+                        total_timeout_seconds=timeout[2] if timeout is not None else None,
+                        started_at=started_at,
+                        operation="S3 get_object",
+                    )
                 except Exception as e:
                     self.logger.error_msg(f"[{url}] exception: {e}")
                     raise
@@ -124,38 +131,94 @@ class S3Client:
         ):
             return get()
 
-    def get_object_and_metadata(self, url: str) -> typing.Optional[typing.Tuple[bytes, typing.Dict[str, str]]]:
-        if not self.client:
-            self.logger.warning_msg("get_object no client")
-            return None
+    def get_object_and_metadata(
+        self,
+        url: str,
+        *,
+        connect_timeout_seconds: typing.Optional[float] = None,
+        read_timeout_seconds: typing.Optional[float] = None,
+        total_timeout_seconds: typing.Optional[float] = None,
+    ) -> typing.Optional[typing.Tuple[bytes, typing.Dict[str, str]]]:
+        timeout = validate_upload_timeouts(
+            connect_timeout_seconds=connect_timeout_seconds,
+            read_timeout_seconds=read_timeout_seconds,
+            total_timeout_seconds=total_timeout_seconds,
+        )
+        started_at = time.monotonic() if timeout is not None else None
 
-        try:
-            s3_bucket, s3_key = self.parse_url(url)
+        def get() -> typing.Optional[typing.Tuple[bytes, typing.Dict[str, str]]]:
+            client_context = self._client_for_timeouts(
+                connect_timeout_seconds=connect_timeout_seconds,
+                read_timeout_seconds=read_timeout_seconds,
+                total_timeout_seconds=total_timeout_seconds,
+            )
+            with client_context as client:
+                if not client:
+                    self.logger.warning_msg("get_object no client")
+                    return None
 
-            response = self.client.get_object(Bucket=s3_bucket, Key=s3_key)
+                try:
+                    s3_bucket, s3_key = self.parse_url(url)
+                    response = client.get_object(Bucket=s3_bucket, Key=s3_key)
+                    body = self._read_body(
+                        response,
+                        total_timeout_seconds=timeout[2] if timeout is not None else None,
+                        started_at=started_at,
+                        operation="S3 get_object_and_metadata",
+                    )
+                    return body, self._metadata_from_response(response)
+                except Exception as e:
+                    self.logger.error_msg(f"[{url}] exception: {e}")
+                    raise
 
-            body = self._read_body(response)
+        if timeout is None:
+            return get()
+        with wall_clock_operation_deadline(
+            timeout[2],
+            operation="S3 get_object_and_metadata",
+        ):
+            return get()
 
-            return body, self._metadata_from_response(response)
+    def head_object(
+        self,
+        url: str,
+        *,
+        connect_timeout_seconds: typing.Optional[float] = None,
+        read_timeout_seconds: typing.Optional[float] = None,
+        total_timeout_seconds: typing.Optional[float] = None,
+    ) -> typing.Optional[typing.Dict[str, str]]:
+        timeout = validate_upload_timeouts(
+            connect_timeout_seconds=connect_timeout_seconds,
+            read_timeout_seconds=read_timeout_seconds,
+            total_timeout_seconds=total_timeout_seconds,
+        )
 
-        except Exception as e:
-            self.logger.error_msg(f"[{url}] exception: {e}")
-            raise
+        def head() -> typing.Optional[typing.Dict[str, str]]:
+            client_context = self._client_for_timeouts(
+                connect_timeout_seconds=connect_timeout_seconds,
+                read_timeout_seconds=read_timeout_seconds,
+                total_timeout_seconds=total_timeout_seconds,
+            )
+            with client_context as client:
+                if not client:
+                    self.logger.warning_msg("head_object no client")
+                    return None
 
-    def head_object(self, url: str) -> typing.Optional[typing.Dict[str, str]]:
-        if not self.client:
-            self.logger.warning_msg("head_object no client")
-            return None
+                try:
+                    s3_bucket, s3_key = self.parse_url(url)
+                    response = client.head_object(Bucket=s3_bucket, Key=s3_key)
+                    return self._metadata_from_response(response)
+                except Exception as e:
+                    self.logger.error_msg(f"[{url}] exception: {e}")
+                    raise
 
-        try:
-            s3_bucket, s3_key = self.parse_url(url)
-
-            response = self.client.head_object(Bucket=s3_bucket, Key=s3_key)
-
-            return self._metadata_from_response(response)
-        except Exception as e:
-            self.logger.error_msg(f"[{url}] exception: {e}")
-            raise
+        if timeout is None:
+            return head()
+        with wall_clock_operation_deadline(
+            timeout[2],
+            operation="S3 head_object",
+        ):
+            return head()
 
     def parse_url(self, key: str) -> typing.Tuple[str, str]:
         if key.startswith("s3://"):
@@ -188,17 +251,29 @@ class S3Client:
         )
 
     @staticmethod
-    def _read_body(response: typing.Mapping[str, typing.Any]) -> bytes:
+    def _read_body(
+        response: typing.Mapping[str, typing.Any],
+        *,
+        total_timeout_seconds: typing.Optional[float] = None,
+        started_at: typing.Optional[float] = None,
+        operation: str = "S3 get_object",
+    ) -> bytes:
         body = response.get("Body")
         if body is None:
             raise Exception("S3 response missing Body")
 
-        try:
-            return typing.cast(bytes, body.read())
-        finally:
+        def close_body() -> None:
             close = getattr(body, "close", None)
             if callable(close):
                 close()
+
+        return read_response_body_with_deadline(
+            lambda: typing.cast(bytes, body.read()),
+            close_body,
+            total_timeout_seconds=total_timeout_seconds,
+            started_at=started_at,
+            operation=operation,
+        )
 
     @staticmethod
     def _metadata_from_response(response: typing.Mapping[str, typing.Any]) -> typing.Dict[str, str]:

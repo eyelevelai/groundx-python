@@ -15,6 +15,24 @@ class _Client:
         self.kwargs = kwargs
         return b"workflow"
 
+    def get_object_and_metadata(
+        self,
+        url: str,
+        **kwargs: typing.Any,
+    ) -> typing.Tuple[bytes, typing.Dict[str, str]]:
+        self.url = url
+        self.kwargs = kwargs
+        return b"workflow", {"ETag": '"version"'}
+
+    def head_object(
+        self,
+        url: str,
+        **kwargs: typing.Any,
+    ) -> typing.Dict[str, str]:
+        self.url = url
+        self.kwargs = kwargs
+        return {"ETag": '"version"'}
+
     def put_json_stream(
         self,
         bucket: str,
@@ -85,6 +103,58 @@ def test_upload_preserves_unbounded_object_read_call() -> None:
     body = upload.get_object("s3://eyelevel/workflow.yaml")
 
     assert body == b"workflow"
+    assert client.kwargs == {}
+
+
+def test_upload_forwards_metadata_read_timeout_budget() -> None:
+    client = _Client()
+    upload = Upload.__new__(Upload)
+    upload.client = typing.cast(typing.Any, client)
+
+    result = upload.get_object_and_metadata(
+        "s3://eyelevel/workflow.yaml",
+        connect_timeout_seconds=0.2,
+        read_timeout_seconds=0.5,
+        total_timeout_seconds=0.8,
+    )
+
+    assert result == (b"workflow", {"ETag": '"version"'})
+    assert client.kwargs == {
+        "connect_timeout_seconds": 0.2,
+        "read_timeout_seconds": 0.5,
+        "total_timeout_seconds": 0.8,
+    }
+
+
+def test_upload_forwards_head_read_timeout_budget() -> None:
+    client = _Client()
+    upload = Upload.__new__(Upload)
+    upload.client = typing.cast(typing.Any, client)
+
+    result = upload.head_object(
+        "s3://eyelevel/workflow.yaml",
+        connect_timeout_seconds=0.2,
+        read_timeout_seconds=0.5,
+        total_timeout_seconds=0.8,
+    )
+
+    assert result == {"ETag": '"version"'}
+    assert client.kwargs == {
+        "connect_timeout_seconds": 0.2,
+        "read_timeout_seconds": 0.5,
+        "total_timeout_seconds": 0.8,
+    }
+
+
+def test_upload_preserves_unbounded_metadata_and_head_calls() -> None:
+    client = _Client()
+    upload = Upload.__new__(Upload)
+    upload.client = typing.cast(typing.Any, client)
+
+    upload.get_object_and_metadata("s3://eyelevel/workflow.yaml")
+    assert client.kwargs == {}
+
+    upload.head_object("s3://eyelevel/workflow.yaml")
     assert client.kwargs == {}
 
 

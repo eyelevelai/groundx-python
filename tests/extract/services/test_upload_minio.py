@@ -1,11 +1,14 @@
 import contextlib
 import sys
+import threading
 import time
 import types
 import typing
 import unittest
+from concurrent.futures import ThreadPoolExecutor
 from unittest.mock import Mock, patch
 
+from groundx.extract.services.http import WallClockDeadlineExceeded
 from groundx.extract.services.logger import Logger
 from groundx.extract.services.upload_minio import MinIOClient
 from groundx.extract.settings.settings import ContainerSettings, ContainerUploadSettings
@@ -16,6 +19,9 @@ class FakeMinioResponse:
         self.body = body
         self.closed = False
         self.released = False
+        self.headers = {
+            "ETag": '"etag-1"',
+        }
 
     def read(self) -> bytes:
         return self.body
@@ -243,6 +249,50 @@ class TestMinIOClient(unittest.TestCase):
         self.assertTrue(bounded.response.closed)
         self.assertTrue(bounded.response.released)
 
+    def test_worker_thread_deadline_closes_stalled_response_and_raises_timeout(
+        self,
+    ) -> None:
+        class StalledResponse(FakeMinioResponse):
+            def __init__(self) -> None:
+                super().__init__(b"statement: {}")
+                self.closed_event = threading.Event()
+
+            def read(self) -> bytes:
+                if not self.closed_event.wait(timeout=2):
+                    raise AssertionError("deadline did not close stalled MinIO response")
+                return super().read()
+
+            def close(self) -> None:
+                super().close()
+                self.closed_event.set()
+
+        class StalledMinioClient(FakeMinioClient):
+            def __init__(self) -> None:
+                self.response = StalledResponse()
+
+        cl = self._client()
+        bounded = StalledMinioClient()
+        setattr(cl, "_create_client", Mock(return_value=bounded))
+
+        started = time.monotonic()
+        with fake_minio_error_module(), ThreadPoolExecutor(max_workers=1) as executor:
+            future = executor.submit(
+                cl.get_object,
+                "s3://eyelevel/workflow.yaml",
+                connect_timeout_seconds=0.01,
+                read_timeout_seconds=0.01,
+                total_timeout_seconds=0.06,
+            )
+            with self.assertRaisesRegex(
+                WallClockDeadlineExceeded,
+                "MinIO get_object exceeded",
+            ):
+                future.result(timeout=1)
+
+        self.assertLess(time.monotonic() - started, 0.15)
+        self.assertTrue(bounded.response.closed)
+        self.assertTrue(bounded.response.released)
+
     def test_get_object_and_metadata_closes_response(self) -> None:
         cl = self._client()
         fake = FakeMinioClient()
@@ -258,6 +308,105 @@ class TestMinIOClient(unittest.TestCase):
         self.assertEqual(metadata, {"ETag": "etag-1"})
         self.assertTrue(fake.response.closed)
         self.assertTrue(fake.response.released)
+
+    def test_get_object_and_metadata_preserves_last_modified_header(self) -> None:
+        cl = self._client()
+        fake = FakeMinioClient()
+        fake.response.headers["Last-Modified"] = "Wed, 12 Aug 2026 06:00:00 GMT"
+        cl.client = typing.cast(typing.Any, fake)
+
+        with fake_minio_error_module():
+            _body, metadata = typing.cast(
+                typing.Tuple[bytes, typing.Dict[str, str]],
+                cl.get_object_and_metadata(
+                    "s3://eyelevel/workflows/extract/latest.yaml"
+                ),
+            )
+
+        self.assertEqual(metadata["LastModified"], "1786514400.0")
+
+    def test_get_object_and_metadata_uses_bounded_leased_client(self) -> None:
+        cl = self._client()
+        bounded = FakeMinioClient()
+        create_client = Mock(return_value=bounded)
+        setattr(cl, "_create_client", create_client)
+
+        with fake_minio_error_module():
+            body, metadata = typing.cast(
+                typing.Tuple[bytes, typing.Dict[str, str]],
+                cl.get_object_and_metadata(
+                    "s3://eyelevel/workflows/extract/latest.yaml",
+                    connect_timeout_seconds=0.2,
+                    read_timeout_seconds=0.5,
+                    total_timeout_seconds=0.8,
+                ),
+            )
+
+        self.assertEqual(body, b"statement: {}")
+        self.assertEqual(metadata, {"ETag": "etag-1"})
+        self.assertTrue(bounded.response.closed)
+        self.assertTrue(bounded.response.released)
+        create_client.assert_called_once_with(
+            connect_timeout_seconds=0.2,
+            read_timeout_seconds=0.5,
+            total_timeout_seconds=0.8,
+        )
+
+    def test_head_object_uses_bounded_leased_client(self) -> None:
+        cl = self._client()
+        bounded = FakeMinioClient()
+        create_client = Mock(return_value=bounded)
+        setattr(cl, "_create_client", create_client)
+
+        with fake_minio_error_module():
+            metadata = cl.head_object(
+                "s3://eyelevel/workflows/extract/latest.yaml",
+                connect_timeout_seconds=0.2,
+                read_timeout_seconds=0.5,
+                total_timeout_seconds=0.8,
+            )
+
+        self.assertEqual(metadata, {"ETag": "etag-1"})
+        create_client.assert_called_once_with(
+            connect_timeout_seconds=0.2,
+            read_timeout_seconds=0.5,
+            total_timeout_seconds=0.8,
+        )
+
+    def test_worker_thread_head_and_put_use_transport_bounded_client(self) -> None:
+        cl = self._client()
+        bounded = FakeMinioClient()
+        create_client = Mock(return_value=bounded)
+        setattr(cl, "_create_client", create_client)
+
+        with fake_minio_error_module(), ThreadPoolExecutor(max_workers=1) as executor:
+            head = executor.submit(
+                cl.head_object,
+                "s3://eyelevel/workflow.yaml",
+                connect_timeout_seconds=0.2,
+                read_timeout_seconds=0.5,
+                total_timeout_seconds=0.8,
+            )
+            put = executor.submit(
+                cl.put_json_stream,
+                "eyelevel",
+                "trace.json",
+                b"{}",
+                "application/json",
+                connect_timeout_seconds=0.2,
+                read_timeout_seconds=0.5,
+                total_timeout_seconds=0.8,
+            )
+
+            self.assertEqual(head.result(timeout=1), {"ETag": "etag-1"})
+            put.result(timeout=1)
+
+        create_client.assert_called_once_with(
+            connect_timeout_seconds=0.2,
+            read_timeout_seconds=0.5,
+            total_timeout_seconds=0.8,
+        )
+        self.assertEqual(bounded.put["object_name"], "trace.json")
 
     def test_put_json_stream_uses_single_attempt_bounded_client(self) -> None:
         cl = self._client()

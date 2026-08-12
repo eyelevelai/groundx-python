@@ -1,8 +1,9 @@
 import contextlib
+import time
 import typing
 
 from ..settings.settings import ContainerSettings
-from .http import wall_clock_operation_deadline
+from .http import read_response_body_with_deadline, wall_clock_operation_deadline
 from .logger import Logger
 from .upload import TimeoutClientCache, validate_upload_timeouts
 
@@ -135,6 +136,7 @@ class MinIOClient:
             read_timeout_seconds=read_timeout_seconds,
             total_timeout_seconds=total_timeout_seconds,
         )
+        started_at = time.monotonic() if timeout is not None else None
 
         def get() -> typing.Optional[bytes]:
             client_context = self._client_for_timeouts(
@@ -154,10 +156,13 @@ class MinIOClient:
                         self.parse_url(url),
                     )
 
-                    try:
-                        return response.read()
-                    finally:
-                        self._close_response(response)
+                    return read_response_body_with_deadline(
+                        response.read,
+                        lambda: self._close_response(response),
+                        total_timeout_seconds=timeout[2] if timeout is not None else None,
+                        started_at=started_at,
+                        operation="MinIO get_object",
+                    )
                 except S3Error as e:
                     self.logger.error_msg(f"Failed to get object from [{url}] [{self.parse_url(url)}]: {str(e)}")
                     raise
@@ -170,59 +175,110 @@ class MinIOClient:
         ):
             return get()
 
-    def get_object_and_metadata(self, url: str) -> typing.Optional[typing.Tuple[bytes, typing.Dict[str, str]]]:
-        if not self.client:
-            return None
+    def get_object_and_metadata(
+        self,
+        url: str,
+        *,
+        connect_timeout_seconds: typing.Optional[float] = None,
+        read_timeout_seconds: typing.Optional[float] = None,
+        total_timeout_seconds: typing.Optional[float] = None,
+    ) -> typing.Optional[typing.Tuple[bytes, typing.Dict[str, str]]]:
+        timeout = validate_upload_timeouts(
+            connect_timeout_seconds=connect_timeout_seconds,
+            read_timeout_seconds=read_timeout_seconds,
+            total_timeout_seconds=total_timeout_seconds,
+        )
+        started_at = time.monotonic() if timeout is not None else None
 
-        from minio.error import S3Error
-
-        try:
-            meta = (
-                self.head_object(
-                    self.parse_url(url),
-                )
-                or {}
+        def get() -> typing.Optional[typing.Tuple[bytes, typing.Dict[str, str]]]:
+            client_context = self._client_for_timeouts(
+                connect_timeout_seconds=connect_timeout_seconds,
+                read_timeout_seconds=read_timeout_seconds,
+                total_timeout_seconds=total_timeout_seconds,
             )
+            with client_context as client:
+                if not client:
+                    return None
 
-            response = self.client.get_object(
-                self.settings.upload.bucket,
-                self.parse_url(url),
+                from minio.error import S3Error
+
+                try:
+                    response = client.get_object(
+                        self.settings.upload.bucket,
+                        self.parse_url(url),
+                    )
+                    body = read_response_body_with_deadline(
+                        response.read,
+                        lambda: self._close_response(response),
+                        total_timeout_seconds=timeout[2] if timeout is not None else None,
+                        started_at=started_at,
+                        operation="MinIO get_object_and_metadata",
+                    )
+                    metadata = self._metadata_from_get_response(response)
+                    return body, metadata
+                except S3Error as e:
+                    self.logger.error_msg(f"Failed to get object from [{url}] [{self.parse_url(url)}]: {str(e)}")
+                    raise
+
+        if timeout is None:
+            return get()
+        with wall_clock_operation_deadline(
+            timeout[2],
+            operation="MinIO get_object_and_metadata",
+        ):
+            return get()
+
+    def head_object(
+        self,
+        url: str,
+        *,
+        connect_timeout_seconds: typing.Optional[float] = None,
+        read_timeout_seconds: typing.Optional[float] = None,
+        total_timeout_seconds: typing.Optional[float] = None,
+    ) -> typing.Optional[typing.Dict[str, str]]:
+        timeout = validate_upload_timeouts(
+            connect_timeout_seconds=connect_timeout_seconds,
+            read_timeout_seconds=read_timeout_seconds,
+            total_timeout_seconds=total_timeout_seconds,
+        )
+
+        def head() -> typing.Optional[typing.Dict[str, str]]:
+            client_context = self._client_for_timeouts(
+                connect_timeout_seconds=connect_timeout_seconds,
+                read_timeout_seconds=read_timeout_seconds,
+                total_timeout_seconds=total_timeout_seconds,
             )
+            with client_context as client:
+                if not client:
+                    return None
 
-            try:
-                body = response.read()
-            finally:
-                self._close_response(response)
+                from minio.error import S3Error
 
-            return body, meta
-        except S3Error as e:
-            self.logger.error_msg(f"Failed to get object from [{url}] [{self.parse_url(url)}]: {str(e)}")
-            raise
+                try:
+                    response = client.stat_object(
+                        self.settings.upload.bucket,
+                        self.parse_url(url),
+                    )
+                    if not response:
+                        return None
 
-    def head_object(self, url: str) -> typing.Optional[typing.Dict[str, str]]:
-        if not self.client:
-            return None
+                    res: typing.Dict[str, str] = {}
+                    if response.etag:
+                        res["ETag"] = response.etag
+                    if response.last_modified:
+                        res["LastModified"] = str(response.last_modified.timestamp())
+                    return res
+                except S3Error as e:
+                    self.logger.error_msg(f"Failed to get object from [{url}] [{self.parse_url(url)}]: {str(e)}")
+                    raise
 
-        from minio.error import S3Error
-
-        try:
-            response = self.client.stat_object(
-                self.settings.upload.bucket,
-                self.parse_url(url),
-            )
-            if not response:
-                return None
-
-            res: typing.Dict[str, str] = {}
-            if response.etag:
-                res["ETag"] = response.etag
-            if response.last_modified:
-                res["LastModified"] = str(response.last_modified.timestamp())
-
-            return res
-        except S3Error as e:
-            self.logger.error_msg(f"Failed to get object from [{url}] [{self.parse_url(url)}]: {str(e)}")
-            raise
+        if timeout is None:
+            return head()
+        with wall_clock_operation_deadline(
+            timeout[2],
+            operation="MinIO head_object",
+        ):
+            return head()
 
     def parse_url(self, ur: str) -> str:
         minio_uri_parts = ur.replace("s3://", "").split("/")
@@ -285,6 +341,21 @@ class MinIOClient:
         release_conn = getattr(response, "release_conn", None)
         if callable(release_conn):
             release_conn()
+
+    @staticmethod
+    def _metadata_from_get_response(response: typing.Any) -> typing.Dict[str, str]:
+        headers = getattr(response, "headers", {})
+        etag = headers.get("ETag") or headers.get("etag")
+        result: typing.Dict[str, str] = {}
+        if etag:
+            result["ETag"] = str(etag).strip('"')
+
+        last_modified = headers.get("Last-Modified") or headers.get("last-modified")
+        if last_modified:
+            from email.utils import parsedate_to_datetime
+
+            result["LastModified"] = str(parsedate_to_datetime(str(last_modified)).timestamp())
+        return result
 
     def put_json_stream(
         self,
