@@ -283,7 +283,7 @@ class Upload:
 
 
 def freeze_object_tags(
-    object_tags: typing.Optional[typing.Mapping[str, str]],
+    object_tags: object,
 ) -> typing.Optional[typing.Mapping[str, str]]:
     """Validate and detach optional object tags before storage I/O."""
     if object_tags is None:
@@ -291,12 +291,14 @@ def freeze_object_tags(
     if not isinstance(object_tags, typing.Mapping):
         raise ValueError("object_tags must be a mapping")
 
-    items = tuple(object_tags.items())
+    raw_tags = typing.cast(typing.Mapping[object, object], object_tags)
+    items = tuple(raw_tags.items())
     if not items:
         return None
     if len(items) > MAX_OBJECT_TAGS:
         raise ValueError(f"object_tags supports at most {MAX_OBJECT_TAGS} tags")
 
+    validated_items: typing.List[typing.Tuple[str, str]] = []
     for key, value in items:
         if not isinstance(key, str) or not isinstance(value, str):
             raise ValueError("object tag keys and values must be strings")
@@ -312,8 +314,9 @@ def freeze_object_tags(
             raise ValueError("object tag keys contain unsupported characters")
         if OBJECT_TAG_SAFE_PATTERN.fullmatch(value) is None:
             raise ValueError("object tag values contain unsupported characters")
+        validated_items.append((key, value))
 
-    return MappingProxyType(dict(sorted(items)))
+    return MappingProxyType(dict(sorted(validated_items)))
 
 
 def validate_upload_timeouts(
