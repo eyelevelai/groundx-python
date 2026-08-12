@@ -94,8 +94,8 @@
 - [x] 4.4 Build one candidate wheel with `poetry build`. Record its SHA-256 and
   source commit. Do not release it.
   Candidate: `groundx-3.9.2-py3-none-any.whl`, source commit
-  `adbaa137f3da3d7c70f57bd7be1099cc009d30e3`, SHA-256
-  `5a52ef45dd7d53da3cdad40c23a9a2ca9f7570e60eed2bc03bfd4123b6f86ee5`.
+  `d37d8d7679ca29a3c03dea1460016d9a82b2b55f`, SHA-256
+  `76d71b1bb1f00404a3243424df16eccc0926a00bc9d4ee962c83986cdb47abc2`.
 
 ## 5. Prove The Internal Arcadia Consumer
 
