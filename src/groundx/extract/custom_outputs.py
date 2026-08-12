@@ -203,12 +203,12 @@ def reassemble_custom_outputs_from_xray(
                             page_numbers=route_container.page_numbers,
                             scalar_candidates=scalar_candidates,
                             diagnostics=diagnostics,
-                            repeated=route_repeats and route_value.repeated,
+                            repeated=route_repeats,
                         )
                     continue
                 if route_value.repeated or _unwrap_match_value(route_value.value) is not None:
                     route_satisfied[route_index] = True
-                if route_value.repeated:
+                if route_repeats:
                     _record_repeated_group_path(
                         repeated_group_paths,
                         pointer,
@@ -237,7 +237,7 @@ def reassemble_custom_outputs_from_xray(
                     page_numbers=route_container.page_numbers,
                     scalar_candidates=scalar_candidates,
                     diagnostics=diagnostics,
-                    repeated=route_repeats and route_value.repeated,
+                    repeated=route_repeats,
                 )
                 if route_value.repeated and route_value.conflicts is not None:
                     # Task 3.2a7b: carry the generic `<field>__conflicts`
@@ -253,7 +253,7 @@ def reassemble_custom_outputs_from_xray(
                         page_numbers=route_container.page_numbers,
                         scalar_candidates=scalar_candidates,
                         diagnostics=diagnostics,
-                        repeated=route_repeats and route_value.repeated,
+                        repeated=route_repeats,
                     )
 
     _dedupe_repeated_group_outputs(
@@ -884,7 +884,7 @@ def _set_pointer(
             _set_nested_value(record, field_path, value)
         return
 
-    if repeated and parts[0] == route.get("workflow_group"):
+    if repeated:
         records = result.setdefault(parts[0], [])
         if not isinstance(records, list):
             return

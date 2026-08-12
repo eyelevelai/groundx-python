@@ -234,7 +234,7 @@ def test_reassembles_complete_destination_trees_without_depth_inference(
     assert result.final_output == expected
 
 
-def test_compiled_final_path_does_not_infer_repetition_from_observed_records() -> None:
+def test_compiled_final_path_uses_declared_repeated_step_kind() -> None:
     workflow_extract = {
         "workflow": {
             "custom_steps": [
@@ -269,7 +269,7 @@ def test_compiled_final_path_does_not_infer_repetition_from_observed_records() -
     )
 
     assert result.final_output == {
-        "group": {"object": {"field": "compiled scalar"}},
+        "group": [{"object": {"field": "compiled scalar"}}],
     }
 
 
@@ -2004,7 +2004,7 @@ def test_records_wrapper_preserves_direct_outputs_next_to_records() -> None:
     )
 
     assert result.final_output == {
-        "statement": {"account_number": "A-123"},
+        "statement": [{"account_number": "A-123"}],
         "charges": [{"description": "Admin fee"}],
     }
 
@@ -2283,6 +2283,89 @@ def test_repeated_section_route_still_deduplicates_shared_section_id() -> None:
 
     assert result.final_output == {
         "line_items": [{"description": "Admin fee"}],
+    }
+
+
+def test_direct_repeated_route_uses_destination_root_when_workflow_group_differs() -> None:
+    workflow_extract = {
+        "workflow": {
+            "custom_steps": [
+                {"name": "line_item_rows", "level": "chunk", "kind": "keys"},
+            ],
+            "output_routes": [
+                {
+                    "workflow_group": "source_records",
+                    "workflow_field": "description",
+                    "final_path": "/line_items/description",
+                    "step_name": "line_item_rows",
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": "description",
+                },
+            ],
+        }
+    }
+    xray = {
+        "chunks": [
+            {
+                "customChunkOutputs": {
+                    "line_item_rows": {
+                        "_records": [{"description": "Admin fee"}],
+                    }
+                }
+            }
+        ]
+    }
+
+    result = reassemble_custom_outputs_from_xray(
+        xray,
+        workflow_extract=workflow_extract,
+    )
+
+    assert result.final_output == {
+        "line_items": [{"description": "Admin fee"}],
+    }
+
+
+def test_direct_repeated_route_uses_sibling_fallback_when_records_do_not_match() -> None:
+    workflow_extract = {
+        "workflow": {
+            "custom_steps": [
+                {"name": "line_item_rows", "level": "chunk", "kind": "keys"},
+            ],
+            "output_routes": [
+                {
+                    "workflow_group": "line_items",
+                    "workflow_field": "code",
+                    "final_path": "/line_items/code",
+                    "step_name": "line_item_rows",
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": "code",
+                },
+            ],
+        }
+    }
+    xray = {
+        "chunks": [
+            {
+                "customChunkOutputs": {
+                    "line_item_rows": {
+                        "code": "A-1",
+                        "_records": [{"description": "Admin fee"}],
+                    }
+                }
+            }
+        ]
+    }
+
+    result = reassemble_custom_outputs_from_xray(
+        xray,
+        workflow_extract=workflow_extract,
+    )
+
+    assert result.final_output == {
+        "line_items": [{"code": "A-1"}],
     }
 
 
