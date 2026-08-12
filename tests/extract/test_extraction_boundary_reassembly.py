@@ -533,6 +533,7 @@ def test_sdk_reassembly_expected_answer_projection_is_diagnostic_only(surface: s
     "surface",
     REAL_BOUNDARY_SURFACES,
 )
+@pytest.mark.release_intentional_fixture_red
 def test_sdk_xray_reassembly_real_boundary_packets(
     tmp_path: pathlib.Path,
     surface: str,
@@ -553,6 +554,7 @@ def test_sdk_xray_reassembly_real_boundary_packets(
     _assert_reviewed_expected_output_sidecar(expected_path)
 
 
+@pytest.mark.release_intentional_fixture_red
 def test_adp_boundary_reassembly_detects_corrupted_real_input(
     tmp_path: pathlib.Path,
 ) -> None:
@@ -583,6 +585,7 @@ def test_adp_boundary_reassembly_detects_corrupted_real_input(
         )
 
 
+@pytest.mark.release_intentional_fixture_red
 def test_adp_boundary_reassembly_detects_corrupted_expected_output(
     tmp_path: pathlib.Path,
 ) -> None:
@@ -616,6 +619,7 @@ def test_adp_boundary_reassembly_detects_corrupted_expected_output(
         )
 
 
+@pytest.mark.release_intentional_fixture_red
 def test_adp_boundary_reassembly_rejects_invalid_identity_threshold_metadata(
     tmp_path: pathlib.Path,
 ) -> None:

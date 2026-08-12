@@ -115,6 +115,12 @@ When a release is required, the handoff must name the requested version, merged 
 validation evidence, and downstream consumers that need the new version. Do not create a
 release tag, dispatch a release workflow, or publish the package from this repository.
 
+Ordinary pull-request CI keeps these protected tests failing until governed fixtures are
+promoted. Tag-release CI classifies them separately. Publishing is allowed only when the
+selected set contains exactly seven approved missing-fixture failures, or all seven tests
+pass after fixture promotion. Any missing, extra, skipped, errored, mixed, or changed
+outcome blocks publishing.
+
 ### Commit Messages
 
 Write clear, descriptive commit messages that explain what changed and why.

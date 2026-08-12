@@ -33,3 +33,7 @@ def pytest_configure(config: pytest.Config) -> None:
         "pending_fixture_promotion: committed replay inputs are absent or locally "
         "incoherent; owner fixture lifecycle status is tracked separately",
     )
+    config.addinivalue_line(
+        "markers",
+        "release_intentional_fixture_red: exact protected fixture failures accepted only by the tag-release classifier",
+    )
