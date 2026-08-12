@@ -93,9 +93,9 @@
   parallel pytest, line endings, and diff checks pass.
 - [x] 4.4 Build one candidate wheel with `poetry build`. Record its SHA-256 and
   source commit. Do not release it.
-  Candidate: `groundx-3.9.2-py3-none-any.whl`, source commit
-  `d37d8d7679ca29a3c03dea1460016d9a82b2b55f`, SHA-256
-  `76d71b1bb1f00404a3243424df16eccc0926a00bc9d4ee962c83986cdb47abc2`.
+  Candidate: `groundx-3.9.3-py3-none-any.whl`, source commit
+  `4c18c195e403cf48591aaa901b7bfdfe5364d60e`, SHA-256
+  `ecb57255c87291cbc8bb6df1af26ef6ea08e5152b1b52dfe94dc799fdd40945c`.
 
 ## 5. Prove The Internal Arcadia Consumer
 
