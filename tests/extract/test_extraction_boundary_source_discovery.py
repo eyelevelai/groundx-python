@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import ast
 import json
+import typing
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -90,7 +91,10 @@ def test_reassembly_boundary_declarations_match_production_source() -> None:
 
 
 def test_reassembly_registry_names_the_real_arcadia_capture_writer() -> None:
-    [artifact] = _catalog()["artifacts"]
+    [artifact] = typing.cast(
+        list[dict[str, str]],
+        _catalog()["artifacts"],
+    )
 
     assert artifact["production_entrypoint"] == (
         "groundx.extract.custom_outputs.reassemble_custom_outputs"
