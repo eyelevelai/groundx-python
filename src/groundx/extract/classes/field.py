@@ -1,29 +1,35 @@
-import dateparser, typing
-from pydantic import Field
-from typing_extensions import Annotated
+import typing
 
+import dateparser
+from ..utility import coerce_value, str_to_type_sequence
 from .element import Element
-from ..utility import str_to_type_sequence
+from pydantic import Field, PrivateAttr
+from typing_extensions import Annotated
 
 
 class ExtractedField(Element):
     confidence: typing.Optional[str] = None
     conflicts: Annotated[typing.List[typing.Any], Field(default_factory=list)]
 
-    value: typing.Optional[typing.Union[str, float, typing.List[typing.Any]]] = ""
+    value: typing.Any = None
+    _coercion_warning: typing.Optional[str] = PrivateAttr(default=None)
 
     def __init__(
         self,
-        value: typing.Union[str, float, typing.List[typing.Any]] = "",
+        value: typing.Any = None,
         **data: typing.Any,
     ) -> None:
         super().__init__(**data)
 
         self.set_value(value)
 
+    @property
+    def coercion_warning(self) -> typing.Optional[str]:
+        return self._coercion_warning
+
     def attr_name(self) -> typing.Optional[str]:
         if not self.prompt:
-            raise Exception(f"prompt is not set")
+            raise Exception("prompt is not set")
 
         return self.prompt.attr_name
 
@@ -91,71 +97,23 @@ class ExtractedField(Element):
 
     def get_value(
         self,
-    ) -> typing.Optional[typing.Union[str, float, typing.List[typing.Any]]]:
+    ) -> typing.Any:
         if self.value is None:
-            return self.none_value()
-
-        ty = self.type()
-        if ty is None:
-            return self.value
-
-        expected_types = str_to_type_sequence(ty)
-
-        if type(self.value) in expected_types:
-            return self.value
-
-        if isinstance(self.value, dict):
-            nv = typing.cast(typing.Dict[str, typing.Any], self.value)
-            if "value" in nv and (
-                isinstance(nv["value"], str)
-                or isinstance(nv["value"], float)
-                or isinstance(nv["value"], int)
-            ):
-                return nv["value"]
-
-        if not isinstance(self.value, (str, float, int)):
-            return self.value
-
-        if isinstance(self.value, str):
-            if not self.value:
-                if any(t in (int, float) for t in expected_types):
-                    return self.none_value()
-                ev = self.empty_value()
-                if ev is not None:
-                    return ev
-                return self.value
-            if float in expected_types:
-                return float(self.value)
-            return int(self.value)
-
-        return str(self.value)
+            return None
+        expected_type = self.prompt.type if self.prompt else None
+        result = coerce_value(self.value, expected_type)
+        self._set_coercion_warning(result.warning)
+        return result.value
 
     def key(self) -> str:
         if not self.prompt:
-            raise Exception(f"prompt is not set")
+            raise Exception("prompt is not set")
 
         return self.prompt.key()
 
     def none_value(
         self,
     ) -> typing.Optional[typing.Optional[typing.Union[int, float, typing.Any]]]:
-        ty = self.type()
-        if ty is None:
-            return None
-        expected_types = str_to_type_sequence(ty)
-
-        if any(t in (int, float) for t in expected_types):
-            return None
-
-        if str in expected_types:
-            return ""
-
-        if list in expected_types:
-            return []
-
-        if dict in expected_types:
-            return {}
-
         return None
 
     def remove_conflict(self, value: typing.Any) -> None:
@@ -213,42 +171,40 @@ Special Instructions:
 
     def required(self) -> bool:
         if not self.prompt:
-            raise Exception(f"prompt is not set")
+            raise Exception("prompt is not set")
 
         return self.prompt.required
 
-    def set_value(
-        self, value: typing.Union[str, float, typing.List[typing.Any]]
-    ) -> None:
-        if isinstance(value, int):
-            self.value = float(value)
-        elif (
-            isinstance(value, str)
-            and self.prompt
-            and self.prompt.attr_name
-            and "date" in self.prompt.key().lower()
-        ):
+    def set_value(self, value: typing.Any) -> None:
+        if type(value) is str and self.prompt and self.prompt.attr_name and "date" in self.prompt.key().lower():
             try:
                 dt = dateparser.parse(value)
-                if dt is None:
-                    self.value = value
-                else:
-                    self.value = dt.strftime("%Y-%m-%d")
-            except Exception as e:
-                print(f"date error [{value}]: [{e}]")
-                self.value = value
-        else:
-            self.value = value
+                if dt is not None:
+                    value = dt.strftime("%Y-%m-%d")
+            except Exception:
+                pass
+
+        expected_type = self.prompt.type if self.prompt else None
+        result = coerce_value(value, expected_type)
+        self.value = result.value
+        self._set_coercion_warning(result.warning)
+
+    def _set_coercion_warning(self, warning: typing.Optional[str]) -> None:
+        if warning is None:
+            self._coercion_warning = None
+            return
+        field_name = self.prompt.attr_name if self.prompt and self.prompt.attr_name else "unknown"
+        self._coercion_warning = f"field {field_name}: {warning}"
 
     def type(self) -> typing.Optional[typing.Union[str, typing.List[str]]]:
         if not self.prompt:
-            raise Exception(f"prompt is not set")
+            raise Exception("prompt is not set")
 
         return self.prompt.type
 
     def valid_value(self, value: typing.Any) -> bool:
         if not self.prompt:
-            raise Exception(f"prompt is not set")
+            raise Exception("prompt is not set")
 
         return self.prompt.valid_value(value)
 

@@ -1,9 +1,14 @@
 from __future__ import annotations
 
-import json, traceback, typing
+import json
+import typing
 from dataclasses import dataclass, field
 from urllib.parse import urlparse
 
+from ..services.deadline import remaining_operation_seconds
+from ..services.logger import Logger
+from ..settings.settings import AgentSettings
+from ..utility.utility import clean_json
 from smolagents import (  # pyright: ignore[reportMissingTypeStubs]
     CodeAgent,
     Tool,
@@ -19,11 +24,6 @@ from smolagents.models import (  # pyright: ignore[reportMissingTypeStubs]
     MessageRole,
     OpenAIServerModel,
 )
-
-from ..services.deadline import remaining_operation_seconds
-from ..services.logger import Logger
-from ..settings.settings import AgentSettings
-from ..utility.utility import clean_json
 
 if typing.TYPE_CHECKING:
     from PIL.Image import Image
@@ -111,13 +111,8 @@ class RemoteImageTaskStep(TaskStep):
     image_urls: typing.List[str] = field(default_factory=list)
 
     def to_messages(self, summary_mode: bool = False) -> typing.List[ChatMessage]:
-        content: typing.List[typing.Dict[str, typing.Any]] = [
-            {"type": "text", "text": f"New task:\n{self.task}"}
-        ]
-        content.extend(
-            {"type": "image_url", "image_url": {"url": image_url}}
-            for image_url in self.image_urls
-        )
+        content: typing.List[typing.Dict[str, typing.Any]] = [{"type": "text", "text": f"New task:\n{self.task}"}]
+        content.extend({"type": "image_url", "image_url": {"url": image_url}} for image_url in self.image_urls)
         return [ChatMessage(role=MessageRole.USER, content=content)]
 
     def dict(self) -> typing.Dict[str, typing.Any]:
@@ -145,47 +140,61 @@ def extract_response(res: typing.Dict[str, typing.Any]) -> typing.Any:
     return res
 
 
+class _ResponseTypeError(TypeError):
+    pass
+
+
+def _matches_expected_type(
+    value: typing.Any,
+    expected_types: typing.Union[type, typing.Tuple[type, ...]],
+) -> bool:
+    return isinstance(value, expected_types)
+
+
+def _expects_dict(expected_types: typing.Union[type, typing.Tuple[type, ...]]) -> bool:
+    return isinstance({}, expected_types)
+
+
+def _unwrap_response(
+    value: typing.Any,
+    expected_types: typing.Union[type, typing.Tuple[type, ...]],
+) -> typing.Any:
+    if (
+        type(value) is list
+        and not _matches_expected_type(value, expected_types)
+        and _expects_dict(expected_types)
+        and len(value) == 1
+    ):
+        value = value[0]
+    if type(value) is dict:
+        return extract_response(value)
+    return value
+
+
+def _raise_response_type_error(
+    value: typing.Any,
+    expected_types: typing.Union[type, typing.Tuple[type, ...]],
+) -> typing.NoReturn:
+    raise _ResponseTypeError(f"agent process result is not of expected type(s) {expected_types!r}, got {type(value)!r}")
+
+
 def process_response(
     res: typing.Any,
     expected_types: typing.Union[type, typing.Tuple[type, ...]] = dict,
 ) -> typing.Any:
-    if not isinstance(res, expected_types):
-        if (
-            isinstance(res, list)
-            and isinstance(dict(), expected_types)
-            and len(res) == 1  # pyright: ignore[reportUnknownArgumentType]
-        ):
-            return extract_response(
-                res[0]  # pyright: ignore[reportUnknownArgumentType]
-            )
+    candidate = res
+    if not _matches_expected_type(candidate, expected_types):
+        if type(candidate) is list and _expects_dict(expected_types) and len(candidate) == 1:
+            pass
+        elif type(candidate) is str:
+            candidate = json.loads(clean_json(candidate))
+        else:
+            _raise_response_type_error(candidate, expected_types)
 
-        if not isinstance(res, str):
-            traceback.print_stack()
-            raise TypeError(
-                f"agent process result is not of expected type(s) {expected_types!r}, got {type(res)!r}"  # type: ignore
-            )
-
-        res = clean_json(res)
-
-        loaded = json.loads(res)
-        if not isinstance(loaded, expected_types):
-            if isinstance(loaded, list) and isinstance(dict(), expected_types) and len(loaded) == 1:  # type: ignore
-                return extract_response(loaded[0])  # type: ignore
-
-            traceback.print_stack()
-            raise TypeError(
-                f"agent process result is not of expected type(s) {expected_types!r} after JSON parsing, got {type(loaded)!r}"  # type: ignore
-            )
-
-        if isinstance(loaded, typing.Dict):
-            return extract_response(loaded)  # type: ignore
-
-        return loaded
-
-    if isinstance(res, typing.Dict):
-        return extract_response(res)  # type: ignore
-
-    return res
+    candidate = _unwrap_response(candidate, expected_types)
+    if not _matches_expected_type(candidate, expected_types):
+        _raise_response_type_error(candidate, expected_types)
+    return candidate
 
 
 class AgentCode(CodeAgent):
@@ -237,15 +246,11 @@ class AgentCode(CodeAgent):
         try:
             return process_response(res=res, expected_types=expected_types)
 
-        except Exception as e:
+        except (json.JSONDecodeError, _ResponseTypeError) as e:
             if attempt >= self.response_parse_max_retries:
                 raise TypeError(
-                    f"agent process result is not of expected type(s) {expected_types!r}: [{e}]\n\n{res}"
-                )
-
-            self.log.debug_msg(
-                f"agent process result is not of expected type(s) {expected_types!r}: [{e}], attempting again [{attempt+1}]\n\n{res}"
-            )
+                    f"agent process result is not of expected type(s) {expected_types!r} after {attempt + 1} attempt(s)"
+                ) from None
 
             return self.process(conflict, images, expected_types, attempt + 1)
 
@@ -338,7 +343,7 @@ class AgentTool(ToolCallingAgent):
             )
             return parsed
 
-        except Exception as e:
+        except (json.JSONDecodeError, _ResponseTypeError) as e:
             _emit_agent_trace(
                 self.log,
                 trace_callback,
@@ -350,12 +355,8 @@ class AgentTool(ToolCallingAgent):
             )
             if attempt >= self.response_parse_max_retries:
                 raise TypeError(
-                    f"agent process result is not of expected type(s) {expected_types!r}: [{e}]\n\n{res}"
-                )
-
-            print(
-                f"agent process result is not of expected type(s) {expected_types!r}: [{e}], attempting again [{attempt+1}]\n\n{res}"
-            )
+                    f"agent process result is not of expected type(s) {expected_types!r} after {attempt + 1} attempt(s)"
+                ) from None
 
             return self.process(
                 conflict,
@@ -380,9 +381,7 @@ class AgentTool(ToolCallingAgent):
         self.memory.system_prompt = SystemPromptStep(system_prompt=self.system_prompt)
         self.memory.reset()
         self.monitor.reset()
-        self.memory.steps.append(
-            RemoteImageTaskStep(task=self.task, task_images=None, image_urls=image_urls)
-        )
+        self.memory.steps.append(RemoteImageTaskStep(task=self.task, task_images=None, image_urls=image_urls))
 
         try:
             try:
@@ -403,8 +402,7 @@ class AgentTool(ToolCallingAgent):
     ) -> str:
         if image_transport not in SUPPORTED_IMAGE_TRANSPORTS:
             raise ValueError(
-                "unsupported image_transport "
-                f"[{image_transport}]; expected one of {sorted(SUPPORTED_IMAGE_TRANSPORTS)}"
+                f"unsupported image_transport [{image_transport}]; expected one of {sorted(SUPPORTED_IMAGE_TRANSPORTS)}"
             )
         if image_urls and image_transport not in {"data_url", "remote_url"}:
             raise ValueError("image_urls require image_transport='data_url' or 'remote_url'")

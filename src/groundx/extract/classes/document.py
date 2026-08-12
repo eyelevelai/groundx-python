@@ -170,6 +170,8 @@ class Document(Group):
             return None, element
 
         element.prompt = gf.prompt
+        if isinstance(element, ExtractedField):
+            element.set_value(element.value)
 
         if group_name != parent:
             return parent, element
