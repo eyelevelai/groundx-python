@@ -12,7 +12,7 @@
       "companion_input_path_template": "groundx-python/tests/extract/fixtures/extraction-boundary/inputs/{surface}/internal_arcadia_download_workflow_load.handoff.json",
       "consumer_boundary": "internal_arcadia_load_xray_predecessor plus internal_arcadia_download_workflow_load",
       "diff_path_template": "groundx-python/tests/extract/fixtures/extraction-boundary/boundary-goldens/{surface}/groundx_python_xray_reassembly.expected.diff.json",
-      "evidence_writer_function": "classes.pipeline_trace.capture_load_xray_after",
+      "evidence_writer_function": "classes.pipeline_trace.capture_sdk_reassembly_output",
       "fixture_path_template": "groundx-python/tests/extract/fixtures/extraction-boundary/boundary-goldens/{surface}/groundx_python_xray_reassembly.expected.json",
       "fixture_policy": "commit_sanitized_fixture",
       "input_from": "internal_arcadia_load_xray_predecessor",
@@ -29,14 +29,14 @@
       "required": true,
       "required_ci_check": "Test",
       "review_path_template": "groundx-python/tests/extract/fixtures/extraction-boundary/boundary-goldens/{surface}/groundx_python_xray_reassembly.expected.review.json",
-      "s3_path_template": "layout/processed/{task_id}/{document_id}-extract-trace/internal-arcadia-agents/{stage_run}/output.full_json.json",
+      "s3_path_template": "layout/processed/{task_id}/{document_id}-extract-trace/internal-arcadia-agents/{stage_run}/sdk.reassembly_output.json",
       "service_role": "internal-arcadia-agents extract pod embedded GroundX Python SDK",
       "source_log_required": false,
       "stage": "sdk_xray_reassembly",
       "status": "complete",
       "validation_point": "groundx.extract.custom_outputs.reassemble_custom_outputs_from_xray",
       "validator": "groundx-python/tests/extract/test_extraction_boundary_reassembly.py",
-      "writer": "groundx-python/src/groundx/extract"
+      "writer": "classes/statement.py _sdk_custom_output_reassembly_result -> classes/pipeline_trace.py capture_sdk_reassembly_output"
     }
   ],
   "cases": [
@@ -176,5 +176,5 @@
       ]
     }
   },
-  "writer_registry_sha256": "e3f2b53b4cc786c6cf69ca35bc20c4c0eb6942f4d676abcd3276540a9e862e0f"
+  "writer_registry_sha256": "ba417b355c288876a3764de9d34350782a8a113b8e5002c4055f7dc627bf8c84"
 }
