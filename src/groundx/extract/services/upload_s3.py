@@ -278,9 +278,20 @@ class S3Client:
             if callable(close):
                 close()
 
+        def abort_body() -> None:
+            raw_stream = getattr(body, "_raw_stream", None)
+            shutdown = getattr(raw_stream, "shutdown", None)
+            if callable(shutdown):
+                try:
+                    shutdown()
+                except (OSError, RuntimeError, ValueError):
+                    pass
+            close_body()
+
         return read_response_body_with_deadline(
             lambda: typing.cast(bytes, body.read()),
             close_body,
+            abort_response=abort_body,
             total_timeout_seconds=total_timeout_seconds,
             started_at=started_at,
             operation=operation,

@@ -68,7 +68,7 @@ def wall_clock_operation_deadline(
     """Use SIGALRM for a hard main-thread deadline.
 
     Worker threads rely on transport-native connect/read limits. Streaming
-    response bodies add a per-response close timer through
+    response bodies add a per-response abort timer through
     ``read_response_body_with_deadline``.
     """
     if seconds <= 0:
@@ -109,13 +109,14 @@ def read_response_body_with_deadline(
     read_body: typing.Callable[[], bytes],
     close_response: typing.Callable[[], None],
     *,
+    abort_response: typing.Optional[typing.Callable[[], None]] = None,
     total_timeout_seconds: typing.Optional[float],
     started_at: typing.Optional[float],
     operation: str,
 ) -> bytes:
     """Read and close one response within its operation's remaining budget.
 
-    A joined non-daemon timer closes only this response if the body stalls. On
+    A joined non-daemon timer aborts only this response if the body stalls. On
     the main thread, SIGALRM also bounds the complete operation when available.
     Neither mechanism closes the leased client or affects unrelated requests.
     """
@@ -139,13 +140,16 @@ def read_response_body_with_deadline(
     expired = False
     closed = False
 
-    def close_once() -> None:
+    def close_once(*, abort: bool = False) -> None:
         nonlocal closed
         with close_lock:
             if closed:
                 return
             closed = True
-        close_response()
+        if abort and abort_response is not None:
+            abort_response()
+        else:
+            close_response()
 
     def expire() -> None:
         nonlocal expired
@@ -153,7 +157,7 @@ def read_response_body_with_deadline(
             if completed:
                 return
             expired = True
-        close_once()
+        close_once(abort=True)
 
     timer = threading.Timer(remaining, expire)
     timer.daemon = False

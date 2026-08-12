@@ -178,6 +178,7 @@ class MinIOClient:
                     return read_response_body_with_deadline(
                         response.read,
                         lambda: self._close_response(response),
+                        abort_response=lambda: self._abort_response(response),
                         total_timeout_seconds=timeout[2] if timeout is not None else None,
                         started_at=started_at,
                         operation="MinIO get_object",
@@ -229,6 +230,7 @@ class MinIOClient:
                     body = read_response_body_with_deadline(
                         response.read,
                         lambda: self._close_response(response),
+                        abort_response=lambda: self._abort_response(response),
                         total_timeout_seconds=timeout[2] if timeout is not None else None,
                         started_at=started_at,
                         operation="MinIO get_object_and_metadata",
@@ -352,6 +354,16 @@ class MinIOClient:
         release_conn = getattr(response, "release_conn", None)
         if callable(release_conn):
             release_conn()
+
+    @classmethod
+    def _abort_response(cls, response: typing.Any) -> None:
+        shutdown = getattr(response, "shutdown", None)
+        if callable(shutdown):
+            try:
+                shutdown()
+            except (OSError, RuntimeError, ValueError):
+                pass
+        cls._close_response(response)
 
     @staticmethod
     def _metadata_from_get_response(response: typing.Any) -> typing.Dict[str, str]:

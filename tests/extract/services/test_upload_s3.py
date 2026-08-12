@@ -7,6 +7,8 @@ import unittest
 from concurrent.futures import ThreadPoolExecutor
 from unittest.mock import Mock, patch
 
+from ._stalled_http import stalled_urllib3_response
+
 from groundx.extract.services.http import WallClockDeadlineExceeded
 from groundx.extract.services.logger import Logger
 from groundx.extract.services.upload_s3 import S3Client
@@ -350,6 +352,37 @@ class TestS3Client(unittest.TestCase):
         self.assertLess(time.monotonic() - started, 0.15)
         self.assertTrue(bounded.body.closed)
         self.assertFalse(any(isinstance(thread, threading.Timer) for thread in threading.enumerate()))
+
+    def test_worker_deadline_interrupts_real_streaming_body_socket(self) -> None:
+        from botocore.response import StreamingBody
+
+        cl = self._client()
+        executor = ThreadPoolExecutor(max_workers=1)
+        started = time.monotonic()
+        try:
+            with stalled_urllib3_response() as response:
+                bounded = FakeS3Client()
+                bounded.body = typing.cast(
+                    typing.Any,
+                    StreamingBody(response, 1_000_000),
+                )
+                setattr(cl, "_create_client", Mock(return_value=bounded))
+                future = executor.submit(
+                    cl.get_object,
+                    "s3://eyelevel/workflow.yaml",
+                    connect_timeout_seconds=0.01,
+                    read_timeout_seconds=0.01,
+                    total_timeout_seconds=0.10,
+                )
+                with self.assertRaisesRegex(
+                    WallClockDeadlineExceeded,
+                    "S3 get_object exceeded",
+                ):
+                    future.result(timeout=0.35)
+        finally:
+            executor.shutdown(wait=True)
+
+        self.assertLess(time.monotonic() - started, 0.30)
 
     def test_worker_timeout_does_not_close_shared_client_or_other_response(
         self,

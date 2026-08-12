@@ -8,6 +8,8 @@ import unittest
 from concurrent.futures import ThreadPoolExecutor
 from unittest.mock import Mock, patch
 
+from ._stalled_http import stalled_urllib3_response
+
 from groundx.extract.services.http import WallClockDeadlineExceeded
 from groundx.extract.services.logger import Logger
 from groundx.extract.services.upload_minio import MinIOClient
@@ -304,6 +306,33 @@ class TestMinIOClient(unittest.TestCase):
         self.assertLess(time.monotonic() - started, 0.15)
         self.assertTrue(bounded.response.closed)
         self.assertTrue(bounded.response.released)
+
+    def test_worker_deadline_interrupts_real_minio_response_socket(self) -> None:
+        cl = self._client()
+        executor = ThreadPoolExecutor(max_workers=1)
+        started = time.monotonic()
+        try:
+            with stalled_urllib3_response() as response:
+                bounded = FakeMinioClient()
+                bounded.response = response
+                setattr(cl, "_create_client", Mock(return_value=bounded))
+                with fake_minio_error_module():
+                    future = executor.submit(
+                        cl.get_object,
+                        "s3://eyelevel/workflow.yaml",
+                        connect_timeout_seconds=0.01,
+                        read_timeout_seconds=0.01,
+                        total_timeout_seconds=0.10,
+                    )
+                    with self.assertRaisesRegex(
+                        WallClockDeadlineExceeded,
+                        "MinIO get_object exceeded",
+                    ):
+                        future.result(timeout=0.35)
+        finally:
+            executor.shutdown(wait=True)
+
+        self.assertLess(time.monotonic() - started, 0.30)
 
     def test_get_object_and_metadata_closes_response(self) -> None:
         cl = self._client()
