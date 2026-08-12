@@ -1,16 +1,21 @@
 import typing
 
-from .logger import Logger
 from ..settings.settings import ContainerSettings
+from .logger import Logger
 
 
 @typing.runtime_checkable
 class UploadClient(typing.Protocol):
-    def get_object(self, url: str) -> typing.Optional[bytes]: ...
+    def get_object(
+        self,
+        url: str,
+        *,
+        connect_timeout_seconds: typing.Optional[float] = None,
+        read_timeout_seconds: typing.Optional[float] = None,
+        total_timeout_seconds: typing.Optional[float] = None,
+    ) -> typing.Optional[bytes]: ...
 
-    def get_object_and_metadata(
-        self, url: str
-    ) -> typing.Optional[typing.Tuple[bytes, typing.Dict[str, str]]]: ...
+    def get_object_and_metadata(self, url: str) -> typing.Optional[typing.Tuple[bytes, typing.Dict[str, str]]]: ...
 
     def head_object(self, url: str) -> typing.Optional[typing.Dict[str, str]]: ...
 
@@ -45,9 +50,7 @@ class Upload:
         self.settings = settings
         self.logger = logger
 
-        self.logger.info_msg(
-            f"upload type [{self.settings.upload.type}] [{self.settings.upload.bucket}]"
-        )
+        self.logger.info_msg(f"upload type [{self.settings.upload.type}] [{self.settings.upload.bucket}]")
 
         if self.settings.upload.type == "minio":
             from .upload_minio import MinIOClient
@@ -60,12 +63,24 @@ class Upload:
         else:
             raise Exception(f"unsupported upload.type [{self.settings.upload.type}]")
 
-    def get_object(self, url: str) -> typing.Optional[bytes]:
-        return self.client.get_object(url)
+    def get_object(
+        self,
+        url: str,
+        *,
+        connect_timeout_seconds: typing.Optional[float] = None,
+        read_timeout_seconds: typing.Optional[float] = None,
+        total_timeout_seconds: typing.Optional[float] = None,
+    ) -> typing.Optional[bytes]:
+        timeout_kwargs: typing.Dict[str, float] = {}
+        if connect_timeout_seconds is not None or read_timeout_seconds is not None or total_timeout_seconds is not None:
+            timeout_kwargs = {
+                "connect_timeout_seconds": typing.cast(float, connect_timeout_seconds),
+                "read_timeout_seconds": typing.cast(float, read_timeout_seconds),
+                "total_timeout_seconds": typing.cast(float, total_timeout_seconds),
+            }
+        return self.client.get_object(url, **timeout_kwargs)
 
-    def get_object_and_metadata(
-        self, url: str
-    ) -> typing.Optional[typing.Tuple[bytes, typing.Dict[str, str]]]:
+    def get_object_and_metadata(self, url: str) -> typing.Optional[typing.Tuple[bytes, typing.Dict[str, str]]]:
         return self.client.get_object_and_metadata(url)
 
     def head_object(self, url: str) -> typing.Optional[typing.Dict[str, str]]:
@@ -92,15 +107,9 @@ class Upload:
         total_timeout_seconds: typing.Optional[float] = None,
     ) -> None:
         timeout_kwargs: typing.Dict[str, float] = {}
-        if (
-            connect_timeout_seconds is not None
-            or read_timeout_seconds is not None
-            or total_timeout_seconds is not None
-        ):
+        if connect_timeout_seconds is not None or read_timeout_seconds is not None or total_timeout_seconds is not None:
             timeout_kwargs = {
-                "connect_timeout_seconds": typing.cast(
-                    float, connect_timeout_seconds
-                ),
+                "connect_timeout_seconds": typing.cast(float, connect_timeout_seconds),
                 "read_timeout_seconds": typing.cast(float, read_timeout_seconds),
                 "total_timeout_seconds": typing.cast(float, total_timeout_seconds),
             }

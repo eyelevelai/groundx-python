@@ -75,20 +75,45 @@ class S3Client:
             )
         return self._timeout_clients[timeout]
 
-    def get_object(self, url: str) -> typing.Optional[bytes]:
-        if not self.client:
-            self.logger.warning_msg("get_object no client")
-            return None
+    def get_object(
+        self,
+        url: str,
+        *,
+        connect_timeout_seconds: typing.Optional[float] = None,
+        read_timeout_seconds: typing.Optional[float] = None,
+        total_timeout_seconds: typing.Optional[float] = None,
+    ) -> typing.Optional[bytes]:
+        timeout = validate_upload_timeouts(
+            connect_timeout_seconds=connect_timeout_seconds,
+            read_timeout_seconds=read_timeout_seconds,
+            total_timeout_seconds=total_timeout_seconds,
+        )
 
-        try:
-            s3_bucket, s3_key = self.parse_url(url)
+        def get() -> typing.Optional[bytes]:
+            client = self._client_for_timeouts(
+                connect_timeout_seconds=connect_timeout_seconds,
+                read_timeout_seconds=read_timeout_seconds,
+                total_timeout_seconds=total_timeout_seconds,
+            )
+            if not client:
+                self.logger.warning_msg("get_object no client")
+                return None
 
-            response = self.client.get_object(Bucket=s3_bucket, Key=s3_key)
+            try:
+                s3_bucket, s3_key = self.parse_url(url)
+                response = client.get_object(Bucket=s3_bucket, Key=s3_key)
+                return self._read_body(response)
+            except Exception as e:
+                self.logger.error_msg(f"[{url}] exception: {e}")
+                raise
 
-            return self._read_body(response)
-        except Exception as e:
-            self.logger.error_msg(f"[{url}] exception: {e}")
-            raise
+        if timeout is None:
+            return get()
+        with wall_clock_operation_deadline(
+            timeout[2],
+            operation="S3 get_object",
+        ):
+            return get()
 
     def get_object_and_metadata(self, url: str) -> typing.Optional[typing.Tuple[bytes, typing.Dict[str, str]]]:
         if not self.client:

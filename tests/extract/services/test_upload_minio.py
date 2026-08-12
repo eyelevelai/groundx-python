@@ -1,5 +1,6 @@
 import contextlib
 import sys
+import time
 import types
 import typing
 import unittest
@@ -125,6 +126,86 @@ class TestMinIOClient(unittest.TestCase):
         self.assertEqual(body, b"statement: {}")
         self.assertTrue(fake.response.closed)
         self.assertTrue(fake.response.released)
+
+    def test_get_object_uses_bounded_client_and_closes_response(self) -> None:
+        cl = self._client()
+        bounded = FakeMinioClient()
+        create_client = Mock(return_value=bounded)
+        setattr(cl, "_create_client", create_client)
+
+        with fake_minio_error_module():
+            body = cl.get_object(
+                "s3://eyelevel/workflows/extract/latest.yaml",
+                connect_timeout_seconds=0.2,
+                read_timeout_seconds=0.5,
+                total_timeout_seconds=0.8,
+            )
+
+        self.assertEqual(body, b"statement: {}")
+        self.assertTrue(bounded.response.closed)
+        self.assertTrue(bounded.response.released)
+        create_client.assert_called_once_with(
+            connect_timeout_seconds=0.2,
+            read_timeout_seconds=0.5,
+            total_timeout_seconds=0.8,
+        )
+
+    def test_get_object_requires_complete_positive_timeout_budget(self) -> None:
+        cl = self._client()
+        cl.client = typing.cast(typing.Any, FakeMinioClient())
+
+        with fake_minio_error_module():
+            with self.assertRaisesRegex(ValueError, "all required"):
+                cl.get_object(
+                    "s3://eyelevel/workflow.yaml",
+                    connect_timeout_seconds=0.2,
+                )
+
+            with self.assertRaisesRegex(ValueError, "must be positive"):
+                cl.get_object(
+                    "s3://eyelevel/workflow.yaml",
+                    connect_timeout_seconds=0.2,
+                    read_timeout_seconds=0,
+                    total_timeout_seconds=0.8,
+                )
+
+            with self.assertRaisesRegex(ValueError, "exceed total"):
+                cl.get_object(
+                    "s3://eyelevel/workflow.yaml",
+                    connect_timeout_seconds=0.4,
+                    read_timeout_seconds=0.5,
+                    total_timeout_seconds=0.8,
+                )
+
+    def test_get_object_total_deadline_includes_body_read_and_closes_response(
+        self,
+    ) -> None:
+        class StalledResponse(FakeMinioResponse):
+            def read(self) -> bytes:
+                time.sleep(0.20)
+                return super().read()
+
+        class StalledMinioClient(FakeMinioClient):
+            def __init__(self) -> None:
+                self.response = StalledResponse(b"statement: {}")
+
+        cl = self._client()
+        bounded = StalledMinioClient()
+        setattr(cl, "_create_client", Mock(return_value=bounded))
+
+        started = time.monotonic()
+        with fake_minio_error_module():
+            with self.assertRaisesRegex(TimeoutError, "MinIO get_object exceeded"):
+                cl.get_object(
+                    "s3://eyelevel/workflow.yaml",
+                    connect_timeout_seconds=0.01,
+                    read_timeout_seconds=0.01,
+                    total_timeout_seconds=0.06,
+                )
+
+        self.assertLess(time.monotonic() - started, 0.15)
+        self.assertTrue(bounded.response.closed)
+        self.assertTrue(bounded.response.released)
 
     def test_get_object_and_metadata_closes_response(self) -> None:
         cl = self._client()

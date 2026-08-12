@@ -1,6 +1,7 @@
 import typing
 
 from ..settings.settings import ContainerSettings
+from .http import wall_clock_operation_deadline
 from .logger import Logger
 from .upload import validate_upload_timeouts
 
@@ -112,25 +113,52 @@ class MinIOClient:
             )
         return self._timeout_clients[timeout]
 
-    def get_object(self, url: str) -> typing.Optional[bytes]:
-        if not self.client:
-            return None
+    def get_object(
+        self,
+        url: str,
+        *,
+        connect_timeout_seconds: typing.Optional[float] = None,
+        read_timeout_seconds: typing.Optional[float] = None,
+        total_timeout_seconds: typing.Optional[float] = None,
+    ) -> typing.Optional[bytes]:
+        timeout = validate_upload_timeouts(
+            connect_timeout_seconds=connect_timeout_seconds,
+            read_timeout_seconds=read_timeout_seconds,
+            total_timeout_seconds=total_timeout_seconds,
+        )
 
-        from minio.error import S3Error
-
-        try:
-            response = self.client.get_object(
-                self.settings.upload.bucket,
-                self.parse_url(url),
+        def get() -> typing.Optional[bytes]:
+            client = self._client_for_timeouts(
+                connect_timeout_seconds=connect_timeout_seconds,
+                read_timeout_seconds=read_timeout_seconds,
+                total_timeout_seconds=total_timeout_seconds,
             )
+            if not client:
+                return None
+
+            from minio.error import S3Error
 
             try:
-                return response.read()
-            finally:
-                self._close_response(response)
-        except S3Error as e:
-            self.logger.error_msg(f"Failed to get object from [{url}] [{self.parse_url(url)}]: {str(e)}")
-            raise
+                response = client.get_object(
+                    self.settings.upload.bucket,
+                    self.parse_url(url),
+                )
+
+                try:
+                    return response.read()
+                finally:
+                    self._close_response(response)
+            except S3Error as e:
+                self.logger.error_msg(f"Failed to get object from [{url}] [{self.parse_url(url)}]: {str(e)}")
+                raise
+
+        if timeout is None:
+            return get()
+        with wall_clock_operation_deadline(
+            timeout[2],
+            operation="MinIO get_object",
+        ):
+            return get()
 
     def get_object_and_metadata(self, url: str) -> typing.Optional[typing.Tuple[bytes, typing.Dict[str, str]]]:
         if not self.client:
