@@ -39,6 +39,13 @@ class CustomOutputScalarCandidate:
 
 @dataclasses.dataclass(frozen=True)
 class CustomOutputScalarCandidateSet:
+    """Observed values for one singular route in traversal order.
+
+    ``selected`` is the first observed candidate and remains provisional when
+    ``alternatives`` is non-empty. Later unique observations appear in
+    ``alternatives`` without SDK value selection.
+    """
+
     output_source: str
     workflow_group: str
     workflow_field: str
@@ -49,6 +56,12 @@ class CustomOutputScalarCandidateSet:
 
 @dataclasses.dataclass(frozen=True)
 class CustomOutputReassemblyResult:
+    """Custom-output route reassembly and diagnostic evidence.
+
+    ``final_output`` contains the first observed scalar candidate. A scalar
+    value remains provisional when its candidate set has alternatives.
+    """
+
     final_output: typing.Dict[str, typing.Any]
     relationship_output: typing.Optional[typing.Dict[str, typing.Any]]
     diagnostics: typing.List[CustomOutputDiagnostic]
@@ -89,7 +102,6 @@ class _RouteContainer:
 @dataclasses.dataclass(frozen=True)
 class _ScalarCandidate:
     value: typing.Any
-    quality: typing.Tuple[int, int, float]
     page_numbers: typing.Tuple[int, ...]
 
 
@@ -107,19 +119,6 @@ _RELATIONSHIP_PACKET_CAMEL_KEYS = {
     "match_attrs": "matchAttrs",
     "parent_passthrough_attrs": "parentPassthroughAttrs",
     "multiple_match_strategy": "multipleMatchStrategy",
-}
-_DEFAULT_CANDIDATE_VALUES = {
-    "n/a",
-    "na",
-    "none",
-    "not applicable",
-    "not found",
-    "not indicated",
-    "not provided",
-    "not specified",
-    "not stated",
-    "null",
-    "unknown",
 }
 _GET_ALIASES = {
     "chunkId": ("chunk_id",),
@@ -150,7 +149,7 @@ def reassemble_custom_outputs_from_xray(
     final_output: typing.Dict[str, typing.Any] = {}
     workflow_output: typing.Dict[str, typing.Any] = {}
     source_provenance: typing.List[CustomOutputSourceProvenance] = []
-    route_hits: typing.Dict[int, bool] = {}
+    route_satisfied: typing.Dict[int, bool] = {}
     repeated_records: typing.Dict[
         typing.Tuple[typing.Tuple[str, ...], typing.Tuple[typing.Any, ...]],
         typing.Dict[str, typing.Any],
@@ -167,7 +166,7 @@ def reassemble_custom_outputs_from_xray(
     diagnostics: typing.List[CustomOutputDiagnostic] = []
 
     for route_index, route in enumerate(routes):
-        route_hits[route_index] = False
+        route_satisfied[route_index] = False
         if not isinstance(route, dict):
             continue
         route_map = typing.cast(typing.Mapping[str, typing.Any], route)
@@ -187,8 +186,8 @@ def reassemble_custom_outputs_from_xray(
                     route_map.get("step_name"),
                     route_value.record_index,
                 )
-                if _is_empty_output(route_value.value):
-                    if route_value.repeated and route_value.conflicts:
+                if route_value.repeated and _is_empty_output(route_value.value):
+                    if route_value.conflicts:
                         _set_pointer(
                             final_output,
                             f"{pointer}{_CONFLICTS_SIBLING_SUFFIX}",
@@ -201,7 +200,8 @@ def reassemble_custom_outputs_from_xray(
                             diagnostics=diagnostics,
                         )
                     continue
-                route_hits[route_index] = True
+                if route_value.repeated or route_value.value is not None:
+                    route_satisfied[route_index] = True
                 if route_value.repeated:
                     _record_repeated_group_path(
                         repeated_group_paths,
@@ -258,7 +258,7 @@ def reassemble_custom_outputs_from_xray(
     diagnostics.extend(
         _missing_required_route_diagnostics(
             typing.cast(typing.Sequence[typing.Any], routes),
-            route_hits,
+            route_satisfied,
             workflow_extract,
         )
     )
@@ -752,47 +752,55 @@ def _scalar_candidate(
     value: typing.Any,
     page_numbers: typing.Tuple[int, ...],
 ) -> _ScalarCandidate:
+    retained_value = value
+    if isinstance(value, str):
+        retained_value = value.strip()
+    elif isinstance(value, typing.Mapping) and _unwrap_match_value(value) is not value:
+        retained_value = copy.deepcopy(dict(value))
+        inner_value = retained_value.get("value")
+        if isinstance(inner_value, str):
+            retained_value["value"] = inner_value.strip()
     return _ScalarCandidate(
-        value=value,
-        quality=_scalar_candidate_quality(value, page_numbers),
+        value=retained_value,
         page_numbers=page_numbers,
     )
 
 
-def _scalar_candidate_quality(
-    value: typing.Any,
-    page_numbers: typing.Tuple[int, ...],
-) -> typing.Tuple[int, int, float]:
-    normalized = _normalized_candidate_value(value)
-    is_specific = 0 if _is_default_candidate_value(normalized) else 1
-    has_source_pages = 1 if page_numbers else 0
-    return (is_specific, has_source_pages, _candidate_confidence(value))
-
-
-def _normalized_candidate_value(value: typing.Any) -> typing.Any:
+def _scalar_candidate_identity(value: typing.Any) -> typing.Any:
+    """Return transport-only identity for one scalar candidate value."""
     unwrapped = _unwrap_match_value(value)
     if isinstance(unwrapped, str):
-        return " ".join(unwrapped.strip().casefold().split())
-    if isinstance(unwrapped, numbers.Real):
-        return float(unwrapped)
-    return unwrapped
+        return ("string", unwrapped.strip().casefold())
 
+    def exact_json_identity(item: typing.Any) -> typing.Any:
+        if item is None:
+            return ("null",)
+        if type(item) is bool:
+            return ("boolean", item)
+        if type(item) is int:
+            return ("integer", item)
+        if type(item) is float:
+            return ("float", item)
+        if isinstance(item, str):
+            return ("string", item)
+        if isinstance(item, list):
+            return ("list", tuple(exact_json_identity(value) for value in item))
+        if isinstance(item, typing.Mapping):
+            return (
+                "object",
+                tuple(
+                    sorted(
+                        (
+                            (type(key).__name__, repr(key)),
+                            exact_json_identity(nested_value),
+                        )
+                        for key, nested_value in item.items()
+                    )
+                ),
+            )
+        return (type(item).__module__, type(item).__qualname__, repr(item))
 
-def _is_default_candidate_value(value: typing.Any) -> bool:
-    if value is None:
-        return True
-    if isinstance(value, str):
-        return value in _DEFAULT_CANDIDATE_VALUES
-    return False
-
-
-def _candidate_confidence(value: typing.Any) -> float:
-    if not isinstance(value, typing.Mapping):
-        return 0.0
-    confidence = value.get("confidence")
-    if not isinstance(confidence, numbers.Real):
-        return 0.0
-    return max(0.0, min(1.0, float(confidence)))
+    return exact_json_identity(unwrapped)
 
 
 def _string_value(value: typing.Any) -> typing.Optional[str]:
@@ -856,49 +864,45 @@ def _set_pointer(
     state = scalar_candidates.get(pointer)
     if state is not None:
         existing = state.selected
-        if candidate.quality < existing.quality:
-            return
-        if candidate.quality == existing.quality:
-            normalized_candidate = _normalized_candidate_value(candidate.value)
-            if normalized_candidate == _normalized_candidate_value(existing.value):
-                scalar_candidates[pointer] = dataclasses.replace(
-                    state,
-                    selected=dataclasses.replace(
-                        existing,
-                        page_numbers=_merge_page_numbers(existing.page_numbers, candidate.page_numbers),
-                    ),
-                )
-                return
-
-            diagnostics.append(
-                CustomOutputDiagnostic(
-                    code="conflicting_output_candidates",
-                    message=f"multiple equal-quality candidates for [{pointer}]",
-                    severity="warning",
-                    workflow_group=_string_value(route.get("workflow_group")),
-                    workflow_field=_string_value(route.get("workflow_field")),
-                    final_path=pointer,
-                )
-            )
-            for index, alternative in enumerate(state.alternatives):
-                if normalized_candidate != _normalized_candidate_value(alternative.value):
-                    continue
-                alternatives = list(state.alternatives)
-                alternatives[index] = dataclasses.replace(
-                    alternative,
-                    page_numbers=_merge_page_numbers(alternative.page_numbers, candidate.page_numbers),
-                )
-                scalar_candidates[pointer] = dataclasses.replace(
-                    state,
-                    alternatives=tuple(alternatives),
-                )
-                return
+        candidate_identity = _scalar_candidate_identity(candidate.value)
+        if candidate_identity == _scalar_candidate_identity(existing.value):
             scalar_candidates[pointer] = dataclasses.replace(
                 state,
-                alternatives=(*state.alternatives, candidate),
+                selected=dataclasses.replace(
+                    existing,
+                    page_numbers=_merge_page_numbers(existing.page_numbers, candidate.page_numbers),
+                ),
             )
             return
-    current[parts[-1]] = value
+        for index, alternative in enumerate(state.alternatives):
+            if candidate_identity != _scalar_candidate_identity(alternative.value):
+                continue
+            alternatives = list(state.alternatives)
+            alternatives[index] = dataclasses.replace(
+                alternative,
+                page_numbers=_merge_page_numbers(alternative.page_numbers, candidate.page_numbers),
+            )
+            scalar_candidates[pointer] = dataclasses.replace(
+                state,
+                alternatives=tuple(alternatives),
+            )
+            return
+        diagnostics.append(
+            CustomOutputDiagnostic(
+                code="conflicting_output_candidates",
+                message=f"multiple candidates for [{pointer}]",
+                severity="warning",
+                workflow_group=_string_value(route.get("workflow_group")),
+                workflow_field=_string_value(route.get("workflow_field")),
+                final_path=pointer,
+            )
+        )
+        scalar_candidates[pointer] = dataclasses.replace(
+            state,
+            alternatives=(*state.alternatives, candidate),
+        )
+        return
+    current[parts[-1]] = copy.deepcopy(candidate.value)
     scalar_candidates[pointer] = _ScalarCandidateState(
         selected=candidate,
         alternatives=(),
@@ -1031,7 +1035,7 @@ def _set_nested_value(
 
 def _missing_required_route_diagnostics(
     routes: typing.Sequence[typing.Any],
-    route_hits: typing.Mapping[int, bool],
+    route_satisfied: typing.Mapping[int, bool],
     workflow_extract: typing.Optional[typing.Mapping[str, typing.Any]],
 ) -> typing.List[CustomOutputDiagnostic]:
     if not isinstance(workflow_extract, typing.Mapping):
@@ -1040,11 +1044,11 @@ def _missing_required_route_diagnostics(
     hit_workflow_groups = {
         str(route.get("workflow_group"))
         for index, route in enumerate(routes)
-        if route_hits.get(index) and isinstance(route, typing.Mapping)
+        if route_satisfied.get(index) and isinstance(route, typing.Mapping)
     }
     diagnostics: typing.List[CustomOutputDiagnostic] = []
     for index, route in enumerate(routes):
-        if route_hits.get(index):
+        if route_satisfied.get(index):
             continue
         if not isinstance(route, typing.Mapping):
             continue

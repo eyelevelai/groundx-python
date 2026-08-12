@@ -71,7 +71,7 @@ def _provenance_dicts(result) -> list[dict]:
 
 
 def _scalar_candidate_workflow(*, required: bool = False) -> dict:
-    workflow_extract = {
+    workflow_extract: dict[str, typing.Any] = {
         "workflow": {
             "custom_steps": [
                 {"name": "scalar_step", "level": "chunk", "kind": "instruct"},
@@ -2254,7 +2254,7 @@ def test_reassembly_reports_source_provenance_for_routed_outputs() -> None:
     ]
 
 
-def test_adp_scalar_reducer_prefers_source_backed_positive_over_later_default() -> None:
+def test_adp_scalar_candidates_preserve_source_backed_and_default_like_values() -> None:
     workflow_extract = {
         "workflow": {
             "custom_steps": [
@@ -2334,9 +2334,37 @@ def test_adp_scalar_reducer_prefers_source_backed_positive_over_later_default() 
             "entry_date": "2026-01-01",
         }
     }
-    assert [diagnostic.code for diagnostic in result.diagnostics] == ["conflicting_output_candidates"]
-    assert result.diagnostics[0].severity == "warning"
-    assert result.diagnostics[0].final_path == "/eligibility_requirements/entry_date"
+    assert [
+        (
+            candidate_set.final_path,
+            candidate_set.selected.value,
+            [candidate.value for candidate in candidate_set.alternatives],
+        )
+        for candidate_set in result.scalar_candidate_sets
+    ] == [
+        (
+            "/eligibility_requirements/predecessor_service",
+            "Service with predecessor employer counts",
+            [
+                "Not specified",
+                {
+                    "value": "Not Indicated",
+                    "_raw_text": "No predecessor-service section visible.",
+                },
+            ],
+        ),
+        (
+            "/eligibility_requirements/entry_date",
+            "2026-01-01",
+            ["2026-02-01"],
+        ),
+    ]
+    assert [diagnostic.code for diagnostic in result.diagnostics] == [
+        "conflicting_output_candidates",
+        "conflicting_output_candidates",
+        "conflicting_output_candidates",
+    ]
+    assert all(diagnostic.severity == "warning" for diagnostic in result.diagnostics)
 
 
 def test_scalar_candidate_sidecar_preserves_equal_quality_conflicts_and_pages() -> None:
