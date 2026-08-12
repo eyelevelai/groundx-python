@@ -4,12 +4,13 @@
 > `superpowers:subagent-driven-development` or `superpowers:executing-plans` to
 > implement this plan task by task. Use test-first development.
 
-**Goal:** Preserve all scalar values and source pages across chunks that share a
-section ID without changing repeated-record behavior.
+**Goal:** Preserve all scalar values and source pages from section and document
+observations without changing repeated-record behavior.
 
-**Architecture:** Change only the section-route container boundary. Singular
-routes emit every chunk observation. Existing candidate collection deduplicates
-values and merges pages. Repeated routes retain section-ID deduplication.
+**Architecture:** Change only the route-container boundary and share one
+repeated-route predicate with route-value loading. Singular section and document
+routes emit every observation. Existing candidate collection deduplicates
+values and merges pages. Repeated routes retain producer-copy deduplication.
 
 **Tech stack:** Python 3.9+, pytest, Ruff, Mypy, Poetry, OpenSpec 1.3.1.
 
@@ -31,8 +32,8 @@ values and merges pages. Repeated routes retain section-ID deduplication.
 - Modify: `tests/extract/test_custom_output_reassembly.py`
 - Exercise: `src/groundx/extract/custom_outputs.py::_route_containers`
 
-**Produces:** Two regressions that distinguish singular observations from
-repeated-record copies.
+**Produces:** Four regressions that distinguish singular observations from
+repeated-record copies across section and document routes.
 
 - [ ] Add
   `test_singular_section_route_preserves_candidates_and_pages_across_shared_section_id`.
@@ -41,13 +42,21 @@ repeated-record copies.
   alternative `B` with pages `(16,)`, and provisional final output `A`.
 - [ ] Add
   `test_repeated_section_route_still_deduplicates_shared_section_id` using two
-  chunks with the same section ID and identical `_records`. Assert one final
-  repeated record.
+  chunks with the same section ID, a `keys` step, a direct top-level final path
+  without `*`, and identical `_records`. Assert one final repeated record.
+- [ ] Add
+  `test_singular_document_route_preserves_candidates_and_chunk_pages`. Include
+  the same value at the document root and on pages 12 and 14, plus a competing
+  value on page 16. Assert the two candidate values, complete page lists, and no
+  invented page for a root-only value.
+- [ ] Add
+  `test_repeated_document_route_still_deduplicates_copied_payloads` for both a
+  wildcard path and a direct top-level `keys` route without `*`. Assert one
+  repeated record in each case.
 - [ ] Run:
-  `poetry run pytest -q tests/extract/test_custom_output_reassembly.py -k 'shared_section_id'`.
-  Both new tests must fail against the current route-container behavior. The
-  singular test must show missing pages or candidates. The repeated test may
-  already pass and records the protected behavior.
+  `poetry run pytest -q tests/extract/test_custom_output_reassembly.py -k 'shared_section_id or document_route'`.
+  The singular tests must fail against the current route-container behavior.
+  The repeated tests may already pass and record protected behavior.
 - [ ] Commit only the tests with message
   `test(extract): expose shared-section scalar provenance loss`.
 
@@ -58,18 +67,26 @@ repeated-record copies.
 - Modify: `src/groundx/extract/custom_outputs.py`
 - Test: `tests/extract/test_custom_output_reassembly.py`
 
-**Interface:** `_route_containers(xray, route) -> list[_RouteContainer]` keeps
-its signature. No public interface changes.
+**Interface:** Private route helpers may accept the existing `step_kinds`
+metadata or one precomputed repeated flag. No public interface changes.
 
-- [ ] In the `level == "section"` branch, determine whether the parsed
-  `final_path` contains `*`.
-- [ ] For repeated paths, retain the current `custom_output_section_identity()`
-  and `section_seen` behavior.
+- [ ] Add one private repeated-route predicate. It returns true when the step
+  kind is `keys` or `summary`, or when parsed `final_path` contains `*`.
+- [ ] Use that same predicate in `_route_containers()` and
+  `_custom_route_values()` so route shape cannot disagree between the two
+  stages.
+- [ ] For repeated section routes, retain current
+  `custom_output_section_identity()` and `section_seen` behavior.
 - [ ] For singular paths, append one `_RouteContainer` for every X-Ray chunk,
   using `_chunk_identity(chunk)` in its internal identity and `_page_numbers(chunk)`
   for provenance. Do not compare values in `_route_containers()`.
+- [ ] For singular document routes, append the root observation when present
+  and each chunk observation with `_page_numbers(chunk)`. Do not invent root
+  page numbers or deduplicate by payload identity before candidate collection.
+- [ ] For repeated document routes, retain current payload-identity
+  deduplication.
 - [ ] Run:
-  `poetry run pytest -q tests/extract/test_custom_output_reassembly.py -k 'shared_section_id or scalar_candidate'`.
+  `poetry run pytest -q tests/extract/test_custom_output_reassembly.py -k 'shared_section_id or document_route or scalar_candidate'`.
   All selected values, alternatives, and page assertions must pass.
 - [ ] Run:
   `poetry run pytest -q tests/extract/test_custom_output_reassembly.py`.

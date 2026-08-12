@@ -3,10 +3,16 @@
 ## Why
 
 `delegate-scalar-candidate-resolution-to-agents` requires the SDK to preserve
-every scalar observation and every source page. The current section-container
-loader deduplicates chunks by explicit section ID before scalar candidates are
-collected. When multiple chunks share a section ID, only the first chunk's value
-and pages reach candidate collection.
+every scalar observation and every source page. The current route-container
+loader removes observations before scalar candidates are collected:
+
+- section routes deduplicate chunks by explicit section ID; and
+- document routes deduplicate copied payloads without retaining chunk page
+  numbers.
+
+The route boundary also cannot identify repeated output from `final_path`
+alone. `keys` and `summary` steps can produce repeated top-level groups through
+paths such as `/line_items/description`, without a `*` segment.
 
 This is not the cause of the current ADP run's failures. Its 251 chunks across
 68 pages have no top-level section identifier. It is still a supported X-Ray
@@ -16,10 +22,15 @@ shape and violates the candidate transport contract for other documents.
 
 - Singular section routes process every chunk observation, even when chunks
   share an explicit section ID.
+- Singular document routes process every root and chunk observation and retain
+  all available chunk page numbers.
 - Existing scalar candidate identity removes duplicate values and merges their
   unique page numbers.
 - Distinct values from chunks sharing a section ID remain distinct candidates.
-- Repeated section routes keep their current section-record deduplication.
+- One shared route-shape helper treats `keys` and `summary` steps, or a
+  `final_path` containing `*`, as repeated.
+- Repeated section and document routes keep their current producer-copy
+  deduplication.
 - Relationship matching, repeated-record identity, route placement, and public
   result types do not change.
 
@@ -39,8 +50,8 @@ shape and violates the candidate transport contract for other documents.
 
 ### New capabilities
 
-- `scalar-candidate-provenance`: complete page provenance for singular scalar
-  observations that share a section identity.
+- `scalar-candidate-provenance`: complete page provenance for singular section
+  and document observations without changing repeated-output behavior.
 
 ### Modified capabilities
 
@@ -53,9 +64,11 @@ shape and violates the candidate transport contract for other documents.
 - Hand-written tests:
   `tests/extract/test_custom_output_reassembly.py`.
 - Public dataclasses and imports remain unchanged.
-- Singular section routes may expose candidates and page numbers that were
-  previously lost. This is the intended correction.
-- Repeated section output remains byte-for-byte compatible after reassembly.
+- Singular section and document routes may expose candidates and page numbers
+  that were previously lost. This is the intended correction.
+- Repeated section and document output remains byte-for-byte compatible after
+  reassembly, including direct top-level groups owned by `keys` and `summary`
+  steps.
 - The implementation stays under paths protected by `.fernignore`.
 - No workflow, API, database, customer JSON, or generated Fern change.
 - Open design questions: none.
