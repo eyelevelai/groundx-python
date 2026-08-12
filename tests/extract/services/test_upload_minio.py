@@ -525,6 +525,39 @@ class TestMinIOClient(unittest.TestCase):
         self.assertEqual(bounded.put["object_name"], "trace.json")
         self.assertEqual(bounded.put["length"], 2)
 
+    def test_put_json_stream_transmits_minio_object_tags_with_timeout_bounds(self) -> None:
+        cl = self._client()
+        bounded = FakeMinioClient()
+        create_client = Mock(return_value=bounded)
+        setattr(cl, "_create_client", create_client)
+
+        cl.put_json_stream(
+            "eyelevel",
+            "trace.json",
+            b"{}",
+            "application/json",
+            connect_timeout_seconds=0.2,
+            read_timeout_seconds=0.5,
+            transport_total_timeout_seconds=0.8,
+            object_tags={
+                "groundx-artifact-class": "extraction-private-evidence",
+                "scope/path": "trace+payload",
+            },
+        )
+
+        self.assertEqual(
+            dict(bounded.put["tags"]),
+            {
+                "groundx-artifact-class": "extraction-private-evidence",
+                "scope/path": "trace+payload",
+            },
+        )
+        create_client.assert_called_once_with(
+            connect_timeout_seconds=0.2,
+            read_timeout_seconds=0.5,
+            total_timeout_seconds=0.8,
+        )
+
     def test_put_json_stream_without_timeouts_preserves_default_client(self) -> None:
         cl = self._client()
         default = FakeMinioClient()
@@ -542,6 +575,7 @@ class TestMinIOClient(unittest.TestCase):
         create_client.assert_not_called()
         self.assertEqual(default.put["object_name"], "trace.json")
         self.assertEqual(default.put["length"], 2)
+        self.assertNotIn("tags", default.put)
 
     def test_bounded_client_configures_socket_and_total_timeouts_without_retries(
         self,

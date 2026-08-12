@@ -7,6 +7,7 @@ from .http import read_response_body_with_deadline, wall_clock_operation_deadlin
 from .logger import Logger
 from .upload import (
     TimeoutClientCache,
+    freeze_object_tags,
     resolve_transport_total_timeout,
     validate_transport_timeouts,
     validate_upload_timeouts,
@@ -320,6 +321,7 @@ class S3Client:
         read_timeout_seconds: typing.Optional[float] = None,
         total_timeout_seconds: typing.Optional[float] = None,
         transport_total_timeout_seconds: typing.Optional[float] = None,
+        object_tags: typing.Optional[typing.Mapping[str, str]] = None,
     ) -> None:
         """Write with native connect/read bounds and no hard wall-clock claim.
 
@@ -337,6 +339,17 @@ class S3Client:
             read_timeout_seconds=read_timeout_seconds,
             total_timeout_seconds=transport_total,
         )
+        frozen_object_tags = freeze_object_tags(object_tags)
+        put_kwargs: typing.Dict[str, typing.Any] = {
+            "Bucket": bucket,
+            "Key": key,
+            "Body": data,
+            "ContentType": content_type,
+        }
+        if frozen_object_tags is not None:
+            from urllib.parse import urlencode
+
+            put_kwargs["Tagging"] = urlencode(tuple(frozen_object_tags.items()))
 
         def put() -> None:
             client_context = self._client_for_timeouts(
@@ -347,11 +360,6 @@ class S3Client:
             with client_context as client:
                 if not client:
                     return
-                client.put_object(
-                    Bucket=bucket,
-                    Key=key,
-                    Body=data,
-                    ContentType=content_type,
-                )
+                client.put_object(**put_kwargs)
 
         put()

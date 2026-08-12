@@ -9,6 +9,7 @@ from groundx.extract.services.upload import TimeoutClientCache, Upload, validate
 class _Client:
     def __init__(self) -> None:
         self.kwargs: typing.Dict[str, typing.Any] = {}
+        self.put_calls = 0
 
     def get_object(self, url: str, **kwargs: typing.Any) -> typing.Optional[bytes]:
         self.url = url
@@ -41,6 +42,7 @@ class _Client:
         content_type: str,
         **kwargs: typing.Any,
     ) -> None:
+        self.put_calls += 1
         self.kwargs = kwargs
 
     def provision_bucket(self) -> None:
@@ -97,6 +99,80 @@ def test_upload_forwards_preferred_transport_total_timeout() -> None:
         "read_timeout_seconds": 0.5,
         "transport_total_timeout_seconds": 0.8,
     }
+
+
+def test_upload_forwards_an_immutable_copy_of_object_tags() -> None:
+    client = _Client()
+    upload = Upload.__new__(Upload)
+    upload.client = typing.cast(typing.Any, client)
+    object_tags = {
+        "groundx-artifact-class": "extraction-private-evidence",
+    }
+
+    upload.put_json_stream(
+        "eyelevel",
+        "trace.json",
+        b"{}",
+        "application/json",
+        object_tags=object_tags,
+    )
+    object_tags["groundx-artifact-class"] = "ordinary"
+
+    forwarded = client.kwargs["object_tags"]
+    assert dict(forwarded) == {
+        "groundx-artifact-class": "extraction-private-evidence",
+    }
+    with pytest.raises(TypeError):
+        forwarded["groundx-artifact-class"] = "ordinary"
+
+
+def test_upload_without_object_tags_preserves_the_existing_call_shape() -> None:
+    client = _Client()
+    upload = Upload.__new__(Upload)
+    upload.client = typing.cast(typing.Any, client)
+
+    upload.put_json_stream(
+        "eyelevel",
+        "trace.json",
+        b"{}",
+        "application/json",
+    )
+
+    assert client.kwargs == {}
+
+
+@pytest.mark.parametrize(
+    "object_tags, message",
+    [
+        ({"": "value"}, "keys must be nonempty"),
+        ({"key": ""}, "values must be nonempty"),
+        ({"x" * 129: "value"}, "keys must be at most 128"),
+        ({"key": "x" * 257}, "values must be at most 256"),
+        ({"unsafe&key": "value"}, "keys contain unsupported characters"),
+        ({"key": "unsafe\nvalue"}, "values contain unsupported characters"),
+        ({typing.cast(str, 1): "value"}, "keys and values must be strings"),
+        ({"key": typing.cast(str, 1)}, "keys and values must be strings"),
+        ({f"key-{index}": "value" for index in range(11)}, "at most 10"),
+    ],
+)
+def test_upload_rejects_invalid_object_tags_before_storage_io(
+    object_tags: typing.Mapping[str, str],
+    message: str,
+) -> None:
+    client = _Client()
+    upload = Upload.__new__(Upload)
+    upload.client = typing.cast(typing.Any, client)
+
+    with pytest.raises(ValueError, match=message):
+        upload.put_json_stream(
+            "eyelevel",
+            "trace.json",
+            b"{}",
+            "application/json",
+            object_tags=object_tags,
+        )
+
+    assert client.put_calls == 0
 
 
 def test_put_rejects_both_legacy_and_transport_total_timeouts() -> None:

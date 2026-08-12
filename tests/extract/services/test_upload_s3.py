@@ -678,6 +678,36 @@ class TestS3Client(unittest.TestCase):
         self.assertEqual(bounded.put["Key"], "trace.json")
         self.assertEqual(bounded.put["Body"], b"{}")
 
+    def test_put_json_stream_transmits_canonical_url_encoded_object_tags(self) -> None:
+        cl = self._client()
+        bounded = FakeS3Client()
+        create_client = Mock(return_value=bounded)
+        setattr(cl, "_create_client", create_client)
+
+        cl.put_json_stream(
+            "eyelevel",
+            "trace.json",
+            b"{}",
+            "application/json",
+            connect_timeout_seconds=0.2,
+            read_timeout_seconds=0.5,
+            transport_total_timeout_seconds=0.8,
+            object_tags={
+                "groundx-artifact-class": "extraction-private-evidence",
+                "scope/path": "trace+payload",
+            },
+        )
+
+        self.assertEqual(
+            bounded.put["Tagging"],
+            "groundx-artifact-class=extraction-private-evidence&scope%2Fpath=trace%2Bpayload",
+        )
+        create_client.assert_called_once_with(
+            connect_timeout_seconds=0.2,
+            read_timeout_seconds=0.5,
+            total_timeout_seconds=0.8,
+        )
+
     def test_put_json_stream_without_timeouts_preserves_default_client(self) -> None:
         cl = self._client()
         default = FakeS3Client()
@@ -695,6 +725,7 @@ class TestS3Client(unittest.TestCase):
         create_client.assert_not_called()
         self.assertEqual(default.put["Key"], "trace.json")
         self.assertEqual(default.put["Body"], b"{}")
+        self.assertNotIn("Tagging", default.put)
 
     def test_bounded_client_configures_socket_timeouts_without_sdk_retries(
         self,

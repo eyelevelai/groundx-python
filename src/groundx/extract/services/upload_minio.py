@@ -7,6 +7,7 @@ from .http import read_response_body_with_deadline, wall_clock_operation_deadlin
 from .logger import Logger
 from .upload import (
     TimeoutClientCache,
+    freeze_object_tags,
     resolve_transport_total_timeout,
     validate_transport_timeouts,
     validate_upload_timeouts,
@@ -391,6 +392,7 @@ class MinIOClient:
         read_timeout_seconds: typing.Optional[float] = None,
         total_timeout_seconds: typing.Optional[float] = None,
         transport_total_timeout_seconds: typing.Optional[float] = None,
+        object_tags: typing.Optional[typing.Mapping[str, str]] = None,
     ) -> None:
         """Write with native transport bounds, never a hard Python deadline.
 
@@ -407,6 +409,14 @@ class MinIOClient:
             read_timeout_seconds=read_timeout_seconds,
             total_timeout_seconds=transport_total,
         )
+        frozen_object_tags = freeze_object_tags(object_tags)
+        minio_object_tags: typing.Optional[typing.Any] = None
+        if frozen_object_tags is not None:
+            from minio.commonconfig import Tags
+
+            minio_object_tags = Tags.new_object_tags()
+            for tag_key, tag_value in frozen_object_tags.items():
+                minio_object_tags[tag_key] = tag_value
 
         def put() -> None:
             client_context = self._client_for_timeouts(
@@ -419,12 +429,17 @@ class MinIOClient:
                     return
                 import io
 
+                put_kwargs: typing.Dict[str, typing.Any] = {
+                    "bucket_name": bucket,
+                    "object_name": key,
+                    "data": io.BytesIO(data),
+                    "length": len(data),
+                    "content_type": content_type,
+                }
+                if minio_object_tags is not None:
+                    put_kwargs["tags"] = minio_object_tags
                 client.put_object(
-                    bucket_name=bucket,
-                    object_name=key,
-                    data=io.BytesIO(data),
-                    length=len(data),
-                    content_type=content_type,
+                    **put_kwargs,
                 )
 
         put()

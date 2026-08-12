@@ -1,8 +1,10 @@
 import contextlib
 import math
+import re
 import threading
 import typing
 from collections import OrderedDict
+from types import MappingProxyType
 
 from ..settings.settings import ContainerSettings
 from .logger import Logger
@@ -11,6 +13,10 @@ OBJECT_STORE_CONNECT_TIMEOUT_SECONDS = 5.0
 OBJECT_STORE_READ_TIMEOUT_SECONDS = 20.0
 OBJECT_STORE_TOTAL_TIMEOUT_SECONDS = 25.0
 MAX_CACHED_TIMEOUT_CLIENTS = 8
+MAX_OBJECT_TAGS = 10
+MAX_OBJECT_TAG_KEY_LENGTH = 128
+MAX_OBJECT_TAG_VALUE_LENGTH = 256
+OBJECT_TAG_SAFE_PATTERN = re.compile(r"^[A-Za-z0-9 _.:/=+\-@]+$")
 
 
 class _TimeoutClientEntry:
@@ -133,6 +139,7 @@ class UploadClient(typing.Protocol):
         read_timeout_seconds: typing.Optional[float] = None,
         total_timeout_seconds: typing.Optional[float] = None,
         transport_total_timeout_seconds: typing.Optional[float] = None,
+        object_tags: typing.Optional[typing.Mapping[str, str]] = None,
     ) -> None: ...
 
 
@@ -235,6 +242,7 @@ class Upload:
         read_timeout_seconds: typing.Optional[float] = None,
         total_timeout_seconds: typing.Optional[float] = None,
         transport_total_timeout_seconds: typing.Optional[float] = None,
+        object_tags: typing.Optional[typing.Mapping[str, str]] = None,
     ) -> None:
         """Write with transport-native bounds, not a hard wall-clock deadline.
 
@@ -246,7 +254,8 @@ class Upload:
             total_timeout_seconds=total_timeout_seconds,
             transport_total_timeout_seconds=transport_total_timeout_seconds,
         )
-        timeout_kwargs: typing.Dict[str, float] = {}
+        frozen_object_tags = freeze_object_tags(object_tags)
+        timeout_kwargs: typing.Dict[str, typing.Any] = {}
         if connect_timeout_seconds is not None or read_timeout_seconds is not None or transport_total is not None:
             timeout_kwargs = {
                 "connect_timeout_seconds": typing.cast(float, connect_timeout_seconds),
@@ -262,6 +271,8 @@ class Upload:
                     float,
                     transport_total,
                 )
+        if frozen_object_tags is not None:
+            timeout_kwargs["object_tags"] = frozen_object_tags
         self.client.put_json_stream(
             bucket,
             key,
@@ -269,6 +280,40 @@ class Upload:
             content_type,
             **timeout_kwargs,
         )
+
+
+def freeze_object_tags(
+    object_tags: typing.Optional[typing.Mapping[str, str]],
+) -> typing.Optional[typing.Mapping[str, str]]:
+    """Validate and detach optional object tags before storage I/O."""
+    if object_tags is None:
+        return None
+    if not isinstance(object_tags, typing.Mapping):
+        raise ValueError("object_tags must be a mapping")
+
+    items = tuple(object_tags.items())
+    if not items:
+        return None
+    if len(items) > MAX_OBJECT_TAGS:
+        raise ValueError(f"object_tags supports at most {MAX_OBJECT_TAGS} tags")
+
+    for key, value in items:
+        if not isinstance(key, str) or not isinstance(value, str):
+            raise ValueError("object tag keys and values must be strings")
+        if not key:
+            raise ValueError("object tag keys must be nonempty")
+        if not value:
+            raise ValueError("object tag values must be nonempty")
+        if len(key) > MAX_OBJECT_TAG_KEY_LENGTH:
+            raise ValueError(f"object tag keys must be at most {MAX_OBJECT_TAG_KEY_LENGTH} characters")
+        if len(value) > MAX_OBJECT_TAG_VALUE_LENGTH:
+            raise ValueError(f"object tag values must be at most {MAX_OBJECT_TAG_VALUE_LENGTH} characters")
+        if OBJECT_TAG_SAFE_PATTERN.fullmatch(key) is None:
+            raise ValueError("object tag keys contain unsupported characters")
+        if OBJECT_TAG_SAFE_PATTERN.fullmatch(value) is None:
+            raise ValueError("object tag values contain unsupported characters")
+
+    return MappingProxyType(dict(sorted(items)))
 
 
 def validate_upload_timeouts(
