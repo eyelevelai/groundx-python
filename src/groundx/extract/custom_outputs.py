@@ -639,6 +639,14 @@ def _custom_route_values(
         ]
 
     if isinstance(step_value, list):
+        if not route_repeats:
+            return [
+                _RouteValue(
+                    value=step_value,
+                    record_index=None,
+                    repeated=False,
+                )
+            ]
         values: typing.List[_RouteValue] = []
         for index, record in enumerate(step_value):
             if isinstance(record, typing.Mapping):

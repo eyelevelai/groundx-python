@@ -120,6 +120,25 @@ def _reassemble_scalar_observations(
     )
 
 
+def _reassemble_direct_scalar_value(
+    value: typing.Any,
+    *,
+    required: bool = False,
+):
+    return reassemble_custom_outputs_from_xray(
+        {
+            "chunks": [
+                {
+                    "chunkId": "direct-value",
+                    "pageNumbers": [7],
+                    "customChunkOutputs": {"scalar_step": value},
+                }
+            ]
+        },
+        workflow_extract=_scalar_candidate_workflow(required=required),
+    )
+
+
 def _candidate_values(result) -> list[typing.Any]:
     assert len(result.scalar_candidate_sets) == 1
     candidate_set = result.scalar_candidate_sets[0]
@@ -3041,6 +3060,29 @@ def test_scalar_candidate_direct_step_presence_distinguishes_missing_null_and_fa
     candidates = [candidate_set.selected, *candidate_set.alternatives]
     assert [candidate.value for candidate in candidates] == [None, False]
     assert [candidate.page_numbers for candidate in candidates] == [(2,), (3,)]
+
+
+def test_direct_singular_empty_list_is_retained_as_one_candidate() -> None:
+    result = _reassemble_direct_scalar_value([])
+
+    assert _candidate_values(result) == [[]]
+    assert result.scalar_candidate_sets[0].selected.page_numbers == (7,)
+    assert result.final_output == {"scalar_group": {"scalar_field": []}}
+
+
+def test_direct_singular_nonempty_list_preserves_list_identity() -> None:
+    result = _reassemble_direct_scalar_value(["first", "second"])
+
+    assert _candidate_values(result) == [["first", "second"]]
+    assert result.scalar_candidate_sets[0].selected.page_numbers == (7,)
+    assert result.final_output == {"scalar_group": {"scalar_field": ["first", "second"]}}
+
+
+def test_required_direct_singular_empty_list_satisfies_route() -> None:
+    result = _reassemble_direct_scalar_value([], required=True)
+
+    assert _candidate_values(result) == [[]]
+    assert not [diagnostic for diagnostic in result.diagnostics if diagnostic.code.startswith("missing_workflow_")]
 
 
 @pytest.mark.parametrize(
