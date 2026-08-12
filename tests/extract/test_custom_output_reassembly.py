@@ -2461,6 +2461,43 @@ def test_scalar_candidate_sidecar_keeps_first_observation_and_all_later_unique_v
     }
 
 
+def test_scalar_candidate_selection_ignores_later_source_page_presence() -> None:
+    result = _reassemble_scalar_observations(
+        [
+            ({"scalar_field": "first without a page"}, []),
+            ({"scalar_field": "later with a page"}, [8]),
+        ]
+    )
+
+    assert len(result.scalar_candidate_sets) == 1
+    candidate_set = result.scalar_candidate_sets[0]
+    assert (candidate_set.selected.value, candidate_set.selected.page_numbers) == (
+        "first without a page",
+        (),
+    )
+    assert [(candidate.value, candidate.page_numbers) for candidate in candidate_set.alternatives] == [
+        ("later with a page", (8,)),
+    ]
+    assert result.final_output == {"scalar_group": {"scalar_field": "first without a page"}}
+
+
+def test_scalar_candidate_selection_ignores_default_like_value_meaning() -> None:
+    result = _reassemble_scalar_observations(
+        [
+            ({"scalar_field": "N/A"}, [3]),
+            ({"scalar_field": "100% immediate"}, [5]),
+        ]
+    )
+
+    assert len(result.scalar_candidate_sets) == 1
+    candidate_set = result.scalar_candidate_sets[0]
+    assert (candidate_set.selected.value, candidate_set.selected.page_numbers) == ("N/A", (3,))
+    assert [(candidate.value, candidate.page_numbers) for candidate in candidate_set.alternatives] == [
+        ("100% immediate", (5,)),
+    ]
+    assert result.final_output == {"scalar_group": {"scalar_field": "N/A"}}
+
+
 @pytest.mark.parametrize(
     ("observations", "expected_values", "expected_pages"),
     [
