@@ -44,6 +44,8 @@ shape and violates the candidate transport contract for other documents.
 - It does not replace or close Internal Arcadia's
   `complete-extraction-boundary-regression-coverage` change or Studio Harness's
   `add-extraction-certification-harness` change.
+- Remaining cross-repository fixture and boundary work is owned by
+  `internal-arcadia-agents/openspec/changes/complete-extraction-boundary-regression-coverage/tasks.md`.
 - Implementation starts from the candidate collection behavior defined by
   `delegate-scalar-candidate-resolution-to-agents`. Both changes ship in the
   same requested GroundX Python 3.9.7 release. Tasks 1 and 2 here complete

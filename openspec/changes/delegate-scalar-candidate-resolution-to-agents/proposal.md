@@ -86,6 +86,9 @@ complete value-to-page mapping.
 
 ## Release order
 
+Remaining cross-repository fixture and boundary work is owned by
+`internal-arcadia-agents/openspec/changes/complete-extraction-boundary-regression-coverage/tasks.md`.
+
 1. Implement and test Tasks 0 through 2 in this change on Python 3.11.
 2. Implement and test Tasks 1 and 2 in the companion
    `complete-scalar-candidate-provenance` change on top of the same branch.
