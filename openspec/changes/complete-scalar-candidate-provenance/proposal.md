@@ -29,10 +29,12 @@ shape and violates the candidate transport contract for other documents.
 - Distinct values from chunks sharing a section ID remain distinct candidates.
 - One shared route-shape helper treats `keys` and `summary` steps, or a
   `final_path` containing `*`, as repeated.
+- Direct repeated `keys` and `summary` routes without `*` use the existing
+  top-level-array contract instead of falling through scalar placement.
 - Repeated section and document routes keep their current producer-copy
   deduplication.
-- Relationship matching, repeated-record identity, route placement, and public
-  result types do not change.
+- Relationship matching, repeated-record identity, unrelated route placement,
+  and public result types do not change.
 
 ## Relationship to active plans
 
@@ -44,7 +46,8 @@ shape and violates the candidate transport contract for other documents.
   `add-extraction-certification-harness` change.
 - Implementation starts from the candidate collection behavior defined by
   `delegate-scalar-candidate-resolution-to-agents`. Both changes ship in the
-  same requested GroundX Python 3.9.7 release.
+  same requested GroundX Python 3.9.7 release. Tasks 1 and 2 here complete
+  before the single combined unpublished consumer candidate is built.
 
 ## Capabilities
 
@@ -66,9 +69,9 @@ shape and violates the candidate transport contract for other documents.
 - Public dataclasses and imports remain unchanged.
 - Singular section and document routes may expose candidates and page numbers
   that were previously lost. This is the intended correction.
-- Repeated section and document output remains byte-for-byte compatible after
-  reassembly, including direct top-level groups owned by `keys` and `summary`
-  steps.
+- Repeated section and document producer-copy deduplication remains compatible.
+  Direct top-level groups owned by `keys` and `summary` steps are emitted as
+  arrays, as the existing SDK specification already requires.
 - The implementation stays under paths protected by `.fernignore`.
 - No workflow, API, database, customer JSON, or generated Fern change.
 - Open design questions: none.

@@ -21,10 +21,17 @@ The narrow correction belongs at this route boundary. Changing only
 
 ## Implementation
 
-Add one shared private repeated-route predicate used by both
-`_route_containers()` and `_custom_route_values()`. A route is repeated when its
-step kind is `keys` or `summary`, or its parsed `final_path` contains `*`.
-Repeatedness must not be inferred from `final_path` alone.
+Add one shared private repeated-route predicate used by
+`_route_containers()`, `_custom_route_values()`, and final placement. A route is
+repeated when its step kind is `keys` or `summary`, or its parsed `final_path`
+contains `*`. Repeatedness must not be inferred from `final_path` alone.
+
+Pass that predicate's result into `_set_pointer()`. Existing wildcard routes
+keep their current placement. For a repeated `keys` or `summary` route without
+`*`, `_set_pointer()` treats the first path segment as the top-level list and
+the remaining segments as fields in the repeated record. This is the narrow
+implementation of the existing `custom-output-readback` requirement. It does
+not alter singular routes or invent placement from a group name.
 
 For `level: section` routes:
 
@@ -87,10 +94,11 @@ relationship, and repeated-route behavior.
 
 ## Release dependency
 
-This change joins the unpublished source candidate produced for
-`delegate-scalar-candidate-resolution-to-agents`. The candidate keeps the
-repository's generated package version and records its source commit and
-SHA-256. Internal Arcadia and Studio Harness test it on Python 3.11 before the
+This change completes Tasks 1 and 2 before
+`delegate-scalar-candidate-resolution-to-agents` builds the one unpublished
+source candidate from the combined commit. The candidate keeps the repository's
+generated package version and records its source commit and SHA-256. Internal
+Arcadia and Studio Harness test only that candidate on Python 3.11 before the
 human release owner publishes requested version 3.9.7. After publication, both
 consumers verify the released package contains the same handwritten source
 change and rerun their gates from a clean install. The differently versioned

@@ -7,8 +7,8 @@
 **Goal:** Preserve all scalar values and source pages from section and document
 observations without changing repeated-record behavior.
 
-**Architecture:** Change only the route-container boundary and share one
-repeated-route predicate with route-value loading. Singular section and document
+**Architecture:** Share one repeated-route predicate across route-container
+loading, route-value loading, and final placement. Singular section and document
 routes emit every observation. Existing candidate collection deduplicates
 values and merges pages. Repeated routes retain producer-copy deduplication.
 
@@ -20,8 +20,9 @@ values and merges pages. Repeated routes retain producer-copy deduplication.
   `delegate-scalar-candidate-resolution-to-agents`, not an unrelated checkout.
 - Do not edit or archive any existing OpenSpec change.
 - Do not modify generated Fern files or public dataclass shapes.
-- Do not change repeated-record, relationship, route-placement, or type-coercion
-  behavior.
+- Do not change relationship, type-coercion, singular placement, or wildcard
+  repeated placement behavior. Implement only the existing top-level-array
+  contract for direct `keys` and `summary` routes without `*`.
 - Requested release is GroundX Python 3.9.7. Publication remains owned by the
   human release owner.
 
@@ -73,8 +74,12 @@ metadata or one precomputed repeated flag. No public interface changes.
 - [ ] Add one private repeated-route predicate. It returns true when the step
   kind is `keys` or `summary`, or when parsed `final_path` contains `*`.
 - [ ] Use that same predicate in `_route_containers()` and
-  `_custom_route_values()` so route shape cannot disagree between the two
-  stages.
+  `_custom_route_values()`, and pass its result to `_set_pointer()` so route
+  shape cannot disagree across collection and placement.
+- [ ] When that predicate is true and `final_path` has no `*`, make
+  `_set_pointer()` emit the first path segment as a top-level list and write the
+  remaining path into one repeated record per source record. Keep wildcard and
+  singular placement unchanged.
 - [ ] For repeated section routes, retain current
   `custom_output_section_identity()` and `section_seen` behavior.
 - [ ] For singular paths, append one `_RouteContainer` for every X-Ray chunk,
@@ -109,10 +114,12 @@ metadata or one precomputed repeated flag. No public interface changes.
 - [ ] Run `bash scripts/check-line-endings.sh` and `git diff --check`.
 - [ ] Run
   `OPENSPEC_TELEMETRY=0 npx -y @fission-ai/openspec@1.3.1 validate complete-scalar-candidate-provenance --strict`.
-- [ ] Build the same unpublished source candidate used by
-  `delegate-scalar-candidate-resolution-to-agents` on Python 3.11. Keep the
-  generated package version unchanged. Record its source commit, filename, and
-  SHA-256 in the consumer test handoff. Do not publish it.
+- [ ] Finish this change's Tasks 1 and 2 on top of
+  `delegate-scalar-candidate-resolution-to-agents` before any consumer wheel is
+  built. Then let that producer plan build one unpublished source candidate
+  from the combined commit on Python 3.11. Keep the generated package version
+  unchanged. Record its source commit, filename, and SHA-256 in the consumer
+  test handoff. Do not publish it.
 - [ ] Hand the source candidate to the Internal Arcadia and Studio Harness
   companion changes. Do not request release 3.9.7 until both consumer gates
   pass.
