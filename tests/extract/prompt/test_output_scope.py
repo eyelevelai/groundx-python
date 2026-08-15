@@ -189,7 +189,37 @@ line_items:
     assert route["final_path"] == "/line_items/*/details/description"
     assert leaf["final_path"] == "/line_items/*/details/description"
     assert leaf["is_repeated"] is True
-    assert leaf["repetition_scope"] == "/line_items/*"
+    assert leaf["repetition_scope"] == "item"
+
+
+def test_prepare_extraction_yaml_emits_api_repetition_scope_enum() -> None:
+    prepared = prepare_extraction_yaml(
+        _workflow_yaml(
+            """
+invoice:
+  workflow_step: scalar_step
+  fields:
+    account_number:
+      workflow_output_key: account_number
+      prompt:
+        instructions: Return the account number.
+        type: str
+
+line_items:
+  workflow_step: repeated_step
+  fields:
+    description:
+      workflow_output_key: description
+      prompt:
+        instructions: Return each description.
+        type: str
+"""
+        )
+    )
+
+    leaves = prepared.persisted_workflow_extract["workflow"]["leaf_fields"]
+    scopes = {leaf["workflow_group"]: leaf["repetition_scope"] for leaf in leaves}
+    assert scopes == {"invoice": "none", "line_items": "item"}
 
 
 def test_final_field_path_accepts_complete_destination_trees() -> None:
