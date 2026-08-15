@@ -222,6 +222,43 @@ line_items:
     assert scopes == {"invoice": "none", "line_items": "item"}
 
 
+# Shared compiler-parity golden: the same YAML is compiled by the Studio
+# Harness compile_workflow.py tests. A divergence between the two compilers on
+# this schema must fail a test the day it is introduced.
+_PARITY_GOLDEN_YAML = """\
+extraction_policy_version: v1
+workflow:
+  custom_steps:
+    - name: claim_rows
+      level: chunk
+      kind: keys
+  agent_chain:
+    - parallel:
+        - group: claims
+          chain: [reconcile_charges, save_charges]
+claims:
+  workflow_step: claim_rows
+  role: charges
+  fields:
+    claim_number:
+      workflow_output_key: claim_number
+      prompt:
+        description: claim number
+        type: str
+        identifiers: ["Claim"]
+        instructions: Return the claim number.
+"""
+
+
+def test_parity_golden_repeated_group_emits_enum_scope() -> None:
+    prepared = prepare_extraction_yaml(_PARITY_GOLDEN_YAML)
+
+    leaves = prepared.persisted_workflow_extract["workflow"]["leaf_fields"]
+    assert [leaf["repetition_scope"] for leaf in leaves] == ["item"]
+    assert leaves[0]["final_path"] == "/claims/*/claim_number"
+    assert leaves[0]["is_repeated"] is True
+
+
 def test_final_field_path_accepts_complete_destination_trees() -> None:
     for pointer in (
         "/field",
