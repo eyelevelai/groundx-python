@@ -69,7 +69,7 @@ def _custom_workflow_metadata() -> typing.Dict[str, typing.Any]:
                 "output_key": "label",
                 "field_type": "str",
                 "is_repeated": True,
-                "repetition_scope": "/line_items/*",
+                "repetition_scope": "item",
             }
         ],
         "field_counts": {"line_item_labels": 1},
@@ -577,6 +577,19 @@ def test_persisted_custom_workflow_extract_round_trips_routes_and_leaf_fields() 
     assert workflow["output_routes"] == persisted["workflow"]["output_routes"]
     assert workflow["leaf_fields"] == persisted["workflow"]["leaf_fields"]
     assert workflow["leaf_fields"][0]["final_path"] == "/line_items/*/description"
+    assert workflow["leaf_fields"][0]["repetition_scope"] == "item"
+    assert reloaded.workflow_field_paths["line_items"]["description"] == ("/line_items/*/description")
+
+
+def test_persisted_legacy_pointer_repetition_scope_loads_verbatim() -> None:
+    """Stored rows written before the enum fix carry pointer-format scopes."""
+    persisted = _persisted_custom_workflow_extract()
+    persisted["workflow"]["leaf_fields"][0]["repetition_scope"] = "/line_items/*"
+
+    reloaded = prepare_extraction_yaml(json.loads(json.dumps(persisted)))
+    workflow = reloaded.persisted_workflow_extract["workflow"]
+
+    assert workflow["leaf_fields"] == persisted["workflow"]["leaf_fields"]
     assert workflow["leaf_fields"][0]["repetition_scope"] == "/line_items/*"
     assert reloaded.workflow_field_paths["line_items"]["description"] == ("/line_items/*/description")
 

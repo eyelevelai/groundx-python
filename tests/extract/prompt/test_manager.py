@@ -1724,7 +1724,7 @@ _pseudo_groups:
                     "output_key": "label",
                     "field_type": "str",
                     "is_repeated": True,
-                    "repetition_scope": "/line_items/*",
+                    "repetition_scope": "item",
                 }
             ],
         )
@@ -1767,7 +1767,7 @@ invoice:
         )
         self.assertEqual(
             workflow["leaf_fields"][0]["repetition_scope"],
-            "/invoice/charges/*",
+            "item",
         )
 
     def test_prepare_extraction_yaml_does_not_use_role_for_placement(

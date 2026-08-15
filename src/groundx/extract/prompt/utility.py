@@ -1321,11 +1321,7 @@ def _field_type(field: typing.Dict[str, typing.Any]) -> str:
 
 
 def _repetition_scope(segments: typing.Tuple[str, ...]) -> str:
-    if "*" not in segments:
-        return "none"
-
-    idx = segments.index("*")
-    return _encode_pointer(segments[: idx + 1])
+    return "item" if "*" in segments else "none"
 
 
 def _custom_workflow_field_name(prefix: typing.Tuple[str, ...], field_name: str) -> str:
