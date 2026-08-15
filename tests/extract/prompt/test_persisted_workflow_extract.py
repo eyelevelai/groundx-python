@@ -581,6 +581,19 @@ def test_persisted_custom_workflow_extract_round_trips_routes_and_leaf_fields() 
     assert reloaded.workflow_field_paths["line_items"]["description"] == ("/line_items/*/description")
 
 
+def test_persisted_legacy_pointer_repetition_scope_loads_verbatim() -> None:
+    """Stored rows written before the enum fix carry pointer-format scopes."""
+    persisted = _persisted_custom_workflow_extract()
+    persisted["workflow"]["leaf_fields"][0]["repetition_scope"] = "/line_items/*"
+
+    reloaded = prepare_extraction_yaml(json.loads(json.dumps(persisted)))
+    workflow = reloaded.persisted_workflow_extract["workflow"]
+
+    assert workflow["leaf_fields"] == persisted["workflow"]["leaf_fields"]
+    assert workflow["leaf_fields"][0]["repetition_scope"] == "/line_items/*"
+    assert reloaded.workflow_field_paths["line_items"]["description"] == ("/line_items/*/description")
+
+
 def test_persisted_relationship_round_trips_first_stable_match_strategy() -> None:
     persisted = _persisted_custom_workflow_extract()
     persisted["workflow"]["output_relationships"] = [
