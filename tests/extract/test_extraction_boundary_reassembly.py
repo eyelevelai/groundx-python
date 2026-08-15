@@ -534,6 +534,27 @@ def test_sdk_reassembly_expected_answer_projection_is_diagnostic_only(surface: s
     REAL_BOUNDARY_SURFACES,
 )
 @pytest.mark.release_intentional_fixture_red
+def test_boundary_workflow_leaf_repetition_scope_is_api_enum(surface: str) -> None:
+    """Stored production workflows carry enum scopes, not pointer-format ones."""
+    _require_protected_fixture_pack(surface)
+    handoff = _read_json(
+        BOUNDARY_INPUT_ROOT / surface / "internal_arcadia_download_workflow_load.handoff.json"
+    )
+    leaves = handoff["workflow_extract"].get("workflow", {}).get("leaf_fields", [])
+
+    for leaf in leaves:
+        expected = "item" if leaf["is_repeated"] else "none"
+        assert leaf["repetition_scope"] == expected, (
+            f"{surface} leaf {leaf['final_path']} carries repetition_scope "
+            f"{leaf['repetition_scope']!r}, expected {expected!r}"
+        )
+
+
+@pytest.mark.parametrize(
+    "surface",
+    REAL_BOUNDARY_SURFACES,
+)
+@pytest.mark.release_intentional_fixture_red
 def test_sdk_xray_reassembly_real_boundary_packets(
     tmp_path: pathlib.Path,
     surface: str,

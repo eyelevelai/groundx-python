@@ -67,5 +67,5 @@ def test_release_handoff_documents_the_intentional_fixture_gate() -> None:
     guide = " ".join((REPO_ROOT / "CONTRIBUTING.md").read_text().split())
 
     assert "Ordinary pull-request CI keeps these protected tests failing" in guide
-    assert "exactly seven approved missing-fixture failures" in guide
-    assert "all seven tests pass after fixture promotion" in guide
+    assert "exactly the approved missing-fixture failures" in guide
+    assert "pass after fixture promotion" in guide

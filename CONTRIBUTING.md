@@ -117,9 +117,10 @@ release tag, dispatch a release workflow, or publish the package from this repos
 
 Ordinary pull-request CI keeps these protected tests failing until governed fixtures are
 promoted. Tag-release CI classifies them separately. Publishing is allowed only when the
-selected set contains exactly seven approved missing-fixture failures, or all seven tests
-pass after fixture promotion. Any missing, extra, skipped, errored, mixed, or changed
-outcome blocks publishing.
+selected set contains exactly the approved missing-fixture failures registered in
+`scripts/verify_release_intentional_red.py`, or all of those tests pass after fixture
+promotion. Any missing, extra, skipped, errored, mixed, or changed outcome blocks
+publishing.
 
 ### Commit Messages
 

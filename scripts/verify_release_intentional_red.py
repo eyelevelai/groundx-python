@@ -10,6 +10,10 @@ from pathlib import Path
 
 CLASSNAME = "tests.extract.test_extraction_boundary_reassembly"
 SURFACES_BY_TEST = {
+    "test_boundary_workflow_leaf_repetition_scope_is_api_enum[arcadia_legacy]": "arcadia_legacy",
+    "test_boundary_workflow_leaf_repetition_scope_is_api_enum[arcadia_v1]": "arcadia_v1",
+    "test_boundary_workflow_leaf_repetition_scope_is_api_enum[generic_v1]": "generic_v1",
+    "test_boundary_workflow_leaf_repetition_scope_is_api_enum[adp_v1]": "adp_v1",
     "test_sdk_xray_reassembly_real_boundary_packets[arcadia_legacy]": "arcadia_legacy",
     "test_sdk_xray_reassembly_real_boundary_packets[arcadia_v1]": "arcadia_v1",
     "test_sdk_xray_reassembly_real_boundary_packets[generic_v1]": "generic_v1",
@@ -95,9 +99,11 @@ def main(argv: list[str] | None = None) -> int:
     root = ET.parse(args.junit_report).getroot()
     outcomes = {_testcase_outcome(testcase)[0] for testcase in root.iter("testcase")}
     if outcomes == {"passed"}:
-        print("release fixture gate passed: all seven protected fixture tests passed")
+        print(f"release fixture gate passed: all {len(EXPECTED_FAILURES)} protected fixture tests passed")
     else:
-        print("release fixture gate passed: exactly seven approved intentional fixture failures")
+        print(
+            f"release fixture gate passed: exactly {len(EXPECTED_FAILURES)} approved intentional fixture failures"
+        )
     return 0
 
 

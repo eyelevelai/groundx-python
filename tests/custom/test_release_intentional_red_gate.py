@@ -9,6 +9,10 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 VERIFIER = REPO_ROOT / "scripts" / "verify_release_intentional_red.py"
 CLASSNAME = "tests.extract.test_extraction_boundary_reassembly"
 EXPECTED_FAILURES = {
+    "test_boundary_workflow_leaf_repetition_scope_is_api_enum[arcadia_legacy]": "arcadia_legacy",
+    "test_boundary_workflow_leaf_repetition_scope_is_api_enum[arcadia_v1]": "arcadia_v1",
+    "test_boundary_workflow_leaf_repetition_scope_is_api_enum[generic_v1]": "generic_v1",
+    "test_boundary_workflow_leaf_repetition_scope_is_api_enum[adp_v1]": "adp_v1",
     "test_sdk_xray_reassembly_real_boundary_packets[arcadia_legacy]": "arcadia_legacy",
     "test_sdk_xray_reassembly_real_boundary_packets[arcadia_v1]": "arcadia_v1",
     "test_sdk_xray_reassembly_real_boundary_packets[generic_v1]": "generic_v1",
@@ -74,17 +78,17 @@ def test_release_gate_accepts_exact_intentional_fixture_failures(tmp_path: Path)
     result = _run_verifier(report)
 
     assert result.returncode == 0, result.stdout + result.stderr
-    assert "exactly seven approved intentional fixture failures" in result.stdout
+    assert f"exactly {len(EXPECTED_FAILURES)} approved intentional fixture failures" in result.stdout
 
 
-def test_release_gate_accepts_all_seven_tests_after_fixture_promotion(tmp_path: Path) -> None:
+def test_release_gate_accepts_all_registered_tests_after_fixture_promotion(tmp_path: Path) -> None:
     report = tmp_path / "report.xml"
     _write_report(report, _expected_passes())
 
     result = _run_verifier(report)
 
     assert result.returncode == 0, result.stdout + result.stderr
-    assert "all seven protected fixture tests passed" in result.stdout
+    assert f"all {len(EXPECTED_FAILURES)} protected fixture tests passed" in result.stdout
 
 
 def test_release_gate_rejects_missing_test(tmp_path: Path) -> None:
