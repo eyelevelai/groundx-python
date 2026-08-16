@@ -871,6 +871,10 @@ def test_builder_records_reassembly_when_quality_assertions_fail(
         surface,
         captured_complete_output=captured_complete_output,
     )
+    _manifest["governed_test_cases"] = [
+        {"case_id": "adp-v1", "surface": surface},
+    ]
+    _write_json(capture_manifest, _manifest)
     accepted_output = tmp_path / "accepted.json"
     _write_json(
         accepted_output,
@@ -910,6 +914,8 @@ def test_builder_records_reassembly_when_quality_assertions_fail(
     )
 
     assert manifest_path == candidate_root / "fixture_candidate_manifest.json"
+    generated_manifest = json.loads(manifest_path.read_text())
+    assert generated_manifest["governed_test_cases"] == _manifest["governed_test_cases"]
     candidate = json.loads(
         (
             candidate_root

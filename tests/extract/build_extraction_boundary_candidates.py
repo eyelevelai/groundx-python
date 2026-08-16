@@ -606,6 +606,7 @@ def build_candidates(
             "artifact_catalog_sha256": capture_manifest["artifact_catalog_sha256"],
             "source_boundary_manifest_sha256": capture_manifest["source_boundary_manifest_sha256"],
             "upstream_candidate_manifest_sha256": _sha256(xray_candidate_manifest_path),
+            "governed_test_cases": [{"case_id": _CASE_IDS[surface], "surface": surface} for surface in surfaces],
             "generator": {
                 "candidate_builder_sha256": _sha256(Path(__file__)),
                 "boundary_replay_sha256": _sha256(
