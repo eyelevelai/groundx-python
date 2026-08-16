@@ -91,8 +91,19 @@ def coerce_value(
             warning=_coercion_warning(value, []),
         )
 
-    supported_targets = [target for target in targets if target in _SUPPORTED_TYPES]
-    if len(supported_targets) != len(targets):
+    allows_null = "null" in targets
+    typed_targets = [target for target in targets if target != "null"]
+    supported_targets = [target for target in typed_targets if target in _SUPPORTED_TYPES]
+    if len(supported_targets) != len(typed_targets):
+        return CoercionResult(
+            value=None,
+            matched=False,
+            converted=False,
+            warning=_coercion_warning(value, targets),
+        )
+    if value is None and allows_null:
+        return CoercionResult(value=None, matched=True, converted=False)
+    if not supported_targets:
         return CoercionResult(
             value=None,
             matched=False,
