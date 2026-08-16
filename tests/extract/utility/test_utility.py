@@ -100,6 +100,25 @@ class TestUtilCoerceValue(unittest.TestCase):
         self.assert_result(coerce_value(None, ["int", "float"]), None, type(None), True, False)
         self.assert_result(coerce_value({"a": 1}), {"a": 1}, dict, True, False)
 
+    def test_null_in_declared_type_unions(self) -> None:
+        cases: typing.List[typing.Tuple[typing.Any, typing.List[str]]] = [
+            ("2026-06-29", ["str", "null"]),
+            (24839.43, ["int", "float", "null"]),
+            (7, ["int", "null"]),
+            ([1], ["list", "null"]),
+        ]
+        for value, target in cases:
+            with self.subTest(value=value, target=target):
+                self.assert_result(coerce_value(value, target), value, type(value), True, False)
+
+        self.assert_result(coerce_value(None, ["str", "null"]), None, type(None), True, False)
+        self.assert_result(coerce_value(None, ["null"]), None, type(None), True, False)
+        self.assert_result(coerce_value("7", ["int", "null"]), 7, int, True, True)
+
+        rejected = coerce_value("text", ["null"])
+        self.assertIsNone(rejected.value)
+        self.assertIs(rejected.matched, False)
+
     def test_scalar_conversions_are_deterministic(self) -> None:
         cases = [
             (True, "str", "true", str, True),
