@@ -70,6 +70,7 @@ _SUPPORTED_FINAL_GROUP_METADATA_KEYS = {
     "identity_match",
     "match_attrs",
     "not_required_service_types",
+    "normalization_profiles",
     "partial_pair_attrs",
     "passthrough",
     "passthrough_attrs",
@@ -102,6 +103,11 @@ _PASSTHROUGH_KEYS = {
     "multiple_match_strategy",
     "parent_output_field",
     "unmatched_child_group",
+}
+_SUPPORTED_NORMALIZATION_PROFILES = {
+    "currency_code",
+    "currency_label",
+    "unit_of_measurement",
 }
 _UNSUPPORTED_TOP_LEVEL_KEYS = {"domain"}
 _UNSUPPORTED_WORKFLOW_GROUP_KEYS = {"slot"}
@@ -660,6 +666,36 @@ def _validate_object_array_metadata(
 ) -> None:
     fields = _ensure_fields_mapping(group.get("fields"), f"{group_name}.fields")
     field_names = set(fields)
+
+    normalization_profiles_value = metadata.get("normalization_profiles")
+    if normalization_profiles_value is not None:
+        if not isinstance(normalization_profiles_value, dict):
+            raise ValueError(f"[{group_name}.normalization_profiles] must be a mapping")
+        normalization_profiles = typing.cast(
+            typing.Mapping[typing.Any, typing.Any], normalization_profiles_value
+        )
+        invalid_attrs = {
+            attr
+            for attr in normalization_profiles
+            if not isinstance(attr, str) or not attr
+        }
+        if invalid_attrs:
+            raise ValueError(
+                f"normalization_profiles attributes must be non-empty strings in group [{group_name}]: "
+                + ", ".join(sorted(str(attr) for attr in invalid_attrs))
+            )
+        invalid_profiles = {
+            profile
+            for profile in normalization_profiles.values()
+            if not isinstance(profile, str)
+            or not profile
+            or profile not in _SUPPORTED_NORMALIZATION_PROFILES
+        }
+        if invalid_profiles:
+            raise ValueError(
+                f"unsupported normalization profile in group [{group_name}]: "
+                + ", ".join(sorted(str(profile) for profile in invalid_profiles))
+            )
 
     unique_attrs_value = metadata.get("unique_attrs", [])
     unique_attrs = set(

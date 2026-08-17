@@ -79,6 +79,16 @@ surface.
 - **AND** the marker is exposed in `PreparedExtractionYaml.top_level_metadata`
 - **AND** the marker is preserved in the persisted workflow extract
 
+#### Scenario: Normalization profiles are explicit final-group metadata
+
+- **WHEN** v1 YAML maps runtime attributes to supported
+  `normalization_profiles`
+- **THEN** preparation validates the attribute names and profile names
+- **AND** supports `currency_code`, `currency_label`, and
+  `unit_of_measurement`
+- **AND** preserves the mapping in final-group metadata and the persisted
+  workflow extract without exposing it as an extraction field
+
 #### Scenario: Explicit metadata registration still works
 - **WHEN** the same authored YAML is prepared with the scalar key included in
   `top_level_metadata_keys`
