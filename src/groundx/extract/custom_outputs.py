@@ -76,8 +76,10 @@ class RelationshipParentSelection:
 
     ``parent`` is the selected parent record, or ``None`` when no parent was
     selected.  ``ambiguous`` is ``True`` only when more than one parent matched
-    the child exactly and the relationship packet declared no
-    ``multiple_match_strategy`` to resolve the tie.
+    the child exactly and the relationship packet explicitly declared a
+    ``multiple_match_strategy`` other than ``first_stable``.  An absent
+    strategy defaults to ``first_stable`` (2026-08-17 ruling), so undeclared
+    ties select the first parent and are never ambiguous.
     """
 
     parent: typing.Optional[typing.Mapping[str, typing.Any]] = None
@@ -315,8 +317,10 @@ def select_relationship_parent(
 
     This is the one exported relationship parent-selection primitive.  It ports
     the legacy charge-to-meter matcher
-    (``internal-arcadia classes/statement.py::Statement.get_charge_meter`` at
-    ``main`` @ ``2797b5e``, semantics adopted by owner RULING 7a, 2026-08-05)
+    (``internal-arcadia classes/statement.py::Statement.get_charge_meter`` on
+    ``origin/main``, with the populated-keys filter and empty-value-is-absent
+    semantics adopted by owner RULING 7a, 2026-08-05; the ``2797b5e`` commit an
+    earlier revision cited as "main" is a plan-branch checkpoint, not main)
     onto the generic relationship packet:
 
     * ``parents`` is an ordered sequence of parent records, ``child`` is one
@@ -326,10 +330,12 @@ def select_relationship_parent(
       child's populated (non-empty) values; an empty value counts as absent.
     * Exact pass: a parent is an exact candidate when it populates exactly the
       same match attrs the child populates, with equal values.  A single exact
-      candidate wins.  Multiple exact candidates follow only the packet's
-      declared ``multiple_match_strategy`` (``first_stable`` selects the first
-      parent in order); with no declared strategy the outcome is ambiguous and
-      no parent is selected.
+      candidate wins.  Multiple exact candidates select the first parent in
+      stable input order, matching the legacy matcher, whether the packet
+      declares ``multiple_match_strategy: first_stable`` or declares no
+      strategy at all (2026-08-17 ruling; ``first_stable`` is the only legal
+      declared value).  Only an explicitly declared unrecognized strategy
+      leaves the tie ambiguous with no parent selected.
     * Fallback pass: only the match attrs also named by the packet's
       ``parent_passthrough_attrs`` are removed from comparison.  If that
       removes nothing, or removes everything, there is no fallback.  A parent
@@ -383,7 +389,7 @@ def select_relationship_parent(
         return RelationshipParentSelection(parent=direct_matches[0], ambiguous=False)
     if len(direct_matches) > 1:
         strategy = _relationship_packet_value(relationship, "multiple_match_strategy")
-        if strategy == "first_stable":
+        if strategy is None or strategy == "first_stable":
             return RelationshipParentSelection(
                 parent=direct_matches[0],
                 ambiguous=False,

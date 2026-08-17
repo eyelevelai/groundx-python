@@ -224,22 +224,20 @@ _MAIN_ADOPTED_NOTE = (
     "0c359e45/d4f8ead/24a490c, which is why the revision is recorded per row"
 )
 
-# The accepted boundary inputs disagree on `multiple_match_strategy`:
+# The accepted boundary inputs vary on `multiple_match_strategy`:
 # arcadia_legacy declares `first_stable` on its persisted relationship while
-# arcadia_v1 and generic_v1 declare no strategy at all.  RULING 7b (2026-08-05)
-# resolves this by DECLARING `multiple_match_strategy: first_stable` in the
-# arcadia_v1 and generic_v1 accepted inputs, routed through the Phase 4
-# promotion lifecycle (tasks 10.1b / 10.2a) -- NOT by editing those inputs now.
-# See `test_pending_accepted_inputs_declare_one_ambiguity_strategy` below, which
-# flips from failing to passing when that promotion lands.
+# arcadia_v1 and generic_v1 declare no strategy at all.  The 2026-08-17 ruling
+# (superseding RULING 7b) makes an undeclared strategy default to
+# `first_stable`, so all three surfaces share one tie behavior with no fixture
+# edit or promotion-time declaration required.  See
+# `test_pending_accepted_inputs_declare_one_ambiguity_strategy` below, which
+# now verifies no accepted input declares a foreign strategy.
 _PARITY_RULING = (
-    "RULING 7b (2026-08-05): the accepted inputs currently disagree on "
-    "multiple_match_strategy (arcadia_legacy declares first_stable; arcadia_v1 "
-    "and generic_v1 declare none). Resolution is to DECLARE first_stable in the "
-    "arcadia_v1 and generic_v1 accepted inputs through the Phase 4 promotion "
-    "lifecycle (10.1b/10.2a), not by editing them now. Until that promotion "
-    "lands the three surfaces cannot demonstrate the parity spec.md:374-375 "
-    "requires. The primitive-level contract in this row is ratified."
+    "2026-08-17 ruling (supersedes RULING 7b): an undeclared "
+    "multiple_match_strategy defaults to first_stable, so arcadia_legacy "
+    "(declares first_stable) and arcadia_v1/generic_v1 (declare none) share "
+    "one tie behavior. No accepted-input declaration is required at promotion. "
+    "The primitive-level contract in this row is ratified."
 )
 
 BEHAVIOR_TABLE: typing.Tuple[Row, ...] = (
@@ -319,20 +317,31 @@ BEHAVIOR_TABLE: typing.Tuple[Row, ...] = (
         strategy="first_stable",
     ),
     _row(
-        "R16_multiple_exact_without_strategy_is_ambiguous",
+        "R16_multiple_exact_without_strategy_first_stable",
+        [{_M: "M-1", _P: "Utility", _S: "water"}, {_M: "m-1", _P: "utility", _S: "WATER"}],
+        {_M: "M-1", _P: "Utility", _S: "water"},
+        0,
+        "exact",
+        "RATIFIED primitive contract per the 2026-08-17 ruling, which supersedes "
+        "RULING 7b (2026-08-05): an undeclared multiple_match_strategy defaults to "
+        "first_stable, restoring legacy assertion "
+        f"{_STMT}:5741, which returns the first candidate with NO declared strategy. "
+        "Only an explicitly declared strategy other than first_stable leaves the "
+        f"tie ambiguous. {_PARITY_RULING}",
+        provenance=RATIFIED,
+    ),
+    _row(
+        "R16b_multiple_exact_foreign_declared_strategy_is_ambiguous",
         [{_M: "M-1", _P: "Utility", _S: "water"}, {_M: "m-1", _P: "utility", _S: "WATER"}],
         {_M: "M-1", _P: "Utility", _S: "water"},
         None,
         "none",
-        "RATIFIED primitive contract per RULING 7b (2026-08-05): an undeclared "
-        "multiple_match_strategy makes multiple exact candidates AMBIGUOUS. This is "
-        "a DELIBERATE DIVERGENCE from legacy assertion "
-        f"{_STMT}:5741, which returns the first candidate with NO declared strategy; "
-        "openspec tasks.md:1365-1366 'Ambiguity follows only the packet's declared "
-        "strategy' and tasks.md:1381-1382 'Delete the unconditional direct_matches[0] "
-        "result' mandate the divergence, so Internal Arcadia must update :5741 in "
-        f"3.2a7c. {_PARITY_RULING}",
+        "2026-08-17 ruling: only an explicitly declared strategy other than "
+        "first_stable leaves multiple exact candidates ambiguous. YAML "
+        "validation rejects such values at authoring time, so this row covers "
+        "the unvalidated runtime-packet path only.",
         ambiguous=True,
+        strategy="round_robin",
         provenance=RATIFIED,
     ),
     # --- reviewed available-identity matrix -------------------------------
@@ -841,28 +850,16 @@ def _accepted_relationship(surface: str) -> typing.Mapping[str, typing.Any]:
     return relationships[0]
 
 
-@pytest.mark.pending_decision
 def test_pending_accepted_inputs_declare_one_ambiguity_strategy() -> None:
-    """PENDING PROMOTION -- fails until the Phase 4 fixture promotion lands.
+    """Accepted inputs must not declare a strategy other than `first_stable`.
 
-    spec.md:374-375 requires Arcadia and renamed-generic parity as proof of the
-    general contract.  Under behavior-table row R16 -- now the RATIFIED primitive
-    contract -- a workflow with no declared `multiple_match_strategy` treats
-    multiple exact candidates as ambiguous, while `first_stable` selects the
-    first.  The accepted boundary inputs do not agree on that declaration:
-    arcadia_legacy declares `first_stable`, arcadia_v1 and generic_v1 declare
-    none, so the three surfaces land on opposite sides of the R15/R16 boundary.
-
-    RULING 7b (2026-08-05) resolves this by DECLARING
-    `multiple_match_strategy: first_stable` in the arcadia_v1 and generic_v1
-    accepted inputs, routed through the Phase 4 promotion lifecycle (tasks 10.1b
-    and 10.2a).  It is explicitly NOT resolved by editing those accepted inputs
-    now, and this lane changes no fixture bytes.
-
-    This test therefore stays red on purpose and **flips to passing when that
-    promotion lands** -- it is the promotion's acceptance check, not a matcher
-    requirement.  It is marked `pending_decision` so it never reads as a 3.2a7b
-    implementation target.
+    The 2026-08-17 ruling (superseding RULING 7b) makes an undeclared
+    `multiple_match_strategy` default to `first_stable`, so the parity
+    spec.md:374-375 requires holds whether an accepted input declares
+    `first_stable` (arcadia_legacy) or declares nothing (arcadia_v1,
+    generic_v1).  No promotion-time declaration is required.  This test guards
+    the one state that would still split the surfaces: an accepted input
+    declaring some other strategy.
     """
     surfaces = ("arcadia_legacy", "arcadia_v1", "generic_v1")
     accepted_paths = [
@@ -876,9 +873,8 @@ def test_pending_accepted_inputs_declare_one_ambiguity_strategy() -> None:
 
     declared = {surface: _accepted_relationship(surface).get("multiple_match_strategy") for surface in surfaces}
 
-    assert set(declared.values()) == {"first_stable"}, (
-        "RULING 7b: every accepted input must declare "
-        "multiple_match_strategy=first_stable once the Phase 4 promotion "
-        "(10.1b/10.2a) lands; until then the parity spec.md:374-375 requires "
-        f"cannot hold under R16. Current state: {declared}"
+    assert set(declared.values()) <= {None, "first_stable"}, (
+        "2026-08-17 ruling: an undeclared multiple_match_strategy defaults to "
+        "first_stable, so accepted inputs may declare first_stable or nothing; "
+        f"a foreign declared strategy splits the surfaces. Current state: {declared}"
     )

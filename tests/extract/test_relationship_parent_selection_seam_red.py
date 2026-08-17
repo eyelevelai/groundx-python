@@ -475,17 +475,11 @@ def test_output_names_default_to_the_child_group_name(omitted: str) -> None:
 
 
 def test_reassembly_reports_ambiguity_only_per_declared_strategy() -> None:
-    """Encodes behavior-table row R16, RATIFIED by RULING 7b (2026-08-05):
-    an undeclared `multiple_match_strategy` makes multiple exact candidates
-    ambiguous.  The `pending_decision` tag this test carried in fix round 1 is
-    removed -- only the fixture-level declaration is still pending promotion
-    (see `test_pending_accepted_inputs_declare_one_ambiguity_strategy`).
-    Currently passes, so it is a regression guard rather than a red requirement.
-
-    tasks.md:1365-1366 -- ambiguity follows only the packet's declared
-    strategy.  Two exact candidates with no strategy are ambiguous and
-    unmatched; with `first_stable` the first parent in order wins.
-    (Behavior-table rows R15/R16.)
+    """Encodes behavior-table row R16 under the 2026-08-17 ruling (supersedes
+    RULING 7b): an undeclared `multiple_match_strategy` defaults to
+    `first_stable`, matching the legacy Arcadia matcher.  Two exact candidates
+    with no declared strategy attach the child to the first parent in stable
+    input order with no ambiguity diagnostic.  (Behavior-table rows R15/R16.)
     """
     meters = [
         {"meter_number": "M-1", "provider_name": "Utility", "service_type": "water"},
@@ -493,11 +487,11 @@ def test_reassembly_reports_ambiguity_only_per_declared_strategy() -> None:
     ]
     charge = {"meter_number": "M-1", "provider_name": "Utility", "service_type": "water"}
 
-    ambiguous = _reassemble(meters, [charge])
-    assert ambiguous.final_output["meters"][0]["meter_charges"] == []
-    assert ambiguous.final_output["meters"][1]["meter_charges"] == []
-    assert ambiguous.final_output["account_charges"] == [charge]
-    assert [d.code for d in ambiguous.diagnostics] == ["ambiguous_relationship_match"]
+    undeclared = _reassemble(meters, [charge])
+    assert undeclared.final_output["meters"][0]["meter_charges"] == [charge]
+    assert undeclared.final_output["meters"][1]["meter_charges"] == []
+    assert undeclared.final_output["account_charges"] == []
+    assert undeclared.diagnostics == []
 
     stable = _reassemble(
         meters,
