@@ -15,4 +15,7 @@
 - [ ] 1.5 Release the change (next patch after 3.9.9) and update consumer pins
       (internal-arcadia-agents `requirements.txt` and `Dockerfile.extract`;
       Studio Harness `templates/requirements.txt` floor). Gated on Benjamin's
-      release approval; tracked in the extraction-boundary closeout plan.
+      release approval. Remaining work is routed to the consolidated plan at
+      internal-arcadia-agents/openspec/changes/complete-extraction-boundary-regression-coverage/tasks.md
+      (tasks 9.1 and 9.5f own the pin, rebuild, and capture rerun); this change
+      archives with that plan's closeout.
