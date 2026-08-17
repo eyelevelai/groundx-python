@@ -3380,19 +3380,19 @@ def test_duplicate_parents_without_unique_attrs_are_not_collapsed() -> None:
 
     result = reassemble_custom_outputs_from_xray(xray, workflow_extract=workflow_extract)
 
-    assert [diagnostic.code for diagnostic in result.diagnostics] == ["ambiguous_relationship_match"]
+    assert result.diagnostics == []
     assert result.final_output == {
         "accounts": [
             {
                 "account_id": "A-1",
-                "transactions": [],
+                "transactions": [{"account_id": "a-1", "amount": 10}],
             },
             {
                 "account_id": "A-1",
                 "transactions": [],
             },
         ],
-        "transactions": [{"account_id": "a-1", "amount": 10}],
+        "transactions": [],
     }
 
 
@@ -3563,12 +3563,12 @@ def test_compiled_relationship_can_attach_ambiguous_child_to_first_parent() -> N
 @pytest.mark.parametrize(
     "multiple_match_strategy",
     ["first_stable", None],
-    ids=["first-stable", "strict-ambiguity"],
+    ids=["first-stable", "undeclared-defaults-first-stable"],
 )
 def test_relationship_matching_at_scale_follows_declared_strategy(
     multiple_match_strategy: str | None,
 ) -> None:
-    """Large parent/child sets follow only the declared ambiguity strategy.
+    """Large parent/child sets resolve exact ties to the first stable parent.
 
     This test previously monkeypatched the `_match_key` index helper and
     bounded its call count to O(parents + children).  Task 3.2a7b replaced
@@ -3578,9 +3578,9 @@ def test_relationship_matching_at_scale_follows_declared_strategy(
     3803-3817`), so `_match_key` was deleted and the key-computation bound
     with it; no comparable budget exists on the primitive path to re-point
     the guard at.  The behavioral half of the original test is retained:
-    at scale, multiple exact candidates follow a declared `first_stable`
-    strategy, and with no declared strategy every such child is reported
-    ambiguous and stays unmatched.
+    at scale, multiple exact candidates select the first parent in stable
+    input order, whether `first_stable` is declared or absent (the
+    2026-08-17 ruling makes the undeclared default first_stable).
     """
     relationship = {
         "parent_group": "parents",
@@ -3639,15 +3639,10 @@ def test_relationship_matching_at_scale_follows_declared_strategy(
         workflow_extract=workflow_extract,
     )
 
-    if multiple_match_strategy == "first_stable":
-        assert result.diagnostics == []
-        assert result.final_output["parents"][0]["children"] == [children[0]]
-        assert result.final_output["parents"][1]["children"] == []
-        assert result.final_output["children"] == []
-    else:
-        assert len(result.diagnostics) == record_count
-        assert all(diagnostic.code == "ambiguous_relationship_match" for diagnostic in result.diagnostics)
-        assert result.final_output["children"] == children
+    assert result.diagnostics == []
+    assert result.final_output["parents"][0]["children"] == [children[0]]
+    assert result.final_output["parents"][1]["children"] == []
+    assert result.final_output["children"] == []
 
 
 def test_indexed_relationship_matching_preserves_structured_keys() -> None:
