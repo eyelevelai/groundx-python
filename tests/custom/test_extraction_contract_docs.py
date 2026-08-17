@@ -31,10 +31,11 @@ def test_extraction_placement_contract_pins_sdk_ownership() -> None:
 
 
 def test_active_openspec_changes_route_to_consolidated_plan() -> None:
+    # Extraction-project scaffolding: dies with the consolidated plan's
+    # archive (its task 10.5). An empty changes directory is legal.
     changes_root = REPO_ROOT / "openspec/changes"
     active_changes = sorted(path for path in changes_root.iterdir() if path.is_dir() and path.name != "archive")
 
-    assert active_changes
     for change in active_changes:
         body = "\n".join(path.read_text() for path in sorted(change.rglob("*.md")))
         assert CONSOLIDATED_ROUTE in body, (
