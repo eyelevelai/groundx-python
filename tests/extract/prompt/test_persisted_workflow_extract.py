@@ -215,6 +215,69 @@ def _prepare(raw: typing.Any):
     )
 
 
+def test_normalization_profiles_are_supported_final_group_metadata() -> None:
+    raw = """
+extraction_policy_version: v1
+
+statement:
+  normalization_profiles:
+    amount_due_currency: currency_label
+    currency: currency_code
+  fields:
+    amount_due_currency:
+      prompt: {instructions: Return the currency., type: str}
+"""
+
+    prepared = prepare_extraction_yaml(raw)
+    persisted = json.loads(json.dumps(prepared.persisted_workflow_extract))
+    reloaded = prepare_extraction_yaml(persisted)
+
+    expected = {
+        "amount_due_currency": "currency_label",
+        "currency": "currency_code",
+    }
+    assert (
+        prepared.final_group_metadata["statement"]["normalization_profiles"]
+        == expected
+    )
+    assert (
+        reloaded.final_group_metadata["statement"]["normalization_profiles"]
+        == expected
+    )
+    assert persisted["_groundx_persisted_extract"]["statement"][
+        "normalization_profiles"
+    ] == expected
+    assert "normalization_profiles" not in prepared.groups["statement"]
+
+
+@pytest.mark.parametrize(
+    ("metadata", "message"),
+    [
+        ("normalization_profiles: [currency_label]", "normalization_profiles] must be a mapping"),
+        (
+            "normalization_profiles: {amount_due_currency: guess_currency}",
+            "unsupported normalization profile in group [statement]: guess_currency",
+        ),
+    ],
+)
+def test_normalization_profiles_reject_invalid_contracts(
+    metadata: str, message: str
+) -> None:
+    raw = f"""
+extraction_policy_version: v1
+
+statement:
+  {metadata}
+  fields:
+    amount_due_currency:
+      prompt: {{instructions: Return the currency., type: str}}
+"""
+
+    with pytest.raises(ValueError) as exc:
+        prepare_extraction_yaml(raw)
+    assert message in str(exc.value)
+
+
 def test_persisted_workflow_extract_round_trips_authored_metadata() -> None:
     prepared = _prepare(POLICY_YAML)
 
