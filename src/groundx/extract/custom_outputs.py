@@ -75,11 +75,8 @@ class RelationshipParentSelection:
     """Result of :func:`select_relationship_parent` (task 3.2a7b).
 
     ``parent`` is the selected parent record, or ``None`` when no parent was
-    selected.  ``ambiguous`` is ``True`` only when more than one parent matched
-    the child exactly and the relationship packet explicitly declared a
-    ``multiple_match_strategy`` other than ``first_stable``.  An absent
-    strategy defaults to ``first_stable`` (2026-08-17 ruling), so undeclared
-    ties select the first parent and are never ambiguous.
+    selected. ``ambiguous`` remains for API compatibility and is always
+    ``False``. Multiple matches select the first parent in stable input order.
     """
 
     parent: typing.Optional[typing.Mapping[str, typing.Any]] = None
@@ -242,9 +239,8 @@ def reassemble_custom_outputs_from_xray(
                     repeated=route_repeats,
                 )
                 if route_value.repeated and route_value.conflicts is not None:
-                    # Task 3.2a7b: carry the generic `<field>__conflicts`
-                    # record sibling next to its field so relationship parent
-                    # selection can read ignored-field conflict state.
+                    # Preserve the generic `<field>__conflicts` record sibling
+                    # as reassembly evidence next to its field.
                     _set_pointer(
                         final_output,
                         f"{pointer}{_CONFLICTS_SIBLING_SUFFIX}",
@@ -313,7 +309,7 @@ def select_relationship_parent(
     child: typing.Mapping[str, typing.Any],
     relationship: typing.Mapping[str, typing.Any],
 ) -> RelationshipParentSelection:
-    """Select the parent record a child record belongs to (task 3.2a7b).
+    """Select the parent record a child record belongs to.
 
     This is the one exported relationship parent-selection primitive.  It ports
     the legacy charge-to-meter matcher
@@ -324,24 +320,14 @@ def select_relationship_parent(
     onto the generic relationship packet:
 
     * ``parents`` is an ordered sequence of parent records, ``child`` is one
-      child record, and ``relationship`` is the seven-field relationship packet
-      in either the persisted snake_case or the dispatched camelCase spelling.
+      child record, and ``relationship`` contains ``match_attrs`` or
+      ``matchAttrs``.
     * The child identity is the packet's ``match_attrs`` filtered to the
       child's populated (non-empty) values; an empty value counts as absent.
-    * Exact pass: a parent is an exact candidate when it populates exactly the
-      same match attrs the child populates, with equal values.  A single exact
-      candidate wins.  Multiple exact candidates select the first parent in
-      stable input order, matching the legacy matcher, whether the packet
-      declares ``multiple_match_strategy: first_stable`` or declares no
-      strategy at all (2026-08-17 ruling; ``first_stable`` is the only legal
-      declared value).  Only an explicitly declared unrecognized strategy
-      leaves the tie ambiguous with no parent selected.
-    * Fallback pass: only the match attrs also named by the packet's
-      ``parent_passthrough_attrs`` are removed from comparison.  If that
-      removes nothing, or removes everything, there is no fallback.  A parent
-      whose ignored (removed) field carries conflict state -- read from the
-      generic ``<field>__conflicts`` record sibling -- is rejected.  Only a
-      unique surviving candidate wins; anything else stays unmatched.
+    * A parent matches when it populates exactly the same match attrs the child
+      populates and every populated value compares equal. The first matching
+      parent in stable input order wins.
+    * Other relationship metadata does not affect parent selection.
     * String comparison trims only leading and trailing whitespace before
       case-insensitive comparison. Ints and floats remain number-normalized.
     """
@@ -363,65 +349,19 @@ def select_relationship_parent(
     if not populated_keys:
         return no_selection
 
-    def matches_attrs(
-        parent: typing.Mapping[str, typing.Any],
-        attrs: typing.Sequence[str],
-    ) -> bool:
-        for attr in attrs:
-            if attr not in populated_keys:
-                return False
+    def matches_attrs(parent: typing.Mapping[str, typing.Any]) -> bool:
+        for attr, child_value in populated_keys.items():
             parent_value = parent.get(attr)
             if _relationship_value_absent(parent_value):
                 return False
-            if _relationship_comparison_value(parent_value) != _relationship_comparison_value(populated_keys[attr]):
+            if _relationship_comparison_value(parent_value) != _relationship_comparison_value(child_value):
                 return False
         return True
 
-    direct_matches: typing.List[typing.Mapping[str, typing.Any]] = []
     for parent in parent_list:
         parent_key_count = sum(1 for attr in match_attrs if not _relationship_value_absent(parent.get(attr)))
-        if parent_key_count == len(populated_keys) and matches_attrs(
-            parent,
-            tuple(populated_keys),
-        ):
-            direct_matches.append(parent)
-    if len(direct_matches) == 1:
-        return RelationshipParentSelection(parent=direct_matches[0], ambiguous=False)
-    if len(direct_matches) > 1:
-        strategy = _relationship_packet_value(relationship, "multiple_match_strategy")
-        if strategy is None or strategy == "first_stable":
-            return RelationshipParentSelection(
-                parent=direct_matches[0],
-                ambiguous=False,
-            )
-        return RelationshipParentSelection(parent=None, ambiguous=True)
-
-    passthrough_attrs = _relationship_attr_list(_relationship_packet_value(relationship, "parent_passthrough_attrs"))
-    stable_match_attrs = tuple(attr for attr in match_attrs if attr not in passthrough_attrs)
-    if len(stable_match_attrs) == len(match_attrs):
-        return no_selection
-    if not stable_match_attrs:
-        return no_selection
-    ignored_match_attrs = tuple(attr for attr in match_attrs if attr not in stable_match_attrs)
-
-    def has_ignored_match_conflict(
-        parent: typing.Mapping[str, typing.Any],
-    ) -> bool:
-        for attr in ignored_match_attrs:
-            if parent.get(f"{attr}{_CONFLICTS_SIBLING_SUFFIX}"):
-                return True
-        return False
-
-    fallback_matches = [
-        parent
-        for parent in parent_list
-        if not has_ignored_match_conflict(parent) and matches_attrs(parent, stable_match_attrs)
-    ]
-    if len(fallback_matches) == 1:
-        return RelationshipParentSelection(
-            parent=fallback_matches[0],
-            ambiguous=False,
-        )
+        if parent_key_count == len(populated_keys) and matches_attrs(parent):
+            return RelationshipParentSelection(parent=parent, ambiguous=False)
     return no_selection
 
 
@@ -684,12 +624,7 @@ def _record_conflicts_sibling(
     record: typing.Mapping[str, typing.Any],
     output_key: str,
 ) -> typing.Optional[typing.List[typing.Any]]:
-    """Read a source record's generic ``<field>__conflicts`` sibling.
-
-    Task 3.2a7b transports ignored-field conflict state through reassembly so
-    relationship parent selection can read it (read side only; design.md
-    408-409, tasks.md:1368-1369).
-    """
+    """Read a source record's generic ``<field>__conflicts`` sibling."""
     sibling = record.get(f"{output_key}{_CONFLICTS_SIBLING_SUFFIX}")
     if isinstance(sibling, list):
         return typing.cast(typing.List[typing.Any], sibling)
