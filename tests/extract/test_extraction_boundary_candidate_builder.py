@@ -303,6 +303,7 @@ def _coherent_candidate_manifest(
         "artifact_catalog_version": "2026-07-23.1",
         "artifact_catalog_sha256": "a" * 64,
         "source_boundary_manifest_sha256": BOUNDARY_MANIFEST_SHA256,
+        "governed_test_cases": [{"case_id": surface.replace("_", "-"), "surface": surface}],
         "candidates": candidates,
     }
     path = root / "fixture_candidate_manifest.json"
@@ -449,6 +450,26 @@ def test_builder_is_intentionally_red_without_captured_complete_output(
     ) in result.stderr
     assert not candidate_root.exists()
     assert candidate_xray.exists()
+
+
+def test_builder_requires_registered_governed_case_before_writes(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    capture_root = tmp_path / "captured-boundaries"
+    manifest_path, manifest, _xray_path, _handoff_path = _coherent_candidate_manifest(
+        capture_root,
+        SURFACE,
+    )
+    del manifest["governed_test_cases"]
+
+    _assert_rejected_before_writes(
+        tmp_path=tmp_path,
+        monkeypatch=monkeypatch,
+        manifest=manifest,
+        manifest_path=manifest_path,
+        expected_error="X-Ray candidate manifest governed_test_cases is required",
+    )
 
 
 def test_builder_rejects_a_nonempty_candidate_root(tmp_path: Path) -> None:
@@ -910,6 +931,8 @@ def test_builder_records_reassembly_when_quality_assertions_fail(
     )
 
     assert manifest_path == candidate_root / "fixture_candidate_manifest.json"
+    sdk_manifest = json.loads(manifest_path.read_text())
+    assert sdk_manifest["governed_test_cases"] == [{"case_id": "adp-v1", "surface": surface}]
     candidate = json.loads(
         (
             candidate_root

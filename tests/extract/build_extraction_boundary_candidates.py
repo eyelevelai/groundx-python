@@ -116,6 +116,32 @@ def _selected_surfaces(value: str | None) -> tuple[str, ...]:
     return selected
 
 
+def _governed_test_cases(
+    manifest: dict[str, typing.Any],
+    surfaces: tuple[str, ...],
+) -> list[dict[str, str]]:
+    raw_cases = manifest.get("governed_test_cases")
+    if not isinstance(raw_cases, list):
+        raise ValueError("X-Ray candidate manifest governed_test_cases is required")
+    cases_by_surface: dict[str, dict[str, str]] = {}
+    for raw_case in raw_cases:
+        if not isinstance(raw_case, dict):
+            continue
+        surface = raw_case.get("surface")
+        if surface not in surfaces:
+            continue
+        case_id = raw_case.get("case_id")
+        if case_id != _CASE_IDS[surface]:
+            raise ValueError(f"X-Ray candidate manifest case ID is invalid for {surface}")
+        if surface in cases_by_surface:
+            raise ValueError(f"X-Ray candidate manifest duplicates governed case {surface}")
+        cases_by_surface[surface] = {"case_id": case_id, "surface": surface}
+    missing = sorted(set(surfaces) - set(cases_by_surface))
+    if missing:
+        raise ValueError("X-Ray candidate manifest governed cases missing surfaces: " + ", ".join(missing))
+    return [cases_by_surface[surface] for surface in surfaces]
+
+
 def _required(
     value: dict[str, typing.Any],
     key: str,
@@ -483,6 +509,7 @@ def build_candidates(
         raise ValueError("invalid X-Ray candidate manifest schema")
     if capture_manifest.get("status") != "pending_review":
         raise ValueError("X-Ray candidate manifest must be pending review")
+    governed_test_cases = _governed_test_cases(capture_manifest, surfaces)
     capture_root = xray_candidate_manifest_path.parent
     xray_predecessors = _xray_predecessor_candidates(
         candidate_manifest=capture_manifest,
@@ -606,6 +633,7 @@ def build_candidates(
             "artifact_catalog_sha256": capture_manifest["artifact_catalog_sha256"],
             "source_boundary_manifest_sha256": capture_manifest["source_boundary_manifest_sha256"],
             "upstream_candidate_manifest_sha256": _sha256(xray_candidate_manifest_path),
+            "governed_test_cases": governed_test_cases,
             "generator": {
                 "candidate_builder_sha256": _sha256(Path(__file__)),
                 "boundary_replay_sha256": _sha256(
