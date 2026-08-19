@@ -11,8 +11,8 @@ cannot reach:
    parent's `passthrough_attrs` onto the relationship;
 3. `_apply_relationships` -- the initial X-Ray reassembly path -- delegates
    every parent selection to the one exported primitive; and
-4. end-to-end reassembly honours the passthrough fallback and the declared
-   ambiguity strategy.
+4. end-to-end reassembly uses the original populated-key-shape, stable-first
+   matcher regardless of later passthrough or tie metadata.
 
 Citations and the ASSERTION / DERIVED / MAIN_ADOPTED / RATIFIED / PENDING provenance labels use
 the same sources and conventions as `test_relationship_parent_selection_red.py`;
@@ -243,21 +243,17 @@ def test_apply_relationships_delegates_to_the_exported_primitive(
         ), f"child {child!r} was not routed through {_MATCHER_NAME!r}"
 
 
-def test_reassembly_attaches_child_through_passthrough_fallback() -> None:
-    """Behavior-table row R05/R19: a complete parent and a child missing only
-    the passthrough field must be attached, not left unmatched.
-    (`classes/test_statement.py@2797b5e:5647-5648`, `5774-5783`)
-    """
+def test_reassembly_does_not_use_passthrough_fallback() -> None:
     result = _reassemble(
         [{"meter_number": "12", "provider_name": "Test", "service_type": "water"}],
         [{"meter_number": "12", "service_type": "water"}],
     )
     final = result.final_output
 
-    assert final["meters"][0]["meter_charges"] == [
+    assert final["meters"][0]["meter_charges"] == []
+    assert final["account_charges"] == [
         {"meter_number": "12", "service_type": "water"}
     ]
-    assert final.get("account_charges", []) == []
 
 
 def test_reassembly_keeps_child_unmatched_when_ignored_field_conflicts() -> None:
