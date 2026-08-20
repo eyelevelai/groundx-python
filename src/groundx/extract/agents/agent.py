@@ -29,6 +29,41 @@ if typing.TYPE_CHECKING:
     from PIL.Image import Image
 
 
+BEDROCK_REQUEST_LIMIT_BYTES = 3_500_000
+
+
+def _enforce_bedrock_request_limit(request: typing.Any) -> None:
+    body = request.content
+    if len(body) > BEDROCK_REQUEST_LIMIT_BYTES:
+        raise ValueError(f"bedrock request is {len(body)} bytes; limit is {BEDROCK_REQUEST_LIMIT_BYTES} bytes")
+
+
+def _bedrock_model_options(
+    model_options: typing.Dict[str, typing.Any],
+) -> typing.Dict[str, typing.Any]:
+    import httpx
+
+    options = dict(model_options)
+    if "client" in options:
+        raise ValueError("bedrock service does not support a custom model client")
+
+    client_kwargs = dict(options.get("client_kwargs") or {})
+    http_client = client_kwargs.get("http_client")
+    if http_client is None:
+        http_client = httpx.Client(event_hooks={"request": [_enforce_bedrock_request_limit]})
+    else:
+        hooks = getattr(http_client, "event_hooks", None)
+        if not isinstance(hooks, dict):
+            raise ValueError("bedrock service requires an HTTP client with request event hooks")
+        hooks["request"] = [
+            *hooks.get("request", []),
+            _enforce_bedrock_request_limit,
+        ]
+    client_kwargs["http_client"] = http_client
+    options["client_kwargs"] = client_kwargs
+    return options
+
+
 class _DeadlineOpenAICompletions:
     def __init__(self, client: typing.Any) -> None:
         self._client = client
@@ -69,10 +104,10 @@ def build_openai_server_model(settings: AgentSettings) -> OpenAIServerModel:
     if settings.reasoning_effort:
         model_kwargs["reasoning_effort"] = settings.reasoning_effort
 
-    if settings.model_kwargs:
-        model = OpenAIServerModel(**model_kwargs, **settings.model_kwargs)
-    else:
-        model = OpenAIServerModel(**model_kwargs)
+    model_options = dict(settings.model_kwargs or {})
+    if settings.service == "bedrock":
+        model_options = _bedrock_model_options(model_options)
+    model = OpenAIServerModel(**model_kwargs, **model_options)
 
     client = getattr(model, "client", None)
     if client is not None and not isinstance(client, _DeadlineOpenAIClient):

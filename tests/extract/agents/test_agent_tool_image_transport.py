@@ -108,6 +108,24 @@ def test_agent_tool_remote_url_transport_uses_image_url_blocks_without_fetching(
     assert "sig=secret" not in json.dumps(agent.memory.get_full_steps())
 
 
+def test_agent_tool_remote_url_transport_passes_s3_image_uris() -> None:
+    agent, model = build_agent()
+    image_uri = "s3://configured-bucket/workflows/pages/page-1.png"
+
+    result = agent.process(
+        "read this",
+        images=[],
+        image_urls=[image_uri],
+        image_transport="remote_url",
+    )
+
+    assert result == {"ok": True}
+    assert {
+        "type": "image_url",
+        "image_url": {"url": image_uri},
+    } in last_user_content(model)
+
+
 def test_agent_tool_uses_agent_settings_image_transport_default() -> None:
     agent = AgentTool(
         AgentSettings(

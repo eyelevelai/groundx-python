@@ -1,10 +1,8 @@
-import typing, os, unittest
+import os
+import typing
+import unittest
 
 from groundx.extract.settings.settings import (
-    AgentSettings,
-    ContainerSettings,
-    ContainerUploadSettings,
-    GroundXSettings,
     AWS_REGION,
     CALLBACK_KEY,
     GX_AGENT_KEY,
@@ -13,8 +11,11 @@ from groundx.extract.settings.settings import (
     GX_REGION,
     GX_SECRET,
     VALID_KEYS,
+    AgentSettings,
+    ContainerSettings,
+    ContainerUploadSettings,
+    GroundXSettings,
 )
-
 
 AWS_KEY: str = "AWS_ACCESS_KEY_ID"
 AWS_SECRET: str = "AWS_SECRET_ACCESS_KEY"
@@ -36,6 +37,7 @@ class TestAgentSettings(unittest.TestCase):
                     "max_steps": 7,
                     "model_id": "gpt-5.4-mini",
                     "reasoning_effort": None,
+                    "service": None,
                 },
             },
             {
@@ -45,12 +47,14 @@ class TestAgentSettings(unittest.TestCase):
                 "image_transport": "remote_url",
                 "max_steps": 4,
                 "model_id": "gpt-5",
+                "service": "bedrock",
                 "expect": {
                     "api_base": "http://test.com",
                     "api_key": "mykey",
                     "image_transport": "remote_url",
                     "max_steps": 4,
                     "model_id": "gpt-5",
+                    "service": "bedrock",
                 },
             },
             {
@@ -62,6 +66,7 @@ class TestAgentSettings(unittest.TestCase):
                     "max_steps": 7,
                     "model_id": "gpt-5.4-mini",
                     "reasoning_effort": None,
+                    "service": None,
                 },
             },
         ]
@@ -82,6 +87,8 @@ class TestAgentSettings(unittest.TestCase):
                 input["max_steps"] = tst["max_steps"]
             if "model_id" in tst:
                 input["model_id"] = tst["model_id"]
+            if "service" in tst:
+                input["service"] = tst["service"]
 
             settings = AgentSettings(**input)
 
@@ -96,16 +103,14 @@ class TestAgentSettings(unittest.TestCase):
 
             self.assertEqual(settings.max_steps, tst["expect"]["max_steps"])
 
-            self.assertEqual(
-                settings.image_transport, tst["expect"]["image_transport"]
-            )
+            self.assertEqual(settings.image_transport, tst["expect"]["image_transport"])
 
             self.assertEqual(settings.model_id, tst["expect"]["model_id"])
 
             if "reasoning_effort" in tst["expect"]:
-                self.assertEqual(
-                    settings.reasoning_effort, tst["expect"]["reasoning_effort"]
-                )
+                self.assertEqual(settings.reasoning_effort, tst["expect"]["reasoning_effort"])
+
+            self.assertEqual(settings.service, tst["expect"]["service"])
 
 
 class TestContainerUploadSettings(unittest.TestCase):
@@ -424,9 +429,7 @@ class TestContainerSettings(unittest.TestCase):
 
             self.assertEqual(settings.cache_to, tst["expect"]["cache_to"])
 
-            self.assertEqual(
-                settings.google_sheets_drive_id, tst["expect"]["google_sheets_drive_id"]
-            )
+            self.assertEqual(settings.google_sheets_drive_id, tst["expect"]["google_sheets_drive_id"])
 
             self.assertEqual(
                 settings.google_sheets_template_id,
