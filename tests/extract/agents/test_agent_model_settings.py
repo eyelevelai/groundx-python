@@ -1,6 +1,7 @@
 import types
 import typing
 
+import httpx
 import pytest
 
 try:
@@ -112,3 +113,51 @@ def test_agent_model_client_uses_remaining_shared_deadline(
     assert calls[0]["max_retries"] == 0
     assert 0 < calls[0]["timeout"] <= 9
     assert calls[1] == {"model": "test"}
+
+
+def test_bedrock_model_checks_the_final_http_request_body(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    patch_agent_constructors(monkeypatch)
+
+    AgentTool(
+        AgentSettings(
+            api_base="https://bedrock.example/v1",
+            api_key="test-key",
+            model_id="google.gemma-4-31b",
+            service="bedrock",
+        ),
+        Logger("agent-tool-model-settings", "error"),
+    )
+
+    client_kwargs = CapturingOpenAIModel.calls[-1]["client_kwargs"]
+    http_client = client_kwargs["http_client"]
+    exact = httpx.Request(
+        "POST",
+        "https://bedrock.example/v1/chat/completions",
+        content=b"x" * agent_module.BEDROCK_REQUEST_LIMIT_BYTES,
+    )
+    over = httpx.Request(
+        "POST",
+        "https://bedrock.example/v1/chat/completions",
+        content=b"x" * (agent_module.BEDROCK_REQUEST_LIMIT_BYTES + 1),
+    )
+
+    hook = http_client.event_hooks["request"][-1]
+    hook(exact)
+    with pytest.raises(ValueError, match="bedrock request.*3500000"):
+        hook(over)
+    http_client.close()
+
+
+def test_non_bedrock_model_does_not_install_bedrock_body_guard(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    patch_agent_constructors(monkeypatch)
+
+    AgentTool(
+        AgentSettings(api_key="test-key", service="openai"),
+        Logger("agent-tool-model-settings", "error"),
+    )
+
+    assert "client_kwargs" not in CapturingOpenAIModel.calls[-1]

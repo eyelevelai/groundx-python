@@ -1,7 +1,8 @@
-import json, typing, os
+import json
+import os
+import typing
 
 from pydantic import BaseModel
-
 
 AWS_REGION: str = "AWS_REGION"
 AWS_DEFAULT_REGION: str = "AWS_DEFAULT_REGION"
@@ -46,6 +47,7 @@ class AgentSettings(BaseModel):
     response_parse_max_retries: int = 3
     image_transport: str = "pil"
     model_kwargs: typing.Optional[typing.Dict[str, typing.Any]] = None
+    service: typing.Optional[str] = None
 
     def get_api_key(self) -> str:
         if self.api_key:
@@ -55,7 +57,7 @@ class AgentSettings(BaseModel):
         if key:
             return key
 
-        raise Exception(f"you must set a valid agent api_key")
+        raise Exception("you must set a valid agent api_key")
 
 
 class ContainerSettings(BaseModel):
@@ -96,7 +98,7 @@ class ContainerSettings(BaseModel):
         if key:
             return key
 
-        raise Exception(f"you must set a callback_api_key")
+        raise Exception("you must set a callback_api_key")
 
     def get_valid_api_keys(self) -> typing.List[str]:
         keys: typing.List[str] = []
@@ -129,7 +131,7 @@ class ContainerSettings(BaseModel):
             keys.append(key)
 
         if len(keys) < 1:
-            raise Exception(f"you must set an array of valid_api_keys")
+            raise Exception("you must set an array of valid_api_keys")
 
         return keys
 
@@ -214,4 +216,4 @@ class GroundXSettings(BaseModel):
         if key:
             return key
 
-        raise Exception(f"you must set a valid GroundX api_key")
+        raise Exception("you must set a valid GroundX api_key")
