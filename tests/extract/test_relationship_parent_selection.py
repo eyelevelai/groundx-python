@@ -91,7 +91,7 @@ def test_requires_equal_populated_key_shape_and_values(parent, child) -> None:
     assert _select([parent], child).parent is None
 
 
-def test_uses_declared_passthrough_fields_for_single_parent_fallback() -> None:
+def test_ignores_passthrough_fallback_metadata() -> None:
     parent = {
         "meter_number": "12",
         "provider_name": "Utility",
@@ -109,10 +109,10 @@ def test_uses_declared_passthrough_fields_for_single_parent_fallback() -> None:
         parent_passthrough_attrs=["provider_name"],
     )
 
-    assert selection == RelationshipParentSelection(parent, False)
+    assert selection == RelationshipParentSelection(None, False)
 
 
-def test_rejects_an_unsupported_declared_tie_strategy() -> None:
+def test_ignores_tie_strategy_metadata() -> None:
     parents = [
         {"meter_number": "M-1"},
         {"meter_number": "m-1"},
@@ -124,7 +124,7 @@ def test_rejects_an_unsupported_declared_tie_strategy() -> None:
         multiple_match_strategy="unsupported",
     )
 
-    assert selection == RelationshipParentSelection(None, True)
+    assert selection == RelationshipParentSelection(parents[0], False)
 
 
 def test_accepts_dispatched_match_attrs() -> None:

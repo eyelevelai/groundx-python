@@ -215,15 +215,15 @@ def test_apply_relationships_delegates_to_the_exported_primitive(
         )
 
 
-def test_reassembly_uses_declared_passthrough_fallback() -> None:
+def test_reassembly_ignores_passthrough_fallback_metadata() -> None:
     result = _reassemble(
         [{"meter_number": "12", "provider_name": "Test", "service_type": "water"}],
         [{"meter_number": "12", "service_type": "water"}],
     )
     final = result.final_output
 
-    assert final["meters"][0]["meter_charges"] == [{"meter_number": "12", "service_type": "water"}]
-    assert final["account_charges"] == []
+    assert final["meters"][0]["meter_charges"] == []
+    assert final["account_charges"] == [{"meter_number": "12", "service_type": "water"}]
 
 
 def test_reassembly_keeps_child_unmatched_when_ignored_field_conflicts() -> None:
