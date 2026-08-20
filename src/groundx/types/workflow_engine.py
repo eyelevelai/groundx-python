@@ -41,7 +41,7 @@ class WorkflowEngine(UniversalBaseModel):
         FieldMetadata(alias="maxImages"),
         pydantic.Field(
             alias="maxImages",
-            description="Maximum number of image attachments sent in one request using this workflow engine. GroundX removes earlier images when the request exceeds the limit, while preserving text and later images. Omit to leave image count uncapped by the workflow. GroundX may enforce a lower platform limit for the selected provider route.",
+            description="Maximum number of image attachments sent in one request using this workflow engine. GroundX removes earlier images when the request exceeds the limit, while preserving text and later images. Omit to leave image count uncapped. Workflow and step engine settings follow normal engine precedence; no separate route-specific image-count value overrides the selected engine. The independent openai-base64 serialized request-size guard still applies.",
         ),
     ] = None
     reasoning_effort: typing_extensions.Annotated[
