@@ -38,7 +38,7 @@ jobs:
         run: poetry install --extras extract
 
       - name: Test
-        run: poetry run pytest -rP -n auto -m "not pending_decision" .
+        run: poetry run pytest -rP -n auto .
 
       - name: Install aiohttp extra
         run: poetry install --extras extract --extras aiohttp

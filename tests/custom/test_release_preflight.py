@@ -39,4 +39,4 @@ def test_aiohttp_ci_install_retains_extract_dependencies() -> None:
 def test_ci_runs_one_unmodified_test_suite_for_branches_and_tags() -> None:
     step = _test_steps()["Test"]
     assert "if" not in step
-    assert step["run"] == 'poetry run pytest -rP -n auto -m "not pending_decision" .'
+    assert step["run"] == "poetry run pytest -rP -n auto ."
