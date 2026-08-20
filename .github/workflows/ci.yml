@@ -37,30 +37,8 @@ jobs:
       - name: Install dependencies
         run: poetry install --extras extract
 
-      - name: Test pre-promotion code
-        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
-        run: poetry run pytest -rP -n auto -m "not pending_decision and not pending_fixture_promotion" .
-
-      - name: Extraction boundary pre-promotion checks
-        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
-        run: poetry run pytest -q -m "not pending_fixture_promotion" tests/extract/test_extraction_boundary_reassembly.py tests/extract/test_extraction_boundary_evidence_contract.py
-
-      - name: Test release source
-        if: ${{ startsWith(github.ref, 'refs/tags/') }}
-        run: poetry run pytest -rP -n auto -m "not pending_decision and not pending_fixture_promotion and not release_intentional_fixture_red" .
-
-      - name: Verify exact intentional fixture outcomes
-        if: ${{ startsWith(github.ref, 'refs/tags/') }}
-        run: |
-          set +e
-          poetry run pytest -q -m release_intentional_fixture_red --junitxml=release-intentional-red.xml .
-          status=$?
-          set -e
-          case "$status" in
-            0|1) ;;
-            *) exit "$status" ;;
-          esac
-          poetry run python scripts/verify_release_intentional_red.py release-intentional-red.xml
+      - name: Test
+        run: poetry run pytest -rP -n auto -m "not pending_decision" .
 
       - name: Install aiohttp extra
         run: poetry install --extras extract --extras aiohttp

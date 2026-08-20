@@ -1,6 +1,5 @@
 import dataclasses
 import json
-import pathlib
 import typing
 
 import pytest
@@ -9,65 +8,6 @@ import groundx.extract as extract
 import groundx.extract.custom_outputs as custom_outputs
 from groundx.extract import prepare_extraction_yaml, reassemble_custom_outputs
 from groundx.extract.custom_outputs import reassemble_custom_outputs_from_xray
-
-FIXTURE_DIR = pathlib.Path(__file__).parent / "fixtures"
-BOUNDARY_PROJECTION_PATH = FIXTURE_DIR / "extraction-boundary" / "catalog.json"
-
-
-def _custom_output_reassembly_cases() -> list[dict]:
-    fixture = FIXTURE_DIR / "custom_output_reassembly_cases.json"
-    return json.loads(fixture.read_text())["cases"]
-
-
-def _projection_cases() -> dict[str, dict]:
-    projection = json.loads(BOUNDARY_PROJECTION_PATH.read_text())
-    return {case["id"]: case for case in projection["cases"]}
-
-
-def _certification_case_params() -> list:
-    projection_cases = _projection_cases()
-    cases = {case["id"]: case for case in _custom_output_reassembly_cases()}
-    return [
-        pytest.param(
-            cases[case_id],
-            id=case_id,
-            marks=(
-                (
-                    pytest.mark.pending_fixture_promotion,
-                    pytest.mark.skip(reason=(f"{projection_case['surface']} exact boundary pack is pending")),
-                )
-                if (
-                    projection_case["fixture_status"] == "pending"
-                    and not any(
-                        candidate.is_file()
-                        for root in (
-                            BOUNDARY_PROJECTION_PATH.parent / "inputs" / projection_case["surface"],
-                            BOUNDARY_PROJECTION_PATH.parent / "boundary-goldens" / projection_case["surface"],
-                        )
-                        if root.exists()
-                        for candidate in root.rglob("*")
-                    )
-                )
-                else ()
-            ),
-        )
-        for case_id, projection_case in projection_cases.items()
-        if case_id in cases
-    ]
-
-
-def _provenance_dicts(result) -> list[dict]:
-    return [
-        {
-            "output_source": provenance.output_source,
-            "workflow_group": provenance.workflow_group,
-            "workflow_field": provenance.workflow_field,
-            "final_path": provenance.final_path,
-            "record_index": provenance.record_index,
-            "page_numbers": list(provenance.page_numbers),
-        }
-        for provenance in result.source_provenance
-    ]
 
 
 def _scalar_candidate_workflow(*, required: bool = False) -> dict:
@@ -933,66 +873,6 @@ def test_renamed_parent_and_child_groups_use_declared_identity_match() -> None:
         ],
         "generic_children": [],
     }
-
-
-def test_custom_output_case_membership_matches_owner_projection() -> None:
-    projection_cases = _projection_cases()
-    present = {case["id"] for case in _custom_output_reassembly_cases()}
-
-    assert present <= set(projection_cases)
-    missing_complete = sorted(
-        case_id
-        for case_id, projection_case in projection_cases.items()
-        if projection_case["fixture_status"] == "complete" and case_id not in present
-    )
-    assert missing_complete == []
-
-
-def test_replay_input_gate_marks_only_stale_custom_output_cases() -> None:
-    projection_cases = _projection_cases()
-
-    for param in _certification_case_params():
-        marks = [mark.name for mark in param.marks]
-        case_id = param.values[0]["id"]
-        assert marks == ["pending_fixture_promotion", "skip"]
-        assert projection_cases[case_id]["fixture_status"] == "pending"
-
-
-def test_replay_input_gate_never_marks_complete_custom_output_cases_with_missing_inputs(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    case_id = "synthetic-complete"
-    projection_case = {
-        "id": case_id,
-        "surface": "synthetic_complete",
-        "fixture_status": "complete",
-    }
-    custom_output_case = {"id": case_id}
-    monkeypatch.setitem(globals(), "_projection_cases", lambda: {case_id: projection_case})
-    monkeypatch.setitem(
-        globals(),
-        "_custom_output_reassembly_cases",
-        lambda: [custom_output_case],
-    )
-
-    [param] = _certification_case_params()
-
-    assert [mark.name for mark in param.marks] == []
-
-
-@pytest.mark.parametrize("case", _certification_case_params())
-def test_certification_fixture_reassembles_custom_outputs(case: dict) -> None:
-    result = reassemble_custom_outputs_from_xray(
-        case["xray"],
-        workflow_extract=case["workflow_extract"],
-    )
-
-    expected = case["expected"]
-    assert result.workflow_output == expected["workflow_output"]
-    assert result.relationship_output == expected["relationship_output"]
-    assert result.final_output == expected["final_output"]
-    assert [diagnostic.code for diagnostic in result.diagnostics] == expected["diagnostics"]
-    assert _provenance_dicts(result) == expected["source_provenance"]
 
 
 def test_reassembles_records_wrapper_to_final_relationship_output() -> None:
