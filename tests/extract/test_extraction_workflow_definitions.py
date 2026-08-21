@@ -104,6 +104,8 @@ ADP_WORKFLOW_SOURCE: dict[str, typing.Any] = {
     },
 }
 
+V1_CONTRACT_YAML = Path(__file__).parent / "prompt" / "fixtures" / "extraction_yaml_contract_v1.yaml"
+
 
 EXECUTION_ONLY_EXTRACT = {
     "line_items": {
@@ -332,6 +334,47 @@ def test_load_extraction_definition_uses_workflow_id() -> None:
     assert definition.template["{{LANGUAGE_UNKNOWN}}"] == ""
 
 
+def test_workflow_readback_does_not_recompile_historical_authored_snapshot() -> None:
+    extract = copy.deepcopy(prepare_extraction_yaml(CUSTOM_WORKFLOW_YAML).persisted_workflow_extract)
+    extract["_groundx_persisted_extract"]["line_items"]["final_value_aliases"] = {"description": "label"}
+    response = WorkflowResponse(
+        workflow=WorkflowDetail(
+            workflow_id="historical-workflow",
+            extract=typing.cast(typing.Any, extract),
+        )
+    )
+
+    definition = _client(RecordingWorkflows(response)).load_extraction_definition(workflow_id="historical-workflow")
+
+    assert definition.extract == extract
+    assert definition.prepared is None
+
+
+def test_workflow_extract_mapping_does_not_revalidate_authored_agent_chain() -> None:
+    extract = copy.deepcopy(prepare_extraction_yaml(V1_CONTRACT_YAML.read_text()).persisted_workflow_extract)
+    partial_chain = [
+        {
+            "parallel": [
+                {
+                    "group": "statement_identity",
+                    "chain": ["reconcile_statement", "qa_statement"],
+                }
+            ]
+        },
+        "save_statement",
+    ]
+    extract["workflow"]["agent_chain"] = copy.deepcopy(partial_chain)
+    extract["_groundx_persisted_extract"]["workflow"]["agent_chain"] = copy.deepcopy(partial_chain)
+
+    definition = _client(RecordingWorkflows()).load_extraction_definition_from_yaml(
+        mapping=extract,
+        mapping_kind="workflow_extract",
+    )
+
+    assert definition.extract == extract
+    assert definition.prepared is None
+
+
 def test_load_extraction_definition_uses_workflow_id_before_yaml_sources(tmp_path: Path) -> None:
     path = tmp_path / "statement.yaml"
     path.write_text("not: [valid")
@@ -414,7 +457,7 @@ def test_workflow_extract_mapping_requires_explicit_kind() -> None:
     )
 
     assert definition.extract == persisted
-    assert definition.prepared is not None
+    assert definition.prepared is None
     assert definition.template == {
         "{{LANGUAGE}}": "English",
         "{{LANGUAGE_UNKNOWN}}": "",
@@ -601,7 +644,8 @@ def test_load_adp_workflow_readback_preserves_section_strategy() -> None:
         mapping_kind="workflow_extract",
     )
 
-    assert definition.prepared is not None
+    assert definition.prepared is None
+    assert mapping_definition.prepared is None
     assert definition.section_strategy == "page"
     assert mapping_definition.section_strategy == "page"
 

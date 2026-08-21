@@ -118,9 +118,7 @@ def load_extraction_definition_from_yaml(
     if source_name == "mapping":
         effective_kind = mapping_kind or _AUTHORED_YAML_MAPPING_KIND
         if effective_kind not in {_AUTHORED_YAML_MAPPING_KIND, _WORKFLOW_EXTRACT_MAPPING_KIND}:
-            raise ValueError(
-                "mapping_kind must be 'authored_yaml' or 'workflow_extract'"
-            )
+            raise ValueError("mapping_kind must be 'authored_yaml' or 'workflow_extract'")
 
         mapping_value = _ensure_mapping(source_value, "mapping")
         if effective_kind == _WORKFLOW_EXTRACT_MAPPING_KIND:
@@ -155,9 +153,8 @@ def load_extraction_definition_from_workflow_response(
     if not isinstance(extract, Mapping):
         raise ValueError(f"workflow [{workflow_id}] does not include extraction config")
 
-    extract_mapping = _deepcopy_mapping(
-        typing.cast(typing.Mapping[str, typing.Any], extract)
-    )
+    extract_mapping = _deepcopy_mapping(typing.cast(typing.Mapping[str, typing.Any], extract))
+    _validate_workflow_extract_mapping(extract_mapping)
     fallback_metadata = _workflow_metadata(extract_mapping)
 
     template = _first_present(
@@ -179,7 +176,7 @@ def load_extraction_definition_from_workflow_response(
 
     return ExtractionDefinition(
         extract=extract_mapping,
-        prepared=_prepared_from_workflow_extract(extract_mapping),
+        prepared=None,
         template=_normalize_template(template),
         custom_steps=_plain_metadata_sequence(custom_steps, _CUSTOM_STEP_ALIASES),
         output_routes=_plain_metadata_sequence(output_routes, _OUTPUT_ROUTE_ALIASES),
@@ -291,8 +288,7 @@ def ensure_workflow_method_supports_kwargs(
     kwargs: typing.Mapping[str, typing.Any],
 ) -> None:
     unsupported = [
-        key for key in _UNRELEASED_WORKFLOW_KWARGS
-        if key in kwargs and not _method_accepts_keyword(method, key)
+        key for key in _UNRELEASED_WORKFLOW_KWARGS if key in kwargs and not _method_accepts_keyword(method, key)
     ]
     if unsupported:
         unsupported_list = ", ".join(unsupported)
@@ -335,11 +331,11 @@ def _definition_from_workflow_extract(
     extract: typing.Mapping[str, typing.Any],
 ) -> ExtractionDefinition:
     extract_mapping = _deepcopy_mapping(extract)
-    prepared = _validate_workflow_extract_mapping(extract_mapping)
+    _validate_workflow_extract_mapping(extract_mapping)
     metadata = _workflow_metadata(extract_mapping)
     return ExtractionDefinition(
         extract=extract_mapping,
-        prepared=prepared,
+        prepared=None,
         template=_normalize_template(metadata.get("template")),
         custom_steps=_plain_metadata_sequence(
             metadata.get("custom_steps"),
@@ -357,17 +353,9 @@ def _definition_from_workflow_extract(
     )
 
 
-def _prepared_from_workflow_extract(
-    extract: typing.Mapping[str, typing.Any],
-) -> typing.Optional[PreparedExtractionYaml]:
-    if _PERSISTED_WORKFLOW_EXTRACT_KEY not in extract:
-        return None
-    return prepare_extraction_yaml(extract)
-
-
 def _validate_workflow_extract_mapping(
     extract: typing.Mapping[str, typing.Any],
-) -> typing.Optional[PreparedExtractionYaml]:
+) -> None:
     authoring_paths = _find_authoring_only_workflow_keys(extract)
     if authoring_paths:
         preview = ", ".join(authoring_paths[:3])
@@ -377,19 +365,22 @@ def _validate_workflow_extract_mapping(
             "workflow extract with workflow.metadata_version"
         )
 
+    persisted_source = extract.get(_PERSISTED_WORKFLOW_EXTRACT_KEY)
+    if persisted_source is not None and not isinstance(persisted_source, Mapping):
+        raise ValueError("workflow_extract._groundx_persisted_extract must be a mapping")
+
+    raw_metadata = extract.get(_WORKFLOW_METADATA_KEY)
+    if raw_metadata is not None and not isinstance(raw_metadata, Mapping):
+        raise ValueError("workflow_extract.workflow must be a mapping")
     metadata = _workflow_metadata(extract)
     has_workflow_metadata = bool(set(metadata.keys()) & _PERSISTED_WORKFLOW_METADATA_KEYS)
     if not has_workflow_metadata:
-        return _prepared_from_workflow_extract(extract)
+        return
 
     if metadata.get("metadata_version") != _WORKFLOW_METADATA_VERSION:
         raise ValueError("unsupported custom workflow metadata_version")
 
-    prepared = prepare_extraction_yaml(extract)
     _validate_workflow_metadata_references(extract, metadata)
-    if _PERSISTED_WORKFLOW_EXTRACT_KEY in extract:
-        return prepared
-    return None
 
 
 def _find_authoring_only_workflow_keys(
@@ -412,11 +403,7 @@ def _find_authoring_only_workflow_keys(
 
         child_path = f"{path}.{key}"
         is_name_position = parent_key == "fields"
-        if (
-            isinstance(key, str)
-            and key in _AUTHORING_ONLY_WORKFLOW_KEYS
-            and not is_name_position
-        ):
+        if isinstance(key, str) and key in _AUTHORING_ONLY_WORKFLOW_KEYS and not is_name_position:
             paths.append(child_path)
 
         paths.extend(
@@ -452,8 +439,7 @@ def _validate_workflow_metadata_references(
                 raise ValueError(f"workflow.{metadata_key}[{idx}] is missing workflow_field")
             if not _workflow_field_exists(extract, group_name, field_name):
                 raise ValueError(
-                    f"workflow.{metadata_key}[{idx}] references missing "
-                    f"workflow field [{group_name}.{field_name}]"
+                    f"workflow.{metadata_key}[{idx}] references missing workflow field [{group_name}.{field_name}]"
                 )
 
 
@@ -510,9 +496,7 @@ def _select_source(**sources: typing.Any) -> typing.Tuple[str, typing.Any]:
         if not selected:
             raise ValueError(f"expected exactly one source: {source_names}")
         conflicts = ", ".join(name for name, _value in selected)
-        raise ValueError(
-            f"expected exactly one source from {source_names}; received {conflicts}"
-        )
+        raise ValueError(f"expected exactly one source from {source_names}; received {conflicts}")
     return selected[0]
 
 
@@ -557,9 +541,7 @@ def _normalize_template(value: typing.Any) -> typing.Optional[typing.Dict[str, s
         if not isinstance(key, str):
             raise ValueError("workflow template keys must be strings")
         if not isinstance(template_value, str):
-            raise ValueError(
-                f"workflow template value for [{key}] must be a string"
-            )
+            raise ValueError(f"workflow template value for [{key}] must be a string")
         template[key] = template_value
     return template or None
 
@@ -630,10 +612,7 @@ def _normalize_mapping_aliases(
 ) -> typing.Any:
     if isinstance(value, Mapping):
         mapping = typing.cast(typing.Mapping[typing.Any, typing.Any], value)
-        return {
-            aliases.get(key, key): _normalize_mapping_aliases(item, aliases)
-            for key, item in mapping.items()
-        }
+        return {aliases.get(key, key): _normalize_mapping_aliases(item, aliases) for key, item in mapping.items()}
     if isinstance(value, (list, tuple)):
         sequence = typing.cast(typing.Sequence[typing.Any], value)
         return [_normalize_mapping_aliases(item, aliases) for item in sequence]
@@ -675,9 +654,13 @@ def _method_accepts_keyword(method: typing.Any, key: str) -> bool:
     for parameter in signature.parameters.values():
         if parameter.kind == inspect.Parameter.VAR_KEYWORD:
             return True
-        if parameter.kind in {
-            inspect.Parameter.KEYWORD_ONLY,
-            inspect.Parameter.POSITIONAL_OR_KEYWORD,
-        } and parameter.name == key:
+        if (
+            parameter.kind
+            in {
+                inspect.Parameter.KEYWORD_ONLY,
+                inspect.Parameter.POSITIONAL_OR_KEYWORD,
+            }
+            and parameter.name == key
+        ):
             return True
     return False
