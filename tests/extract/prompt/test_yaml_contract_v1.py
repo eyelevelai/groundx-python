@@ -266,6 +266,98 @@ statement:
             prepare_extraction_yaml(base.format(agent_chain=agent_chain))
 
 
+def test_agent_chain_serial_role_covers_renamed_workflow_group() -> None:
+    raw = """
+extraction_policy_version: v1
+
+workflow:
+  custom_steps:
+    - name: generic_step_a
+      level: chunk
+      kind: instruct
+    - name: generic_step_b
+      level: chunk
+      kind: summary
+    - name: generic_step_c
+      level: chunk
+      kind: keys
+  agent_chain:
+    - parallel:
+        - group: generic_group_b
+          chain: [reconcile_meters, qa_meters, save_meters]
+        - group: generic_group_a
+          chain: [reconcile_statement, qa_statement, save_statement]
+    - reconcile_charges
+    - save_charges
+
+generic_group_a:
+  role: statement
+  workflow_step: generic_step_a
+  fields:
+    account_number:
+      workflow_output_key: account_number
+      prompt:
+        instructions: Return the account number.
+        type: str
+
+generic_group_b:
+  role: meters
+  workflow_step: generic_step_b
+  fields:
+    meter_number:
+      workflow_output_key: meter_number
+      prompt:
+        instructions: Return the meter number.
+        type: str
+
+generic_group_c:
+  role: charges
+  workflow_step: generic_step_c
+  fields:
+    charge_amount:
+      workflow_output_key: charge_amount
+      prompt:
+        instructions: Return the charge amount.
+        type: float
+"""
+
+    prepared = prepare_extraction_yaml(raw)
+
+    authored = prepared.persisted_workflow_extract["_groundx_persisted_extract"]
+    assert authored["generic_group_a"]["role"] == "statement"
+    assert authored["generic_group_b"]["role"] == "meters"
+    assert authored["generic_group_c"]["role"] == "charges"
+    assert prepared.persisted_workflow_extract["workflow"]["agent_chain"] == [
+        {
+            "parallel": [
+                {
+                    "group": "generic_group_b",
+                    "chain": ["reconcile_meters", "qa_meters", "save_meters"],
+                },
+                {
+                    "group": "generic_group_a",
+                    "chain": ["reconcile_statement", "qa_statement", "save_statement"],
+                },
+            ]
+        },
+        "reconcile_charges",
+        "save_charges",
+    ]
+
+    reloaded = prepare_extraction_yaml(prepared.persisted_workflow_extract)
+
+    reloaded_authored = reloaded.persisted_workflow_extract[
+        "_groundx_persisted_extract"
+    ]
+    assert reloaded_authored["generic_group_a"]["role"] == "statement"
+    assert reloaded_authored["generic_group_b"]["role"] == "meters"
+    assert reloaded_authored["generic_group_c"]["role"] == "charges"
+    assert (
+        reloaded.persisted_workflow_extract["workflow"]["agent_chain"]
+        == prepared.persisted_workflow_extract["workflow"]["agent_chain"]
+    )
+
+
 def test_agent_chain_rejects_unscheduled_workflow_groups() -> None:
     raw = """
 extraction_policy_version: v1
