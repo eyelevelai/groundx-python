@@ -41,8 +41,9 @@ def test_prompt_suffix_matches_final_answer_tool_schema() -> None:
     }
     assert agent_module.prompt_suffix == (
         "\nReturn exactly one `final_answer` tool call with exactly one argument named `answer`. "
-        "The `answer` value must be a JSON string containing the requested JSON object. Do not include "
-        'any other arguments. Example: {"answer":"{\\"field\\":null}"}\n'
+        "The `answer` value must be a JSON string containing the requested JSON value, which may be an "
+        'object or array. Do not include any other arguments. Object example: {"answer":"{\\"field\\":null}"}. '
+        'Array example: {"answer":"[{\\"field\\":\\"value\\"}]"}.\n'
     )
 
 
