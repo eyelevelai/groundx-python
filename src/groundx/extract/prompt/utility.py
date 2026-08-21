@@ -1020,7 +1020,7 @@ def _normalize_workflow_template(value: typing.Any) -> typing.Dict[str, str]:
 
 def _normalize_agent_chain(
     value: typing.Any,
-    workflow_groups: typing.Optional[typing.Set[str]] = None,
+    workflow_group_roles: typing.Optional[typing.Mapping[str, str]] = None,
 ) -> typing.Optional[typing.Any]:
     if value is None:
         return None
@@ -1029,13 +1029,27 @@ def _normalize_agent_chain(
     if not value:
         raise ValueError(f"{_CUSTOM_WORKFLOW_KEY}.agent_chain must be a non-empty list")
 
-    _validate_agent_chain(value, workflow_groups or set())
+    _validate_agent_chain(value, workflow_group_roles or {})
     return copy.deepcopy(value)
+
+
+def _workflow_group_roles(
+    workflow_groups: typing.Iterable[str],
+    workflow_group_metadata: typing.Mapping[str, typing.Mapping[str, typing.Any]],
+    authored_group_roles: typing.Mapping[str, str],
+) -> typing.Dict[str, str]:
+    roles: typing.Dict[str, str] = {}
+    for group in workflow_groups:
+        role = authored_group_roles.get(group)
+        if role is None:
+            role = workflow_group_metadata.get(group, {}).get("role")
+        roles[group] = role if isinstance(role, str) else group
+    return roles
 
 
 def _validate_agent_chain(
     raw_chain: typing.List[typing.Any],
-    workflow_groups: typing.Set[str],
+    workflow_group_roles: typing.Mapping[str, str],
 ) -> None:
     first_stage = raw_chain[0]
     if not isinstance(first_stage, dict) or set(first_stage.keys()) != {"parallel"}:
@@ -1076,7 +1090,7 @@ def _validate_agent_chain(
             group = raw_branch["group"]
             if not isinstance(group, str) or not group:
                 raise ValueError(f"{path}.group must be a non-empty string")
-            if group not in workflow_groups:
+            if group not in workflow_group_roles:
                 raise ValueError(f"{path}.group [{group}] is not a workflow group")
             covered_groups.add(group)
 
@@ -1125,7 +1139,7 @@ def _validate_agent_chain(
     _validate_agent_chain_serial_tasks(raw_chain, serial_start_index)
     _validate_agent_chain_group_coverage(
         raw_chain,
-        workflow_groups,
+        workflow_group_roles,
         covered_groups,
         serial_start_index,
     )
@@ -1160,7 +1174,7 @@ def _validate_agent_chain_serial_tasks(
 
 def _validate_agent_chain_group_coverage(
     raw_chain: typing.List[typing.Any],
-    workflow_groups: typing.Set[str],
+    workflow_group_roles: typing.Mapping[str, str],
     branch_covered_groups: typing.Set[str],
     serial_start_index: int,
 ) -> None:
@@ -1170,13 +1184,16 @@ def _validate_agent_chain_group_coverage(
         raw_stage = raw_chain[stage_index]
         if isinstance(raw_stage, str) and raw_stage in _CUSTOM_WORKFLOW_AGENT_CHAIN_AGENT_TASKS:
             suffix = _agent_chain_task_suffix(raw_stage)
-            if suffix in workflow_groups:
-                covered_groups.add(suffix)
+            covered_groups.update(
+                group
+                for group, role in workflow_group_roles.items()
+                if role == suffix
+            )
             stage_index += 2
             continue
         stage_index += 1
 
-    missing_groups = sorted(workflow_groups - covered_groups)
+    missing_groups = sorted(set(workflow_group_roles) - covered_groups)
     if missing_groups:
         raise ValueError(
             f"{_CUSTOM_WORKFLOW_KEY}.agent_chain does not cover workflow groups [{', '.join(missing_groups)}]"
@@ -1830,6 +1847,8 @@ def _custom_workflow_input(
 def _normalize_persisted_custom_workflow_metadata(
     workflow: typing.Dict[str, typing.Any],
     final_group_metadata: typing.Mapping[str, typing.Mapping[str, typing.Any]],
+    workflow_group_metadata: typing.Mapping[str, typing.Mapping[str, typing.Any]],
+    authored_group_roles: typing.Mapping[str, str],
 ) -> typing.Dict[str, typing.Any]:
     version = workflow.get("metadata_version")
     if version != _CUSTOM_WORKFLOW_METADATA_VERSION:
@@ -1872,7 +1891,11 @@ def _normalize_persisted_custom_workflow_metadata(
         metadata["field_counts"] = field_counts
     agent_chain = _normalize_agent_chain(
         workflow.get(_CUSTOM_WORKFLOW_AGENT_CHAIN_KEY),
-        {route["workflow_group"] for route in routes},
+        _workflow_group_roles(
+            {route["workflow_group"] for route in routes},
+            workflow_group_metadata,
+            authored_group_roles,
+        ),
     )
     if agent_chain is not None:
         metadata[_CUSTOM_WORKFLOW_AGENT_CHAIN_KEY] = agent_chain
@@ -2090,6 +2113,7 @@ def _build_authored_custom_workflow_metadata(
     workflow_field_paths: typing.Dict[str, typing.Dict[str, str]],
     pseudo_group_names: typing.Set[str],
     final_group_metadata: typing.Mapping[str, typing.Mapping[str, typing.Any]],
+    authored_group_roles: typing.Mapping[str, str],
 ) -> typing.Dict[str, typing.Any]:
     template = _normalize_workflow_template(workflow.get("template"))
     custom_steps, steps_by_name = _normalize_custom_workflow_steps(workflow.get("custom_steps"), template)
@@ -2157,7 +2181,11 @@ def _build_authored_custom_workflow_metadata(
         metadata["field_counts"] = field_counts
     agent_chain = _normalize_agent_chain(
         workflow.get(_CUSTOM_WORKFLOW_AGENT_CHAIN_KEY),
-        {route["workflow_group"] for route in routes},
+        _workflow_group_roles(
+            {route["workflow_group"] for route in routes},
+            workflow_group_metadata,
+            authored_group_roles,
+        ),
     )
     if agent_chain is not None:
         metadata[_CUSTOM_WORKFLOW_AGENT_CHAIN_KEY] = agent_chain
@@ -2351,6 +2379,12 @@ def prepare_extraction_yaml(
             continue
         raw_groups[group_name] = group_data
 
+    authored_group_roles = {
+        group_name: raw_group["role"]
+        for group_name, raw_group in raw_groups.items()
+        if isinstance(raw_group, dict) and isinstance(raw_group.get("role"), str)
+    }
+
     groups: typing.Dict[str, typing.Dict[str, typing.Any]] = {}
     final_group_metadata: typing.Dict[str, typing.Dict[str, typing.Any]] = {}
     final_workflow_metadata: typing.Dict[str, typing.Dict[str, typing.Any]] = {}
@@ -2384,6 +2418,8 @@ def prepare_extraction_yaml(
             custom_workflow_metadata = _normalize_persisted_custom_workflow_metadata(
                 custom_workflow_input,
                 final_group_metadata,
+                final_workflow_metadata,
+                authored_group_roles,
             )
         else:
             custom_workflow_authoring_input = custom_workflow_input
@@ -2391,6 +2427,14 @@ def prepare_extraction_yaml(
     raw_pseudo_groups: typing.Dict[str, typing.Any] = {}
     if "_pseudo_groups" in data:
         raw_pseudo_groups = _ensure_mapping(data["_pseudo_groups"], "_pseudo_groups")
+        authored_group_roles.update(
+            {
+                group_name: raw_group["role"]
+                for group_name, raw_group in raw_pseudo_groups.items()
+                if isinstance(raw_group, dict)
+                and isinstance(raw_group.get("role"), str)
+            }
+        )
 
     pseudo_groups: typing.Dict[str, typing.Dict[str, typing.Any]] = {}
     workflow_group_metadata: typing.Dict[str, typing.Dict[str, typing.Any]] = {}
@@ -2512,6 +2556,7 @@ def prepare_extraction_yaml(
                 workflow_field_paths,
                 set(),
                 final_group_metadata,
+                authored_group_roles,
             )
             _strip_custom_workflow_authoring_keys(groups)
             _strip_custom_workflow_authoring_keys(workflow_groups)
@@ -2563,6 +2608,7 @@ def prepare_extraction_yaml(
             workflow_field_paths,
             set(pseudo_groups.keys()),
             final_group_metadata,
+            authored_group_roles,
         )
         _strip_custom_workflow_authoring_keys(groups)
         _strip_custom_workflow_authoring_keys(workflow_groups)
