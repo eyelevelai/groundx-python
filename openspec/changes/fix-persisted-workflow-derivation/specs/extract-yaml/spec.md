@@ -1,39 +1,41 @@
-# Spec delta — extract-yaml (fix-persisted-workflow-derivation)
+# Spec delta: extract-yaml
 
-## MODIFIED Requirements
+## ADDED Requirements
 
-### Requirement: Field paths preserve final_path verbatim
+### Requirement: persisted workflow readback is not authored compilation
 
-`workflow_field_paths` SHALL carry each route's `final_path` verbatim, including `*` tokens —
-they are load-bearing vocabulary for the SDK's own row routing (field-level lists such as
-`/group/list_field/*/sub`). Consumers with narrower path contracts (the Arcadia reassembly
-parser's 2-segment group/field pointers) SHALL normalize at THEIR export boundary
-(internal-arcadia-agents `workflow_reassembly_metadata`), never in the shared derivation.
-(Fresh-scan P1/P2: the earlier "SDK dialect is 2-segment" model was falsified by the SDK's own
-row-routing tests — both dialects legitimately contain `*`.)
+The SDK SHALL compile and validate authored YAML when creating a new extraction
+definition. It SHALL NOT recompile the persisted extract returned by an
+existing workflow. Existing-workflow readback SHALL preserve the extract,
+structurally validate its execution metadata, and return `prepared=None`.
 
-#### Scenario: starred routes survive derivation untouched
+#### Scenario: historical authored snapshot remains readable
 
-- **GIVEN** a persisted workflow whose `output_routes[].final_path` values include `*` tokens
-- **WHEN** `prepare_extraction_yaml` derives `workflow_field_paths`
-- **THEN** every derived path equals its route's `final_path` byte-for-byte
+- **GIVEN** an existing workflow contains a historical authored snapshot that
+  current authoring validation would reject
+- **WHEN** the SDK loads that workflow for execution
+- **THEN** it preserves the workflow extract without compiling the snapshot
+- **AND** it returns `prepared=None`.
 
-### Requirement: Readers do not verify writer hashes
+#### Scenario: current authoring rules do not rewrite deployed execution
 
-The persisted-workflow reader SHALL NOT compare the stored `schema_hash` against any recompute
-(cross-implementation hash comparison is the proven false-positive: distinct canonicalizations
-disagree over identical structures). The stored hash is writer-owned and opaque to readers.
-Read-time integrity SHALL be structural validation of the stored metadata; a canonical hash MAY
-be recomputed for runtime use but SHALL never gate loading.
+- **GIVEN** an existing workflow has valid compiled execution routes
+- **AND** its authored agent chain does not satisfy current authoring coverage
+  rules
+- **WHEN** the SDK loads the workflow
+- **THEN** the deployed extract is accepted unchanged
+- **AND** current authoring coverage rules are not applied.
 
-#### Scenario: either dialect loads without hash errors
+#### Scenario: authored input still compiles
 
-- **GIVEN** a workflow persisted in the harness or SDK dialect with its writer's hash
-- **WHEN** the persisted metadata is loaded for runtime use
-- **THEN** no schema-hash comparison occurs and loading succeeds
+- **GIVEN** a path, YAML string, or authored mapping
+- **WHEN** the SDK creates an extraction definition from it
+- **THEN** the SDK applies current authored-YAML validation and compilation
+- **AND** returns its prepared definition.
 
-#### Scenario: structural corruption still fails
+#### Scenario: malformed execution metadata fails
 
-- **GIVEN** a persisted workflow whose routes reference undefined steps or malformed targets
-- **WHEN** the persisted metadata is loaded
-- **THEN** structural validation raises a descriptive error
+- **GIVEN** an existing workflow whose execution routes reference missing
+  workflow fields
+- **WHEN** the SDK loads the workflow
+- **THEN** structural validation fails with a descriptive error.

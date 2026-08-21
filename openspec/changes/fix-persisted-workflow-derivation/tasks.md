@@ -1,74 +1,31 @@
-# Tasks — fix-persisted-workflow-derivation
+# Tasks: preserve persisted workflow readback
 
-Execution note: this is the SDK implementation input for the consolidated
-extraction reliability plan in
-`internal-arcadia-agents/openspec/changes/complete-extraction-boundary-regression-coverage/tasks.md`.
-The prior derivation release does not close the new placement work. Active tasks
-0.5, 2.2d, 2.2f, 3.2c0, and 9.1a own the remaining diagnosis, stored-route
-migration, `output_scope` parsing, complete-path reassembly, cross-repo proof,
-release, pinning, and deployed-version verification. Do not use this file as a
-separate certification finish path.
+## 1. Boundary contract
 
-## 1. Failing tests first (TDD; both are red today)
-
-- [x] 1.1 (re-scoped, fresh-scan P1/P2) Tests in THIS repo: (a) harness-dialect stored hash
-      never gates loading; (b) `workflow_field_paths` preserves starred `final_path` values
-      VERBATIM (the `*` is SDK row-routing vocabulary); (c) recomputed hash attached, never
-      compared. Fixture = the real prod readback. The 2-segment derivation tests MOVED to
-      internal-arcadia-agents (3.2) — the reassembly export is the only 2-segment consumer.
-- [x] 1.2 (lives in internal-arcadia-agents PR #81 with the export fix) Test: end-to-end repeated-group reassembly — workflow output with list groups
-      (`meters`/`charges` rows) + harness-dialect persisted metadata reassembles into final
-      arrays with zero diagnostics (the exact prod failure).
-- [x] 1.3 Test: structural integrity still enforced — corrupt stored structures (drop a
-      route's target, malform a leaf) → still raises via structural validation, WITHOUT any
-      stored-hash comparison.
+- [x] 1.1 Add a regression using a historical persisted authored snapshot with
+      `final_value_aliases`; prove readback does not compile it.
+- [x] 1.2 Add a regression using the real v1 contract shape with a persisted
+      agent chain that current authoring validation would reject; prove
+      readback preserves it.
+- [x] 1.3 Keep structural validation for persisted execution metadata and
+      authoring-only key leakage.
 
 ## 2. Implementation
 
-- [x] 2.1 (re-scoped) `_apply_custom_workflow_field_paths` stays VERBATIM by design, with a
-      comment pinning why (`*` = row-routing vocabulary; normalization is the Arcadia export's
-      job). The wildcard normalization implementation moves to internal-arcadia-agents (3.2).
-- [x] 2.2 (PR #38) `_normalize_persisted_custom_workflow_metadata`: STOP comparing stored `schema_hash`
-      at read time entirely — repro #4 proved even an as-received recompute diverges across
-      hash implementations (SDK `896b…` vs stored Go `f1a2…` over the same structures). The
-      stored hash is writer-owned/opaque to readers; read-time integrity = structural
-      validation (routes/leaves/steps well-formed); the recomputed canonical hash is attached
-      for runtime use only, never compared against the stored one. (Consolidated task 2.2d
-      owns canonical Cashbot storage and route migration.)
-- [x] 2.3 Confirm `agent_chain` handling unchanged (hash never covered it; keep it that way,
-      pinned by a test).
+- [x] 2.1 Remove `prepare_extraction_yaml()` from workflow-response and explicit
+      `workflow_extract` loading.
+- [x] 2.2 Preserve the persisted extract and workflow-level settings exactly.
+- [x] 2.3 Return `prepared=None` for every existing-workflow readback.
+- [x] 2.4 Document the authored-input and persisted-readback boundary on sync
+      and async clients.
 
-## 3. Release + rollout
+## 3. Verification and rollout
 
-- [ ] 3.1 SDK publication was complete for the original persisted-workflow
-      derivation work via the released 3.8.4 line, but new SDK code changes
-      were added after that release for relationship child-row dedupe in
-      `src/groundx/extract/custom_outputs.py`. A new SDK PR merge and release
-      are required before deployed extract pods can prove the corrected
-      Arcadia-family 24-30 nested meter-charge shape. Runtime verification
-      remains owned by the consolidated deployment gate in
-      `internal-arcadia-agents`.
-- [x] 3.2 (PR #81 — ALSO fixes the hardcoded {meters,charges} array vocabulary: array-ness now derives from workflow metadata per the archived generalize-v1 spec, UNION legacy names per owner ruling; runtime pin/deploy verification tracked in the consolidated plan) internal-arcadia-agents — NOW OWNS THE WILDCARD NORMALIZATION (fresh-scan P2):
-      `workflow_reassembly_metadata` normalizes group-repetition paths (`/g/*/f` → `/g/f`)
-      when exporting `workflow_field_paths` for the reassembly parser; field-level list paths
-      (still >2 tokens after the strip) get an EXPLICIT unsupported-in-reassembly error, not
-      silence (fresh-scan P3). Tests: harness-dialect persisted workflow through
-      `prepare_arcadia_extraction_yaml` + `reassemble_from_metadata` end-to-end (the moved
-      2-segment tests live here); bump `groundx[extract]` pin.
-- [x] 3.3 (folded into PR #81, NOT separate — adversarial finding: the export fix raises errors the swallow would eat) stop silently swallowing metadata
-      loader exceptions (`classes/statement.py:1400`) — surface as a visible diagnostic; the
-      prod hang was undebuggable because the ValueError vanished.
-- [ ] 3.4 Diagnostics for the three un-root-caused live failures BEFORE declaring the retest
-      gate: (a) confirm the v1/utility hang mechanism in pod logs (the swallowed
-      `caller schema_hash` ValueError at the observed timestamps); (b) root-cause scaffold's
-      empty workflow output (custom steps produced no groups at all — readback keys? steps
-      never ran?); (c) root-cause legacy's all-empty values (legacy shape has no customSteps —
-      is the standard pipeline expected to populate it at all, and if not, what should the API
-      return?). Each becomes a test or a documented expected-behavior note.
-- [ ] 3.5 Tolerance lifetime: this dialect tolerance is deleted ONLY when the
-      stored-route inventory and migration in consolidated task 2.2d show zero
-      non-canonical rows, not on a schedule.
-- [ ] 3.6 Redeploy extract pods; rerun the cashbot-go live proof matrix (legacy, v1, utility,
-      scaffold + studio-demo control) with the rich utility PDF; require populated
-      `meters`/`charges` rows, not just completion. Then delete test workflows/buckets
-      (30065-30068, 30096).
+- [ ] 3.1 Pass focused, extract, static, and package tests on Python 3.9.
+- [ ] 3.2 Replay the exact protected workflow readbacks and record compact
+      inputs, outputs, identities, and failures.
+- [ ] 3.3 Open and merge the SDK PR through normal repository gates.
+- [ ] 3.4 Human release owner publishes the next SDK version.
+- [ ] 3.5 Update Internal Arcadia's SDK pin, deploy the approved production
+      branch, and verify extract, reconcile, QA, and save handoffs on the exact
+      saved files before capture resumes.

@@ -1,67 +1,43 @@
-# Proposal — fix-persisted-workflow-derivation
+# Proposal: preserve persisted workflow readback
 
 ## Execution route
 
-This active SDK input is governed by
+This SDK change is governed by
 `internal-arcadia-agents/openspec/changes/complete-extraction-boundary-regression-coverage/tasks.md`.
-Tasks 0.5, 2.2d, 2.2f, 3.2c0, and 9.1a own the remaining diagnosis, stored-route
-migration, SDK placement, cross-repo proof, release, pinning, and deployment
-work. This proposal is not a separate completion or certification path.
+It is an input to that closeout, not a separate certification path.
 
 ## Why
 
-Live prod testing (2026-07-08, cashbot-go `accept-workflow-yaml-source` E2E) proved that **any
-workflow with repeating groups (meters/charges-style list output) fails extraction** when the
-runtime derives its reassembly metadata from the persisted workflow. Five deployed workflows
-(four Go-compiled + the platform's own `studio-demo` from May) all fail; a local reproduction
-against the persisted forms isolated two defects in `src/groundx/extract/prompt/utility.py`
-(identical in 3.7.7 and 3.7.8):
+`load_extraction_definition_from_workflow_response()` recompiles an existing
+workflow by passing its persisted extract back through the authored-YAML
+compiler. That crosses two different boundaries:
 
-1. **Wildcard poisoning** — `_apply_custom_workflow_field_paths` copies each persisted route's
-   `final_path` verbatim into `workflow_field_paths`. Harness-dialect workflows store
-   `/charges/*/amount` (3 segments, not a valid RFC 6901 pointer); the reassembly parser
-   (`extraction_reassembly._parse_final_path`) requires exactly 2 segments and rejects them →
-   `route ... must have exactly two non-empty path segments` / `missing routed group` 500s.
-   The authored-YAML path derives correct 2-segment paths; only persisted-readback breaks.
+- authored YAML is validated and compiled when a workflow is created or updated;
+- persisted workflow readback is execution input and must be preserved.
 
-2. **Hash false-positive** — `_normalize_persisted_custom_workflow_metadata` recomputes the
-   schema hash over its *re-normalized* structures and compares it to the stored hash that was
-   computed over the *original* (harness-dialect) structures. Different canonicalization →
-   guaranteed mismatch → `ValueError: caller schema_hash does not match route metadata`. The
-   runtime's metadata loader swallows the exception and proceeds with no metadata (observed as
-   the v1/utility extraction hang).
-
-Root context: two long-standing compiled dialects exist (harness `compile_workflow.py`:
-3-segment + `is_repeated: true`; SDK `prepare_extraction_yaml`: 2-segment + flags), documented
-in cashbot-go `pkg/testdata/workflowyaml/goldens/FINDINGS.md`. Production deploys the harness
-dialect; the extraction runtime reads the SDK dialect. This change makes the SDK reader
-**dialect-tolerant** so every already-stored workflow works; consolidated task 2.2d owns the
-Cashbot API's canonical stored-route behavior going forward.
+The error blocked two protected workflows before ingest. Arcadia legacy was
+rejected because its historical authored snapshot contains
+`final_value_aliases`. Generic v1 was rejected because current authoring-chain
+coverage rules were applied to its already compiled routes.
 
 ## What changes
 
-- `_apply_custom_workflow_field_paths` is pinned VERBATIM (re-scoped by fresh-scan P1/P2: `*`
-  tokens are the SDK's own row-routing vocabulary — field-level lists — so stripping them here
-  broke 7 SDK tests). The wildcard normalization for the reassembly parser's 2-segment
-  contract moves to its only consumer's export boundary: internal-arcadia-agents
-  `workflow_reassembly_metadata` (task 3.2).
-- Readers STOP verifying writer hashes entirely (adversarial finding F1: even an as-received
-  recompute diverges across hash implementations — proven SDK `896b…` vs stored Go `f1a2…`
-  over identical structures). The stored `schema_hash` is writer-owned and opaque; read-time
-  integrity is structural validation; the server becomes the only hash authority
-  (consolidated task 2.2d).
-- Regression tests pinned to **both dialect goldens** (harness-dialect and SDK-dialect
-  persisted extracts) must derive byte-identical `workflow_field_paths` and pass reassembly
-  preflight; plus an end-to-end repeated-group reassembly test — the exact case production
-  missed.
+- Authored paths, YAML text, and authored mappings continue through
+  `prepare_extraction_yaml()`.
+- Existing workflow responses and mappings explicitly marked
+  `mapping_kind="workflow_extract"` receive structural execution-metadata
+  validation only.
+- Persisted extract bytes are preserved, and readback returns `prepared=None`.
+- The reader does not reapply current authoring rules or compare writer-owned
+  hashes.
+
+Internal Arcadia already reconstructs its runtime prompt cache and reassembly
+metadata from the deployed workflow. It does not need an SDK-authored prepared
+object at this boundary.
 
 ## Impact
 
-- Affected: only the persisted-workflow read path (`prepare_extraction_yaml` "persisted"
-  classification). Today that path always fails for repeated groups, so the change strictly
-  enables; SDK-dialect inputs are byte-identical before/after.
-- Consumers: internal-arcadia-agents (extract pods) via `prepare_arcadia_extraction_yaml`.
-  Rollout = SDK release → internal-arcadia-agents pin bump → extract pod redeploy → rerun the
-  cashbot-go live proof matrix (repeated-group population).
-- Out of scope here: what the API stores (consolidated task 2.2d), the
-  internal-arcadia-agents exception-swallowing (follow-up noted in tasks).
+The change affects only existing-workflow readback. Creating or updating a
+workflow from authored YAML remains fully compiled and validated. Rollout
+requires an SDK release, an Internal Arcadia pin update, and extraction-service
+deployment before the protected file replays and closeout capture resume.

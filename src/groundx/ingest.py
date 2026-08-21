@@ -295,7 +295,9 @@ class GroundX(GroundXBase):
             A `PreparedExtractionYaml` returned by `prepare_extraction_yaml`.
         mapping_kind : typing.Optional[str]
             Use `"workflow_extract"` only when `mapping` is an existing workflow
-            extract payload. Omit it for authored YAML-shaped mappings.
+            extract payload. Existing workflow extracts are structurally
+            validated and preserved without recompiling their authored source.
+            Omit it for authored YAML-shaped mappings.
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration forwarded to the generated workflow
             client. Valid only with `workflow_id`.
@@ -384,8 +386,10 @@ class GroundX(GroundXBase):
         may be either YAML or an existing workflow ID.
         Authored YAML may be pure legacy or explicitly marked v1 YAML. Existing
         workflow extract mappings must use `mapping_kind="workflow_extract"`;
-        mixed payloads that leak authoring-only workflow metadata into
-        execution extracts are rejected.
+        Existing workflow extracts return `prepared=None`; only authored YAML
+        sources are compiled into a prepared definition. Mixed payloads that
+        leak authoring-only workflow metadata into execution extracts are
+        rejected.
         """
         extraction_workflows = _import_extraction_workflows()
         return extraction_workflows.load_extraction_definition_from_yaml(
@@ -420,8 +424,8 @@ class GroundX(GroundXBase):
         -------
         typing.Any
             An `ExtractionDefinition` loaded from the workflow response.
-            Workflows that only contain execution-ready extract JSON return a
-            definition with `prepared=None`.
+            Existing workflow extracts are preserved and return a definition
+            with `prepared=None`.
 
         Examples
         --------
@@ -432,9 +436,9 @@ class GroundX(GroundXBase):
 
         Notes
         -----
-        Workflows that only contain execution-ready extract JSON return a
-        definition with `prepared=None`; the create/update payload remains
-        reusable, but authored YAML metadata is unavailable.
+        Existing workflow extracts return `prepared=None`; the create/update
+        payload remains reusable, but the persisted authored snapshot is not
+        recompiled or treated as current authoring input.
         """
         extraction_workflows = _import_extraction_workflows()
         response = self.workflows.get(workflow_id, request_options=request_options)
@@ -480,7 +484,8 @@ class GroundX(GroundXBase):
             A `PreparedExtractionYaml` returned by `prepare_extraction_yaml`.
         mapping_kind : typing.Optional[str]
             Use `"workflow_extract"` only when `mapping` is an existing workflow
-            extract payload.
+            extract payload. Existing workflow extracts are structurally
+            validated and preserved without recompiling their authored source.
         name : typing.Optional[str]
             Workflow name. Required for create.
         chunk_strategy : typing.Any
@@ -1211,8 +1216,10 @@ class AsyncGroundX(AsyncGroundXBase):
         may be either YAML or an existing workflow ID.
         Authored YAML may be pure legacy or explicitly marked v1 YAML. Existing
         workflow extract mappings must use `mapping_kind="workflow_extract"`;
-        mixed payloads that leak authoring-only workflow metadata into
-        execution extracts are rejected.
+        Existing workflow extracts return `prepared=None`; only authored YAML
+        sources are compiled into a prepared definition. Mixed payloads that
+        leak authoring-only workflow metadata into execution extracts are
+        rejected.
         """
         extraction_workflows = _import_extraction_workflows()
         return extraction_workflows.load_extraction_definition_from_yaml(
@@ -1243,7 +1250,8 @@ class AsyncGroundX(AsyncGroundXBase):
         Returns
         -------
         typing.Any
-            An `ExtractionDefinition` loaded from the workflow response.
+            An `ExtractionDefinition` that preserves the existing workflow
+            extract and has `prepared=None`.
 
         Examples
         --------
@@ -1251,6 +1259,8 @@ class AsyncGroundX(AsyncGroundXBase):
 
         Prefer `load_extraction_definition(workflow_id=...)` for new code when
         the source may be either YAML or an existing workflow ID.
+
+        Existing workflow extracts are not recompiled as authored YAML.
         """
         extraction_workflows = _import_extraction_workflows()
         response = await self.workflows.get(
