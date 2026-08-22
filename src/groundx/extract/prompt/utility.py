@@ -1092,6 +1092,9 @@ def _validate_agent_chain(
                 raise ValueError(f"{path}.group must be a non-empty string")
             if group not in workflow_group_roles:
                 raise ValueError(f"{path}.group [{group}] is not a workflow group")
+            group_role = workflow_group_roles[group]
+            if not group_role:
+                raise ValueError(f"workflow group [{group}] must declare role")
             covered_groups.add(group)
 
             chain = raw_branch["chain"]
@@ -1103,7 +1106,13 @@ def _validate_agent_chain(
             suffixes = {_agent_chain_task_suffix(task) for task in parsed_chain}
             if len(suffixes) != 1:
                 raise ValueError(f"{path}.chain must use one processing suffix")
-            branch_suffixes.append(suffixes.pop())
+            branch_suffix = suffixes.pop()
+            if group_role != branch_suffix:
+                raise ValueError(
+                    f"workflow group [{group}] declares role {group_role} "
+                    f"but its agent chain uses {branch_suffix}"
+                )
+            branch_suffixes.append(branch_suffix)
             branch_terminal_saves.append(parsed_chain[-1] in _CUSTOM_WORKFLOW_AGENT_CHAIN_SAVE_TASKS)
 
         terminal_save = _agent_chain_following_save_task(raw_chain, stage_index)

@@ -61,12 +61,14 @@ statement:
 
 _pseudo_groups:
   statement_identity:
+    role: statement
     workflow_step: statement_identity_fields
     fields:
       account_number:
         path: /statement/account_number
 
   statement_totals:
+    role: statement
     workflow_step: statement_total_fields
     prompt:
       instructions: Extract only statement total fields.
