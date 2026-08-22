@@ -19,3 +19,4 @@
 
 poetry.lock binary
 *.DS_Store binary
+tests/extract/fixtures/extraction-fixture-pack/blobs/sha256/* binary

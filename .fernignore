@@ -18,6 +18,5 @@ CLAUDE.md
 .gitattributes
 .editorconfig
 scripts/check-line-endings.sh
-scripts/verify_release_intentional_red.py
 .github/workflows/ci.yml
 .github/workflows/line-endings.yml

@@ -1,27 +1,4 @@
-"""RED tests for task 3.2a7b: packet transport and single-matcher delegation.
-
-Expected to FAIL before implementation.  These cover the seam requirements that
-the pure behavior-table tests in `test_relationship_parent_selection_red.py`
-cannot reach:
-
-1. the production relationship normalizer accepts and carries
-   `parent_passthrough_attrs` (persisted) / `parentPassthroughAttrs`
-   (dispatched);
-2. relationship derivation from final group metadata copies the related
-   parent's `passthrough_attrs` onto the relationship;
-3. `_apply_relationships` -- the initial X-Ray reassembly path -- delegates
-   every parent selection to the one exported primitive; and
-4. end-to-end reassembly uses the original populated-key-shape, stable-first
-   matcher regardless of later passthrough or tie metadata.
-
-Citations and the ASSERTION / DERIVED / MAIN_ADOPTED / RATIFIED / PENDING provenance labels use
-the same sources and conventions as `test_relationship_parent_selection_red.py`;
-markers are registered in `tests/extract/conftest.py`.
-Contract sources:
-`openspec/changes/complete-extraction-boundary-regression-coverage/tasks.md`
-1355-1378, `design.md` 380-411, `specs/extraction-boundary-regression/spec.md`
-335-375, all in `/private/tmp/codex-internal-merge-20260803`.
-"""
+"""Packet transport and single-matcher relationship selection tests."""
 
 import typing
 
@@ -201,9 +178,7 @@ def test_apply_relationships_delegates_to_the_exported_primitive(
     reassembly path must call the exported primitive, not an inline index.
     """
     matcher = getattr(extract, _MATCHER_NAME, None)
-    assert matcher is not None, (
-        f"groundx.extract must export {_MATCHER_NAME!r} (task 3.2a7b)"
-    )
+    assert matcher is not None, f"groundx.extract must export {_MATCHER_NAME!r} (task 3.2a7b)"
     assert hasattr(custom_outputs, _MATCHER_NAME), (
         f"custom_outputs must resolve {_MATCHER_NAME!r} as a module global so the "
         "single-matcher delegation is observable and monkeypatchable"
@@ -233,17 +208,14 @@ def test_apply_relationships_delegates_to_the_exported_primitive(
     # Per-child coverage rather than an exact call count: an implementation that
     # groups or batches children by match key is still correct as long as every
     # child's selection goes through the one exported primitive.
-    assert len(calls) >= 1, (
-        "relationship placement must route through the one exported primitive"
-    )
+    assert len(calls) >= 1, "relationship placement must route through the one exported primitive"
     for child in children:
-        assert any(
-            all(seen.get(key) == value for key, value in child.items())
-            for seen in calls
-        ), f"child {child!r} was not routed through {_MATCHER_NAME!r}"
+        assert any(all(seen.get(key) == value for key, value in child.items()) for seen in calls), (
+            f"child {child!r} was not routed through {_MATCHER_NAME!r}"
+        )
 
 
-def test_reassembly_does_not_use_passthrough_fallback() -> None:
+def test_reassembly_ignores_passthrough_fallback_metadata() -> None:
     result = _reassemble(
         [{"meter_number": "12", "provider_name": "Test", "service_type": "water"}],
         [{"meter_number": "12", "service_type": "water"}],
@@ -251,9 +223,7 @@ def test_reassembly_does_not_use_passthrough_fallback() -> None:
     final = result.final_output
 
     assert final["meters"][0]["meter_charges"] == []
-    assert final["account_charges"] == [
-        {"meter_number": "12", "service_type": "water"}
-    ]
+    assert final["account_charges"] == [{"meter_number": "12", "service_type": "water"}]
 
 
 def test_reassembly_keeps_child_unmatched_when_ignored_field_conflicts() -> None:
@@ -275,9 +245,7 @@ def test_reassembly_keeps_child_unmatched_when_ignored_field_conflicts() -> None
     final = result.final_output
 
     assert final["meters"][0]["meter_charges"] == []
-    assert final["account_charges"] == [
-        {"meter_number": "12", "provider_name": "Unknown", "service_type": "water"}
-    ]
+    assert final["account_charges"] == [{"meter_number": "12", "provider_name": "Unknown", "service_type": "water"}]
 
 
 def test_reassembly_keeps_empty_value_conflict_sibling_for_fallback_selection() -> None:
@@ -301,9 +269,7 @@ def test_reassembly_keeps_empty_value_conflict_sibling_for_fallback_selection() 
 
     assert final["meters"][0]["provider_name__conflicts"] == ["Other"]
     assert final["meters"][0]["meter_charges"] == []
-    assert final["account_charges"] == [
-        {"meter_number": "12", "provider_name": "Unknown", "service_type": "water"}
-    ]
+    assert final["account_charges"] == [{"meter_number": "12", "provider_name": "Unknown", "service_type": "water"}]
 
 
 def test_reassembly_keeps_omitted_value_conflict_sibling_from_records() -> None:
@@ -325,9 +291,7 @@ def test_reassembly_keeps_omitted_value_conflict_sibling_from_records() -> None:
     assert "provider_name" not in final["meters"][1]
     assert "provider_name__conflicts" not in final["meters"][1]
     assert final["meters"][0]["meter_charges"] == []
-    assert final["account_charges"] == [
-        {"meter_number": "12", "provider_name": "Unknown", "service_type": "water"}
-    ]
+    assert final["account_charges"] == [{"meter_number": "12", "provider_name": "Unknown", "service_type": "water"}]
 
 
 def test_reassembly_keeps_omitted_value_conflict_sibling_from_list_output() -> None:
@@ -366,9 +330,7 @@ def test_reassembly_keeps_omitted_value_conflict_sibling_from_list_output() -> N
     assert "provider_name" not in final["meters"][1]
     assert "provider_name__conflicts" not in final["meters"][1]
     assert final["meters"][0]["meter_charges"] == []
-    assert final["account_charges"] == [
-        {"meter_number": "12", "provider_name": "Unknown", "service_type": "water"}
-    ]
+    assert final["account_charges"] == [{"meter_number": "12", "provider_name": "Unknown", "service_type": "water"}]
 
 
 def test_reassembly_requires_a_unique_fallback_parent() -> None:
@@ -465,9 +427,7 @@ def test_output_names_default_to_the_child_group_name(omitted: str) -> None:
 
     normalized = prompt_utility._normalize_custom_relationship(relationship, 0)
 
-    assert normalized[omitted] == "charges", (
-        f"design.md:384-388 -- {omitted} defaults to the child group name"
-    )
+    assert normalized[omitted] == "charges", f"design.md:384-388 -- {omitted} defaults to the child group name"
 
 
 def test_reassembly_reports_ambiguity_only_per_declared_strategy() -> None:

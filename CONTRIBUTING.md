@@ -115,12 +115,9 @@ When a release is required, the handoff must name the requested version, merged 
 validation evidence, and downstream consumers that need the new version. Do not create a
 release tag, dispatch a release workflow, or publish the package from this repository.
 
-Ordinary pull-request CI keeps these protected tests failing until governed fixtures are
-promoted. Tag-release CI classifies them separately. Publishing is allowed only when the
-selected set contains exactly the approved missing-fixture failures registered in
-`scripts/verify_release_intentional_red.py`, or all of those tests pass after fixture
-promotion. Any missing, extra, skipped, errored, mixed, or changed outcome blocks
-publishing.
+The protected extraction replay uses the compact fixture pack promoted through the
+GroundX Studio Harness certification procedure. Pull requests and releases run the same
+test suite. A missing, changed, skipped, or failing protected replay blocks publishing.
 
 ### Commit Messages
 
