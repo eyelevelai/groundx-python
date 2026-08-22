@@ -358,6 +358,51 @@ generic_group_c:
     )
 
 
+@pytest.mark.parametrize("group_name", ["charges", "fees"])
+def test_agent_chain_requires_explicit_role_independent_of_group_name(
+    group_name: str,
+) -> None:
+    raw = f"""
+extraction_policy_version: v1
+
+workflow:
+  custom_steps:
+    - name: statement_step
+      level: chunk
+      kind: instruct
+    - name: charges_step
+      level: chunk
+      kind: keys
+  agent_chain:
+    - parallel:
+        - group: statement
+          chain: [reconcile_statement, save_statement]
+    - reconcile_charges
+    - save_charges
+
+statement:
+  role: statement
+  workflow_step: statement_step
+  fields:
+    statement_id:
+      workflow_output_key: statement_id
+      prompt: {{instructions: Return the statement ID., type: str}}
+
+{group_name}:
+  workflow_step: charges_step
+  fields:
+    amount:
+      workflow_output_key: amount
+      prompt: {{instructions: Return the amount., type: float}}
+"""
+
+    with pytest.raises(
+        ValueError,
+        match=rf"workflow group \[{group_name}\] must declare role",
+    ):
+        prepare_extraction_yaml(raw)
+
+
 def test_agent_chain_rejects_unscheduled_workflow_groups() -> None:
     raw = """
 extraction_policy_version: v1
@@ -388,6 +433,7 @@ statement:
         instructions: Return the account number.
         type: str
 meters:
+  role: meters
   workflow_step: meter_fields
   fields:
     meter_number:
@@ -396,6 +442,7 @@ meters:
         instructions: Return the meter number.
         type: str
 charges:
+  role: charges
   workflow_step: charge_fields
   fields:
     charge_amount:

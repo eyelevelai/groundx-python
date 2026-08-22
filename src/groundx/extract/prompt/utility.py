@@ -1043,7 +1043,7 @@ def _workflow_group_roles(
         role = authored_group_roles.get(group)
         if role is None:
             role = workflow_group_metadata.get(group, {}).get("role")
-        roles[group] = role if isinstance(role, str) else group
+        roles[group] = role if isinstance(role, str) else ""
     return roles
 
 
@@ -1179,6 +1179,9 @@ def _validate_agent_chain_group_coverage(
     serial_start_index: int,
 ) -> None:
     covered_groups = set(branch_covered_groups)
+    for group, role in workflow_group_roles.items():
+        if group not in covered_groups and not role:
+            raise ValueError(f"workflow group [{group}] must declare role")
     stage_index = serial_start_index
     while stage_index < len(raw_chain):
         raw_stage = raw_chain[stage_index]
