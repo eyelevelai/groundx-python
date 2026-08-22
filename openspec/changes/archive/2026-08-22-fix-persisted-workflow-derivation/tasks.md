@@ -21,11 +21,19 @@
 
 ## 3. Verification and rollout
 
-- [ ] 3.1 Pass focused, extract, static, and package tests on Python 3.9.
-- [ ] 3.2 Replay the exact protected workflow readbacks and record compact
+- [x] 3.1 Closed as superseded by the supported runtime. The package now
+      requires Python 3.10 or newer, so the obsolete Python 3.9 gate was not
+      run. PR 77 merged, and the final promoted-fixture main CI passed at
+      `8b1479e` on the supported runtime.
+- [x] 3.2 Replay the exact protected workflow readbacks and record compact
       inputs, outputs, identities, and failures.
-- [ ] 3.3 Open and merge the SDK PR through normal repository gates.
-- [ ] 3.4 Human release owner publishes the next SDK version.
-- [ ] 3.5 Update Internal Arcadia's SDK pin, deploy the approved production
+- [x] 3.3 Open and merge the SDK PR through normal repository gates. PR 77
+      merged as `da9423d`.
+- [x] 3.4 Human release owner publishes the next SDK version. The change shipped
+      in GroundX Python 3.9.15.
+- [x] 3.5 Update Internal Arcadia's SDK pin, deploy the approved production
       branch, and verify extract, reconcile, QA, and save handoffs on the exact
-      saved files before capture resumes.
+      saved files before capture resumes. Internal Arcadia pins 3.9.15. The
+      four-case configured-set certification passed with
+      `certification_eligible: true` before the consolidated plan archived on
+      2026-08-22.

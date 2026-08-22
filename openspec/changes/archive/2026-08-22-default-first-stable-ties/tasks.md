@@ -12,10 +12,8 @@
       marker and the promotion-time declaration requirement.
 - [x] 1.4 Full `tests/extract` suite: no failures beyond the 14 pre-existing
       on `origin/main` (verified by identical baseline run in the same venv).
-- [ ] 1.5 Release the change (next patch after 3.9.9) and update consumer pins
-      (internal-arcadia-agents `requirements.txt` and `Dockerfile.extract`;
-      Studio Harness `templates/requirements.txt` floor). Gated on Benjamin's
-      release approval. Remaining work is routed to the consolidated plan at
-      internal-arcadia-agents/openspec/changes/complete-extraction-boundary-regression-coverage/tasks.md
-      (tasks 9.1 and 9.5f own the pin, rebuild, and capture rerun); this change
-      archives with that plan's closeout.
+- [x] 1.5 Release the change and update consumer pins. GroundX Python 3.9.10
+      contains PR 71. Internal Arcadia now pins 3.9.15 in `requirements.txt`
+      and `Dockerfile.extract`; Studio Harness requires
+      `groundx[extract]>=3.9.10`. The consolidated four-case closeout passed
+      and archived on 2026-08-22.
