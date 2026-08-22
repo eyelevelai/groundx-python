@@ -108,6 +108,7 @@ workflow:
       - save_statement
 
 statement:
+  role: statement
   workflow_step: statement_fields
   fields:
     account_number:
@@ -134,6 +135,7 @@ workflow:
     - save_statement
 
 statement:
+  role: statement
   workflow_step: statement_fields
   fields:
     account_number:
@@ -166,6 +168,7 @@ workflow:
     - save_statement
 
 statement:
+  role: statement
   workflow_step: statement_fields
   fields:
     account_number:
@@ -201,6 +204,7 @@ workflow:
     - save_statement
 
 statement:
+  role: statement
   workflow_step: statement_fields
   fields:
     account_number:
@@ -230,6 +234,7 @@ workflow:
 {agent_chain}
 
 statement:
+  role: statement
   workflow_step: statement_fields
   fields:
     account_number:
@@ -403,6 +408,68 @@ statement:
         prepare_extraction_yaml(raw)
 
 
+@pytest.mark.parametrize("group_name", ["charges", "fees"])
+def test_parallel_agent_chain_requires_explicit_role_independent_of_group_name(
+    group_name: str,
+) -> None:
+    raw = f"""
+extraction_policy_version: v1
+
+workflow:
+  custom_steps:
+    - name: charge_step
+      level: chunk
+      kind: keys
+  agent_chain:
+    - parallel:
+        - group: {group_name}
+          chain: [reconcile_charges, save_charges]
+
+{group_name}:
+  workflow_step: charge_step
+  fields:
+    amount:
+      workflow_output_key: amount
+      prompt: {{instructions: Return the amount., type: float}}
+"""
+
+    with pytest.raises(
+        ValueError,
+        match=rf"workflow group \[{group_name}\] must declare role",
+    ):
+        prepare_extraction_yaml(raw)
+
+
+def test_parallel_agent_chain_validates_authored_role_not_group_name() -> None:
+    raw = """
+extraction_policy_version: v1
+
+workflow:
+  custom_steps:
+    - name: charge_step
+      level: chunk
+      kind: keys
+  agent_chain:
+    - parallel:
+        - group: fees
+          chain: [reconcile_charges, save_charges]
+
+fees:
+  role: meters
+  workflow_step: charge_step
+  fields:
+    amount:
+      workflow_output_key: amount
+      prompt: {instructions: Return the amount., type: float}
+"""
+
+    with pytest.raises(
+        ValueError,
+        match=r"workflow group \[fees\] declares role meters but its agent chain uses charges",
+    ):
+        prepare_extraction_yaml(raw)
+
+
 def test_agent_chain_rejects_unscheduled_workflow_groups() -> None:
     raw = """
 extraction_policy_version: v1
@@ -425,6 +492,7 @@ workflow:
     - save_statement
 
 statement:
+  role: statement
   workflow_step: statement_fields
   fields:
     account_number:

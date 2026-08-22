@@ -35,6 +35,7 @@ def test_prepare_extraction_yaml_uses_only_output_scope_for_root_placement() -> 
         _workflow_yaml(
             """
 statement_fields:
+  role: statement
   workflow_step: scalar_step
   output_scope: document_root
   fill_rules:
@@ -50,6 +51,7 @@ statement_fields:
             type: str
 
 grouped_statement_fields:
+  role: statement
   workflow_step: scalar_step
   fill_rules:
     - source: total
