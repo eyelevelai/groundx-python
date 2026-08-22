@@ -5,6 +5,8 @@ import pytest
 try:
     from smolagents import CodeAgent, ToolCallingAgent
     from smolagents.agent_types import AgentText
+    from smolagents.default_tools import FinalAnswerTool
+    from smolagents.models import get_tool_json_schema
 except ModuleNotFoundError:
     pytest.skip("smolagents extra is not installed", allow_module_level=True)
 
@@ -21,6 +23,27 @@ def settings(retries: int) -> AgentSettings:
         max_steps=1,
         response_parse_max_retries=retries,
         imports=[],
+    )
+
+
+def test_prompt_suffix_matches_final_answer_tool_schema() -> None:
+    schema = get_tool_json_schema(FinalAnswerTool())
+
+    assert schema["function"]["parameters"] == {
+        "type": "object",
+        "properties": {
+            "answer": {
+                "type": "string",
+                "description": "The final answer to the problem",
+            }
+        },
+        "required": ["answer"],
+    }
+    assert agent_module.prompt_suffix == (
+        "\nReturn exactly one `final_answer` tool call with exactly one argument named `answer`. "
+        "The `answer` value must be a JSON string containing the requested JSON value, which may be an "
+        'object or array. Do not include any other arguments. Object example: {"answer":"{\\"field\\":null}"}. '
+        'Array example: {"answer":"[{\\"field\\":\\"value\\"}]"}.\n'
     )
 
 

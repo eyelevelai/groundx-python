@@ -115,13 +115,12 @@ def build_openai_server_model(settings: AgentSettings) -> OpenAIServerModel:
     return model
 
 
-prompt_suffix = """
-Return only your response using the `final_answer` tool format:
-
-```json
-{{"answer": {{"type": RESPONSE_HERE, "description": "The final answer to the problem"}}}}
-```
-"""
+prompt_suffix = (
+    "\nReturn exactly one `final_answer` tool call with exactly one argument named `answer`. "
+    "The `answer` value must be a JSON string containing the requested JSON value, which may be an "
+    'object or array. Do not include any other arguments. Object example: {"answer":"{\\"field\\":null}"}. '
+    'Array example: {"answer":"[{\\"field\\":\\"value\\"}]"}.\n'
+)
 
 SUPPORTED_IMAGE_TRANSPORTS = {"pil", "data_url", "remote_url"}
 AgentTraceCallback = typing.Callable[[typing.Dict[str, typing.Any]], None]
