@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import dataclasses
 import gzip
 import hashlib
@@ -35,6 +36,24 @@ def _artifact(case: dict[str, Any], role: str) -> dict[str, Any]:
     return references[0]
 
 
+def _workflow_extract_from_arcadia_request(
+    request_packet: dict[str, Any],
+) -> dict[str, Any]:
+    metadata = request_packet["request"]["extraction_workflow_metadata_v1"]
+    workflow = {
+        "custom_steps": copy.deepcopy(metadata["custom_steps"]),
+        "output_routes": copy.deepcopy(metadata["custom_output_routes"]),
+    }
+    output_relationships = metadata.get("output_relationships")
+    if isinstance(output_relationships, list):
+        workflow["output_relationships"] = copy.deepcopy(output_relationships)
+    prepared_final_groups = metadata.get("prepared_final_groups")
+    return {
+        "workflow": workflow,
+        "groups": copy.deepcopy(prepared_final_groups if isinstance(prepared_final_groups, dict) else {}),
+    }
+
+
 def test_protected_reassembly_replays_compact_fixture_pack() -> None:
     root = Path(
         os.environ.get(
@@ -47,12 +66,12 @@ def test_protected_reassembly_replays_compact_fixture_pack() -> None:
 
     for case in manifest["cases"].values():
         xray = json.loads(_read_blob(root, _artifact(case, "arcadia.xray_input")))
-        workflow = json.loads(_read_blob(root, _artifact(case, "cashbot.workflow_readback")))
+        request_packet = json.loads(_read_blob(root, _artifact(case, "arcadia.request")))
         expected = json.loads(_read_blob(root, _artifact(case, "groundx_python.reassembly_output")))
 
         result = reassemble_custom_outputs_from_xray(
             xray["value"],
-            workflow_extract=workflow["deployed_extract"],
+            workflow_extract=_workflow_extract_from_arcadia_request(request_packet),
         )
 
         assert result.workflow_output == expected["workflow_output"]
