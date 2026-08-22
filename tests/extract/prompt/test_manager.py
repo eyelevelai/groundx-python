@@ -1793,6 +1793,7 @@ workflow:
           chain: [reconcile_meters, qa_meters, save_meters]
 
 generic_group_a:
+  role: statement
   workflow_step: generic_step_a
   fields:
     generic_attr_01:
@@ -1802,6 +1803,7 @@ generic_group_a:
         type: str
 
 generic_group_b:
+  role: meters
   workflow_step: generic_step_b
   fields:
     generic_attr_15:
