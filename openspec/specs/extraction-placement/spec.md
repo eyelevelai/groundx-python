@@ -12,8 +12,8 @@ and authored final JSON placement.
 
 GroundX Python SHALL own its hand-written extraction YAML parser/compiler
 behavior and keep the resulting route metadata in parity with the canonical
-production compiler and the supported Harness fallback. GroundX Python SHALL
-also own production X-Ray/custom-output reassembly from compiled route metadata.
+production compiler. GroundX Python SHALL also own production
+X-Ray/custom-output reassembly from compiled route metadata.
 
 This ownership does not make the SDK the product YAML upload compiler. It makes
 the SDK responsible for accepting the supported authored contract, producing

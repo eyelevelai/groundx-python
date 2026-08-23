@@ -1,6 +1,7 @@
 import copy
 import inspect
 import typing
+import warnings
 from pathlib import Path
 
 import pytest
@@ -9,6 +10,7 @@ import yaml
 from groundx import AsyncGroundX, GroundX
 from groundx.core.request_options import RequestOptions
 from groundx.extract import prepare_extraction_yaml
+from groundx.extract.prompt.utility import _prepare_extraction_yaml
 from groundx.types import (
     WorkflowDetail,
     WorkflowResponse,
@@ -720,3 +722,35 @@ async def test_async_workflow_readback_preserves_server_metadata() -> None:
         "{{LANGUAGE_UNKNOWN}}": "",
     }
     assert definition.prepared is None
+
+
+def test_prepare_extraction_yaml_is_deprecated() -> None:
+    with pytest.warns(
+        DeprecationWarning,
+        match="removed in the next breaking GroundX SDK release",
+    ):
+        prepared = prepare_extraction_yaml(CUSTOM_WORKFLOW_YAML)
+
+    assert (
+        prepared.persisted_workflow_extract == _prepare_extraction_yaml(CUSTOM_WORKFLOW_YAML).persisted_workflow_extract
+    )
+
+
+def test_authored_yaml_definition_loading_warns_deprecation() -> None:
+    with pytest.warns(DeprecationWarning, match="prepare_extraction_yaml is deprecated"):
+        definition = _client(RecordingWorkflows()).load_extraction_definition_from_yaml(
+            yaml_text=CUSTOM_WORKFLOW_YAML,
+        )
+
+    assert definition.prepared is not None
+
+
+def test_workflow_extract_definition_loading_does_not_warn() -> None:
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", DeprecationWarning)
+        definition = _client(RecordingWorkflows()).load_extraction_definition_from_yaml(
+            mapping=copy.deepcopy(EXECUTION_ONLY_EXTRACT),
+            mapping_kind="workflow_extract",
+        )
+
+    assert definition.extract == EXECUTION_ONLY_EXTRACT

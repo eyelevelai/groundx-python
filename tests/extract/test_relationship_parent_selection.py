@@ -91,7 +91,11 @@ def test_requires_equal_populated_key_shape_and_values(parent, child) -> None:
     assert _select([parent], child).parent is None
 
 
-def test_ignores_passthrough_fallback_metadata() -> None:
+@pytest.mark.parametrize(
+    "passthrough_key",
+    ["parent_passthrough_attrs", "parentPassthroughAttrs"],
+)
+def test_ignores_passthrough_fallback_metadata(passthrough_key) -> None:
     parent = {
         "meter_number": "12",
         "provider_name": "Utility",
@@ -106,13 +110,17 @@ def test_ignores_passthrough_fallback_metadata() -> None:
     selection = _select(
         [parent],
         child,
-        parent_passthrough_attrs=["provider_name"],
+        **{passthrough_key: ["provider_name"]},
     )
 
     assert selection == RelationshipParentSelection(None, False)
 
 
-def test_ignores_tie_strategy_metadata() -> None:
+@pytest.mark.parametrize(
+    "strategy_key",
+    ["multiple_match_strategy", "multipleMatchStrategy"],
+)
+def test_ignores_tie_strategy_metadata(strategy_key) -> None:
     parents = [
         {"meter_number": "M-1"},
         {"meter_number": "m-1"},
@@ -121,7 +129,7 @@ def test_ignores_tie_strategy_metadata() -> None:
     selection = _select(
         parents,
         {"meter_number": "M-1"},
-        multiple_match_strategy="unsupported",
+        **{strategy_key: "unsupported"},
     )
 
     assert selection == RelationshipParentSelection(parents[0], False)

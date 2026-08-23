@@ -13,9 +13,9 @@ from ..services.logger import Logger
 from .source import Source
 from .utility import (
     PreparedExtractionYaml,
+    _prepare_extraction_yaml,
     do_not_remove_fields,
     load_from_mapping,
-    prepare_extraction_yaml,
 )
 from .utility import (
     load_from_yaml as _load_from_yaml,
@@ -337,7 +337,7 @@ class PromptManager:
     def _prepare_extraction_yaml(
         self, raw: RawExtractionConfig
     ) -> PreparedExtractionYaml:
-        return prepare_extraction_yaml(
+        return _prepare_extraction_yaml(
             raw,
             top_level_metadata_keys=self._top_level_metadata_keys,
             final_group_metadata_keys=self._final_group_metadata_keys,
