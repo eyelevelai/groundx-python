@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import copy
 import dataclasses
 import gzip
@@ -54,6 +55,33 @@ def _workflow_extract_from_arcadia_request(
     }
 
 
+EXPECTED_OUTPUT_MEMBERS = {
+    "workflow_output",
+    "relationship_output",
+    "final_output",
+    "diagnostics",
+    "source_provenance",
+}
+
+
+def _assert_xray_predecessor(envelope: dict[str, Any]) -> None:
+    assert envelope.get("kind") == "xray_predecessor"
+    source = envelope.get("source")
+    assert isinstance(source, dict)
+    assert source.get("source_kind") == "live_capture"
+    for field in ("run_id", "process_id", "document_id"):
+        assert isinstance(source.get(field), str) and source[field]
+    raw = base64.b64decode(envelope["raw_xray_model_base64"], validate=True)
+    assert hashlib.sha256(raw).hexdigest() == envelope["raw_xray_model_sha256"]
+    assert len(raw) == envelope["raw_xray_model_bytes"]
+    parsed = json.loads(raw)
+    canonical = json.dumps(
+        parsed, ensure_ascii=False, separators=(",", ":"), sort_keys=True
+    ).encode("utf-8")
+    assert raw == canonical, "X-Ray predecessor uses an unknown serializer"
+    assert parsed == envelope["value"]
+
+
 def test_protected_reassembly_replays_compact_fixture_pack() -> None:
     root = Path(
         os.environ.get(
@@ -63,11 +91,20 @@ def test_protected_reassembly_replays_compact_fixture_pack() -> None:
     ).resolve()
     manifest = json.loads((root / "fixture-pack.json").read_text(encoding="utf-8"))
     assert manifest["schema_version"] == "extraction_fixture_pack_v1"
+    assert manifest["state"] == "promoted"
+    assert manifest["review"]["decision"] == "approved"
+    assert sorted(
+        case["case_id"] for case in manifest["cases"].values()
+    ) == sorted(manifest["configured_set"]["case_ids"])
 
     for case in manifest["cases"].values():
         xray = json.loads(_read_blob(root, _artifact(case, "arcadia.xray_input")))
+        _assert_xray_predecessor(xray)
         request_packet = json.loads(_read_blob(root, _artifact(case, "arcadia.request")))
         expected = json.loads(_read_blob(root, _artifact(case, "groundx_python.reassembly_output")))
+        assert set(expected) == EXPECTED_OUTPUT_MEMBERS
+        assert isinstance(expected["diagnostics"], list)
+        assert isinstance(expected["source_provenance"], list)
 
         result = reassemble_custom_outputs_from_xray(
             xray["value"],

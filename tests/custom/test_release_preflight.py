@@ -40,3 +40,12 @@ def test_ci_runs_one_unmodified_test_suite_for_branches_and_tags() -> None:
     step = _test_steps()["Test"]
     assert "if" not in step
     assert step["run"] == "poetry run pytest -rP -n auto ."
+
+
+def test_protected_replay_and_fixture_pack_exist() -> None:
+    assert (
+        REPO_ROOT / "tests/extract/test_compact_fixture_pack_replay.py"
+    ).is_file(), "a missing protected replay must block publishing"
+    pack_root = REPO_ROOT / "tests/extract/fixtures/extraction-fixture-pack"
+    assert (pack_root / "fixture-pack.json").is_file()
+    assert (pack_root / "blobs" / "sha256").is_dir()
