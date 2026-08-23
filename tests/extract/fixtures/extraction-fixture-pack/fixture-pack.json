@@ -711,12 +711,18 @@
     "stored_bytes": 3442627
   },
   "owner": "groundx-python",
+  "registry_binding": {
+    "method": "guarded_migration",
+    "registry_digest": "649c214c2c8cdfe731cef4e1b44bdaf905038748dca5dc59a4fa0da8b15323f1",
+    "registry_sha256": "4b47f6382fcdb343610cd1213cf17104c2d23737f116a3198138e9c9e69e2b41",
+    "schema_version": "extraction_fixture_registry_binding_v1"
+  },
   "review": {
     "candidate_sha256": "2fc4aee5879dc76c0e28f9f1aef66d2fe02782b0034795ca073164f53594e026",
     "decision": "approved",
     "receipt_sha256": "667124c0c382e277511efe4a7b949585dbf08f5e063f2aaccf447e6889c75df3",
     "reviewed_at": "2026-08-22T03:14:48Z",
-    "reviewer_identity": "OpenAI Codex",
+    "reviewer_identity": "Benjamin Fletcher",
     "schema_version": "extraction_fixture_pack_review_v1",
     "transformations": []
   },
