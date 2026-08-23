@@ -231,17 +231,17 @@ matches, the tie resolves to the first parent in stable input order: the
   (2026-08-17 ruling: absence defaults to `first_stable`, the original Arcadia
   tie behavior).
 
-#### Scenario: Ambiguous child matches fail clearly
+#### Scenario: Runtime-only strategy metadata does not change selection
 
 - **GIVEN** one child record matches more than one parent record
 - **AND** the relationship explicitly declares a `multiple_match_strategy`
   other than `first_stable` (rejected at YAML authoring time, but possible on
   an unvalidated runtime packet)
 - **WHEN** the SDK applies relationship metadata
-- **THEN** the helper returns a diagnostic that names the relationship and child
-  record
-- **AND** the child stays in the unmatched child group
-- **AND** it does not silently attach the child to an arbitrary parent.
+- **THEN** the child still attaches to the first matching parent in input order
+- **AND** no ambiguity diagnostic is emitted
+- **AND** authoring validation remains responsible for rejecting the foreign
+  strategy before persistence.
 
 #### Scenario: A declared strategy resolves an exact tie
 
@@ -251,20 +251,15 @@ matches, the tie resolves to the first parent in stable input order: the
 - **THEN** the child attaches to the first matching parent in input order
 - **AND** no ambiguity diagnostic is emitted.
 
-#### Scenario: Ignored passthrough fields are the only fallback
+#### Scenario: Passthrough metadata does not weaken matching
 
 - **GIVEN** relationship metadata declares `parent_passthrough_attrs` that
   overlap `match_attrs`
 - **AND** no parent matches the child on the full populated match-key shape
 - **WHEN** the SDK applies relationship metadata
-- **THEN** the SDK retries comparison with exactly those passthrough attrs
-  removed
-- **AND** the child attaches only when exactly one parent survives that retry
-- **AND** more than one surviving parent leaves the child unmatched without an
-  ambiguity diagnostic
-- **AND** `parent_passthrough_attrs` never changes the outcome of the full
-  match-key pass
-- **AND** removing every match attr, or removing none, performs no retry.
+- **THEN** the SDK performs no fallback comparison
+- **AND** the child remains unmatched
+- **AND** `parent_passthrough_attrs` never changes parent selection.
 
 #### Scenario: Chained relationships create arrays inside arrays
 
@@ -312,18 +307,14 @@ selection = select_relationship_parent(parents, child, relationship)
 - `parents` is an ordered sequence of parent records (mappings), `child` is one
   child record, and `relationship` is the relationship packet.
 - The packet is accepted in persisted snake_case or dispatched camelCase
-  spelling. `match_attrs`/`matchAttrs`,
-  `parent_passthrough_attrs`/`parentPassthroughAttrs`, and
-  `multiple_match_strategy`/`multipleMatchStrategy` are the selection-relevant
-  fields; snake_case wins when both spellings are present.
+  spelling. Only `match_attrs`/`matchAttrs` affects parent selection;
+  snake_case wins when both spellings are present. Other relationship metadata
+  is ignored by the matcher.
 - The return value is the frozen dataclass
   `RelationshipParentSelection(parent, ambiguous)`. `parent` is the selected
-  parent record object itself — identity-preserving, so a caller can map it back
-  to its own domain object — or `None`. `ambiguous` is `True` only for multiple
-  exact candidates under an explicitly declared `multiple_match_strategy`
-  other than `first_stable`; an absent strategy defaults to `first_stable`
-  (2026-08-17 ruling), so undeclared ties select the first parent and are
-  never ambiguous.
+  parent record object itself, identity-preserving so a caller can map it back
+  to its own domain object, or `None`. `ambiguous` is always `False` because
+  exact ties select the first parent in stable input order.
 - The primitive is total: it never raises for unsupported value types.
 - Both names are exported from `groundx.extract`.
 
@@ -334,8 +325,7 @@ selection = select_relationship_parent(parents, child, relationship)
 - **WHEN** it calls `select_relationship_parent(parents, child, relationship)`
 - **THEN** it receives a `RelationshipParentSelection`
 - **AND** `parent` is the selected parent record object or `None`
-- **AND** `ambiguous` distinguishes an unresolved declared-strategy tie from an
-  ordinary no-match
+- **AND** `ambiguous` is `False`
 - **AND** the consumer needs no reassembly, X-Ray, or `Document` state to select.
 
 #### Scenario: One primitive serves every workflow
@@ -346,8 +336,8 @@ selection = select_relationship_parent(parents, child, relationship)
 - **THEN** every case is served by the one exported primitive
 - **AND** reassembly's `_apply_relationships` delegates to it rather than
   matching inline
-- **AND** the selection outcome depends only on the packet's selection-relevant
-  fields and the record values, never on group names, final field names,
+- **AND** the selection outcome depends only on `match_attrs` and the record
+  values, never on other relationship metadata, group names, final field names,
   workflow identity, or compiler provenance.
 
 #### Scenario: Renamed generic workflows select identically
@@ -357,17 +347,14 @@ selection = select_relationship_parent(parents, child, relationship)
 - **WHEN** the same records are selected through both under that rename
 - **THEN** the selected parent and the ambiguity result are the same.
 
-#### Scenario: Retained parent conflicts ride as record siblings
+#### Scenario: Retained parent conflicts do not change selection
 
-- **GIVEN** a parent record carries retained conflict state for a field the
-  passthrough fallback would ignore
+- **GIVEN** a parent record carries retained conflict state for a match field
 - **AND** that state is supplied as the record sibling key `<field>__conflicts`
   holding a list of conflicting values
-- **WHEN** the fallback pass would otherwise accept that parent
-- **THEN** the SDK rejects that parent and leaves the child unmatched
-- **AND** an empty `<field>__conflicts` list does not reject the parent
-- **AND** the convention is read-side only: the SDK consumes
-  `<field>__conflicts` for selection and defines no policy for writing it.
+- **WHEN** the SDK selects a parent
+- **THEN** the conflict sibling does not affect the comparison
+- **AND** selection uses only the populated `match_attrs` values.
 
 #### Scenario: Empty routed values retain non-empty conflict siblings
 
@@ -376,8 +363,7 @@ selection = select_relationship_parent(parents, child, relationship)
 - **WHEN** the SDK reassembles custom output
 - **THEN** it omits the empty field value
 - **AND** it retains the conflict sibling on the same final record
-- **AND** fallback parent selection consumes that sibling exactly as it would
-  when supplied directly.
+- **AND** parent selection ignores that sibling.
 
 ### Requirement: Relationship metadata is prepared and persisted with workflow metadata
 

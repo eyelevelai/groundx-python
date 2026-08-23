@@ -69,7 +69,8 @@
             "account_number": {
               "path": "/statement/account_number"
             }
-          }
+          },
+          "role": "statement"
         },
         "statement_totals": {
           "fields": {
@@ -79,7 +80,8 @@
           },
           "prompt": {
             "instructions": "Extract only statement total fields."
-          }
+          },
+          "role": "statement"
         }
       },
       "extraction_policy_version": "v1",
@@ -415,9 +417,11 @@
   },
   "workflow_group_metadata": {
     "statement_identity": {
+      "role": "statement",
       "workflow_step": "statement_identity_fields"
     },
     "statement_totals": {
+      "role": "statement",
       "workflow_step": "statement_total_fields"
     }
   },

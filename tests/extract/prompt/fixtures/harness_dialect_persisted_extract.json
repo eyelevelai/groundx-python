@@ -1,5 +1,6 @@
 {
  "widget_summary": {
+  "role": "statement",
   "fields": {
    "widget_code": {
     "prompt": {
@@ -16,6 +17,7 @@
   }
  },
  "gadget_rows": {
+  "role": "meters",
   "fields": {
    "gadget_id": {
     "prompt": {
@@ -270,6 +272,7 @@
    "schema_hash": "b887988dbf6d84d4cf3a106e1e24af1bd4735e6ccaf9008a78b63b5590c23ee1"
   },
   "widget_summary": {
+   "role": "statement",
    "fields": {
     "widget_code": {
      "prompt": {
@@ -286,6 +289,7 @@
    }
   },
   "gadget_rows": {
+   "role": "meters",
    "fields": {
     "gadget_id": {
      "prompt": {
