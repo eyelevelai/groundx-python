@@ -5,7 +5,6 @@ from pathlib import Path
 
 import pytest
 import yaml
-from .prompt._fixtures import SAMPLE_YAML_1
 
 from groundx import AsyncGroundX, GroundX
 from groundx.core.request_options import RequestOptions
@@ -45,28 +44,6 @@ line_items:
         identifiers:
           - Description
         instructions: Return the printed line-item description.
-        type: str
-"""
-
-INVALID_TOP_LEVEL_METADATA_YAML = """
-unsupported_policy_version: v1
-statement:
-  fields:
-    account_number:
-      prompt:
-        instructions: Return the account number.
-        type: str
-"""
-
-POLICY_METADATA_YAML = """
-extraction_policy_version: v1
-statement:
-  explanation_attrs:
-    - account_number
-  fields:
-    account_number:
-      prompt:
-        instructions: Return the account number.
         type: str
 """
 
@@ -228,17 +205,6 @@ def _step_value(value: typing.Any, field: str) -> typing.Any:
     if isinstance(value, dict):
         return typing.cast(typing.Dict[str, typing.Any], value)[field]
     return getattr(value, field)
-
-
-def _model_to_alias_dict(value: typing.Any) -> typing.Dict[str, typing.Any]:
-    if isinstance(value, dict):
-        return typing.cast(typing.Dict[str, typing.Any], value)
-    if hasattr(value, "dict"):
-        return typing.cast(typing.Dict[str, typing.Any], value.dict())
-    return typing.cast(
-        typing.Dict[str, typing.Any],
-        value.model_dump(by_alias=True, exclude_none=False),
-    )
 
 
 def _find_mapping_keys(
@@ -669,72 +635,7 @@ def test_prepare_adp_persisted_source_preserves_runtime_metadata() -> None:
     assert prepared.workflow_group_metadata["adp_f1_employer_and_plan_information"]["role"] == "statement"
 
 
-def test_create_and_update_use_definition_before_yaml_sources() -> None:
-    client = _client(RecordingWorkflows())
-    definition = client.load_extraction_definition_from_yaml(yaml_text=CUSTOM_WORKFLOW_YAML)
-
-    assert (
-        client.create_extraction_workflow(
-            definition=definition,
-            yaml_text="not: [valid",
-            name="statement extraction",
-        )
-        == "created"
-    )
-    assert (
-        client.update_extraction_workflow(
-            "workflow-1",
-            definition=definition,
-            yaml_text="not: [valid",
-            name="statement extraction",
-        )
-        == "updated"
-    )
-
-    assert client.workflows.calls[0][1]["extract"] == definition.extract
-    assert client.workflows.calls[1][2]["extract"] == definition.extract
-
-
-def test_create_and_update_reject_mapping_kind_with_definition() -> None:
-    client = _client(RecordingWorkflows())
-    definition = client.load_extraction_definition_from_yaml(yaml_text=CUSTOM_WORKFLOW_YAML)
-
-    with pytest.raises(ValueError, match="mapping_kind"):
-        client.create_extraction_workflow(
-            definition=definition,
-            mapping_kind="workflow_extract",
-            name="statement extraction",
-        )
-
-    with pytest.raises(ValueError, match="mapping_kind"):
-        client.update_extraction_workflow(
-            "workflow-1",
-            definition=definition,
-            mapping_kind="workflow_extract",
-            name="statement extraction",
-        )
-
-
-def test_create_and_update_reject_missing_or_ambiguous_yaml_sources() -> None:
-    client = _client(RecordingWorkflows())
-
-    with pytest.raises(ValueError, match="exactly one"):
-        client.create_extraction_workflow(name="statement extraction")
-    with pytest.raises(ValueError, match="path.*yaml_text|yaml_text.*path"):
-        client.create_extraction_workflow(
-            path="statement.yaml",
-            yaml_text=CUSTOM_WORKFLOW_YAML,
-            name="statement extraction",
-        )
-    with pytest.raises(ValueError, match="mapping_kind"):
-        client.create_extraction_workflow(
-            yaml_text=CUSTOM_WORKFLOW_YAML,
-            mapping_kind="workflow_extract",
-            name="statement extraction",
-        )
-
-
-def test_create_and_update_forward_workflow_settings_and_request_options() -> None:
+def test_create_and_update_forward_raw_yaml_and_request_options() -> None:
     workflows = RecordingWorkflows()
     client = _client(workflows)
     request_options: RequestOptions = {"timeout_in_seconds": 1}
@@ -764,168 +665,10 @@ def test_create_and_update_forward_workflow_settings_and_request_options() -> No
     assert create_kwargs["request_options"] is request_options
     assert update_kwargs["name"] == "statement extraction"
     assert update_kwargs["request_options"] is request_options
-    assert create_kwargs["template"] == {
-        "{{LANGUAGE}}": "English",
-        "{{LANGUAGE_UNKNOWN}}": "",
-    }
-    assert create_kwargs["extract"]["workflow"]["template"] == {
-        "{{LANGUAGE}}": "English",
-        "{{LANGUAGE_UNKNOWN}}": "",
-    }
-    assert create_kwargs["custom_steps"][0]["name"] == "line_item_labels"
-    assert create_kwargs["output_routes"][0]["output_key"] == "label"
-    assert create_kwargs["leaf_fields"][0]["field_type"] == "str"
-    assert update_kwargs["extract"] == create_kwargs["extract"]
-
-
-def test_create_and_update_accept_yaml_path_shortcut(tmp_path: Path) -> None:
-    path = tmp_path / "statement.yaml"
-    path.write_text(CUSTOM_WORKFLOW_YAML)
-    workflows = RecordingWorkflows()
-    client = _client(workflows)
-
-    assert (
-        client.create_extraction_workflow(
-            path=path,
-            name="statement extraction",
-        )
-        == "created"
-    )
-    assert (
-        client.update_extraction_workflow(
-            "workflow-1",
-            path=path,
-            name="statement extraction",
-        )
-        == "updated"
-    )
-
-    create_kwargs = workflows.calls[0][1]
-    update_kwargs = workflows.calls[1][2]
-    assert create_kwargs["extract"] == update_kwargs["extract"]
-    assert create_kwargs["template"] == {
-        "{{LANGUAGE}}": "English",
-        "{{LANGUAGE_UNKNOWN}}": "",
-    }
-
-
-def test_create_and_update_yaml_path_errors_include_source_context(
-    tmp_path: Path,
-) -> None:
-    path = tmp_path / "statement.yaml"
-    path.write_text(INVALID_TOP_LEVEL_METADATA_YAML)
-    workflows = RecordingWorkflows()
-    client = _client(workflows)
-
-    with pytest.raises(ValueError) as create_exc:
-        client.create_extraction_workflow(
-            path=path,
-            name="statement extraction",
-        )
-
-    create_message = str(create_exc.value)
-    assert str(path) in create_message
-    assert "unsupported top-level metadata [unsupported_policy_version]" in create_message
-
-    with pytest.raises(ValueError) as update_exc:
-        client.update_extraction_workflow(
-            "workflow-1",
-            path=path,
-            name="statement extraction",
-        )
-
-    update_message = str(update_exc.value)
-    assert str(path) in update_message
-    assert "unsupported top-level metadata [unsupported_policy_version]" in update_message
-    assert workflows.calls == []
-
-
-@pytest.mark.asyncio
-async def test_async_create_and_update_yaml_path_accept_supported_policy_metadata(
-    tmp_path: Path,
-) -> None:
-    path = tmp_path / "statement.yaml"
-    path.write_text(POLICY_METADATA_YAML)
-    workflows = AsyncRecordingWorkflows()
-    client = _async_client(workflows)
-
-    assert (
-        await client.create_extraction_workflow(
-            path=path,
-            name="statement extraction",
-        )
-        == "created"
-    )
-    assert (
-        await client.update_extraction_workflow(
-            "workflow-1",
-            path=path,
-            name="statement extraction",
-        )
-        == "updated"
-    )
-
-    create_extract = workflows.calls[0][1]["extract"]
-    update_extract = workflows.calls[1][2]["extract"]
-    assert create_extract == update_extract
-    assert create_extract["_groundx_persisted_extract"]["extraction_policy_version"] == "v1"
-
-
-def test_create_and_update_yaml_path_accept_supported_policy_metadata(
-    tmp_path: Path,
-) -> None:
-    path = tmp_path / "statement.yaml"
-    path.write_text(POLICY_METADATA_YAML)
-    workflows = RecordingWorkflows()
-    client = _client(workflows)
-
-    assert (
-        client.create_extraction_workflow(
-            path=path,
-            name="statement extraction",
-        )
-        == "created"
-    )
-    assert (
-        client.update_extraction_workflow(
-            "workflow-1",
-            path=path,
-            name="statement extraction",
-        )
-        == "updated"
-    )
-
-    create_extract = workflows.calls[0][1]["extract"]
-    update_extract = workflows.calls[1][2]["extract"]
-    assert create_extract == update_extract
-    assert create_extract["_groundx_persisted_extract"]["extraction_policy_version"] == "v1"
-
-
-def test_create_and_update_accept_legacy_yaml_without_preflight() -> None:
-    workflows = RecordingWorkflows()
-    client = _client(workflows)
-
-    assert (
-        client.create_extraction_workflow(
-            yaml_text=SAMPLE_YAML_1,
-            name="legacy extraction",
-        )
-        == "created"
-    )
-    assert (
-        client.update_extraction_workflow(
-            "workflow-1",
-            yaml_text=SAMPLE_YAML_1,
-        )
-        == "updated"
-    )
-
-    assert [call[0] for call in workflows.calls] == ["create", "update"]
-    create_extract = workflows.calls[0][1]["extract"]
-    update_extract = workflows.calls[1][2]["extract"]
-    assert "workflow" not in create_extract
-    assert "_groundx_persisted_extract" not in create_extract
-    assert update_extract == create_extract
+    assert create_kwargs["yaml"] == CUSTOM_WORKFLOW_YAML
+    assert update_kwargs["yaml"] == CUSTOM_WORKFLOW_YAML
+    assert set(create_kwargs) == {"name", "yaml", "request_options"}
+    assert set(update_kwargs) == {"name", "yaml", "request_options"}
 
 
 def test_update_helper_exposes_no_client_side_downgrade_option() -> None:
@@ -952,29 +695,8 @@ def test_create_requires_name_but_update_can_omit_name() -> None:
     assert "name" not in workflows.calls[0][2]
 
 
-def test_custom_steps_disable_exact_fixed_default_overlay() -> None:
-    workflows = RecordingWorkflows()
-    client = _client(workflows)
-
-    client.create_extraction_workflow(
-        yaml_text=CUSTOM_WORKFLOW_YAML,
-        name="statement extraction",
-    )
-
-    steps = workflows.calls[0][1]["steps"]
-    assert _model_to_alias_dict(steps) == {
-        "chunk-instruct": None,
-        "chunk-keys": None,
-        "chunk-summary": None,
-        "doc-keys": None,
-        "doc-summary": None,
-        "sect-instruct": None,
-        "sect-summary": None,
-    }
-
-
 @pytest.mark.asyncio
-async def test_async_methods_match_sync_source_loading_and_forwarding() -> None:
+async def test_async_workflow_readback_preserves_server_metadata() -> None:
     response = WorkflowResponse(
         workflow=WorkflowDetail(
             workflow_id="workflow-1",
@@ -986,68 +708,15 @@ async def test_async_methods_match_sync_source_loading_and_forwarding() -> None:
     client = _async_client(workflows)
     request_options: RequestOptions = {"timeout_in_seconds": 1}
 
-    definition = await client.load_extraction_definition_from_yaml(yaml_text=CUSTOM_WORKFLOW_YAML)
-    direct_definition = await client.load_extraction_definition(yaml_text=CUSTOM_WORKFLOW_YAML)
-    workflow_definition = await client.load_extraction_definition(
-        workflow_id="workflow-1",
-        yaml_text="not: [valid",
-        request_options=request_options,
-    )
-    from_workflow = await client.load_extraction_definition_from_workflow(
+    definition = await client.load_extraction_definition_from_workflow(
         "workflow-1",
         request_options=request_options,
     )
-    created = await client.create_extraction_workflow(
-        definition=definition,
-        yaml_text="not: [valid",
-        name="statement extraction",
-        request_options=request_options,
-    )
-    updated = await client.update_extraction_workflow(
-        "workflow-1",
-        definition=from_workflow,
-        yaml_text="not: [valid",
-        request_options=request_options,
-    )
 
-    assert created == "created"
-    assert updated == "updated"
-    assert workflows.calls[0] == ("get", "workflow-1", request_options)
-    assert workflows.calls[1] == ("get", "workflow-1", request_options)
-    assert workflows.calls[2][1]["request_options"] is request_options
-    assert workflows.calls[3][2]["request_options"] is request_options
-    assert workflows.calls[2][1]["template"]["{{LANGUAGE_UNKNOWN}}"] == ""
-    assert direct_definition.extract == definition.extract
-    assert workflow_definition.extract == from_workflow.extract
-
-
-@pytest.mark.asyncio
-async def test_async_create_and_update_yaml_path_errors_include_source_context(
-    tmp_path: Path,
-) -> None:
-    path = tmp_path / "statement.yaml"
-    path.write_text(INVALID_TOP_LEVEL_METADATA_YAML)
-    workflows = AsyncRecordingWorkflows()
-    client = _async_client(workflows)
-
-    with pytest.raises(ValueError) as create_exc:
-        await client.create_extraction_workflow(
-            path=path,
-            name="statement extraction",
-        )
-
-    create_message = str(create_exc.value)
-    assert str(path) in create_message
-    assert "unsupported top-level metadata [unsupported_policy_version]" in create_message
-
-    with pytest.raises(ValueError) as update_exc:
-        await client.update_extraction_workflow(
-            "workflow-1",
-            path=path,
-            name="statement extraction",
-        )
-
-    update_message = str(update_exc.value)
-    assert str(path) in update_message
-    assert "unsupported top-level metadata [unsupported_policy_version]" in update_message
-    assert workflows.calls == []
+    assert workflows.calls == [("get", "workflow-1", request_options)]
+    assert definition.extract == EXECUTION_ONLY_EXTRACT
+    assert definition.template == {
+        "{{LANGUAGE}}": "English",
+        "{{LANGUAGE_UNKNOWN}}": "",
+    }
+    assert definition.prepared is None

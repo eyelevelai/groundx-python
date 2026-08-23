@@ -63,7 +63,7 @@ def test_extraction_workflow_helpers_have_method_level_docstrings() -> None:
 
     update_doc = inspect.getdoc(GroundX.update_extraction_workflow)
     assert update_doc is not None
-    assert "full extraction workflow settings" in update_doc
+    assert "Cashbot owns validation" in update_doc
 
 
 def test_base_groundx_import_does_not_import_extract_optional_dependencies() -> None:
@@ -139,7 +139,7 @@ def test_extraction_methods_raise_install_hint_when_extract_extra_is_missing(
         client.load_extraction_definition_from_yaml(yaml_text=CUSTOM_WORKFLOW_YAML)
 
 
-def test_create_extraction_workflow_sends_custom_steps_after_generated_client_release() -> None:
+def test_create_extraction_workflow_sends_only_authored_yaml() -> None:
     captured: typing.List[httpx.Request] = []
 
     def handler(request: httpx.Request) -> httpx.Response:
@@ -167,12 +167,7 @@ def test_create_extraction_workflow_sends_custom_steps_after_generated_client_re
 
     assert len(captured) == 1
     payload = _request_json(captured[0])
-    assert payload["customSteps"][0]["name"] == "line_item_labels"
-    assert payload["customSteps"][0]["requiredTemplateKeys"] == ["{{LANGUAGE}}"]
-    assert payload["template"] == {
-        "{{LANGUAGE}}": "English",
-        "{{LANGUAGE_UNKNOWN}}": "",
+    assert payload == {
+        "name": "statement extraction",
+        "yaml": CUSTOM_WORKFLOW_YAML,
     }
-    assert payload["steps"]["chunk-keys"] is None
-    assert payload["outputRoutes"][0]["stepName"] == "line_item_labels"
-    assert payload["leafFields"][0]["stepName"] == "line_item_labels"

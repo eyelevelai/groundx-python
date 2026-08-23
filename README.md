@@ -44,12 +44,6 @@ client.ingest(
 
 ## Extraction Workflows
 
-Extraction workflow helpers require the extract extra:
-
-```sh
-pip install "groundx[extract]"
-```
-
 Create or update an extraction workflow directly from a YAML file:
 
 ```python
@@ -69,17 +63,22 @@ client.update_extraction_workflow(
 )
 ```
 
-Load an extraction definition when you need to inspect or reuse settings:
+The SDK sends the YAML unchanged. GroundX validates and compiles it.
 
-```python
-definition = client.load_extraction_definition(path="statement.yaml")
-existing = client.load_extraction_definition(workflow_id="workflow-id")
+Server workflow metadata readback requires the extract extra:
+
+```sh
+pip install "groundx[extract]"
 ```
 
-If `workflow_id` is provided, the SDK loads from that workflow before considering
-YAML inputs. For create/update, pass `path=...` directly for the common case or
-pass `definition=...` when you already loaded one; `definition` takes precedence
-over YAML inputs.
+Load an existing workflow when you need its compiled extraction metadata:
+
+```python
+existing = client.load_extraction_definition_from_workflow("workflow-id")
+```
+
+For create and update, pass exactly one of `path=...` or `yaml_text=...`.
+Compiled definitions, mappings, and prepared objects are not authoring inputs.
 
 Workflow assignment is still explicit. After creating a workflow, assign it to a
 bucket, group, or account with the normal workflow API.
