@@ -1,36 +1,13 @@
 import json
 from pathlib import Path
-import typing
 
 import pytest
 
-from groundx import GroundX
 from groundx.extract import prepare_extraction_yaml
-
 
 FIXTURE_DIR = Path(__file__).parent / "fixtures"
 CONTRACT_YAML = FIXTURE_DIR / "extraction_yaml_contract_v1.yaml"
 EXPECTED_JSON = FIXTURE_DIR / "extraction_yaml_contract_v1.expected.json"
-
-
-class RecordingWorkflows:
-    def __init__(self, response: typing.Any = None) -> None:
-        self.response = response
-        self.calls: typing.List[typing.Tuple[typing.Any, ...]] = []
-
-    def create(self, **kwargs: typing.Any) -> str:
-        self.calls.append(("create", kwargs))
-        return "created"
-
-    def update(self, id: str, **kwargs: typing.Any) -> str:
-        self.calls.append(("update", id, kwargs))
-        return "updated"
-
-
-def _client(workflows: RecordingWorkflows) -> GroundX:
-    client = GroundX.__new__(GroundX)
-    typing.cast(typing.Any, client)._workflows = workflows
-    return client
 
 
 def test_contract_fixture_compiles_to_expected_payload() -> None:
@@ -69,26 +46,6 @@ def test_pseudo_groups_create_custom_workflow_routes_and_preserve_agent_chain() 
     ]
     assert "workflow_step" not in authored["_pseudo_groups"]["statement_identity"]
     assert "workflow_output_key" not in json.dumps(authored)
-
-
-def test_create_update_persist_agent_chain_only_inside_extract() -> None:
-    workflows = RecordingWorkflows()
-    client = _client(workflows)
-
-    client.create_extraction_workflow(path=CONTRACT_YAML, name="statement extraction")
-    client.update_extraction_workflow(
-        "workflow-1",
-        path=CONTRACT_YAML,
-        name="statement extraction",
-    )
-
-    create_kwargs = workflows.calls[0][1]
-    update_kwargs = workflows.calls[1][2]
-    for kwargs in (create_kwargs, update_kwargs):
-        assert "agent_chain" not in kwargs
-        assert kwargs["extract"]["workflow"]["agent_chain"] == (
-            kwargs["extract"]["_groundx_persisted_extract"]["workflow"]["agent_chain"]
-        )
 
 
 def test_agent_chain_rejects_map_shape() -> None:
@@ -181,9 +138,7 @@ statement:
     with pytest.raises(ValueError, match="missing.*is not a workflow group"):
         prepare_extraction_yaml(unknown_group)
 
-    unknown_task = unknown_group.replace(
-        "reconcile_statement", "unknown_task"
-    ).replace("missing", "statement")
+    unknown_task = unknown_group.replace("reconcile_statement", "unknown_task").replace("missing", "statement")
     with pytest.raises(ValueError, match="unsupported task"):
         prepare_extraction_yaml(unknown_task)
 
@@ -351,9 +306,7 @@ generic_group_c:
 
     reloaded = prepare_extraction_yaml(prepared.persisted_workflow_extract)
 
-    reloaded_authored = reloaded.persisted_workflow_extract[
-        "_groundx_persisted_extract"
-    ]
+    reloaded_authored = reloaded.persisted_workflow_extract["_groundx_persisted_extract"]
     assert reloaded_authored["generic_group_a"]["role"] == "statement"
     assert reloaded_authored["generic_group_b"]["role"] == "meters"
     assert reloaded_authored["generic_group_c"]["role"] == "charges"

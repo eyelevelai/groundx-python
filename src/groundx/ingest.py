@@ -114,6 +114,27 @@ def _select_extraction_definition_loader_source(
     return selected[0]
 
 
+def _read_authored_extraction_yaml(
+    *,
+    path: typing.Any = OMIT,
+    yaml_text: typing.Any = OMIT,
+) -> str:
+    selected = [name for name, value in (("path", path), ("yaml_text", yaml_text)) if value is not OMIT]
+    if len(selected) != 1:
+        if not selected:
+            raise ValueError("expected exactly one source: path, yaml_text")
+        raise ValueError("expected exactly one source from path, yaml_text; received path, yaml_text")
+
+    if path is not OMIT:
+        if not isinstance(path, (str, os.PathLike)):
+            raise TypeError("path must be a string or path-like object")
+        return Path(os.path.expanduser(os.fspath(path))).read_bytes().decode("utf-8")
+
+    if not isinstance(yaml_text, str):
+        raise TypeError("yaml_text must be a string")
+    return yaml_text
+
+
 def get_presigned_url(
     endpoint: str,
     file_name: str,
@@ -450,52 +471,22 @@ class GroundX(GroundXBase):
     def create_extraction_workflow(
         self,
         *,
-        definition: typing.Any = OMIT,
         path: typing.Any = OMIT,
         yaml_text: typing.Any = OMIT,
-        mapping: typing.Any = OMIT,
-        prepared: typing.Any = OMIT,
-        mapping_kind: typing.Optional[str] = None,
         name: typing.Optional[str] = None,
-        chunk_strategy: typing.Any = OMIT,
-        section_strategy: typing.Any = OMIT,
-        steps: typing.Any = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Any:
         """
-        Create an extraction workflow from a definition or YAML/prepared source.
-
-        Extraction workflow helpers require the extract extra:
-        `pip install groundx[extract]`.
+        Create an extraction workflow from authored YAML.
 
         Parameters
         ----------
-        definition : typing.Any
-            An `ExtractionDefinition` returned by an extraction definition
-            loader.
         path : typing.Any
             Path to an authored extraction YAML file.
         yaml_text : typing.Any
             Authored extraction YAML as a string.
-        mapping : typing.Any
-            Authored YAML-shaped mapping, or a workflow extract mapping when
-            `mapping_kind="workflow_extract"` is set.
-        prepared : typing.Any
-            A `PreparedExtractionYaml` returned by `prepare_extraction_yaml`.
-        mapping_kind : typing.Optional[str]
-            Use `"workflow_extract"` only when `mapping` is an existing workflow
-            extract payload. Existing workflow extracts are structurally
-            validated and preserved without recompiling their authored source.
         name : typing.Optional[str]
             Workflow name. Required for create.
-        chunk_strategy : typing.Any
-            Optional workflow chunk strategy override.
-        section_strategy : typing.Any
-            Optional workflow section strategy override.
-        steps : typing.Any
-            Optional fixed workflow step overlay. When omitted and the
-            definition has custom steps, fixed default extraction steps are
-            disabled.
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration forwarded to the generated workflow
             client.
@@ -515,88 +506,42 @@ class GroundX(GroundXBase):
 
         Notes
         -----
-        This delegates to `client.workflows.create(...)` after loading the
-        extraction definition and copying workflow template/custom-step settings.
-        If `definition` is provided, it takes precedence over YAML/prepared
-        inputs. Otherwise pass exactly one of `path`, `yaml_text`, `mapping`, or
-        `prepared`.
+        Pass exactly one of `path` or `yaml_text`. The SDK sends that authored
+        YAML unchanged to the workflow API. Cashbot owns validation and
+        compilation.
         Assign the returned workflow to a bucket, group, or account explicitly.
         """
-        extraction_workflows = _import_extraction_workflows()
-        resolved = extraction_workflows.resolve_extraction_definition_source(
-            definition=definition,
-            path=path,
-            yaml_text=yaml_text,
-            mapping=mapping,
-            prepared=prepared,
-            mapping_kind=mapping_kind,
-        )
-        kwargs = extraction_workflows.workflow_kwargs_from_extraction_definition(
-            resolved,
+        if not isinstance(name, str) or not name:
+            raise ValueError("workflow name is required")
+        yaml_source = _read_authored_extraction_yaml(path=path, yaml_text=yaml_text)
+        return self.workflows.create(
             name=name,
-            require_name=True,
-            chunk_strategy=chunk_strategy,
-            section_strategy=section_strategy,
-            steps=steps,
+            yaml=yaml_source,
             request_options=request_options,
         )
-        extraction_workflows.ensure_workflow_method_supports_kwargs(
-            self.workflows.create,
-            kwargs,
-        )
-        return self.workflows.create(**kwargs)
 
     def update_extraction_workflow(
         self,
         workflow_id: str,
         *,
-        definition: typing.Any = OMIT,
         path: typing.Any = OMIT,
         yaml_text: typing.Any = OMIT,
-        mapping: typing.Any = OMIT,
-        prepared: typing.Any = OMIT,
-        mapping_kind: typing.Optional[str] = None,
         name: typing.Any = OMIT,
-        chunk_strategy: typing.Any = OMIT,
-        section_strategy: typing.Any = OMIT,
-        steps: typing.Any = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Any:
         """
-        Update an extraction workflow from a definition or YAML/prepared source.
-
-        Extraction workflow helpers require the extract extra:
-        `pip install groundx[extract]`.
+        Update an extraction workflow from authored YAML.
 
         Parameters
         ----------
         workflow_id : str
             Existing workflow ID to update.
-        definition : typing.Any
-            An `ExtractionDefinition` returned by an extraction definition
-            loader.
         path : typing.Any
             Path to an authored extraction YAML file.
         yaml_text : typing.Any
             Authored extraction YAML as a string.
-        mapping : typing.Any
-            Authored YAML-shaped mapping, or a workflow extract mapping when
-            `mapping_kind="workflow_extract"` is set.
-        prepared : typing.Any
-            A `PreparedExtractionYaml` returned by `prepare_extraction_yaml`.
-        mapping_kind : typing.Optional[str]
-            Use `"workflow_extract"` only when `mapping` is an existing workflow
-            extract payload.
         name : typing.Any
-            Optional workflow name to send with the full update payload.
-        chunk_strategy : typing.Any
-            Optional workflow chunk strategy override.
-        section_strategy : typing.Any
-            Optional workflow section strategy override.
-        steps : typing.Any
-            Optional fixed workflow step overlay. When omitted and the
-            definition has custom steps, fixed default extraction steps are
-            disabled.
+            Optional workflow name.
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration forwarded to the generated workflow
             client.
@@ -616,36 +561,16 @@ class GroundX(GroundXBase):
 
         Notes
         -----
-        Update sends the full extraction workflow settings, not a patch. Pass
-        the YAML or definition again so custom workflow settings are preserved.
-        If `definition` is provided, it takes precedence over YAML/prepared
-        inputs. Otherwise pass exactly one of `path`, `yaml_text`, `mapping`, or
-        `prepared`.
-        The SDK validates only the supplied definition shape here. Stored-state
-        downgrade protection is enforced server-side by the workflow API; this
-        helper does not perform a hidden `workflows.get(...)` preflight read.
+        Pass exactly one of `path` or `yaml_text`. The SDK sends that authored
+        YAML unchanged to the workflow API. Cashbot owns validation and
+        compilation.
         """
-        extraction_workflows = _import_extraction_workflows()
-        resolved = extraction_workflows.resolve_extraction_definition_source(
-            definition=definition,
-            path=path,
-            yaml_text=yaml_text,
-            mapping=mapping,
-            prepared=prepared,
-            mapping_kind=mapping_kind,
-        )
-        kwargs = extraction_workflows.workflow_kwargs_from_extraction_definition(
-            resolved,
-            name=name,
-            chunk_strategy=chunk_strategy,
-            section_strategy=section_strategy,
-            steps=steps,
-            request_options=request_options,
-        )
-        extraction_workflows.ensure_workflow_method_supports_kwargs(
-            self.workflows.update,
-            kwargs,
-        )
+        kwargs: typing.Dict[str, typing.Any] = {
+            "yaml": _read_authored_extraction_yaml(path=path, yaml_text=yaml_text),
+            "request_options": request_options,
+        }
+        if name is not OMIT:
+            kwargs["name"] = name
         return self.workflows.update(workflow_id, **kwargs)
 
     def ingest(
@@ -1275,46 +1200,22 @@ class AsyncGroundX(AsyncGroundXBase):
     async def create_extraction_workflow(
         self,
         *,
-        definition: typing.Any = OMIT,
         path: typing.Any = OMIT,
         yaml_text: typing.Any = OMIT,
-        mapping: typing.Any = OMIT,
-        prepared: typing.Any = OMIT,
-        mapping_kind: typing.Optional[str] = None,
         name: typing.Optional[str] = None,
-        chunk_strategy: typing.Any = OMIT,
-        section_strategy: typing.Any = OMIT,
-        steps: typing.Any = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Any:
         """
-        Create an extraction workflow from a definition or YAML/prepared source.
+        Create an extraction workflow from authored YAML.
 
         Parameters
         ----------
-        definition : typing.Any
-            An `ExtractionDefinition` returned by an extraction definition
-            loader.
         path : typing.Any
             Path to an authored extraction YAML file.
         yaml_text : typing.Any
             Authored extraction YAML as a string.
-        mapping : typing.Any
-            Authored YAML-shaped mapping, or a workflow extract mapping when
-            `mapping_kind="workflow_extract"` is set.
-        prepared : typing.Any
-            A `PreparedExtractionYaml` returned by `prepare_extraction_yaml`.
-        mapping_kind : typing.Optional[str]
-            Use `"workflow_extract"` only when `mapping` is an existing workflow
-            extract payload.
         name : typing.Optional[str]
             Workflow name. Required for create.
-        chunk_strategy : typing.Any
-            Optional workflow chunk strategy override.
-        section_strategy : typing.Any
-            Optional workflow section strategy override.
-        steps : typing.Any
-            Optional fixed workflow step overlay.
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration forwarded to the generated workflow
             client.
@@ -1331,80 +1232,40 @@ class AsyncGroundX(AsyncGroundXBase):
         ...     name="statement extraction",
         ... )
 
-        If `definition` is provided, it takes precedence over YAML/prepared
-        inputs. Otherwise pass exactly one of `path`, `yaml_text`, `mapping`, or
-        `prepared`.
+        Pass exactly one of `path` or `yaml_text`. Cashbot validates and
+        compiles the unchanged YAML.
         """
-        extraction_workflows = _import_extraction_workflows()
-        resolved = extraction_workflows.resolve_extraction_definition_source(
-            definition=definition,
-            path=path,
-            yaml_text=yaml_text,
-            mapping=mapping,
-            prepared=prepared,
-            mapping_kind=mapping_kind,
-        )
-        kwargs = extraction_workflows.workflow_kwargs_from_extraction_definition(
-            resolved,
+        if not isinstance(name, str) or not name:
+            raise ValueError("workflow name is required")
+        yaml_source = _read_authored_extraction_yaml(path=path, yaml_text=yaml_text)
+        return await self.workflows.create(
             name=name,
-            require_name=True,
-            chunk_strategy=chunk_strategy,
-            section_strategy=section_strategy,
-            steps=steps,
+            yaml=yaml_source,
             request_options=request_options,
         )
-        extraction_workflows.ensure_workflow_method_supports_kwargs(
-            self.workflows.create,
-            kwargs,
-        )
-        return await self.workflows.create(**kwargs)
 
     async def update_extraction_workflow(
         self,
         workflow_id: str,
         *,
-        definition: typing.Any = OMIT,
         path: typing.Any = OMIT,
         yaml_text: typing.Any = OMIT,
-        mapping: typing.Any = OMIT,
-        prepared: typing.Any = OMIT,
-        mapping_kind: typing.Optional[str] = None,
         name: typing.Any = OMIT,
-        chunk_strategy: typing.Any = OMIT,
-        section_strategy: typing.Any = OMIT,
-        steps: typing.Any = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Any:
         """
-        Update an extraction workflow from a definition or YAML/prepared source.
+        Update an extraction workflow from authored YAML.
 
         Parameters
         ----------
         workflow_id : str
             Existing workflow ID to update.
-        definition : typing.Any
-            An `ExtractionDefinition` returned by an extraction definition
-            loader.
         path : typing.Any
             Path to an authored extraction YAML file.
         yaml_text : typing.Any
             Authored extraction YAML as a string.
-        mapping : typing.Any
-            Authored YAML-shaped mapping, or a workflow extract mapping when
-            `mapping_kind="workflow_extract"` is set.
-        prepared : typing.Any
-            A `PreparedExtractionYaml` returned by `prepare_extraction_yaml`.
-        mapping_kind : typing.Optional[str]
-            Use `"workflow_extract"` only when `mapping` is an existing workflow
-            extract payload.
         name : typing.Any
-            Optional workflow name to send with the full update payload.
-        chunk_strategy : typing.Any
-            Optional workflow chunk strategy override.
-        section_strategy : typing.Any
-            Optional workflow section strategy override.
-        steps : typing.Any
-            Optional fixed workflow step overlay.
+            Optional workflow name.
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration forwarded to the generated workflow
             client.
@@ -1424,35 +1285,15 @@ class AsyncGroundX(AsyncGroundXBase):
 
         Notes
         -----
-        Update sends the full extraction workflow settings, not a patch. If
-        `definition` is provided, it takes precedence over YAML/prepared inputs.
-        Otherwise pass exactly one of `path`, `yaml_text`, `mapping`, or
-        `prepared`.
-        The SDK validates only the supplied definition shape here. Stored-state
-        downgrade protection is enforced server-side by the workflow API; this
-        helper does not perform a hidden `workflows.get(...)` preflight read.
+        Pass exactly one of `path` or `yaml_text`. Cashbot validates and
+        compiles the unchanged YAML.
         """
-        extraction_workflows = _import_extraction_workflows()
-        resolved = extraction_workflows.resolve_extraction_definition_source(
-            definition=definition,
-            path=path,
-            yaml_text=yaml_text,
-            mapping=mapping,
-            prepared=prepared,
-            mapping_kind=mapping_kind,
-        )
-        kwargs = extraction_workflows.workflow_kwargs_from_extraction_definition(
-            resolved,
-            name=name,
-            chunk_strategy=chunk_strategy,
-            section_strategy=section_strategy,
-            steps=steps,
-            request_options=request_options,
-        )
-        extraction_workflows.ensure_workflow_method_supports_kwargs(
-            self.workflows.update,
-            kwargs,
-        )
+        kwargs: typing.Dict[str, typing.Any] = {
+            "yaml": _read_authored_extraction_yaml(path=path, yaml_text=yaml_text),
+            "request_options": request_options,
+        }
+        if name is not OMIT:
+            kwargs["name"] = name
         return await self.workflows.update(workflow_id, **kwargs)
 
     async def ingest(
