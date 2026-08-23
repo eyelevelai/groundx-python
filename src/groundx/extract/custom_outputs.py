@@ -116,9 +116,7 @@ _EXTRACTED_FIELD_VALUE_KEYS = {"value", "_raw_text", "confidence", "conflicts", 
 _CONFLICTS_SIBLING_SUFFIX = "__conflicts"
 _RELATIONSHIP_PACKET_CAMEL_KEYS = {
     "match_attrs": "matchAttrs",
-    # Deprecated transport spellings kept for historical packets only: both
-    # fields are accepted and ignored, never honored, and are removed from
-    # canonical selector behavior by the compiler migration.
+    # Historical packet aliases are accepted but ignored.
     "parent_passthrough_attrs": "parentPassthroughAttrs",
     "multiple_match_strategy": "multipleMatchStrategy",
 }
