@@ -12,4 +12,4 @@
 - [x] 2.1 Add renamed-group regressions for parallel and serial chains.
 - [x] 2.2 Pass focused and full repository tests on a supported Python version.
 - [x] 2.3 Pass the promoted four-case owner replay.
-- [ ] 2.4 Merge PR #78 through normal repository gates and archive this change.
+- [x] 2.4 Merge PR #78 through normal repository gates and archive this change.
