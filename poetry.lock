@@ -339,17 +339,17 @@ files = [
 
 [[package]]
 name = "boto3"
-version = "1.43.76"
+version = "1.43.78"
 description = "The AWS SDK for Python"
 optional = true
 python-versions = ">=3.10"
 files = [
-    {file = "boto3-1.43.76-py3-none-any.whl", hash = "sha256:249f55274aef9fa3b9de6afb6f5b2effbbb15c5263d97c13e7b691f479a62c04"},
-    {file = "boto3-1.43.76.tar.gz", hash = "sha256:fa4dc85f735bb67d8f82e42ac50af7e1d2c039aeacf40c878067c9046464b6ad"},
+    {file = "boto3-1.43.78-py3-none-any.whl", hash = "sha256:893f06a171469618e17de78dc927aca6e74fcf45a70d2c5918e9ac9919e96cc9"},
+    {file = "boto3-1.43.78.tar.gz", hash = "sha256:2fa59116e298171ef59e7600a8be6c01177faef8af4b9a4314b7a57a04009ada"},
 ]
 
 [package.dependencies]
-botocore = ">=1.43.76,<1.44.0"
+botocore = ">=1.43.78,<1.44.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.19.0,<0.20.0"
 
@@ -358,13 +358,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.43.76"
+version = "1.43.78"
 description = "Low-level, data-driven core of boto 3."
 optional = true
 python-versions = ">=3.10"
 files = [
-    {file = "botocore-1.43.76-py3-none-any.whl", hash = "sha256:1f19bc9f388db571ca2385ea9fb8b58f4e01d4ff20fa225cff698ea123feb6f7"},
-    {file = "botocore-1.43.76.tar.gz", hash = "sha256:2b0325a0b4523ccb83b84a7acf7c3eade9f9e6be51a6769a01014df343744f5d"},
+    {file = "botocore-1.43.78-py3-none-any.whl", hash = "sha256:ddd020493235e264b3bd12606f239a3d3b2dd7cfb1d25a0691061183c290c228"},
+    {file = "botocore-1.43.78.tar.gz", hash = "sha256:e8238d22c1e1342025d75d2e33d154a375e7caad0fc67f77d77faa2d82668b94"},
 ]
 
 [package.dependencies]
@@ -1207,19 +1207,18 @@ uritemplate = ">=3.0.1,<5"
 
 [[package]]
 name = "google-api-python-client-stubs"
-version = "1.39.0"
+version = "1.40.0"
 description = "Type stubs for google-api-python-client"
 optional = true
-python-versions = ">=3.7"
+python-versions = ">=3.10"
 files = [
-    {file = "google_api_python_client_stubs-1.39.0-py3-none-any.whl", hash = "sha256:eedef91ce51cf7a83ac861608dbfee5b995f9d7e89bbe4d1dad334cb8b6a8326"},
-    {file = "google_api_python_client_stubs-1.39.0.tar.gz", hash = "sha256:c5af3e779011cc3447e0ab89c72159351da7495692201d08a0d23e6b7b67c097"},
+    {file = "google_api_python_client_stubs-1.40.0-py3-none-any.whl", hash = "sha256:aa2b6cf8ea354970f1100e189ac176ae096d7d22846083a9a086d0f7f4a1858e"},
+    {file = "google_api_python_client_stubs-1.40.0.tar.gz", hash = "sha256:2a573b1ee80502e9d226fa4dcdad21765ef709264ea6c2f72ef1a88f920e295a"},
 ]
 
 [package.dependencies]
-google-api-python-client = ">=2.198.0"
+google-api-python-client = ">=2.199.0"
 types-httplib2 = ">=0.22.0.2"
-typing-extensions = ">=3.10.0"
 
 [[package]]
 name = "google-auth"
@@ -3430,13 +3429,13 @@ files = [
 
 [[package]]
 name = "types-boto3"
-version = "1.43.76"
-description = "Type annotations for boto3 1.43.76 generated with mypy-boto3-builder 8.12.0"
+version = "1.43.78"
+description = "Type annotations for boto3 1.43.78 generated with mypy-boto3-builder 8.12.0"
 optional = true
 python-versions = ">=3.9"
 files = [
-    {file = "types_boto3-1.43.76-py3-none-any.whl", hash = "sha256:1511d9c9594fe70cfe112e71489743eab353d6f07f41e123f2d10393e46683bf"},
-    {file = "types_boto3-1.43.76.tar.gz", hash = "sha256:8f85ac452624c97056b7bba323c9b0deb4de624aba2e40d582b40389d54fcfc1"},
+    {file = "types_boto3-1.43.78-py3-none-any.whl", hash = "sha256:482536844d81914cdbebcc3d5570310670931d9ec938a38f687ce305292f47f6"},
+    {file = "types_boto3-1.43.78.tar.gz", hash = "sha256:e7ae12c099e5d500227cc8a8a4e9fffc85fc72c0cbd15427de0d209b34e18785"},
 ]
 
 [package.dependencies]
@@ -3500,7 +3499,7 @@ bedrock-data-automation-runtime = ["types-boto3-bedrock-data-automation-runtime 
 bedrock-runtime = ["types-boto3-bedrock-runtime (>=1.43.0,<1.44.0)"]
 billing = ["types-boto3-billing (>=1.43.0,<1.44.0)"]
 billingconductor = ["types-boto3-billingconductor (>=1.43.0,<1.44.0)"]
-boto3 = ["boto3 (==1.43.76)"]
+boto3 = ["boto3 (==1.43.78)"]
 braket = ["types-boto3-braket (>=1.43.0,<1.44.0)"]
 budgets = ["types-boto3-budgets (>=1.43.0,<1.44.0)"]
 ce = ["types-boto3-ce (>=1.43.0,<1.44.0)"]
