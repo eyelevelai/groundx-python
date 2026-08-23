@@ -411,6 +411,11 @@ class GroundX(GroundXBase):
         sources are compiled into a prepared definition. Mixed payloads that
         leak authoring-only workflow metadata into execution extracts are
         rejected.
+        Loading authored YAML sources runs the deprecated local compiler and
+        emits a `DeprecationWarning`; it will be removed in the next breaking
+        SDK release. Submit authored YAML unchanged with
+        `create_extraction_workflow`/`update_extraction_workflow` and read
+        workflows back with `load_extraction_definition_from_workflow`.
         """
         extraction_workflows = _import_extraction_workflows()
         return extraction_workflows.load_extraction_definition_from_yaml(
@@ -1145,6 +1150,11 @@ class AsyncGroundX(AsyncGroundXBase):
         sources are compiled into a prepared definition. Mixed payloads that
         leak authoring-only workflow metadata into execution extracts are
         rejected.
+        Loading authored YAML sources runs the deprecated local compiler and
+        emits a `DeprecationWarning`; it will be removed in the next breaking
+        SDK release. Submit authored YAML unchanged with
+        `create_extraction_workflow`/`update_extraction_workflow` and read
+        workflows back with `load_extraction_definition_from_workflow`.
         """
         extraction_workflows = _import_extraction_workflows()
         return extraction_workflows.load_extraction_definition_from_yaml(

@@ -5,6 +5,7 @@ import hashlib
 import json
 import re
 import typing
+import warnings
 
 import yaml
 from ..classes.element import Element
@@ -2317,7 +2318,7 @@ def _resolve_pseudo_workflow_metadata(
     return resolved
 
 
-def prepare_extraction_yaml(
+def _prepare_extraction_yaml(
     raw_yaml: typing.Union[str, typing.Mapping[str, typing.Any]],
     top_level_metadata_keys: typing.Optional[typing.Iterable[str]] = None,
     final_group_metadata_keys: typing.Optional[typing.Iterable[str]] = None,
@@ -2648,6 +2649,36 @@ def prepare_extraction_yaml(
     )
 
 
+_PREPARE_EXTRACTION_YAML_DEPRECATION = (
+    "prepare_extraction_yaml is deprecated and will be removed in the next "
+    "breaking GroundX SDK release; Cashbot owns workflow validation and "
+    "compilation. Submit authored YAML unchanged with "
+    "create_extraction_workflow/update_extraction_workflow and read workflows "
+    "back with load_extraction_definition_from_workflow."
+)
+
+
+def prepare_extraction_yaml(
+    raw_yaml: typing.Union[str, typing.Mapping[str, typing.Any]],
+    top_level_metadata_keys: typing.Optional[typing.Iterable[str]] = None,
+    final_group_metadata_keys: typing.Optional[typing.Iterable[str]] = None,
+    workflow_group_metadata_keys: typing.Optional[typing.Iterable[str]] = None,
+    pseudo_group_metadata_keys: typing.Optional[typing.Iterable[str]] = None,
+) -> PreparedExtractionYaml:
+    warnings.warn(
+        _PREPARE_EXTRACTION_YAML_DEPRECATION,
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    return _prepare_extraction_yaml(
+        raw_yaml,
+        top_level_metadata_keys=top_level_metadata_keys,
+        final_group_metadata_keys=final_group_metadata_keys,
+        workflow_group_metadata_keys=workflow_group_metadata_keys,
+        pseudo_group_metadata_keys=pseudo_group_metadata_keys,
+    )
+
+
 def element_from_mapping(data: typing.Dict[str, typing.Any]) -> Element:
     if "fields" in data:
         return group_from_mapping(data)
@@ -2720,7 +2751,7 @@ def load_from_mapping(data: typing.Dict[str, typing.Any]) -> typing.Dict[str, Gr
 
 
 def load_from_yaml(raw_yaml: str) -> typing.Dict[str, Group]:
-    prepared = prepare_extraction_yaml(raw_yaml)
+    prepared = _prepare_extraction_yaml(raw_yaml)
 
     return load_from_mapping(prepared.groups)
 
