@@ -20,9 +20,11 @@ from smolagents.memory import (  # pyright: ignore[reportMissingTypeStubs]
     TaskStep,
 )
 from smolagents.models import (  # pyright: ignore[reportMissingTypeStubs]
+    REMOVE_PARAMETER,
     ChatMessage,
     MessageRole,
     OpenAIServerModel,
+    supports_stop_parameter,
 )
 
 if typing.TYPE_CHECKING:
@@ -39,6 +41,7 @@ def _enforce_bedrock_request_limit(request: typing.Any) -> None:
 
 
 def _bedrock_model_options(
+    model_id: str,
     model_options: typing.Dict[str, typing.Any],
 ) -> typing.Dict[str, typing.Any]:
     import httpx
@@ -61,6 +64,12 @@ def _bedrock_model_options(
         ]
     client_kwargs["http_client"] = http_client
     options["client_kwargs"] = client_kwargs
+
+    model_id_parts = model_id.split(".")
+    model_id_candidates = [".".join(model_id_parts[index:]) for index in range(len(model_id_parts))]
+    if any(not supports_stop_parameter(candidate) for candidate in model_id_candidates):
+        options["stop"] = REMOVE_PARAMETER
+
     return options
 
 
@@ -106,7 +115,7 @@ def build_openai_server_model(settings: AgentSettings) -> OpenAIServerModel:
 
     model_options = dict(settings.model_kwargs or {})
     if settings.service == "bedrock":
-        model_options = _bedrock_model_options(model_options)
+        model_options = _bedrock_model_options(settings.model_id, model_options)
     model = OpenAIServerModel(**model_kwargs, **model_options)
 
     client = getattr(model, "client", None)
