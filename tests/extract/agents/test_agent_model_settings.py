@@ -115,7 +115,7 @@ def test_agent_model_client_uses_remaining_shared_deadline(
     assert calls[1] == {"model": "test"}
 
 
-def test_bedrock_gpt5_provider_prefix_removes_unsupported_stop() -> None:
+def test_bedrock_luna_removes_unsupported_stop_and_disables_reasoning() -> None:
     from smolagents.models import ChatMessage, MessageRole
 
     from groundx.extract.agents.agent import build_openai_server_model
@@ -136,6 +136,30 @@ def test_bedrock_gpt5_provider_prefix_removes_unsupported_stop() -> None:
 
     assert model.model_id == "openai.gpt-5.6-luna"
     assert "stop" not in completion_kwargs
+    assert completion_kwargs["reasoning_effort"] == "none"
+    model.client._client.close()
+
+
+def test_bedrock_luna_overrides_incompatible_reasoning_effort() -> None:
+    from smolagents.models import ChatMessage, MessageRole
+
+    from groundx.extract.agents.agent import build_openai_server_model
+
+    model = build_openai_server_model(
+        AgentSettings(
+            api_base="https://bedrock.example/v1",
+            api_key="test-key",
+            model_id="openai.gpt-5.6-luna",
+            reasoning_effort="medium",
+            service="bedrock",
+        )
+    )
+
+    completion_kwargs = model._prepare_completion_kwargs(
+        messages=[ChatMessage(role=MessageRole.USER, content="test")],
+    )
+
+    assert completion_kwargs["reasoning_effort"] == "none"
     model.client._client.close()
 
 

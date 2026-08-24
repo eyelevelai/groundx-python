@@ -69,6 +69,8 @@ def _bedrock_model_options(
     model_id_candidates = [".".join(model_id_parts[index:]) for index in range(len(model_id_parts))]
     if any(not supports_stop_parameter(candidate) for candidate in model_id_candidates):
         options["stop"] = REMOVE_PARAMETER
+    if "gpt-5.6-luna" in model_id_candidates:
+        options["reasoning_effort"] = "none"
 
     return options
 
@@ -116,6 +118,8 @@ def build_openai_server_model(settings: AgentSettings) -> OpenAIServerModel:
     model_options = dict(settings.model_kwargs or {})
     if settings.service == "bedrock":
         model_options = _bedrock_model_options(settings.model_id, model_options)
+        if "reasoning_effort" in model_options:
+            model_kwargs.pop("reasoning_effort", None)
     model = OpenAIServerModel(**model_kwargs, **model_options)
 
     client = getattr(model, "client", None)
