@@ -115,6 +115,30 @@ def test_agent_model_client_uses_remaining_shared_deadline(
     assert calls[1] == {"model": "test"}
 
 
+def test_bedrock_gpt5_provider_prefix_removes_unsupported_stop() -> None:
+    from smolagents.models import ChatMessage, MessageRole
+
+    from groundx.extract.agents.agent import build_openai_server_model
+
+    model = build_openai_server_model(
+        AgentSettings(
+            api_base="https://bedrock.example/v1",
+            api_key="test-key",
+            model_id="openai.gpt-5.6-luna",
+            service="bedrock",
+        )
+    )
+
+    completion_kwargs = model._prepare_completion_kwargs(
+        messages=[ChatMessage(role=MessageRole.USER, content="test")],
+        stop_sequences=["STOP"],
+    )
+
+    assert model.model_id == "openai.gpt-5.6-luna"
+    assert "stop" not in completion_kwargs
+    model.client._client.close()
+
+
 def test_bedrock_model_checks_the_final_http_request_body(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
