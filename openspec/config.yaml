@@ -78,8 +78,7 @@ rules:
     - State what the public package surface gains/changes and why; flag any breaking change
       to the published API (semver impact)
     - List downstream consumers (repos that import this package) affected
-    - For a Fern-generated repo: confirm the change targets the hand-written layer only
-      (paths on .fernignore). API-surface changes belong in the generation SOURCE repo, not here.
+    - "For a Fern-generated repo: confirm the change targets the hand-written layer only (paths on .fernignore). API-surface changes belong in the generation SOURCE repo, not here."
     - If open design questions remain after consulting AGENTS.md and existing specs, use the
       superpowers:brainstorming skill; otherwise note "none" in proposal.md
   specs:
