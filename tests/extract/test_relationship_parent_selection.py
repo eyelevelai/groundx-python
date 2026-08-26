@@ -54,10 +54,18 @@ def test_matches_equal_populated_values(parents, child) -> None:
     assert _select(parents, child).parent is parents[0]
 
 
+def test_matches_internal_whitespace_variants_without_rewriting_parent() -> None:
+    parent = {"meter_number": "M 1"}
+
+    selection = _select([parent], {"meter_number": "M  1"})
+
+    assert selection.parent is parent
+    assert selection.parent["meter_number"] == "M 1"
+
+
 @pytest.mark.parametrize(
     ("parent_value", "child_value"),
     [
-        ("M 1", "M  1"),
         ("12", 12),
         (True, 1),
         ("2026-1-2", "2026-01-02"),

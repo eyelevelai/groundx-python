@@ -19,6 +19,7 @@ if typing.TYPE_CHECKING:
         TestXRay,
         XRayDocument,
     )
+    from .comparison import match_key, values_match
     from .custom_outputs import (
         CustomOutputDiagnostic,
         CustomOutputReassemblyResult,
@@ -70,6 +71,7 @@ __all__ = [
     "GroundXSettings",
     "Group",
     "Logger",
+    "match_key",
     "ObjectStore",
     "PreparedExtractionYaml",
     "ProcessResponse",
@@ -85,6 +87,7 @@ __all__ = [
     "TestField",
     "TestXRay",
     "Upload",
+    "values_match",
     "XRayDocument",
     "prepare_extraction_yaml",
     "reassemble_custom_outputs",
@@ -114,6 +117,7 @@ _EXPORT_MODULES = {
     "GroundXSettings": ".settings",
     "Group": ".classes",
     "Logger": ".services",
+    "match_key": ".comparison",
     "ObjectStore": ".prompt.object_store",
     "PreparedExtractionYaml": ".prompt.utility",
     "ProcessResponse": ".classes",
@@ -129,6 +133,7 @@ _EXPORT_MODULES = {
     "TestField": ".classes",
     "TestXRay": ".classes",
     "Upload": ".services",
+    "values_match": ".comparison",
     "XRayDocument": ".classes",
     "prepare_extraction_yaml": ".prompt.utility",
     "reassemble_custom_outputs": ".custom_outputs",

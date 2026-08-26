@@ -535,7 +535,7 @@ def test_identity_normalization_preserves_large_integer_precision() -> None:
     ],
     ids=["fixed-partition", "threshold-index", "final-comparison"],
 )
-def test_missing_exact_attrs_preserves_exact_legacy_identity(
+def test_exact_attrs_cannot_bypass_universal_identity_matching(
     unique_attrs: list[str],
     identity_match: dict,
     force_final_comparison: bool,
@@ -595,8 +595,7 @@ def test_missing_exact_attrs_preserves_exact_legacy_identity(
             lambda self, record: (1 << len(self.records)) - 1,
         )
 
-    assert reassemble(None) == {"rows": rows}
-    assert reassemble([]) == {
+    expected = {
         "rows": [
             {
                 "fixed_identity": "GROUP-A",
@@ -606,6 +605,8 @@ def test_missing_exact_attrs_preserves_exact_legacy_identity(
             }
         ]
     }
+    assert reassemble(None) == expected
+    assert reassemble([]) == expected
 
 
 def test_advanced_identity_matching_bounds_candidate_comparisons(
@@ -3276,7 +3277,7 @@ def test_duplicate_parents_without_unique_attrs_are_not_collapsed() -> None:
     }
 
 
-def test_compiled_relationship_can_attach_ambiguous_child_to_first_parent() -> None:
+def test_compiled_relationship_dedupes_case_variant_parents_before_attachment() -> None:
     identity_attrs = (
         "record_key",
         "period_start",
@@ -3422,18 +3423,6 @@ def test_compiled_relationship_can_attach_ambiguous_child_to_first_parent() -> N
                         "value": 42,
                     }
                 ],
-            },
-            {
-                "record_key": "p-1",
-                "period_start": "2026-01-01",
-                "period_end": "2026-01-31",
-                "category": "primary",
-                "market_state": "combined",
-                "alternate_account": "A-1",
-                "alternate_provider": "Provider A",
-                "primary_provider": "Provider B",
-                "label": "second",
-                "children": [],
             },
         ],
         "children": [],

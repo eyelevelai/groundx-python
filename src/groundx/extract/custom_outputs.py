@@ -6,6 +6,7 @@ import json
 import numbers
 import typing
 
+from .comparison import match_key, values_match
 from .utility import clean_json
 
 
@@ -329,8 +330,8 @@ def select_relationship_parent(
       populates and every populated value compares equal. The first matching
       parent in stable input order wins.
     * Other relationship metadata does not affect parent selection.
-    * String comparison trims only leading and trailing whitespace before
-      case-insensitive comparison. Ints and floats remain number-normalized.
+    * String comparison ignores capitalization and whitespace and maps the
+      approved OCR-confusable classes. Ints and floats remain number-normalized.
     """
     no_selection = RelationshipParentSelection(parent=None, ambiguous=False)
     if not isinstance(relationship, typing.Mapping):
@@ -355,6 +356,12 @@ def select_relationship_parent(
             parent_value = parent.get(attr)
             if _relationship_value_absent(parent_value):
                 return False
+            parent_unwrapped = _unwrap_match_value(parent_value)
+            child_unwrapped = _unwrap_match_value(child_value)
+            if isinstance(parent_unwrapped, str) and isinstance(child_unwrapped, str):
+                if not values_match(parent_unwrapped, child_unwrapped):
+                    return False
+                continue
             if _relationship_comparison_value(parent_value) != _relationship_comparison_value(child_value):
                 return False
         return True
@@ -1744,6 +1751,10 @@ def _identity_values_match(
     second_absent = _match_value_absent(second)
     if first_absent or second_absent:
         return match_absent and first_absent and second_absent
+    first_unwrapped = _unwrap_match_value(first)
+    second_unwrapped = _unwrap_match_value(second)
+    if isinstance(first_unwrapped, str) and isinstance(second_unwrapped, str):
+        return values_match(first_unwrapped, second_unwrapped)
     return _identity_comparison_value(
         first,
         exact=exact,
@@ -1805,18 +1816,8 @@ def _hashable_identity_value(value: typing.Any, *, exact: bool = False) -> typin
 
 
 def _identity_comparison_value(value: typing.Any, *, exact: bool) -> typing.Any:
-    if not exact:
-        return _normalize_match_value(value)
-    unwrapped = _unwrap_match_value(value)
-    if isinstance(unwrapped, bool):
-        return ("bool", unwrapped)
-    if isinstance(unwrapped, int):
-        return ("number", unwrapped)
-    if isinstance(unwrapped, float):
-        if unwrapped.is_integer():
-            return ("number", int(unwrapped))
-        return ("float", unwrapped)
-    return unwrapped
+    del exact
+    return _normalize_match_value(value)
 
 
 def _identity_exact_attrs(
@@ -2004,8 +2005,7 @@ def _relationship_value_absent(value: typing.Any) -> bool:
 def _relationship_comparison_value(value: typing.Any) -> typing.Any:
     """Normalize a match value for relationship comparison.
 
-    Strings trim only their leading and trailing whitespace before
-    case-insensitive comparison. Ints and floats compare as numbers, and
+    Strings use the shared extraction identity key. Ints and floats compare as numbers, and
     differently-typed values never compare equal. Booleans stay distinct from
     numbers, and structured values compare structurally with the same string
     normalization.
@@ -2018,7 +2018,7 @@ def _relationship_comparison_value(value: typing.Any) -> typing.Any:
     if isinstance(unwrapped, numbers.Real):
         return ("number", float(unwrapped))
     if isinstance(unwrapped, str):
-        return ("string", unwrapped.strip().lower())
+        return ("string", match_key(unwrapped))
     if isinstance(unwrapped, typing.Mapping):
         mapping = typing.cast(typing.Mapping[typing.Any, typing.Any], unwrapped)
         return (
@@ -2044,7 +2044,7 @@ def _relationship_comparison_value(value: typing.Any) -> typing.Any:
 def _normalize_match_value(value: typing.Any) -> typing.Any:
     unwrapped = _unwrap_match_value(value)
     if isinstance(unwrapped, str):
-        return unwrapped.strip().casefold()
+        return match_key(unwrapped)
     if isinstance(unwrapped, bool):
         return ("boolean", unwrapped)
     if isinstance(unwrapped, numbers.Integral):
