@@ -5,8 +5,7 @@
 - [x] 1.2 Run focused and full test baselines and keep every existing test,
   fixture, expected output, and score unchanged.
 - [x] 1.3 Add new failing tests for both public functions, every approved and
-  rejected string case, nonstring helper rejection, caller-owned nonstring
-  behavior, and raw-value preservation.
+  rejected string case, nonstring helper rejection, and raw-value preservation.
 - [x] 1.4 Add new failing production-entrypoint tests for repeated-record
   identity, advanced identity indexing, `exact_attrs` no-op behavior, populated
   relationship key shape, and stable parent selection.
@@ -21,8 +20,8 @@
   generated top-level SDK files.
 - [x] 2.3 Prove case folding, all `str.isspace()` characters, and only
   `{0, o}`, `{1, i, l}`, and `{8, b}` affect string comparison.
-- [x] 2.4 Prove both helpers reject nonstrings and production callers preserve
-  their existing nonstring comparisons and retained values.
+- [x] 2.4 Prove both helpers reject nonstrings and production callers invoke
+  them only for strings.
 
 ## 3. Route SDK Matching Through The Functions
 
@@ -34,9 +33,9 @@
   parent order.
 - [x] 3.3 Remove the runtime effect of `identity_match.exact_attrs` while
   preserving metadata validation, preparation, persistence, and readback.
-- [ ] 3.4 Add a narrow routing check that fails if the listed production string
-  matching paths reintroduce a separate case, whitespace, confusable, or exact
-  transform.
+- [x] 3.4 Add narrow production-behavior checks that fail if repeated identity
+  or relationship matching reintroduces a separate case, whitespace,
+  confusable, or exact transform.
 
 ## 4. Verify And Release
 

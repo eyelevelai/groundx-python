@@ -52,12 +52,9 @@ For a string, `match_key` performs one linear pass after `casefold()`:
 3. Preserve every other character and the resulting length.
 
 Whitespace-only strings remain absent where the existing caller already treats
-them as absent. Callers unwrap values and select their existing number, boolean,
-mapping, list, extracted-field wrapper, absence, and unsupported-type behavior
-before invoking either function. Callers that need hashable structured keys
-retain their current typed wrappers and call `match_key` only for string
-components. This prevents Python equality such as `True == 1` from becoming
-matcher behavior.
+them as absent. Callers invoke these functions only for strings. Existing
+nonstring comparison, structured-key, absence, and unsupported-type behavior
+remains outside this matcher.
 
 This restricted implementation is safer than an open-source Unicode skeleton
 library. Unicode security libraries create many equivalences that were not
@@ -88,9 +85,9 @@ conflicts, provenance, diagnostics, and final output.
 
 New tests cover case, every whitespace form, each approved class, combined
 differences, punctuation, unmapped characters, unequal lengths, whitespace-only
-values, nonstring helper rejection, existing caller behavior for mixed and
-nonstring values, structured identity values, stable parent order, populated-key
-shape, raw-value retention, and `exact_attrs` no-op behavior.
+values, nonstring helper rejection, structured string identity values, stable
+parent order, populated-key shape, raw-value retention, and `exact_attrs` no-op
+behavior.
 
 Existing tests run unchanged. If an existing assertion fails because the new
 equality is intentional, implementation stops before editing it and records the

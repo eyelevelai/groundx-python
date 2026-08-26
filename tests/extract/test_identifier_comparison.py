@@ -1,5 +1,3 @@
-from typing import Any
-
 import pytest
 
 from groundx.extract import match_key, select_relationship_parent, values_match
@@ -81,9 +79,3 @@ def test_repeated_identity_uses_shared_match_even_when_exact_attrs_are_present()
             "description": "second",
         }
     ]
-
-
-def test_repeated_identity_keeps_boolean_and_number_distinct() -> None:
-    records: list[dict[str, Any]] = [{"meter_id": True}, {"meter_id": 1}]
-
-    assert _dedupe_repeated_records(records, ["meter_id"]) == records

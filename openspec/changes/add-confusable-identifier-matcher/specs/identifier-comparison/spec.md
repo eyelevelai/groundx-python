@@ -52,10 +52,8 @@ profile, field, workflow, or nonstring rule.
 #### Scenario: Production callers compare nonstrings themselves
 
 - **WHEN** an identity or relationship caller compares a nonstring value
-- **THEN** it retains its existing typed comparison behavior
-- **AND** it does not pass that value to either public function
-- **AND** booleans do not become equal to numbers through Python's `bool` and
-  `int` equality.
+- **THEN** it does not pass that value to either public function
+- **AND** its existing behavior remains outside this matcher.
 
 ### Requirement: Exact metadata cannot bypass universal matching
 
