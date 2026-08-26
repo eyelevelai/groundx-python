@@ -10,11 +10,13 @@ case, whitespace, and approved OCR-confusable handling for both.
 
 ## What Changes
 
-- Add public `match_key(value)` and `values_match(left, right)` functions to the
-  hand-written `groundx.extract` package.
-- For strings only, case-fold, remove whitespace, and map the approved classes
-  `{0, o}`, `{1, i, l}`, and `{8, b}`. Preserve punctuation, length, unmapped
-  characters, and current nonstring behavior.
+- Add public string-only `match_key(value: str) -> str` and
+  `values_match(left: str, right: str) -> bool` functions to the hand-written
+  `groundx.extract` package.
+- Case-fold strings, remove whitespace, and map the approved classes `{0, o}`,
+  `{1, i, l}`, and `{8, b}`. Preserve punctuation, length, and unmapped
+  characters. Reject nonstring helper inputs; production callers retain their
+  existing nonstring comparison behavior.
 - Route every string component of repeated-record identity keys and relationship
   comparisons through those functions.
 - Retire `identity_match.exact_attrs` as a runtime matching switch. Continue
@@ -49,8 +51,11 @@ case, whitespace, and approved OCR-confusable handling for both.
 - `tests/extract/`: adds function and production-entrypoint regressions.
 - `internal-arcadia-agents`: consumes the released functions under its separate
   `adopt-confusable-identifier-matcher` change and updates its SDK pin.
-- No dependency, Fern source, generated SDK, API, workflow YAML, Cashbot,
-  Harness, database, or stored-data change.
+- `eyelevel-fern-config`: a separate docs-only
+  `document-universal-identifier-matching` change updates the public workflow
+  contract before the SDK release.
+- No dependency, Fern API schema, generated SDK shape, API, workflow YAML,
+  Cashbot, Harness, database, or stored-data change.
 - All touched source, tests, and OpenSpec paths are protected by `.fernignore`.
 - Open design questions: none.
 

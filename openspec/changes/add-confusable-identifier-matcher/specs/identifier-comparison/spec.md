@@ -2,9 +2,9 @@
 
 ### Requirement: One function owns string comparison keys
 
-GroundX Python SHALL export `match_key(value)` from `groundx.extract`.
-For string input it SHALL return a transient comparison string. For nonstring
-input it SHALL return the input unchanged.
+GroundX Python SHALL export `match_key(value: str) -> str` from
+`groundx.extract`. It SHALL return a transient comparison string and reject
+nonstring input.
 
 #### Scenario: String extraction noise is ignored
 
@@ -19,18 +19,21 @@ input it SHALL return the input unchanged.
   or an unmapped character
 - **THEN** `match_key` returns different values.
 
-#### Scenario: Nonstrings are not transformed
+#### Scenario: The key function rejects nonstrings
 
 - **WHEN** `match_key` receives a missing, numeric, boolean, list, mapping, or
   other nonstring value
-- **THEN** it returns that value unchanged
-- **AND** the caller retains its existing type, absence, and hashability rules.
+- **THEN** it raises `TypeError`
+- **AND** production callers retain their existing type, absence, comparison,
+  and hashability rules without passing that value to `match_key`.
 
 ### Requirement: One equality wrapper delegates to the key function
 
-GroundX Python SHALL export `values_match(left, right)` from `groundx.extract`.
-It SHALL return `match_key(left) == match_key(right)` and SHALL contain no second
-case, whitespace, confusable, exact, profile, field, or workflow rule.
+GroundX Python SHALL export
+`values_match(left: str, right: str) -> bool` from `groundx.extract`. For two
+strings it SHALL return `match_key(left) == match_key(right)`. It SHALL reject
+nonstring input and contain no second case, whitespace, confusable, exact,
+profile, field, workflow, or nonstring rule.
 
 #### Scenario: Direct comparison uses the same transformation
 
@@ -45,6 +48,14 @@ case, whitespace, confusable, exact, profile, field, or workflow rule.
   sorting values, rendered values, or transport values
 - **THEN** it retains its existing behavior
 - **AND** it does not use these functions merely because it compares values.
+
+#### Scenario: Production callers compare nonstrings themselves
+
+- **WHEN** an identity or relationship caller compares a nonstring value
+- **THEN** it retains its existing typed comparison behavior
+- **AND** it does not pass that value to either public function
+- **AND** booleans do not become equal to numbers through Python's `bool` and
+  `int` equality.
 
 ### Requirement: Exact metadata cannot bypass universal matching
 

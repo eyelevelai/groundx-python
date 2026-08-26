@@ -40,9 +40,10 @@ Fern regeneration.
 
 ### Two small public functions own string matching
 
-`match_key(value)` transforms strings and returns nonstrings unchanged.
-`values_match(left, right)` compares only `match_key(left)` and
-`match_key(right)`. It contains no second transformation.
+`match_key(value: str) -> str` transforms one string.
+`values_match(left: str, right: str) -> bool` compares only
+`match_key(left)` and `match_key(right)`. Both reject nonstring input and contain
+no nonstring comparison semantics or second transformation.
 
 For a string, `match_key` performs one linear pass after `casefold()`:
 
@@ -51,10 +52,12 @@ For a string, `match_key` performs one linear pass after `casefold()`:
 3. Preserve every other character and the resulting length.
 
 Whitespace-only strings remain absent where the existing caller already treats
-them as absent. Existing number, boolean, mapping, list, extracted-field wrapper,
-and unsupported-type behavior remains at the caller boundary. Callers that need
-hashable structured keys retain their current typed wrappers, but every string
-component passes through `match_key`.
+them as absent. Callers unwrap values and select their existing number, boolean,
+mapping, list, extracted-field wrapper, absence, and unsupported-type behavior
+before invoking either function. Callers that need hashable structured keys
+retain their current typed wrappers and call `match_key` only for string
+components. This prevents Python equality such as `True == 1` from becoming
+matcher behavior.
 
 This restricted implementation is safer than an open-source Unicode skeleton
 library. Unicode security libraries create many equivalences that were not
@@ -85,9 +88,9 @@ conflicts, provenance, diagnostics, and final output.
 
 New tests cover case, every whitespace form, each approved class, combined
 differences, punctuation, unmapped characters, unequal lengths, whitespace-only
-values, mixed and nonstring values, structured identity values, stable parent
-order, populated-key shape, raw-value retention, and `exact_attrs` no-op
-behavior.
+values, nonstring helper rejection, existing caller behavior for mixed and
+nonstring values, structured identity values, stable parent order, populated-key
+shape, raw-value retention, and `exact_attrs` no-op behavior.
 
 Existing tests run unchanged. If an existing assertion fails because the new
 equality is intentional, implementation stops before editing it and records the
@@ -98,6 +101,12 @@ report over protected fixtures and representative private captures. It lists
 each pair of distinct raw strings that produces one key, with caller and field.
 Every unexpected collision requires human approval. The report is not a runtime
 mode and does not mutate or commit private input.
+
+The docs-only `eyelevel-fern-config`
+`document-universal-identifier-matching` change must merge before the SDK
+release. It removes the public promise that `exact_attrs` selects exact runtime
+equality and documents the universal comparison without changing the API schema,
+compiler, or workflow payload.
 
 ## Risks / Trade-offs
 
@@ -114,9 +123,10 @@ mode and does not mutate or commit private input.
 2. Exercise the Internal Arcadia implementation against this branch and run its
    collision report before publishing.
 3. Obtain approval for every unexpected collision and any existing-test change.
-4. Merge GroundX Python and hand the merged commit and requested version to the
+4. Merge the Fern public-documentation change.
+5. Merge GroundX Python and hand the merged commit and requested version to the
    human release owner.
-5. Pin the published version in Internal Arcadia, rebuild its image, and run the
+6. Pin the published version in Internal Arcadia, rebuild its image, and run the
    protected and affected-document verification.
 
 Rollback pins the prior SDK release and restores the prior Internal Arcadia
