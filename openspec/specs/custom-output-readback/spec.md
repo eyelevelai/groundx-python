@@ -181,21 +181,19 @@ metadata rather than hardcoded final group names.
   integers, floats, blanks, and missing values
 - **WHEN** the SDK applies relationship metadata
 - **THEN** extracted-field wrappers are compared by their `value`
-- **AND** strings compare case-insensitively
-- **AND** leading and trailing string whitespace is removed before comparison
-- **AND** internal string whitespace remains significant
+- **AND** strings ignore capitalization and every whitespace character
+- **AND** only `{0, o}`, `{1, i, l}`, and `{8, b}` are OCR-equivalent
+- **AND** punctuation, unmapped characters, and remaining length stay significant
 - **AND** integers and floats compare by numeric value
 - **AND** blank or missing fields do not participate
 - **AND** the parent and child only match when they have the same non-empty set
   of present match fields
-- **AND** date-style strings are not normalized by the relationship matcher.
+- **AND** date-style strings receive no special normalization.
 
-Benjamin Fletcher resolved R25b on 2026-08-05: surrounding extraction
-whitespace is formatting noise, not identifier identity. The matcher trims only
-leading and trailing string whitespace. If trimming creates multiple parent
-matches, the tie resolves to the first parent in stable input order: the
-2026-08-17 ruling makes an absent `multiple_match_strategy` default to
-`first_stable`.
+Comparison keys are transient and never replace source or output values. Legacy
+`identity_match.exact_attrs` remains readable but has no runtime effect. If the
+shared comparison creates multiple parent matches, the tie resolves to the
+first parent in stable input order.
 
 #### Scenario: Match attrs without a present key do not match
 
