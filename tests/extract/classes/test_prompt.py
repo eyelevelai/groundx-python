@@ -43,6 +43,13 @@ class TestPromptValidValue(unittest.TestCase):
         self.assertFalse(p.valid_value((1, 2, 3)))
         self.assertFalse(p.valid_value([1, 2, 3]))
 
+    def test_single_type_bool(self):
+        p = TestPrompt("field1", "bool")
+        self.assertTrue(p.valid_value(True))
+        self.assertTrue(p.valid_value(False))
+        self.assertFalse(p.valid_value(1))
+        self.assertFalse(p.valid_value("true"))
+
     def test_single_type_list(self):
         p = TestPrompt("field1", "list")
         self.assertFalse(p.valid_value("hello"))

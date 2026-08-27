@@ -27,6 +27,8 @@ class TestExtractedField(unittest.TestCase):
     def test_supported_types_use_shared_coercion(self):
         cases = [
             ("str_field", "str", True, "true"),
+            ("bool_field", "bool", True, True),
+            ("false_bool_field", "bool", False, False),
             ("int_field", "int", "3.9", 3),
             ("float_field", "float", "1,234.5", 1234.5),
             ("list_field", "list", '[1,"two"]', [1, "two"]),
@@ -38,6 +40,11 @@ class TestExtractedField(unittest.TestCase):
                 self.assertEqual(field.get_value(), expected)
                 self.assertIs(type(field.get_value()), type(expected))
                 self.assertIsNone(field.coercion_warning)
+
+    def test_bool_render_requires_native_json_boolean(self):
+        field = typed_field("enabled", "bool", False)
+
+        self.assertIn("Format:                 native JSON boolean", field.render())
 
     def test_missing_and_impossible_values_remain_null(self):
         for target in ["str", "int", "float", "list", "dict"]:

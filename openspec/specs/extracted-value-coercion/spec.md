@@ -8,9 +8,9 @@ hand-written extraction SDK.
 ### Requirement: The SDK provides one schema-driven coercion contract
 
 The hand-written extraction SDK SHALL expose one helper that accepts a JSON
-value and an optional declared type of `str`, `int`, `float`, `list`, `dict`, or
-a list of those types, and returns the selected value, match status, conversion
-status, and an optional content-free warning.
+value and an optional declared type of `str`, `int`, `float`, `bool`, `list`,
+`dict`, or a list of those types, and returns the selected value, match status,
+conversion status, and an optional content-free warning.
 
 #### Scenario: Value already matches the declared type
 
@@ -56,6 +56,17 @@ value.
 The helper SHALL convert scalar JSON values according to one shared matrix.
 Exact type checks SHALL prevent Python booleans from matching integer or float
 targets before conversion.
+
+#### Scenario: Native boolean targets bool
+
+- **WHEN** `true` or `false` is supplied for a `bool` target
+- **THEN** the helper returns the same native boolean without conversion.
+
+#### Scenario: Non-boolean targets bool
+
+- **WHEN** a string, number, list, or object is supplied for a `bool` target
+- **THEN** the helper returns null, marks it unmatched, and returns a warning
+- **AND** it does not guess truthiness.
 
 #### Scenario: Boolean targets a string
 
@@ -183,8 +194,8 @@ conversion logic. Existing date normalization SHALL remain separate.
 
 #### Scenario: Null remains null for every declared type
 
-- **WHEN** a field is missing or conversion to `str`, `int`, `float`, `list`, or
-  `dict` is impossible
+- **WHEN** a field is missing or conversion to `str`, `int`, `float`, `bool`,
+  `list`, or `dict` is impossible
 - **THEN** the field remains present with a null value through field readback and
   typed output serialization
 - **AND** the SDK does not replace null with an empty string, list, or dict.
