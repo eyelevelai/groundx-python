@@ -150,6 +150,8 @@ class ExtractedField(Element):
             elif isinstance(self.prompt.type, str):
                 if self.prompt.type == "int" or self.prompt.type == "float":
                     format = "number (float or int)"
+                elif self.prompt.type == "bool":
+                    format = "native JSON boolean"
                 elif self.prompt.type == "str":
                     format = "string"
             else:

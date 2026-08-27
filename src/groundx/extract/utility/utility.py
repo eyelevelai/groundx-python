@@ -16,6 +16,7 @@ _SUPPORTED_TYPES: typing.Dict[str, typing.Type[typing.Any]] = {
     "str": str,
     "int": int,
     "float": float,
+    "bool": bool,
     "list": list,
     "dict": dict,
 }

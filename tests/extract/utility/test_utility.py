@@ -86,6 +86,8 @@ class TestUtilCoerceValue(unittest.TestCase):
     def test_exact_values_and_null_are_preserved(self) -> None:
         cases: typing.List[typing.Tuple[typing.Any, typing.Union[str, typing.List[str]]]] = [
             ("text", "str"),
+            (True, "bool"),
+            (False, "bool"),
             (7, "int"),
             (7.5, "float"),
             ([1], "list"),
@@ -99,6 +101,18 @@ class TestUtilCoerceValue(unittest.TestCase):
         self.assert_result(coerce_value(None, "str"), None, type(None), True, False)
         self.assert_result(coerce_value(None, ["int", "float"]), None, type(None), True, False)
         self.assert_result(coerce_value({"a": 1}), {"a": 1}, dict, True, False)
+
+    def test_bool_accepts_only_native_booleans(self) -> None:
+        values: typing.Tuple[typing.Any, ...] = ("true", "false", 0, 1, [], {})
+        for value in values:
+            with self.subTest(value=value):
+                self.assert_result(
+                    coerce_value(value, "bool"),
+                    None,
+                    type(None),
+                    False,
+                    False,
+                )
 
     def test_null_in_declared_type_unions(self) -> None:
         cases: typing.List[typing.Tuple[typing.Any, typing.List[str]]] = [
