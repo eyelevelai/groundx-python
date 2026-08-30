@@ -22,6 +22,7 @@ if typing.TYPE_CHECKING:
     from .comparison import match_key, values_match
     from .custom_outputs import (
         CustomOutputDiagnostic,
+        CustomOutputFinalRecordProvenance,
         CustomOutputReassemblyResult,
         CustomOutputScalarCandidate,
         CustomOutputScalarCandidateSet,
@@ -57,6 +58,7 @@ __all__ = [
     "ContainerSettings",
     "ContainerUploadSettings",
     "CustomOutputDiagnostic",
+    "CustomOutputFinalRecordProvenance",
     "CustomOutputReassemblyResult",
     "CustomOutputScalarCandidate",
     "CustomOutputScalarCandidateSet",
@@ -103,6 +105,7 @@ _EXPORT_MODULES = {
     "ContainerSettings": ".settings",
     "ContainerUploadSettings": ".settings",
     "CustomOutputDiagnostic": ".custom_outputs",
+    "CustomOutputFinalRecordProvenance": ".custom_outputs",
     "CustomOutputReassemblyResult": ".custom_outputs",
     "CustomOutputScalarCandidate": ".custom_outputs",
     "CustomOutputScalarCandidateSet": ".custom_outputs",

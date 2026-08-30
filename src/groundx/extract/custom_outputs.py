@@ -33,6 +33,12 @@ class CustomOutputSourceProvenance:
 
 
 @dataclasses.dataclass(frozen=True)
+class CustomOutputFinalRecordProvenance:
+    final_path: str
+    page_numbers: typing.Tuple[int, ...] = ()
+
+
+@dataclasses.dataclass(frozen=True)
 class CustomOutputScalarCandidate:
     value: typing.Any
     page_numbers: typing.Tuple[int, ...] = ()
@@ -68,6 +74,7 @@ class CustomOutputReassemblyResult:
     diagnostics: typing.List[CustomOutputDiagnostic]
     workflow_output: typing.Dict[str, typing.Any] = dataclasses.field(default_factory=dict)
     source_provenance: typing.List[CustomOutputSourceProvenance] = dataclasses.field(default_factory=list)
+    final_record_provenance: typing.List[CustomOutputFinalRecordProvenance] = dataclasses.field(default_factory=list)
     scalar_candidate_sets: typing.List[CustomOutputScalarCandidateSet] = dataclasses.field(default_factory=list)
 
 
@@ -97,6 +104,14 @@ class _RouteContainer:
     identity: typing.Tuple[typing.Any, ...]
     value: typing.Any
     page_numbers: typing.Tuple[int, ...] = ()
+
+
+class _LineagedRecord(dict[str, typing.Any]):
+    page_numbers: typing.Tuple[int, ...]
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.page_numbers = ()
 
 
 @dataclasses.dataclass(frozen=True)
@@ -285,12 +300,27 @@ def reassemble_custom_outputs_from_xray(
             )
         )
 
+    final_record_provenance = _final_record_provenance(final_output)
+    plain_final_output = typing.cast(
+        typing.Dict[str, typing.Any],
+        _plain_output(final_output),
+    )
+    plain_relationship_output = (
+        typing.cast(
+            typing.Dict[str, typing.Any],
+            _plain_output(relationship_output),
+        )
+        if relationship_output is not None
+        else None
+    )
+
     return CustomOutputReassemblyResult(
-        final_output=final_output,
-        relationship_output=relationship_output,
+        final_output=plain_final_output,
+        relationship_output=plain_relationship_output,
         diagnostics=diagnostics,
         workflow_output=workflow_output,
         source_provenance=source_provenance,
+        final_record_provenance=final_record_provenance,
         scalar_candidate_sets=_public_scalar_candidate_sets(scalar_candidates),
     )
 
@@ -832,9 +862,10 @@ def _set_pointer(
         item_key = (tuple(list_path), record_key)
         record = repeated_records.get(item_key)
         if record is None:
-            record = {}
+            record = _LineagedRecord()
             repeated_records[item_key] = record
             records.append(record)
+        _add_record_pages(record, page_numbers)
 
         field_path = parts[star_index + 1 :]
         if field_path:
@@ -848,9 +879,10 @@ def _set_pointer(
         item_key = ((parts[0],), record_key)
         record = repeated_records.get(item_key)
         if record is None:
-            record = {}
+            record = _LineagedRecord()
             repeated_records[item_key] = record
             records.append(record)
+        _add_record_pages(record, page_numbers)
         if len(parts) > 1:
             _set_nested_value(record, parts[1:], value)
         return
@@ -916,6 +948,51 @@ def _merge_page_numbers(
     second: typing.Sequence[int],
 ) -> typing.Tuple[int, ...]:
     return tuple(dict.fromkeys((*first, *second)))
+
+
+def _add_record_pages(
+    record: typing.MutableMapping[str, typing.Any],
+    page_numbers: typing.Sequence[int],
+) -> None:
+    if isinstance(record, _LineagedRecord):
+        record.page_numbers = _merge_page_numbers(
+            record.page_numbers,
+            page_numbers,
+        )
+
+
+def _final_record_provenance(
+    output: typing.Mapping[str, typing.Any],
+) -> typing.List[CustomOutputFinalRecordProvenance]:
+    provenance: typing.List[CustomOutputFinalRecordProvenance] = []
+
+    def visit(value: typing.Any, parts: typing.Tuple[str, ...]) -> None:
+        if isinstance(value, list):
+            for index, item in enumerate(value):
+                item_parts = (*parts, str(index))
+                if isinstance(item, _LineagedRecord):
+                    provenance.append(
+                        CustomOutputFinalRecordProvenance(
+                            final_path=_encode_pointer(item_parts),
+                            page_numbers=item.page_numbers,
+                        )
+                    )
+                visit(item, item_parts)
+            return
+        if isinstance(value, typing.Mapping):
+            for key, item in value.items():
+                visit(item, (*parts, str(key)))
+
+    visit(output, ())
+    return provenance
+
+
+def _plain_output(value: typing.Any) -> typing.Any:
+    if isinstance(value, typing.Mapping):
+        return {key: _plain_output(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_plain_output(item) for item in value]
+    return copy.deepcopy(value)
 
 
 def _public_scalar_candidate_sets(
@@ -1889,6 +1966,11 @@ def _merge_identity_record(
     target: typing.Dict[str, typing.Any],
     source: typing.Mapping[str, typing.Any],
 ) -> None:
+    if isinstance(target, _LineagedRecord) and isinstance(source, _LineagedRecord):
+        target.page_numbers = _merge_page_numbers(
+            target.page_numbers,
+            source.page_numbers,
+        )
     for key, value in source.items():
         if key not in target or _match_value_absent(target.get(key)):
             target[key] = copy.deepcopy(value)
