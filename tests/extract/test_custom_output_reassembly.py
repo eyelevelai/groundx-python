@@ -1098,6 +1098,114 @@ def test_relationship_places_rows_deduped_by_explicit_unique_attrs() -> None:
     assert result.relationship_output == result.final_output
 
 
+def test_final_record_provenance_follows_dedupe_and_relationship_placement() -> None:
+    workflow_extract = {
+        "_groundx_persisted_extract": {
+            "charges": {
+                "match_attrs": ["meter_number"],
+                "unique_attrs": ["description", "amount"],
+            }
+        },
+        "workflow": {
+            "custom_steps": [
+                {"name": "meter_rows", "level": "chunk", "kind": "keys"},
+                {"name": "charge_rows", "level": "chunk", "kind": "keys"},
+            ],
+            "output_routes": [
+                {
+                    "workflow_group": "meters",
+                    "workflow_field": "meter_number",
+                    "final_path": "/meters/*/meter_number",
+                    "step_name": "meter_rows",
+                    "level": "chunk",
+                    "output_map": "customChunkOutputs",
+                    "output_key": "meter_number",
+                },
+                *[
+                    {
+                        "workflow_group": "charges",
+                        "workflow_field": field,
+                        "final_path": f"/charges/*/{field}",
+                        "step_name": "charge_rows",
+                        "level": "chunk",
+                        "output_map": "customChunkOutputs",
+                        "output_key": field,
+                    }
+                    for field in ("meter_number", "description", "amount")
+                ],
+            ],
+            "output_relationships": [
+                {
+                    "parent_group": "meters",
+                    "child_group": "charges",
+                    "parent_output_field": "charges",
+                    "match_attrs": ["meter_number"],
+                    "unmatched_child_group": "charges",
+                }
+            ],
+        },
+    }
+    xray = {
+        "chunks": [
+            {
+                "chunkId": "meter",
+                "pageNumbers": [1],
+                "customChunkOutputs": {"meter_rows": {"_records": [{"meter_number": "M-1"}]}},
+            },
+            *[
+                {
+                    "chunkId": f"charge-{page_number}",
+                    "pageNumbers": [page_number],
+                    "customChunkOutputs": {"charge_rows": {"_records": [charge]}},
+                }
+                for page_number, charge in (
+                    (
+                        2,
+                        {
+                            "meter_number": "M-1",
+                            "description": "Energy",
+                            "amount": 10,
+                        },
+                    ),
+                    (
+                        3,
+                        {
+                            "meter_number": "M-1",
+                            "description": "Energy",
+                            "amount": 10,
+                        },
+                    ),
+                    (
+                        4,
+                        {
+                            "meter_number": "M-1",
+                            "description": "Demand",
+                            "amount": 20,
+                        },
+                    ),
+                )
+            ],
+        ]
+    }
+
+    result = reassemble_custom_outputs_from_xray(
+        xray,
+        workflow_extract=workflow_extract,
+    )
+
+    assert [
+        {
+            "final_path": provenance.final_path,
+            "page_numbers": provenance.page_numbers,
+        }
+        for provenance in getattr(result, "final_record_provenance", [])
+    ] == [
+        {"final_path": "/meters/0", "page_numbers": (1,)},
+        {"final_path": "/meters/0/charges/0", "page_numbers": (2, 3)},
+        {"final_path": "/meters/0/charges/1", "page_numbers": (4,)},
+    ]
+
+
 def test_relationship_roles_support_the_same_declared_value_types() -> None:
     parent_group = "generic_parent_records"
     child_group = "generic_child_records"
@@ -2072,6 +2180,17 @@ def test_identical_section_payloads_on_different_pages_are_not_collapsed() -> No
         ],
     }
     assert [provenance.page_numbers for provenance in result.source_provenance] == [(1,), (2,)]
+    assert [provenance.record_index for provenance in result.source_provenance] == [0, 0]
+    assert [
+        {
+            "final_path": provenance.final_path,
+            "page_numbers": provenance.page_numbers,
+        }
+        for provenance in getattr(result, "final_record_provenance", [])
+    ] == [
+        {"final_path": "/sections/0", "page_numbers": (1,)},
+        {"final_path": "/sections/1", "page_numbers": (2,)},
+    ]
 
 
 def test_singular_section_route_preserves_candidates_and_pages_across_shared_section_id() -> None:
@@ -3079,8 +3198,10 @@ def test_duplicate_scalar_observations_merge_pages_for_selected_and_every_altern
 
 
 def test_scalar_candidate_sidecar_types_are_public_exports() -> None:
+    assert "CustomOutputFinalRecordProvenance" in extract.__all__
     assert "CustomOutputScalarCandidate" in extract.__all__
     assert "CustomOutputScalarCandidateSet" in extract.__all__
+    assert extract.CustomOutputFinalRecordProvenance is custom_outputs.CustomOutputFinalRecordProvenance
     assert extract.CustomOutputScalarCandidate is custom_outputs.CustomOutputScalarCandidate
     assert extract.CustomOutputScalarCandidateSet is custom_outputs.CustomOutputScalarCandidateSet
 
