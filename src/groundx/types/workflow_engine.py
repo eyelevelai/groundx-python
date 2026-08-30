@@ -19,17 +19,13 @@ class WorkflowEngine(UniversalBaseModel):
         typing.Optional[str],
         FieldMetadata(alias="apiKey"),
         pydantic.Field(
-            alias="apiKey",
-            description="A token that is added to the header of a request as an authorization bearer token",
+            alias="apiKey", description="Credential sent using the selected service's authentication scheme"
         ),
     ] = None
     base_url: typing_extensions.Annotated[
         typing.Optional[str],
         FieldMetadata(alias="baseURL"),
-        pydantic.Field(
-            alias="baseURL",
-            description="The base URL that precedes '/chat/completion' for an OpenAI chat completion-compatible endpoint",
-        ),
+        pydantic.Field(alias="baseURL", description="The provider base URL used for requests by the selected service"),
     ] = None
     engine_id: typing_extensions.Annotated[
         typing.Optional[str],
@@ -41,7 +37,7 @@ class WorkflowEngine(UniversalBaseModel):
         FieldMetadata(alias="maxImages"),
         pydantic.Field(
             alias="maxImages",
-            description="Maximum number of image attachments sent in one request using this workflow engine. GroundX removes earlier images when the request exceeds the limit, while preserving text and later images. Omit to leave image count uncapped. Workflow and step engine settings follow normal engine precedence; no separate route-specific image-count value overrides the selected engine. The independent openai-base64 serialized request-size guard still applies.",
+            description="Maximum number of image attachments sent in one request using this workflow engine. GroundX removes earlier images when the request exceeds the limit, while preserving text and later images. Omit to use the default limit of 50. An explicit value takes precedence. Workflow and step engine settings follow normal engine precedence; no separate route-specific image-count value overrides the selected engine. The independent openai-base64 serialized request-size guard still applies.",
         ),
     ] = None
     reasoning_effort: typing_extensions.Annotated[
@@ -70,7 +66,7 @@ class WorkflowEngine(UniversalBaseModel):
     ] = None
     service: typing.Optional[WorkflowEngineService] = pydantic.Field(default=None)
     """
-    An enumerated descriptor of the service type, impacts how the requests are configured
+    Selects how requests are configured for the provider. Anthropic uses the native Messages API with baseURL, apiKey, engineID, requestHeaders, and requestPassthrough.
     """
 
     if IS_PYDANTIC_V2:
