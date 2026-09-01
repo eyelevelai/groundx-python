@@ -202,6 +202,19 @@ def _unwrap_response(
     value: typing.Any,
     expected_types: typing.Union[type, typing.Tuple[type, ...]],
 ) -> typing.Any:
+    if type(value) is dict and set(value) == {"answer"}:
+        answer = value["answer"]
+        if (
+            type(answer) is dict
+            and set(answer) == {"type", "description"}
+            and answer["type"] in {"array", "object"}
+            and isinstance(answer["description"], str)
+        ):
+            decoded = json.loads(clean_json(answer["description"]))
+            labeled_type = list if answer["type"] == "array" else dict
+            if type(decoded) is not labeled_type:
+                _raise_response_type_error(decoded, labeled_type)
+            return decoded
     if (
         type(value) is list
         and not _matches_expected_type(value, expected_types)
@@ -227,7 +240,9 @@ def process_response(
 ) -> typing.Any:
     candidate = res
     if not _matches_expected_type(candidate, expected_types):
-        if type(candidate) is list and _expects_dict(expected_types) and len(candidate) == 1:
+        if type(candidate) is dict:
+            pass
+        elif type(candidate) is list and _expects_dict(expected_types) and len(candidate) == 1:
             pass
         elif isinstance(candidate, str):
             candidate = json.loads(clean_json(candidate))

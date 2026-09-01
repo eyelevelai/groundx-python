@@ -71,6 +71,65 @@ def test_process_response_parses_agent_text_string_subclass() -> None:
     assert process_response(response, dict) == {"ok": True}
 
 
+@pytest.mark.parametrize(
+    ("response_type", "description", "expected_type", "expected"),
+    [
+        ("array", '[{"meter_number":"M-1"}]', list, [{"meter_number": "M-1"}]),
+        ("object", '{"amount_due":12.34}', dict, {"amount_due": 12.34}),
+    ],
+)
+def test_process_response_decodes_exact_typed_description_envelope(
+    response_type: str,
+    description: str,
+    expected_type: type,
+    expected: typing.Any,
+) -> None:
+    response = {
+        "answer": {
+            "type": response_type,
+            "description": description,
+        }
+    }
+
+    assert process_response(response, expected_type) == expected
+
+
+@pytest.mark.parametrize(
+    "response",
+    [
+        {"answer": {"type": "array", "description": '{"ok":true}'}},
+        {"answer": {"type": "object", "description": "[]"}},
+        {"answer": {"type": "array", "description": "not json"}},
+        {
+            "answer": {
+                "type": "array",
+                "description": "[]",
+                "unexpected": True,
+            }
+        },
+        {
+            "answer": {
+                "type": "array",
+                "description": "[]",
+            },
+            "unexpected": True,
+        },
+    ],
+)
+def test_process_response_rejects_ambiguous_typed_description_envelope(
+    response: typing.Dict[str, typing.Any],
+) -> None:
+    with pytest.raises((TypeError, ValueError)):
+        process_response(response, (dict, list))
+
+
+def test_process_response_rejects_typed_description_value_of_unexpected_type() -> None:
+    response = {"answer": {"type": "array", "description": "[]"}}
+
+    with pytest.raises(TypeError):
+        process_response(response, dict)
+
+
 def test_agent_tool_retries_one_parser_failure_without_ordinary_output(
     monkeypatch,
     capsys,
