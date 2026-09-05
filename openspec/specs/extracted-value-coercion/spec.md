@@ -220,7 +220,7 @@ SHALL NOT contain a second conversion policy.
 ### Requirement: Protected extraction paths retain behavior
 
 The change SHALL include regression evidence for the current reproduction,
-Arcadia legacy, Arcadia v1, generic v1, and ADP v1 extraction paths.
+Arcadia legacy, Arcadia v1, generic v1, and ADP v4 extraction paths.
 
 #### Scenario: Protected path receives coercible mismatched output
 
