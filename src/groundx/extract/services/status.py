@@ -1,5 +1,6 @@
 import time
 import typing
+from urllib.parse import unquote, urlparse
 
 from ..settings.settings import ContainerSettings
 from .logger import Logger
@@ -20,27 +21,42 @@ class Status:
     ) -> None:
         import redis
 
-        rl_port = 6379
-        rl_host = cfg.status_broker()
-        rl_ssl = False
-        if rl_host.endswith("/0"):
-            rl_host = rl_host[:-2]
-        if rl_host.startswith("redis://"):
-            rl_host = rl_host[8:]
-        elif rl_host.startswith("rediss://"):
-            rl_host = rl_host[9:]
-            rl_ssl = True
-        if ":" in rl_host:
-            base, number = rl_host.rsplit(":", 1)
-            if number.isdigit():
-                rl_port = int(number)
-                rl_host = base
+        broker_url = cfg.status_broker()
+        parsed = urlparse(broker_url)
+        rl_username: typing.Optional[str] = None
+        rl_password: typing.Optional[str] = None
+        if parsed.hostname is not None:
+            rl_host = parsed.hostname
+            rl_port = parsed.port or 6379
+            rl_ssl = parsed.scheme == "rediss"
+            rl_username = unquote(parsed.username) if parsed.username else None
+            rl_password = (
+                unquote(parsed.password) if parsed.password is not None else None
+            )
+        else:
+            rl_port = 6379
+            rl_host = broker_url
+            rl_ssl = False
+            if rl_host.endswith("/0"):
+                rl_host = rl_host[:-2]
+            if rl_host.startswith("redis://"):
+                rl_host = rl_host[8:]
+            elif rl_host.startswith("rediss://"):
+                rl_host = rl_host[9:]
+                rl_ssl = True
+            if ":" in rl_host:
+                base, number = rl_host.rsplit(":", 1)
+                if number.isdigit():
+                    rl_port = int(number)
+                    rl_host = base
 
         self.client = redis.Redis(
             host=rl_host,
             port=rl_port,
             decode_responses=True,
             ssl=rl_ssl,
+            username=rl_username,
+            password=rl_password,
             retry=redis.retry.Retry(redis.backoff.NoBackoff(), 0),
             socket_connect_timeout=REDIS_CONNECT_TIMEOUT_SECONDS,
             socket_timeout=REDIS_SOCKET_TIMEOUT_SECONDS,
