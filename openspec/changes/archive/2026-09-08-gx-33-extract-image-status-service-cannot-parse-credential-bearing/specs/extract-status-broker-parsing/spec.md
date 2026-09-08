@@ -100,3 +100,26 @@ The current, authoritative text of the port-derivation guard lives in
 `openspec/specs/extract-status-broker-parsing/spec.md` — this archived delta is left as
 originally shipped above, per the record-hygiene rule against silently rewriting a shipped
 record.
+
+### Amendment (2026-09-08): explicit zero port honored; Unicode-digit db path guarded
+
+Two cross-family review minors (F3, F4, verified) on the port/db guards above:
+
+- F3 — the schemed branch's `rl_port = parsed.port or 6379` treated an explicit `:0` port as
+  unset (`0` is falsy in Python), overriding it to `6379` and diverging from the legacy numeric
+  derivation, which honors an explicit `0`. The port access now reads
+  `rl_port = parsed.port if parsed.port is not None else 6379`, kept inside the existing
+  `try`/`except ValueError -> 6379` guard, so a malformed/out-of-range port still falls back to
+  `6379` while an explicit `0` is honored.
+- F4 — the db guard's `rl_db_path.isdigit()` returns `True` for a Unicode digit character (e.g. a
+  superscript digit) that `int()` then rejects with `ValueError`, so the guard could still crash.
+  The guard now reads `rl_db_path.isdecimal()`, which is `False` for a Unicode digit `int()`
+  cannot parse, so that input defaults `db` to `0` instead of raising. ASCII `"0".."9"` is
+  unaffected.
+
+Hostname, credentials, ssl, and every hardening kwarg are unchanged by these two guards.
+
+The current, authoritative text of the port and db guards lives in
+`openspec/specs/extract-status-broker-parsing/spec.md` — this archived delta is left as
+originally shipped above, per the record-hygiene rule against silently rewriting a shipped
+record.

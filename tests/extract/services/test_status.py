@@ -133,6 +133,30 @@ def _status_with_client(client: typing.Any) -> Status:
             },
             id="out-of-range-port-segment-defaults-port-to-6379",
         ),
+        pytest.param(
+            "rediss://host:0/0",
+            {
+                "host": "host",
+                "port": 0,
+                "ssl": True,
+                "username": None,
+                "password": None,
+                "db": 0,
+            },
+            id="explicit-zero-port-is-honored-not-defaulted",
+        ),
+        pytest.param(
+            "rediss://host:6379/²",
+            {
+                "host": "host",
+                "port": 6379,
+                "ssl": True,
+                "username": None,
+                "password": None,
+                "db": 0,
+            },
+            id="unicode-digit-db-path-segment-defaults-db-to-zero",
+        ),
     ],
 )
 def test_status_redis_client_derives_connection_params_from_broker_url(

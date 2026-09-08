@@ -29,7 +29,7 @@ class Status:
         if parsed.hostname is not None:
             rl_host = parsed.hostname
             try:
-                rl_port = parsed.port or 6379
+                rl_port = parsed.port if parsed.port is not None else 6379
             except ValueError:
                 rl_port = 6379
             rl_ssl = parsed.scheme == "rediss"
@@ -38,7 +38,7 @@ class Status:
                 unquote(parsed.password) if parsed.password is not None else None
             )
             rl_db_path = parsed.path.lstrip("/")
-            rl_db = int(rl_db_path) if rl_db_path.isdigit() else 0
+            rl_db = int(rl_db_path) if rl_db_path.isdecimal() else 0
         else:
             rl_port = 6379
             rl_host = broker_url
