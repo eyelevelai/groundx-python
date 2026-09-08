@@ -181,6 +181,18 @@ def _status_with_client(client: typing.Any) -> Status:
             },
             id="over-integer-string-limit-db-path-segment-defaults-db-to-zero",
         ),
+        pytest.param(
+            "host:²/0",
+            {
+                "host": "host:²",
+                "port": 6379,
+                "ssl": False,
+                "username": None,
+                "password": None,
+                "db": 0,
+            },
+            id="schemeless-non-numeric-legacy-port-segment-keeps-default-port-and-host",
+        ),
     ],
 )
 def test_status_redis_client_derives_connection_params_from_broker_url(

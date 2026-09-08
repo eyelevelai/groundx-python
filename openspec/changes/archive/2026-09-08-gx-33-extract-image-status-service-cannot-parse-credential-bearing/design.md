@@ -79,26 +79,36 @@ no data-model or cross-module contract change). It does not meet the repo's own 
 ("architecturally significant or hard-to-reverse decisions").
 
 **D5 — every conversion point is guarded by `try`/`except`, not a pre-check predicate;
-`Status.__init__` cannot crash on any broker string (F5, F6).** Invariant, stated once and applied
-identically at all three points: **a value derived from untrusted input is never validated by a
-predicate that approximates what the converter accepts — it is derived inside a `try`/`except` that
-catches exactly the converter's own failure mode, so no input shape the predicate didn't anticipate
-can still reach the converter unguarded.** A cross-family review finding (F5) showed `parsed =
-urlparse(broker_url)` — the derivation's own entry point — raises `ValueError` for a malformed
-bracketed authority (e.g. `"rediss://[bad:6379/0"`, "Invalid IPv6 URL"), crashing the constructor
-before D1's `parsed.hostname is not None` branch ever runs. `Status.__init__` now calls `urlparse`
-inside a `try`/`except ValueError`, setting `parsed = None` on failure; D1's branch condition
-becomes `parsed is not None and parsed.hostname is not None`, so a parse failure takes the same
-schemeless/legacy string-strip path as a `None` hostname. A second review finding (F6) showed the
-`db` guard violated the same invariant in its own right: a `str.isdecimal()` pre-check (D3's
+`Status.__init__` cannot crash on any broker string (F5, F6, F8).** Invariant, stated once and
+applied identically at all four points: **a value derived from untrusted input is never validated
+by a predicate that approximates what the converter accepts — it is derived inside a `try`/`except`
+that catches exactly the converter's own failure mode, so no input shape the predicate didn't
+anticipate can still reach the converter unguarded.** A cross-family review finding (F5) showed
+`parsed = urlparse(broker_url)` — the derivation's own entry point — raises `ValueError` for a
+malformed bracketed authority (e.g. `"rediss://[bad:6379/0"`, "Invalid IPv6 URL"), crashing the
+constructor before D1's `parsed.hostname is not None` branch ever runs. `Status.__init__` now calls
+`urlparse` inside a `try`/`except ValueError`, setting `parsed = None` on failure; D1's branch
+condition becomes `parsed is not None and parsed.hostname is not None`, so a parse failure takes the
+same schemeless/legacy string-strip path as a `None` hostname. A second review finding (F6) showed
+the `db` guard violated the same invariant in its own right: a `str.isdecimal()` pre-check (D3's
 amendment, itself a hardening of an earlier `str.isdigit()` pre-check per F4) still passes a
 path segment over Python's 4300-digit integer-string conversion limit through to `int()`, which
 then raises `ValueError` — a predicate approximating `int()`'s acceptance criteria, not enforcing
 it. The fix replaces the predicate with `try: db = int(db_path)` / `except ValueError: db = 0`,
-guarding the conversion itself rather than pre-validating its input. All three points inside this
-derivation that can raise from untrusted input — `urlparse(broker_url)`, `parsed.port`, and
-`int(db_path)` — are now guarded this same way: a `try`/`except` around the conversion, never a
-predicate in front of it; none propagates out of `Status.__init__`.
+guarding the conversion itself rather than pre-validating its input. A third finding (F8) showed the
+same predicate-vs-converter gap survived in the **legacy schemeless-fallback branch's own port
+conversion** — `if number.isdigit(): rl_port = int(number); rl_host = base` — where a superscript
+digit (or any other digit character `str.isdigit()` accepts but `int()` rejects) passes the
+predicate and then crashes `int()`. The fix replaces that predicate the same way: `try: rl_port =
+int(number); rl_host = base / except ValueError: pass`, preserving the pre-existing semantics that
+`rl_host` is reassigned to `base` only when the port segment actually converts — on failure, neither
+`rl_port` nor `rl_host` is touched, exactly as the `isdigit()`-False path left them. All four points
+inside this derivation that can raise from untrusted input — `urlparse(broker_url)`, `parsed.port`,
+`int(db_path)` (the schemed-URL branch), and `int(number)` (the legacy schemeless-branch port
+conversion) — are now guarded this same way: a `try`/`except` around the conversion, never a
+predicate in front of it; none propagates out of `Status.__init__`. This is the last unguarded
+conversion point in `Status.__init__`; every parse/int point in the constructor is now
+`try`/`except`-guarded.
 
 ## `.fernignore` scope confirmation
 

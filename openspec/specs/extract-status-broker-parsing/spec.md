@@ -95,9 +95,15 @@ default to `6379` rather than propagating the exception out of `Status.__init__`
 scheme, e.g. a bare `host:port` address, where `urlparse` does not populate `.hostname`/`.port` the
 way a schemed URL does. `Status.__init__` SHALL detect that case by checking whether the parsed
 `.hostname` is `None`, and in that case SHALL fall back to the existing string-stripping
-derivation — trim a trailing `/0`, then split the remainder on the last `:` for a numeric port —
-producing the same `host`, `port`, and `ssl=False` the prior implementation produced for that input
-shape. This branch does NOT parse a `db` from the schemeless string's path; `db` defaults to `0`,
+derivation — trim a trailing `/0`, then split the remainder on the last `:` for a port segment,
+converted inside a guard that catches exactly `int()`'s own failure mode (`ValueError`) rather than
+pre-validating the segment with a predicate — producing the same `host`, `port`, and `ssl=False` the
+prior implementation produced for that input shape. Any port segment `int()` rejects, including a
+digit character `str.isdigit()` accepts but `int()` does not (e.g. a superscript digit), SHALL leave
+`port` at its default (`6379`) and SHALL leave `host` unmodified (still carrying the `:`-joined
+segment), matching the behavior a failed `str.isdigit()` predicate check produced before this guard
+existed — only a segment that actually converts reassigns both `host` (to the pre-`:` portion) and
+`port`. This branch does NOT parse a `db` from the schemeless string's path; `db` defaults to `0`,
 as it always has for this input shape. This preserves current behavior for schemeless broker
 strings; it is a regression to be protected by a test, not merely a design note.
 
@@ -105,10 +111,10 @@ strings; it is a regression to be protected by a test, not merely a design note.
 `ValueError` on `cfg.status_broker()`'s return value — e.g. a malformed bracketed authority such as
 `"rediss://[bad:6379/0"` ("Invalid IPv6 URL"). `Status.__init__` SHALL catch that `ValueError` and
 treat the parse failure identically to a missing `.hostname`, taking the legacy string-strip
-derivation against the raw broker string. This is the last of the three points inside this
-derivation that could raise on untrusted input (`urlparse(broker_url)` itself, `parsed.port`, and
-`int()` on the `db` path segment); with this guard in place, no `broker_url` value can propagate an
-exception out of `Status.__init__`.
+derivation against the raw broker string. This is the last of the four points inside this
+derivation that could raise on untrusted input (`urlparse(broker_url)` itself, `parsed.port`,
+`int()` on the `db` path segment, and `int()` on the legacy branch's port segment); with this guard
+in place, no `broker_url` value can propagate an exception out of `Status.__init__`.
 
 #### Scenario: Schemeless bare-address broker string keeps working exactly as before
 - **WHEN** `cfg.status_broker()` returns `"host:6379/0"` (no `redis://`/`rediss://` scheme)
@@ -117,6 +123,17 @@ exception out of `Status.__init__`.
 - **AND** `Status.__init__` does NOT raise and does NOT route this input through the credentialed
   URL-parse branch as if it were an unparseable/failing broker value — the schemeless case is
   intentionally skipped past that branch, not rejected by it
+
+#### Scenario: Non-numeric legacy port segment guards port to the default instead of crashing
+- **WHEN** `cfg.status_broker()` returns a schemeless broker string whose colon-separated port
+  segment is a digit character `str.isdigit()` accepts but `int()` rejects, e.g. `"host:²/0"`
+- **THEN** `Status.__init__` passes `port=6379` to `redis.Redis(...)` — the `try`/`except
+  ValueError` guard around the legacy branch's `int()` conversion defaults `port` for this input
+  rather than propagating the exception `int()` raises for it
+- **AND** `Status.__init__` does NOT raise `ValueError`, and `host` is left unmodified (still
+  carrying the `:`-joined segment, e.g. `"host:²"`) exactly as a failed `str.isdigit()` predicate
+  check left it before this guard existed — `host` is only reassigned to the pre-`:` portion when
+  the port segment actually converts
 
 #### Scenario: A broker string urlparse cannot parse falls back to the legacy derivation
 - **WHEN** `cfg.status_broker()` returns a broker string `urlparse` raises `ValueError` on, e.g.

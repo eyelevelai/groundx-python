@@ -58,9 +58,11 @@ class Status:
                 rl_ssl = True
             if ":" in rl_host:
                 base, number = rl_host.rsplit(":", 1)
-                if number.isdigit():
+                try:
                     rl_port = int(number)
                     rl_host = base
+                except ValueError:
+                    pass
 
         self.client = redis.Redis(
             host=rl_host,
