@@ -85,3 +85,18 @@ The current, authoritative text of this requirement lives in
 `openspec/specs/extract-status-broker-parsing/spec.md` — this archived delta is left as
 originally shipped above, per the record-hygiene rule against silently rewriting a shipped
 record.
+
+### Amendment (2026-09-08): schemed-branch port access guarded against a malformed port
+
+A cross-family review finding (F2, verified) on the `db`-derivation amendment above showed the
+schemed branch's `rl_port = parsed.port or 6379` raises `ValueError` when the broker URL's port
+segment is non-numeric (e.g. `"redis://host:not-a-port/0"`) or out-of-range (e.g.
+`"rediss://host:99999999/0"`), because `ParseResult.port` itself raises for those inputs —
+crashing `Status.__init__` on a malformed but schemed broker URL. The port access is now wrapped
+in `try`/`except ValueError`, falling back to the same `6379` default used for an unset port.
+Hostname, credentials, ssl, `db`, and every hardening kwarg are unchanged by this guard.
+
+The current, authoritative text of the port-derivation guard lives in
+`openspec/specs/extract-status-broker-parsing/spec.md` — this archived delta is left as
+originally shipped above, per the record-hygiene rule against silently rewriting a shipped
+record.

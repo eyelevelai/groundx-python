@@ -28,7 +28,10 @@ class Status:
         rl_db = 0
         if parsed.hostname is not None:
             rl_host = parsed.hostname
-            rl_port = parsed.port or 6379
+            try:
+                rl_port = parsed.port or 6379
+            except ValueError:
+                rl_port = 6379
             rl_ssl = parsed.scheme == "rediss"
             rl_username = unquote(parsed.username) if parsed.username else None
             rl_password = (

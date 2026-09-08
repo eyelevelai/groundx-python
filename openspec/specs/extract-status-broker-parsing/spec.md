@@ -12,7 +12,10 @@ scheme prefix and a trailing `/0`. `username` and `password` SHALL be percent-un
 parsed URL's path segment, mirroring `redis-py`'s own `from_url` semantics: a numeric path
 segment (e.g. `/2`) sets `db` to that integer; an empty, absent, or non-numeric path segment
 defaults `db` to `0` (the guard that keeps a schemeless or path-less URL from crashing this
-derivation).
+derivation). `port` SHALL be derived from `parsed.port`, guarded the same way: an unset port
+defaults to `6379`, and an unparseable port segment — non-numeric (e.g. `not-a-port`) or
+out-of-range (e.g. `99999999`, where `ParseResult.port` itself raises `ValueError`) — SHALL also
+default to `6379` rather than propagating the exception out of `Status.__init__`.
 
 #### Scenario: Credential-bearing rediss broker URL yields an authenticated, connectable client
 - **WHEN** `cfg.status_broker()` returns `"rediss://svc_redis:S3cr3t%20p%40ss%2Fw%23rd@host:6379/0"`
@@ -44,6 +47,15 @@ derivation).
   `db` rather than raising or passing a non-numeric value
 - **AND** `Status.__init__` does NOT raise when the path segment is empty, absent, or
   non-numeric
+
+#### Scenario: Unparseable or out-of-range port segment guards port to the default
+- **WHEN** `cfg.status_broker()` returns a schemed broker URL whose port segment
+  `ParseResult.port` cannot parse — non-numeric (e.g. `"redis://host:not-a-port/0"`) or
+  out-of-range (e.g. `"rediss://host:99999999/0"`)
+- **THEN** `Status.__init__` passes `port=6379` to `redis.Redis(...)`, the same default used for
+  an unset port
+- **AND** `Status.__init__` does NOT raise `ValueError` and does NOT propagate the exception
+  `parsed.port` raises for that input
 
 ### Requirement: Status falls back to legacy host/port derivation for schemeless broker strings
 `Status.__init__` SHALL fall back to the existing string-stripping host/port derivation whenever
