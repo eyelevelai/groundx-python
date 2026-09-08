@@ -15,8 +15,14 @@ and needs its own fix.
 
 - Replace the string-stripping derivation in `Status.__init__` with `urllib.parse` parsing
   (`urlparse`) of the value `cfg.status_broker()` returns: derive `host` from `.hostname`, `port`
-  from `.port` (falling back to `6379` when unset), `ssl` from the URL scheme being `rediss`, and
-  `username`/`password` from the parsed userinfo, percent-unquoted via `urllib.parse.unquote`.
+  from `.port` (falling back to `6379` when unset), `ssl` from the URL scheme being `rediss`,
+  `username`/`password` from the parsed userinfo (percent-unquoted via `urllib.parse.unquote`), and
+  `db` from the path segment (mirroring `redis-py`'s own `from_url` semantics; a user-directed
+  scope amendment during review — see `design.md` D3's amendment note for provenance).
+- The whole parse is guarded end to end: `urlparse(broker_url)` itself, `parsed.port`, and the `db`
+  path-segment-to-integer conversion each catch their own failure mode inside `try`/`except`, so no
+  broker string — malformed, schemeless, non-numeric, or an over-limit digit string — can crash
+  `Status.__init__`; each guarded point instead falls back to a safe default (see `design.md` D5).
 - Pass the derived `username`/`password` into the `redis.Redis(...)` constructor call, so a
   credential-bearing broker URL produces an authenticated, connectable client — today the
   constructor call never passes credentials at all.
@@ -30,9 +36,10 @@ and needs its own fix.
   exact-kwargs assertion at `tests/extract/services/test_status.py:50` gets the new
   `username`/`password`/`ssl` expectations **added** to it; none of the existing asserted kwargs are
   relaxed or removed.
-- Out of scope for this change: deriving `db` from the broker URL's path segment (redis-py's
-  default `db=0` is kept as-is) and `ssl_cert_reqs` handling for self-signed/internal certs (a
-  design-phase confirmation, not a build task here).
+- Out of scope for this change: `ssl_cert_reqs` handling for self-signed/internal certs (a
+  design-phase confirmation, not a build task here). `db` derivation was originally out of scope
+  and is not — it is now derived from the broker URL's path segment (see the amended bullet above
+  and `design.md` D3's amendment note).
 - Not a breaking change: the public `Status(cfg, logger)` constructor signature is unchanged — only
   the internal connection-parameter derivation and the resulting `redis.Redis(...)` kwargs change.
 
@@ -40,8 +47,9 @@ and needs its own fix.
 
 ### New Capabilities
 - `extract-status-broker-parsing`: how `Status.__init__` derives Redis connection parameters (host,
-  port, username, password, ssl) from the broker URL `status_broker()` returns, including the
-  schemeless/bare-address fallback and the unchanged hardening-kwargs invariant. No existing
+  port, username, password, ssl, db) from the broker URL `status_broker()` returns, including the
+  schemeless/bare-address fallback, the guard against every malformed-input raise point (never
+  crashes on any broker string), and the unchanged hardening-kwargs invariant. No existing
   `openspec/specs/` capability covers this constructor logic — the current specs are all
   extraction-YAML/workflow-authoring capabilities.
 

@@ -57,11 +57,15 @@ Confirmed non-goal (see Non-Goals). `redis.Redis`'s own default (`db=0`) is pres
 
 > **Amendment (2026-09-08): D3 reversed.** A user-directed scope amendment on 2026-09-08 reversed
 > this non-goal. `Status.__init__` now derives `db` from the schemed URL's path segment, mirroring
-> `redis-py`'s own `from_url` semantics: `db_path = parsed.path.lstrip("/")`; `db = int(db_path) if
-> db_path.isdecimal() else 0` (F4 below hardened the guard from an initial `isdigit()` to
-> `isdecimal()`, so this note states the final guard directly). The guard exists specifically so an
-> empty, path-less, or non-decimal path segment (`rediss://host:6379`, no `/N` segment) cannot
-> crash this derivation — it defaults to `0` instead. The schemeless-fallback branch (D1,
+> `redis-py`'s own `from_url` semantics: `db_path = parsed.path.lstrip("/")`; the conversion itself
+> is guarded — `try: db = int(db_path)` / `except ValueError: db = 0` (F4 below first hardened the
+> guard from a predicate `isdigit()` to `isdecimal()`; F6 then found `isdecimal()` still leaks a
+> case `int()` rejects — a path segment over Python's 4300-digit integer-string conversion limit —
+> so the guard now wraps the conversion itself in `try`/`except ValueError` instead of pre-checking
+> it with any predicate, which catches every case a predicate could ever miss). The guard exists
+> specifically so an empty, path-less, non-decimal, or over-limit path segment
+> (`rediss://host:6379`, no `/N` segment) cannot crash this derivation — it defaults to `0` instead.
+> The schemeless-fallback branch (D1,
 > `parsed.hostname is None`) is unaffected: it still does not parse a `db` from its input, and
 > continues to pass `db=0` (now passed explicitly rather than implicitly relying on `redis.Redis`'s
 > own default, matching D2's "always pass explicitly" pattern). See
@@ -74,20 +78,27 @@ module (`urllib.parse` and `redis`'s own kwargs, no new dependency, no new archi
 no data-model or cross-module contract change). It does not meet the repo's own ADR bar
 ("architecturally significant or hard-to-reverse decisions").
 
-**D5 — `urlparse` itself is guarded; `Status.__init__` cannot crash on any broker string (F5).** A
-cross-family review finding (F5) showed `parsed = urlparse(broker_url)` — the derivation's own
-entry point — raises `ValueError` for a malformed bracketed authority (e.g.
-`"rediss://[bad:6379/0"`, "Invalid IPv6 URL"), crashing the constructor before D1's
-`parsed.hostname is not None` branch ever runs. `Status.__init__` now calls `urlparse` inside a
-`try`/`except ValueError`, setting `parsed = None` on failure; D1's branch condition becomes
-`parsed is not None and parsed.hostname is not None`, so a parse failure takes the same
-schemeless/legacy string-strip path as a `None` hostname. **Invariant: `Status.__init__` cannot
-raise on any `broker_url` value** — every value either parses into a schemed URL with a resolvable
-hostname (D1's structured branch) or falls back to the legacy derivation (D1's else branch),
-whether it lacks a scheme, fails to parse at all (this decision), has an unparseable/out-of-range
-port (F2/F3), or has a non-decimal `db` path segment (F4). The three points inside this derivation
-that can raise from untrusted input — `urlparse(broker_url)`, `parsed.port`, and `int(rl_db_path)`
-— are now all guarded; none propagates out of `Status.__init__`.
+**D5 — every conversion point is guarded by `try`/`except`, not a pre-check predicate;
+`Status.__init__` cannot crash on any broker string (F5, F6).** Invariant, stated once and applied
+identically at all three points: **a value derived from untrusted input is never validated by a
+predicate that approximates what the converter accepts — it is derived inside a `try`/`except` that
+catches exactly the converter's own failure mode, so no input shape the predicate didn't anticipate
+can still reach the converter unguarded.** A cross-family review finding (F5) showed `parsed =
+urlparse(broker_url)` — the derivation's own entry point — raises `ValueError` for a malformed
+bracketed authority (e.g. `"rediss://[bad:6379/0"`, "Invalid IPv6 URL"), crashing the constructor
+before D1's `parsed.hostname is not None` branch ever runs. `Status.__init__` now calls `urlparse`
+inside a `try`/`except ValueError`, setting `parsed = None` on failure; D1's branch condition
+becomes `parsed is not None and parsed.hostname is not None`, so a parse failure takes the same
+schemeless/legacy string-strip path as a `None` hostname. A second review finding (F6) showed the
+`db` guard violated the same invariant in its own right: a `str.isdecimal()` pre-check (D3's
+amendment, itself a hardening of an earlier `str.isdigit()` pre-check per F4) still passes a
+path segment over Python's 4300-digit integer-string conversion limit through to `int()`, which
+then raises `ValueError` — a predicate approximating `int()`'s acceptance criteria, not enforcing
+it. The fix replaces the predicate with `try: db = int(db_path)` / `except ValueError: db = 0`,
+guarding the conversion itself rather than pre-validating its input. All three points inside this
+derivation that can raise from untrusted input — `urlparse(broker_url)`, `parsed.port`, and
+`int(db_path)` — are now guarded this same way: a `try`/`except` around the conversion, never a
+predicate in front of it; none propagates out of `Status.__init__`.
 
 ## `.fernignore` scope confirmation
 

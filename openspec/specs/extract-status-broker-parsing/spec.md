@@ -9,11 +9,14 @@ parameters (`host`, `port`, `username`, `password`, `ssl`, `db`) by parsing the 
 `cfg.status_broker()` returns with `urllib.parse.urlparse`, rather than by string-stripping a
 scheme prefix and a trailing `/0`. `username` and `password` SHALL be percent-unquoted via
 `urllib.parse.unquote` before being passed to `redis.Redis(...)`. `db` SHALL be derived from the
-parsed URL's path segment, mirroring `redis-py`'s own `from_url` semantics: a decimal path
-segment (e.g. `/2`) sets `db` to that integer; an empty, absent, or non-decimal path segment
-(including a Unicode digit character that `str.isdecimal()` rejects, e.g. a superscript digit)
-defaults `db` to `0` (the guard that keeps a schemeless, path-less, or Unicode-digit-bearing URL
-from crashing this derivation). `port` SHALL be derived from `parsed.port`: an explicit port,
+parsed URL's path segment, mirroring `redis-py`'s own `from_url` semantics: an integer path
+segment (e.g. `/2`) sets `db` to that integer, converted inside a guard that catches exactly
+`int()`'s own failure mode (`ValueError`) rather than pre-validating the segment with a predicate.
+Any path segment `int()` rejects — empty, absent, non-integer, a Unicode digit character `int()`
+does not accept (e.g. a superscript digit), or a digit string over Python's integer-string
+conversion limit (4300+ digits) — SHALL default `db` to `0` (the guard that keeps a schemeless,
+path-less, non-integer, or over-limit path segment from crashing this derivation). `port` SHALL be
+derived from `parsed.port`: an explicit port,
 **including `0`**, SHALL be honored as given (distinguishing "unset" from the falsy value `0`), an
 unset port defaults to `6379`, and an unparseable port segment — non-numeric (e.g. `not-a-port`)
 or out-of-range (e.g. `99999999`, where `ParseResult.port` itself raises `ValueError`) — SHALL also
@@ -46,16 +49,28 @@ default to `6379` rather than propagating the exception out of `Status.__init__`
 - **WHEN** `cfg.status_broker()` returns a schemed broker URL with no path segment, e.g.
   `"rediss://host:6379"`
 - **THEN** `Status.__init__` passes `db=0` to `redis.Redis(...)` — the empty-path guard defaults
-  `db` rather than raising or passing a non-decimal value
+  `db` rather than raising or passing a non-integer value
 - **AND** `Status.__init__` does NOT raise when the path segment is empty, absent, or
-  non-decimal
+  non-integer
 
 #### Scenario: Unicode-digit path segment guards db to the default instead of crashing
 - **WHEN** `cfg.status_broker()` returns a schemed broker URL whose path segment is a Unicode
-  digit character `str.isdigit()` would accept but `int()` rejects, e.g. `"rediss://host:6379/²"`
-- **THEN** `Status.__init__` passes `db=0` to `redis.Redis(...)` — the `str.isdecimal()` guard
-  defaults `db` for this input rather than calling `int()` on it
+  digit character `int()` rejects, e.g. `"rediss://host:6379/²"`
+- **THEN** `Status.__init__` passes `db=0` to `redis.Redis(...)` — the `try`/`except ValueError`
+  guard around the `int()` conversion defaults `db` for this input rather than propagating the
+  exception `int()` raises for it
 - **AND** `Status.__init__` does NOT raise `ValueError`
+
+#### Scenario: An over-integer-string-limit path segment guards db to the default instead of crashing
+- **WHEN** `cfg.status_broker()` returns a schemed broker URL whose path segment is an all-digit
+  string over Python's integer-string conversion limit (4300+ digits), e.g.
+  `"rediss://host:6379/" + "1" * 4301`
+- **THEN** `Status.__init__` passes `db=0` to `redis.Redis(...)` — the `try`/`except ValueError`
+  guard around the `int()` conversion defaults `db` for this input rather than propagating the
+  `ValueError` `int()` raises for it
+- **AND** `Status.__init__` does NOT raise `ValueError`, even though this path segment would pass
+  a `str.isdecimal()` pre-check — the guard is on the conversion itself, not on a predicate that
+  approximates what `int()` accepts
 
 #### Scenario: Unparseable or out-of-range port segment guards port to the default
 - **WHEN** `cfg.status_broker()` returns a schemed broker URL whose port segment

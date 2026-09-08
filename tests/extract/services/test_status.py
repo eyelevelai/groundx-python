@@ -169,6 +169,18 @@ def _status_with_client(client: typing.Any) -> Status:
             },
             id="malformed-bracketed-authority-falls-back-to-legacy-derivation",
         ),
+        pytest.param(
+            f"rediss://host:6379/{'1' * 4301}",
+            {
+                "host": "host",
+                "port": 6379,
+                "ssl": True,
+                "username": None,
+                "password": None,
+                "db": 0,
+            },
+            id="over-integer-string-limit-db-path-segment-defaults-db-to-zero",
+        ),
     ],
 )
 def test_status_redis_client_derives_connection_params_from_broker_url(

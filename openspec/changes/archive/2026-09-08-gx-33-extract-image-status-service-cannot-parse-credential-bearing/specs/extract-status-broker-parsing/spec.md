@@ -6,11 +6,14 @@ parameters (`host`, `port`, `username`, `password`, `ssl`, `db`) by parsing the 
 `cfg.status_broker()` returns with `urllib.parse.urlparse`, rather than by string-stripping a
 scheme prefix and a trailing `/0`. `username` and `password` SHALL be percent-unquoted via
 `urllib.parse.unquote` before being passed to `redis.Redis(...)`. `db` SHALL be derived from the
-parsed URL's path segment, mirroring `redis-py`'s own `from_url` semantics: a decimal path
-segment (e.g. `/2`) sets `db` to that integer; an empty, absent, or non-decimal path segment
-(including a Unicode digit character that `str.isdecimal()` rejects, e.g. a superscript digit)
-defaults `db` to `0` (the guard that keeps a schemeless, path-less, or Unicode-digit-bearing URL
-from crashing this derivation). `port` SHALL be derived from `parsed.port`: an explicit port,
+parsed URL's path segment, mirroring `redis-py`'s own `from_url` semantics: an integer path
+segment (e.g. `/2`) sets `db` to that integer, converted inside a guard that catches exactly
+`int()`'s own failure mode (`ValueError`) rather than pre-validating the segment with a predicate.
+Any path segment `int()` rejects — empty, absent, non-integer, a Unicode digit character `int()`
+does not accept (e.g. a superscript digit), or a digit string over Python's integer-string
+conversion limit (4300+ digits) — SHALL default `db` to `0` (the guard that keeps a schemeless,
+path-less, non-integer, or over-limit path segment from crashing this derivation). `port` SHALL be
+derived from `parsed.port`: an explicit port,
 **including `0`**, SHALL be honored as given (distinguishing "unset" from the falsy value `0`), an
 unset port defaults to `6379`, and an unparseable port segment — non-numeric (e.g. `not-a-port`)
 or out-of-range (e.g. `99999999`, where `ParseResult.port` itself raises `ValueError`) — SHALL also
@@ -43,16 +46,28 @@ default to `6379` rather than propagating the exception out of `Status.__init__`
 - **WHEN** `cfg.status_broker()` returns a schemed broker URL with no path segment, e.g.
   `"rediss://host:6379"`
 - **THEN** `Status.__init__` passes `db=0` to `redis.Redis(...)` — the empty-path guard defaults
-  `db` rather than raising or passing a non-decimal value
+  `db` rather than raising or passing a non-integer value
 - **AND** `Status.__init__` does NOT raise when the path segment is empty, absent, or
-  non-decimal
+  non-integer
 
 #### Scenario: Unicode-digit path segment guards db to the default instead of crashing
 - **WHEN** `cfg.status_broker()` returns a schemed broker URL whose path segment is a Unicode
-  digit character `str.isdigit()` would accept but `int()` rejects, e.g. `"rediss://host:6379/²"`
-- **THEN** `Status.__init__` passes `db=0` to `redis.Redis(...)` — the `str.isdecimal()` guard
-  defaults `db` for this input rather than calling `int()` on it
+  digit character `int()` rejects, e.g. `"rediss://host:6379/²"`
+- **THEN** `Status.__init__` passes `db=0` to `redis.Redis(...)` — the `try`/`except ValueError`
+  guard around the `int()` conversion defaults `db` for this input rather than propagating the
+  exception `int()` raises for it
 - **AND** `Status.__init__` does NOT raise `ValueError`
+
+#### Scenario: An over-integer-string-limit path segment guards db to the default instead of crashing
+- **WHEN** `cfg.status_broker()` returns a schemed broker URL whose path segment is an all-digit
+  string over Python's integer-string conversion limit (4300+ digits), e.g.
+  `"rediss://host:6379/" + "1" * 4301`
+- **THEN** `Status.__init__` passes `db=0` to `redis.Redis(...)` — the `try`/`except ValueError`
+  guard around the `int()` conversion defaults `db` for this input rather than propagating the
+  `ValueError` `int()` raises for it
+- **AND** `Status.__init__` does NOT raise `ValueError`, even though this path segment would pass
+  a `str.isdecimal()` pre-check — the guard is on the conversion itself, not on a predicate that
+  approximates what `int()` accepts
 
 #### Scenario: Unparseable or out-of-range port segment guards port to the default
 - **WHEN** `cfg.status_broker()` returns a schemed broker URL whose port segment
@@ -128,17 +143,21 @@ broker-URL-parsing fix.
 ## Amendment history (informational — this change is not yet merged; the requirements above
 already state the final shipped behavior directly, superseding the original archived text)
 
-This change went through five review rounds before the requirements above reached their final,
+This change went through six review rounds before the requirements above reached their final,
 internally coherent form:
 
 - The change originally archived with a `db`-is-never-derived non-goal and a `parsed.port or 6379`
   port default. A user-directed scope amendment reversed the `db` non-goal (deriving `db` from the
   URL path segment, mirroring `redis-py`'s `from_url`).
-- Cross-family review then found three further raise-points on malformed input, fixed in order:
-  an unparseable/out-of-range port (`parsed.port` itself raising `ValueError`, F2), an explicit
-  `:0` port being incorrectly treated as unset by the falsy-`or` default (F3), a Unicode-digit `db`
-  path segment passing `str.isdigit()` but failing `int()` (F4), and finally `urlparse(broker_url)`
-  itself raising on a malformed bracketed authority (F5, this revision).
-- The requirements text above reflects the code as it stands after all five rounds — the same text
+- Cross-family review then found four further raise-points on malformed input, fixed in order: an
+  unparseable/out-of-range port (`parsed.port` itself raising `ValueError`, F2), an explicit `:0`
+  port being incorrectly treated as unset by the falsy-`or` default (F3), a Unicode-digit `db` path
+  segment passing `str.isdigit()` but failing `int()` (F4), `urlparse(broker_url)` itself raising
+  on a malformed bracketed authority (F5), and finally a `db` path segment over Python's
+  4300-digit integer-string conversion limit passing the F4 fix's own `str.isdecimal()` pre-check
+  but still failing `int()` (F6, this revision) — the same predicate-vs-converter gap F4 was meant
+  to close, this time closed by guarding the `int()` conversion itself with `try`/`except
+  ValueError` instead of any pre-check predicate.
+- The requirements text above reflects the code as it stands after all six rounds — the same text
   now also published to `openspec/specs/extract-status-broker-parsing/spec.md`, which remains the
   authoritative current source. `design.md`'s Decisions (D1–D5) record the rationale for each step.

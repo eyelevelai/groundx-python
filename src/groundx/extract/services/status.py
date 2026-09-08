@@ -41,7 +41,10 @@ class Status:
                 unquote(parsed.password) if parsed.password is not None else None
             )
             rl_db_path = parsed.path.lstrip("/")
-            rl_db = int(rl_db_path) if rl_db_path.isdecimal() else 0
+            try:
+                rl_db = int(rl_db_path)
+            except ValueError:
+                rl_db = 0
         else:
             rl_port = 6379
             rl_host = broker_url

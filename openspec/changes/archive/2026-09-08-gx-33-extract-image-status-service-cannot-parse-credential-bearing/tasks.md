@@ -14,15 +14,18 @@
 ## 2. Implement urlparse-based broker URL parsing (GREEN)
 
 - [x] 2.1 In `Status.__init__` (`src/groundx/extract/services/status.py`), replace the
-      string-stripping derivation with the `urlparse`-based derivation from `design.md` (D1–D3):
-      parse `cfg.status_broker()` once with `urllib.parse.urlparse`; when `parsed.hostname` is not
-      `None`, derive `host`/`port`/`ssl`/`username`/`password` from the parsed result
-      (`username`/`password` unquoted via `urllib.parse.unquote`, `port` falling back to `6379`,
-      `ssl` true only for scheme `rediss`); when `parsed.hostname` is `None` (schemeless
+      string-stripping derivation with the `urlparse`-based derivation from `design.md` (D1, D2, D3
+      as amended, D5): parse `cfg.status_broker()` once with `urllib.parse.urlparse`; when
+      `parsed.hostname` is not `None`, derive `host`/`port`/`ssl`/`username`/`password` from the
+      parsed result (`username`/`password` unquoted via `urllib.parse.unquote`, `port` falling back
+      to `6379`, `ssl` true only for scheme `rediss`) and derive `db` from the path segment,
+      converting it to an integer inside a `try`/`except ValueError` guard (never a pre-check
+      predicate) so an empty, absent, non-integer, or over-limit path segment defaults `db` to `0`
+      instead of crashing the constructor; when `parsed.hostname` is `None` (schemeless
       bare-address input), fall back to the existing string-stripping logic unchanged, with
-      `ssl=False`, `username=None`, `password=None`. Never derive `db` from any path segment. Pass
-      `username=`/`password=`/`ssl=` to `redis.Redis(...)` unconditionally (value `None` when
-      absent), alongside the four existing hardening kwargs, unchanged.
+      `ssl=False`, `username=None`, `password=None`, `db=0`. Pass `username=`/`password=`/`ssl=`/
+      `db=` to `redis.Redis(...)` unconditionally (value `None`/`0` when absent), alongside the four
+      existing hardening kwargs, unchanged.
       check: poetry run pytest "tests/extract/services/test_status.py::test_status_redis_client_derives_connection_params_from_broker_url" -q
 - [x] 2.2 Run the full `tests/extract/services/test_status.py` file to confirm the other `Status`
       tests (`prompt_init_lock`, `get_service_state` scan/deadline tests) are unaffected by the
