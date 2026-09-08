@@ -74,7 +74,7 @@ default to `6379` rather than propagating the exception out of `Status.__init__`
 - **AND** `Status.__init__` does NOT treat `parsed.port == 0` as equivalent to `parsed.port is
   None`
 
-### Requirement: Status falls back to legacy host/port derivation for schemeless broker strings
+### Requirement: Status falls back to legacy host/port derivation for schemeless or unparseable broker strings
 `Status.__init__` SHALL fall back to the existing string-stripping host/port derivation whenever
 `cfg.status_broker()` returns a schemeless broker string — one with no `redis://`/`rediss://`
 scheme, e.g. a bare `host:port` address, where `urlparse` does not populate `.hostname`/`.port` the
@@ -86,6 +86,15 @@ shape. This branch does NOT parse a `db` from the schemeless string's path; `db`
 as it always has for this input shape. This preserves current behavior for schemeless broker
 strings; it is a regression to be protected by a test, not merely a design note.
 
+`Status.__init__` SHALL also take this same fallback derivation whenever `urlparse` itself raises
+`ValueError` on `cfg.status_broker()`'s return value — e.g. a malformed bracketed authority such as
+`"rediss://[bad:6379/0"` ("Invalid IPv6 URL"). `Status.__init__` SHALL catch that `ValueError` and
+treat the parse failure identically to a missing `.hostname`, taking the legacy string-strip
+derivation against the raw broker string. This is the last of the three points inside this
+derivation that could raise on untrusted input (`urlparse(broker_url)` itself, `parsed.port`, and
+`int()` on the `db` path segment); with this guard in place, no `broker_url` value can propagate an
+exception out of `Status.__init__`.
+
 #### Scenario: Schemeless bare-address broker string keeps working exactly as before
 - **WHEN** `cfg.status_broker()` returns `"host:6379/0"` (no `redis://`/`rediss://` scheme)
 - **THEN** `Status.__init__` constructs `redis.Redis(...)` with `host="host"`, `port=6379`,
@@ -93,6 +102,15 @@ strings; it is a regression to be protected by a test, not merely a design note.
 - **AND** `Status.__init__` does NOT raise and does NOT route this input through the credentialed
   URL-parse branch as if it were an unparseable/failing broker value — the schemeless case is
   intentionally skipped past that branch, not rejected by it
+
+#### Scenario: A broker string urlparse cannot parse falls back to the legacy derivation
+- **WHEN** `cfg.status_broker()` returns a broker string `urlparse` raises `ValueError` on, e.g.
+  `"rediss://[bad:6379/0"` (an unbalanced bracketed authority)
+- **THEN** `Status.__init__` does NOT raise `ValueError` and does NOT propagate the exception
+  `urlparse` raises for that input
+- **AND** `Status.__init__` derives `host`, `port`, and `ssl` via the same legacy string-strip
+  derivation used for a schemeless broker string, against the raw (unparsed) broker string, with
+  `username=None`, `password=None`, and `db=0`
 
 ### Requirement: Status preserves the existing Redis client hardening kwargs unchanged
 Regardless of the broker URL's shape, `Status.__init__` SHALL continue to pass

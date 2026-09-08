@@ -2,12 +2,19 @@
 
 ### Requirement: Status derives Redis connection parameters by parsing the broker URL
 `groundx.extract.services.Status.__init__` SHALL derive the `redis.Redis(...)` connection
-parameters (`host`, `port`, `username`, `password`, `ssl`) by parsing the value
+parameters (`host`, `port`, `username`, `password`, `ssl`, `db`) by parsing the value
 `cfg.status_broker()` returns with `urllib.parse.urlparse`, rather than by string-stripping a
 scheme prefix and a trailing `/0`. `username` and `password` SHALL be percent-unquoted via
-`urllib.parse.unquote` before being passed to `redis.Redis(...)`. `db` SHALL NOT be derived from
-the broker URL; the `redis.Redis` default (`db=0`) is preserved regardless of any path segment
-present in the broker URL.
+`urllib.parse.unquote` before being passed to `redis.Redis(...)`. `db` SHALL be derived from the
+parsed URL's path segment, mirroring `redis-py`'s own `from_url` semantics: a decimal path
+segment (e.g. `/2`) sets `db` to that integer; an empty, absent, or non-decimal path segment
+(including a Unicode digit character that `str.isdecimal()` rejects, e.g. a superscript digit)
+defaults `db` to `0` (the guard that keeps a schemeless, path-less, or Unicode-digit-bearing URL
+from crashing this derivation). `port` SHALL be derived from `parsed.port`: an explicit port,
+**including `0`**, SHALL be honored as given (distinguishing "unset" from the falsy value `0`), an
+unset port defaults to `6379`, and an unparseable port segment — non-numeric (e.g. `not-a-port`)
+or out-of-range (e.g. `99999999`, where `ParseResult.port` itself raises `ValueError`) — SHALL also
+default to `6379` rather than propagating the exception out of `Status.__init__`.
 
 #### Scenario: Credential-bearing rediss broker URL yields an authenticated, connectable client
 - **WHEN** `cfg.status_broker()` returns `"rediss://svc_redis:S3cr3t%20p%40ss%2Fw%23rd@host:6379/0"`
@@ -25,13 +32,46 @@ present in the broker URL.
 - **AND** the client is NOT constructed with `ssl=True` (the scheme is `redis`, not `rediss`) and
   is NOT constructed without `username`/`password` set
 
-#### Scenario: Broker URL path segment never sets a non-default db
+#### Scenario: Broker URL path segment derives a non-default db
 - **WHEN** `cfg.status_broker()` returns a broker URL with a non-`/0` database path segment, e.g.
   `"rediss://user:pass@host:6379/2"`
-- **THEN** `Status.__init__` does NOT pass a `db` kwarg derived from `/2` to `redis.Redis(...)`
-- **AND** the constructed client keeps the `redis.Redis` default `db=0`
+- **THEN** `Status.__init__` passes `db=2` to `redis.Redis(...)`, derived from the `/2` path
+  segment
+- **AND** the constructed client is NOT given the `redis.Redis` default `db=0`
 
-### Requirement: Status falls back to legacy host/port derivation for schemeless broker strings
+#### Scenario: Empty or absent path segment guards db to the default
+- **WHEN** `cfg.status_broker()` returns a schemed broker URL with no path segment, e.g.
+  `"rediss://host:6379"`
+- **THEN** `Status.__init__` passes `db=0` to `redis.Redis(...)` — the empty-path guard defaults
+  `db` rather than raising or passing a non-decimal value
+- **AND** `Status.__init__` does NOT raise when the path segment is empty, absent, or
+  non-decimal
+
+#### Scenario: Unicode-digit path segment guards db to the default instead of crashing
+- **WHEN** `cfg.status_broker()` returns a schemed broker URL whose path segment is a Unicode
+  digit character `str.isdigit()` would accept but `int()` rejects, e.g. `"rediss://host:6379/²"`
+- **THEN** `Status.__init__` passes `db=0` to `redis.Redis(...)` — the `str.isdecimal()` guard
+  defaults `db` for this input rather than calling `int()` on it
+- **AND** `Status.__init__` does NOT raise `ValueError`
+
+#### Scenario: Unparseable or out-of-range port segment guards port to the default
+- **WHEN** `cfg.status_broker()` returns a schemed broker URL whose port segment
+  `ParseResult.port` cannot parse — non-numeric (e.g. `"redis://host:not-a-port/0"`) or
+  out-of-range (e.g. `"rediss://host:99999999/0"`)
+- **THEN** `Status.__init__` passes `port=6379` to `redis.Redis(...)`, the same default used for
+  an unset port
+- **AND** `Status.__init__` does NOT raise `ValueError` and does NOT propagate the exception
+  `parsed.port` raises for that input
+
+#### Scenario: An explicit zero port is honored, not defaulted
+- **WHEN** `cfg.status_broker()` returns a schemed broker URL with an explicit `:0` port, e.g.
+  `"rediss://host:0/0"`
+- **THEN** `Status.__init__` passes `port=0` to `redis.Redis(...)` — the falsy value `0` is
+  distinguished from an unset port and is NOT overridden to `6379`
+- **AND** `Status.__init__` does NOT treat `parsed.port == 0` as equivalent to `parsed.port is
+  None`
+
+### Requirement: Status falls back to legacy host/port derivation for schemeless or unparseable broker strings
 `Status.__init__` SHALL fall back to the existing string-stripping host/port derivation whenever
 `cfg.status_broker()` returns a schemeless broker string — one with no `redis://`/`rediss://`
 scheme, e.g. a bare `host:port` address, where `urlparse` does not populate `.hostname`/`.port` the
@@ -39,16 +79,35 @@ way a schemed URL does. `Status.__init__` SHALL detect that case by checking whe
 `.hostname` is `None`, and in that case SHALL fall back to the existing string-stripping
 derivation — trim a trailing `/0`, then split the remainder on the last `:` for a numeric port —
 producing the same `host`, `port`, and `ssl=False` the prior implementation produced for that input
-shape. This preserves current behavior for schemeless broker strings; it is a regression to be
-protected by a test, not merely a design note.
+shape. This branch does NOT parse a `db` from the schemeless string's path; `db` defaults to `0`,
+as it always has for this input shape. This preserves current behavior for schemeless broker
+strings; it is a regression to be protected by a test, not merely a design note.
+
+`Status.__init__` SHALL also take this same fallback derivation whenever `urlparse` itself raises
+`ValueError` on `cfg.status_broker()`'s return value — e.g. a malformed bracketed authority such as
+`"rediss://[bad:6379/0"` ("Invalid IPv6 URL"). `Status.__init__` SHALL catch that `ValueError` and
+treat the parse failure identically to a missing `.hostname`, taking the legacy string-strip
+derivation against the raw broker string. This is the last of the three points inside this
+derivation that could raise on untrusted input (`urlparse(broker_url)` itself, `parsed.port`, and
+`int()` on the `db` path segment); with this guard in place, no `broker_url` value can propagate an
+exception out of `Status.__init__`.
 
 #### Scenario: Schemeless bare-address broker string keeps working exactly as before
 - **WHEN** `cfg.status_broker()` returns `"host:6379/0"` (no `redis://`/`rediss://` scheme)
-- **THEN** `Status.__init__` constructs `redis.Redis(...)` with `host="host"`, `port=6379`, and
-  `ssl=False`, matching the pre-fix behavior for this input shape
+- **THEN** `Status.__init__` constructs `redis.Redis(...)` with `host="host"`, `port=6379`,
+  `ssl=False`, and `db=0`, matching the pre-fix behavior for this input shape
 - **AND** `Status.__init__` does NOT raise and does NOT route this input through the credentialed
   URL-parse branch as if it were an unparseable/failing broker value — the schemeless case is
   intentionally skipped past that branch, not rejected by it
+
+#### Scenario: A broker string urlparse cannot parse falls back to the legacy derivation
+- **WHEN** `cfg.status_broker()` returns a broker string `urlparse` raises `ValueError` on, e.g.
+  `"rediss://[bad:6379/0"` (an unbalanced bracketed authority)
+- **THEN** `Status.__init__` does NOT raise `ValueError` and does NOT propagate the exception
+  `urlparse` raises for that input
+- **AND** `Status.__init__` derives `host`, `port`, and `ssl` via the same legacy string-strip
+  derivation used for a schemeless broker string, against the raw (unparsed) broker string, with
+  `username=None`, `password=None`, and `db=0`
 
 ### Requirement: Status preserves the existing Redis client hardening kwargs unchanged
 Regardless of the broker URL's shape, `Status.__init__` SHALL continue to pass
@@ -63,63 +122,23 @@ broker-URL-parsing fix.
   `retry=redis.retry.Retry(redis.backoff.NoBackoff(), 0)`, `socket_connect_timeout=5.0`, and
   `socket_timeout=5.0`
 - **AND** none of these four kwargs is omitted, renamed, or given a different value by the
-  broker-URL-parsing fix — the exact-kwargs assertion gains new `username`/`password`/`ssl`
+  broker-URL-parsing fix — the exact-kwargs assertion gains new `username`/`password`/`ssl`/`db`
   expectations, it does not lose any of the four hardening kwargs it already asserts
 
-## Amendments
+## Amendment history (informational — this change is not yet merged; the requirements above
+already state the final shipped behavior directly, superseding the original archived text)
 
-### Amendment (2026-09-08): `db` derivation reversed
+This change went through five review rounds before the requirements above reached their final,
+internally coherent form:
 
-The "Status derives Redis connection parameters by parsing the broker URL" requirement above, as
-originally archived, stated `db` SHALL NOT be derived from the broker URL. A user-directed scope
-amendment on 2026-09-08 reversed that non-goal — see `design.md`'s D3 amendment note for the
-rationale. The live, current requirement now reads:
-
-`db` SHALL be derived from the parsed URL's path segment, mirroring `redis-py`'s own `from_url`
-semantics: a numeric path segment (e.g. `/2`) sets `db` to that integer; an empty, absent, or
-non-numeric path segment defaults `db` to `0` (the guard that keeps a schemeless or path-less URL
-from crashing this derivation). The schemeless-fallback branch does not parse a `db` from its
-input and continues to pass `db=0`.
-
-The current, authoritative text of this requirement lives in
-`openspec/specs/extract-status-broker-parsing/spec.md` — this archived delta is left as
-originally shipped above, per the record-hygiene rule against silently rewriting a shipped
-record.
-
-### Amendment (2026-09-08): schemed-branch port access guarded against a malformed port
-
-A cross-family review finding (F2, verified) on the `db`-derivation amendment above showed the
-schemed branch's `rl_port = parsed.port or 6379` raises `ValueError` when the broker URL's port
-segment is non-numeric (e.g. `"redis://host:not-a-port/0"`) or out-of-range (e.g.
-`"rediss://host:99999999/0"`), because `ParseResult.port` itself raises for those inputs —
-crashing `Status.__init__` on a malformed but schemed broker URL. The port access is now wrapped
-in `try`/`except ValueError`, falling back to the same `6379` default used for an unset port.
-Hostname, credentials, ssl, `db`, and every hardening kwarg are unchanged by this guard.
-
-The current, authoritative text of the port-derivation guard lives in
-`openspec/specs/extract-status-broker-parsing/spec.md` — this archived delta is left as
-originally shipped above, per the record-hygiene rule against silently rewriting a shipped
-record.
-
-### Amendment (2026-09-08): explicit zero port honored; Unicode-digit db path guarded
-
-Two cross-family review minors (F3, F4, verified) on the port/db guards above:
-
-- F3 — the schemed branch's `rl_port = parsed.port or 6379` treated an explicit `:0` port as
-  unset (`0` is falsy in Python), overriding it to `6379` and diverging from the legacy numeric
-  derivation, which honors an explicit `0`. The port access now reads
-  `rl_port = parsed.port if parsed.port is not None else 6379`, kept inside the existing
-  `try`/`except ValueError -> 6379` guard, so a malformed/out-of-range port still falls back to
-  `6379` while an explicit `0` is honored.
-- F4 — the db guard's `rl_db_path.isdigit()` returns `True` for a Unicode digit character (e.g. a
-  superscript digit) that `int()` then rejects with `ValueError`, so the guard could still crash.
-  The guard now reads `rl_db_path.isdecimal()`, which is `False` for a Unicode digit `int()`
-  cannot parse, so that input defaults `db` to `0` instead of raising. ASCII `"0".."9"` is
-  unaffected.
-
-Hostname, credentials, ssl, and every hardening kwarg are unchanged by these two guards.
-
-The current, authoritative text of the port and db guards lives in
-`openspec/specs/extract-status-broker-parsing/spec.md` — this archived delta is left as
-originally shipped above, per the record-hygiene rule against silently rewriting a shipped
-record.
+- The change originally archived with a `db`-is-never-derived non-goal and a `parsed.port or 6379`
+  port default. A user-directed scope amendment reversed the `db` non-goal (deriving `db` from the
+  URL path segment, mirroring `redis-py`'s `from_url`).
+- Cross-family review then found three further raise-points on malformed input, fixed in order:
+  an unparseable/out-of-range port (`parsed.port` itself raising `ValueError`, F2), an explicit
+  `:0` port being incorrectly treated as unset by the falsy-`or` default (F3), a Unicode-digit `db`
+  path segment passing `str.isdigit()` but failing `int()` (F4), and finally `urlparse(broker_url)`
+  itself raising on a malformed bracketed authority (F5, this revision).
+- The requirements text above reflects the code as it stands after all five rounds — the same text
+  now also published to `openspec/specs/extract-status-broker-parsing/spec.md`, which remains the
+  authoritative current source. `design.md`'s Decisions (D1–D5) record the rationale for each step.

@@ -22,11 +22,14 @@ class Status:
         import redis
 
         broker_url = cfg.status_broker()
-        parsed = urlparse(broker_url)
+        try:
+            parsed: typing.Optional[typing.Any] = urlparse(broker_url)
+        except ValueError:
+            parsed = None
         rl_username: typing.Optional[str] = None
         rl_password: typing.Optional[str] = None
         rl_db = 0
-        if parsed.hostname is not None:
+        if parsed is not None and parsed.hostname is not None:
             rl_host = parsed.hostname
             try:
                 rl_port = parsed.port if parsed.port is not None else 6379

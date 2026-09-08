@@ -157,6 +157,18 @@ def _status_with_client(client: typing.Any) -> Status:
             },
             id="unicode-digit-db-path-segment-defaults-db-to-zero",
         ),
+        pytest.param(
+            "rediss://[bad:6379/0",
+            {
+                "host": "[bad",
+                "port": 6379,
+                "ssl": True,
+                "username": None,
+                "password": None,
+                "db": 0,
+            },
+            id="malformed-bracketed-authority-falls-back-to-legacy-derivation",
+        ),
     ],
 )
 def test_status_redis_client_derives_connection_params_from_broker_url(

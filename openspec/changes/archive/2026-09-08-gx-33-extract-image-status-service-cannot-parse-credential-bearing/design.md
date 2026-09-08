@@ -58,19 +58,36 @@ Confirmed non-goal (see Non-Goals). `redis.Redis`'s own default (`db=0`) is pres
 > **Amendment (2026-09-08): D3 reversed.** A user-directed scope amendment on 2026-09-08 reversed
 > this non-goal. `Status.__init__` now derives `db` from the schemed URL's path segment, mirroring
 > `redis-py`'s own `from_url` semantics: `db_path = parsed.path.lstrip("/")`; `db = int(db_path) if
-> db_path.isdigit() else 0`. The guard (`isdigit()`) exists specifically so an empty or path-less
-> URL (`rediss://host:6379`, no `/N` segment) cannot crash this derivation — it defaults to `0`
-> instead. The schemeless-fallback branch (D1, `parsed.hostname is None`) is unaffected: it still
-> does not parse a `db` from its input, and continues to pass `db=0` (now passed explicitly rather
-> than implicitly relying on `redis.Redis`'s own default, matching D2's "always pass explicitly"
-> pattern). See `specs/extract-status-broker-parsing/spec.md`'s own amendment note for the
-> corresponding spec-level reversal, and `openspec/specs/extract-status-broker-parsing/spec.md`
-> for the current, authoritative requirement text.
+> db_path.isdecimal() else 0` (F4 below hardened the guard from an initial `isdigit()` to
+> `isdecimal()`, so this note states the final guard directly). The guard exists specifically so an
+> empty, path-less, or non-decimal path segment (`rediss://host:6379`, no `/N` segment) cannot
+> crash this derivation — it defaults to `0` instead. The schemeless-fallback branch (D1,
+> `parsed.hostname is None`) is unaffected: it still does not parse a `db` from its input, and
+> continues to pass `db=0` (now passed explicitly rather than implicitly relying on `redis.Redis`'s
+> own default, matching D2's "always pass explicitly" pattern). See
+> `specs/extract-status-broker-parsing/spec.md`'s own requirement text for the corresponding
+> spec-level reversal, and `openspec/specs/extract-status-broker-parsing/spec.md` for the current,
+> authoritative requirement text.
 
 **D4 — No ADR.** This is a single-function bug fix inside an already-hand-written, already-`stdlib`
 module (`urllib.parse` and `redis`'s own kwargs, no new dependency, no new architectural pattern,
 no data-model or cross-module contract change). It does not meet the repo's own ADR bar
 ("architecturally significant or hard-to-reverse decisions").
+
+**D5 — `urlparse` itself is guarded; `Status.__init__` cannot crash on any broker string (F5).** A
+cross-family review finding (F5) showed `parsed = urlparse(broker_url)` — the derivation's own
+entry point — raises `ValueError` for a malformed bracketed authority (e.g.
+`"rediss://[bad:6379/0"`, "Invalid IPv6 URL"), crashing the constructor before D1's
+`parsed.hostname is not None` branch ever runs. `Status.__init__` now calls `urlparse` inside a
+`try`/`except ValueError`, setting `parsed = None` on failure; D1's branch condition becomes
+`parsed is not None and parsed.hostname is not None`, so a parse failure takes the same
+schemeless/legacy string-strip path as a `None` hostname. **Invariant: `Status.__init__` cannot
+raise on any `broker_url` value** — every value either parses into a schemed URL with a resolvable
+hostname (D1's structured branch) or falls back to the legacy derivation (D1's else branch),
+whether it lacks a scheme, fails to parse at all (this decision), has an unparseable/out-of-range
+port (F2/F3), or has a non-decimal `db` path segment (F4). The three points inside this derivation
+that can raise from untrusted input — `urlparse(broker_url)`, `parsed.port`, and `int(rl_db_path)`
+— are now all guarded; none propagates out of `Status.__init__`.
 
 ## `.fernignore` scope confirmation
 
@@ -82,11 +99,13 @@ regenerated `tests/` root) is touched.
 
 ## Risks / Trade-offs
 
-- [Risk] A future broker-URL shape neither schemed nor a clean bare `host:port` (e.g. malformed
-  input) could fall into the schemeless branch and produce an unexpected host/port via the legacy
-  string-stripping logic. → Mitigation: this is the pre-existing behavior for any input the current
-  code already accepts; this change does not widen or narrow what `Status.__init__` tolerates as
-  input, it only adds correct credential/ssl derivation for the schemed case.
+- [Risk, resolved by D5] A broker-URL shape neither schemed nor a clean bare `host:port` (e.g. a
+  malformed bracketed authority `urlparse` cannot parse at all) could crash `Status.__init__`
+  instead of degrading gracefully. → Resolution: D5 routes any `urlparse` failure into the same
+  legacy string-strip branch used for a schemeless string, so this input class now produces a
+  best-effort `host`/`port` via the legacy string-stripping logic instead of raising — the same
+  behavior this change already guarantees for the schemeless case, extended to cover a
+  parse-failing case D1 alone did not.
 - [Risk] Always passing `username=None, password=None` to `redis.Redis(...)` changes the exact
   kwargs dict for every existing and new test, not just the credentialed one. → Mitigation:
   `tasks.md` explicitly updates every existing assertion in `tests/extract/services/test_status.py`
