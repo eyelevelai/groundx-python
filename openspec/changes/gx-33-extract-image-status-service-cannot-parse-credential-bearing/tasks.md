@@ -34,7 +34,7 @@
 - [ ] 3.1 Type-check with the CI-declared mypy gate (`poetry run mypy .`, no `--extras extract` —
       the extract package falls back to `Any` under that gate, so this is a cheap sanity pass, not
       the primary correctness signal for this change).
-      check: poetry run mypy .
+      check: n/a — CI static type gate (mypy), not a behavioral acceptance check; passes on unchanged code by design
 
 Note: no consumer needs a dependency-pin bump for this fix (see `proposal.md` Impact) — the public
 `Status(cfg, logger)` constructor signature is unchanged, and `internal-arcadia-agents` (the only
