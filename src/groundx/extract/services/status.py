@@ -25,6 +25,7 @@ class Status:
         parsed = urlparse(broker_url)
         rl_username: typing.Optional[str] = None
         rl_password: typing.Optional[str] = None
+        rl_db = 0
         if parsed.hostname is not None:
             rl_host = parsed.hostname
             rl_port = parsed.port or 6379
@@ -33,6 +34,8 @@ class Status:
             rl_password = (
                 unquote(parsed.password) if parsed.password is not None else None
             )
+            rl_db_path = parsed.path.lstrip("/")
+            rl_db = int(rl_db_path) if rl_db_path.isdigit() else 0
         else:
             rl_port = 6379
             rl_host = broker_url
@@ -57,6 +60,7 @@ class Status:
             ssl=rl_ssl,
             username=rl_username,
             password=rl_password,
+            db=rl_db,
             retry=redis.retry.Retry(redis.backoff.NoBackoff(), 0),
             socket_connect_timeout=REDIS_CONNECT_TIMEOUT_SECONDS,
             socket_timeout=REDIS_SOCKET_TIMEOUT_SECONDS,

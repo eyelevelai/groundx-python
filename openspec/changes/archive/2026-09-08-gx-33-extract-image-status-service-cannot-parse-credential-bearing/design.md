@@ -11,8 +11,9 @@
   `socket_connect_timeout`, `socket_timeout`) are untouched.
 
 **Non-Goals (confirmed scope boundary, not deferred follow-ups):**
-- Deriving `db` from the broker URL's path segment. `redis.Redis`'s own default (`db=0`) is kept
-  regardless of what path segment a broker URL carries.
+- ~~Deriving `db` from the broker URL's path segment. `redis.Redis`'s own default (`db=0`) is kept
+  regardless of what path segment a broker URL carries.~~ **Reversed 2026-09-08 — see D3's
+  amendment note below.**
 - `ssl_cert_reqs` handling for self-signed/internal certs. The Linear issue body raises it as
   something to "also consider," and the confirmed source-of-truth table marks it "a design-phase
   confirmation, not a build task" for GX-33 — this design confirms it stays out, it is not a TODO
@@ -53,6 +54,18 @@ explicitly in the exact-kwargs test, rather than omitting those keys.
 
 **D3 — `db` is never derived; the constructor never receives a `db` kwarg from this parsing path.**
 Confirmed non-goal (see Non-Goals). `redis.Redis`'s own default (`db=0`) is preserved.
+
+> **Amendment (2026-09-08): D3 reversed.** A user-directed scope amendment on 2026-09-08 reversed
+> this non-goal. `Status.__init__` now derives `db` from the schemed URL's path segment, mirroring
+> `redis-py`'s own `from_url` semantics: `db_path = parsed.path.lstrip("/")`; `db = int(db_path) if
+> db_path.isdigit() else 0`. The guard (`isdigit()`) exists specifically so an empty or path-less
+> URL (`rediss://host:6379`, no `/N` segment) cannot crash this derivation — it defaults to `0`
+> instead. The schemeless-fallback branch (D1, `parsed.hostname is None`) is unaffected: it still
+> does not parse a `db` from its input, and continues to pass `db=0` (now passed explicitly rather
+> than implicitly relying on `redis.Redis`'s own default, matching D2's "always pass explicitly"
+> pattern). See `specs/extract-status-broker-parsing/spec.md`'s own amendment note for the
+> corresponding spec-level reversal, and `openspec/specs/extract-status-broker-parsing/spec.md`
+> for the current, authoritative requirement text.
 
 **D4 — No ADR.** This is a single-function bug fix inside an already-hand-written, already-`stdlib`
 module (`urllib.parse` and `redis`'s own kwargs, no new dependency, no new architectural pattern,

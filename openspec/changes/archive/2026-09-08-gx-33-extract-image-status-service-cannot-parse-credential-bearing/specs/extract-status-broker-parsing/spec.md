@@ -65,3 +65,23 @@ broker-URL-parsing fix.
 - **AND** none of these four kwargs is omitted, renamed, or given a different value by the
   broker-URL-parsing fix — the exact-kwargs assertion gains new `username`/`password`/`ssl`
   expectations, it does not lose any of the four hardening kwargs it already asserts
+
+## Amendments
+
+### Amendment (2026-09-08): `db` derivation reversed
+
+The "Status derives Redis connection parameters by parsing the broker URL" requirement above, as
+originally archived, stated `db` SHALL NOT be derived from the broker URL. A user-directed scope
+amendment on 2026-09-08 reversed that non-goal — see `design.md`'s D3 amendment note for the
+rationale. The live, current requirement now reads:
+
+`db` SHALL be derived from the parsed URL's path segment, mirroring `redis-py`'s own `from_url`
+semantics: a numeric path segment (e.g. `/2`) sets `db` to that integer; an empty, absent, or
+non-numeric path segment defaults `db` to `0` (the guard that keeps a schemeless or path-less URL
+from crashing this derivation). The schemeless-fallback branch does not parse a `db` from its
+input and continues to pass `db=0`.
+
+The current, authoritative text of this requirement lives in
+`openspec/specs/extract-status-broker-parsing/spec.md` — this archived delta is left as
+originally shipped above, per the record-hygiene rule against silently rewriting a shipped
+record.
