@@ -19,8 +19,11 @@ class _Settings:
     workers = 4
     cache_to = 300
 
+    def __init__(self, broker_url: str = "rediss://redis.test:6380/0") -> None:
+        self._broker_url = broker_url
+
     def status_broker(self) -> str:
-        return "rediss://redis.test:6380/0"
+        return self._broker_url
 
 
 def _status_with_client(client: typing.Any) -> Status:
@@ -31,7 +34,171 @@ def _status_with_client(client: typing.Any) -> Status:
     return typing.cast(Status, status)
 
 
-def test_status_redis_client_has_explicit_socket_bounds() -> None:
+@pytest.mark.parametrize(
+    ("broker_url", "expected_connection_kwargs"),
+    [
+        pytest.param(
+            "rediss://svc_redis:S3cr3t%20p%40ss%2Fw%23rd@host:6379/0",
+            {
+                "host": "host",
+                "port": 6379,
+                "ssl": True,
+                "username": "svc_redis",
+                "password": "S3cr3t p@ss/w#rd",
+                "db": 0,
+            },
+            id="credentialed-rediss-url-is-parsed-and-authenticated",
+        ),
+        pytest.param(
+            "redis://svc_redis:S3cr3t%20p%40ss%2Fw%23rd@host:6379/0",
+            {
+                "host": "host",
+                "port": 6379,
+                "ssl": False,
+                "username": "svc_redis",
+                "password": "S3cr3t p@ss/w#rd",
+                "db": 0,
+            },
+            id="credentialed-plaintext-redis-url-is-parsed-and-authenticated",
+        ),
+        pytest.param(
+            "rediss://user:pass@host:6379/2",
+            {
+                "host": "host",
+                "port": 6379,
+                "ssl": True,
+                "username": "user",
+                "password": "pass",
+                "db": 2,
+            },
+            id="non-default-db-path-segment-is-derived",
+        ),
+        pytest.param(
+            "host:6379/0",
+            {
+                "host": "host",
+                "port": 6379,
+                "ssl": False,
+                "username": None,
+                "password": None,
+                "db": 0,
+            },
+            id="schemeless-bare-address-broker-string-keeps-legacy-derivation",
+        ),
+        pytest.param(
+            "rediss://redis.test:6380/0",
+            {
+                "host": "redis.test",
+                "port": 6380,
+                "ssl": True,
+                "username": None,
+                "password": None,
+                "db": 0,
+            },
+            id="credential-free-schemed-url-still-derives-host-port-and-ssl",
+        ),
+        pytest.param(
+            "rediss://host:6379",
+            {
+                "host": "host",
+                "port": 6379,
+                "ssl": True,
+                "username": None,
+                "password": None,
+                "db": 0,
+            },
+            id="empty-path-segment-defaults-db-to-zero",
+        ),
+        pytest.param(
+            "redis://host:not-a-port/0",
+            {
+                "host": "host",
+                "port": 6379,
+                "ssl": False,
+                "username": None,
+                "password": None,
+                "db": 0,
+            },
+            id="non-numeric-port-segment-defaults-port-to-6379",
+        ),
+        pytest.param(
+            "rediss://host:99999999/0",
+            {
+                "host": "host",
+                "port": 6379,
+                "ssl": True,
+                "username": None,
+                "password": None,
+                "db": 0,
+            },
+            id="out-of-range-port-segment-defaults-port-to-6379",
+        ),
+        pytest.param(
+            "rediss://host:0/0",
+            {
+                "host": "host",
+                "port": 0,
+                "ssl": True,
+                "username": None,
+                "password": None,
+                "db": 0,
+            },
+            id="explicit-zero-port-is-honored-not-defaulted",
+        ),
+        pytest.param(
+            "rediss://host:6379/²",
+            {
+                "host": "host",
+                "port": 6379,
+                "ssl": True,
+                "username": None,
+                "password": None,
+                "db": 0,
+            },
+            id="unicode-digit-db-path-segment-defaults-db-to-zero",
+        ),
+        pytest.param(
+            "rediss://[bad:6379/0",
+            {
+                "host": "[bad",
+                "port": 6379,
+                "ssl": True,
+                "username": None,
+                "password": None,
+                "db": 0,
+            },
+            id="malformed-bracketed-authority-falls-back-to-legacy-derivation",
+        ),
+        pytest.param(
+            f"rediss://host:6379/{'1' * 4301}",
+            {
+                "host": "host",
+                "port": 6379,
+                "ssl": True,
+                "username": None,
+                "password": None,
+                "db": 0,
+            },
+            id="over-integer-string-limit-db-path-segment-defaults-db-to-zero",
+        ),
+        pytest.param(
+            "host:²/0",
+            {
+                "host": "host:²",
+                "port": 6379,
+                "ssl": False,
+                "username": None,
+                "password": None,
+                "db": 0,
+            },
+            id="schemeless-non-numeric-legacy-port-segment-keeps-default-port-and-host",
+        ),
+    ],
+)
+def test_status_redis_client_derives_connection_params_from_broker_url(
+    broker_url: str,
+    expected_connection_kwargs: typing.Dict[str, typing.Any],
+) -> None:
     redis_factory = Mock()
     no_backoff = object()
     retry_policy = object()
@@ -45,16 +212,14 @@ def test_status_redis_client_has_explicit_socket_bounds() -> None:
     setattr(redis_module, "retry", types.SimpleNamespace(Retry=retry_factory))
 
     with patch.dict(sys.modules, {"redis": redis_module}):
-        Status(_Settings(), _Logger())  # type: ignore[arg-type]
+        Status(_Settings(broker_url), _Logger())  # type: ignore[arg-type]
 
     assert redis_factory.call_args.kwargs == {
         "decode_responses": True,
-        "host": "redis.test",
-        "port": 6380,
         "retry": retry_policy,
         "socket_connect_timeout": 5.0,
         "socket_timeout": 5.0,
-        "ssl": True,
+        **expected_connection_kwargs,
     }
     no_backoff_factory.assert_called_once_with()
     retry_factory.assert_called_once_with(no_backoff, 0)
