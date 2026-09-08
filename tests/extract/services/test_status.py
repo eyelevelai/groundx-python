@@ -81,6 +81,17 @@ def _status_with_client(client: typing.Any) -> Status:
             },
             id="schemeless-bare-address-broker-string-keeps-legacy-derivation",
         ),
+        pytest.param(
+            "rediss://redis.test:6380/0",
+            {
+                "host": "redis.test",
+                "port": 6380,
+                "ssl": True,
+                "username": None,
+                "password": None,
+            },
+            id="credential-free-schemed-url-still-derives-host-port-and-ssl",
+        ),
     ],
 )
 def test_status_redis_client_derives_connection_params_from_broker_url(
