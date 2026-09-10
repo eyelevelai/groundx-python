@@ -581,8 +581,8 @@
   "owner": "groundx-python",
   "registry_binding": {
     "method": "guarded_migration",
-    "registry_digest": "4f0347b2f9057f9af65a41d557dc8be619a62c892621c9822c5a5f208e3832b9",
-    "registry_sha256": "888e77f51da9b331303ea080df118cdcf5d00d3e3263b8f54e8f62d629a7f659",
+    "registry_digest": "7fc31e434f036e6c3735c72ba9741703e5ee2336f8aeaed44de2b069f5dc1e3b",
+    "registry_sha256": "c3bfab337f92347ae99924b036fd41ad379fd9026e734488abf6ac050bf39b3e",
     "schema_version": "extraction_fixture_registry_binding_v1"
   },
   "review": {
