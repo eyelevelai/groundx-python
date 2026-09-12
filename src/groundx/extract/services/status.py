@@ -1,5 +1,6 @@
 import time
 import typing
+from urllib.parse import unquote, urlparse
 
 from ..settings.settings import ContainerSettings
 from .logger import Logger
@@ -20,27 +21,57 @@ class Status:
     ) -> None:
         import redis
 
-        rl_port = 6379
-        rl_host = cfg.status_broker()
-        rl_ssl = False
-        if rl_host.endswith("/0"):
-            rl_host = rl_host[:-2]
-        if rl_host.startswith("redis://"):
-            rl_host = rl_host[8:]
-        elif rl_host.startswith("rediss://"):
-            rl_host = rl_host[9:]
-            rl_ssl = True
-        if ":" in rl_host:
-            base, number = rl_host.rsplit(":", 1)
-            if number.isdigit():
-                rl_port = int(number)
-                rl_host = base
+        broker_url = cfg.status_broker()
+        try:
+            parsed: typing.Optional[typing.Any] = urlparse(broker_url)
+        except ValueError:
+            parsed = None
+        rl_username: typing.Optional[str] = None
+        rl_password: typing.Optional[str] = None
+        rl_db = 0
+        if parsed is not None and parsed.hostname is not None:
+            rl_host = parsed.hostname
+            try:
+                rl_port = parsed.port if parsed.port is not None else 6379
+            except ValueError:
+                rl_port = 6379
+            rl_ssl = parsed.scheme == "rediss"
+            rl_username = unquote(parsed.username) if parsed.username else None
+            rl_password = (
+                unquote(parsed.password) if parsed.password is not None else None
+            )
+            rl_db_path = parsed.path.lstrip("/")
+            try:
+                rl_db = int(rl_db_path)
+            except ValueError:
+                rl_db = 0
+        else:
+            rl_port = 6379
+            rl_host = broker_url
+            rl_ssl = False
+            if rl_host.endswith("/0"):
+                rl_host = rl_host[:-2]
+            if rl_host.startswith("redis://"):
+                rl_host = rl_host[8:]
+            elif rl_host.startswith("rediss://"):
+                rl_host = rl_host[9:]
+                rl_ssl = True
+            if ":" in rl_host:
+                base, number = rl_host.rsplit(":", 1)
+                try:
+                    rl_port = int(number)
+                    rl_host = base
+                except ValueError:
+                    pass
 
         self.client = redis.Redis(
             host=rl_host,
             port=rl_port,
             decode_responses=True,
             ssl=rl_ssl,
+            username=rl_username,
+            password=rl_password,
+            db=rl_db,
             retry=redis.retry.Retry(redis.backoff.NoBackoff(), 0),
             socket_connect_timeout=REDIS_CONNECT_TIMEOUT_SECONDS,
             socket_timeout=REDIS_SOCKET_TIMEOUT_SECONDS,
