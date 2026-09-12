@@ -7,6 +7,7 @@ import typing_extensions
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 from ..core.serialization import FieldMetadata
 from .document_type import DocumentType
+from .extraction_provenance import ExtractionProvenance
 from .process_level import ProcessLevel
 from .processing_status import ProcessingStatus
 
@@ -20,6 +21,11 @@ class DocumentDetail(UniversalBaseModel):
         FieldMetadata(alias="documentId"),
         pydantic.Field(alias="documentId", description="Unique system generated ID for the document"),
     ]
+    extraction_provenance: typing_extensions.Annotated[
+        typing.Optional[ExtractionProvenance],
+        FieldMetadata(alias="extractionProvenance"),
+        pydantic.Field(alias="extractionProvenance"),
+    ] = None
     file_name: typing_extensions.Annotated[
         typing.Optional[str], FieldMetadata(alias="fileName"), pydantic.Field(alias="fileName")
     ] = None

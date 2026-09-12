@@ -45,6 +45,7 @@ if typing.TYPE_CHECKING:
     from .document_xray import DocumentXray
     from .document_xray_chunk import DocumentXrayChunk
     from .document_xray_page import DocumentXrayPage
+    from .extraction_provenance import ExtractionProvenance
     from .group_detail import GroupDetail
     from .group_list_response import GroupListResponse
     from .group_response import GroupResponse
@@ -139,6 +140,7 @@ _dynamic_imports: typing.Dict[str, str] = {
     "DocumentXray": ".document_xray",
     "DocumentXrayChunk": ".document_xray_chunk",
     "DocumentXrayPage": ".document_xray_page",
+    "ExtractionProvenance": ".extraction_provenance",
     "GroupDetail": ".group_detail",
     "GroupListResponse": ".group_list_response",
     "GroupResponse": ".group_response",
@@ -257,6 +259,7 @@ __all__ = [
     "DocumentXray",
     "DocumentXrayChunk",
     "DocumentXrayPage",
+    "ExtractionProvenance",
     "GroupDetail",
     "GroupListResponse",
     "GroupResponse",
