@@ -2,6 +2,7 @@ import json
 import types
 import typing
 import unittest
+from unittest.mock import patch
 
 import yaml
 from ._fixtures import (
@@ -81,6 +82,37 @@ line_items:
 
 
 class TestPromptManager(unittest.TestCase):
+    def test_singular_lookups_do_not_copy_unrelated_workflow_groups(self) -> None:
+        source = TestSource(SAMPLE_YAML_2)
+        manager = PromptManager(cache_source=source, config_source=source)
+        original_copy = Group.model_copy
+        copied_groups: typing.List[Group] = []
+
+        def tracked_copy(group: Group, *args: typing.Any, **kwargs: typing.Any) -> Group:
+            copied_groups.append(group)
+            return original_copy(group, *args, **kwargs)
+
+        with patch.object(Group, "model_copy", tracked_copy):
+            field = manager.group_field("statement.meters", "meter_number")
+            self.assertEqual(copied_groups, [])
+            prompt = manager.get_prompt("statement.meters.meter_number")
+            self.assertEqual(copied_groups, [])
+            group = manager.group_load("statement.meters")
+
+        self.assertEqual(len(copied_groups), 1)
+        self.assertIs(copied_groups[0], manager._cache["latest"]["statement"].fields["meters"])
+        assert field is not None and field.prompt is not None
+        assert prompt is not None
+        field.prompt.instructions = "caller edit"
+        prompt.instructions = "another caller edit"
+        group_field = group.fields["meter_number"]
+        assert isinstance(group_field, ExtractedField) and group_field.prompt is not None
+        group_field.prompt.instructions = "group edit"
+        unchanged = manager.group_field("statement.meters", "meter_number")
+        assert unchanged is not None and unchanged.prompt is not None
+        self.assertEqual(unchanged.prompt.instructions, "## meter_number\n")
+        self.assertIsNone(manager.group_field("statement.meters", "missing"))
+
     def test_load_from_yaml_1(self) -> None:
         root = load_from_yaml(SAMPLE_YAML_1)
 

@@ -355,15 +355,20 @@ class PromptManager:
         file_name: typing.Optional[str] = None,
         workflow_id: typing.Optional[str] = None,
     ) -> typing.Dict[str, Group]:
-        workflow_id = self.workflow_id(workflow_id)
-
-        self.cache_workflow(self.file_name(file_name), workflow_id)
-
-        grp = self._cache.get(workflow_id)
-        if not grp:
-            raise Exception(f"group is None in cache [{workflow_id}]")
-
+        grp = self._workflow_groups_ref(file_name, workflow_id)
         return {k: v.model_copy(deep=True) for k, v in grp.items()}
+
+    def _workflow_groups_ref(
+        self,
+        file_name: typing.Optional[str],
+        workflow_id: typing.Optional[str],
+    ) -> typing.Dict[str, Group]:
+        resolved_workflow_id = self.workflow_id(workflow_id)
+        self.cache_workflow(self.file_name(file_name), resolved_workflow_id)
+        groups = self._cache.get(resolved_workflow_id)
+        if not groups:
+            raise Exception(f"group is None in cache [{resolved_workflow_id}]")
+        return groups
 
     def get_fields_for_data_object(
         self,
@@ -389,7 +394,7 @@ class PromptManager:
         if not name:
             raise Exception("name is empty")
 
-        res = self.get_fields_for_workflow(file_name, workflow_id)
+        res = self._workflow_groups_ref(file_name, workflow_id)
 
         file_name = self.file_name(file_name)
         workflow_id = self.workflow_id(workflow_id)
@@ -406,7 +411,7 @@ class PromptManager:
         grp = res[root]
 
         if not remainder:
-            return grp.prompt
+            return copy.deepcopy(grp.prompt)
 
         lineage = root
         idx = 1
@@ -428,7 +433,7 @@ class PromptManager:
                 )
 
             if idx == n:
-                return nv.prompt
+                return copy.deepcopy(nv.prompt)
 
             if not isinstance(nv, Group):
                 raise Exception(
@@ -510,13 +515,9 @@ class PromptManager:
         file_name: typing.Optional[str] = None,
         workflow_id: typing.Optional[str] = None,
     ) -> typing.Optional[ExtractedField]:
-        fld = self.group_fields(
-            group_name=group_name, file_name=file_name, workflow_id=workflow_id
-        )
-        if attr_name in fld:
-            return fld[attr_name]
-
-        return None
+        group = self._group_ref(group_name, file_name, workflow_id)
+        field = group.fields.get(attr_name)
+        return field.model_copy(deep=True) if isinstance(field, ExtractedField) else None
 
     def group_field_prompts(
         self,
@@ -595,10 +596,18 @@ class PromptManager:
         file_name: typing.Optional[str] = None,
         workflow_id: typing.Optional[str] = None,
     ) -> Group:
+        return self._group_ref(group_name, file_name, workflow_id).model_copy(deep=True)
+
+    def _group_ref(
+        self,
+        group_name: str,
+        file_name: typing.Optional[str],
+        workflow_id: typing.Optional[str],
+    ) -> Group:
         if not group_name:
             raise Exception("group_name is empty")
 
-        res = self.get_fields_for_workflow(file_name, workflow_id)
+        res = self._workflow_groups_ref(file_name, workflow_id)
 
         file_name = self.file_name(file_name)
         workflow_id = self.workflow_id(workflow_id)
