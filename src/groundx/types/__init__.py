@@ -36,6 +36,7 @@ if typing.TYPE_CHECKING:
     from .customer_usage_response_customer import CustomerUsageResponseCustomer
     from .document import Document
     from .document_detail import DocumentDetail
+    from .document_detail_delivery_status import DocumentDetailDeliveryStatus
     from .document_list_response import DocumentListResponse
     from .document_local_ingest_request import DocumentLocalIngestRequest
     from .document_lookup_response import DocumentLookupResponse
@@ -131,6 +132,7 @@ _dynamic_imports: typing.Dict[str, str] = {
     "CustomerUsageResponseCustomer": ".customer_usage_response_customer",
     "Document": ".document",
     "DocumentDetail": ".document_detail",
+    "DocumentDetailDeliveryStatus": ".document_detail_delivery_status",
     "DocumentListResponse": ".document_list_response",
     "DocumentLocalIngestRequest": ".document_local_ingest_request",
     "DocumentLookupResponse": ".document_lookup_response",
@@ -250,6 +252,7 @@ __all__ = [
     "CustomerUsageResponseCustomer",
     "Document",
     "DocumentDetail",
+    "DocumentDetailDeliveryStatus",
     "DocumentListResponse",
     "DocumentLocalIngestRequest",
     "DocumentLookupResponse",
