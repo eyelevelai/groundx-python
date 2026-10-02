@@ -28,6 +28,13 @@ poetry build
 
 ### Testing
 
+Read the affected source, upstream Fern definition or input, downstream SDK
+consumers, shared helpers, and nearest preserved tests before editing. Reuse
+existing patterns and make the smallest sufficient change. Extend an existing
+test when it can prove a consequential regression. Add a new case only when
+that behavior is otherwise
+unprotected; keep required extraction replays and validation gates.
+
 Run the test suite:
 
 ```bash
@@ -69,8 +76,8 @@ If you need to customize the SDK, you have two options:
 
 For custom code that should persist across SDK regenerations:
 
-1. Create a `.fernignore` file in the project root
-2. Add file patterns for files you want to preserve (similar to `.gitignore` syntax)
+1. Inspect the existing `.fernignore` in the project root
+2. Extend it with patterns for files you want to preserve, retaining its current entries
 3. Add your custom code to those files
 
 Files listed in `.fernignore` will not be overwritten when the SDK is regenerated.
