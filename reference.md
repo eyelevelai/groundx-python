@@ -1080,7 +1080,7 @@ client.documents.delete_by_id(
 </dl>
 </details>
 
-<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">get_extract</a>(...) -> typing.Dict[str, typing.Any]</code></summary>
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">get_extract</a>(...) -> DocumentsGetExtractResponse</code></summary>
 <dl>
 <dd>
 

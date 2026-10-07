@@ -26,6 +26,7 @@ from ..types.processing_status import ProcessingStatus
 from ..types.sort import Sort
 from ..types.sort_order import SortOrder
 from ..types.website_source import WebsiteSource
+from .types.documents_get_extract_response import DocumentsGetExtractResponse
 from pydantic import ValidationError
 
 # this is used as the default value for optional parameters
@@ -943,7 +944,7 @@ class RawDocumentsClient:
 
     def get_extract(
         self, document_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> HttpResponse[typing.Dict[str, typing.Any]]:
+    ) -> HttpResponse[DocumentsGetExtractResponse]:
         """
         Look up extractions for an existing document by documentId.
 
@@ -957,7 +958,7 @@ class RawDocumentsClient:
 
         Returns
         -------
-        HttpResponse[typing.Dict[str, typing.Any]]
+        HttpResponse[DocumentsGetExtractResponse]
             Look up success
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -968,9 +969,9 @@ class RawDocumentsClient:
         try:
             if 200 <= _response.status_code < 300:
                 _data = typing.cast(
-                    typing.Dict[str, typing.Any],
+                    DocumentsGetExtractResponse,
                     parse_obj_as(
-                        type_=typing.Dict[str, typing.Any],  # type: ignore
+                        type_=DocumentsGetExtractResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -2037,7 +2038,7 @@ class AsyncRawDocumentsClient:
 
     async def get_extract(
         self, document_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> AsyncHttpResponse[typing.Dict[str, typing.Any]]:
+    ) -> AsyncHttpResponse[DocumentsGetExtractResponse]:
         """
         Look up extractions for an existing document by documentId.
 
@@ -2051,7 +2052,7 @@ class AsyncRawDocumentsClient:
 
         Returns
         -------
-        AsyncHttpResponse[typing.Dict[str, typing.Any]]
+        AsyncHttpResponse[DocumentsGetExtractResponse]
             Look up success
         """
         _response = await self._client_wrapper.httpx_client.request(
@@ -2062,9 +2063,9 @@ class AsyncRawDocumentsClient:
         try:
             if 200 <= _response.status_code < 300:
                 _data = typing.cast(
-                    typing.Dict[str, typing.Any],
+                    DocumentsGetExtractResponse,
                     parse_obj_as(
-                        type_=typing.Dict[str, typing.Any],  # type: ignore
+                        type_=DocumentsGetExtractResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

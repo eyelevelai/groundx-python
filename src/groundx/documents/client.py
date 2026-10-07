@@ -18,6 +18,7 @@ from ..types.sort import Sort
 from ..types.sort_order import SortOrder
 from ..types.website_source import WebsiteSource
 from .raw_client import AsyncRawDocumentsClient, RawDocumentsClient
+from .types.documents_get_extract_response import DocumentsGetExtractResponse
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -600,7 +601,7 @@ class DocumentsClient:
 
     def get_extract(
         self, document_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.Dict[str, typing.Any]:
+    ) -> DocumentsGetExtractResponse:
         """
         Look up extractions for an existing document by documentId.
 
@@ -614,7 +615,7 @@ class DocumentsClient:
 
         Returns
         -------
-        typing.Dict[str, typing.Any]
+        DocumentsGetExtractResponse
             Look up success
 
         Examples
@@ -1383,7 +1384,7 @@ class AsyncDocumentsClient:
 
     async def get_extract(
         self, document_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.Dict[str, typing.Any]:
+    ) -> DocumentsGetExtractResponse:
         """
         Look up extractions for an existing document by documentId.
 
@@ -1397,7 +1398,7 @@ class AsyncDocumentsClient:
 
         Returns
         -------
-        typing.Dict[str, typing.Any]
+        DocumentsGetExtractResponse
             Look up success
 
         Examples

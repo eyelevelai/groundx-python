@@ -107,6 +107,7 @@ if typing.TYPE_CHECKING:
     from . import api_key, buckets, customer, documents, groups, health, search, workflows
     from ._default_clients import DefaultAioHttpClient, DefaultAsyncHttpxClient
     from .customer import CustomerGetUsageRequestMetric
+    from .documents import DocumentsGetExtractResponse
     from .environment import GroundXEnvironment
     from .ingest import AsyncGroundX, GroundX
     from .search import SearchContentRequestId
@@ -158,6 +159,7 @@ _dynamic_imports: typing.Dict[str, str] = {
     "DocumentXray": ".types",
     "DocumentXrayChunk": ".types",
     "DocumentXrayPage": ".types",
+    "DocumentsGetExtractResponse": ".documents",
     "ExtractionProvenance": ".types",
     "GroundX": ".ingest",
     "GroundXEnvironment": ".environment",
@@ -299,6 +301,7 @@ __all__ = [
     "DocumentXray",
     "DocumentXrayChunk",
     "DocumentXrayPage",
+    "DocumentsGetExtractResponse",
     "ExtractionProvenance",
     "GroundX",
     "GroundXEnvironment",
