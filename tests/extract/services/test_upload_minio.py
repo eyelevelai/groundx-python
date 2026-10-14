@@ -87,6 +87,7 @@ class TestMinIOClient(unittest.TestCase):
     def test_private_endpoint_is_used_for_default_and_timed_clients(self) -> None:
         for endpoint, authority, secure in (
             ("https://private.test:9443", "private.test:9443", True),
+            ("https://private.test:9443/", "private.test:9443", True),
             ("http://private.test:9000", "private.test:9000", False),
             ("https://[::1]:9443", "[::1]:9443", True),
         ):
@@ -164,7 +165,6 @@ class TestMinIOClient(unittest.TestCase):
             "ftp://private.test",
             "https://",
             "https://user:secret@private.test",
-            "https://private.test/",
             "https://private.test/bucket",
             "https://private.test?x=1",
             "https://private.test#fragment",

@@ -177,7 +177,7 @@ class ContainerUploadSettings(BaseModel):
             or not host
             or parsed.username is not None
             or parsed.password is not None
-            or parsed.path
+            or parsed.path not in ("", "/")
             or parsed.netloc.endswith(":")
             or (parsed.port is not None and not 1 <= parsed.port <= 65535)
         ):
