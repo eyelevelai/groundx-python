@@ -14,6 +14,9 @@ configuration must remain compatible.
   respect `SSL_CERT_FILE` while keeping certificate verification required.
 - Preserve existing credentials, region selection, public presentation URL,
   timeout behavior, storage keys and exact object bytes.
+- Add explicit returned X-Ray URL and opt-in trusted HTTPS credential arguments
+  to existing X-Ray/page-image readers. Preserve native signed GET URLs and
+  refresh gateway presentation without caching expiring references.
 
 This is an additive package change. No generated API or dependency changes are
 required. Design questions: none.
@@ -22,6 +25,7 @@ required. Design questions: none.
 
 ### New Capabilities
 - `extract-private-storage`: compatible private MinIO connection and provisioning.
+- `extract-protected-file-consumers`: trusted authenticated X-Ray/file reads.
 
 ### Modified Capabilities
 None.

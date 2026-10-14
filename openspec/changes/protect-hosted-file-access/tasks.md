@@ -34,3 +34,26 @@ adoption.
       the established Fern release path.
 - [ ] GroundX on-prem extraction image adopts the compatible SDK version and
       passes live private-storage and CA verification before activation.
+
+## Protected consumers
+
+- [x] Add returned-URL and explicit credential/trust arguments to existing X-Ray
+      and page-image readers, with one narrow bounded GET helper.
+- [x] Enforce HTTPS root matching, native-grant header exclusion and redirect
+      rejection; close streaming responses within bounded body-read deadlines.
+- [x] Bypass disk/object-store caches for returned X-Ray URLs and privileged
+      storage shortcuts for native signed image GETs.
+- [x] Cover public compatibility, owner/delegated headers, wrong hosts/paths,
+      redirects, exact signatures, expired grants, fresh presentation and log
+      redaction without changing fixtures or extraction outputs.
+- [x] Run focused tests, required compact replay, complete SDK suite, mypy,
+      changed-file Ruff, build, LF and strict OpenSpec gates.
+- [x] Record SDK validation and separate application adoption/live gates.
+
+Consumer validation: 69 focused tests pass; the complete SDK suite with extract
+and aiohttp extras passes 687 tests with 2 existing skips, 100 subtests and
+156 existing deprecation warnings. The protected compact fixture replay passes
+independently. Mypy reports no issues in 267 source files. Changed-file Ruff,
+build, LF and strict OpenSpec gates pass. All HTTP credentials and expiry cases
+use controlled test responses; no live protection or application adoption is
+established by these tests.
