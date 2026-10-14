@@ -163,6 +163,10 @@ class Upload:
             from .upload_s3 import S3Client
 
             self.client = S3Client(self.settings, self.logger)
+        elif self.settings.upload.type == "s4":
+            from .upload_s4 import S4Client
+
+            self.client = S4Client(self.settings, self.logger)
         else:
             raise Exception(f"unsupported upload.type [{self.settings.upload.type}]")
 

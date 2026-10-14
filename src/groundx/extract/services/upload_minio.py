@@ -15,6 +15,8 @@ from .upload import (
 
 
 class MinIOClient:
+    upload_type: typing.ClassVar[str] = "minio"
+
     def __init__(
         self,
         settings: ContainerSettings,
@@ -24,7 +26,7 @@ class MinIOClient:
         self.client = None
         self._timeout_clients = TimeoutClientCache(self._close_client)
         self.logger = logger
-        if self.settings.upload.type == "minio":
+        if self.settings.upload.type == self.upload_type:
             self.client = self._create_client()
 
     def provision_bucket(self) -> None:
@@ -56,6 +58,9 @@ class MinIOClient:
         except Exception as e:
             self.logger.warning_msg(str(e))
             self.logger.warning_msg(f"error creating bucket [{self.settings.upload.bucket}]")
+
+    def _region(self) -> typing.Optional[str]:
+        return self.settings.upload.get_region()
 
     def _create_client(
         self,
@@ -102,7 +107,7 @@ class MinIOClient:
             self.settings.upload.base_domain,
             access_key=self.settings.upload.get_key(),
             secret_key=self.settings.upload.get_secret(),
-            region=self.settings.upload.get_region(),
+            region=self._region(),
             session_token=self.settings.upload.get_token(),
             secure=self.settings.upload.ssl,
             http_client=urllib3.PoolManager(**pool_kwargs),
