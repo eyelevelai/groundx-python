@@ -1,6 +1,8 @@
 import contextlib
+import os
 import time
 import typing
+from urllib.parse import urlsplit
 
 from ..settings.settings import ContainerSettings
 from .http import read_response_body_with_deadline, wall_clock_operation_deadline
@@ -28,7 +30,7 @@ class MinIOClient:
             self.client = self._create_client()
 
     def provision_bucket(self) -> None:
-        """Explicitly create and publish the configured MinIO bucket."""
+        """Create a missing bucket without changing existing bucket policies."""
         if not self.client or self.client.bucket_exists(self.settings.upload.bucket):
             return
 
@@ -37,6 +39,8 @@ class MinIOClient:
         try:
             self.client.make_bucket(self.settings.upload.bucket)
             self.logger.info_msg(f"Bucket '{self.settings.upload.bucket}' created.")
+            if not self.settings.upload.public_read:
+                return
             self.client.set_bucket_policy(
                 self.settings.upload.bucket,
                 json.dumps(
@@ -91,20 +95,26 @@ class MinIOClient:
             ),
             "retries": False,
         }
-        if self.settings.upload.ssl:
+        endpoint = self.settings.upload.base_domain
+        secure = self.settings.upload.ssl
+        if self.settings.upload.storage_endpoint is not None:
+            parsed = urlsplit(self.settings.upload.storage_endpoint)
+            endpoint = parsed.netloc
+            secure = parsed.scheme == "https"
+        if secure:
             import certifi
 
             pool_kwargs.update(
                 cert_reqs="CERT_REQUIRED",
-                ca_certs=certifi.where(),
+                ca_certs=os.environ.get("SSL_CERT_FILE") or certifi.where(),
             )
         return Minio(
-            self.settings.upload.base_domain,
+            endpoint,
             access_key=self.settings.upload.get_key(),
             secret_key=self.settings.upload.get_secret(),
             region=self.settings.upload.get_region(),
             session_token=self.settings.upload.get_token(),
-            secure=self.settings.upload.ssl,
+            secure=secure,
             http_client=urllib3.PoolManager(**pool_kwargs),
         )
 

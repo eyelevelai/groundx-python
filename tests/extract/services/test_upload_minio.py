@@ -1,4 +1,5 @@
 import contextlib
+import os
 import sys
 import threading
 import time
@@ -79,6 +80,163 @@ class TestMinIOClient(unittest.TestCase):
         self.assertEqual(timeout.connect_timeout, 5)
         self.assertEqual(timeout.read_timeout, 20)
         self.assertFalse(http_client.connection_pool_kw["retries"].total)
+        self.assertEqual(mock_minio.call_args.args, ("minio.test",))
+        self.assertFalse(mock_minio.call_args.kwargs["secure"])
+        mock_minio.return_value.bucket_exists.assert_not_called()
+
+    def test_private_endpoint_is_used_for_default_and_timed_clients(self) -> None:
+        for endpoint, authority, secure in (
+            ("https://private.test:9443", "private.test:9443", True),
+            ("http://private.test:9000", "private.test:9000", False),
+            ("https://[::1]:9443", "[::1]:9443", True),
+        ):
+            with self.subTest(endpoint=endpoint):
+                settings = ContainerSettings(
+                    broker="",
+                    service="minio",
+                    upload=ContainerUploadSettings(
+                        base_domain="public.test",
+                        bucket="eyelevel",
+                        type="minio",
+                        url="https://files.test/eyelevel",
+                        storage_endpoint=endpoint,
+                        public_read=False,
+                        key="",
+                        secret="",
+                        ssl=not secure,
+                    ),
+                    workers=1,
+                )
+                default = FakeMinioClient()
+                bounded = FakeMinioClient()
+                body = b'{"value":"unchanged"}\n\x00'
+                bounded.response = FakeMinioResponse(body)
+                constructor = Mock(side_effect=[default, bounded])
+                minio_module = types.ModuleType("minio")
+                setattr(minio_module, "Minio", constructor)
+                with (
+                    fake_minio_error_module(),
+                    patch.dict(sys.modules, {"minio": minio_module}),
+                    patch.dict(
+                        os.environ,
+                        {
+                            "GROUNDX_ACCESS_KEY_ID": "test-key",
+                            "GROUNDX_SECRET_ACCESS_KEY": "test-secret",
+                            "GROUNDX_REGION": "test-region",
+                            "GROUNDX_SESSION_TOKEN": "test-token",
+                        },
+                    ),
+                ):
+                    cl = MinIOClient(settings, Logger("test", "debug"))
+                    result = cl.get_object(
+                        "s3://eyelevel/layout/file.json",
+                        connect_timeout_seconds=0.2,
+                        read_timeout_seconds=0.5,
+                        total_timeout_seconds=1.0,
+                    )
+                    cl.put_json_stream(
+                        "eyelevel",
+                        "layout/file.json",
+                        body,
+                        connect_timeout_seconds=0.2,
+                        read_timeout_seconds=0.5,
+                        total_timeout_seconds=1.0,
+                    )
+
+                self.assertEqual(result, body)
+                self.assertEqual(bounded.put["data"].getvalue(), body)
+                self.assertEqual(bounded.put["object_name"], "layout/file.json")
+                self.assertEqual(settings.upload.url, "https://files.test/eyelevel")
+                self.assertEqual(settings.upload.base_domain, "public.test")
+                self.assertEqual(constructor.call_count, 2)
+                for call in constructor.call_args_list:
+                    self.assertEqual(call.args, (authority,))
+                    self.assertEqual(call.kwargs["secure"], secure)
+                    self.assertEqual(call.kwargs["access_key"], "test-key")
+                    self.assertEqual(call.kwargs["secret_key"], "test-secret")
+                    self.assertEqual(call.kwargs["region"], "test-region")
+                    self.assertEqual(call.kwargs["session_token"], "test-token")
+
+    def test_storage_endpoint_rejects_malformed_input(self) -> None:
+        for endpoint in (
+            "",
+            "private.test:9000",
+            "ftp://private.test",
+            "https://",
+            "https://user:secret@private.test",
+            "https://private.test/",
+            "https://private.test/bucket",
+            "https://private.test?x=1",
+            "https://private.test#fragment",
+            "https://private.test?",
+            "https://private.test#",
+            "https://private.test:abc",
+            "https://private.test:65536",
+            "https://private.test:0",
+            "https://private.test:",
+            "https://bad host",
+            " https://private.test",
+            "https://private.test\n",
+            "https://bad%20host",
+            "https://bad\\host",
+            "https://[invalid]:9000",
+            "https://-bad.test",
+            "https://bad..test",
+            123,
+            False,
+        ):
+            with self.subTest(endpoint=endpoint), self.assertRaises(ValueError):
+                ContainerUploadSettings(
+                    base_domain="public.test",
+                    bucket="eyelevel",
+                    type="minio",
+                    url="",
+                    storage_endpoint=endpoint,
+                )
+
+    def test_https_clients_use_configured_ca_with_verification_required(self) -> None:
+        import certifi
+
+        for ca_file, expected in (("/private/ca.crt", "/private/ca.crt"), ("", certifi.where())):
+            with self.subTest(ca_file=ca_file):
+                settings = ContainerSettings(
+                    broker="",
+                    service="minio",
+                    workers=1,
+                    upload=ContainerUploadSettings(
+                        base_domain="legacy.test",
+                        bucket="eyelevel",
+                        type="minio",
+                        url="",
+                        ssl=True,
+                        public_read=False,
+                    ),
+                )
+                constructor = Mock()
+                minio_module = types.ModuleType("minio")
+                setattr(minio_module, "Minio", constructor)
+                with (
+                    patch.dict(sys.modules, {"minio": minio_module}),
+                    patch.dict(os.environ, {"SSL_CERT_FILE": ca_file}),
+                ):
+                    cl = MinIOClient(settings, Logger("test", "debug"))
+                    with cl._client_for_timeouts(
+                        connect_timeout_seconds=0.2,
+                        read_timeout_seconds=0.5,
+                        total_timeout_seconds=1.0,
+                    ):
+                        pass
+
+                self.assertEqual(constructor.call_count, 2)
+                for call in constructor.call_args_list:
+                    self.assertEqual(call.args, ("legacy.test",))
+                    self.assertTrue(call.kwargs["secure"])
+                    pool = call.kwargs["http_client"].connection_pool_kw
+                    self.assertEqual(pool["ca_certs"], expected)
+                    self.assertEqual(pool["cert_reqs"], "CERT_REQUIRED")
+                constructor.return_value.bucket_exists.assert_not_called()
+                constructor.return_value.make_bucket.assert_not_called()
+                constructor.return_value.set_bucket_policy.assert_not_called()
 
     def test_bucket_provisioning_is_explicit(self) -> None:
         cl = self._client()
@@ -91,6 +249,44 @@ class TestMinIOClient(unittest.TestCase):
         client.bucket_exists.assert_called_once_with("eyelevel")
         client.make_bucket.assert_called_once_with("eyelevel")
         client.set_bucket_policy.assert_called_once()
+
+    def test_private_bucket_provisioning_does_not_publish(self) -> None:
+        cl = self._client()
+        cl.settings.upload = ContainerUploadSettings(
+            base_domain="minio.test",
+            bucket="eyelevel",
+            type="minio",
+            url="https://files.test/eyelevel",
+            public_read=False,
+        )
+        client = Mock()
+        client.bucket_exists.return_value = False
+        cl.client = client
+
+        cl.provision_bucket()
+
+        client.make_bucket.assert_called_once_with("eyelevel")
+        client.set_bucket_policy.assert_not_called()
+
+    def test_existing_bucket_policy_is_untouched_in_both_modes(self) -> None:
+        for public_read in (True, False):
+            with self.subTest(public_read=public_read):
+                cl = self._client()
+                cl.settings.upload = ContainerUploadSettings(
+                    base_domain="minio.test",
+                    bucket="eyelevel",
+                    type="minio",
+                    url="",
+                    public_read=public_read,
+                )
+                client = Mock()
+                client.bucket_exists.return_value = True
+                cl.client = client
+
+                cl.provision_bucket()
+
+                client.make_bucket.assert_not_called()
+                client.set_bucket_policy.assert_not_called()
 
     def _client(self) -> MinIOClient:
         logger = Logger("parse_url", "debug")
