@@ -73,6 +73,10 @@ context: |
   - ASK FIRST: add optional dep to groundx[extract]; add path to .fernignore; modify .fern/metadata.json or ci.yml non-trivially; add CI job with shared credentials
   - NEVER: edit Fern-generated files directly; edit pyproject.toml for deps/mypy; remove path from .fernignore without re-homing hand-written code; commit credentials; create agent-tool-specific files duplicating AGENTS.md
 
+  Extract storage clients: one module per storage type, src/groundx/extract/services/upload_<type>.py, selected by the Upload dispatcher in upload.py on settings.upload.type; tests are one file per client, tests/extract/services/test_upload_<type>.py
+
+  Releases: generated from eyelevel-fern-config by a human release owner (CONTRIBUTING.md "Release Handoff"); never edit the version in pyproject.toml or src/groundx/core/client_wrapper.py; hand-written changes go under CHANGELOG.md "## Unreleased" and the PR carries the release hand-off (requested version, merged commit, validation evidence, downstream consumers)
+
 rules:
   proposal:
     - State what the public package surface gains/changes and why; flag any breaking change
