@@ -9,7 +9,7 @@ The motivation and current behavior are in `proposal.md`; the required behavior 
 **Non-Goals:**
 - Write-once uploads. This library's writes send no write-once condition, so the GX-88 single-PUT rule has nothing to apply to here.
 - Changes to `S3Client`, to reads, or to the handling of unknown storage types (they still raise).
-- Trace capture, Bedrock on non-AWS stores, and GX-68 (GX-88 Out of scope).
+- Trace capture and Bedrock on non-AWS stores: GX-88 fixes them in cashbot-go and internal-arcadia-agents (ticket amended 2026-10-15); this library needs no change. GX-68 is out of scope.
 - Release mechanics. The pull request text carries the release hand-off (`CONTRIBUTING.md` "Release Handoff"); no version field is edited.
 
 ## Decisions
