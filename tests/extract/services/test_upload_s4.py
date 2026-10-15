@@ -26,6 +26,7 @@ REGION_ENV = {
     AWS_DEFAULT_REGION: "us-west-2",
 }
 PRIVATE_EVIDENCE_TAGS = {"groundx-artifact-class": "extraction-private-evidence"}
+TOTAL_TIMEOUT_ARGUMENTS = ["total_timeout_seconds", "transport_total_timeout_seconds"]
 
 
 def _upload(upload_type: str, region: typing.Optional[str] = None) -> Upload:
@@ -76,6 +77,7 @@ def test_upload_rejects_an_unknown_upload_type_before_building_a_client() -> Non
     boto3_client.assert_not_called()
 
 
+@pytest.mark.parametrize("total_timeout_argument", TOTAL_TIMEOUT_ARGUMENTS)
 @pytest.mark.parametrize(
     ("upload_type", "configured_region", "expected_region"),
     [
@@ -88,7 +90,9 @@ def test_s4_signs_for_us_east_1_and_minio_keeps_the_configured_region(
     upload_type: str,
     configured_region: typing.Optional[str],
     expected_region: str,
+    total_timeout_argument: str,
 ) -> None:
+    total_timeout: typing.Dict[str, typing.Any] = {total_timeout_argument: 0.8}
     with patch.dict(os.environ, REGION_ENV), patch("minio.Minio") as minio_cls:
         upload = _upload(upload_type, region=configured_region)
         upload.put_json_stream(
@@ -98,7 +102,7 @@ def test_s4_signs_for_us_east_1_and_minio_keeps_the_configured_region(
             "application/json",
             connect_timeout_seconds=0.2,
             read_timeout_seconds=0.5,
-            transport_total_timeout_seconds=0.8,
+            **total_timeout,
         )
 
     assert [call.kwargs["region"] for call in minio_cls.call_args_list] == [expected_region, expected_region]
@@ -122,6 +126,7 @@ def test_put_object_trims_a_leading_slash_only_in_s4_mode(upload_type: str, key:
     assert put["object_name"] == stored_key
 
 
+@pytest.mark.parametrize("total_timeout_argument", TOTAL_TIMEOUT_ARGUMENTS)
 @pytest.mark.parametrize(
     ("upload_type", "key", "stored_key"),
     [
@@ -134,7 +139,9 @@ def test_put_json_stream_trims_a_leading_slash_only_in_s4_mode_and_keeps_tags_an
     upload_type: str,
     key: str,
     stored_key: str,
+    total_timeout_argument: str,
 ) -> None:
+    total_timeout: typing.Dict[str, typing.Any] = {total_timeout_argument: 0.8}
     with patch("minio.Minio") as minio_cls:
         upload = _upload(upload_type)
         upload.put_json_stream(
@@ -144,8 +151,8 @@ def test_put_json_stream_trims_a_leading_slash_only_in_s4_mode_and_keeps_tags_an
             "application/json",
             connect_timeout_seconds=0.2,
             read_timeout_seconds=0.5,
-            transport_total_timeout_seconds=0.8,
             object_tags=PRIVATE_EVIDENCE_TAGS,
+            **total_timeout,
         )
 
     put = minio_cls.return_value.put_object.call_args.kwargs
