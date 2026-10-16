@@ -223,6 +223,11 @@ the existing broker. This adds a policy read per local file. A failed lookup or
 private upload does not fall back to public storage. Directory ingest accepts
 `file_access` for every file in that call.
 
+Private reservations last at most fifteen minutes. The helpers reject the current
+batch before ingest submission if any reservation has expired. Retry with fewer
+files per call or a smaller monitored/directory `batch_size`. Files are not
+automatically reuploaded, and a successful check does not extend the deadline.
+
 Later policy changes require the current revision. Stable protected URLs need
 current API authentication and have no age-based expiry. `documents.file_link`
 issues a finite bearer link that can be forwarded until expiry; later key/policy

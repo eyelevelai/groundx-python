@@ -23,6 +23,14 @@ their existing explicit-value then environment precedence. `url` remains a
 presentation field. Storage settings do not add signing, URL rewriting or output
 transformation.
 
+Private local ingest retains reservation expiry only in the current batch's
+helper state. Sync, async, CSV-split, monitored and directory uploads check those
+deadlines before the existing ingest submission. An expired batch raises a clear
+error directing the caller to retry with fewer files or a smaller batch size.
+This prevents knowingly submitting an unbound expired source. It does not extend
+the fifteen-minute reservation, renew uploads, create extra ingest requests or
+change public method signatures, policies, callbacks or process identifiers.
+
 Only `src/groundx/extract/`, `tests/extract/` and `openspec/` are edited, all
 preserved by `.fernignore`. The protected fixture pack replay covers the current
 promoted cases; storage changes do not change extraction placement, candidate

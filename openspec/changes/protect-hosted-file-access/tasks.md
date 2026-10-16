@@ -65,3 +65,27 @@ established by these tests.
 - [x] Exercise the real generated HTTP transport and existing helpers for inherited protection, explicit file protection in a public bucket, split propagation and unchanged public uploads. Verify native PUT receives no API credentials and exact signed URL/headers are retained.
 
 Creation-policy validation:694 SDK tests pass,2existing skips,100subtests;156 existing deprecation warnings. Whole-repository mypy passes283 source files. These are local/synthetic results, not storage, release or deployment acceptance.
+
+## Reservation expiry before submission
+
+- [x] Retain private upload expiry per batch and reject expired source reservations
+      immediately before ingest, with a smaller-batch retry instruction.
+- [x] Preserve public upload, initial policies, callbacks and existing single-ingest
+      behavior without renewal or automatic batch splitting.
+- [x] Cover sync/async, actual CSV splits, mixed public/private uploads, monitored
+      batches and directory ingest through the generated HTTP transport.
+
+The expiry regression uses thirty successful thirty-one-second PUTs, each below
+the sixty-second request timeout. Expired batches produce no ingest request;
+twenty-nine-file fresh batches and public batches retain their existing behavior.
+These checks enforce the existing reservation deadline and do not make longer
+private batches succeed. Network transit after the local check can still consume
+the remaining lifetime. Extraction runtime, prompt policy, schema routing and
+customer output are unchanged; historical Arcadia legacy, Arcadia v1, generic v1
+and ADP v1 execution paths are unaffected.
+
+Validation: 25 focused upload tests pass. The complete SDK suite in the pinned
+Poetry runtime passes 710 tests with 2 existing skips, 100 subtests and 156 existing
+extraction YAML deprecation warnings. Whole-repository mypy passes 283 source
+files. Changed-file Ruff, LF and strict OpenSpec validation pass. No package,
+image, deployment or live storage acceptance follows from these local tests.

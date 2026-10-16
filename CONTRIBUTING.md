@@ -165,6 +165,10 @@ Inherited or requested protection selects `buckets.file_upload`, exact native PU
 and returned `hosted_url`. Public/unconfigured destinations retain the legacy broker.
 A lookup or private-reservation failure must never select the public broker. Native
 requests receive only returned storage headers, without GroundX credentials.
+Keep private reservation expiry local to each batch and check it before ingest
+submission, including CSV splits, monitored batches and directory ingest. Expired
+batches fail with a smaller-batch retry instruction; do not renew or partially
+submit them automatically.
 
 Stable protected URLs need current authentication; they do not expire by age.
 Generated `documents.file_link` returns a finite bearer grant that can be forwarded
