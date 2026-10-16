@@ -9,6 +9,7 @@ from .client import AsyncGroundXBase, GroundXBase
 from .core.request_options import RequestOptions
 from .csv_splitter import CSVSplitter
 from .types.document import Document
+from .types.file_access_policy import FileAccessPolicy
 from .types.ingest_remote_document import IngestRemoteDocument
 from .types.ingest_response import IngestResponse
 from .types.ingest_status import IngestStatus
@@ -223,6 +224,25 @@ def _put_upload_file(
     raise RuntimeError("upload retry loop exited unexpectedly")
 
 
+def _needs_private_upload(bucket: typing.Any, policy: typing.Optional[FileAccessPolicy]) -> bool:
+    effective = bucket.bucket.effective_file_access
+    return (effective is not None and effective.mode == "protected") or (
+        policy is not None and policy.mode == "protected"
+    )
+
+
+def _private_upload_info(grant: typing.Any) -> typing.Dict[str, typing.Any]:
+    if grant.method != "PUT" or not grant.hosted_url:
+        raise ValueError("Private upload requires an exact PUT grant and hosted URL")
+    if any(key.lower() in ("x-api-key", "authorization", "x-customer-key") for key in grant.headers):
+        raise ValueError("Private upload headers must not contain GroundX credentials")
+    return {
+        "URL": grant.upload_url,
+        "Method": grant.method,
+        "Header": {**grant.headers, HOSTED_URL_HEADER: grant.hosted_url},
+    }
+
+
 def prep_documents(
     documents: typing.Sequence[Document],
 ) -> typing.Tuple[
@@ -256,6 +276,7 @@ def prep_documents(
         if is_valid_url(document.file_path):
             remote_document = IngestRemoteDocument(
                 bucket_id=document.bucket_id,
+                file_access=document.file_access,
                 file_name=document.file_name,
                 file_type=document.file_type,
                 filter=document.filter,
@@ -700,7 +721,9 @@ class GroundX(GroundXBase):
                     file_size = fp.stat().st_size
 
                     if (current_batch_size + file_size > MAX_BATCH_SIZE_BYTES) or (len(local_batch) >= n):
-                        up_docs, progress = self._process_local(local_batch, upload_api, progress, pbar)
+                        up_docs, progress = self._process_local(
+                            local_batch, upload_api, progress, pbar, request_options
+                        )
 
                         ingest = self.documents.ingest_remote(
                             documents=up_docs,
@@ -717,7 +740,7 @@ class GroundX(GroundXBase):
                     current_batch_size += file_size
 
                 if local_batch:
-                    up_docs, progress = self._process_local(local_batch, upload_api, progress, pbar)
+                    up_docs, progress = self._process_local(local_batch, upload_api, progress, pbar, request_options)
 
                     ingest = self.documents.ingest_remote(
                         documents=up_docs,
@@ -734,7 +757,7 @@ class GroundX(GroundXBase):
         elif len(remote_documents) + len(local_documents) > max_n:
             raise ValueError("You have sent too many documents in this request")
 
-        up_docs, _ = self._process_local(local_documents, upload_api, 0, None)
+        up_docs, _ = self._process_local(local_documents, upload_api, 0, None, request_options)
         remote_documents.extend(up_docs)
 
         return self.documents.ingest_remote(
@@ -749,6 +772,7 @@ class GroundX(GroundXBase):
         *,
         bucket_id: int,
         path: str,
+        file_access: typing.Optional[FileAccessPolicy] = None,
         batch_size: int = 10,
         upload_api: str = "https://api.eyelevel.ai/upload/file",
         callback_url: typing.Optional[str] = None,
@@ -845,6 +869,7 @@ class GroundX(GroundXBase):
                         callback_data,
                         request_options,
                         pbar,
+                        file_access,
                     )
                     current_batch = []
                     current_batch_size = 0
@@ -861,19 +886,32 @@ class GroundX(GroundXBase):
                     callback_data,
                     request_options,
                     pbar,
+                    file_access,
                 )
 
     def _upload_file(
         self,
         endpoint: str,
         file_path: Path,
+        *,
+        bucket_id: typing.Optional[int] = None,
+        file_access: typing.Optional[FileAccessPolicy] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> str:
         file_name = os.path.basename(file_path)
         file_extension = os.path.splitext(file_name)[1][1:].lower()
         if f".{file_extension}" in SUFFIX_ALIASES:
             file_extension = SUFFIX_ALIASES[f".{file_extension}"]
 
-        presigned_info = get_presigned_url(endpoint, file_name, file_extension)
+        if bucket_id is not None and _needs_private_upload(
+            self.buckets.get(bucket_id, request_options=request_options), file_access
+        ):
+            grant = self.buckets.file_upload(
+                bucket_id, file_name=file_name, file_type=file_extension, request_options=request_options
+            )
+            presigned_info = _private_upload_info(grant)
+        else:
+            presigned_info = get_presigned_url(endpoint, file_name, file_extension)
 
         upload_url = presigned_info["URL"]
         headers, hosted_url = _upload_headers_from_presign(presigned_info.get("Header", {}))
@@ -908,13 +946,16 @@ class GroundX(GroundXBase):
         upload_api: str,
         progress: float,
         pbar: typing.Optional[typing.Any] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Tuple[typing.List[IngestRemoteDocument], float]:
         remote_docs: typing.List[IngestRemoteDocument] = []
         for d in local_docs:
             splits = split_doc(Path(os.path.expanduser(d.file_path)))
 
             for sd in splits:
-                url = self._upload_file(upload_api, sd)
+                url = self._upload_file(
+                    upload_api, sd, bucket_id=d.bucket_id, file_access=d.file_access, request_options=request_options
+                )
 
                 ft = d.file_type
                 if sd.suffix.lower() in SUFFIX_ALIASES:
@@ -927,6 +968,7 @@ class GroundX(GroundXBase):
                 remote_docs.append(
                     IngestRemoteDocument(
                         bucket_id=d.bucket_id,
+                        file_access=d.file_access,
                         file_name=fn,
                         file_type=ft,
                         filter=d.filter,
@@ -994,16 +1036,20 @@ class GroundX(GroundXBase):
         callback_data: typing.Optional[str],
         request_options: typing.Optional[RequestOptions],
         pbar: typing.Any,
+        file_access: typing.Optional[FileAccessPolicy] = None,
     ) -> None:
         docs: typing.List[Document] = []
 
         progress = float(len(batch))
         for file in batch:
-            url = self._upload_file(upload_api, file)
+            url = self._upload_file(
+                upload_api, file, bucket_id=bucket_id, file_access=file_access, request_options=request_options
+            )
             if file.suffix.lower() in SUFFIX_ALIASES:
                 docs.append(
                     Document(
                         bucket_id=bucket_id,
+                        file_access=file_access,
                         file_name=file.name,
                         file_path=url,
                         file_type=SUFFIX_ALIASES[file.suffix.lower()],
@@ -1013,6 +1059,7 @@ class GroundX(GroundXBase):
                 docs.append(
                     Document(
                         bucket_id=bucket_id,
+                        file_access=file_access,
                         file_name=file.name,
                         file_path=url,
                     ),
@@ -1382,7 +1429,9 @@ class AsyncGroundX(AsyncGroundXBase):
             splits = split_doc(Path(os.path.expanduser(d.file_path)))
 
             for sd in splits:
-                url = self._upload_file(upload_api, sd)
+                url = await self._upload_file(
+                    upload_api, sd, bucket_id=d.bucket_id, file_access=d.file_access, request_options=request_options
+                )
 
                 ft = d.file_type
                 if sd.suffix.lower() in SUFFIX_ALIASES:
@@ -1395,6 +1444,7 @@ class AsyncGroundX(AsyncGroundXBase):
                 remote_documents.append(
                     IngestRemoteDocument(
                         bucket_id=d.bucket_id,
+                        file_access=d.file_access,
                         file_name=fn,
                         file_type=ft,
                         filter=d.filter,
@@ -1411,17 +1461,29 @@ class AsyncGroundX(AsyncGroundXBase):
             request_options=request_options,
         )
 
-    def _upload_file(
+    async def _upload_file(
         self,
         endpoint: str,
         file_path: Path,
+        *,
+        bucket_id: typing.Optional[int] = None,
+        file_access: typing.Optional[FileAccessPolicy] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> str:
         file_name = os.path.basename(file_path)
         file_extension = os.path.splitext(file_name)[1][1:].lower()
         if f".{file_extension}" in SUFFIX_ALIASES:
             file_extension = SUFFIX_ALIASES[f".{file_extension}"]
 
-        presigned_info = get_presigned_url(endpoint, file_name, file_extension)
+        if bucket_id is not None and _needs_private_upload(
+            await self.buckets.get(bucket_id, request_options=request_options), file_access
+        ):
+            grant = await self.buckets.file_upload(
+                bucket_id, file_name=file_name, file_type=file_extension, request_options=request_options
+            )
+            presigned_info = _private_upload_info(grant)
+        else:
+            presigned_info = get_presigned_url(endpoint, file_name, file_extension)
 
         upload_url = presigned_info["URL"]
         headers, hosted_url = _upload_headers_from_presign(presigned_info.get("Header", {}))

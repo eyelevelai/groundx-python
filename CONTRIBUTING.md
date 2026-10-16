@@ -145,3 +145,35 @@ If you have questions or run into issues:
 ## License
 
 By contributing to this project, you agree that your contributions will be licensed under the same license as the project.
+
+## File access and ingest
+
+Fern owns policy models and generated customer/bucket/document methods. Regenerate
+them upstream; preserve `ingest.py` and extract helpers through `.fernignore`.
+Installed usage examples belong to the Studio Harness API/MCP references, while
+Fern owns the human API guide. Keep examples aligned with actual generated methods
+and state the released SDK version separately from branch support.
+
+`Document.file_access` carries an optional initial override into remote ingest and
+each local/split document. `ingest_directory(file_access=...)` applies it to every
+file in that call. Omitted/null inherits; creating resources requires no prior
+revision. Later settings changes use the current revision and cannot weaken an
+ancestor's protection or share lifetime.
+
+The preserved sync/async helpers inspect destination policy before local upload.
+Inherited or requested protection selects `buckets.file_upload`, exact native PUT
+and returned `hosted_url`. Public/unconfigured destinations retain the legacy broker.
+A lookup or private-reservation failure must never select the public broker. Native
+requests receive only returned storage headers, without GroundX credentials.
+
+Stable protected URLs need current authentication; they do not expire by age.
+Generated `documents.file_link` returns a finite bearer grant that can be forwarded
+until expiry. Reissue expired links; policy/key changes do not revoke prior native
+grants. Raw X-Ray links cover only the JSON object. Preserve exact raw bytes for
+certification; use the authenticated `?view=links` presentation for browser/QC assets.
+
+Extend `tests/custom/test_ingest_upload.py` with real generated HTTP transport for
+helper changes and retain existing extraction transport/replay tests. Validate
+sync/async, public/private, initial overrides, split propagation and native header
+separation. Runtime enablement, image adoption, vendor acceptance and human-owned
+SDK publication remain separate gates.

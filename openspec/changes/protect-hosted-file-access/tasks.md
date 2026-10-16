@@ -57,3 +57,11 @@ independently. Mypy reports no issues in 267 source files. Changed-file Ruff,
 build, LF and strict OpenSpec gates pass. All HTTP credentials and expiry cases
 use controlled test responses; no live protection or application adoption is
 established by these tests.
+
+## Creation-time policies and ingest helpers
+
+- [x] Generate optional initial fileAccess models and bucket/file operations from Fern; preserve handwritten files.
+- [x] Extend existing sync/async ingest and directory helpers to preserve per-document policies and choose bucket-owned private staging before protected bytes are uploaded. Keep legacy public uploads for unconfigured/public destinations; fail without public fallback on policy or reservation errors.
+- [x] Exercise the real generated HTTP transport and existing helpers for inherited protection, explicit file protection in a public bucket, split propagation and unchanged public uploads. Verify native PUT receives no API credentials and exact signed URL/headers are retained.
+
+Creation-policy validation:694 SDK tests pass,2existing skips,100subtests;156 existing deprecation warnings. Whole-repository mypy passes283 source files. These are local/synthetic results, not storage, release or deployment acceptance.

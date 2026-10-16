@@ -194,3 +194,38 @@ a proof of concept, but know that we will not be able to merge it as-is. We sugg
 an issue first to discuss with us!
 
 On the other hand, contributions to the README are always very welcome!
+
+## Protected files
+
+Requires a compatible SDK and an API deployment with file access enabled. Source
+schemas or generated methods alone do not establish deployment availability.
+
+```python
+import os
+from groundx import GroundX, Document, FileAccessPolicy
+
+client = GroundX(api_key=os.environ["GROUNDX_API_KEY"])
+bucket = client.buckets.create(
+    name="private-documents",
+    file_access=FileAccessPolicy(mode="protected"),
+)
+client.ingest(documents=[Document(
+    bucket_id=bucket.bucket.bucket_id,
+    file_path="./contract.pdf",
+    file_access=FileAccessPolicy(mode="protected", url_ttl_seconds=120),
+)])
+```
+
+Initial policies are optional; omitted/null inherits account/bucket settings.
+The sync and async ingest helpers check the destination before local upload.
+Protected files use bucket-owned private reservations; public destinations retain
+the existing broker. This adds a policy read per local file. A failed lookup or
+private upload does not fall back to public storage. Directory ingest accepts
+`file_access` for every file in that call.
+
+Later policy changes require the current revision. Stable protected URLs need
+current API authentication and have no age-based expiry. `documents.file_link`
+issues a finite bearer link that can be forwarded until expiry; later key/policy
+changes do not revoke it. Keep native signatures intact and API keys server-side.
+See the [human API guide](https://docs.groundx.ai) and the Studio Harness API/MCP
+file-access references for asset selectors, private upload, refresh and on-prem use.
