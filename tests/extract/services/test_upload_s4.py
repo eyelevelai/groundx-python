@@ -1,5 +1,6 @@
 import os
 import typing
+import urllib.parse
 from unittest.mock import patch
 
 import pytest
@@ -27,6 +28,42 @@ REGION_ENV = {
 }
 PRIVATE_EVIDENCE_TAGS = {"groundx-artifact-class": "extraction-private-evidence"}
 TOTAL_TIMEOUT_ARGUMENTS = ["total_timeout_seconds", "transport_total_timeout_seconds"]
+WRITE_METHODS = ["put_object", "put_json_stream"]
+SIX_MIB = 6 * 1024 * 1024
+MULTIPART_REQUESTS = [
+    ("POST", ("uploads",)),
+    ("PUT", ("partNumber", "uploadId")),
+    ("PUT", ("partNumber", "uploadId")),
+    ("POST", ("uploadId",)),
+]
+
+
+class _OverFiveGiB(bytes):
+    def __len__(self) -> int:
+        return 5 * 1024 * 1024 * 1024 + 1
+
+
+def _record_storage_requests(
+    requests: typing.List[typing.Tuple[str, typing.Tuple[str, ...]]],
+) -> typing.Any:
+    import urllib3
+
+    def urlopen(_pool: typing.Any, method: str, url: str, **kwargs: typing.Any) -> typing.Any:
+        query = tuple(sorted(urllib.parse.parse_qs(urllib.parse.urlsplit(url).query, keep_blank_values=True)))
+        requests.append((method, query))
+        body = b""
+        if method == "POST" and query == ("uploads",):
+            body = b"<InitiateMultipartUploadResult><UploadId>u1</UploadId></InitiateMultipartUploadResult>"
+        elif method == "POST":
+            body = b"<CompleteMultipartUploadResult><ETag>e</ETag></CompleteMultipartUploadResult>"
+        return urllib3.HTTPResponse(
+            body=body,
+            status=200,
+            headers={"ETag": '"e"', "Content-Type": "application/xml"},
+            preload_content=kwargs.get("preload_content", True),
+        )
+
+    return patch.object(urllib3.PoolManager, "urlopen", urlopen)
 
 
 def _upload(upload_type: str, region: typing.Optional[str] = None) -> Upload:
@@ -160,3 +197,32 @@ def test_put_json_stream_trims_a_leading_slash_only_in_s4_mode_and_keeps_tags_an
     assert put["object_name"] == stored_key
     assert dict(put["tags"]) == PRIVATE_EVIDENCE_TAGS
     assert minio_cls.call_args.kwargs["http_client"].connection_pool_kw["timeout"].total == 0.8
+
+
+@pytest.mark.parametrize("method", WRITE_METHODS)
+@pytest.mark.parametrize(
+    ("upload_type", "expected_requests"),
+    [("s4", [("PUT", ())]), ("minio", MULTIPART_REQUESTS)],
+)
+def test_s4_sends_an_upload_over_five_mib_as_one_put_and_minio_keeps_multipart(
+    method: str,
+    upload_type: str,
+    expected_requests: typing.List[typing.Tuple[str, typing.Tuple[str, ...]]],
+) -> None:
+    requests: typing.List[typing.Tuple[str, typing.Tuple[str, ...]]] = []
+    with _record_storage_requests(requests):
+        upload = _upload(upload_type, region="us-east-1")
+        getattr(upload, method)("eyelevel", KEY, b"x" * SIX_MIB, "application/json")
+
+    assert sorted(requests) == sorted(expected_requests)
+
+
+@pytest.mark.parametrize("method", WRITE_METHODS)
+def test_s4_refuses_an_upload_over_five_gib_without_sending_a_request(method: str) -> None:
+    requests: typing.List[typing.Tuple[str, typing.Tuple[str, ...]]] = []
+    with _record_storage_requests(requests):
+        upload = _upload("s4")
+        with pytest.raises(ValueError):
+            getattr(upload, method)("eyelevel", KEY, _OverFiveGiB(b"{}"), "application/json")
+
+    assert requests == []

@@ -68,3 +68,21 @@ TBD - created by archiving change gx-88-migrate-minio-to-s4. Update Purpose afte
 - **WHEN** an `Upload` of type `"minio"` writes with `put_object` or `put_json_stream` using the key `"/layout/processed/doc.json"`
 - **THEN** the minio client receives `object_name="/layout/processed/doc.json"`
 
+### Requirement: S4Client sends every write as one PUT
+`S4Client.put_object` and `S4Client.put_json_stream` SHALL send each object of up to 5 GiB to the store as one PUT request, never as a multipart upload, because S4 accepts a longer key in one PUT (246 bytes URL-encoded) than in a multipart upload (210). An object larger than 5 GiB SHALL be refused with a `ValueError` before any request is sent. `MinIOClient` SHALL keep minio-py's default sizing, so an object over 5 MiB still goes as a multipart upload in `minio` mode.
+
+#### Scenario: an object over 5 MiB goes as one PUT in s4 mode
+- **Polarity:** finalize success: the store receives one PUT and no multipart initiate
+- **WHEN** an `Upload` of type `"s4"` writes a 6 MiB object with `put_object` or `put_json_stream`
+- **THEN** the store receives exactly one `PUT` with no `uploads`, `uploadId`, or `partNumber` query
+
+#### Scenario: an object over 5 GiB is refused before any request in s4 mode
+- **Polarity:** reject before state: nothing is sent to the store
+- **WHEN** an `Upload` of type `"s4"` writes an object longer than 5 GiB with `put_object` or `put_json_stream`
+- **THEN** the write raises `ValueError`
+- **AND** no request reaches the store
+
+#### Scenario: minio mode keeps multipart for an object over 5 MiB
+- **Polarity:** skip unrelated repair path: the s4 single PUT is not applied to `minio`
+- **WHEN** an `Upload` of type `"minio"` writes a 6 MiB object with `put_object` or `put_json_stream`
+- **THEN** the store receives a multipart initiate, two part uploads, and a complete request

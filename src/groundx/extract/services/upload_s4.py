@@ -11,6 +11,11 @@ class S4Client(MinIOClient):
     def _region(self) -> str:
         return S4_REGION
 
+    def _part_size(self, length: int) -> int:
+        from minio.helpers import MIN_PART_SIZE
+
+        return max(length, MIN_PART_SIZE)
+
     def put_object(
         self,
         bucket: str,

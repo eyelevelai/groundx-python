@@ -17,6 +17,11 @@
 - [x] 3.1 In `CHANGELOG.md`, under `## Unreleased`, add an `### Added` section above `### Deprecated`. It states that `upload.type: s4` selects the new `S4Client` (`groundx.extract.services.upload_s4`, a `MinIOClient` subclass). It also states that `S4Client` always signs for `us-east-1`, ignoring `upload.region` and the region environment variables, that it trims a leading `/` from keys on `put_object` and `put_json_stream`, and that `minio` and `s3` behave as before.
   check: n/a — changelog text, no runtime behavior
 
+## 4. Send every S4 write as one PUT (2026-10-16 amendment)
+
+- [x] 4.1 Add `_part_size(length)` to `MinIOClient`, returning `0`, and pass `part_size=self._part_size(len(data))` to the minio client's `put_object` in `put_object` and `put_json_stream`. Override it in `S4Client` to return `max(length, MIN_PART_SIZE)` (design Amendments, 2026-10-16).
+  check: poetry run pytest "tests/extract/services/test_upload_s4.py::test_s4_sends_an_upload_over_five_mib_as_one_put_and_minio_keeps_multipart" "tests/extract/services/test_upload_s4.py::test_s4_refuses_an_upload_over_five_gib_without_sending_a_request" tests/extract/services/test_upload_minio.py -q
+
 The acceptance tests named above live in `tests/extract/services/test_upload_s4.py`. They drive the real `Upload` dispatcher with only `minio.Minio` (and `boto3.client` for `s3`) patched. `tests/extract/services/test_upload.py` and `tests/extract/services/test_upload_minio.py` are not edited.
 
 Consumer pin: internal-arcadia-agents pins `groundx==4.0.7` (`requirements.txt:22` at `ea67325f`). It must raise that pin to the release that carries `S4Client`; the pull request's release hand-off requests 4.0.10. See workspace `openspec/changes/gx-88-migrate-minio-to-s4/tasks.md` for cross-service coordination and deferred items.

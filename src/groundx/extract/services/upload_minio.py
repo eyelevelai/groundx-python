@@ -62,6 +62,9 @@ class MinIOClient:
     def _region(self) -> typing.Optional[str]:
         return self.settings.upload.get_region()
 
+    def _part_size(self, length: int) -> int:
+        return 0
+
     def _create_client(
         self,
         *,
@@ -345,6 +348,7 @@ class MinIOClient:
                 object_name=key,
                 data=io.BytesIO(data),
                 length=len(data),
+                part_size=self._part_size(len(data)),
                 content_type=content_type,
             )
         except S3Error as e:
@@ -439,6 +443,7 @@ class MinIOClient:
                     "object_name": key,
                     "data": io.BytesIO(data),
                     "length": len(data),
+                    "part_size": self._part_size(len(data)),
                     "content_type": content_type,
                 }
                 if minio_object_tags is not None:
