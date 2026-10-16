@@ -4,16 +4,19 @@ import typing
 
 from ..core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ..core.request_options import RequestOptions
+from ..types.asset_selector import AssetSelector
 from ..types.document_list_response import DocumentListResponse
 from ..types.document_local_ingest_request import DocumentLocalIngestRequest
 from ..types.document_lookup_response import DocumentLookupResponse
 from ..types.document_response import DocumentResponse
 from ..types.document_update import DocumentUpdate
 from ..types.document_xray import DocumentXray
+from ..types.file_link_response import FileLinkResponse
 from ..types.ingest_remote_document import IngestRemoteDocument
 from ..types.ingest_response import IngestResponse
 from ..types.processes_status_response import ProcessesStatusResponse
 from ..types.processing_status import ProcessingStatus
+from ..types.retry_failed_stage_response import RetryFailedStageResponse
 from ..types.sort import Sort
 from ..types.sort_order import SortOrder
 from ..types.website_source import WebsiteSource
@@ -599,6 +602,38 @@ class DocumentsClient:
         _response = self._raw_client.delete_by_id(document_id, request_options=request_options)
         return _response.data
 
+    def retry_failed_stage(
+        self, document_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> RetryFailedStageResponse:
+        """
+        Restart the document at its currently failed HTTP callback using its saved output and callback settings. No request body is required. Active or successfully delivered documents and other failed stages return 409. HTTP 202 means the retry was accepted. Get the document to check deliveryStatus. Post-processing and manual retries must be enabled. An earlier unconfirmed delivery may still have reached the receiver.
+
+        Parameters
+        ----------
+        document_id : str
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        RetryFailedStageResponse
+            Retry request accepted; read the document to check deliveryStatus
+
+        Examples
+        --------
+        from groundx import GroundX
+
+        client = GroundX(
+            api_key="YOUR_API_KEY",
+        )
+        client.documents.retry_failed_stage(
+            document_id="documentId",
+        )
+        """
+        _response = self._raw_client.retry_failed_stage(document_id, request_options=request_options)
+        return _response.data
+
     def get_extract(
         self, document_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> DocumentsGetExtractResponse:
@@ -702,6 +737,54 @@ class DocumentsClient:
         )
         """
         _response = self._raw_client.get_processes(n=n, status=status, request_options=request_options)
+        return _response.data
+
+    def file_link(
+        self,
+        document_id: str,
+        *,
+        asset: AssetSelector,
+        expires_in_seconds: typing.Optional[int] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> FileLinkResponse:
+        """
+        Issue a native storage GET link for a saved owned asset. The bearer can reuse or forward it until expiresAt. Key revocation and policy changes do not revoke existing native grants. No GroundX key is carried in the URL.
+
+        Parameters
+        ----------
+        document_id : str
+
+        asset : AssetSelector
+
+        expires_in_seconds : typing.Optional[int]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        FileLinkResponse
+            Private, no-store response
+
+        Examples
+        --------
+        from groundx import AssetSelectorCorrected, GroundX
+
+        client = GroundX(
+            api_key="YOUR_API_KEY",
+        )
+        client.documents.file_link(
+            document_id="11111111-1111-4111-8111-111111111111",
+            asset=AssetSelectorCorrected(
+                page_number=1,
+                corrected=False,
+            ),
+            expires_in_seconds=120,
+        )
+        """
+        _response = self._raw_client.file_link(
+            document_id, asset=asset, expires_in_seconds=expires_in_seconds, request_options=request_options
+        )
         return _response.data
 
 
@@ -1382,6 +1465,46 @@ class AsyncDocumentsClient:
         _response = await self._raw_client.delete_by_id(document_id, request_options=request_options)
         return _response.data
 
+    async def retry_failed_stage(
+        self, document_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> RetryFailedStageResponse:
+        """
+        Restart the document at its currently failed HTTP callback using its saved output and callback settings. No request body is required. Active or successfully delivered documents and other failed stages return 409. HTTP 202 means the retry was accepted. Get the document to check deliveryStatus. Post-processing and manual retries must be enabled. An earlier unconfirmed delivery may still have reached the receiver.
+
+        Parameters
+        ----------
+        document_id : str
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        RetryFailedStageResponse
+            Retry request accepted; read the document to check deliveryStatus
+
+        Examples
+        --------
+        import asyncio
+
+        from groundx import AsyncGroundX
+
+        client = AsyncGroundX(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.documents.retry_failed_stage(
+                document_id="documentId",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.retry_failed_stage(document_id, request_options=request_options)
+        return _response.data
+
     async def get_extract(
         self, document_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> DocumentsGetExtractResponse:
@@ -1511,4 +1634,60 @@ class AsyncDocumentsClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.get_processes(n=n, status=status, request_options=request_options)
+        return _response.data
+
+    async def file_link(
+        self,
+        document_id: str,
+        *,
+        asset: AssetSelector,
+        expires_in_seconds: typing.Optional[int] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> FileLinkResponse:
+        """
+        Issue a native storage GET link for a saved owned asset. The bearer can reuse or forward it until expiresAt. Key revocation and policy changes do not revoke existing native grants. No GroundX key is carried in the URL.
+
+        Parameters
+        ----------
+        document_id : str
+
+        asset : AssetSelector
+
+        expires_in_seconds : typing.Optional[int]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        FileLinkResponse
+            Private, no-store response
+
+        Examples
+        --------
+        import asyncio
+
+        from groundx import AssetSelectorCorrected, AsyncGroundX
+
+        client = AsyncGroundX(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.documents.file_link(
+                document_id="11111111-1111-4111-8111-111111111111",
+                asset=AssetSelectorCorrected(
+                    page_number=1,
+                    corrected=False,
+                ),
+                expires_in_seconds=120,
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.file_link(
+            document_id, asset=asset, expires_in_seconds=expires_in_seconds, request_options=request_options
+        )
         return _response.data

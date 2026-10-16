@@ -7,8 +7,12 @@ from ..core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ..core.request_options import RequestOptions
 from ..types.customer_response import CustomerResponse
 from ..types.customer_usage_response import CustomerUsageResponse
+from ..types.file_access_policy import FileAccessPolicy
 from .raw_client import AsyncRawCustomerClient, RawCustomerClient
 from .types.customer_get_usage_request_metric import CustomerGetUsageRequestMetric
+
+# this is used as the default value for optional parameters
+OMIT = typing.cast(typing.Any, ...)
 
 
 class CustomerClient:
@@ -50,6 +54,50 @@ class CustomerClient:
         client.customer.get()
         """
         _response = self._raw_client.get(request_options=request_options)
+        return _response.data
+
+    def update(
+        self,
+        *,
+        file_access_revision: int,
+        file_access: typing.Optional[FileAccessPolicy] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> CustomerResponse:
+        """
+        Replace or clear confirmed own-account file access settings. fileAccessRevision is required; 400 means missing or invalid input, 409 means stale revision, and 503 with Retry-After means application is incomplete. Stable protected links require X-API-Key on each read.
+
+        Parameters
+        ----------
+        file_access_revision : int
+
+        file_access : typing.Optional[FileAccessPolicy]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        CustomerResponse
+            Applied settings
+
+        Examples
+        --------
+        from groundx import FileAccessPolicy, GroundX
+
+        client = GroundX(
+            api_key="YOUR_API_KEY",
+        )
+        client.customer.update(
+            file_access=FileAccessPolicy(
+                mode="protected",
+                url_ttl_seconds=300,
+            ),
+            file_access_revision=0,
+        )
+        """
+        _response = self._raw_client.update(
+            file_access_revision=file_access_revision, file_access=file_access, request_options=request_options
+        )
         return _response.data
 
     def get_usage(
@@ -156,6 +204,58 @@ class AsyncCustomerClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.get(request_options=request_options)
+        return _response.data
+
+    async def update(
+        self,
+        *,
+        file_access_revision: int,
+        file_access: typing.Optional[FileAccessPolicy] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> CustomerResponse:
+        """
+        Replace or clear confirmed own-account file access settings. fileAccessRevision is required; 400 means missing or invalid input, 409 means stale revision, and 503 with Retry-After means application is incomplete. Stable protected links require X-API-Key on each read.
+
+        Parameters
+        ----------
+        file_access_revision : int
+
+        file_access : typing.Optional[FileAccessPolicy]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        CustomerResponse
+            Applied settings
+
+        Examples
+        --------
+        import asyncio
+
+        from groundx import AsyncGroundX, FileAccessPolicy
+
+        client = AsyncGroundX(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.customer.update(
+                file_access=FileAccessPolicy(
+                    mode="protected",
+                    url_ttl_seconds=300,
+                ),
+                file_access_revision=0,
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.update(
+            file_access_revision=file_access_revision, file_access=file_access, request_options=request_options
+        )
         return _response.data
 
     async def get_usage(

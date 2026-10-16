@@ -10,11 +10,19 @@ from ..core.jsonable_encoder import encode_path_param
 from ..core.parse_error import ParsingError
 from ..core.pydantic_utilities import parse_obj_as
 from ..core.request_options import RequestOptions
+from ..core.serialization import convert_and_respect_annotation_metadata
 from ..errors.bad_request_error import BadRequestError
+from ..errors.conflict_error import ConflictError
+from ..errors.forbidden_error import ForbiddenError
+from ..errors.not_found_error import NotFoundError
+from ..errors.service_unavailable_error import ServiceUnavailableError
 from ..errors.unauthorized_error import UnauthorizedError
 from ..types.bucket_list_response import BucketListResponse
 from ..types.bucket_response import BucketResponse
 from ..types.bucket_update_response import BucketUpdateResponse
+from ..types.document_type import DocumentType
+from ..types.file_access_policy import FileAccessPolicy
+from ..types.file_upload_response import FileUploadResponse
 from ..types.message_response import MessageResponse
 from pydantic import ValidationError
 
@@ -81,7 +89,11 @@ class RawBucketsClient:
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
     def create(
-        self, *, name: str, request_options: typing.Optional[RequestOptions] = None
+        self,
+        *,
+        name: str,
+        file_access: typing.Optional[FileAccessPolicy] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[BucketResponse]:
         """
         Create a new bucket.
@@ -89,6 +101,9 @@ class RawBucketsClient:
         Parameters
         ----------
         name : str
+
+        file_access : typing.Optional[FileAccessPolicy]
+            Initial override for this new resource. Omitted or null inherits. No fileAccessRevision is required on creation. Protected ancestors cannot be reopened or their share lifetime exceeded. Choose private staging before uploading bytes for a protected file, including in a public bucket.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -102,6 +117,9 @@ class RawBucketsClient:
             "v1/bucket",
             method="POST",
             json={
+                "fileAccess": convert_and_respect_annotation_metadata(
+                    object_=file_access, annotation=typing.Optional[FileAccessPolicy], direction="write"
+                ),
                 "name": name,
             },
             headers={
@@ -206,7 +224,13 @@ class RawBucketsClient:
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
     def update(
-        self, bucket_id: int, *, new_name: str, request_options: typing.Optional[RequestOptions] = None
+        self,
+        bucket_id: int,
+        *,
+        new_name: typing.Optional[str] = OMIT,
+        file_access: typing.Optional[FileAccessPolicy] = OMIT,
+        file_access_revision: typing.Optional[int] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[BucketUpdateResponse]:
         """
         Rename a bucket.
@@ -216,8 +240,12 @@ class RawBucketsClient:
         bucket_id : int
             The bucketId of the bucket being updated.
 
-        new_name : str
+        new_name : typing.Optional[str]
             The new name of the bucket being renamed.
+
+        file_access : typing.Optional[FileAccessPolicy]
+
+        file_access_revision : typing.Optional[int]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -232,6 +260,10 @@ class RawBucketsClient:
             method="PUT",
             json={
                 "newName": new_name,
+                "fileAccess": convert_and_respect_annotation_metadata(
+                    object_=file_access, annotation=typing.Optional[FileAccessPolicy], direction="write"
+                ),
+                "fileAccessRevision": file_access_revision,
             },
             headers={
                 "content-type": "application/json",
@@ -345,6 +377,131 @@ class RawBucketsClient:
             )
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
+    def file_upload(
+        self,
+        bucket_id: int,
+        *,
+        file_name: str,
+        file_type: DocumentType,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> HttpResponse[FileUploadResponse]:
+        """
+        Reserve a private bucket-owned source before issuing a native PUT grant, lasting at most 900 seconds. Use hostedUrl with the existing ingest operation.
+
+        Parameters
+        ----------
+        bucket_id : int
+
+        file_name : str
+
+        file_type : DocumentType
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[FileUploadResponse]
+            Private, no-store response
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"v1/bucket/{encode_path_param(bucket_id)}/file-upload",
+            method="POST",
+            json={
+                "fileName": file_name,
+                "fileType": file_type,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    FileUploadResponse,
+                    parse_obj_as(
+                        type_=FileUploadResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 403:
+                raise ForbiddenError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 409:
+                raise ConflictError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 503:
+                raise ServiceUnavailableError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
+        except ValidationError as e:
+            raise ParsingError(
+                status_code=_response.status_code, headers=dict(_response.headers), body=_response.json(), cause=e
+            )
+        raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
+
 
 class AsyncRawBucketsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
@@ -405,7 +562,11 @@ class AsyncRawBucketsClient:
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
     async def create(
-        self, *, name: str, request_options: typing.Optional[RequestOptions] = None
+        self,
+        *,
+        name: str,
+        file_access: typing.Optional[FileAccessPolicy] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[BucketResponse]:
         """
         Create a new bucket.
@@ -413,6 +574,9 @@ class AsyncRawBucketsClient:
         Parameters
         ----------
         name : str
+
+        file_access : typing.Optional[FileAccessPolicy]
+            Initial override for this new resource. Omitted or null inherits. No fileAccessRevision is required on creation. Protected ancestors cannot be reopened or their share lifetime exceeded. Choose private staging before uploading bytes for a protected file, including in a public bucket.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -426,6 +590,9 @@ class AsyncRawBucketsClient:
             "v1/bucket",
             method="POST",
             json={
+                "fileAccess": convert_and_respect_annotation_metadata(
+                    object_=file_access, annotation=typing.Optional[FileAccessPolicy], direction="write"
+                ),
                 "name": name,
             },
             headers={
@@ -530,7 +697,13 @@ class AsyncRawBucketsClient:
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
     async def update(
-        self, bucket_id: int, *, new_name: str, request_options: typing.Optional[RequestOptions] = None
+        self,
+        bucket_id: int,
+        *,
+        new_name: typing.Optional[str] = OMIT,
+        file_access: typing.Optional[FileAccessPolicy] = OMIT,
+        file_access_revision: typing.Optional[int] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[BucketUpdateResponse]:
         """
         Rename a bucket.
@@ -540,8 +713,12 @@ class AsyncRawBucketsClient:
         bucket_id : int
             The bucketId of the bucket being updated.
 
-        new_name : str
+        new_name : typing.Optional[str]
             The new name of the bucket being renamed.
+
+        file_access : typing.Optional[FileAccessPolicy]
+
+        file_access_revision : typing.Optional[int]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -556,6 +733,10 @@ class AsyncRawBucketsClient:
             method="PUT",
             json={
                 "newName": new_name,
+                "fileAccess": convert_and_respect_annotation_metadata(
+                    object_=file_access, annotation=typing.Optional[FileAccessPolicy], direction="write"
+                ),
+                "fileAccessRevision": file_access_revision,
             },
             headers={
                 "content-type": "application/json",
@@ -651,6 +832,131 @@ class AsyncRawBucketsClient:
                 )
             if _response.status_code == 401:
                 raise UnauthorizedError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
+        except ValidationError as e:
+            raise ParsingError(
+                status_code=_response.status_code, headers=dict(_response.headers), body=_response.json(), cause=e
+            )
+        raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
+
+    async def file_upload(
+        self,
+        bucket_id: int,
+        *,
+        file_name: str,
+        file_type: DocumentType,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AsyncHttpResponse[FileUploadResponse]:
+        """
+        Reserve a private bucket-owned source before issuing a native PUT grant, lasting at most 900 seconds. Use hostedUrl with the existing ingest operation.
+
+        Parameters
+        ----------
+        bucket_id : int
+
+        file_name : str
+
+        file_type : DocumentType
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[FileUploadResponse]
+            Private, no-store response
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"v1/bucket/{encode_path_param(bucket_id)}/file-upload",
+            method="POST",
+            json={
+                "fileName": file_name,
+                "fileType": file_type,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    FileUploadResponse,
+                    parse_obj_as(
+                        type_=FileUploadResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 403:
+                raise ForbiddenError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 409:
+                raise ConflictError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 503:
+                raise ServiceUnavailableError(
                     headers=dict(_response.headers),
                     body=typing.cast(
                         typing.Any,

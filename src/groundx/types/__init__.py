@@ -9,6 +9,12 @@ if typing.TYPE_CHECKING:
     from .api_key_detail import ApiKeyDetail
     from .api_key_request import ApiKeyRequest
     from .api_key_response import ApiKeyResponse
+    from .asset_selector import AssetSelector
+    from .asset_selector_chunk_id import AssetSelectorChunkId
+    from .asset_selector_chunk_index import AssetSelectorChunkIndex
+    from .asset_selector_corrected import AssetSelectorCorrected
+    from .asset_selector_zero import AssetSelectorZero
+    from .asset_selector_zero_kind import AssetSelectorZeroKind
     from .bounding_box_detail import BoundingBoxDetail
     from .bucket_detail import BucketDetail
     from .bucket_list_response import BucketListResponse
@@ -46,7 +52,13 @@ if typing.TYPE_CHECKING:
     from .document_xray import DocumentXray
     from .document_xray_chunk import DocumentXrayChunk
     from .document_xray_page import DocumentXrayPage
+    from .effective_policy import EffectivePolicy
+    from .effective_policy_mode import EffectivePolicyMode
     from .extraction_provenance import ExtractionProvenance
+    from .file_access_policy import FileAccessPolicy
+    from .file_access_policy_mode import FileAccessPolicyMode
+    from .file_link_response import FileLinkResponse
+    from .file_upload_response import FileUploadResponse
     from .group_detail import GroupDetail
     from .group_list_response import GroupListResponse
     from .group_response import GroupResponse
@@ -71,6 +83,7 @@ if typing.TYPE_CHECKING:
     from .process_level import ProcessLevel
     from .processes_status_response import ProcessesStatusResponse
     from .processing_status import ProcessingStatus
+    from .retry_failed_stage_response import RetryFailedStageResponse
     from .search_response import SearchResponse
     from .search_response_search import SearchResponseSearch
     from .search_result_item import SearchResultItem
@@ -105,6 +118,12 @@ _dynamic_imports: typing.Dict[str, str] = {
     "ApiKeyDetail": ".api_key_detail",
     "ApiKeyRequest": ".api_key_request",
     "ApiKeyResponse": ".api_key_response",
+    "AssetSelector": ".asset_selector",
+    "AssetSelectorChunkId": ".asset_selector_chunk_id",
+    "AssetSelectorChunkIndex": ".asset_selector_chunk_index",
+    "AssetSelectorCorrected": ".asset_selector_corrected",
+    "AssetSelectorZero": ".asset_selector_zero",
+    "AssetSelectorZeroKind": ".asset_selector_zero_kind",
     "BoundingBoxDetail": ".bounding_box_detail",
     "BucketDetail": ".bucket_detail",
     "BucketListResponse": ".bucket_list_response",
@@ -142,7 +161,13 @@ _dynamic_imports: typing.Dict[str, str] = {
     "DocumentXray": ".document_xray",
     "DocumentXrayChunk": ".document_xray_chunk",
     "DocumentXrayPage": ".document_xray_page",
+    "EffectivePolicy": ".effective_policy",
+    "EffectivePolicyMode": ".effective_policy_mode",
     "ExtractionProvenance": ".extraction_provenance",
+    "FileAccessPolicy": ".file_access_policy",
+    "FileAccessPolicyMode": ".file_access_policy_mode",
+    "FileLinkResponse": ".file_link_response",
+    "FileUploadResponse": ".file_upload_response",
     "GroupDetail": ".group_detail",
     "GroupListResponse": ".group_list_response",
     "GroupResponse": ".group_response",
@@ -167,6 +192,7 @@ _dynamic_imports: typing.Dict[str, str] = {
     "ProcessLevel": ".process_level",
     "ProcessesStatusResponse": ".processes_status_response",
     "ProcessingStatus": ".processing_status",
+    "RetryFailedStageResponse": ".retry_failed_stage_response",
     "SearchResponse": ".search_response",
     "SearchResponseSearch": ".search_response_search",
     "SearchResultItem": ".search_result_item",
@@ -225,6 +251,12 @@ __all__ = [
     "ApiKeyDetail",
     "ApiKeyRequest",
     "ApiKeyResponse",
+    "AssetSelector",
+    "AssetSelectorChunkId",
+    "AssetSelectorChunkIndex",
+    "AssetSelectorCorrected",
+    "AssetSelectorZero",
+    "AssetSelectorZeroKind",
     "BoundingBoxDetail",
     "BucketDetail",
     "BucketListResponse",
@@ -262,7 +294,13 @@ __all__ = [
     "DocumentXray",
     "DocumentXrayChunk",
     "DocumentXrayPage",
+    "EffectivePolicy",
+    "EffectivePolicyMode",
     "ExtractionProvenance",
+    "FileAccessPolicy",
+    "FileAccessPolicyMode",
+    "FileLinkResponse",
+    "FileUploadResponse",
     "GroupDetail",
     "GroupListResponse",
     "GroupResponse",
@@ -287,6 +325,7 @@ __all__ = [
     "ProcessLevel",
     "ProcessesStatusResponse",
     "ProcessingStatus",
+    "RetryFailedStageResponse",
     "SearchResponse",
     "SearchResponseSearch",
     "SearchResultItem",

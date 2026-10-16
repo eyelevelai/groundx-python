@@ -6,9 +6,18 @@ import pydantic
 import typing_extensions
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 from ..core.serialization import FieldMetadata
+from .file_access_policy import FileAccessPolicy
 
 
 class WebsiteSource(UniversalBaseModel):
+    file_access: typing_extensions.Annotated[
+        typing.Optional[FileAccessPolicy],
+        FieldMetadata(alias="fileAccess"),
+        pydantic.Field(
+            alias="fileAccess",
+            description="Initial override for this new resource. Omitted or null inherits. No fileAccessRevision is required on creation. Protected ancestors cannot be reopened or their share lifetime exceeded. Choose private staging before uploading bytes for a protected file, including in a public bucket.",
+        ),
+    ] = None
     bucket_id: typing_extensions.Annotated[
         int,
         FieldMetadata(alias="bucketId"),

@@ -7,10 +7,19 @@ import typing_extensions
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 from ..core.serialization import FieldMetadata
 from .document_type import DocumentType
+from .file_access_policy import FileAccessPolicy
 from .process_level import ProcessLevel
 
 
 class Document(UniversalBaseModel):
+    file_access: typing_extensions.Annotated[
+        typing.Optional[FileAccessPolicy],
+        FieldMetadata(alias="fileAccess"),
+        pydantic.Field(
+            alias="fileAccess",
+            description="Initial per-file override carried by SDK ingest helpers through batching and splitting. Omitted or null inherits; new resources require no policy revision. Select private staging before sending protected bytes.",
+        ),
+    ] = None
     bucket_id: typing_extensions.Annotated[
         int,
         FieldMetadata(alias="bucketId"),

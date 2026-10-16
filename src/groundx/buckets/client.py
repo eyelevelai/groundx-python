@@ -7,6 +7,9 @@ from ..core.request_options import RequestOptions
 from ..types.bucket_list_response import BucketListResponse
 from ..types.bucket_response import BucketResponse
 from ..types.bucket_update_response import BucketUpdateResponse
+from ..types.document_type import DocumentType
+from ..types.file_access_policy import FileAccessPolicy
+from ..types.file_upload_response import FileUploadResponse
 from ..types.message_response import MessageResponse
 from .raw_client import AsyncRawBucketsClient, RawBucketsClient
 
@@ -70,13 +73,22 @@ class BucketsClient:
         _response = self._raw_client.list(n=n, next_token=next_token, request_options=request_options)
         return _response.data
 
-    def create(self, *, name: str, request_options: typing.Optional[RequestOptions] = None) -> BucketResponse:
+    def create(
+        self,
+        *,
+        name: str,
+        file_access: typing.Optional[FileAccessPolicy] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> BucketResponse:
         """
         Create a new bucket.
 
         Parameters
         ----------
         name : str
+
+        file_access : typing.Optional[FileAccessPolicy]
+            Initial override for this new resource. Omitted or null inherits. No fileAccessRevision is required on creation. Protected ancestors cannot be reopened or their share lifetime exceeded. Choose private staging before uploading bytes for a protected file, including in a public bucket.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -88,16 +100,20 @@ class BucketsClient:
 
         Examples
         --------
-        from groundx import GroundX
+        from groundx import FileAccessPolicy, GroundX
 
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.buckets.create(
-            name="your_bucket_name",
+            name="private-documents",
+            file_access=FileAccessPolicy(
+                mode="protected",
+                url_ttl_seconds=300,
+            ),
         )
         """
-        _response = self._raw_client.create(name=name, request_options=request_options)
+        _response = self._raw_client.create(name=name, file_access=file_access, request_options=request_options)
         return _response.data
 
     def get(self, bucket_id: int, *, request_options: typing.Optional[RequestOptions] = None) -> BucketResponse:
@@ -132,7 +148,13 @@ class BucketsClient:
         return _response.data
 
     def update(
-        self, bucket_id: int, *, new_name: str, request_options: typing.Optional[RequestOptions] = None
+        self,
+        bucket_id: int,
+        *,
+        new_name: typing.Optional[str] = OMIT,
+        file_access: typing.Optional[FileAccessPolicy] = OMIT,
+        file_access_revision: typing.Optional[int] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> BucketUpdateResponse:
         """
         Rename a bucket.
@@ -142,8 +164,12 @@ class BucketsClient:
         bucket_id : int
             The bucketId of the bucket being updated.
 
-        new_name : str
+        new_name : typing.Optional[str]
             The new name of the bucket being renamed.
+
+        file_access : typing.Optional[FileAccessPolicy]
+
+        file_access_revision : typing.Optional[int]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -161,11 +187,17 @@ class BucketsClient:
             api_key="YOUR_API_KEY",
         )
         client.buckets.update(
-            bucket_id=1,
+            bucket_id=7,
             new_name="your_bucket_name",
         )
         """
-        _response = self._raw_client.update(bucket_id, new_name=new_name, request_options=request_options)
+        _response = self._raw_client.update(
+            bucket_id,
+            new_name=new_name,
+            file_access=file_access,
+            file_access_revision=file_access_revision,
+            request_options=request_options,
+        )
         return _response.data
 
     def delete(self, bucket_id: int, *, request_options: typing.Optional[RequestOptions] = None) -> MessageResponse:
@@ -197,6 +229,51 @@ class BucketsClient:
         )
         """
         _response = self._raw_client.delete(bucket_id, request_options=request_options)
+        return _response.data
+
+    def file_upload(
+        self,
+        bucket_id: int,
+        *,
+        file_name: str,
+        file_type: DocumentType,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> FileUploadResponse:
+        """
+        Reserve a private bucket-owned source before issuing a native PUT grant, lasting at most 900 seconds. Use hostedUrl with the existing ingest operation.
+
+        Parameters
+        ----------
+        bucket_id : int
+
+        file_name : str
+
+        file_type : DocumentType
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        FileUploadResponse
+            Private, no-store response
+
+        Examples
+        --------
+        from groundx import GroundX
+
+        client = GroundX(
+            api_key="YOUR_API_KEY",
+        )
+        client.buckets.file_upload(
+            bucket_id=1234,
+            file_name="invoice.pdf",
+            file_type="pdf",
+        )
+        """
+        _response = self._raw_client.file_upload(
+            bucket_id, file_name=file_name, file_type=file_type, request_options=request_options
+        )
         return _response.data
 
 
@@ -264,13 +341,22 @@ class AsyncBucketsClient:
         _response = await self._raw_client.list(n=n, next_token=next_token, request_options=request_options)
         return _response.data
 
-    async def create(self, *, name: str, request_options: typing.Optional[RequestOptions] = None) -> BucketResponse:
+    async def create(
+        self,
+        *,
+        name: str,
+        file_access: typing.Optional[FileAccessPolicy] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> BucketResponse:
         """
         Create a new bucket.
 
         Parameters
         ----------
         name : str
+
+        file_access : typing.Optional[FileAccessPolicy]
+            Initial override for this new resource. Omitted or null inherits. No fileAccessRevision is required on creation. Protected ancestors cannot be reopened or their share lifetime exceeded. Choose private staging before uploading bytes for a protected file, including in a public bucket.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -284,7 +370,7 @@ class AsyncBucketsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundX
+        from groundx import AsyncGroundX, FileAccessPolicy
 
         client = AsyncGroundX(
             api_key="YOUR_API_KEY",
@@ -293,13 +379,17 @@ class AsyncBucketsClient:
 
         async def main() -> None:
             await client.buckets.create(
-                name="your_bucket_name",
+                name="private-documents",
+                file_access=FileAccessPolicy(
+                    mode="protected",
+                    url_ttl_seconds=300,
+                ),
             )
 
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.create(name=name, request_options=request_options)
+        _response = await self._raw_client.create(name=name, file_access=file_access, request_options=request_options)
         return _response.data
 
     async def get(self, bucket_id: int, *, request_options: typing.Optional[RequestOptions] = None) -> BucketResponse:
@@ -342,7 +432,13 @@ class AsyncBucketsClient:
         return _response.data
 
     async def update(
-        self, bucket_id: int, *, new_name: str, request_options: typing.Optional[RequestOptions] = None
+        self,
+        bucket_id: int,
+        *,
+        new_name: typing.Optional[str] = OMIT,
+        file_access: typing.Optional[FileAccessPolicy] = OMIT,
+        file_access_revision: typing.Optional[int] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> BucketUpdateResponse:
         """
         Rename a bucket.
@@ -352,8 +448,12 @@ class AsyncBucketsClient:
         bucket_id : int
             The bucketId of the bucket being updated.
 
-        new_name : str
+        new_name : typing.Optional[str]
             The new name of the bucket being renamed.
+
+        file_access : typing.Optional[FileAccessPolicy]
+
+        file_access_revision : typing.Optional[int]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -376,14 +476,20 @@ class AsyncBucketsClient:
 
         async def main() -> None:
             await client.buckets.update(
-                bucket_id=1,
+                bucket_id=7,
                 new_name="your_bucket_name",
             )
 
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.update(bucket_id, new_name=new_name, request_options=request_options)
+        _response = await self._raw_client.update(
+            bucket_id,
+            new_name=new_name,
+            file_access=file_access,
+            file_access_revision=file_access_revision,
+            request_options=request_options,
+        )
         return _response.data
 
     async def delete(
@@ -425,4 +531,57 @@ class AsyncBucketsClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.delete(bucket_id, request_options=request_options)
+        return _response.data
+
+    async def file_upload(
+        self,
+        bucket_id: int,
+        *,
+        file_name: str,
+        file_type: DocumentType,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> FileUploadResponse:
+        """
+        Reserve a private bucket-owned source before issuing a native PUT grant, lasting at most 900 seconds. Use hostedUrl with the existing ingest operation.
+
+        Parameters
+        ----------
+        bucket_id : int
+
+        file_name : str
+
+        file_type : DocumentType
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        FileUploadResponse
+            Private, no-store response
+
+        Examples
+        --------
+        import asyncio
+
+        from groundx import AsyncGroundX
+
+        client = AsyncGroundX(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.buckets.file_upload(
+                bucket_id=1234,
+                file_name="invoice.pdf",
+                file_type="pdf",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.file_upload(
+            bucket_id, file_name=file_name, file_type=file_type, request_options=request_options
+        )
         return _response.data

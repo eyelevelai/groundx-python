@@ -6,9 +6,32 @@ import pydantic
 import typing_extensions
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 from ..core.serialization import FieldMetadata
+from .effective_policy import EffectivePolicy
+from .file_access_policy import FileAccessPolicy
 
 
 class BucketUpdateDetail(UniversalBaseModel):
+    file_access: typing_extensions.Annotated[
+        typing.Optional[FileAccessPolicy],
+        FieldMetadata(alias="fileAccess"),
+        pydantic.Field(
+            alias="fileAccess",
+            description="Confirmed override. Null means inherited; omitted on clients without this feature. Pending changes remain internal.",
+        ),
+    ] = None
+    file_access_revision: typing_extensions.Annotated[
+        typing.Optional[int],
+        FieldMetadata(alias="fileAccessRevision"),
+        pydantic.Field(
+            alias="fileAccessRevision",
+            description="Confirmed revision. Required with fileAccess on writes; stale revisions return 409.",
+        ),
+    ] = None
+    effective_file_access: typing_extensions.Annotated[
+        typing.Optional[EffectivePolicy],
+        FieldMetadata(alias="effectiveFileAccess"),
+        pydantic.Field(alias="effectiveFileAccess"),
+    ] = None
     bucket_id: typing_extensions.Annotated[int, FieldMetadata(alias="bucketId"), pydantic.Field(alias="bucketId")]
     name: typing.Optional[str] = None
 

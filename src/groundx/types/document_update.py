@@ -6,6 +6,7 @@ import pydantic
 import typing_extensions
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 from ..core.serialization import FieldMetadata
+from .file_access_policy import FileAccessPolicy
 
 
 class DocumentUpdate(UniversalBaseModel):
@@ -30,6 +31,12 @@ class DocumentUpdate(UniversalBaseModel):
         pydantic.Field(
             alias="searchData", description="A dictionary of key-value pairs that will replace the existing searchData."
         ),
+    ] = None
+    file_access: typing_extensions.Annotated[
+        typing.Optional[FileAccessPolicy], FieldMetadata(alias="fileAccess"), pydantic.Field(alias="fileAccess")
+    ] = None
+    file_access_revision: typing_extensions.Annotated[
+        typing.Optional[int], FieldMetadata(alias="fileAccessRevision"), pydantic.Field(alias="fileAccessRevision")
     ] = None
 
     if IS_PYDANTIC_V2:
