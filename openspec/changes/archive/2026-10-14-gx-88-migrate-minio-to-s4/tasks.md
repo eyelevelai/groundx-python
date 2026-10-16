@@ -21,7 +21,7 @@
 
 - [x] 4.1 Add `_part_size(length)` to `MinIOClient`, returning `0`, and pass `part_size=self._part_size(len(data))` to the minio client's `put_object` in `put_object` and `put_json_stream`. Override it in `S4Client` to return `max(length, MIN_PART_SIZE)` (design Amendments, 2026-10-16).
   check: poetry run pytest "tests/extract/services/test_upload_s4.py::test_s4_sends_an_upload_over_five_mib_as_one_put_and_minio_keeps_multipart" "tests/extract/services/test_upload_s4.py::test_s4_refuses_an_upload_over_five_gib_without_sending_a_request" tests/extract/services/test_upload_minio.py -q
-- [x] 4.2 Cover the 5 MiB floor of `S4Client._part_size`: an S4 write of 0 bytes or 4 KiB through `put_object` and `put_json_stream` sends exactly one PUT (design Amendments, 2026-10-16).
+- [x] 4.2 An S4 write under 5 MiB through `put_object` and `put_json_stream` sends exactly one PUT: the 4 KiB case guards the 5 MiB floor of `S4Client._part_size`, and the 0-byte case covers an empty object (design Amendments, 2026-10-16).
   check: poetry run pytest "tests/extract/services/test_upload_s4.py::test_s4_sends_an_upload_under_five_mib_as_one_put" -q
 
 The acceptance tests named above live in `tests/extract/services/test_upload_s4.py`. They drive the real `Upload` dispatcher with only `minio.Minio` (and `boto3.client` for `s3`) patched. `tests/extract/services/test_upload.py` and `tests/extract/services/test_upload_minio.py` are not edited.
