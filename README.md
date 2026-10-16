@@ -227,5 +227,5 @@ Later policy changes require the current revision. Stable protected URLs need
 current API authentication and have no age-based expiry. `documents.file_link`
 issues a finite bearer link that can be forwarded until expiry; later key/policy
 changes do not revoke it. Keep native signatures intact and API keys server-side.
-See the [human API guide](https://docs.groundx.ai) and the Studio Harness API/MCP
-file-access references for asset selectors, private upload, refresh and on-prem use.
+Fern owns the human API guide. The Studio Harness API/MCP file-access references
+cover asset selectors, private upload, refresh and on-prem use.
