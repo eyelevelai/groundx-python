@@ -76,6 +76,11 @@ TBD - created by archiving change gx-88-migrate-minio-to-s4. Update Purpose afte
 - **WHEN** an `Upload` of type `"s4"` writes a 6 MiB object with `put_object` or `put_json_stream`
 - **THEN** the store receives exactly one `PUT` with no `uploads`, `uploadId`, or `partNumber` query
 
+#### Scenario: an object under 5 MiB goes as one PUT in s4 mode
+- **Polarity:** finalize success: the store receives one PUT
+- **WHEN** an `Upload` of type `"s4"` writes a 0-byte or 4 KiB object with `put_object` or `put_json_stream`
+- **THEN** the store receives exactly one `PUT` with no `uploads`, `uploadId`, or `partNumber` query
+
 #### Scenario: an object over 5 GiB is refused before any request in s4 mode
 - **Polarity:** reject before state: nothing is sent to the store
 - **WHEN** an `Upload` of type `"s4"` writes an object longer than 5 GiB with `put_object` or `put_json_stream`

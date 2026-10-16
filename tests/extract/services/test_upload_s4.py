@@ -218,6 +218,17 @@ def test_s4_sends_an_upload_over_five_mib_as_one_put_and_minio_keeps_multipart(
 
 
 @pytest.mark.parametrize("method", WRITE_METHODS)
+@pytest.mark.parametrize("size", [0, 4 * 1024])
+def test_s4_sends_an_upload_under_five_mib_as_one_put(method: str, size: int) -> None:
+    requests: typing.List[typing.Tuple[str, typing.Tuple[str, ...]]] = []
+    with _record_storage_requests(requests):
+        upload = _upload("s4", region="us-east-1")
+        getattr(upload, method)("eyelevel", KEY, b"x" * size, "application/json")
+
+    assert requests == [("PUT", ())]
+
+
+@pytest.mark.parametrize("method", WRITE_METHODS)
 def test_s4_refuses_an_upload_over_five_gib_without_sending_a_request(method: str) -> None:
     requests: typing.List[typing.Tuple[str, typing.Tuple[str, ...]]] = []
     with _record_storage_requests(requests):
