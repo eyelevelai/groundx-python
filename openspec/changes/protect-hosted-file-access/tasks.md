@@ -102,7 +102,7 @@ Fern source `aee787cd01340e5f5459594399baf4d3cc68f905`, Python generator
 with all three version exports when filesystem IR requests a full project.
 The isolated generator used `downloadFiles` output with networking disabled;
 only its initializer was retained. Ordinary filesystem generation omits these
-exports even with `--version`. Package metadata and version headers are unchanged.
+exports even with `--version`. Package metadata remains `4.0.9`.
 
 Validation: the existing isolated import test fails without the exports and
 passes with them; all five export tests pass. The complete SDK suite passes
@@ -118,3 +118,27 @@ closed on 2026-10-17 at 18:15 UTC. The dedicated work root and generator-owned
 temporary outputs were removed (742 files, 27,650,199 bytes); absence was verified.
 The lifecycle-only summary remains under ignored `openspec/runs`, SHA-256
 `ee4f2f056c79f39f63ae87d2092ab421acfae6bdd27851080ec54ad832ce6855`.
+
+## Generated request metadata
+
+- [x] Retain `client_wrapper.py` byte-for-byte from pushed main
+      `c8b14f18a77002c873f8f7550f354b7626f2b674`: `User-Agent` and
+      `X-Fern-SDK-Version` report `4.0.9`, and `X-Fern-SDK-Name` reports `groundx`.
+- [x] Extend existing sync/async private-ingest transport coverage to compare
+      request metadata with the installed package version and public version
+      export, retain API/delegated customer keys, and exclude them from native PUT.
+
+The generated wrapper has no change relative to main. `.fernignore`, package
+metadata and the initializer's version export are unchanged. No generator
+ownership or public API surface is added.
+
+Validation: all four extended transport cases fail on the mismatched
+`groundx/4.0.10` user agent before restoration and pass afterward. All 30
+upload/export tests pass. The complete SDK suite passes 710 tests with 2 existing
+skips, 100 subtests and 156 existing deprecation warnings. Mypy passes all 283
+source files; changed-test Ruff lint/format, LF, build and strict OpenSpec checks
+pass. All three aiohttp tests and the protected compact replay pass separately.
+Arcadia legacy,
+Arcadia v1, generic v1 and ADP v1 extraction execution paths are unaffected:
+only generated HTTP package metadata is restored, with authentication retained.
+These are local checks, not a package release or deployed result.

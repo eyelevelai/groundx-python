@@ -79,10 +79,14 @@ def test_upload_file_retries_transient_put_errors(
 @pytest.mark.parametrize("asynchronous", [False, True])
 @pytest.mark.parametrize("inherited,override", [("protected", None), ("public", {"mode": "protected"})])
 def test_ingest_reserves_private_source_before_upload(monkeypatch, tmp_path, inherited, override, asynchronous):
+    from importlib.metadata import version
+
     import httpx
 
-    from groundx import Document
+    from groundx import Document, __version__
 
+    package_version = version("groundx")
+    assert __version__ == package_version
     path = tmp_path / "private.txt"
     path.write_bytes(b"private source")
     events = []
@@ -90,6 +94,10 @@ def test_ingest_reserves_private_source_before_upload(monkeypatch, tmp_path, inh
     def handle(request):
         events.append((request.method, request.url.path))
         assert request.headers["x-api-key"] == "test"
+        assert request.headers["x-customer-key"] == "customer-test"
+        assert request.headers["user-agent"] == f"groundx/{package_version}"
+        assert request.headers["x-fern-sdk-name"] == "groundx"
+        assert request.headers["x-fern-sdk-version"] == package_version
         if request.method == "GET":
             return httpx.Response(
                 200, json={"bucket": {"bucketId": 7, "effectiveFileAccess": {"mode": inherited, "urlTtlSeconds": 300}}}
@@ -126,10 +134,18 @@ def test_ingest_reserves_private_source_before_upload(monkeypatch, tmp_path, inh
 
         from groundx import AsyncGroundX
 
-        client = AsyncGroundX(api_key="test", httpx_client=httpx.AsyncClient(transport=httpx.MockTransport(handle)))
+        client = AsyncGroundX(
+            api_key="test",
+            headers={"X-Customer-Key": "customer-test"},
+            httpx_client=httpx.AsyncClient(transport=httpx.MockTransport(handle)),
+        )
         asyncio.run(client.ingest(documents=documents))
     else:
-        client = GroundX(api_key="test", httpx_client=httpx.Client(transport=httpx.MockTransport(handle)))
+        client = GroundX(
+            api_key="test",
+            headers={"X-Customer-Key": "customer-test"},
+            httpx_client=httpx.Client(transport=httpx.MockTransport(handle)),
+        )
         client.ingest(documents=documents)
     assert [method for method, _ in events] == ["GET", "POST", "PUT", "POST"]
     if not asynchronous:
