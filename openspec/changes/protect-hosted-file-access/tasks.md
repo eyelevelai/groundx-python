@@ -89,3 +89,32 @@ Poetry runtime passes 710 tests with 2 existing skips, 100 subtests and 156 exis
 extraction YAML deprecation warnings. Whole-repository mypy passes 283 source
 files. Changed-file Ruff, LF and strict OpenSpec validation pass. No package,
 image, deployment or live storage acceptance follows from these local tests.
+
+## Package version compatibility
+
+- [x] Retain the released package version export in the generated initializer,
+      including type-checking, lazy import and wildcard export support.
+- [x] Extend the existing isolated base-import test to verify the installed
+      metadata version remains available without extract dependencies.
+
+Fern source `aee787cd01340e5f5459594399baf4d3cc68f905`, Python generator
+`5.10.0`, and the existing `groundx` version `4.0.9` produce the initializer
+with all three version exports when filesystem IR requests a full project.
+The isolated generator used `downloadFiles` output with networking disabled;
+only its initializer was retained. Ordinary filesystem generation omits these
+exports even with `--version`. Package metadata and version headers are unchanged.
+
+Validation: the existing isolated import test fails without the exports and
+passes with them; all five export tests pass. The complete SDK suite passes
+710 tests with 2 existing skips, 100 subtests and 156 existing deprecation
+warnings. The protected compact replay passes independently; all three aiohttp
+tests pass. Mypy passes all 283 source files. Changed-file Ruff, LF and strict
+OpenSpec checks pass. Extraction runtime, prompt policy, schema routing and
+output are unchanged, so Arcadia legacy, Arcadia v1, generic v1 and ADP v1
+execution paths are unaffected. These are local checks, not a package release.
+
+Local closeout receipt: `protect-hosted-file-access/version-export-regeneration`
+closed on 2026-10-17 at 18:15 UTC. The dedicated work root and generator-owned
+temporary outputs were removed (742 files, 27,650,199 bytes); absence was verified.
+The lifecycle-only summary remains under ignored `openspec/runs`, SHA-256
+`ee4f2f056c79f39f63ae87d2092ab421acfae6bdd27851080ec54ad832ce6855`.
