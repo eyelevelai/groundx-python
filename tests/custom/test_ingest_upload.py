@@ -460,3 +460,87 @@ def test_policy_operations_raise_typed_errors(asynchronous, operation, status):
         sent = json.loads(requests[0].content)
         assert (sent["documents"][0] if group == "documents" else sent)["fileAccess"] is None
         assert (sent["documents"][0] if group == "documents" else sent)["fileAccessRevision"] == 7
+
+
+@pytest.mark.parametrize("asynchronous", [False, True])
+def test_policy_models_preserve_legacy_updates_and_initial_inheritance(asynchronous):
+    import asyncio
+    import json
+
+    import httpx
+
+    from groundx import AsyncGroundX, DocumentUpdate
+
+    requests = []
+
+    def handle(request):
+        requests.append((request.method, request.url.path, json.loads(request.content)))
+        return httpx.Response(
+            200, json={"bucket": {"bucketId": 7}, "ingest": {"processId": "process", "status": "queued"}}
+        )
+
+    async def run():
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handle)) as transport:
+            client = AsyncGroundX(api_key="test", base_url="https://api.test", httpx_client=transport)
+            await client.buckets.update(7, new_name="renamed")
+            await client.documents.update(documents=[DocumentUpdate(document_id="document", file_name="renamed.pdf")])
+            await client.buckets.create(name="inherited")
+            await client.buckets.create(name="inherited", file_access=None)
+
+    if asynchronous:
+        asyncio.run(run())
+    else:
+        with httpx.Client(transport=httpx.MockTransport(handle)) as transport:
+            client = GroundX(api_key="test", base_url="https://api.test", httpx_client=transport)
+            client.buckets.update(7, new_name="renamed")
+            client.documents.update(documents=[DocumentUpdate(document_id="document", file_name="renamed.pdf")])
+            client.buckets.create(name="inherited")
+            client.buckets.create(name="inherited", file_access=None)
+
+    assert requests == [
+        ("PUT", "/v1/bucket/7", {"newName": "renamed"}),
+        ("PUT", "/v1/ingest/documents", {"documents": [{"documentId": "document", "fileName": "renamed.pdf"}]}),
+        ("POST", "/v1/bucket", {"name": "inherited"}),
+        ("POST", "/v1/bucket", {"name": "inherited", "fileAccess": None}),
+    ]
+
+
+@pytest.mark.parametrize("asynchronous", [False, True])
+def test_file_link_serializes_page_selector_and_reads_native_grant(asynchronous):
+    import asyncio
+    import json
+
+    import httpx
+
+    from groundx import AssetSelectorCorrected, AsyncGroundX
+
+    requests = []
+    grant = {"url": "https://storage.test/page?signature=exact", "expiresAt": "2099-01-01T00:00:00Z"}
+
+    def handle(request):
+        requests.append((request.method, request.url.path, json.loads(request.content)))
+        return httpx.Response(200, json=grant)
+
+    kwargs = {"asset": AssetSelectorCorrected(kind="page", page_number=1), "expires_in_seconds": 120}
+
+    async def run():
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handle)) as transport:
+            client = AsyncGroundX(api_key="test", base_url="https://api.test", httpx_client=transport)
+            return await client.documents.file_link("document", **kwargs)
+
+    if asynchronous:
+        response = asyncio.run(run())
+    else:
+        with httpx.Client(transport=httpx.MockTransport(handle)) as transport:
+            client = GroundX(api_key="test", base_url="https://api.test", httpx_client=transport)
+            response = client.documents.file_link("document", **kwargs)
+
+    assert requests == [
+        (
+            "POST",
+            "/v1/ingest/document/document/file-link",
+            {"asset": {"kind": "page", "pageNumber": 1}, "expiresInSeconds": 120},
+        )
+    ]
+    assert response.url == grant["url"]
+    assert response.expires_at.isoformat() == "2099-01-01T00:00:00+00:00"

@@ -158,3 +158,19 @@ Forty-six sync/async recording-transport cases verify typed errors, response bod
 Local closeout receipt: `protect-hosted-file-access/response-errors` closed at 2026-10-18T04:55:18.342075+00:00. Removed the exact registered generation/test root and its generator-owned temporary logs, 572 files and 3937402 bytes. Absence verified. The bounded lifecycle summary remains under ignored `openspec/runs`, SHA-256 `fdfbe68a8b8cc4b069d5fdb857073d1c0c9a56b37bb0e633726ffb6d87290bb4`. Reviewed generated clients remain with their SDK owners.
 
 Final exact `poetry run mypy .` after run closeout passes all 283 source files. Changed-test Ruff lint/format, LF, strict OpenSpec and diff checks pass.
+
+## Generated SDK boundary
+
+- [x] Compare every changed generated SDK file with fresh pinned filesystem output from the canonical Fern source; distinguish preserved helper customization.
+- [x] Retain package identity through generator-supported full-project output, preserving existing released versions and handwritten fences.
+- [x] Extend existing transport coverage only for consequential gaps, run focused SDK checks and close the exact local generation root.
+
+Local generation root: `openspec/work/protect-hosted-file-access/generated-boundary-audit`, owned by the SDK maintainer for pinned generation parity and package-identity validation. Expires 2026-10-19T00:00:00Z. No package publication or live API calls.
+
+Pinned Fern CLI `5.37.9`, Python generator `5.10.0` and TypeScript generator `3.69.0` reproduce every generated runtime change from producer source `ef86e94b29706dac558cb9e2aedb37ffe41b3d33`. Python has 28 byte-identical files and six description-only differences; TypeScript has 42 byte-identical files and six comment-only differences. Current producer `3091a04` adds descriptions only. Full-project filesystem output retains package identity and the Python version export. TypeScript's generated `BaseClient.ts` is restored from that output and matches pushed main byte-for-byte. Handwritten behavior remains within existing `.fernignore` fences.
+
+The existing Python recording-transport tests now cover successful legacy bucket/document updates, omitted/null initial bucket inheritance and page-selector native links. Existing private-ingest coverage already checks parsed 201 uploads and separate native headers. The existing TypeScript delegated-ingest test now checks package identity on API requests; it fails before the generated restoration. Both contributor guides state the local full-project/package-identity requirement.
+
+Validation: exact `poetry run mypy .` passes all 283 source files after generation-root cleanup. Python passes 760 tests with two existing skips, 100 subtests and 156 existing warnings; all three aiohttp tests and the protected compact replay pass separately. TypeScript passes all 480 tests and both CJS/ESM builds. Changed-test Ruff/Biome, LF, strict OpenSpec and diff checks pass. Arcadia legacy, Arcadia v1, generic v1 and ADP v1 extraction runtime, schemas, prompts and routing are unchanged. Package publication and live acceptance remain separate gates.
+
+Local closeout receipt: `protect-hosted-file-access/generated-boundary-audit` closed at 2026-10-18T17:04:48.583001+00:00. Removed the exact registered root and generator-owned temporary roots, 1609 files and 71373966 bytes; absence verified. The bounded lifecycle summary remains under ignored `openspec/runs`, SHA-256 `3f3dd390ea7ea0be6948d39eb7db3c399a46bd102a214bc13ac8e96b54b5b649`.

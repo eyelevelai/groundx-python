@@ -150,6 +150,9 @@ By contributing to this project, you agree that your contributions will be licen
 
 Fern owns policy models and generated customer/bucket/document methods. Regenerate
 them upstream; preserve `ingest.py` and extract helpers through `.fernignore`.
+Local regeneration must request a full project with Fern's configured `groundx`
+package name and the repository's existing version. Source-only downloads omit
+package identity headers and the public `__version__` export.
 Installed usage examples belong to the Studio Harness API/MCP references, while
 Fern owns the human API guide. Keep examples aligned with actual generated methods
 and state the released SDK version separately from branch support.
