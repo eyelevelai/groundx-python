@@ -21,7 +21,7 @@ class MeterDetail(UniversalBaseModel):
     meter_id: typing_extensions.Annotated[
         typing.Optional[str],
         FieldMetadata(alias="meterId"),
-        pydantic.Field(alias="meterId", description="Unique system generated ID for the meteric"),
+        pydantic.Field(alias="meterId", description="Unique usage metric ID."),
     ] = None
     value: typing.Optional[int] = pydantic.Field(default=None)
     """

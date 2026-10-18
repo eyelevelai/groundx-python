@@ -11,7 +11,7 @@ from .workflow_step_config import WorkflowStepConfig
 
 class WorkflowStep(UniversalBaseModel):
     """
-    Configurations for an agent, including LLM information and prompts
+    Agent settings, including its LLM and prompts.
     """
 
     all_: typing_extensions.Annotated[

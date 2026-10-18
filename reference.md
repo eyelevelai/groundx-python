@@ -12,7 +12,7 @@
 <dl>
 <dd>
 
-copy documents from one bucket to another
+Copy documents from one bucket to another.
 </dd>
 </dl>
 </dd>
@@ -159,7 +159,7 @@ client.documents.ingest_remote(
 <dl>
 <dd>
 
-**callback_url:** `typing.Optional[str]` — An endpoint that will receive processing event updates as POST.
+**callback_url:** `typing.Optional[str]` — URL that receives processing updates as POST requests.
     
 </dd>
 </dl>
@@ -167,7 +167,7 @@ client.documents.ingest_remote(
 <dl>
 <dd>
 
-**callback_data:** `typing.Optional[str]` — A string that is returned, along with processing event updates, to the callback URL.
+**callback_data:** `typing.Optional[str]` — Custom string included in processing updates sent to the callback URL.
     
 </dd>
 </dl>
@@ -283,12 +283,7 @@ client.documents.ingest_local(
 <dl>
 <dd>
 
-Upload the content of a publicly accessible website for ingestion into a GroundX bucket. This is done by following links within a specified URL, recursively, up to a specified depth or number of pages.
-
-Note1: This endpoint is currently not supported for on-prem deployments. 
-Note2: The `source_url` must include the protocol, http:// or https://.
-
-[Supported Document Types and Ingest Capacities](https://docs.eyelevel.ai/documentation/fundamentals/document-types-and-ingest-capacities)
+Ingest a public website by following links from a starting URL, up to the requested depth or page limit. The source_url must start with http:// or https://. Website crawling is not supported on-prem. [Supported Document Types and Ingest Capacities](https://docs.eyelevel.ai/documentation/fundamentals/document-types-and-ingest-capacities)
 </dd>
 </dl>
 </dd>
@@ -355,7 +350,7 @@ client.documents.crawl_website(
 <dl>
 <dd>
 
-**callback_data:** `typing.Optional[str]` — A string that is returned, along with processing event updates, to the callback URL.
+**callback_data:** `typing.Optional[str]` — Custom string included in processing updates sent to the callback URL.
     
 </dd>
 </dl>
@@ -441,7 +436,7 @@ client.documents.list(
 <dl>
 <dd>
 
-**filter:** `typing.Optional[str]` — Only documents with names that contain the filter string will be returned in the results.
+**filter:** `typing.Optional[str]` — Return only documents whose names contain this string.
     
 </dd>
 </dl>
@@ -457,7 +452,7 @@ client.documents.list(
 <dl>
 <dd>
 
-**sort_order:** `typing.Optional[SortOrder]` — The order in which to sort the results. A value for sort must also be set.
+**sort_order:** `typing.Optional[SortOrder]` — Sort order. Requires sort.
     
 </dd>
 </dl>
@@ -465,7 +460,7 @@ client.documents.list(
 <dl>
 <dd>
 
-**status:** `typing.Optional[ProcessingStatus]` — A status filter on the get documents query. If this value is set, then only documents with this status will be returned in the results.
+**status:** `typing.Optional[ProcessingStatus]` — Return only documents with this status.
     
 </dd>
 </dl>
@@ -473,7 +468,7 @@ client.documents.list(
 <dl>
 <dd>
 
-**next_token:** `typing.Optional[str]` — A token for pagination. If the number of documents for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n documents.
+**next_token:** `typing.Optional[str]` — Pass nextToken from the previous response to get the next page of up to n documents.
     
 </dd>
 </dl>
@@ -506,6 +501,8 @@ client.documents.list(
 <dd>
 
 Update the attributes of documents that have been uploaded to GroundX.
+Policy-bearing updates return 403 when file access is disabled; enabled
+temporary failures return 503 with Retry-After.
 </dd>
 </dl>
 </dd>
@@ -558,7 +555,7 @@ client.documents.update(
 <dl>
 <dd>
 
-**callback_url:** `typing.Optional[str]` — An endpoint that will receive processing event updates as POST.
+**callback_url:** `typing.Optional[str]` — URL that receives processing updates as POST requests.
     
 </dd>
 </dl>
@@ -566,7 +563,7 @@ client.documents.update(
 <dl>
 <dd>
 
-**callback_data:** `typing.Optional[str]` — A string that is returned, along with processing event updates, to the callback URL.
+**callback_data:** `typing.Optional[str]` — Custom string included in processing updates sent to the callback URL.
     
 </dd>
 </dl>
@@ -882,7 +879,7 @@ client.documents.lookup(
 <dl>
 <dd>
 
-**filter:** `typing.Optional[str]` — Only documents with names that contain the filter string will be returned in the results.
+**filter:** `typing.Optional[str]` — Return only documents whose names contain this string.
     
 </dd>
 </dl>
@@ -898,7 +895,7 @@ client.documents.lookup(
 <dl>
 <dd>
 
-**sort_order:** `typing.Optional[SortOrder]` — The order in which to sort the results. A value for sort must also be set.
+**sort_order:** `typing.Optional[SortOrder]` — Sort order. Requires sort.
     
 </dd>
 </dl>
@@ -906,7 +903,7 @@ client.documents.lookup(
 <dl>
 <dd>
 
-**status:** `typing.Optional[ProcessingStatus]` — A status filter on the get documents query. If this value is set, then only documents with this status will be returned in the results.
+**status:** `typing.Optional[ProcessingStatus]` — Return only documents with this status.
     
 </dd>
 </dl>
@@ -914,7 +911,7 @@ client.documents.lookup(
 <dl>
 <dd>
 
-**next_token:** `typing.Optional[str]` — A token for pagination. If the number of documents for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n documents.
+**next_token:** `typing.Optional[str]` — Pass nextToken from the previous response to get the next page of up to n documents.
     
 </dd>
 </dl>
@@ -1061,6 +1058,79 @@ client.documents.delete_by_id(
 <dd>
 
 **document_id:** `str` — A documentId which correspond to a document ingested by GroundX
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">retry_failed_stage</a>(...) -> RetryFailedStageResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retry a failed HTTP callback using its saved output and settings. No request body is needed. Post-processing and manual retries must be enabled. Active or successfully delivered documents and other failed stages return 409. A 202 response confirms acceptance; get the document to check deliveryStatus. An earlier unconfirmed delivery may already have reached the receiver.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from groundx import GroundX
+from groundx.environment import GroundXEnvironment
+
+client = GroundX(
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
+)
+
+client.documents.retry_failed_stage(
+    document_id="documentId",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**document_id:** `str` 
     
 </dd>
 </dl>
@@ -1288,7 +1358,102 @@ client.documents.get_processes(
 <dl>
 <dd>
 
-**status:** `typing.Optional[ProcessingStatus]` — A status filter on the processing status. If this value is set, then only processes with this status will be returned in the results.
+**status:** `typing.Optional[ProcessingStatus]` — Return only processes with this status.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.documents.<a href="src/groundx/documents/client.py">file_link</a>(...) -> FileLinkResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Create a storage-signed download link for a saved asset you own. Anyone with the link can use or forward it until expiresAt. Revoking an API key or changing policy does not cancel issued links. The URL contains no GroundX API key. Returns 404 if file access is disabled, or 503 with Retry-After for temporary file-access failures.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from groundx import GroundX, AssetSelectorCorrected
+from groundx.environment import GroundXEnvironment
+
+client = GroundX(
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
+)
+
+client.documents.file_link(
+    document_id="11111111-1111-4111-8111-111111111111",
+    asset=AssetSelectorCorrected(
+        kind="page",
+        page_number=1,
+        corrected=False,
+    ),
+    expires_in_seconds=120,
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**document_id:** `str` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**asset:** `AssetSelector` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**expires_in_seconds:** `typing.Optional[int]` 
     
 </dd>
 </dl>
@@ -1321,8 +1486,7 @@ client.documents.get_processes(
 <dl>
 <dd>
 
-Search documents on GroundX for the most relevant information to a given query.
-The result of this query is typically used in one of two ways; `result.search.text` can be used to provide context to a language model, facilitating RAG, or `result.search.results` can be used to observe chunks of text which are relevant to the query, facilitating citation.
+Search a bucket, group or document for information relevant to a query. Use result.search.text as context for a language model and result.search.results for matching text and citations.
 </dd>
 </dl>
 </dd>
@@ -1375,7 +1539,7 @@ client.search.content(
 <dl>
 <dd>
 
-**query:** `str` — The search query to be used to find relevant documentation.
+**query:** `str` — Search query.
     
 </dd>
 </dl>
@@ -1391,7 +1555,7 @@ client.search.content(
 <dl>
 <dd>
 
-**next_token:** `typing.Optional[str]` — A token for pagination. If the number of search results for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n search results.
+**next_token:** `typing.Optional[str]` — Pass nextToken from the previous response to get the next page of up to n search results.
     
 </dd>
 </dl>
@@ -1399,7 +1563,7 @@ client.search.content(
 <dl>
 <dd>
 
-**verbosity:** `typing.Optional[int]` — The amount of data returned with each search result. 0 == no search results, only the recommended context. 1 == search results but no searchData. 2 == search results and searchData.
+**verbosity:** `typing.Optional[int]` — Response detail: 0 returns only recommended context; 1 adds search results without searchData; 2 includes searchData.
     
 </dd>
 </dl>
@@ -1407,7 +1571,7 @@ client.search.content(
 <dl>
 <dd>
 
-**filter:** `typing.Optional[typing.Dict[str, typing.Any]]` — A dictionary of key-value pairs that can be used to pre-filter documents prior to a search.
+**filter:** `typing.Optional[typing.Dict[str, typing.Any]]` — Key-value metadata used to filter documents before searching.
     
 </dd>
 </dl>
@@ -1447,8 +1611,7 @@ client.search.content(
 <dl>
 <dd>
 
-Search documents on GroundX for the most relevant information to a given query by documentId(s).
-The result of this query is typically used in one of two ways; `result.search.text` can be used to provide context to a language model, facilitating RAG, or `result.search.results` can be used to observe chunks of text which are relevant to the query, facilitating citation.
+Search the specified document IDs for information relevant to a query. Use result.search.text as context for a language model and result.search.results for matching text and citations.
 </dd>
 </dl>
 </dd>
@@ -1496,7 +1659,7 @@ client.search.documents(
 <dl>
 <dd>
 
-**query:** `str` — The search query to be used to find relevant documentation.
+**query:** `str` — Search query.
     
 </dd>
 </dl>
@@ -1520,7 +1683,7 @@ client.search.documents(
 <dl>
 <dd>
 
-**next_token:** `typing.Optional[str]` — A token for pagination. If the number of search results for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n search results.
+**next_token:** `typing.Optional[str]` — Pass nextToken from the previous response to get the next page of up to n search results.
     
 </dd>
 </dl>
@@ -1528,7 +1691,7 @@ client.search.documents(
 <dl>
 <dd>
 
-**verbosity:** `typing.Optional[int]` — The amount of data returned with each search result. 0 == no search results, only the recommended context. 1 == search results but no searchData. 2 == search results and searchData.
+**verbosity:** `typing.Optional[int]` — Response detail: 0 returns only recommended context; 1 adds search results without searchData; 2 includes searchData.
     
 </dd>
 </dl>
@@ -1536,7 +1699,7 @@ client.search.documents(
 <dl>
 <dd>
 
-**filter:** `typing.Optional[typing.Dict[str, typing.Any]]` — A dictionary of key-value pairs that can be used to pre-filter documents prior to a search.
+**filter:** `typing.Optional[typing.Dict[str, typing.Any]]` — Key-value metadata used to filter documents before searching.
     
 </dd>
 </dl>
@@ -1627,7 +1790,7 @@ client.buckets.list(
 <dl>
 <dd>
 
-**next_token:** `typing.Optional[str]` — A token for pagination. If the number of buckets for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n buckets.
+**next_token:** `typing.Optional[str]` — Pass nextToken from the previous response to get the next page of up to n buckets.
     
 </dd>
 </dl>
@@ -1674,7 +1837,7 @@ Create a new bucket.
 <dd>
 
 ```python
-from groundx import GroundX
+from groundx import GroundX, FileAccessPolicy
 from groundx.environment import GroundXEnvironment
 
 client = GroundX(
@@ -1683,7 +1846,11 @@ client = GroundX(
 )
 
 client.buckets.create(
-    name="your_bucket_name",
+    name="private-documents",
+    file_access=FileAccessPolicy(
+        mode="protected",
+        url_ttl_seconds=300,
+    ),
 )
 
 ```
@@ -1701,6 +1868,14 @@ client.buckets.create(
 <dd>
 
 **name:** `str` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**file_access:** `typing.Optional[FileAccessPolicy]` — Initial settings for this resource. Omit or send null to inherit. Creation needs no fileAccessRevision. These settings cannot make a protected parent public or exceed its sharing time limit. Use private staging before uploading a protected file, even in a public bucket. Returns 403 if file access is disabled.
     
 </dd>
 </dl>
@@ -1805,7 +1980,7 @@ client.buckets.get(
 <dl>
 <dd>
 
-Rename a bucket.
+Rename a bucket or replace its file-access policy. Policy-bearing updates return 403 when file access is disabled; enabled temporary failures return 503 with Retry-After.
 </dd>
 </dl>
 </dd>
@@ -1829,7 +2004,7 @@ client = GroundX(
 )
 
 client.buckets.update(
-    bucket_id=1,
+    bucket_id=7,
     new_name="your_bucket_name",
 )
 
@@ -1855,7 +2030,23 @@ client.buckets.update(
 <dl>
 <dd>
 
-**new_name:** `str` — The new name of the bucket being renamed.
+**new_name:** `typing.Optional[str]` — The new name of the bucket being renamed.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**file_access:** `typing.Optional[FileAccessPolicy]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**file_access_revision:** `typing.Optional[int]` 
     
 </dd>
 </dl>
@@ -1948,6 +2139,105 @@ client.buckets.delete(
 </dl>
 </details>
 
+<details><summary><code>client.buckets.<a href="src/groundx/buckets/client.py">file_upload</a>(...) -> FileUploadResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Return a storage-signed PUT link for a public or protected bucket, valid for at most 900 seconds. Complete PUT before it expires. A private upload reservation also requires ingest submission before that deadline; an unreserved public source remains ingestible after PUT expiry. Available even when file-access protection is disabled. Uses this deployment and its configured storage. Include the requested per-file fileAccess policy so it is checked before upload; non-null policies return 403 when protection is disabled. Returns 503 with Retry-After for temporary verification failures.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from groundx import GroundX
+from groundx.environment import GroundXEnvironment
+
+client = GroundX(
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
+)
+
+client.buckets.file_upload(
+    bucket_id=1234,
+    file_name="invoice.pdf",
+    file_type="pdf",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**bucket_id:** `int` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**file_name:** `str` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**file_type:** `DocumentType` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**file_access:** `typing.Optional[FileAccessPolicy]` — Requested initial file policy, also sent during ingest. Omit or send null to inherit. Validated before an upload URL is issued. Non-null policies return 403 when file protection is disabled, so a protected upload cannot be staged publicly.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## Groups
 <details><summary><code>client.groups.<a href="src/groundx/groups/client.py">list</a>(...) -> GroupListResponse</code></summary>
 <dl>
@@ -2011,7 +2301,7 @@ client.groups.list(
 <dl>
 <dd>
 
-**next_token:** `typing.Optional[str]` — A token for pagination. If the number of groups for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n groups.
+**next_token:** `typing.Optional[str]` — Pass nextToken from the previous response to get the next page of up to n groups.
     
 </dd>
 </dl>
@@ -2651,7 +2941,7 @@ client.workflows.create()
 <dl>
 <dd>
 
-Validate a workflow definition without creating or modifying anything — a distinct operation from create/update. Accepts the same request body as workflow create, including the `yaml` field (authored workflow YAML source, compiled server-side). Returns the compiled workflow; validation failures return the same structured errors as create.
+Validate a workflow without saving changes. Accepts the workflow-create request body, including authored YAML in yaml. Returns the compiled workflow or the same structured validation errors as create.
 </dd>
 </dl>
 </dd>
@@ -3167,7 +3457,7 @@ client.workflows.get(
 <dl>
 <dd>
 
-Update an existing workflow. The request body is the desired custom overlay relative to GroundX defaults, not a delta against the currently stored custom workflow. Omitted steps and omitted step config fields return to defaults. Step null disables or clears that default step. For step configs, omitted prompt and prompt: {} use the default prompt group; prompt: null intentionally uses no prompt group. A name-only update is not metadata-only; include custom processing settings again if they should remain in effect.
+Replace an existing workflow's custom settings relative to GroundX defaults. Omitted steps and step settings return to defaults. A null step disables or clears it. For step settings, omit prompt or send prompt: {} to use default prompts; prompt: null removes the prompt group. A name-only request also resets custom processing settings. Include every custom setting you want to keep.
 </dd>
 </dl>
 </dd>
@@ -3373,6 +3663,91 @@ client.customer.get()
 </dl>
 </details>
 
+<details><summary><code>client.customer.<a href="src/groundx/customer/client.py">update</a>(...) -> CustomerResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Replace or clear your account's file-access settings. Include fileAccessRevision. Invalid or missing input returns 400; disabled or forbidden access returns 403; a stale revision returns 409. If settings or ownership cannot be verified, returns 503 with Retry-After. After an uncertain outcome, read the applied settings before retrying. Protected stable links require X-API-Key on every read.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from groundx import GroundX, FileAccessPolicy
+from groundx.environment import GroundXEnvironment
+
+client = GroundX(
+    api_key="<value>",
+    environment=GroundXEnvironment.DEFAULT,
+)
+
+client.customer.update(
+    file_access=FileAccessPolicy(
+        mode="protected",
+        url_ttl_seconds=300,
+    ),
+    file_access_revision=0,
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**file_access_revision:** `int` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**file_access:** `typing.Optional[FileAccessPolicy]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.customer.<a href="src/groundx/customer/client.py">get_usage</a>(...) -> CustomerUsageResponse</code></summary>
 <dl>
 <dd>
@@ -3385,9 +3760,7 @@ client.customer.get()
 <dl>
 <dd>
 
-Get aggregate usage for the authenticated customer over a requested time period.
-
-The API resolves the account subscription and usage meter from the authenticated account. Do not provide customer ids, subscription ids, or meter ids. `startTime` is inclusive, `endTime` is exclusive, and both timestamps must be RFC3339 values aligned to minute boundaries. Timestamps are normalized to UTC. `endTime` cannot be in the future, windows longer than 366 days are rejected, and `usageAsOf` reflects the latest usage summary available to GroundX.
+Get usage for the authenticated account over a time period. GroundX selects its subscription and usage meter; do not supply their IDs or a customer ID. startTime is inclusive and endTime is exclusive. Both must be RFC3339 timestamps on minute boundaries and are converted to UTC. endTime cannot be in the future. The window cannot exceed 366 days. usageAsOf identifies the latest usage summary available to GroundX.
 </dd>
 </dl>
 </dd>

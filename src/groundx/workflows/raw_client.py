@@ -45,7 +45,7 @@ class RawWorkflowsClient:
         Returns
         -------
         HttpResponse[WorkflowsResponse]
-            Look up success
+            Lookup successful
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/workflow",
@@ -186,7 +186,7 @@ class RawWorkflowsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[WorkflowResponse]:
         """
-        Validate a workflow definition without creating or modifying anything — a distinct operation from create/update. Accepts the same request body as workflow create, including the `yaml` field (authored workflow YAML source, compiled server-side). Returns the compiled workflow; validation failures return the same structured errors as create.
+        Validate a workflow without saving changes. Accepts the workflow-create request body, including authored YAML in yaml. Returns the compiled workflow or the same structured validation errors as create.
 
         Parameters
         ----------
@@ -281,7 +281,7 @@ class RawWorkflowsClient:
         Returns
         -------
         HttpResponse[WorkflowResponse]
-            Look up success
+            Lookup successful
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/workflow/relationship",
@@ -515,7 +515,7 @@ class RawWorkflowsClient:
         Returns
         -------
         HttpResponse[WorkflowResponse]
-            Look up success
+            Lookup successful
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/workflow/{encode_path_param(id)}",
@@ -562,7 +562,7 @@ class RawWorkflowsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[WorkflowResponse]:
         """
-        Update an existing workflow. The request body is the desired custom overlay relative to GroundX defaults, not a delta against the currently stored custom workflow. Omitted steps and omitted step config fields return to defaults. Step null disables or clears that default step. For step configs, omitted prompt and prompt: {} use the default prompt group; prompt: null intentionally uses no prompt group. A name-only update is not metadata-only; include custom processing settings again if they should remain in effect.
+        Replace an existing workflow's custom settings relative to GroundX defaults. Omitted steps and step settings return to defaults. A null step disables or clears it. For step settings, omit prompt or send prompt: {} to use default prompts; prompt: null removes the prompt group. A name-only request also resets custom processing settings. Include every custom setting you want to keep.
 
         Parameters
         ----------
@@ -710,7 +710,7 @@ class AsyncRawWorkflowsClient:
         Returns
         -------
         AsyncHttpResponse[WorkflowsResponse]
-            Look up success
+            Lookup successful
         """
         _response = await self._client_wrapper.httpx_client.request(
             "v1/workflow",
@@ -851,7 +851,7 @@ class AsyncRawWorkflowsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[WorkflowResponse]:
         """
-        Validate a workflow definition without creating or modifying anything — a distinct operation from create/update. Accepts the same request body as workflow create, including the `yaml` field (authored workflow YAML source, compiled server-side). Returns the compiled workflow; validation failures return the same structured errors as create.
+        Validate a workflow without saving changes. Accepts the workflow-create request body, including authored YAML in yaml. Returns the compiled workflow or the same structured validation errors as create.
 
         Parameters
         ----------
@@ -948,7 +948,7 @@ class AsyncRawWorkflowsClient:
         Returns
         -------
         AsyncHttpResponse[WorkflowResponse]
-            Look up success
+            Lookup successful
         """
         _response = await self._client_wrapper.httpx_client.request(
             "v1/workflow/relationship",
@@ -1182,7 +1182,7 @@ class AsyncRawWorkflowsClient:
         Returns
         -------
         AsyncHttpResponse[WorkflowResponse]
-            Look up success
+            Lookup successful
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/workflow/{encode_path_param(id)}",
@@ -1229,7 +1229,7 @@ class AsyncRawWorkflowsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[WorkflowResponse]:
         """
-        Update an existing workflow. The request body is the desired custom overlay relative to GroundX defaults, not a delta against the currently stored custom workflow. Omitted steps and omitted step config fields return to defaults. Step null disables or clears that default step. For step configs, omitted prompt and prompt: {} use the default prompt group; prompt: null intentionally uses no prompt group. A name-only update is not metadata-only; include custom processing settings again if they should remain in effect.
+        Replace an existing workflow's custom settings relative to GroundX defaults. Omitted steps and step settings return to defaults. A null step disables or clears it. For step settings, omit prompt or send prompt: {} to use default prompts; prompt: null removes the prompt group. A name-only request also resets custom processing settings. Include every custom setting you want to keep.
 
         Parameters
         ----------

@@ -44,7 +44,7 @@ class GroupsClient:
             The maximum number of returned groups. Accepts 1-100 with a default of 20.
 
         next_token : typing.Optional[str]
-            A token for pagination. If the number of groups for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n groups.
+            Pass nextToken from the previous response to get the next page of up to n groups.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -314,7 +314,7 @@ class AsyncGroupsClient:
             The maximum number of returned groups. Accepts 1-100 with a default of 20.
 
         next_token : typing.Optional[str]
-            A token for pagination. If the number of groups for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n groups.
+            Pass nextToken from the previous response to get the next page of up to n groups.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.

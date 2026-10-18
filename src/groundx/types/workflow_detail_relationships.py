@@ -8,7 +8,7 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 
 class WorkflowDetailRelationships(UniversalBaseModel):
     """
-    Information describing what the workflow is associated with
+    Resources associated with this workflow.
     """
 
     account: typing.Optional[bool] = pydantic.Field(default=None)

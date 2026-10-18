@@ -31,7 +31,7 @@ class RawHealthClient:
         Returns
         -------
         HttpResponse[HealthResponse]
-            Look up success
+            Lookup successful
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/health",
@@ -74,7 +74,7 @@ class RawHealthClient:
         Returns
         -------
         HttpResponse[HealthResponse]
-            Look up success
+            Lookup successful
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/health/{encode_path_param(service)}",
@@ -130,7 +130,7 @@ class AsyncRawHealthClient:
         Returns
         -------
         AsyncHttpResponse[HealthResponse]
-            Look up success
+            Lookup successful
         """
         _response = await self._client_wrapper.httpx_client.request(
             "v1/health",
@@ -173,7 +173,7 @@ class AsyncRawHealthClient:
         Returns
         -------
         AsyncHttpResponse[HealthResponse]
-            Look up success
+            Lookup successful
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/health/{encode_path_param(service)}",

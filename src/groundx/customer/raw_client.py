@@ -11,12 +11,21 @@ from ..core.http_response import AsyncHttpResponse, HttpResponse
 from ..core.parse_error import ParsingError
 from ..core.pydantic_utilities import parse_obj_as
 from ..core.request_options import RequestOptions
+from ..core.serialization import convert_and_respect_annotation_metadata
 from ..errors.bad_request_error import BadRequestError
+from ..errors.conflict_error import ConflictError
+from ..errors.forbidden_error import ForbiddenError
 from ..errors.not_found_error import NotFoundError
+from ..errors.service_unavailable_error import ServiceUnavailableError
+from ..errors.unauthorized_error import UnauthorizedError
 from ..types.customer_response import CustomerResponse
 from ..types.customer_usage_response import CustomerUsageResponse
+from ..types.file_access_policy import FileAccessPolicy
 from .types.customer_get_usage_request_metric import CustomerGetUsageRequestMetric
 from pydantic import ValidationError
+
+# this is used as the default value for optional parameters
+OMIT = typing.cast(typing.Any, ...)
 
 
 class RawCustomerClient:
@@ -35,7 +44,7 @@ class RawCustomerClient:
         Returns
         -------
         HttpResponse[CustomerResponse]
-            Look up success
+            Lookup successful
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/customer",
@@ -61,6 +70,130 @@ class RawCustomerClient:
             )
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
+    def update(
+        self,
+        *,
+        file_access_revision: int,
+        file_access: typing.Optional[FileAccessPolicy] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> HttpResponse[CustomerResponse]:
+        """
+        Replace or clear your account's file-access settings. Include fileAccessRevision. Invalid or missing input returns 400; disabled or forbidden access returns 403; a stale revision returns 409. If settings or ownership cannot be verified, returns 503 with Retry-After. After an uncertain outcome, read the applied settings before retrying. Protected stable links require X-API-Key on every read.
+
+        Parameters
+        ----------
+        file_access_revision : int
+
+        file_access : typing.Optional[FileAccessPolicy]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[CustomerResponse]
+            Applied settings
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "v1/customer",
+            method="PUT",
+            json={
+                "fileAccess": convert_and_respect_annotation_metadata(
+                    object_=file_access, annotation=typing.Optional[FileAccessPolicy], direction="write"
+                ),
+                "fileAccessRevision": file_access_revision,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    CustomerResponse,
+                    parse_obj_as(
+                        type_=CustomerResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 403:
+                raise ForbiddenError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 409:
+                raise ConflictError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 503:
+                raise ServiceUnavailableError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
+        except ValidationError as e:
+            raise ParsingError(
+                status_code=_response.status_code, headers=dict(_response.headers), body=_response.json(), cause=e
+            )
+        raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
+
     def get_usage(
         self,
         *,
@@ -70,9 +203,7 @@ class RawCustomerClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[CustomerUsageResponse]:
         """
-        Get aggregate usage for the authenticated customer over a requested time period.
-
-        The API resolves the account subscription and usage meter from the authenticated account. Do not provide customer ids, subscription ids, or meter ids. `startTime` is inclusive, `endTime` is exclusive, and both timestamps must be RFC3339 values aligned to minute boundaries. Timestamps are normalized to UTC. `endTime` cannot be in the future, windows longer than 366 days are rejected, and `usageAsOf` reflects the latest usage summary available to GroundX.
+        Get usage for the authenticated account over a time period. GroundX selects its subscription and usage meter; do not supply their IDs or a customer ID. startTime is inclusive and endTime is exclusive. Both must be RFC3339 timestamps on minute boundaries and are converted to UTC. endTime cannot be in the future. The window cannot exceed 366 days. usageAsOf identifies the latest usage summary available to GroundX.
 
         Parameters
         ----------
@@ -163,7 +294,7 @@ class AsyncRawCustomerClient:
         Returns
         -------
         AsyncHttpResponse[CustomerResponse]
-            Look up success
+            Lookup successful
         """
         _response = await self._client_wrapper.httpx_client.request(
             "v1/customer",
@@ -189,6 +320,130 @@ class AsyncRawCustomerClient:
             )
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
+    async def update(
+        self,
+        *,
+        file_access_revision: int,
+        file_access: typing.Optional[FileAccessPolicy] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AsyncHttpResponse[CustomerResponse]:
+        """
+        Replace or clear your account's file-access settings. Include fileAccessRevision. Invalid or missing input returns 400; disabled or forbidden access returns 403; a stale revision returns 409. If settings or ownership cannot be verified, returns 503 with Retry-After. After an uncertain outcome, read the applied settings before retrying. Protected stable links require X-API-Key on every read.
+
+        Parameters
+        ----------
+        file_access_revision : int
+
+        file_access : typing.Optional[FileAccessPolicy]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[CustomerResponse]
+            Applied settings
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "v1/customer",
+            method="PUT",
+            json={
+                "fileAccess": convert_and_respect_annotation_metadata(
+                    object_=file_access, annotation=typing.Optional[FileAccessPolicy], direction="write"
+                ),
+                "fileAccessRevision": file_access_revision,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    CustomerResponse,
+                    parse_obj_as(
+                        type_=CustomerResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 403:
+                raise ForbiddenError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 409:
+                raise ConflictError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 503:
+                raise ServiceUnavailableError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
+        except ValidationError as e:
+            raise ParsingError(
+                status_code=_response.status_code, headers=dict(_response.headers), body=_response.json(), cause=e
+            )
+        raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
+
     async def get_usage(
         self,
         *,
@@ -198,9 +453,7 @@ class AsyncRawCustomerClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[CustomerUsageResponse]:
         """
-        Get aggregate usage for the authenticated customer over a requested time period.
-
-        The API resolves the account subscription and usage meter from the authenticated account. Do not provide customer ids, subscription ids, or meter ids. `startTime` is inclusive, `endTime` is exclusive, and both timestamps must be RFC3339 values aligned to minute boundaries. Timestamps are normalized to UTC. `endTime` cannot be in the future, windows longer than 366 days are rejected, and `usageAsOf` reflects the latest usage summary available to GroundX.
+        Get usage for the authenticated account over a time period. GroundX selects its subscription and usage meter; do not supply their IDs or a customer ID. startTime is inclusive and endTime is exclusive. Both must be RFC3339 timestamps on minute boundaries and are converted to UTC. endTime cannot be in the future. The window cannot exceed 366 days. usageAsOf identifies the latest usage summary available to GroundX.
 
         Parameters
         ----------

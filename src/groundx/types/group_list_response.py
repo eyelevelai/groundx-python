@@ -16,7 +16,7 @@ class GroupListResponse(UniversalBaseModel):
 
     remaining: typing.Optional[int] = pydantic.Field(default=None)
     """
-    The number of groups that have not been returned yet, will be null if there are no remaining groups
+    Number of groups not yet returned, or null if none remain.
     """
 
     total: typing.Optional[int] = pydantic.Field(default=None)

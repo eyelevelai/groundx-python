@@ -39,7 +39,7 @@ class ApiKeyClient:
         Returns
         -------
         ApiKeyResponse
-            Look up success
+            Lookup successful
 
         Examples
         --------
@@ -178,7 +178,7 @@ class AsyncApiKeyClient:
         Returns
         -------
         ApiKeyResponse
-            Look up success
+            Lookup successful
 
         Examples
         --------
