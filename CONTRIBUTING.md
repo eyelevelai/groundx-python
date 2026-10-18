@@ -166,10 +166,10 @@ ancestor's protection or share lifetime.
 The preserved sync/async helpers use `buckets.file_upload` for every local file,
 public or protected, through the configured GroundX API. Forward each document's
 initial policy as the canonical optional `fileAccess` upload hint so the server
-can reject unavailable protection before bytes. The preserved helper uses
-generated request options' additional body parameters, retaining other options
-and keeping each document's policy authoritative. Direct generated method typing
-for the hint follows normal Fern regeneration. Do not read bucket
+can reject unavailable protection before bytes. Use the generated `file_access`
+argument directly. Preserve caller request options, removing only conflicting
+`fileAccess` additions from the upload request so they cannot replace the
+document's policy. Do not read bucket
 policy to choose a signer or fall back to a hosted broker. An explicit
 `upload_api` retains the legacy broker protocol for public destinations after a
 bucket policy read. Reject overrides for inherited or requested protection.

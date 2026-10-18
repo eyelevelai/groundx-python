@@ -234,14 +234,10 @@ def _check_legacy_upload(bucket: typing.Any, policy: typing.Optional[FileAccessP
         raise ValueError("Protected uploads require the configured GroundX API, without an upload_api override")
 
 
-def _upload_request_options(
-    request_options: typing.Optional[RequestOptions], file_access: typing.Optional[FileAccessPolicy]
-) -> RequestOptions:
+def _upload_request_options(request_options: typing.Optional[RequestOptions]) -> RequestOptions:
     options: RequestOptions = {**(request_options or {})}
     body = dict(options.get("additional_body_parameters") or {})
     body.pop("fileAccess", None)
-    if file_access is not None:
-        body["fileAccess"] = file_access.dict(by_alias=True, exclude_none=True)
     options["additional_body_parameters"] = body
     return options
 
@@ -935,7 +931,8 @@ class GroundX(GroundXBase):
                 bucket_id,
                 file_name=file_name,
                 file_type=file_extension,
-                request_options=_upload_request_options(request_options, file_access),
+                file_access=file_access,
+                request_options=_upload_request_options(request_options),
             )
             presigned_info = _upload_info(grant)
             expires_at = grant.expires_at.timestamp()
@@ -1526,7 +1523,8 @@ class AsyncGroundX(AsyncGroundXBase):
                 bucket_id,
                 file_name=file_name,
                 file_type=file_extension,
-                request_options=_upload_request_options(request_options, file_access),
+                file_access=file_access,
+                request_options=_upload_request_options(request_options),
             )
             presigned_info = _upload_info(grant)
             expires_at = grant.expires_at.timestamp()

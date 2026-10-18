@@ -182,6 +182,56 @@ def test_ingest_uses_configured_api_before_upload(monkeypatch, tmp_path, overrid
         assert [method for method, _ in events] == ["POST", "PUT", "POST"]
 
 
+@pytest.mark.parametrize("asynchronous", [False, True])
+@pytest.mark.parametrize("policy", ["omitted", None, {"mode": "protected", "urlTtlSeconds": 120}])
+def test_direct_upload_operation_accepts_typed_initial_policy(asynchronous, policy):
+    import asyncio
+    import json
+
+    import httpx
+
+    from groundx import AsyncGroundX, FileAccessPolicy
+
+    def handle(request):
+        assert request.method == "POST"
+        assert request.url == "https://onprem.test/v1/bucket/7/file-upload"
+        body = json.loads(request.content)
+        if policy == "omitted":
+            assert "fileAccess" not in body
+        else:
+            assert body["fileAccess"] == policy
+        return httpx.Response(
+            201,
+            json={
+                "uploadId": "upload",
+                "uploadUrl": "https://storage.test/put?signature=exact",
+                "hostedUrl": "https://files.test/source",
+                "expiresAt": "2099-01-01T00:00:00Z",
+                "method": "PUT",
+                "headers": {},
+            },
+        )
+
+    kwargs = {"file_name": "source.pdf", "file_type": "pdf"}
+    if policy != "omitted":
+        kwargs["file_access"] = FileAccessPolicy(**policy) if policy is not None else None
+
+    async def run():
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handle)) as transport:
+            return await AsyncGroundX(
+                api_key="test", base_url="https://onprem.test", httpx_client=transport
+            ).buckets.file_upload(7, **kwargs)
+
+    if asynchronous:
+        result = asyncio.run(run())
+    else:
+        with httpx.Client(transport=httpx.MockTransport(handle)) as transport:
+            result = GroundX(
+                api_key="test", base_url="https://onprem.test", httpx_client=transport
+            ).buckets.file_upload(7, **kwargs)
+    assert result.hosted_url == "https://files.test/source"
+
+
 def test_remote_document_policy_survives_preparation():
     from groundx import Document
 

@@ -96,11 +96,11 @@ ordinary local files, preserving API base URLs, delegated headers and request
 options. Native PUT uses only returned storage headers and exact signed URLs. Initial
 per-file policy accompanies upload issuance as the canonical optional `fileAccess`
 hint, so unavailable protection and ancestor weakening fail before source bytes.
-Python uses the generated request options' documented additional-body mechanism;
-TypeScript passes a structurally compatible request object. Existing generated
-method signatures gain the typed hint through ordinary Fern regeneration, not
-hand edits. Preserve other per-call body options and do not let them override the
-current document's upload hint.
+Python uses the generated `file_access` argument and TypeScript uses the
+generated request's `fileAccess` field. Both generated surfaces come from normal
+full-project Fern generation. Preserve other per-call body options and remove
+conflicting upload hint additions so they cannot override the current document's
+policy.
 Explicit legacy endpoint overrides retain their wire format and metadata
 handling without policy discovery. Remote documents and initial policies remain
 unchanged. Hosted and on-prem use the same client path; storage selection stays

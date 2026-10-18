@@ -197,12 +197,11 @@ prove server deployment, live vendor signing, on-prem connectivity or publicatio
 - [x] Extend existing generated-transport tests and document PUT expiry separately from protected reservation admission.
 
 Initial per-file policies accompany upload issuance in the canonical optional
-`fileAccess` field, including renewals by browser consumers. Python uses the
-generated request options' additional-body support while preserving unrelated
-per-call options. TypeScript uses a structurally compatible request object.
-Explicit protection rejected by server admission produces no native PUT. The
-direct generated methods receive their typed hint through normal upstream
-regeneration; generated runtime files are not hand-edited.
+`fileAccess` field, including renewals by browser consumers. Python uses the generated `file_access` argument while preserving unrelated
+per-call options; conflicting additional-body hints cannot replace the document's
+policy. TypeScript uses the generated request's `fileAccess` field. Explicit
+protection rejected by server admission produces no native PUT. The generated
+methods and request type are retained from full-project Fern generation.
 
 Final local validation: 84 focused Python upload cases and the complete 769-test
 SDK suite pass, with 2 existing skips, 100 subtests and 156 existing warnings.
@@ -213,3 +212,15 @@ batches submit after completed PUT grants expire, native retry checks enforce
 PUT lifetime, unavailable initial protection stops before bytes, and returned
 server admission errors retain status/body. No generated runtime edits, package
 publication, deployment or live storage acceptance are included.
+
+## Typed upload hint generation
+
+Local generation root: `openspec/work/protect-hosted-file-access/unified-upload-regeneration`, owned by the SDK maintainer for offline full-project generation from the current canonical Fern source. Expires 2026-10-20T00:00:00Z. Use existing package names and versions, preserve `.fernignore`, retain reviewed generated upload models/clients, then close the exact root with a bounded receipt. No publication or release is authorized.
+
+- [x] Generate Python and TypeScript full projects from the canonical upload request with existing generator settings.
+- [x] Use direct generated upload hint parameters in preserved wrappers and extend existing HTTP transport tests.
+- [x] Validate generated boundaries, SDK suites and package identity; remove raw generator outputs and retain a bounded closeout receipt.
+
+Full-project generation from Fern `3eb8ca6349dd814a8c36706e3292481b9b8a004d` retains two Python bucket clients and the TypeScript upload request and bucket client. All four files match generator output byte-for-byte. Only the four Python `file_upload` method bodies change at runtime; the TypeScript bucket client has description changes only. Python package exports/headers and TypeScript package headers match full-project output with their existing package versions. Direct typed upload calls preserve omitted, null and protected policies. No publication occurs.
+
+Local closeout receipt: `protect-hosted-file-access/unified-upload-regeneration`, closed 2026-10-18T18:37:04.292789+00:00. State: accepted. Removed the exact registered run root, 640 files and 230753541 bytes; absence verified. Reviewed generated files remain in their owning SDK repos. The bounded local summary is `openspec/runs/protect-hosted-file-access/unified-upload-regeneration.json`, SHA-256 `1f2bcd1e1b379be7028ec23910f9eeb7c408642e9ffe522a247c78e97b27b8d5`. No local run root remains.

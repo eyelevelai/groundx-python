@@ -50,7 +50,7 @@ class RawBucketsClient:
             The maximum number of returned buckets. Accepts 1-100 with a default of 20.
 
         next_token : typing.Optional[str]
-            A token for pagination. If the number of buckets for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n buckets.
+            Pass nextToken from the previous response to get the next page of up to n buckets.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -58,7 +58,7 @@ class RawBucketsClient:
         Returns
         -------
         HttpResponse[BucketListResponse]
-            Look up success
+            Lookup successful
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/bucket",
@@ -103,7 +103,7 @@ class RawBucketsClient:
         name : str
 
         file_access : typing.Optional[FileAccessPolicy]
-            Initial override for this new resource. Policy-bearing creation returns 403 when file access is disabled. Omitted or null inherits. No fileAccessRevision is required on creation. Protected ancestors cannot be reopened or their share lifetime exceeded. Choose private staging before uploading bytes for a protected file, including in a public bucket.
+            Initial settings for this resource. Omit or send null to inherit. Creation needs no fileAccessRevision. These settings cannot make a protected parent public or exceed its sharing time limit. Use private staging before uploading a protected file, even in a public bucket. Returns 403 if file access is disabled.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -208,7 +208,7 @@ class RawBucketsClient:
         Returns
         -------
         HttpResponse[BucketResponse]
-            Look up success
+            Lookup successful
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/bucket/{encode_path_param(bucket_id)}",
@@ -460,10 +460,11 @@ class RawBucketsClient:
         *,
         file_name: str,
         file_type: DocumentType,
+        file_access: typing.Optional[FileAccessPolicy] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[FileUploadResponse]:
         """
-        Reserve a private bucket-owned source before issuing a native PUT grant, lasting at most 900 seconds. Use hostedUrl with the existing ingest operation. Returns 404 when file access is disabled; enabled temporary failures return 503 with Retry-After.
+        Return a storage-signed PUT link for a public or protected bucket, valid for at most 900 seconds. Complete PUT before it expires. A private upload reservation also requires ingest submission before that deadline; an unreserved public source remains ingestible after PUT expiry. Available even when file-access protection is disabled. Uses this deployment and its configured storage. Include the requested per-file fileAccess policy so it is checked before upload; non-null policies return 403 when protection is disabled. Returns 503 with Retry-After for temporary verification failures.
 
         Parameters
         ----------
@@ -472,6 +473,9 @@ class RawBucketsClient:
         file_name : str
 
         file_type : DocumentType
+
+        file_access : typing.Optional[FileAccessPolicy]
+            Requested initial file policy, also sent during ingest. Omit or send null to inherit. Validated before an upload URL is issued. Non-null policies return 403 when file protection is disabled, so a protected upload cannot be staged publicly.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -485,6 +489,9 @@ class RawBucketsClient:
             f"v1/bucket/{encode_path_param(bucket_id)}/file-upload",
             method="POST",
             json={
+                "fileAccess": convert_and_respect_annotation_metadata(
+                    object_=file_access, annotation=typing.Optional[FileAccessPolicy], direction="write"
+                ),
                 "fileName": file_name,
                 "fileType": file_type,
             },
@@ -600,7 +607,7 @@ class AsyncRawBucketsClient:
             The maximum number of returned buckets. Accepts 1-100 with a default of 20.
 
         next_token : typing.Optional[str]
-            A token for pagination. If the number of buckets for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n buckets.
+            Pass nextToken from the previous response to get the next page of up to n buckets.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -608,7 +615,7 @@ class AsyncRawBucketsClient:
         Returns
         -------
         AsyncHttpResponse[BucketListResponse]
-            Look up success
+            Lookup successful
         """
         _response = await self._client_wrapper.httpx_client.request(
             "v1/bucket",
@@ -653,7 +660,7 @@ class AsyncRawBucketsClient:
         name : str
 
         file_access : typing.Optional[FileAccessPolicy]
-            Initial override for this new resource. Policy-bearing creation returns 403 when file access is disabled. Omitted or null inherits. No fileAccessRevision is required on creation. Protected ancestors cannot be reopened or their share lifetime exceeded. Choose private staging before uploading bytes for a protected file, including in a public bucket.
+            Initial settings for this resource. Omit or send null to inherit. Creation needs no fileAccessRevision. These settings cannot make a protected parent public or exceed its sharing time limit. Use private staging before uploading a protected file, even in a public bucket. Returns 403 if file access is disabled.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -758,7 +765,7 @@ class AsyncRawBucketsClient:
         Returns
         -------
         AsyncHttpResponse[BucketResponse]
-            Look up success
+            Lookup successful
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/bucket/{encode_path_param(bucket_id)}",
@@ -1010,10 +1017,11 @@ class AsyncRawBucketsClient:
         *,
         file_name: str,
         file_type: DocumentType,
+        file_access: typing.Optional[FileAccessPolicy] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[FileUploadResponse]:
         """
-        Reserve a private bucket-owned source before issuing a native PUT grant, lasting at most 900 seconds. Use hostedUrl with the existing ingest operation. Returns 404 when file access is disabled; enabled temporary failures return 503 with Retry-After.
+        Return a storage-signed PUT link for a public or protected bucket, valid for at most 900 seconds. Complete PUT before it expires. A private upload reservation also requires ingest submission before that deadline; an unreserved public source remains ingestible after PUT expiry. Available even when file-access protection is disabled. Uses this deployment and its configured storage. Include the requested per-file fileAccess policy so it is checked before upload; non-null policies return 403 when protection is disabled. Returns 503 with Retry-After for temporary verification failures.
 
         Parameters
         ----------
@@ -1022,6 +1030,9 @@ class AsyncRawBucketsClient:
         file_name : str
 
         file_type : DocumentType
+
+        file_access : typing.Optional[FileAccessPolicy]
+            Requested initial file policy, also sent during ingest. Omit or send null to inherit. Validated before an upload URL is issued. Non-null policies return 403 when file protection is disabled, so a protected upload cannot be staged publicly.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1035,6 +1046,9 @@ class AsyncRawBucketsClient:
             f"v1/bucket/{encode_path_param(bucket_id)}/file-upload",
             method="POST",
             json={
+                "fileAccess": convert_and_respect_annotation_metadata(
+                    object_=file_access, annotation=typing.Optional[FileAccessPolicy], direction="write"
+                ),
                 "fileName": file_name,
                 "fileType": file_type,
             },

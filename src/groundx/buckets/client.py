@@ -48,7 +48,7 @@ class BucketsClient:
             The maximum number of returned buckets. Accepts 1-100 with a default of 20.
 
         next_token : typing.Optional[str]
-            A token for pagination. If the number of buckets for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n buckets.
+            Pass nextToken from the previous response to get the next page of up to n buckets.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -56,7 +56,7 @@ class BucketsClient:
         Returns
         -------
         BucketListResponse
-            Look up success
+            Lookup successful
 
         Examples
         --------
@@ -88,7 +88,7 @@ class BucketsClient:
         name : str
 
         file_access : typing.Optional[FileAccessPolicy]
-            Initial override for this new resource. Policy-bearing creation returns 403 when file access is disabled. Omitted or null inherits. No fileAccessRevision is required on creation. Protected ancestors cannot be reopened or their share lifetime exceeded. Choose private staging before uploading bytes for a protected file, including in a public bucket.
+            Initial settings for this resource. Omit or send null to inherit. Creation needs no fileAccessRevision. These settings cannot make a protected parent public or exceed its sharing time limit. Use private staging before uploading a protected file, even in a public bucket. Returns 403 if file access is disabled.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -131,7 +131,7 @@ class BucketsClient:
         Returns
         -------
         BucketResponse
-            Look up success
+            Lookup successful
 
         Examples
         --------
@@ -237,10 +237,11 @@ class BucketsClient:
         *,
         file_name: str,
         file_type: DocumentType,
+        file_access: typing.Optional[FileAccessPolicy] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> FileUploadResponse:
         """
-        Reserve a private bucket-owned source before issuing a native PUT grant, lasting at most 900 seconds. Use hostedUrl with the existing ingest operation. Returns 404 when file access is disabled; enabled temporary failures return 503 with Retry-After.
+        Return a storage-signed PUT link for a public or protected bucket, valid for at most 900 seconds. Complete PUT before it expires. A private upload reservation also requires ingest submission before that deadline; an unreserved public source remains ingestible after PUT expiry. Available even when file-access protection is disabled. Uses this deployment and its configured storage. Include the requested per-file fileAccess policy so it is checked before upload; non-null policies return 403 when protection is disabled. Returns 503 with Retry-After for temporary verification failures.
 
         Parameters
         ----------
@@ -249,6 +250,9 @@ class BucketsClient:
         file_name : str
 
         file_type : DocumentType
+
+        file_access : typing.Optional[FileAccessPolicy]
+            Requested initial file policy, also sent during ingest. Omit or send null to inherit. Validated before an upload URL is issued. Non-null policies return 403 when file protection is disabled, so a protected upload cannot be staged publicly.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -272,7 +276,11 @@ class BucketsClient:
         )
         """
         _response = self._raw_client.file_upload(
-            bucket_id, file_name=file_name, file_type=file_type, request_options=request_options
+            bucket_id,
+            file_name=file_name,
+            file_type=file_type,
+            file_access=file_access,
+            request_options=request_options,
         )
         return _response.data
 
@@ -308,7 +316,7 @@ class AsyncBucketsClient:
             The maximum number of returned buckets. Accepts 1-100 with a default of 20.
 
         next_token : typing.Optional[str]
-            A token for pagination. If the number of buckets for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n buckets.
+            Pass nextToken from the previous response to get the next page of up to n buckets.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -316,7 +324,7 @@ class AsyncBucketsClient:
         Returns
         -------
         BucketListResponse
-            Look up success
+            Lookup successful
 
         Examples
         --------
@@ -356,7 +364,7 @@ class AsyncBucketsClient:
         name : str
 
         file_access : typing.Optional[FileAccessPolicy]
-            Initial override for this new resource. Policy-bearing creation returns 403 when file access is disabled. Omitted or null inherits. No fileAccessRevision is required on creation. Protected ancestors cannot be reopened or their share lifetime exceeded. Choose private staging before uploading bytes for a protected file, including in a public bucket.
+            Initial settings for this resource. Omit or send null to inherit. Creation needs no fileAccessRevision. These settings cannot make a protected parent public or exceed its sharing time limit. Use private staging before uploading a protected file, even in a public bucket. Returns 403 if file access is disabled.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -407,7 +415,7 @@ class AsyncBucketsClient:
         Returns
         -------
         BucketResponse
-            Look up success
+            Lookup successful
 
         Examples
         --------
@@ -539,10 +547,11 @@ class AsyncBucketsClient:
         *,
         file_name: str,
         file_type: DocumentType,
+        file_access: typing.Optional[FileAccessPolicy] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> FileUploadResponse:
         """
-        Reserve a private bucket-owned source before issuing a native PUT grant, lasting at most 900 seconds. Use hostedUrl with the existing ingest operation. Returns 404 when file access is disabled; enabled temporary failures return 503 with Retry-After.
+        Return a storage-signed PUT link for a public or protected bucket, valid for at most 900 seconds. Complete PUT before it expires. A private upload reservation also requires ingest submission before that deadline; an unreserved public source remains ingestible after PUT expiry. Available even when file-access protection is disabled. Uses this deployment and its configured storage. Include the requested per-file fileAccess policy so it is checked before upload; non-null policies return 403 when protection is disabled. Returns 503 with Retry-After for temporary verification failures.
 
         Parameters
         ----------
@@ -551,6 +560,9 @@ class AsyncBucketsClient:
         file_name : str
 
         file_type : DocumentType
+
+        file_access : typing.Optional[FileAccessPolicy]
+            Requested initial file policy, also sent during ingest. Omit or send null to inherit. Validated before an upload URL is issued. Non-null policies return 403 when file protection is disabled, so a protected upload cannot be staged publicly.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -582,6 +594,10 @@ class AsyncBucketsClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.file_upload(
-            bucket_id, file_name=file_name, file_type=file_type, request_options=request_options
+            bucket_id,
+            file_name=file_name,
+            file_type=file_type,
+            file_access=file_access,
+            request_options=request_options,
         )
         return _response.data
