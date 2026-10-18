@@ -16,7 +16,7 @@ class BucketUpdateDetail(UniversalBaseModel):
         FieldMetadata(alias="fileAccess"),
         pydantic.Field(
             alias="fileAccess",
-            description="Confirmed override. Null means inherited; omitted on clients without this feature. Pending changes remain internal.",
+            description="Applied settings for this resource. Null means it inherits settings. Deployments without file access omit this field. Pending changes are not returned.",
         ),
     ] = None
     file_access_revision: typing_extensions.Annotated[
@@ -24,7 +24,7 @@ class BucketUpdateDetail(UniversalBaseModel):
         FieldMetadata(alias="fileAccessRevision"),
         pydantic.Field(
             alias="fileAccessRevision",
-            description="Confirmed revision. Required with fileAccess on writes; stale revisions return 409.",
+            description="Current settings revision. Include it when updating fileAccess. A stale revision returns 409.",
         ),
     ] = None
     effective_file_access: typing_extensions.Annotated[

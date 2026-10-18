@@ -51,7 +51,7 @@ class DocumentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
         """
-        copy documents from one bucket to another
+        Copy documents from one bucket to another.
 
         Parameters
         ----------
@@ -106,10 +106,10 @@ class DocumentsClient:
         documents : typing.Sequence[IngestRemoteDocument]
 
         callback_url : typing.Optional[str]
-            An endpoint that will receive processing event updates as POST.
+            URL that receives processing updates as POST requests.
 
         callback_data : typing.Optional[str]
-            A string that is returned, along with processing event updates, to the callback URL.
+            Custom string included in processing updates sent to the callback URL.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -194,12 +194,7 @@ class DocumentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
         """
-        Upload the content of a publicly accessible website for ingestion into a GroundX bucket. This is done by following links within a specified URL, recursively, up to a specified depth or number of pages.
-
-        Note1: This endpoint is currently not supported for on-prem deployments.
-        Note2: The `source_url` must include the protocol, http:// or https://.
-
-        [Supported Document Types and Ingest Capacities](https://docs.eyelevel.ai/documentation/fundamentals/document-types-and-ingest-capacities)
+        Ingest a public website by following links from a starting URL, up to the requested depth or page limit. The source_url must start with http:// or https://. Website crawling is not supported on-prem. [Supported Document Types and Ingest Capacities](https://docs.eyelevel.ai/documentation/fundamentals/document-types-and-ingest-capacities)
 
         Parameters
         ----------
@@ -209,7 +204,7 @@ class DocumentsClient:
             The URL that will receive processing event updates.
 
         callback_data : typing.Optional[str]
-            A string that is returned, along with processing event updates, to the callback URL.
+            Custom string included in processing updates sent to the callback URL.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -263,19 +258,19 @@ class DocumentsClient:
             The maximum number of returned documents. Accepts 1-100 with a default of 20.
 
         filter : typing.Optional[str]
-            Only documents with names that contain the filter string will be returned in the results.
+            Return only documents whose names contain this string.
 
         sort : typing.Optional[Sort]
             The document attribute that will be used to sort the results.
 
         sort_order : typing.Optional[SortOrder]
-            The order in which to sort the results. A value for sort must also be set.
+            Sort order. Requires sort.
 
         status : typing.Optional[ProcessingStatus]
-            A status filter on the get documents query. If this value is set, then only documents with this status will be returned in the results.
+            Return only documents with this status.
 
         next_token : typing.Optional[str]
-            A token for pagination. If the number of documents for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n documents.
+            Pass nextToken from the previous response to get the next page of up to n documents.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -283,7 +278,7 @@ class DocumentsClient:
         Returns
         -------
         DocumentListResponse
-            Look up success
+            Lookup successful
 
         Examples
         --------
@@ -330,10 +325,10 @@ class DocumentsClient:
         documents : typing.Sequence[DocumentUpdate]
 
         callback_url : typing.Optional[str]
-            An endpoint that will receive processing event updates as POST.
+            URL that receives processing updates as POST requests.
 
         callback_data : typing.Optional[str]
-            A string that is returned, along with processing event updates, to the callback URL.
+            Custom string included in processing updates sent to the callback URL.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -416,7 +411,7 @@ class DocumentsClient:
         Returns
         -------
         IngestResponse
-            Look up success
+            Lookup successful
 
         Examples
         --------
@@ -489,19 +484,19 @@ class DocumentsClient:
             The maximum number of returned documents. Accepts 1-100 with a default of 20.
 
         filter : typing.Optional[str]
-            Only documents with names that contain the filter string will be returned in the results.
+            Return only documents whose names contain this string.
 
         sort : typing.Optional[Sort]
             The document attribute that will be used to sort the results.
 
         sort_order : typing.Optional[SortOrder]
-            The order in which to sort the results. A value for sort must also be set.
+            Sort order. Requires sort.
 
         status : typing.Optional[ProcessingStatus]
-            A status filter on the get documents query. If this value is set, then only documents with this status will be returned in the results.
+            Return only documents with this status.
 
         next_token : typing.Optional[str]
-            A token for pagination. If the number of documents for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n documents.
+            Pass nextToken from the previous response to get the next page of up to n documents.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -509,7 +504,7 @@ class DocumentsClient:
         Returns
         -------
         DocumentLookupResponse
-            Look up success
+            Lookup successful
 
         Examples
         --------
@@ -555,7 +550,7 @@ class DocumentsClient:
         Returns
         -------
         DocumentResponse
-            Look up success
+            Lookup successful
 
         Examples
         --------
@@ -608,7 +603,7 @@ class DocumentsClient:
         self, document_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> RetryFailedStageResponse:
         """
-        Restart the document at its currently failed HTTP callback using its saved output and callback settings. No request body is required. Active or successfully delivered documents and other failed stages return 409. HTTP 202 means the retry was accepted. Get the document to check deliveryStatus. Post-processing and manual retries must be enabled. An earlier unconfirmed delivery may still have reached the receiver.
+        Retry a failed HTTP callback using its saved output and settings. No request body is needed. Post-processing and manual retries must be enabled. Active or successfully delivered documents and other failed stages return 409. A 202 response confirms acceptance; get the document to check deliveryStatus. An earlier unconfirmed delivery may already have reached the receiver.
 
         Parameters
         ----------
@@ -653,7 +648,7 @@ class DocumentsClient:
         Returns
         -------
         DocumentsGetExtractResponse
-            Look up success
+            Lookup successful
 
         Examples
         --------
@@ -684,7 +679,7 @@ class DocumentsClient:
         Returns
         -------
         DocumentXray
-            Look up success
+            Lookup successful
 
         Examples
         --------
@@ -716,7 +711,7 @@ class DocumentsClient:
             The maximum number of returned processes. Accepts 1-100 with a default of 20.
 
         status : typing.Optional[ProcessingStatus]
-            A status filter on the processing status. If this value is set, then only processes with this status will be returned in the results.
+            Return only processes with this status.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -724,7 +719,7 @@ class DocumentsClient:
         Returns
         -------
         ProcessesStatusResponse
-            Look up success
+            Lookup successful
 
         Examples
         --------
@@ -750,7 +745,7 @@ class DocumentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> FileLinkResponse:
         """
-        Issue a native storage GET link for a saved owned asset. Returns 404 when file access is disabled; enabled temporary failures return 503 with Retry-After. The bearer can reuse or forward it until expiresAt. Key revocation and policy changes do not revoke existing native grants. No GroundX key is carried in the URL.
+        Create a storage-signed download link for a saved asset you own. Anyone with the link can use or forward it until expiresAt. Revoking an API key or changing policy does not cancel issued links. The URL contains no GroundX API key. Returns 404 if file access is disabled, or 503 with Retry-After for temporary file-access failures.
 
         Parameters
         ----------
@@ -814,7 +809,7 @@ class AsyncDocumentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
         """
-        copy documents from one bucket to another
+        Copy documents from one bucket to another.
 
         Parameters
         ----------
@@ -877,10 +872,10 @@ class AsyncDocumentsClient:
         documents : typing.Sequence[IngestRemoteDocument]
 
         callback_url : typing.Optional[str]
-            An endpoint that will receive processing event updates as POST.
+            URL that receives processing updates as POST requests.
 
         callback_data : typing.Optional[str]
-            A string that is returned, along with processing event updates, to the callback URL.
+            Custom string included in processing updates sent to the callback URL.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -985,12 +980,7 @@ class AsyncDocumentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
         """
-        Upload the content of a publicly accessible website for ingestion into a GroundX bucket. This is done by following links within a specified URL, recursively, up to a specified depth or number of pages.
-
-        Note1: This endpoint is currently not supported for on-prem deployments.
-        Note2: The `source_url` must include the protocol, http:// or https://.
-
-        [Supported Document Types and Ingest Capacities](https://docs.eyelevel.ai/documentation/fundamentals/document-types-and-ingest-capacities)
+        Ingest a public website by following links from a starting URL, up to the requested depth or page limit. The source_url must start with http:// or https://. Website crawling is not supported on-prem. [Supported Document Types and Ingest Capacities](https://docs.eyelevel.ai/documentation/fundamentals/document-types-and-ingest-capacities)
 
         Parameters
         ----------
@@ -1000,7 +990,7 @@ class AsyncDocumentsClient:
             The URL that will receive processing event updates.
 
         callback_data : typing.Optional[str]
-            A string that is returned, along with processing event updates, to the callback URL.
+            Custom string included in processing updates sent to the callback URL.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1062,19 +1052,19 @@ class AsyncDocumentsClient:
             The maximum number of returned documents. Accepts 1-100 with a default of 20.
 
         filter : typing.Optional[str]
-            Only documents with names that contain the filter string will be returned in the results.
+            Return only documents whose names contain this string.
 
         sort : typing.Optional[Sort]
             The document attribute that will be used to sort the results.
 
         sort_order : typing.Optional[SortOrder]
-            The order in which to sort the results. A value for sort must also be set.
+            Sort order. Requires sort.
 
         status : typing.Optional[ProcessingStatus]
-            A status filter on the get documents query. If this value is set, then only documents with this status will be returned in the results.
+            Return only documents with this status.
 
         next_token : typing.Optional[str]
-            A token for pagination. If the number of documents for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n documents.
+            Pass nextToken from the previous response to get the next page of up to n documents.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1082,7 +1072,7 @@ class AsyncDocumentsClient:
         Returns
         -------
         DocumentListResponse
-            Look up success
+            Lookup successful
 
         Examples
         --------
@@ -1137,10 +1127,10 @@ class AsyncDocumentsClient:
         documents : typing.Sequence[DocumentUpdate]
 
         callback_url : typing.Optional[str]
-            An endpoint that will receive processing event updates as POST.
+            URL that receives processing updates as POST requests.
 
         callback_data : typing.Optional[str]
-            A string that is returned, along with processing event updates, to the callback URL.
+            Custom string included in processing updates sent to the callback URL.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1239,7 +1229,7 @@ class AsyncDocumentsClient:
         Returns
         -------
         IngestResponse
-            Look up success
+            Lookup successful
 
         Examples
         --------
@@ -1328,19 +1318,19 @@ class AsyncDocumentsClient:
             The maximum number of returned documents. Accepts 1-100 with a default of 20.
 
         filter : typing.Optional[str]
-            Only documents with names that contain the filter string will be returned in the results.
+            Return only documents whose names contain this string.
 
         sort : typing.Optional[Sort]
             The document attribute that will be used to sort the results.
 
         sort_order : typing.Optional[SortOrder]
-            The order in which to sort the results. A value for sort must also be set.
+            Sort order. Requires sort.
 
         status : typing.Optional[ProcessingStatus]
-            A status filter on the get documents query. If this value is set, then only documents with this status will be returned in the results.
+            Return only documents with this status.
 
         next_token : typing.Optional[str]
-            A token for pagination. If the number of documents for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n documents.
+            Pass nextToken from the previous response to get the next page of up to n documents.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1348,7 +1338,7 @@ class AsyncDocumentsClient:
         Returns
         -------
         DocumentLookupResponse
-            Look up success
+            Lookup successful
 
         Examples
         --------
@@ -1404,7 +1394,7 @@ class AsyncDocumentsClient:
         Returns
         -------
         DocumentResponse
-            Look up success
+            Lookup successful
 
         Examples
         --------
@@ -1473,7 +1463,7 @@ class AsyncDocumentsClient:
         self, document_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> RetryFailedStageResponse:
         """
-        Restart the document at its currently failed HTTP callback using its saved output and callback settings. No request body is required. Active or successfully delivered documents and other failed stages return 409. HTTP 202 means the retry was accepted. Get the document to check deliveryStatus. Post-processing and manual retries must be enabled. An earlier unconfirmed delivery may still have reached the receiver.
+        Retry a failed HTTP callback using its saved output and settings. No request body is needed. Post-processing and manual retries must be enabled. Active or successfully delivered documents and other failed stages return 409. A 202 response confirms acceptance; get the document to check deliveryStatus. An earlier unconfirmed delivery may already have reached the receiver.
 
         Parameters
         ----------
@@ -1526,7 +1516,7 @@ class AsyncDocumentsClient:
         Returns
         -------
         DocumentsGetExtractResponse
-            Look up success
+            Lookup successful
 
         Examples
         --------
@@ -1567,7 +1557,7 @@ class AsyncDocumentsClient:
         Returns
         -------
         DocumentXray
-            Look up success
+            Lookup successful
 
         Examples
         --------
@@ -1607,7 +1597,7 @@ class AsyncDocumentsClient:
             The maximum number of returned processes. Accepts 1-100 with a default of 20.
 
         status : typing.Optional[ProcessingStatus]
-            A status filter on the processing status. If this value is set, then only processes with this status will be returned in the results.
+            Return only processes with this status.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1615,7 +1605,7 @@ class AsyncDocumentsClient:
         Returns
         -------
         ProcessesStatusResponse
-            Look up success
+            Lookup successful
 
         Examples
         --------
@@ -1649,7 +1639,7 @@ class AsyncDocumentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> FileLinkResponse:
         """
-        Issue a native storage GET link for a saved owned asset. Returns 404 when file access is disabled; enabled temporary failures return 503 with Retry-After. The bearer can reuse or forward it until expiresAt. Key revocation and policy changes do not revoke existing native grants. No GroundX key is carried in the URL.
+        Create a storage-signed download link for a saved asset you own. Anyone with the link can use or forward it until expiresAt. Revoking an API key or changing policy does not cancel issued links. The URL contains no GroundX API key. Returns 404 if file access is disabled, or 503 with Retry-After for temporary file-access failures.
 
         Parameters
         ----------

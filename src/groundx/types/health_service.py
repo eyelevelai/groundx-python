@@ -14,9 +14,7 @@ class HealthService(UniversalBaseModel):
     last_update: typing_extensions.Annotated[
         dt.datetime,
         FieldMetadata(alias="lastUpdate"),
-        pydantic.Field(
-            alias="lastUpdate", description="The data time when the service status was last updated, in RFC3339 format"
-        ),
+        pydantic.Field(alias="lastUpdate", description="Last service status update in RFC3339 format."),
     ]
     service: str = pydantic.Field()
     """

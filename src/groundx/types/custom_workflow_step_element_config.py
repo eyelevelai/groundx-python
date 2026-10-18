@@ -17,7 +17,7 @@ class CustomWorkflowStepElementConfig(UniversalBaseModel):
     includes: typing.Optional[typing.Dict[str, bool]] = None
     prompt: typing.Optional[WorkflowPromptGroup] = pydantic.Field(default=None)
     """
-    Prompt group for this custom step element config. On workflow update, omit prompt or send an empty object to use the default prompt group, send an object to customize supplied prompt members, and send null to use no prompt group.
+    Prompts for this custom step element. On update, omit prompt or send {} to use defaults. Send an object to customize its supplied members, or null to remove the prompt group.
     """
 
     if IS_PYDANTIC_V2:

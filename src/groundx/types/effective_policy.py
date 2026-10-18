@@ -11,7 +11,7 @@ from .effective_policy_mode import EffectivePolicyMode
 
 class EffectivePolicy(UniversalBaseModel):
     """
-    Confirmed inherited policy. Share expiry defaults to 300 seconds and can be shortened by storage credentials. Stable protected URLs require current authentication on every read.
+    Applied settings after inheritance. Sharing links expire after 300 seconds by default; storage credentials may shorten that time. Protected stable URLs require current authentication on every read.
     """
 
     mode: EffectivePolicyMode

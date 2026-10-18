@@ -11,7 +11,7 @@ from .file_access_policy_mode import FileAccessPolicyMode
 
 class FileAccessPolicy(UniversalBaseModel):
     """
-    Partial override. Omitted fields inherit. Protected ancestors cannot be reopened; ancestor share lifetimes are ceilings. Stable public links never expire; urlTtlSeconds controls finite native share grants.
+    Settings that override inherited values. Omitted fields inherit. A protected parent cannot be made public, and its sharing time limit cannot be exceeded. Stable public links never expire. urlTtlSeconds limits the lifetime of storage-signed sharing links.
     """
 
     mode: typing.Optional[FileAccessPolicyMode] = None

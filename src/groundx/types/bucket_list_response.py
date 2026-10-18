@@ -16,7 +16,7 @@ class BucketListResponse(UniversalBaseModel):
 
     remaining: typing.Optional[int] = pydantic.Field(default=None)
     """
-    The number of buckets that have not been returned yet, will be null if there are no remaining buckets
+    Number of buckets not yet returned, or null if none remain.
     """
 
     total: typing.Optional[int] = pydantic.Field(default=None)

@@ -48,11 +48,17 @@ class SearchResultItem(UniversalBaseModel):
         typing.Optional[str],
         FieldMetadata(alias="multimodalUrl"),
         pydantic.Field(
-            alias="multimodalUrl", description="An image clipping of the table or figure object from the document"
+            alias="multimodalUrl",
+            description="Image of a table or figure. Protected images use storage-signed links that expire within the applied policy time limit. Keep documentId and chunkId; use documents.fileLink with a crop selector to refresh the link. Public stable links do not expire.",
         ),
     ] = None
     page_images: typing_extensions.Annotated[
-        typing.Optional[typing.List[str]], FieldMetadata(alias="pageImages"), pydantic.Field(alias="pageImages")
+        typing.Optional[typing.List[str]],
+        FieldMetadata(alias="pageImages"),
+        pydantic.Field(
+            alias="pageImages",
+            description="Page image URLs for this chunk. Protected images use storage-signed links that expire within the applied policy time limit. Keep documentId and the page number; use documents.fileLink with a page selector to refresh the link. Public stable links do not expire.",
+        ),
     ] = None
     pages: typing.Optional[typing.List[SearchResultItemPagesItem]] = None
     process_id: typing_extensions.Annotated[
@@ -86,7 +92,10 @@ class SearchResultItem(UniversalBaseModel):
     source_url: typing_extensions.Annotated[
         typing.Optional[str],
         FieldMetadata(alias="sourceUrl"),
-        pydantic.Field(alias="sourceUrl", description="Source document URL"),
+        pydantic.Field(
+            alias="sourceUrl",
+            description="Source document URL. Protected GroundX-hosted sources use storage-signed links that expire within the applied policy time limit. Keep documentId; use documents.fileLink with a source selector to refresh the link. Public stable links do not expire.",
+        ),
     ] = None
     suggested_text: typing_extensions.Annotated[
         typing.Optional[str],

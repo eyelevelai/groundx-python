@@ -35,7 +35,7 @@ class HealthClient:
         Returns
         -------
         HealthResponse
-            Look up success
+            Lookup successful
 
         Examples
         --------
@@ -64,7 +64,7 @@ class HealthClient:
         Returns
         -------
         HealthResponse
-            Look up success
+            Lookup successful
 
         Examples
         --------
@@ -108,7 +108,7 @@ class AsyncHealthClient:
         Returns
         -------
         HealthResponse
-            Look up success
+            Lookup successful
 
         Examples
         --------
@@ -145,7 +145,7 @@ class AsyncHealthClient:
         Returns
         -------
         HealthResponse
-            Look up success
+            Lookup successful
 
         Examples
         --------

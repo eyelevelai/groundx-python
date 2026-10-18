@@ -241,3 +241,28 @@ Local generation root: `openspec/work/protect-hosted-file-access/upload-policy-r
 Validation: the two response models match full-project generator output byte-for-byte. Python retains 90 focused upload cases and passes 775 tests with 2 existing skips, 100 subtests and 156 existing warnings. Mypy passes 283 files. TypeScript passes 44 custom cases and 488 tests overall, both builds, ESM rename and the explicit custom-test typecheck. Existing package versions, Python exports/headers and TypeScript headers match generator output. No client or wrapper changes are required.
 
 Local closeout receipt: `protect-hosted-file-access/upload-policy-response-regeneration`, closed 2026-10-18T19:11:11.970284+00:00. State: accepted. Removed the exact registered run root, 451 files and 229876321 bytes; absence verified. Reviewed response models remain in their owning SDK repos. The bounded local summary is `openspec/runs/protect-hosted-file-access/upload-policy-response-regeneration.json`, SHA-256 `f5a65eb8ca5dc53f5dac6fc5f43628fc781494297ed70b25beb1fd99d4e67645`. No local run root remains.
+
+
+## Generated release integration and test preservation
+
+- [x] Integrate the official 4.1.0 release from main, preserving its generated files and package metadata unchanged.
+- [x] Verify all pre-change assertions and earlier upload scenarios remain covered in preserved suites.
+- [x] Run the full SDK suite, aiohttp, type checks, protected replay and package build.
+
+Local validation root: `openspec/work/protect-hosted-file-access/test-preservation-python`, owned by the SDK maintainer for isolated pytest and build output. Expires 2026-10-20T00:00:00Z. Retain bounded results, then remove this exact root. No publication or live API calls.
+
+The merged producer is Fern `0793e797f33817d5274cb0b763e2fba792212aea`; its successful Python release workflow is `39158722646`. Official release commit `15671152c6d4e8a7dc7a81f0da90f4e8ee6fce8f` supplies every generated file, package 4.1.0 metadata and current protected fixture recordings. All generated files and package metadata match that commit byte-for-byte. Custom behavior and tests remain inside existing `.fernignore` paths, using the configured `GroundXBase` subclasses and exports. No generator settings or versions change.
+
+Test preservation baseline: `c8b14f18a77002c873f8f7550f354b7626f2b674`. All 63 pre-change test functions in the five edited suites remain under their original names; 59 have identical syntax trees. Every prior assertion remains. The four extended cases are the dependency-free client import, legacy hosted-header stripping, transient native PUT retry and bounded MinIO construction cases. The import adds package identity checks, native mocks accept redirect prevention, retry coverage adds expiry without replacing successful retry, and MinIO adds constructor assertions. All other existing tests and generated test scaffolding are unchanged.
+
+| Earlier upload scenario | Current preserved case | Contract |
+| --- | --- | --- |
+| `test_ingest_reserves_private_source_before_upload` | `test_ingest_uses_configured_api_before_upload` | Sync/async native bytes, initial protection, customer credentials and directory propagation remain. Unified issuance replaces client policy discovery. |
+| `test_public_destination_keeps_legacy_upload` | `test_explicit_legacy_upload_override` | Explicit public legacy transport remains; default public transport uses the configured API. |
+| `test_failed_policy_lookup_never_falls_back_to_public` | `test_failed_upload_issuance_never_falls_back_to_public` | Issuance failure prevents bytes and hosted fallback. |
+| `test_local_batch_checks_private_expiry_before_ingest`, then `test_local_batch_checks_upload_expiry_before_ingest` | `test_local_batch_preserves_submission_and_admission_errors` | Same sync/async public/private/mixed/CSV inputs, counts, callbacks and policy propagation. Protected reservation admission belongs to the server; its 409 status/body is preserved. Public completed PUTs have no batch deadline. |
+| `test_monitored_batch_rejects_private_expiry_before_submission`, then `test_monitored_batch_rejects_upload_expiry_before_submission` | `test_monitored_batch_preserves_upstream_admission_error` | Monitored/directory batching preserves the server's admission rejection and stops further submission. |
+
+Validation: 775 tests and 100 subtests pass, with two existing skips; aiohttp passes three tests. Mypy passes all 283 source files. The protected compact fixture replay passes with current main recordings, covering Arcadia legacy, Arcadia v1, generic v1 and ADP v1. The 4.1.0 wheel and sdist build, LF, strict OpenSpec and diff checks pass. No lost test or assertion requires restoration, and no tests, CI jobs, dependencies or schema changes are added. No live API, storage or publication occurs.
+
+Local closeout receipt: `protect-hosted-file-access/test-preservation-python`, closed 2026-10-18T19:34:54.664253+00:00. Accepted; removed the exact registered root (189 files, 2884621 bytes) and verified absence. Bounded local summary SHA-256: `b5c000ca2eba42a344b346937be3c5cb18598a0a9db4df548afdf04eb544fca4`.

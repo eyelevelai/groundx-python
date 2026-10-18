@@ -22,7 +22,7 @@ class DocumentDetail(UniversalBaseModel):
         FieldMetadata(alias="fileAccess"),
         pydantic.Field(
             alias="fileAccess",
-            description="Confirmed override. Null means inherited; omitted on clients without this feature. Pending changes remain internal.",
+            description="Applied settings for this resource. Null means it inherits settings. Deployments without file access omit this field. Pending changes are not returned.",
         ),
     ] = None
     file_access_revision: typing_extensions.Annotated[
@@ -30,7 +30,7 @@ class DocumentDetail(UniversalBaseModel):
         FieldMetadata(alias="fileAccessRevision"),
         pydantic.Field(
             alias="fileAccessRevision",
-            description="Confirmed revision. Required with fileAccess on writes; stale revisions return 409.",
+            description="Current settings revision. Include it when updating fileAccess. A stale revision returns 409.",
         ),
     ] = None
     effective_file_access: typing_extensions.Annotated[
@@ -51,7 +51,7 @@ class DocumentDetail(UniversalBaseModel):
         FieldMetadata(alias="deliveryStatus"),
         pydantic.Field(
             alias="deliveryStatus",
-            description="Current-run required customer delivery confirmation. Failed confirmation does not prove nonreceipt; unknown means saved evidence is insufficient.",
+            description="Delivery confirmation for the current run. Failure does not prove the receiver received nothing. Unknown means the saved evidence cannot confirm delivery.",
         ),
     ] = None
     document_id: typing_extensions.Annotated[
@@ -69,7 +69,7 @@ class DocumentDetail(UniversalBaseModel):
         FieldMetadata(alias="extractionReady"),
         pydantic.Field(
             alias="extractionReady",
-            description="Whether the current run's final extraction is published after required review and transformations. Null means saved evidence is insufficient.",
+            description="Whether the current run's final extraction was published after required review and transformations. Null means saved evidence cannot confirm publication.",
         ),
     ] = None
     retry_available: typing_extensions.Annotated[
@@ -93,7 +93,7 @@ class DocumentDetail(UniversalBaseModel):
     ] = None
     filter: typing.Optional[typing.Dict[str, typing.Any]] = pydantic.Field(default=None)
     """
-    A dictionary of key-value pairs that can be used to pre-filter documents prior to a search.
+    Key-value metadata used to filter documents before searching.
     """
 
     process_id: typing_extensions.Annotated[
