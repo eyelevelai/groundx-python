@@ -266,3 +266,9 @@ Test preservation baseline: `c8b14f18a77002c873f8f7550f354b7626f2b674`. All 63 p
 Validation: 775 tests and 100 subtests pass, with two existing skips; aiohttp passes three tests. Mypy passes all 283 source files. The protected compact fixture replay passes with current main recordings, covering Arcadia legacy, Arcadia v1, generic v1 and ADP v1. The 4.1.0 wheel and sdist build, LF, strict OpenSpec and diff checks pass. No lost test or assertion requires restoration, and no tests, CI jobs, dependencies or schema changes are added. No live API, storage or publication occurs.
 
 Local closeout receipt: `protect-hosted-file-access/test-preservation-python`, closed 2026-10-18T19:34:54.664253+00:00. Accepted; removed the exact registered root (189 files, 2884621 bytes) and verified absence. Bounded local summary SHA-256: `b5c000ca2eba42a344b346937be3c5cb18598a0a9db4df548afdf04eb544fca4`.
+
+## Creation request coverage
+
+- [x] Extend the existing sync/async creation transport case with a typed document policy, successful protected bucket creation, two remote documents with distinct 120/300-second policies and website policy. Exact wire assertions preserve omitted/null creation and legacy rename requests and reject accidental creation revisions. These replace the meaningful transport assertions formerly run from Fern without restoring duplicate CI or editing generated code.
+
+The existing upload suite passes all 90 cases. Generated files and package metadata remain byte-identical to official Fern 4.1.0 main.

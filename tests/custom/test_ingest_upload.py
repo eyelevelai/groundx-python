@@ -650,7 +650,7 @@ def test_policy_models_preserve_legacy_updates_and_initial_inheritance(asynchron
 
     import httpx
 
-    from groundx import AsyncGroundX, DocumentUpdate
+    from groundx import AsyncGroundX, Document, DocumentUpdate, FileAccessPolicy, IngestRemoteDocument, WebsiteSource
 
     requests = []
 
@@ -660,6 +660,16 @@ def test_policy_models_preserve_legacy_updates_and_initial_inheritance(asynchron
             200, json={"bucket": {"bucketId": 7}, "ingest": {"processId": "process", "status": "queued"}}
         )
 
+    private = FileAccessPolicy(mode="protected")
+    document = Document(bucket_id=7, file_path="a.pdf", file_type="pdf", file_access=private)
+    assert document.file_access is not None
+    assert document.file_access.mode == "protected"
+    documents = [
+        IngestRemoteDocument(bucket_id=7, source_url="https://files.example/a.pdf", file_access=FileAccessPolicy(mode="protected", url_ttl_seconds=120)),
+        IngestRemoteDocument(bucket_id=7, source_url="https://files.example/b.pdf", file_access=FileAccessPolicy(mode="protected", url_ttl_seconds=300)),
+    ]
+    websites = [WebsiteSource(bucket_id=7, source_url="https://example.com", file_access=private)]
+
     async def run():
         async with httpx.AsyncClient(transport=httpx.MockTransport(handle)) as transport:
             client = AsyncGroundX(api_key="test", base_url="https://api.test", httpx_client=transport)
@@ -667,6 +677,9 @@ def test_policy_models_preserve_legacy_updates_and_initial_inheritance(asynchron
             await client.documents.update(documents=[DocumentUpdate(document_id="document", file_name="renamed.pdf")])
             await client.buckets.create(name="inherited")
             await client.buckets.create(name="inherited", file_access=None)
+            await client.buckets.create(name="private", file_access=private)
+            await client.documents.ingest_remote(documents=documents)
+            await client.documents.crawl_website(websites=websites)
 
     if asynchronous:
         asyncio.run(run())
@@ -677,12 +690,23 @@ def test_policy_models_preserve_legacy_updates_and_initial_inheritance(asynchron
             client.documents.update(documents=[DocumentUpdate(document_id="document", file_name="renamed.pdf")])
             client.buckets.create(name="inherited")
             client.buckets.create(name="inherited", file_access=None)
+            client.buckets.create(name="private", file_access=private)
+            client.documents.ingest_remote(documents=documents)
+            client.documents.crawl_website(websites=websites)
 
     assert requests == [
         ("PUT", "/v1/bucket/7", {"newName": "renamed"}),
         ("PUT", "/v1/ingest/documents", {"documents": [{"documentId": "document", "fileName": "renamed.pdf"}]}),
         ("POST", "/v1/bucket", {"name": "inherited"}),
         ("POST", "/v1/bucket", {"name": "inherited", "fileAccess": None}),
+        ("POST", "/v1/bucket", {"name": "private", "fileAccess": {"mode": "protected"}}),
+        ("POST", "/v1/ingest/documents/remote", {"documents": [
+            {"bucketId": 7, "sourceUrl": "https://files.example/a.pdf", "fileAccess": {"mode": "protected", "urlTtlSeconds": 120}},
+            {"bucketId": 7, "sourceUrl": "https://files.example/b.pdf", "fileAccess": {"mode": "protected", "urlTtlSeconds": 300}},
+        ]}),
+        ("POST", "/v1/ingest/documents/website", {"websites": [
+            {"bucketId": 7, "sourceUrl": "https://example.com", "fileAccess": {"mode": "protected"}},
+        ]}),
     ]
 
 
