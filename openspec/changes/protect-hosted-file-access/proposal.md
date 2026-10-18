@@ -18,8 +18,9 @@ configuration must remain compatible.
   to existing X-Ray/page-image readers. Preserve native signed GET URLs and
   refresh gateway presentation without caching expiring references.
 
-This is an additive package change. No generated API or dependency changes are
-required. Design questions: none.
+Local uploads use the configured GroundX API for public and protected buckets.
+An explicit legacy upload endpoint remains available for existing integrations.
+No generated API shape, dependency or package version changes are required.
 
 ## Capabilities
 
@@ -32,8 +33,9 @@ None.
 
 ## Impact
 
-Edits are limited to `.fernignore`-protected `src/groundx/extract/`,
-`tests/extract/` and `openspec/`. GroundX on-prem extraction image builds must
+Custom edits stay in `.fernignore`-protected ingest/extract helpers, existing
+tests, documentation and OpenSpec plans. The TypeScript wrapper and its existing
+custom transport tests use the same upload contract. GroundX on-prem extraction image builds must
 adopt a released SDK containing these constructor fields before enabling the
 private Helm settings. Internal Arcadia remains compatible with legacy defaults.
 Hosted protection, ownership, presigning and rollout gates belong to

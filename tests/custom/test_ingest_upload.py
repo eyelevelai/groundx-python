@@ -37,7 +37,8 @@ def test_upload_file_does_not_send_hosted_url_header_to_s3(
 
     monkeypatch.setattr(ingest, "get_presigned_url", lambda *args: _presigned_info())
 
-    def put(url: str, *, data: bytes, headers: dict[str, Any], timeout: int) -> _Response:
+    def put(url: str, *, data: bytes, headers: dict[str, Any], timeout: int, allow_redirects: bool) -> _Response:
+        assert allow_redirects is False
         sent_headers.update(headers)
         return _Response()
 
@@ -61,7 +62,7 @@ def test_upload_file_retries_transient_put_errors(
     monkeypatch.setattr(ingest, "get_presigned_url", lambda *args: _presigned_info())
     monkeypatch.setattr(ingest.time, "sleep", lambda seconds: None)
 
-    def put(url: str, *, data: bytes, headers: dict[str, Any], timeout: int) -> _Response:
+    def put(url: str, *, data: bytes, headers: dict[str, Any], timeout: int, allow_redirects: bool) -> _Response:
         nonlocal attempts
         attempts += 1
         if attempts == 1:
@@ -77,8 +78,8 @@ def test_upload_file_retries_transient_put_errors(
 
 
 @pytest.mark.parametrize("asynchronous", [False, True])
-@pytest.mark.parametrize("inherited,override", [("protected", None), ("public", {"mode": "protected"})])
-def test_ingest_reserves_private_source_before_upload(monkeypatch, tmp_path, inherited, override, asynchronous):
+@pytest.mark.parametrize("override", [None, {"mode": "public"}, {"mode": "protected"}])
+def test_ingest_uses_configured_api_before_upload(monkeypatch, tmp_path, override, asynchronous):
     from importlib.metadata import version
 
     import httpx
@@ -90,6 +91,11 @@ def test_ingest_reserves_private_source_before_upload(monkeypatch, tmp_path, inh
     path = tmp_path / "private.txt"
     path.write_bytes(b"private source")
     events = []
+    storage_url = (
+        "http://minio.local/exact?signature=test"
+        if override == {"mode": "public"}
+        else "https://private.test/exact?signature=test"
+    )
 
     def handle(request):
         events.append((request.method, request.url.path))
@@ -98,16 +104,14 @@ def test_ingest_reserves_private_source_before_upload(monkeypatch, tmp_path, inh
         assert request.headers["user-agent"] == f"groundx/{package_version}"
         assert request.headers["x-fern-sdk-name"] == "groundx"
         assert request.headers["x-fern-sdk-version"] == package_version
-        if request.method == "GET":
-            return httpx.Response(
-                200, json={"bucket": {"bucketId": 7, "effectiveFileAccess": {"mode": inherited, "urlTtlSeconds": 300}}}
-            )
+        assert request.url.host == "onprem.test"
+        assert request.method == "POST"
         if request.url.path.endswith("file-upload"):
             return httpx.Response(
                 201,
                 json={
                     "uploadId": "upload",
-                    "uploadUrl": "https://private.test/exact?signature=test",
+                    "uploadUrl": storage_url,
                     "hostedUrl": "https://files.test/owned.txt",
                     "expiresAt": "2099-01-01T00:00:00Z",
                     "method": "PUT",
@@ -119,9 +123,10 @@ def test_ingest_reserves_private_source_before_upload(monkeypatch, tmp_path, inh
         assert body["documents"][0].get("fileAccess") == override
         return httpx.Response(200, json={"ingest": {"processId": "process", "status": "queued"}})
 
-    def put(url, *, data, headers, timeout):
+    def put(url, *, data, headers, timeout, allow_redirects):
         events.append(("PUT", url))
-        assert url == "https://private.test/exact?signature=test"
+        assert allow_redirects is False
+        assert url == storage_url
         assert data == b"private source"
         assert headers == {"Content-Type": "text/plain"}
         return _Response()
@@ -136,6 +141,7 @@ def test_ingest_reserves_private_source_before_upload(monkeypatch, tmp_path, inh
 
         client = AsyncGroundX(
             api_key="test",
+            base_url="https://onprem.test",
             headers={"X-Customer-Key": "customer-test"},
             httpx_client=httpx.AsyncClient(transport=httpx.MockTransport(handle)),
         )
@@ -143,16 +149,17 @@ def test_ingest_reserves_private_source_before_upload(monkeypatch, tmp_path, inh
     else:
         client = GroundX(
             api_key="test",
+            base_url="https://onprem.test",
             headers={"X-Customer-Key": "customer-test"},
             httpx_client=httpx.Client(transport=httpx.MockTransport(handle)),
         )
         client.ingest(documents=documents)
-    assert [method for method, _ in events] == ["GET", "POST", "PUT", "POST"]
+    assert [method for method, _ in events] == ["POST", "PUT", "POST"]
     if not asynchronous:
         events.clear()
         monkeypatch.setattr(client, "_monitor_batch", lambda result, progress, pbar: (result, 0))
         client.ingest_directory(bucket_id=7, path=str(tmp_path), file_access=documents[0].file_access)
-        assert [method for method, _ in events] == ["GET", "POST", "PUT", "POST"]
+        assert [method for method, _ in events] == ["POST", "PUT", "POST"]
 
 
 def test_remote_document_policy_survives_preparation():
@@ -165,7 +172,7 @@ def test_remote_document_policy_survives_preparation():
     assert documents[0].dict(by_alias=True)["fileAccess"]["mode"] == "protected"
 
 
-def test_public_destination_keeps_legacy_upload(monkeypatch, tmp_path):
+def test_explicit_legacy_upload_override(monkeypatch, tmp_path):
     import httpx
 
     from groundx import Document
@@ -179,13 +186,52 @@ def test_public_destination_keeps_legacy_upload(monkeypatch, tmp_path):
         assert request.url.path.endswith("remote")
         return httpx.Response(200, json={"ingest": {"processId": "process", "status": "queued"}})
 
-    monkeypatch.setattr(ingest, "get_presigned_url", lambda *args: _presigned_info())
+    def legacy(endpoint, *args):
+        assert endpoint == "https://legacy.test/upload"
+        return _presigned_info()
+
+    monkeypatch.setattr(ingest, "get_presigned_url", legacy)
     monkeypatch.setattr(ingest.requests, "put", lambda *args, **kwargs: _Response())
     client = GroundX(api_key="test", httpx_client=httpx.Client(transport=httpx.MockTransport(handle)))
-    client.ingest(documents=[Document(bucket_id=7, file_path=str(path))])
+    client.ingest(documents=[Document(bucket_id=7, file_path=str(path))], upload_api="https://legacy.test/upload")
 
 
-def test_failed_policy_lookup_never_falls_back_to_public(monkeypatch, tmp_path):
+@pytest.mark.parametrize("asynchronous", [False, True])
+@pytest.mark.parametrize("inherited,override", [("protected", None), ("public", {"mode": "protected"})])
+def test_explicit_legacy_upload_rejects_protection(monkeypatch, tmp_path, asynchronous, inherited, override):
+    import asyncio
+
+    import httpx
+
+    from groundx import AsyncGroundX, Document
+
+    path = tmp_path / "file.txt"
+    path.write_text("source")
+    monkeypatch.setattr(ingest, "get_presigned_url", lambda *a: pytest.fail("protected bytes reached legacy signer"))
+
+    def handle(request):
+        assert request.method == "GET"
+        return httpx.Response(
+            200, json={"bucket": {"bucketId": 7, "effectiveFileAccess": {"mode": inherited, "urlTtlSeconds": 300}}}
+        )
+
+    kwargs = {
+        "documents": [Document(bucket_id=7, file_path=str(path), file_access=override)],
+        "upload_api": "https://legacy.test/upload",
+    }
+
+    async def run():
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handle)) as transport:
+            await AsyncGroundX(api_key="test", httpx_client=transport).ingest(**kwargs)
+
+    with pytest.raises(ValueError, match="without an upload_api override"):
+        if asynchronous:
+            asyncio.run(run())
+        else:
+            GroundX(api_key="test", httpx_client=httpx.Client(transport=httpx.MockTransport(handle))).ingest(**kwargs)
+
+
+def test_failed_upload_issuance_never_falls_back_to_public(monkeypatch, tmp_path):
     import httpx
 
     from groundx import Document
@@ -210,14 +256,14 @@ def test_failed_policy_lookup_never_falls_back_to_public(monkeypatch, tmp_path):
     [
         ("protected", 29, 31, False),
         ("protected", 30, 31, True),
-        ("public", 30, 31, False),
+        ("public", 30, 31, True),
         ("mixed", 29, 31, False),
         ("mixed", 30, 31, True),
         ("csv", 1, 29, False),
         ("csv", 1, 31, True),
     ],
 )
-def test_local_batch_checks_private_expiry_before_ingest(
+def test_local_batch_checks_upload_expiry_before_ingest(
     monkeypatch, tmp_path, asynchronous, mode, count, put_seconds, reject
 ):
     import asyncio
@@ -259,7 +305,7 @@ def test_local_batch_checks_private_expiry_before_ingest(
         submissions.append(json.loads(request.content))
         return httpx.Response(200, json={"ingest": {"processId": "process", "status": "complete"}})
 
-    def put(url, *, data, headers, timeout):
+    def put(url, *, data, headers, timeout, allow_redirects):
         nonlocal now
         assert timeout > put_seconds
         assert not any(key.lower() in ("x-api-key", "x-customer-key", "authorization") for key in headers)
@@ -313,11 +359,11 @@ def test_local_batch_checks_private_expiry_before_ingest(
         ]
         assert [doc.get("fileAccess") for doc in body["documents"]] == (expected * 30 if mode == "csv" else expected)
     assert len(puts) == (30 if mode == "csv" else count)
-    assert len(reservations) == (0 if mode == "public" else 16 if mode == "mixed" else 30 if mode == "csv" else count)
+    assert len(reservations) == (30 if mode == "csv" else count)
 
 
 @pytest.mark.parametrize("directory", [False, True])
-def test_monitored_batch_rejects_private_expiry_before_submission(monkeypatch, tmp_path, directory):
+def test_monitored_batch_rejects_upload_expiry_before_submission(monkeypatch, tmp_path, directory):
     import datetime as dt
 
     import httpx

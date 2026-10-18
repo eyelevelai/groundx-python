@@ -61,8 +61,8 @@ established by these tests.
 ## Creation-time policies and ingest helpers
 
 - [x] Generate optional initial fileAccess models and bucket/file operations from Fern; preserve handwritten files.
-- [x] Extend existing sync/async ingest and directory helpers to preserve per-document policies and choose bucket-owned private staging before protected bytes are uploaded. Keep legacy public uploads for unconfigured/public destinations; fail without public fallback on policy or reservation errors.
-- [x] Exercise the real generated HTTP transport and existing helpers for inherited protection, explicit file protection in a public bucket, split propagation and unchanged public uploads. Verify native PUT receives no API credentials and exact signed URL/headers are retained.
+- [x] Extend existing sync/async ingest and directory helpers to preserve per-document policies and use bucket-owned staging for public and protected files. Preserve explicit legacy endpoint overrides for public destinations only; fail without hosted fallback on issuance errors.
+- [x] Exercise the real generated HTTP transport and existing helpers for inherited protection, explicit file protection in a public bucket, split propagation and public uploads through the configured API. Verify native PUT receives no API credentials and exact signed URL/headers are retained.
 
 Creation-policy validation:694 SDK tests pass,2existing skips,100subtests;156 existing deprecation warnings. Whole-repository mypy passes283 source files. These are local/synthetic results, not storage, release or deployment acceptance.
 
@@ -77,7 +77,8 @@ Creation-policy validation:694 SDK tests pass,2existing skips,100subtests;156 ex
 
 The expiry regression uses thirty successful thirty-one-second PUTs, each below
 the sixty-second request timeout. Expired batches produce no ingest request;
-twenty-nine-file fresh batches and public batches retain their existing behavior.
+twenty-nine-file fresh batches retain their existing submission behavior. Public
+uploads now use the same expiry checks as protected uploads.
 These checks enforce the existing reservation deadline and do not make longer
 private batches succeed. Network transit after the local check can still consume
 the remaining lifetime. Extraction runtime, prompt policy, schema routing and
@@ -174,3 +175,26 @@ The existing Python recording-transport tests now cover successful legacy bucket
 Validation: exact `poetry run mypy .` passes all 283 source files after generation-root cleanup. Python passes 760 tests with two existing skips, 100 subtests and 156 existing warnings; all three aiohttp tests and the protected compact replay pass separately. TypeScript passes all 480 tests and both CJS/ESM builds. Changed-test Ruff/Biome, LF, strict OpenSpec and diff checks pass. Arcadia legacy, Arcadia v1, generic v1 and ADP v1 extraction runtime, schemas, prompts and routing are unchanged. Package publication and live acceptance remain separate gates.
 
 Local closeout receipt: `protect-hosted-file-access/generated-boundary-audit` closed at 2026-10-18T17:04:48.583001+00:00. Removed the exact registered root and generator-owned temporary roots, 1609 files and 71373966 bytes; absence verified. The bounded lifecycle summary remains under ignored `openspec/runs`, SHA-256 `3f3dd390ea7ea0be6948d39eb7db3c399a46bd102a214bc13ac8e96b54b5b649`.
+
+## One upload service
+
+- [x] Use the existing authenticated bucket upload operation for all local SDK uploads, without policy discovery or hosted fallback.
+- [x] Preserve explicit legacy broker overrides and per-file policies, callbacks, splits, batches and delegated request options.
+- [x] Extend existing Python and TypeScript transport tests and run SDK validation without editing generated runtime files.
+
+Validation: existing Python upload tests reproduce the old policy lookup before
+implementation and pass with the configured API path afterward. The complete
+Python suite passes 766 tests, with 2 existing skips, 100 subtests and 156 existing
+warnings. The updated HTTP/on-prem grant cases pass all 81 focused upload tests.
+Mypy passes 283 files; changed-file Ruff, LF, diff and strict OpenSpec checks pass.
+TypeScript has 40 passing custom transport tests and 484 passing tests overall;
+CJS and ESM compile, ESM rename, changed-test lint and diff checks pass.
+
+All SDK changes are handwritten paths already preserved by `.fernignore`.
+No generated runtime files, generator settings, dependencies or CI change.
+Upload tests stay in the existing Python `test_ingest_upload.py` and TypeScript
+`custom.test.ts`; provider-specific extraction tests remain separate because they
+exercise distinct storage implementations. Extraction prompts, schemas, routing
+and final JSON are unchanged, so Arcadia legacy, Arcadia v1, generic v1 and ADP v1
+extraction execution paths are unaffected. These local mocked transports do not
+prove server deployment, live vendor signing, on-prem connectivity or publication.

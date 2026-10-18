@@ -23,16 +23,21 @@ their existing explicit-value then environment precedence. `url` remains a
 presentation field. Storage settings do not add signing, URL rewriting or output
 transformation.
 
-Private local ingest retains reservation expiry only in the current batch's
-helper state. Sync, async, CSV-split, monitored and directory uploads check those
+All local ingest uses `buckets.file_upload` on the configured API, including
+public buckets and installations without file protection. The helper does not
+read bucket policy to select a signer or fall back to hosted infrastructure.
+An explicit `upload_api` (Python) or `uploadApi` (TypeScript) selects the existing
+legacy broker protocol for public integrations after an explicit policy read.
+Inherited or requested protection rejects an override before any bytes are sent. Default calls retain
+upload expiry only in the current batch's helper state. Sync, async, CSV-split, monitored and directory uploads check those
 deadlines before the existing ingest submission. An expired batch raises a clear
 error directing the caller to retry with fewer files or a smaller batch size.
 This prevents knowingly submitting an unbound expired source. It does not extend
 the fifteen-minute reservation, renew uploads, create extra ingest requests or
-change public method signatures, policies, callbacks or process identifiers.
+change policies, callbacks or process identifiers. The optional upload endpoint
+now defaults to the configured API rather than the hosted legacy broker.
 
-Only `src/groundx/extract/`, `tests/extract/` and `openspec/` are edited, all
-preserved by `.fernignore`. The protected fixture pack replay covers the current
+Custom changes stay in `.fernignore`-protected helpers, tests, docs and plans. The protected fixture pack replay covers the current
 promoted cases; storage changes do not change extraction placement, candidate
 selection or customer JSON contracts. Required historical Arcadia v1, generic
 v1 and ADP v1 surfaces remain unaffected because their parser/reassembly paths
@@ -82,3 +87,21 @@ route placement, stored X-Ray or final JSON.
 ## Generated policy error dispatch
 
 Fern declares the reachable policy errors on existing bucket/document updates and initial-policy operations. Regenerate only the affected clients with the pinned Python generator, preserving handwritten helpers, package version exports and the existing 4.0.9 HTTP headers. Extend the recording HTTP tests to exercise status-specific exceptions in sync and async dispatch while retaining explicit null/revision bodies. Existing full test, aiohttp, extraction replay, mypy, build and LF checks remain required. No extraction runtime, prompts, schemas or routing change, so Arcadia legacy, Arcadia v1, generic v1 and ADP v1 are unaffected. Package publication remains human-owned.
+
+## One upload service
+
+Python `ingest.py` and TypeScript `Wrapper.ts` remain handwritten, protected by
+`.fernignore`. Both call the existing generated bucket upload operation for all
+ordinary local files, preserving API base URLs, delegated headers and request
+options. Native PUT uses only returned storage headers and exact signed URLs.
+Explicit legacy endpoint overrides retain their wire format and metadata
+handling without policy discovery. Remote documents and initial policies remain
+unchanged. Hosted and on-prem use the same client path; storage selection stays
+behind the backend object-store interface. No cloud SDK is added to clients.
+
+Extend the existing upload transport tests for public and protected local API
+URLs, failed issuance without fallback, explicit legacy overrides, sync/async,
+CSV splits, directory batches, expiry, callbacks and credential separation.
+Keep extraction fixture, generated HTTP and protocol tests in their existing
+responsibility files. TypeScript has no owned OpenSpec tree; its wrapper and
+existing custom tests are covered by this cross-SDK plan.

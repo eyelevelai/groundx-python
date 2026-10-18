@@ -215,6 +215,7 @@ def _put_upload_file(
                 data=file_data,
                 headers=headers,
                 timeout=UPLOAD_REQUEST_TIMEOUT_SECONDS,
+                allow_redirects=False,
             )
         except requests.RequestException:
             if attempt == UPLOAD_RETRY_ATTEMPTS - 1:
@@ -224,23 +225,31 @@ def _put_upload_file(
     raise RuntimeError("upload retry loop exited unexpectedly")
 
 
-def _needs_private_upload(bucket: typing.Any, policy: typing.Optional[FileAccessPolicy]) -> bool:
-    effective = bucket.bucket.effective_file_access
-    return (effective is not None and effective.mode == "protected") or (
-        policy is not None and policy.mode == "protected"
-    )
-
-
-def _assert_private_uploads_fresh(expiries: typing.Sequence[float]) -> None:
+def _assert_uploads_fresh(expiries: typing.Sequence[float]) -> None:
     if any(expiry <= time.time() for expiry in expiries):
-        raise RuntimeError("Private upload reservation expired before submission. Retry with a smaller batch.")
+        raise RuntimeError("Upload reservation expired before submission. Retry with a smaller batch.")
 
 
-def _private_upload_info(grant: typing.Any) -> typing.Dict[str, typing.Any]:
+def _check_legacy_upload(bucket: typing.Any, policy: typing.Optional[FileAccessPolicy]) -> None:
+    effective = bucket.bucket.effective_file_access or bucket.bucket.file_access
+    if (effective is not None and effective.mode == "protected") or (policy is not None and policy.mode == "protected"):
+        raise ValueError("Protected uploads require the configured GroundX API, without an upload_api override")
+
+
+def _upload_info(grant: typing.Any) -> typing.Dict[str, typing.Any]:
+    target = urlparse(grant.upload_url)
+    if target.scheme not in ("http", "https") or not target.hostname or target.username or target.password:
+        raise ValueError("Invalid upload target")
+    if grant.expires_at.timestamp() <= time.time():
+        raise ValueError("Upload reservation has expired")
     if grant.method != "PUT" or not grant.hosted_url:
-        raise ValueError("Private upload requires an exact PUT grant and hosted URL")
-    if any(key.lower() in ("x-api-key", "authorization", "x-customer-key") for key in grant.headers):
-        raise ValueError("Private upload headers must not contain GroundX credentials")
+        raise ValueError("Upload requires an exact PUT grant and hosted URL")
+    if any(
+        key.lower()
+        in ("x-api-key", "authorization", "x-customer-key", "proxy-authorization", "cookie", "host", HOSTED_URL_HEADER)
+        for key in grant.headers
+    ):
+        raise ValueError("Upload headers must not contain GroundX credentials")
     return {
         "URL": grant.upload_url,
         "Method": grant.method,
@@ -610,7 +619,7 @@ class GroundX(GroundXBase):
         documents: typing.Sequence[Document],
         batch_size: int = 10,
         wait_for_complete: bool = False,
-        upload_api: str = "https://api.eyelevel.ai/upload/file",
+        upload_api: typing.Optional[str] = None,
         callback_url: typing.Optional[str] = None,
         callback_data: typing.Optional[str] = None,
         override_batch_size: typing.Optional[bool] = False,
@@ -630,8 +639,8 @@ class GroundX(GroundXBase):
         # will turn on progress bar and wait for ingestion to complete
         wait_for_complete : typing.Optional[bool]
 
-        # an endpoint that accepts 'name' and 'type' query params
-        # and returns a presigned URL in a JSON dictionary with key 'URL'
+        # optional legacy endpoint; default uses the configured GroundX API
+        # legacy endpoints accept 'name' and 'type' and return a JSON 'URL'
         upload_api : typing.Optional[str]
 
         # an endpoint that will receive processing event updates as POST
@@ -669,7 +678,7 @@ class GroundX(GroundXBase):
         )
         """
         remote_documents, local_documents = prep_documents(documents)
-        private_upload_expiries: typing.List[float] = []
+        upload_expiries: typing.List[float] = []
 
         if len(remote_documents) + len(local_documents) == 0:
             raise ValueError("No valid documents were provided")
@@ -727,12 +736,12 @@ class GroundX(GroundXBase):
                     file_size = fp.stat().st_size
 
                     if (current_batch_size + file_size > MAX_BATCH_SIZE_BYTES) or (len(local_batch) >= n):
-                        private_upload_expiries.clear()
+                        upload_expiries.clear()
                         up_docs, progress = self._process_local(
-                            local_batch, upload_api, progress, pbar, request_options, private_upload_expiries
+                            local_batch, upload_api, progress, pbar, request_options, upload_expiries
                         )
 
-                        _assert_private_uploads_fresh(private_upload_expiries)
+                        _assert_uploads_fresh(upload_expiries)
                         ingest = self.documents.ingest_remote(
                             documents=up_docs,
                             callback_url=callback_url,
@@ -748,12 +757,12 @@ class GroundX(GroundXBase):
                     current_batch_size += file_size
 
                 if local_batch:
-                    private_upload_expiries.clear()
+                    upload_expiries.clear()
                     up_docs, progress = self._process_local(
-                        local_batch, upload_api, progress, pbar, request_options, private_upload_expiries
+                        local_batch, upload_api, progress, pbar, request_options, upload_expiries
                     )
 
-                    _assert_private_uploads_fresh(private_upload_expiries)
+                    _assert_uploads_fresh(upload_expiries)
                     ingest = self.documents.ingest_remote(
                         documents=up_docs,
                         callback_data=callback_data,
@@ -769,10 +778,10 @@ class GroundX(GroundXBase):
         elif len(remote_documents) + len(local_documents) > max_n:
             raise ValueError("You have sent too many documents in this request")
 
-        up_docs, _ = self._process_local(local_documents, upload_api, 0, None, request_options, private_upload_expiries)
+        up_docs, _ = self._process_local(local_documents, upload_api, 0, None, request_options, upload_expiries)
         remote_documents.extend(up_docs)
 
-        _assert_private_uploads_fresh(private_upload_expiries)
+        _assert_uploads_fresh(upload_expiries)
         return self.documents.ingest_remote(
             documents=remote_documents,
             callback_url=callback_url,
@@ -787,7 +796,7 @@ class GroundX(GroundXBase):
         path: str,
         file_access: typing.Optional[FileAccessPolicy] = None,
         batch_size: int = 10,
-        upload_api: str = "https://api.eyelevel.ai/upload/file",
+        upload_api: typing.Optional[str] = None,
         callback_url: typing.Optional[str] = None,
         callback_data: typing.Optional[str] = None,
         override_batch_size: typing.Optional[bool] = False,
@@ -802,8 +811,8 @@ class GroundX(GroundXBase):
         path : str
         batch_size : type.Optional[int]
 
-        # an endpoint that accepts 'name' and 'type' query params
-        # and returns a presigned URL in a JSON dictionary with key 'URL'
+        # optional legacy endpoint; default uses the configured GroundX API
+        # legacy endpoints accept 'name' and 'type' and return a JSON 'URL'
         upload_api : typing.Optional[str]
 
         # an endpoint that will receive processing event updates as POST
@@ -904,29 +913,31 @@ class GroundX(GroundXBase):
 
     def _upload_file(
         self,
-        endpoint: str,
+        endpoint: typing.Optional[str],
         file_path: Path,
         *,
         bucket_id: typing.Optional[int] = None,
         file_access: typing.Optional[FileAccessPolicy] = None,
         request_options: typing.Optional[RequestOptions] = None,
-        private_upload_expiries: typing.Optional[typing.List[float]] = None,
+        upload_expiries: typing.Optional[typing.List[float]] = None,
     ) -> str:
         file_name = os.path.basename(file_path)
         file_extension = os.path.splitext(file_name)[1][1:].lower()
         if f".{file_extension}" in SUFFIX_ALIASES:
             file_extension = SUFFIX_ALIASES[f".{file_extension}"]
 
-        if bucket_id is not None and _needs_private_upload(
-            self.buckets.get(bucket_id, request_options=request_options), file_access
-        ):
+        if endpoint is None:
+            if bucket_id is None:
+                raise ValueError("A bucket ID is required to upload through GroundX")
             grant = self.buckets.file_upload(
                 bucket_id, file_name=file_name, file_type=file_extension, request_options=request_options
             )
-            if private_upload_expiries is not None:
-                private_upload_expiries.append(grant.expires_at.timestamp())
-            presigned_info = _private_upload_info(grant)
+            if upload_expiries is not None:
+                upload_expiries.append(grant.expires_at.timestamp())
+            presigned_info = _upload_info(grant)
         else:
+            if bucket_id is not None:
+                _check_legacy_upload(self.buckets.get(bucket_id, request_options=request_options), file_access)
             presigned_info = get_presigned_url(endpoint, file_name, file_extension)
 
         upload_url = presigned_info["URL"]
@@ -959,11 +970,11 @@ class GroundX(GroundXBase):
     def _process_local(
         self,
         local_docs: typing.List[Document],
-        upload_api: str,
+        upload_api: typing.Optional[str],
         progress: float,
         pbar: typing.Optional[typing.Any] = None,
         request_options: typing.Optional[RequestOptions] = None,
-        private_upload_expiries: typing.Optional[typing.List[float]] = None,
+        upload_expiries: typing.Optional[typing.List[float]] = None,
     ) -> typing.Tuple[typing.List[IngestRemoteDocument], float]:
         remote_docs: typing.List[IngestRemoteDocument] = []
         for d in local_docs:
@@ -976,7 +987,7 @@ class GroundX(GroundXBase):
                     bucket_id=d.bucket_id,
                     file_access=d.file_access,
                     request_options=request_options,
-                    private_upload_expiries=private_upload_expiries,
+                    upload_expiries=upload_expiries,
                 )
 
                 ft = d.file_type
@@ -1053,7 +1064,7 @@ class GroundX(GroundXBase):
         self,
         bucket_id: int,
         batch: typing.List[Path],
-        upload_api: str,
+        upload_api: typing.Optional[str],
         callback_url: typing.Optional[str],
         callback_data: typing.Optional[str],
         request_options: typing.Optional[RequestOptions],
@@ -1061,7 +1072,7 @@ class GroundX(GroundXBase):
         file_access: typing.Optional[FileAccessPolicy] = None,
     ) -> None:
         docs: typing.List[Document] = []
-        private_upload_expiries: typing.List[float] = []
+        upload_expiries: typing.List[float] = []
 
         progress = float(len(batch))
         for file in batch:
@@ -1071,7 +1082,7 @@ class GroundX(GroundXBase):
                 bucket_id=bucket_id,
                 file_access=file_access,
                 request_options=request_options,
-                private_upload_expiries=private_upload_expiries,
+                upload_expiries=upload_expiries,
             )
             if file.suffix.lower() in SUFFIX_ALIASES:
                 docs.append(
@@ -1096,7 +1107,7 @@ class GroundX(GroundXBase):
             progress -= 0.25
 
         if docs:
-            _assert_private_uploads_fresh(private_upload_expiries)
+            _assert_uploads_fresh(upload_expiries)
             ingest = self.ingest(
                 documents=docs,
                 callback_data=callback_data,
@@ -1386,7 +1397,7 @@ class AsyncGroundX(AsyncGroundXBase):
         self,
         *,
         documents: typing.Sequence[Document],
-        upload_api: str = "https://api.eyelevel.ai/upload/file",
+        upload_api: typing.Optional[str] = None,
         callback_url: typing.Optional[str] = None,
         callback_data: typing.Optional[str] = None,
         override_batch_size: typing.Optional[bool] = False,
@@ -1399,8 +1410,8 @@ class AsyncGroundX(AsyncGroundXBase):
         ----------
         documents : typing.Sequence[Document]
 
-        # an endpoint that accepts 'name' and 'type' query params
-        # and returns a presigned URL in a JSON dictionary with key 'URL'
+        # optional legacy endpoint; default uses the configured GroundX API
+        # legacy endpoints accept 'name' and 'type' and return a JSON 'URL'
         upload_api : typing.Optional[str]
 
         # an endpoint that will receive processing event updates as POST
@@ -1443,7 +1454,7 @@ class AsyncGroundX(AsyncGroundXBase):
         asyncio.run(main())
         """
         remote_documents, local_documents = prep_documents(documents)
-        private_upload_expiries: typing.List[float] = []
+        upload_expiries: typing.List[float] = []
 
         max_n = MAX_BATCH_SIZE
         if override_batch_size:
@@ -1465,7 +1476,7 @@ class AsyncGroundX(AsyncGroundXBase):
                     bucket_id=d.bucket_id,
                     file_access=d.file_access,
                     request_options=request_options,
-                    private_upload_expiries=private_upload_expiries,
+                    upload_expiries=upload_expiries,
                 )
 
                 ft = d.file_type
@@ -1489,7 +1500,7 @@ class AsyncGroundX(AsyncGroundXBase):
                     )
                 )
 
-        _assert_private_uploads_fresh(private_upload_expiries)
+        _assert_uploads_fresh(upload_expiries)
         return await self.documents.ingest_remote(
             documents=remote_documents,
             callback_url=callback_url,
@@ -1499,29 +1510,31 @@ class AsyncGroundX(AsyncGroundXBase):
 
     async def _upload_file(
         self,
-        endpoint: str,
+        endpoint: typing.Optional[str],
         file_path: Path,
         *,
         bucket_id: typing.Optional[int] = None,
         file_access: typing.Optional[FileAccessPolicy] = None,
         request_options: typing.Optional[RequestOptions] = None,
-        private_upload_expiries: typing.Optional[typing.List[float]] = None,
+        upload_expiries: typing.Optional[typing.List[float]] = None,
     ) -> str:
         file_name = os.path.basename(file_path)
         file_extension = os.path.splitext(file_name)[1][1:].lower()
         if f".{file_extension}" in SUFFIX_ALIASES:
             file_extension = SUFFIX_ALIASES[f".{file_extension}"]
 
-        if bucket_id is not None and _needs_private_upload(
-            await self.buckets.get(bucket_id, request_options=request_options), file_access
-        ):
+        if endpoint is None:
+            if bucket_id is None:
+                raise ValueError("A bucket ID is required to upload through GroundX")
             grant = await self.buckets.file_upload(
                 bucket_id, file_name=file_name, file_type=file_extension, request_options=request_options
             )
-            if private_upload_expiries is not None:
-                private_upload_expiries.append(grant.expires_at.timestamp())
-            presigned_info = _private_upload_info(grant)
+            if upload_expiries is not None:
+                upload_expiries.append(grant.expires_at.timestamp())
+            presigned_info = _upload_info(grant)
         else:
+            if bucket_id is not None:
+                _check_legacy_upload(await self.buckets.get(bucket_id, request_options=request_options), file_access)
             presigned_info = get_presigned_url(endpoint, file_name, file_extension)
 
         upload_url = presigned_info["URL"]

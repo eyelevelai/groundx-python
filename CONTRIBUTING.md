@@ -163,15 +163,16 @@ file in that call. Omitted/null inherits; creating resources requires no prior
 revision. Later settings changes use the current revision and cannot weaken an
 ancestor's protection or share lifetime.
 
-The preserved sync/async helpers inspect destination policy before local upload.
-Inherited or requested protection selects `buckets.file_upload`, exact native PUT
-and returned `hosted_url`. Public/unconfigured destinations retain the legacy broker.
-A lookup or private-reservation failure must never select the public broker. Native
-requests receive only returned storage headers, without GroundX credentials.
-Keep private reservation expiry local to each batch and check it before ingest
-submission, including CSV splits, monitored batches and directory ingest. Expired
-batches fail with a smaller-batch retry instruction; do not renew or partially
-submit them automatically.
+The preserved sync/async helpers use `buckets.file_upload` for every local file,
+public or protected, through the configured GroundX API. Do not read bucket
+policy to choose a signer or fall back to a hosted broker. An explicit
+`upload_api` retains the legacy broker protocol for public destinations after a
+bucket policy read. Reject overrides for inherited or requested protection.
+Native requests receive only returned storage headers, without GroundX
+credentials. Keep upload expiry local to each batch and check it before ingest
+submission, including CSV splits, monitored batches and directory ingest.
+Expired batches fail with a smaller-batch retry instruction; do not renew or
+partially submit them automatically.
 
 Stable protected URLs need current authentication; they do not expire by age.
 Generated `documents.file_link` returns a finite bearer grant that can be forwarded

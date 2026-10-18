@@ -217,16 +217,20 @@ client.ingest(documents=[Document(
 ```
 
 Initial policies are optional; omitted/null inherits account/bucket settings.
-The sync and async ingest helpers check the destination before local upload.
-Protected files use bucket-owned private reservations; public destinations retain
-the existing broker. This adds a policy read per local file. A failed lookup or
-private upload does not fall back to public storage. Directory ingest accepts
-`file_access` for every file in that call.
+The sync and async ingest helpers request upload URLs from the configured
+GroundX API for every local file, public or protected. On-prem uploads use that
+installation's storage and do not contact the hosted upload service. A failed
+upload request stops ingestion without a public fallback. Directory ingest
+accepts `file_access` for every file in that call.
 
-Private reservations last at most fifteen minutes. The helpers reject the current
-batch before ingest submission if any reservation has expired. Retry with fewer
+Upload grants last at most fifteen minutes. The helpers reject the current
+batch before ingest submission if any grant has expired. Retry with fewer
 files per call or a smaller monitored/directory `batch_size`. Files are not
 automatically reuploaded, and a successful check does not extend the deadline.
+
+Deploy the bucket upload endpoint before adopting these helpers. Existing
+integrations can explicitly set `upload_api` to keep the legacy broker protocol
+for public files. An override is rejected for inherited or requested protection.
 
 Later policy changes require the current revision. Stable protected URLs need
 current API authentication and have no age-based expiry. `documents.file_link`
