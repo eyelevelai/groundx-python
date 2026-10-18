@@ -88,7 +88,7 @@ class BucketsClient:
         name : str
 
         file_access : typing.Optional[FileAccessPolicy]
-            Initial override for this new resource. Omitted or null inherits. No fileAccessRevision is required on creation. Protected ancestors cannot be reopened or their share lifetime exceeded. Choose private staging before uploading bytes for a protected file, including in a public bucket.
+            Initial override for this new resource. Policy-bearing creation returns 403 when file access is disabled. Omitted or null inherits. No fileAccessRevision is required on creation. Protected ancestors cannot be reopened or their share lifetime exceeded. Choose private staging before uploading bytes for a protected file, including in a public bucket.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -157,7 +157,7 @@ class BucketsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> BucketUpdateResponse:
         """
-        Rename a bucket.
+        Rename a bucket or replace its file-access policy. Policy-bearing updates return 403 when file access is disabled; enabled temporary failures return 503 with Retry-After.
 
         Parameters
         ----------
@@ -240,7 +240,7 @@ class BucketsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> FileUploadResponse:
         """
-        Reserve a private bucket-owned source before issuing a native PUT grant, lasting at most 900 seconds. Use hostedUrl with the existing ingest operation.
+        Reserve a private bucket-owned source before issuing a native PUT grant, lasting at most 900 seconds. Use hostedUrl with the existing ingest operation. Returns 404 when file access is disabled; enabled temporary failures return 503 with Retry-After.
 
         Parameters
         ----------
@@ -356,7 +356,7 @@ class AsyncBucketsClient:
         name : str
 
         file_access : typing.Optional[FileAccessPolicy]
-            Initial override for this new resource. Omitted or null inherits. No fileAccessRevision is required on creation. Protected ancestors cannot be reopened or their share lifetime exceeded. Choose private staging before uploading bytes for a protected file, including in a public bucket.
+            Initial override for this new resource. Policy-bearing creation returns 403 when file access is disabled. Omitted or null inherits. No fileAccessRevision is required on creation. Protected ancestors cannot be reopened or their share lifetime exceeded. Choose private staging before uploading bytes for a protected file, including in a public bucket.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -441,7 +441,7 @@ class AsyncBucketsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> BucketUpdateResponse:
         """
-        Rename a bucket.
+        Rename a bucket or replace its file-access policy. Policy-bearing updates return 403 when file access is disabled; enabled temporary failures return 503 with Retry-After.
 
         Parameters
         ----------
@@ -542,7 +542,7 @@ class AsyncBucketsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> FileUploadResponse:
         """
-        Reserve a private bucket-owned source before issuing a native PUT grant, lasting at most 900 seconds. Use hostedUrl with the existing ingest operation.
+        Reserve a private bucket-owned source before issuing a native PUT grant, lasting at most 900 seconds. Use hostedUrl with the existing ingest operation. Returns 404 when file access is disabled; enabled temporary failures return 503 with Retry-After.
 
         Parameters
         ----------

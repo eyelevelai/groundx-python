@@ -78,3 +78,7 @@ provider-size HEAD probe is in `internal-arcadia-agents/classes/image_evidence.p
 Those consumers require separate owner changes; an SDK helper cannot establish
 their adoption. This patch does not change extraction values, prompt policy,
 route placement, stored X-Ray or final JSON.
+
+## Generated policy error dispatch
+
+Fern declares the reachable policy errors on existing bucket/document updates and initial-policy operations. Regenerate only the affected clients with the pinned Python generator, preserving handwritten helpers, package version exports and the existing 4.0.9 HTTP headers. Extend the recording HTTP tests to exercise status-specific exceptions in sync and async dispatch while retaining explicit null/revision bodies. Existing full test, aiohttp, extraction replay, mypy, build and LF checks remain required. No extraction runtime, prompts, schemas or routing change, so Arcadia legacy, Arcadia v1, generic v1 and ADP v1 are unaffected. Package publication remains human-owned.

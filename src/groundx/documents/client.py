@@ -322,6 +322,8 @@ class DocumentsClient:
     ) -> IngestResponse:
         """
         Update the attributes of documents that have been uploaded to GroundX.
+        Policy-bearing updates return 403 when file access is disabled; enabled
+        temporary failures return 503 with Retry-After.
 
         Parameters
         ----------
@@ -748,7 +750,7 @@ class DocumentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> FileLinkResponse:
         """
-        Issue a native storage GET link for a saved owned asset. The bearer can reuse or forward it until expiresAt. Key revocation and policy changes do not revoke existing native grants. No GroundX key is carried in the URL.
+        Issue a native storage GET link for a saved owned asset. Returns 404 when file access is disabled; enabled temporary failures return 503 with Retry-After. The bearer can reuse or forward it until expiresAt. Key revocation and policy changes do not revoke existing native grants. No GroundX key is carried in the URL.
 
         Parameters
         ----------
@@ -1127,6 +1129,8 @@ class AsyncDocumentsClient:
     ) -> IngestResponse:
         """
         Update the attributes of documents that have been uploaded to GroundX.
+        Policy-bearing updates return 403 when file access is disabled; enabled
+        temporary failures return 503 with Retry-After.
 
         Parameters
         ----------
@@ -1645,7 +1649,7 @@ class AsyncDocumentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> FileLinkResponse:
         """
-        Issue a native storage GET link for a saved owned asset. The bearer can reuse or forward it until expiresAt. Key revocation and policy changes do not revoke existing native grants. No GroundX key is carried in the URL.
+        Issue a native storage GET link for a saved owned asset. Returns 404 when file access is disabled; enabled temporary failures return 503 with Retry-After. The bearer can reuse or forward it until expiresAt. Key revocation and policy changes do not revoke existing native grants. No GroundX key is carried in the URL.
 
         Parameters
         ----------

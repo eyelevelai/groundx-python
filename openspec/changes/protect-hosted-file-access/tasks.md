@@ -142,3 +142,19 @@ Arcadia legacy,
 Arcadia v1, generic v1 and ADP v1 extraction execution paths are unaffected:
 only generated HTTP package metadata is restored, with authentication retained.
 These are local checks, not a package release or deployed result.
+
+## Policy error response parity
+
+- [x] Add sync/async recording-transport checks for the errors declared by Fern on updates and initial-policy operations; observe failures before regeneration.
+- [x] Regenerate affected clients through the pinned Fern path and retain release metadata and handwritten files.
+- [x] Run full SDK/aiohttp suites, protected replay, mypy, changed-file Ruff, build, LF and strict OpenSpec checks.
+
+Local generation root: `openspec/work/protect-hosted-file-access/response-errors`, owned by the SDK maintainer for local pinned SDK generation and validation. Expires 2026-10-19T00:00:00Z; close after reviewed generated clients are retained.
+
+Fern source `ef86e94b29706dac558cb9e2aedb37ffe41b3d33`, CLI `5.37.9` and Python generator `5.10.0` produce the retained bucket/document clients through local filesystem output. The clients match generator bytes; their runtime AST differs only in typed error branches. Existing package metadata, `__version__`, 4.0.9 request headers and handwritten fences remain byte-identical.
+
+Forty-six sync/async recording-transport cases verify typed errors, response bodies, Retry-After and unchanged null/revision bodies. They reproduce generic ApiError before regeneration while customer.update already raises the typed errors. The full SDK suite passes 756 tests with 2 existing skips, 100 subtests and 156 existing deprecation warnings. Aiohttp passes all 3 tests, the protected compact replay passes, and the 4.0.9 wheel/sdist build passes. These are local synthetic checks; no API requests, publication or live acceptance occurs.
+
+Local closeout receipt: `protect-hosted-file-access/response-errors` closed at 2026-10-18T04:55:18.342075+00:00. Removed the exact registered generation/test root and its generator-owned temporary logs, 572 files and 3937402 bytes. Absence verified. The bounded lifecycle summary remains under ignored `openspec/runs`, SHA-256 `fdfbe68a8b8cc4b069d5fdb857073d1c0c9a56b37bb0e633726ffb6d87290bb4`. Reviewed generated clients remain with their SDK owners.
+
+Final exact `poetry run mypy .` after run closeout passes all 283 source files. Changed-test Ruff lint/format, LF, strict OpenSpec and diff checks pass.

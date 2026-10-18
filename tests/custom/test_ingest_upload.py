@@ -376,3 +376,87 @@ def test_monitored_batch_rejects_private_expiry_before_submission(monkeypatch, t
                     batch_size=30,
                 )
     assert submissions == []
+
+
+@pytest.mark.parametrize("asynchronous", [False, True])
+@pytest.mark.parametrize(
+    "operation,status",
+    [
+        (operation, status)
+        for operation, statuses in (
+            ("customer.update", (403, 404, 409, 503)),
+            ("buckets.update", (403, 404, 409, 503)),
+            ("documents.update", (403, 404, 409, 503)),
+            ("buckets.create", (403, 404, 503)),
+            ("documents.ingest_remote", (403, 503)),
+            ("documents.ingest_local", (403, 404, 409, 503)),
+            ("documents.crawl_website", (403, 503)),
+        )
+        for status in statuses
+    ],
+)
+def test_policy_operations_raise_typed_errors(asynchronous, operation, status):
+    import asyncio
+    import json
+
+    import httpx
+
+    from groundx import AsyncGroundX
+    from groundx.errors import ConflictError, ForbiddenError, NotFoundError, ServiceUnavailableError
+
+    errors = {403: ForbiddenError, 404: NotFoundError, 409: ConflictError, 503: ServiceUnavailableError}
+    requests = []
+    body = {"message": "policy request rejected"}
+
+    def handle(request):
+        requests.append(request)
+        return httpx.Response(status, json=body, headers={"Retry-After": "1"})
+
+    kwargs = {"request_options": {"max_retries": 0}}
+    group, method = operation.split(".")
+    args = []
+    if method == "update":
+        if group == "documents":
+            kwargs["documents"] = [{"documentId": "document", "fileAccess": None, "fileAccessRevision": 7}]
+        else:
+            kwargs.update(file_access=None, file_access_revision=7)
+            if group == "buckets":
+                args = [7]
+    elif method == "create":
+        kwargs.update(name="private", file_access={"mode": "protected"})
+    elif method == "ingest_local":
+        kwargs["request"] = [
+            {"blob": "test", "metadata": {"bucketId": 7, "fileName": "a.pdf", "fileAccess": {"mode": "protected"}}}
+        ]
+    elif method == "crawl_website":
+        kwargs["websites"] = [{"bucketId": 7, "sourceUrl": "https://source.test", "fileAccess": {"mode": "protected"}}]
+    else:
+        kwargs["documents"] = [
+            {
+                "bucketId": 7,
+                "sourceUrl": "https://source.test/a.pdf",
+                "fileName": "a.pdf",
+                "fileAccess": {"mode": "protected"},
+            }
+        ]
+
+    async def run():
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handle)) as transport:
+            client = AsyncGroundX(api_key="test", base_url="https://api.test", httpx_client=transport)
+            await getattr(getattr(client, group), method)(*args, **kwargs)
+
+    with pytest.raises(errors[status]) as error:
+        if asynchronous:
+            asyncio.run(run())
+        else:
+            with httpx.Client(transport=httpx.MockTransport(handle)) as transport:
+                client = GroundX(api_key="test", base_url="https://api.test", httpx_client=transport)
+                getattr(getattr(client, group), method)(*args, **kwargs)
+    assert error.value.status_code == status
+    assert error.value.body == body
+    assert error.value.headers["retry-after"] == "1"
+    assert len(requests) == 1
+    if method == "update":
+        sent = json.loads(requests[0].content)
+        assert (sent["documents"][0] if group == "documents" else sent)["fileAccess"] is None
+        assert (sent["documents"][0] if group == "documents" else sent)["fileAccessRevision"] == 7
