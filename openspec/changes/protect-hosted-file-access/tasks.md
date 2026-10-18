@@ -30,8 +30,9 @@ adoption.
 
 ## Release
 
-- [ ] Human SDK release owner publishes the merged hand-written change through
-      the established Fern release path.
+- [x] Publish the merged hand-written change through the established release
+      path. [Version 4.1.1](https://github.com/eyelevelai/groundx-python/releases/tag/4.1.1)
+      is published on PyPI and includes the unified upload helpers.
 - [ ] GroundX on-prem extraction image adopts the compatible SDK version and
       passes live private-storage and CA verification before activation.
 
