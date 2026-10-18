@@ -224,3 +224,20 @@ Local generation root: `openspec/work/protect-hosted-file-access/unified-upload-
 Full-project generation from Fern `3eb8ca6349dd814a8c36706e3292481b9b8a004d` retains two Python bucket clients and the TypeScript upload request and bucket client. All four files match generator output byte-for-byte. Only the four Python `file_upload` method bodies change at runtime; the TypeScript bucket client has description changes only. Python package exports/headers and TypeScript package headers match full-project output with their existing package versions. Direct typed upload calls preserve omitted, null and protected policies. No publication occurs.
 
 Local closeout receipt: `protect-hosted-file-access/unified-upload-regeneration`, closed 2026-10-18T18:37:04.292789+00:00. State: accepted. Removed the exact registered run root, 640 files and 230753541 bytes; absence verified. Reviewed generated files remain in their owning SDK repos. The bounded local summary is `openspec/runs/protect-hosted-file-access/unified-upload-regeneration.json`, SHA-256 `1f2bcd1e1b379be7028ec23910f9eeb7c408642e9ffe522a247c78e97b27b8d5`. No local run root remains.
+
+## Upload policy response metadata
+
+The upload response optionally includes the existing effective-policy model used
+for issuance. Public PUT expiry is not a private ingest deadline. Preserve older
+responses without this metadata. No helper transport, request shape, package
+version or generator setting changes are required.
+
+Local generation root: `openspec/work/protect-hosted-file-access/upload-policy-response-regeneration`, owned by the SDK maintainer for offline full-project generation from Fern `1c650cd802aa2185e57c87fae85986cb24977de4`. Expires 2026-10-20T00:00:00Z. Retain only affected generated response models, verify existing package identity, close the exact root with a bounded receipt.
+
+- [x] Generate the additive upload response model for Python and TypeScript from canonical Fern.
+- [x] Extend existing transport cases for public/protected metadata and omitted legacy metadata.
+- [x] Run SDK suites, type/build checks, verify exact generator bytes and close owned artifacts.
+
+Validation: the two response models match full-project generator output byte-for-byte. Python retains 90 focused upload cases and passes 775 tests with 2 existing skips, 100 subtests and 156 existing warnings. Mypy passes 283 files. TypeScript passes 44 custom cases and 488 tests overall, both builds, ESM rename and the explicit custom-test typecheck. Existing package versions, Python exports/headers and TypeScript headers match generator output. No client or wrapper changes are required.
+
+Local closeout receipt: `protect-hosted-file-access/upload-policy-response-regeneration`, closed 2026-10-18T19:11:11.970284+00:00. State: accepted. Removed the exact registered run root, 451 files and 229876321 bytes; absence verified. Reviewed response models remain in their owning SDK repos. The bounded local summary is `openspec/runs/protect-hosted-file-access/upload-policy-response-regeneration.json`, SHA-256 `f5a65eb8ca5dc53f5dac6fc5f43628fc781494297ed70b25beb1fd99d4e67645`. No local run root remains.

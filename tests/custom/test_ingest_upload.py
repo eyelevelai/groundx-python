@@ -192,6 +192,14 @@ def test_direct_upload_operation_accepts_typed_initial_policy(asynchronous, poli
 
     from groundx import AsyncGroundX, FileAccessPolicy
 
+    effective = (
+        None
+        if policy == "omitted"
+        else {"mode": "public", "urlTtlSeconds": 300}
+        if policy is None
+        else {"mode": "protected", "urlTtlSeconds": 120}
+    )
+
     def handle(request):
         assert request.method == "POST"
         assert request.url == "https://onprem.test/v1/bucket/7/file-upload"
@@ -209,6 +217,7 @@ def test_direct_upload_operation_accepts_typed_initial_policy(asynchronous, poli
                 "expiresAt": "2099-01-01T00:00:00Z",
                 "method": "PUT",
                 "headers": {},
+                **({"effectiveFileAccess": effective} if effective is not None else {}),
             },
         )
 
@@ -230,6 +239,7 @@ def test_direct_upload_operation_accepts_typed_initial_policy(asynchronous, poli
                 api_key="test", base_url="https://onprem.test", httpx_client=transport
             ).buckets.file_upload(7, **kwargs)
     assert result.hosted_url == "https://files.test/source"
+    assert (result.effective_file_access.dict(by_alias=True) if result.effective_file_access else None) == effective
 
 
 def test_remote_document_policy_survives_preparation():

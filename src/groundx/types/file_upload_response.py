@@ -7,9 +7,18 @@ import pydantic
 import typing_extensions
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 from ..core.serialization import FieldMetadata
+from .effective_policy import EffectivePolicy
 
 
 class FileUploadResponse(UniversalBaseModel):
+    effective_file_access: typing_extensions.Annotated[
+        typing.Optional[EffectivePolicy],
+        FieldMetadata(alias="effectiveFileAccess"),
+        pydantic.Field(
+            alias="effectiveFileAccess",
+            description="Policy used when issuing this upload. Only protected uploads have a private ingest deadline. Missing policy metadata should retain existing protected-upload checks.",
+        ),
+    ] = None
     upload_id: typing_extensions.Annotated[str, FieldMetadata(alias="uploadId"), pydantic.Field(alias="uploadId")]
     upload_url: typing_extensions.Annotated[str, FieldMetadata(alias="uploadUrl"), pydantic.Field(alias="uploadUrl")]
     hosted_url: typing_extensions.Annotated[str, FieldMetadata(alias="hostedUrl"), pydantic.Field(alias="hostedUrl")]
