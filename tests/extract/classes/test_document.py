@@ -853,6 +853,116 @@ class TestDocument(unittest.TestCase):
 
 
 class TestDocumentRequest(unittest.TestCase):
+    def test_expired_image_grant_requires_fresh_presentation(self) -> None:
+        import json
+        from tempfile import TemporaryDirectory
+        from unittest.mock import Mock
+
+        import urllib3
+
+        from groundx.extract.classes.groundx import GroundXDocument
+
+        gateway = "https://files.test/xray.json?view=links"
+        old = "https://store.test/page.png?X-Amz-Signature=expired-secret"
+        fresh = "https://store.test/page.png?X-Amz-Signature=fresh-secret"
+        buffer = BytesIO()
+        Image.new("RGB", (2, 3), color="red").save(buffer, format="PNG")
+        responses = []
+        for url, status, body in (
+            (gateway, 200, json.dumps({"chunks": [], "sourceUrl": old}).encode()),
+            (old, 403, b"expired"),
+            (gateway, 200, json.dumps({"chunks": [], "sourceUrl": fresh}).encode()),
+            (fresh, 200, buffer.getvalue()),
+        ):
+            response = requests.Response()
+            response.status_code = status
+            response.url = url
+            response.raw = urllib3.HTTPResponse(body=BytesIO(body), preload_content=False)
+            responses.append(response)
+        upload = Mock()
+        auth: typing.Dict[str, typing.Any] = {
+            "api_key": "private-api-key",
+            "trusted_file_roots": ("https://files.test",),
+        }
+        with TemporaryDirectory() as directory, patch("requests.get", side_effect=responses) as get:
+            gx = GroundXDocument(base_url="https://legacy.test", document_id="D", task_id="T")
+            first = gx.xray(cache_dir=Path(directory), xray_url=gateway, upload=upload, **auth)
+            request = _make_request()
+            with self.assertRaises(RuntimeError):
+                request.load_images([first.sourceUrl], upload=upload, **auth)
+            refreshed = gx.xray(cache_dir=Path(directory), xray_url=gateway, upload=upload, **auth)
+            images = request.load_images([refreshed.sourceUrl], upload=upload, **auth)
+            self.assertEqual([image.size for image in images], [(2, 3)])
+            self.assertEqual([call.args[0] for call in get.call_args_list], [gateway, old, gateway, fresh])
+            self.assertEqual(get.call_args_list[1].kwargs["headers"], {})
+            self.assertEqual(get.call_args_list[3].kwargs["headers"], {})
+            self.assertFalse((Path(directory) / "D-xray.json").exists())
+        upload.get_object.assert_not_called()
+
+    def test_native_image_grant_uses_exact_get_without_storage_or_head(self) -> None:
+        from unittest.mock import Mock
+
+        import urllib3
+
+        url = "https://files.test/page.png?X-Amz-Signature=native-secret&X-Amz-Credential=user%2Fscope"
+        buffer = BytesIO()
+        Image.new("RGB", (2, 3), color="red").save(buffer, format="PNG")
+        response = requests.Response()
+        response.status_code = 200
+        response.url = url
+        response.raw = urllib3.HTTPResponse(body=BytesIO(buffer.getvalue()), preload_content=False)
+        upload = Mock()
+        with (
+            patch("requests.get", return_value=response) as get,
+            patch("requests.head") as head,
+            patch("builtins.print") as log,
+        ):
+            try:
+                images = _make_request().load_images(
+                    [url],
+                    upload=upload,
+                    api_key="private-api-key",
+                    customer_key="customer-context",
+                    trusted_file_roots=("https://files.test",),
+                )
+            except TypeError as error:
+                self.fail(f"Page reader cannot consume protected or native links: {error}")
+        self.assertEqual([image.size for image in images], [(2, 3)])
+        self.assertEqual(get.call_args.args, (url,))
+        self.assertEqual(get.call_args.kwargs.get("headers"), {})
+        upload.get_object.assert_not_called()
+        head.assert_not_called()
+        self.assertNotIn("native-secret", repr(log.call_args_list))
+        self.assertNotIn("private-api-key", repr(log.call_args_list))
+        self.assertTrue(response.raw.closed)
+
+    def test_protected_image_uses_owner_headers_without_storage_shortcut(self) -> None:
+        from unittest.mock import Mock
+
+        import urllib3
+
+        url = "https://files.test/owned/page.png"
+        buffer = BytesIO()
+        Image.new("RGB", (2, 3), color="blue").save(buffer, format="PNG")
+        response = requests.Response()
+        response.status_code = 200
+        response.url = url
+        response.raw = urllib3.HTTPResponse(body=BytesIO(buffer.getvalue()), preload_content=False)
+        upload = Mock()
+        with patch("requests.get", return_value=response) as get:
+            try:
+                images = _make_request().load_images(
+                    [url],
+                    upload=upload,
+                    api_key="private-api-key",
+                    trusted_file_roots=("https://files.test/owned",),
+                )
+            except TypeError as error:
+                self.fail(f"Page reader cannot consume protected links: {error}")
+        self.assertEqual([image.size for image in images], [(2, 3)])
+        self.assertEqual(get.call_args.kwargs.get("headers"), {"X-API-Key": "private-api-key"})
+        upload.get_object.assert_not_called()
+
     def test_load_images_cached(self) -> None:
         urls: typing.List[str] = [
             "http://example.com/page1.png",

@@ -69,6 +69,7 @@ def test_extraction_workflow_helpers_have_method_level_docstrings() -> None:
 def test_base_groundx_import_does_not_import_extract_optional_dependencies() -> None:
     code = """
 import builtins
+from importlib.metadata import version
 
 optional_roots = {
     "boto3",
@@ -94,9 +95,11 @@ def guarded_import(name, globals=None, locals=None, fromlist=(), level=0):
 
 builtins.__import__ = guarded_import
 import groundx
-from groundx import AsyncGroundX, GroundX
+from groundx import AsyncGroundX, GroundX, __version__
 assert GroundX.__name__ == "GroundX"
 assert AsyncGroundX.__name__ == "AsyncGroundX"
+assert groundx.__version__ == __version__ == version("groundx")
+assert "__version__" in groundx.__all__
 """
     env = dict(os.environ)
     env["PYTHONPATH"] = os.pathsep.join(filter(None, ["src", env.get("PYTHONPATH", "")]))

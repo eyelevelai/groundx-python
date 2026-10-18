@@ -145,3 +145,49 @@ If you have questions or run into issues:
 ## License
 
 By contributing to this project, you agree that your contributions will be licensed under the same license as the project.
+
+## File access and ingest
+
+Fern owns policy models and generated customer/bucket/document methods. Regenerate
+them upstream; preserve `ingest.py` and extract helpers through `.fernignore`.
+Local regeneration must request a full project with Fern's configured `groundx`
+package name and the repository's existing version. Source-only downloads omit
+package identity headers and the public `__version__` export.
+Installed usage examples belong to the Studio Harness API/MCP references, while
+Fern owns the human API guide. Keep examples aligned with actual generated methods
+and state the released SDK version separately from branch support.
+
+`Document.file_access` carries an optional initial override into remote ingest and
+each local/split document. `ingest_directory(file_access=...)` applies it to every
+file in that call. Omitted/null inherits; creating resources requires no prior
+revision. Later settings changes use the current revision and cannot weaken an
+ancestor's protection or share lifetime.
+
+The preserved sync/async helpers use `buckets.file_upload` for every local file,
+public or protected, through the configured GroundX API. Forward each document's
+initial policy as the canonical optional `fileAccess` upload hint so the server
+can reject unavailable protection before bytes. Use the generated `file_access`
+argument directly. Preserve caller request options, removing only conflicting
+`fileAccess` additions from the upload request so they cannot replace the
+document's policy. Do not read bucket
+policy to choose a signer or fall back to a hosted broker. An explicit
+`upload_api` retains the legacy broker protocol for public destinations after a
+bucket policy read. Reject overrides for inherited or requested protection.
+Native requests receive only returned storage headers, without GroundX
+credentials. Check the grant before each PUT, including retries. Do not treat PUT
+expiry as public-file expiry or impose a batch submission deadline on public
+files. Existing server ingest admission enforces protected reservation deadlines;
+preserve its status and body. Do not add policy discovery, client renewal or
+automatic splitting to infer reservation state.
+
+Stable protected URLs need current authentication; they do not expire by age.
+Generated `documents.file_link` returns a finite bearer grant that can be forwarded
+until expiry. Reissue expired links; policy/key changes do not revoke prior native
+grants. Raw X-Ray links cover only the JSON object. Preserve exact raw bytes for
+certification; use the authenticated `?view=links` presentation for browser/QC assets.
+
+Extend `tests/custom/test_ingest_upload.py` with real generated HTTP transport for
+helper changes and retain existing extraction transport/replay tests. Validate
+sync/async, public/private, initial overrides, split propagation and native header
+separation. Runtime enablement, image adoption, vendor acceptance and human-owned
+SDK publication remain separate gates.

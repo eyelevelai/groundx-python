@@ -13,7 +13,7 @@ from ..custom_outputs import (
     custom_output_section_identity,
 )
 from ..prompt.manager import PromptManager
-from ..services.http import BoundedRequestTimeout, bounded_get
+from ..services.http import BoundedRequestTimeout, bounded_file_get, is_native_signed_url, redacted_file_url
 from ..services.logger import Logger
 from ..services.upload import (
     OBJECT_STORE_CONNECT_TIMEOUT_SECONDS,
@@ -957,18 +957,26 @@ class DocumentRequest(BaseModel):
         upload: typing.Optional[Upload] = None,
         attempt: int = 0,
         should_sleep: bool = True,
+        *,
+        api_key: typing.Optional[str] = None,
+        customer_key: typing.Optional[str] = None,
+        trusted_file_roots: typing.Sequence[str] = (),
     ) -> typing.List[Image.Image]:
+        if customer_key and not api_key:
+            raise ValueError("customer_key requires api_key")
         pageImages: typing.List[Image.Image] = []
         for page in imgs:
+            safe_page = redacted_file_url(page)
+            protected_transport = bool(api_key or customer_key or trusted_file_roots or is_native_signed_url(page))
             if page in self.page_image_dict:
                 self.print(
                     "WARN",
-                    f"[{attempt}] loading cached [{self.page_image_dict[page]}] [{page}]",
+                    f"[{attempt}] loading cached [{self.page_image_dict[page]}] [{safe_page}]",
                 )
                 pageImages.append(self.page_images[self.page_image_dict[page]])
                 continue
 
-            if upload:
+            if upload and not protected_transport:
                 parsed = urlparse(page)
                 path = parsed.path + ("?" + parsed.query if parsed.query else "")
                 ru = upload.get_object(
@@ -986,11 +994,14 @@ class DocumentRequest(BaseModel):
                         continue
 
             try:
-                self.print("WARN", f"[{attempt}] downloading [{page}]")
-                resp = bounded_get(
+                self.print("WARN", f"[{attempt}] downloading [{safe_page}]")
+                resp = bounded_file_get(
                     page,
                     operation="page image",
                     sleep_between_attempts=should_sleep,
+                    api_key=api_key,
+                    customer_key=customer_key,
+                    trusted_file_roots=trusted_file_roots,
                 )
                 resp.raise_for_status()
                 img = Image.open(BytesIO(resp.content))
@@ -999,10 +1010,14 @@ class DocumentRequest(BaseModel):
                     self.page_images.append(img)
                     pageImages.append(img)
             except BoundedRequestTimeout as e:
-                self.print("ERROR", f"[{attempt}] Failed to load image from {page}: {e}")
+                self.print("ERROR", f"[{attempt}] Failed to load image from {safe_page}: {e}")
                 raise RuntimeError(str(e)) from e
             except Exception as e:
-                self.print("ERROR", f"[{attempt}] Failed to load image from {page}: {e}")
+                if protected_transport:
+                    if isinstance(e, ValueError):
+                        raise
+                    raise RuntimeError(f"Failed to load image from {safe_page}") from None
+                self.print("ERROR", f"[{attempt}] Failed to load image from {safe_page}: {e}")
 
         return pageImages
 
