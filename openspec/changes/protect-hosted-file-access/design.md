@@ -28,14 +28,14 @@ public buckets and installations without file protection. The helper does not
 read bucket policy to select a signer or fall back to hosted infrastructure.
 An explicit `upload_api` (Python) or `uploadApi` (TypeScript) selects the existing
 legacy broker protocol for public integrations after an explicit policy read.
-Inherited or requested protection rejects an override before any bytes are sent. Default calls retain
-upload expiry only in the current batch's helper state. Sync, async, CSV-split, monitored and directory uploads check those
-deadlines before the existing ingest submission. An expired batch raises a clear
-error directing the caller to retry with fewer files or a smaller batch size.
-This prevents knowingly submitting an unbound expired source. It does not extend
-the fifteen-minute reservation, renew uploads, create extra ingest requests or
-change policies, callbacks or process identifiers. The optional upload endpoint
-now defaults to the configured API rather than the hosted legacy broker.
+Inherited or requested protection rejects an override before any bytes are sent.
+
+Upload expiry limits the native PUT, not the age of an already uploaded public
+source. Validate it before PUT, including retries. Do not reject an entire batch
+because an earlier successful PUT grant expired before submission. Existing
+server ingest admission enforces the binding deadline for protected reservations
+and its error reaches the caller unchanged. There is no client policy lookup,
+extra response field, renewal, automatic splitting or extra ingest request.
 
 Custom changes stay in `.fernignore`-protected helpers, tests, docs and plans. The protected fixture pack replay covers the current
 promoted cases; storage changes do not change extraction placement, candidate
@@ -93,7 +93,14 @@ Fern declares the reachable policy errors on existing bucket/document updates an
 Python `ingest.py` and TypeScript `Wrapper.ts` remain handwritten, protected by
 `.fernignore`. Both call the existing generated bucket upload operation for all
 ordinary local files, preserving API base URLs, delegated headers and request
-options. Native PUT uses only returned storage headers and exact signed URLs.
+options. Native PUT uses only returned storage headers and exact signed URLs. Initial
+per-file policy accompanies upload issuance as the canonical optional `fileAccess`
+hint, so unavailable protection and ancestor weakening fail before source bytes.
+Python uses the generated request options' documented additional-body mechanism;
+TypeScript passes a structurally compatible request object. Existing generated
+method signatures gain the typed hint through ordinary Fern regeneration, not
+hand edits. Preserve other per-call body options and do not let them override the
+current document's upload hint.
 Explicit legacy endpoint overrides retain their wire format and metadata
 handling without policy discovery. Remote documents and initial policies remain
 unchanged. Hosted and on-prem use the same client path; storage selection stays
@@ -101,7 +108,9 @@ behind the backend object-store interface. No cloud SDK is added to clients.
 
 Extend the existing upload transport tests for public and protected local API
 URLs, failed issuance without fallback, explicit legacy overrides, sync/async,
-CSV splits, directory batches, expiry, callbacks and credential separation.
+CSV splits, directory batches, finite PUT lifetime, public submission after a
+successful PUT expires, authoritative server admission errors, callbacks and
+credential separation.
 Keep extraction fixture, generated HTTP and protocol tests in their existing
 responsibility files. TypeScript has no owned OpenSpec tree; its wrapper and
 existing custom tests are covered by this cross-SDK plan.

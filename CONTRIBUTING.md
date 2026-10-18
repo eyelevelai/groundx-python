@@ -164,15 +164,21 @@ revision. Later settings changes use the current revision and cannot weaken an
 ancestor's protection or share lifetime.
 
 The preserved sync/async helpers use `buckets.file_upload` for every local file,
-public or protected, through the configured GroundX API. Do not read bucket
+public or protected, through the configured GroundX API. Forward each document's
+initial policy as the canonical optional `fileAccess` upload hint so the server
+can reject unavailable protection before bytes. The preserved helper uses
+generated request options' additional body parameters, retaining other options
+and keeping each document's policy authoritative. Direct generated method typing
+for the hint follows normal Fern regeneration. Do not read bucket
 policy to choose a signer or fall back to a hosted broker. An explicit
 `upload_api` retains the legacy broker protocol for public destinations after a
 bucket policy read. Reject overrides for inherited or requested protection.
 Native requests receive only returned storage headers, without GroundX
-credentials. Keep upload expiry local to each batch and check it before ingest
-submission, including CSV splits, monitored batches and directory ingest.
-Expired batches fail with a smaller-batch retry instruction; do not renew or
-partially submit them automatically.
+credentials. Check the grant before each PUT, including retries. Do not treat PUT
+expiry as public-file expiry or impose a batch submission deadline on public
+files. Existing server ingest admission enforces protected reservation deadlines;
+preserve its status and body. Do not add policy discovery, client renewal or
+automatic splitting to infer reservation state.
 
 Stable protected URLs need current authentication; they do not expire by age.
 Generated `documents.file_link` returns a finite bearer grant that can be forwarded

@@ -207,8 +207,11 @@ def _put_upload_file(
     upload_url: str,
     file_data: bytes,
     headers: typing.Dict[str, str],
+    expires_at: typing.Optional[float] = None,
 ) -> requests.Response:
     for attempt in range(UPLOAD_RETRY_ATTEMPTS):
+        if expires_at is not None and expires_at <= time.time():
+            raise ValueError("Upload grant has expired")
         try:
             return requests.put(
                 upload_url,
@@ -225,15 +228,22 @@ def _put_upload_file(
     raise RuntimeError("upload retry loop exited unexpectedly")
 
 
-def _assert_uploads_fresh(expiries: typing.Sequence[float]) -> None:
-    if any(expiry <= time.time() for expiry in expiries):
-        raise RuntimeError("Upload reservation expired before submission. Retry with a smaller batch.")
-
-
 def _check_legacy_upload(bucket: typing.Any, policy: typing.Optional[FileAccessPolicy]) -> None:
     effective = bucket.bucket.effective_file_access or bucket.bucket.file_access
     if (effective is not None and effective.mode == "protected") or (policy is not None and policy.mode == "protected"):
         raise ValueError("Protected uploads require the configured GroundX API, without an upload_api override")
+
+
+def _upload_request_options(
+    request_options: typing.Optional[RequestOptions], file_access: typing.Optional[FileAccessPolicy]
+) -> RequestOptions:
+    options: RequestOptions = {**(request_options or {})}
+    body = dict(options.get("additional_body_parameters") or {})
+    body.pop("fileAccess", None)
+    if file_access is not None:
+        body["fileAccess"] = file_access.dict(by_alias=True, exclude_none=True)
+    options["additional_body_parameters"] = body
+    return options
 
 
 def _upload_info(grant: typing.Any) -> typing.Dict[str, typing.Any]:
@@ -678,7 +688,6 @@ class GroundX(GroundXBase):
         )
         """
         remote_documents, local_documents = prep_documents(documents)
-        upload_expiries: typing.List[float] = []
 
         if len(remote_documents) + len(local_documents) == 0:
             raise ValueError("No valid documents were provided")
@@ -736,12 +745,10 @@ class GroundX(GroundXBase):
                     file_size = fp.stat().st_size
 
                     if (current_batch_size + file_size > MAX_BATCH_SIZE_BYTES) or (len(local_batch) >= n):
-                        upload_expiries.clear()
                         up_docs, progress = self._process_local(
-                            local_batch, upload_api, progress, pbar, request_options, upload_expiries
+                            local_batch, upload_api, progress, pbar, request_options
                         )
 
-                        _assert_uploads_fresh(upload_expiries)
                         ingest = self.documents.ingest_remote(
                             documents=up_docs,
                             callback_url=callback_url,
@@ -757,12 +764,8 @@ class GroundX(GroundXBase):
                     current_batch_size += file_size
 
                 if local_batch:
-                    upload_expiries.clear()
-                    up_docs, progress = self._process_local(
-                        local_batch, upload_api, progress, pbar, request_options, upload_expiries
-                    )
+                    up_docs, progress = self._process_local(local_batch, upload_api, progress, pbar, request_options)
 
-                    _assert_uploads_fresh(upload_expiries)
                     ingest = self.documents.ingest_remote(
                         documents=up_docs,
                         callback_data=callback_data,
@@ -778,10 +781,9 @@ class GroundX(GroundXBase):
         elif len(remote_documents) + len(local_documents) > max_n:
             raise ValueError("You have sent too many documents in this request")
 
-        up_docs, _ = self._process_local(local_documents, upload_api, 0, None, request_options, upload_expiries)
+        up_docs, _ = self._process_local(local_documents, upload_api, 0, None, request_options)
         remote_documents.extend(up_docs)
 
-        _assert_uploads_fresh(upload_expiries)
         return self.documents.ingest_remote(
             documents=remote_documents,
             callback_url=callback_url,
@@ -919,22 +921,24 @@ class GroundX(GroundXBase):
         bucket_id: typing.Optional[int] = None,
         file_access: typing.Optional[FileAccessPolicy] = None,
         request_options: typing.Optional[RequestOptions] = None,
-        upload_expiries: typing.Optional[typing.List[float]] = None,
     ) -> str:
         file_name = os.path.basename(file_path)
         file_extension = os.path.splitext(file_name)[1][1:].lower()
         if f".{file_extension}" in SUFFIX_ALIASES:
             file_extension = SUFFIX_ALIASES[f".{file_extension}"]
 
+        expires_at = None
         if endpoint is None:
             if bucket_id is None:
                 raise ValueError("A bucket ID is required to upload through GroundX")
             grant = self.buckets.file_upload(
-                bucket_id, file_name=file_name, file_type=file_extension, request_options=request_options
+                bucket_id,
+                file_name=file_name,
+                file_type=file_extension,
+                request_options=_upload_request_options(request_options, file_access),
             )
-            if upload_expiries is not None:
-                upload_expiries.append(grant.expires_at.timestamp())
             presigned_info = _upload_info(grant)
+            expires_at = grant.expires_at.timestamp()
         else:
             if bucket_id is not None:
                 _check_legacy_upload(self.buckets.get(bucket_id, request_options=request_options), file_access)
@@ -951,7 +955,7 @@ class GroundX(GroundXBase):
             raise ValueError(f"Error reading file {file_path}: {e}")
 
         if method == "PUT":
-            upload_response = _put_upload_file(upload_url, file_data, headers)
+            upload_response = _put_upload_file(upload_url, file_data, headers, expires_at)
         else:
             raise ValueError(f"Unsupported HTTP method: {method}")
 
@@ -974,7 +978,6 @@ class GroundX(GroundXBase):
         progress: float,
         pbar: typing.Optional[typing.Any] = None,
         request_options: typing.Optional[RequestOptions] = None,
-        upload_expiries: typing.Optional[typing.List[float]] = None,
     ) -> typing.Tuple[typing.List[IngestRemoteDocument], float]:
         remote_docs: typing.List[IngestRemoteDocument] = []
         for d in local_docs:
@@ -987,7 +990,6 @@ class GroundX(GroundXBase):
                     bucket_id=d.bucket_id,
                     file_access=d.file_access,
                     request_options=request_options,
-                    upload_expiries=upload_expiries,
                 )
 
                 ft = d.file_type
@@ -1072,7 +1074,6 @@ class GroundX(GroundXBase):
         file_access: typing.Optional[FileAccessPolicy] = None,
     ) -> None:
         docs: typing.List[Document] = []
-        upload_expiries: typing.List[float] = []
 
         progress = float(len(batch))
         for file in batch:
@@ -1082,7 +1083,6 @@ class GroundX(GroundXBase):
                 bucket_id=bucket_id,
                 file_access=file_access,
                 request_options=request_options,
-                upload_expiries=upload_expiries,
             )
             if file.suffix.lower() in SUFFIX_ALIASES:
                 docs.append(
@@ -1107,7 +1107,6 @@ class GroundX(GroundXBase):
             progress -= 0.25
 
         if docs:
-            _assert_uploads_fresh(upload_expiries)
             ingest = self.ingest(
                 documents=docs,
                 callback_data=callback_data,
@@ -1454,7 +1453,6 @@ class AsyncGroundX(AsyncGroundXBase):
         asyncio.run(main())
         """
         remote_documents, local_documents = prep_documents(documents)
-        upload_expiries: typing.List[float] = []
 
         max_n = MAX_BATCH_SIZE
         if override_batch_size:
@@ -1476,7 +1474,6 @@ class AsyncGroundX(AsyncGroundXBase):
                     bucket_id=d.bucket_id,
                     file_access=d.file_access,
                     request_options=request_options,
-                    upload_expiries=upload_expiries,
                 )
 
                 ft = d.file_type
@@ -1500,7 +1497,6 @@ class AsyncGroundX(AsyncGroundXBase):
                     )
                 )
 
-        _assert_uploads_fresh(upload_expiries)
         return await self.documents.ingest_remote(
             documents=remote_documents,
             callback_url=callback_url,
@@ -1516,22 +1512,24 @@ class AsyncGroundX(AsyncGroundXBase):
         bucket_id: typing.Optional[int] = None,
         file_access: typing.Optional[FileAccessPolicy] = None,
         request_options: typing.Optional[RequestOptions] = None,
-        upload_expiries: typing.Optional[typing.List[float]] = None,
     ) -> str:
         file_name = os.path.basename(file_path)
         file_extension = os.path.splitext(file_name)[1][1:].lower()
         if f".{file_extension}" in SUFFIX_ALIASES:
             file_extension = SUFFIX_ALIASES[f".{file_extension}"]
 
+        expires_at = None
         if endpoint is None:
             if bucket_id is None:
                 raise ValueError("A bucket ID is required to upload through GroundX")
             grant = await self.buckets.file_upload(
-                bucket_id, file_name=file_name, file_type=file_extension, request_options=request_options
+                bucket_id,
+                file_name=file_name,
+                file_type=file_extension,
+                request_options=_upload_request_options(request_options, file_access),
             )
-            if upload_expiries is not None:
-                upload_expiries.append(grant.expires_at.timestamp())
             presigned_info = _upload_info(grant)
+            expires_at = grant.expires_at.timestamp()
         else:
             if bucket_id is not None:
                 _check_legacy_upload(await self.buckets.get(bucket_id, request_options=request_options), file_access)
@@ -1548,7 +1546,7 @@ class AsyncGroundX(AsyncGroundXBase):
             raise ValueError(f"Error reading file {file_path}: {e}")
 
         if method == "PUT":
-            upload_response = _put_upload_file(upload_url, file_data, headers)
+            upload_response = _put_upload_file(upload_url, file_data, headers, expires_at)
         else:
             raise ValueError(f"Unsupported HTTP method: {method}")
 

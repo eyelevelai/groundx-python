@@ -51,7 +51,9 @@ def test_upload_file_does_not_send_hosted_url_header_to_s3(
     assert "GX-HOSTED-URL" not in sent_headers
 
 
+@pytest.mark.parametrize("expires_during_retry", [False, True])
 def test_upload_file_retries_transient_put_errors(
+    expires_during_retry: bool,
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
@@ -60,7 +62,14 @@ def test_upload_file_retries_transient_put_errors(
     attempts = 0
 
     monkeypatch.setattr(ingest, "get_presigned_url", lambda *args: _presigned_info())
-    monkeypatch.setattr(ingest.time, "sleep", lambda seconds: None)
+    now = 1800000000.0
+    monkeypatch.setattr(ingest.time, "time", lambda: now)
+
+    def sleep(seconds):
+        nonlocal now
+        now += seconds
+
+    monkeypatch.setattr(ingest.time, "sleep", sleep)
 
     def put(url: str, *, data: bytes, headers: dict[str, Any], timeout: int, allow_redirects: bool) -> _Response:
         nonlocal attempts
@@ -71,10 +80,14 @@ def test_upload_file_retries_transient_put_errors(
 
     monkeypatch.setattr(ingest.requests, "put", put)
 
-    hosted_url = GroundX(api_key="test")._upload_file("https://api.eyelevel.ai/upload/file", path)
-
-    assert hosted_url == "https://upload.eyelevel.ai/prod/file/ssp/file.png"
-    assert attempts == 2
+    if expires_during_retry:
+        with pytest.raises(ValueError, match="Upload grant has expired"):
+            ingest._put_upload_file("https://storage.test/file?signature=exact", b"png", {}, now + 0.5)
+        assert attempts == 1
+    else:
+        hosted_url = GroundX(api_key="test")._upload_file("https://api.eyelevel.ai/upload/file", path)
+        assert hosted_url == "https://upload.eyelevel.ai/prod/file/ssp/file.png"
+        assert attempts == 2
 
 
 @pytest.mark.parametrize("asynchronous", [False, True])
@@ -91,6 +104,7 @@ def test_ingest_uses_configured_api_before_upload(monkeypatch, tmp_path, overrid
     path = tmp_path / "private.txt"
     path.write_bytes(b"private source")
     events = []
+    request_options = {"additional_body_parameters": {"customFlag": "kept", "fileAccess": {"mode": "public"}}}
     storage_url = (
         "http://minio.local/exact?signature=test"
         if override == {"mode": "public"}
@@ -107,6 +121,9 @@ def test_ingest_uses_configured_api_before_upload(monkeypatch, tmp_path, overrid
         assert request.url.host == "onprem.test"
         assert request.method == "POST"
         if request.url.path.endswith("file-upload"):
+            body = __import__("json").loads(request.content)
+            assert body.get("fileAccess") == override
+            assert body["customFlag"] == "kept"
             return httpx.Response(
                 201,
                 json={
@@ -145,7 +162,7 @@ def test_ingest_uses_configured_api_before_upload(monkeypatch, tmp_path, overrid
             headers={"X-Customer-Key": "customer-test"},
             httpx_client=httpx.AsyncClient(transport=httpx.MockTransport(handle)),
         )
-        asyncio.run(client.ingest(documents=documents))
+        asyncio.run(client.ingest(documents=documents, request_options=request_options))
     else:
         client = GroundX(
             api_key="test",
@@ -153,12 +170,15 @@ def test_ingest_uses_configured_api_before_upload(monkeypatch, tmp_path, overrid
             headers={"X-Customer-Key": "customer-test"},
             httpx_client=httpx.Client(transport=httpx.MockTransport(handle)),
         )
-        client.ingest(documents=documents)
+        client.ingest(documents=documents, request_options=request_options)
     assert [method for method, _ in events] == ["POST", "PUT", "POST"]
+    assert request_options == {"additional_body_parameters": {"customFlag": "kept", "fileAccess": {"mode": "public"}}}
     if not asynchronous:
         events.clear()
         monkeypatch.setattr(client, "_monitor_batch", lambda result, progress, pbar: (result, 0))
-        client.ingest_directory(bucket_id=7, path=str(tmp_path), file_access=documents[0].file_access)
+        client.ingest_directory(
+            bucket_id=7, path=str(tmp_path), file_access=documents[0].file_access, request_options=request_options
+        )
         assert [method for method, _ in events] == ["POST", "PUT", "POST"]
 
 
@@ -194,6 +214,42 @@ def test_explicit_legacy_upload_override(monkeypatch, tmp_path):
     monkeypatch.setattr(ingest.requests, "put", lambda *args, **kwargs: _Response())
     client = GroundX(api_key="test", httpx_client=httpx.Client(transport=httpx.MockTransport(handle)))
     client.ingest(documents=[Document(bucket_id=7, file_path=str(path))], upload_api="https://legacy.test/upload")
+
+
+@pytest.mark.parametrize("asynchronous", [False, True])
+def test_protected_upload_unavailable_stops_before_native_bytes(monkeypatch, tmp_path, asynchronous):
+    import asyncio
+
+    import httpx
+
+    from groundx import AsyncGroundX, Document
+    from groundx.errors import ForbiddenError
+
+    path = tmp_path / "private.pdf"
+    path.write_bytes(b"private")
+    requests = []
+
+    def handle(request):
+        requests.append(request)
+        assert request.url.path.endswith("/file-upload")
+        assert __import__("json").loads(request.content)["fileAccess"] == {"mode": "protected"}
+        return httpx.Response(403, json={"message": "file protection unavailable"})
+
+    monkeypatch.setattr(ingest.requests, "put", lambda *a, **kw: pytest.fail("private source uploaded"))
+    documents = [Document(bucket_id=7, file_path=str(path), file_access={"mode": "protected"})]
+
+    async def run():
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handle)) as transport:
+            await AsyncGroundX(api_key="test", httpx_client=transport).ingest(documents=documents)
+
+    with pytest.raises(ForbiddenError):
+        if asynchronous:
+            asyncio.run(run())
+        else:
+            GroundX(api_key="test", httpx_client=httpx.Client(transport=httpx.MockTransport(handle))).ingest(
+                documents=documents
+            )
+    assert len(requests) == 1
 
 
 @pytest.mark.parametrize("asynchronous", [False, True])
@@ -256,14 +312,14 @@ def test_failed_upload_issuance_never_falls_back_to_public(monkeypatch, tmp_path
     [
         ("protected", 29, 31, False),
         ("protected", 30, 31, True),
-        ("public", 30, 31, True),
+        ("public", 30, 31, False),
         ("mixed", 29, 31, False),
         ("mixed", 30, 31, True),
         ("csv", 1, 29, False),
         ("csv", 1, 31, True),
     ],
 )
-def test_local_batch_checks_upload_expiry_before_ingest(
+def test_local_batch_preserves_submission_and_admission_errors(
     monkeypatch, tmp_path, asynchronous, mode, count, put_seconds, reject
 ):
     import asyncio
@@ -273,6 +329,7 @@ def test_local_batch_checks_upload_expiry_before_ingest(
     import httpx
 
     from groundx import AsyncGroundX, Document
+    from groundx.core.api_error import ApiError
 
     path = tmp_path / ("source.csv" if mode == "csv" else "source.txt")
     path.write_text("value\n" + "synthetic\n" * 29000 if mode == "csv" else "synthetic")
@@ -303,6 +360,8 @@ def test_local_batch_checks_upload_expiry_before_ingest(
                 },
             )
         submissions.append(json.loads(request.content))
+        if reject:
+            return httpx.Response(409, json={"message": "source reservation expired"})
         return httpx.Response(200, json={"ingest": {"processId": "process", "status": "complete"}})
 
     def put(url, *, data, headers, timeout, allow_redirects):
@@ -336,16 +395,26 @@ def test_local_batch_checks_upload_expiry_before_ingest(
             async with httpx.AsyncClient(transport=transport) as http_client:
                 client = AsyncGroundX(api_key="test", httpx_client=http_client)
                 return await client.ingest(
-                    documents=documents, callback_url="https://callback.test", callback_data="data"
+                    documents=documents,
+                    callback_url="https://callback.test",
+                    callback_data="data",
+                    request_options={"max_retries": 0},
                 )
         with httpx.Client(transport=transport) as http_client:
             client = GroundX(api_key="test", httpx_client=http_client)
-            return client.ingest(documents=documents, callback_url="https://callback.test", callback_data="data")
+            return client.ingest(
+                documents=documents,
+                callback_url="https://callback.test",
+                callback_data="data",
+                request_options={"max_retries": 0},
+            )
 
     if reject:
-        with pytest.raises(RuntimeError, match="expired before submission.*smaller batch"):
+        with pytest.raises(ApiError) as error:
             asyncio.run(run())
-        assert submissions == []
+        assert error.value.status_code == 409
+        assert error.value.body == {"message": "source reservation expired"}
+        assert len(submissions) == 1
     else:
         result = asyncio.run(run())
         assert result.ingest.process_id == "process"
@@ -363,12 +432,13 @@ def test_local_batch_checks_upload_expiry_before_ingest(
 
 
 @pytest.mark.parametrize("directory", [False, True])
-def test_monitored_batch_rejects_upload_expiry_before_submission(monkeypatch, tmp_path, directory):
+def test_monitored_batch_preserves_upstream_admission_error(monkeypatch, tmp_path, directory):
     import datetime as dt
 
     import httpx
 
     from groundx import Document
+    from groundx.core.api_error import ApiError
 
     path = tmp_path / "source.txt"
     path.write_text("synthetic")
@@ -400,7 +470,7 @@ def test_monitored_batch_rejects_upload_expiry_before_submission(monkeypatch, tm
                 },
             )
         submissions.append(request)
-        return httpx.Response(200, json={"ingest": {"processId": "process", "status": "complete"}})
+        return httpx.Response(409, json={"message": "source reservation expired"})
 
     def put(*args, **kwargs):
         nonlocal now
@@ -412,16 +482,21 @@ def test_monitored_batch_rejects_upload_expiry_before_submission(monkeypatch, tm
     monkeypatch.setattr(ingest.requests, "put", put)
     with httpx.Client(transport=httpx.MockTransport(handle)) as http_client:
         client = GroundX(api_key="test", httpx_client=http_client)
-        with pytest.raises(RuntimeError, match="expired before submission.*smaller batch"):
+        with pytest.raises(ApiError) as error:
             if directory:
-                client.ingest_directory(bucket_id=7, path=str(tmp_path), batch_size=30)
+                client.ingest_directory(
+                    bucket_id=7, path=str(tmp_path), batch_size=30, request_options={"max_retries": 0}
+                )
             else:
                 client.ingest(
                     documents=[Document(bucket_id=7, file_path=str(path), file_type="txt") for _ in range(31)],
                     wait_for_complete=True,
                     batch_size=30,
+                    request_options={"max_retries": 0},
                 )
-    assert submissions == []
+    assert len(submissions) == 1
+    assert error.value.status_code == 409
+    assert error.value.body == {"message": "source reservation expired"}
 
 
 @pytest.mark.parametrize("asynchronous", [False, True])

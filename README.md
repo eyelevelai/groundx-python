@@ -220,13 +220,15 @@ Initial policies are optional; omitted/null inherits account/bucket settings.
 The sync and async ingest helpers request upload URLs from the configured
 GroundX API for every local file, public or protected. On-prem uploads use that
 installation's storage and do not contact the hosted upload service. A failed
-upload request stops ingestion without a public fallback. Directory ingest
+upload request stops ingestion without a public fallback. Each initial file
+policy is checked by upload admission before bytes are sent. Directory ingest
 accepts `file_access` for every file in that call.
 
-Upload grants last at most fifteen minutes. The helpers reject the current
-batch before ingest submission if any grant has expired. Retry with fewer
-files per call or a smaller monitored/directory `batch_size`. Files are not
-automatically reuploaded, and a successful check does not extend the deadline.
+Upload grants allow PUT for at most fifteen minutes. They do not expire an
+already uploaded public file or prevent its later ingestion. Protected source
+reservations must reach ingest before their deadline; the API rejects expired
+reservations. Retry those files with a smaller batch. The helpers check each
+grant before PUT and return ingest errors without renewing or splitting a batch.
 
 Deploy the bucket upload endpoint before adopting these helpers. Existing
 integrations can explicitly set `upload_api` to keep the legacy broker protocol

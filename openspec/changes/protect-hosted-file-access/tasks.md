@@ -66,30 +66,21 @@ established by these tests.
 
 Creation-policy validation:694 SDK tests pass,2existing skips,100subtests;156 existing deprecation warnings. Whole-repository mypy passes283 source files. These are local/synthetic results, not storage, release or deployment acceptance.
 
-## Reservation expiry before submission
+## Upload grants and ingest admission
 
-- [x] Retain private upload expiry per batch and reject expired source reservations
-      immediately before ingest, with a smaller-batch retry instruction.
-- [x] Preserve public upload, initial policies, callbacks and existing single-ingest
-      behavior without renewal or automatic batch splitting.
-- [x] Cover sync/async, actual CSV splits, mixed public/private uploads, monitored
-      batches and directory ingest through the generated HTTP transport.
+- [x] Validate finite upload grants before PUT, including retry attempts.
+- [x] Preserve already uploaded public sources after their PUT grant expires.
+- [x] Propagate authoritative protected reservation admission failures through
+      generated sync/async transport, including CSV splits and directory batches.
+- [x] Preserve per-file policies, callbacks and existing batching without client
+      renewal, a policy-discovery request or automatic splitting.
 
-The expiry regression uses thirty successful thirty-one-second PUTs, each below
-the sixty-second request timeout. Expired batches produce no ingest request;
-twenty-nine-file fresh batches retain their existing submission behavior. Public
-uploads now use the same expiry checks as protected uploads.
-These checks enforce the existing reservation deadline and do not make longer
-private batches succeed. Network transit after the local check can still consume
-the remaining lifetime. Extraction runtime, prompt policy, schema routing and
-customer output are unchanged; historical Arcadia legacy, Arcadia v1, generic v1
-and ADP v1 execution paths are unaffected.
-
-Validation: 25 focused upload tests pass. The complete SDK suite in the pinned
-Poetry runtime passes 710 tests with 2 existing skips, 100 subtests and 156 existing
-extraction YAML deprecation warnings. Whole-repository mypy passes 283 source
-files. Changed-file Ruff, LF and strict OpenSpec validation pass. No package,
-image, deployment or live storage acceptance follows from these local tests.
+The public long-batch regression uses thirty successful thirty-one-second PUTs,
+each below the sixty-second request timeout. The SDK submits the resulting stable
+public sources even though the first PUT grant has expired. Protected admission
+errors come from the API response and retain their status/body; SDK tests do not
+emulate server reservation rules. Storage grant expiry is checked again before a
+retry. Extraction runtime, prompts, schemas, routing and customer JSON are unchanged.
 
 ## Package version compatibility
 
@@ -198,3 +189,27 @@ exercise distinct storage implementations. Extraction prompts, schemas, routing
 and final JSON are unchanged, so Arcadia legacy, Arcadia v1, generic v1 and ADP v1
 extraction execution paths are unaffected. These local mocked transports do not
 prove server deployment, live vendor signing, on-prem connectivity or publication.
+
+## Upload and submission lifetime
+
+- [x] Validate finite upload grants immediately before native PUT, including retry attempts.
+- [x] Remove client batch-expiry collectors and pre-submit rejection; preserve long public batches and propagate authoritative protected-source admission errors.
+- [x] Extend existing generated-transport tests and document PUT expiry separately from protected reservation admission.
+
+Initial per-file policies accompany upload issuance in the canonical optional
+`fileAccess` field, including renewals by browser consumers. Python uses the
+generated request options' additional-body support while preserving unrelated
+per-call options. TypeScript uses a structurally compatible request object.
+Explicit protection rejected by server admission produces no native PUT. The
+direct generated methods receive their typed hint through normal upstream
+regeneration; generated runtime files are not hand-edited.
+
+Final local validation: 84 focused Python upload cases and the complete 769-test
+SDK suite pass, with 2 existing skips, 100 subtests and 156 existing warnings.
+Mypy passes 283 files. Changed-file Ruff, LF, diff and strict OpenSpec checks
+pass. TypeScript passes 41 custom transport cases and 485 tests overall; CJS and
+ESM compilation, ESM rename, changed-test lint and diff checks pass. Public long
+batches submit after completed PUT grants expire, native retry checks enforce
+PUT lifetime, unavailable initial protection stops before bytes, and returned
+server admission errors retain status/body. No generated runtime edits, package
+publication, deployment or live storage acceptance are included.
