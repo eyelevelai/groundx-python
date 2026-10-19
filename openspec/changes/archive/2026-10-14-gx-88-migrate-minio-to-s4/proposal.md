@@ -36,3 +36,9 @@ None.
 ## Open Questions
 
 None. The approved GX-88 plan settles the client shape, the fixed region, the write-only trim, and the release hand-off.
+
+## Amendments
+
+### 2026-10-19
+
+- **Release version.** The 4.0.10 request in the Release bullet above is historical. main shipped 4.1.0 and 4.1.1 on 2026-10-18 without `S4Client`, so the release hand-off in the pull request now requests 4.1.2. internal-arcadia-agents pins `groundx==4.1.2`.

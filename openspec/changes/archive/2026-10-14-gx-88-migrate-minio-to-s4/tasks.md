@@ -27,3 +27,5 @@
 The acceptance tests named above live in `tests/extract/services/test_upload_s4.py`. They drive the real `Upload` dispatcher with only `minio.Minio` (and `boto3.client` for `s3`) patched. `tests/extract/services/test_upload.py` and `tests/extract/services/test_upload_minio.py` are not edited.
 
 Consumer pin: internal-arcadia-agents pins `groundx==4.0.7` (`requirements.txt:22` at `ea67325f`). It must raise that pin to the release that carries `S4Client`; the pull request's release hand-off requests 4.0.10. See workspace `openspec/changes/gx-88-migrate-minio-to-s4/tasks.md` for cross-service coordination and deferred items.
+
+Amendment, 2026-10-19: the 4.0.10 request above is historical. main shipped 4.1.0 and 4.1.1 on 2026-10-18 without `S4Client`, so the release hand-off now requests 4.1.2, and internal-arcadia-agents pins `groundx==4.1.2`.
