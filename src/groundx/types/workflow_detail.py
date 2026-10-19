@@ -85,7 +85,7 @@ class WorkflowDetail(UniversalBaseModel):
     ] = None
     relationships: typing.Optional[WorkflowDetailRelationships] = pydantic.Field(default=None)
     """
-    Information describing what the workflow is associated with
+    Resources associated with this workflow.
     """
 
     workflow_id: typing_extensions.Annotated[

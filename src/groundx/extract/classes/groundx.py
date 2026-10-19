@@ -3,14 +3,15 @@ import typing
 from pathlib import Path
 
 import requests
-from ..services.http import bounded_get
+from ..services.http import bounded_file_get, redacted_file_url
 from ..services.upload import (
     OBJECT_STORE_CONNECT_TIMEOUT_SECONDS,
     OBJECT_STORE_READ_TIMEOUT_SECONDS,
     OBJECT_STORE_TOTAL_TIMEOUT_SECONDS,
     Upload,
 )
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
+from pydantic_core import InitErrorDetails
 from typing_extensions import Annotated
 
 
@@ -37,6 +38,11 @@ class GroundXDocument(BaseModel):
         clear_cache: bool = False,
         is_test: bool = False,
         base: typing.Optional[str] = None,
+        *,
+        xray_url: typing.Optional[str] = None,
+        api_key: typing.Optional[str] = None,
+        customer_key: typing.Optional[str] = None,
+        trusted_file_roots: typing.Sequence[str] = (),
     ) -> "XRayDocument":
         return XRayDocument.download(
             self,
@@ -45,6 +51,10 @@ class GroundXDocument(BaseModel):
             clear_cache=clear_cache,
             is_test=is_test,
             base=base,
+            xray_url=xray_url,
+            api_key=api_key,
+            customer_key=customer_key,
+            trusted_file_roots=trusted_file_roots,
         )
 
 
@@ -173,22 +183,27 @@ class XRayDocument(BaseModel):
         clear_cache: bool = False,
         is_test: bool = False,
         base: typing.Optional[str] = None,
+        *,
+        xray_url: typing.Optional[str] = None,
+        api_key: typing.Optional[str] = None,
+        customer_key: typing.Optional[str] = None,
+        trusted_file_roots: typing.Sequence[str] = (),
     ) -> "XRayDocument":
+        if customer_key and not api_key:
+            raise ValueError("customer_key requires api_key")
         cache_dir.mkdir(parents=True, exist_ok=True)
         cache_file = cache_dir / f"{gx_doc.document_id}-xray.json"
 
-        if not clear_cache and cache_file.exists():
+        if xray_url is None and not clear_cache and cache_file.exists():
             try:
                 with cache_file.open("r", encoding="utf-8") as f:
                     payload = json.load(f)
 
                 return cls(**payload)
             except Exception as e:
-                raise RuntimeError(
-                    f"Error loading cached X-ray JSON from {cache_file}: {e}"
-                )
+                raise RuntimeError(f"Error loading cached X-ray JSON from {cache_file}: {e}")
 
-        if upload:
+        if upload and xray_url is None:
             path = gx_doc.xray_path()
             ru = upload.get_object(
                 path,
@@ -201,34 +216,46 @@ class XRayDocument(BaseModel):
                     payload = json.loads(ru.decode("utf-8"))
                     return cls(**payload)
                 except Exception as e:
-                    raise RuntimeError(
-                        f"Error decoding X-ray JSON bytes from {path}: {e}"
-                    )
+                    raise RuntimeError(f"Error decoding X-ray JSON bytes from {path}: {e}")
 
-        url = gx_doc.xray_url(base=base)
+        url = xray_url if xray_url is not None else gx_doc.xray_url(base=base)
+        safe_url = redacted_file_url(url)
         try:
-            resp = bounded_get(url, operation="X-ray JSON")
+            resp = bounded_file_get(
+                url,
+                operation="X-ray JSON",
+                api_key=api_key,
+                customer_key=customer_key,
+                trusted_file_roots=trusted_file_roots,
+            )
             resp.raise_for_status()
         except requests.RequestException as e:
-            raise RuntimeError(f"Error fetching X-ray JSON from {url}: {e}")
+            raise RuntimeError(f"Error fetching X-ray JSON from {safe_url}: {e}")
         except RuntimeError as e:
-            raise RuntimeError(f"Error fetching X-ray JSON from {url}: {e}") from e
+            raise RuntimeError(f"Error fetching X-ray JSON from {safe_url}: {e}") from e
 
         try:
             payload = resp.json()
         except ValueError as e:
-            raise RuntimeError(f"Invalid JSON returned from {url}: {e}")
+            raise RuntimeError(f"Invalid JSON returned from {safe_url}: {e}")
 
-        if is_test is False:
+        if is_test is False and xray_url is None:
             try:
                 with cache_file.open("w", encoding="utf-8") as f:
                     json.dump(payload, f)
             except Exception as e:
-                raise RuntimeError(
-                    f"Failed to write X-ray JSON cache to {cache_file}: {e}"
-                )
+                raise RuntimeError(f"Failed to write X-ray JSON cache to {cache_file}: {e}")
 
-        return cls(**payload)
+        try:
+            return cls(**payload)
+        except ValidationError as error:
+            if xray_url is not None or api_key or trusted_file_roots:
+                raise ValidationError.from_exception_data(
+                    cls.__name__,
+                    typing.cast(typing.List[InitErrorDetails], error.errors(include_input=False)),
+                    hide_input=True,
+                ) from None
+            raise
 
     def get_extract(self) -> typing.Dict[str, typing.Any]:
         xray_dict = self.model_dump(exclude_none=True)

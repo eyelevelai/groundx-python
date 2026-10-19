@@ -3,8 +3,12 @@
 import typing
 
 import pydantic
+import typing_extensions
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
+from ..core.serialization import FieldMetadata
 from .customer_detail_status import CustomerDetailStatus
+from .effective_policy import EffectivePolicy
+from .file_access_policy import FileAccessPolicy
 from .subscription_detail import SubscriptionDetail
 
 
@@ -13,6 +17,27 @@ class CustomerDetail(UniversalBaseModel):
     Account information for the user
     """
 
+    file_access: typing_extensions.Annotated[
+        typing.Optional[FileAccessPolicy],
+        FieldMetadata(alias="fileAccess"),
+        pydantic.Field(
+            alias="fileAccess",
+            description="Applied settings for this resource. Null means it inherits settings. Deployments without file access omit this field. Pending changes are not returned.",
+        ),
+    ] = None
+    file_access_revision: typing_extensions.Annotated[
+        typing.Optional[int],
+        FieldMetadata(alias="fileAccessRevision"),
+        pydantic.Field(
+            alias="fileAccessRevision",
+            description="Current settings revision. Include it when updating fileAccess. A stale revision returns 409.",
+        ),
+    ] = None
+    effective_file_access: typing_extensions.Annotated[
+        typing.Optional[EffectivePolicy],
+        FieldMetadata(alias="effectiveFileAccess"),
+        pydantic.Field(alias="effectiveFileAccess"),
+    ] = None
     email: typing.Optional[str] = pydantic.Field(default=None)
     """
     Email associated with the account

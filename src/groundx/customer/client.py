@@ -7,8 +7,12 @@ from ..core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ..core.request_options import RequestOptions
 from ..types.customer_response import CustomerResponse
 from ..types.customer_usage_response import CustomerUsageResponse
+from ..types.file_access_policy import FileAccessPolicy
 from .raw_client import AsyncRawCustomerClient, RawCustomerClient
 from .types.customer_get_usage_request_metric import CustomerGetUsageRequestMetric
+
+# this is used as the default value for optional parameters
+OMIT = typing.cast(typing.Any, ...)
 
 
 class CustomerClient:
@@ -38,7 +42,7 @@ class CustomerClient:
         Returns
         -------
         CustomerResponse
-            Look up success
+            Lookup successful
 
         Examples
         --------
@@ -52,6 +56,50 @@ class CustomerClient:
         _response = self._raw_client.get(request_options=request_options)
         return _response.data
 
+    def update(
+        self,
+        *,
+        file_access_revision: int,
+        file_access: typing.Optional[FileAccessPolicy] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> CustomerResponse:
+        """
+        Replace or clear your account's file-access settings. Include fileAccessRevision. Invalid or missing input returns 400; disabled or forbidden access returns 403; a stale revision returns 409. If settings or ownership cannot be verified, returns 503 with Retry-After. After an uncertain outcome, read the applied settings before retrying. Protected stable links require X-API-Key on every read.
+
+        Parameters
+        ----------
+        file_access_revision : int
+
+        file_access : typing.Optional[FileAccessPolicy]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        CustomerResponse
+            Applied settings
+
+        Examples
+        --------
+        from groundx import FileAccessPolicy, GroundX
+
+        client = GroundX(
+            api_key="YOUR_API_KEY",
+        )
+        client.customer.update(
+            file_access=FileAccessPolicy(
+                mode="protected",
+                url_ttl_seconds=300,
+            ),
+            file_access_revision=0,
+        )
+        """
+        _response = self._raw_client.update(
+            file_access_revision=file_access_revision, file_access=file_access, request_options=request_options
+        )
+        return _response.data
+
     def get_usage(
         self,
         *,
@@ -61,9 +109,7 @@ class CustomerClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CustomerUsageResponse:
         """
-        Get aggregate usage for the authenticated customer over a requested time period.
-
-        The API resolves the account subscription and usage meter from the authenticated account. Do not provide customer ids, subscription ids, or meter ids. `startTime` is inclusive, `endTime` is exclusive, and both timestamps must be RFC3339 values aligned to minute boundaries. Timestamps are normalized to UTC. `endTime` cannot be in the future, windows longer than 366 days are rejected, and `usageAsOf` reflects the latest usage summary available to GroundX.
+        Get usage for the authenticated account over a time period. GroundX selects its subscription and usage meter; do not supply their IDs or a customer ID. startTime is inclusive and endTime is exclusive. Both must be RFC3339 timestamps on minute boundaries and are converted to UTC. endTime cannot be in the future. The window cannot exceed 366 days. usageAsOf identifies the latest usage summary available to GroundX.
 
         Parameters
         ----------
@@ -136,7 +182,7 @@ class AsyncCustomerClient:
         Returns
         -------
         CustomerResponse
-            Look up success
+            Lookup successful
 
         Examples
         --------
@@ -158,6 +204,58 @@ class AsyncCustomerClient:
         _response = await self._raw_client.get(request_options=request_options)
         return _response.data
 
+    async def update(
+        self,
+        *,
+        file_access_revision: int,
+        file_access: typing.Optional[FileAccessPolicy] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> CustomerResponse:
+        """
+        Replace or clear your account's file-access settings. Include fileAccessRevision. Invalid or missing input returns 400; disabled or forbidden access returns 403; a stale revision returns 409. If settings or ownership cannot be verified, returns 503 with Retry-After. After an uncertain outcome, read the applied settings before retrying. Protected stable links require X-API-Key on every read.
+
+        Parameters
+        ----------
+        file_access_revision : int
+
+        file_access : typing.Optional[FileAccessPolicy]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        CustomerResponse
+            Applied settings
+
+        Examples
+        --------
+        import asyncio
+
+        from groundx import AsyncGroundX, FileAccessPolicy
+
+        client = AsyncGroundX(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.customer.update(
+                file_access=FileAccessPolicy(
+                    mode="protected",
+                    url_ttl_seconds=300,
+                ),
+                file_access_revision=0,
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.update(
+            file_access_revision=file_access_revision, file_access=file_access, request_options=request_options
+        )
+        return _response.data
+
     async def get_usage(
         self,
         *,
@@ -167,9 +265,7 @@ class AsyncCustomerClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CustomerUsageResponse:
         """
-        Get aggregate usage for the authenticated customer over a requested time period.
-
-        The API resolves the account subscription and usage meter from the authenticated account. Do not provide customer ids, subscription ids, or meter ids. `startTime` is inclusive, `endTime` is exclusive, and both timestamps must be RFC3339 values aligned to minute boundaries. Timestamps are normalized to UTC. `endTime` cannot be in the future, windows longer than 366 days are rejected, and `usageAsOf` reflects the latest usage summary available to GroundX.
+        Get usage for the authenticated account over a time period. GroundX selects its subscription and usage meter; do not supply their IDs or a customer ID. startTime is inclusive and endTime is exclusive. Both must be RFC3339 timestamps on minute boundaries and are converted to UTC. endTime cannot be in the future. The window cannot exceed 366 days. usageAsOf identifies the latest usage summary available to GroundX.
 
         Parameters
         ----------

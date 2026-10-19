@@ -9,12 +9,35 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 from ..core.serialization import FieldMetadata
 from .document_detail_delivery_status import DocumentDetailDeliveryStatus
 from .document_type import DocumentType
+from .effective_policy import EffectivePolicy
 from .extraction_provenance import ExtractionProvenance
+from .file_access_policy import FileAccessPolicy
 from .process_level import ProcessLevel
 from .processing_status import ProcessingStatus
 
 
 class DocumentDetail(UniversalBaseModel):
+    file_access: typing_extensions.Annotated[
+        typing.Optional[FileAccessPolicy],
+        FieldMetadata(alias="fileAccess"),
+        pydantic.Field(
+            alias="fileAccess",
+            description="Applied settings for this resource. Null means it inherits settings. Deployments without file access omit this field. Pending changes are not returned.",
+        ),
+    ] = None
+    file_access_revision: typing_extensions.Annotated[
+        typing.Optional[int],
+        FieldMetadata(alias="fileAccessRevision"),
+        pydantic.Field(
+            alias="fileAccessRevision",
+            description="Current settings revision. Include it when updating fileAccess. A stale revision returns 409.",
+        ),
+    ] = None
+    effective_file_access: typing_extensions.Annotated[
+        typing.Optional[EffectivePolicy],
+        FieldMetadata(alias="effectiveFileAccess"),
+        pydantic.Field(alias="effectiveFileAccess"),
+    ] = None
     bucket_id: typing_extensions.Annotated[
         typing.Optional[int], FieldMetadata(alias="bucketId"), pydantic.Field(alias="bucketId")
     ] = None
@@ -28,7 +51,7 @@ class DocumentDetail(UniversalBaseModel):
         FieldMetadata(alias="deliveryStatus"),
         pydantic.Field(
             alias="deliveryStatus",
-            description="Current-run required customer delivery confirmation. Failed confirmation does not prove nonreceipt; unknown means saved evidence is insufficient.",
+            description="Delivery confirmation for the current run. Failure does not prove the receiver received nothing. Unknown means the saved evidence cannot confirm delivery.",
         ),
     ] = None
     document_id: typing_extensions.Annotated[
@@ -46,7 +69,15 @@ class DocumentDetail(UniversalBaseModel):
         FieldMetadata(alias="extractionReady"),
         pydantic.Field(
             alias="extractionReady",
-            description="Whether the current run's final extraction is published after required review and transformations. Null means saved evidence is insufficient.",
+            description="Whether the current run's final extraction was published after required review and transformations. Null means saved evidence cannot confirm publication.",
+        ),
+    ] = None
+    retry_available: typing_extensions.Annotated[
+        typing.Optional[bool],
+        FieldMetadata(alias="retryAvailable"),
+        pydantic.Field(
+            alias="retryAvailable",
+            description="Whether the document can currently restart its failed HTTP callback. Returned by document detail only. GroundX rechecks eligibility when retry is requested.",
         ),
     ] = None
     file_name: typing_extensions.Annotated[
@@ -62,7 +93,7 @@ class DocumentDetail(UniversalBaseModel):
     ] = None
     filter: typing.Optional[typing.Dict[str, typing.Any]] = pydantic.Field(default=None)
     """
-    A dictionary of key-value pairs that can be used to pre-filter documents prior to a search.
+    Key-value metadata used to filter documents before searching.
     """
 
     process_id: typing_extensions.Annotated[

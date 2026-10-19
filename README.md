@@ -194,3 +194,49 @@ a proof of concept, but know that we will not be able to merge it as-is. We sugg
 an issue first to discuss with us!
 
 On the other hand, contributions to the README are always very welcome!
+
+## Protected files
+
+Requires a compatible SDK and an API deployment with file access enabled. Source
+schemas or generated methods alone do not establish deployment availability.
+
+```python
+import os
+from groundx import GroundX, Document, FileAccessPolicy
+
+client = GroundX(api_key=os.environ["GROUNDX_API_KEY"])
+bucket = client.buckets.create(
+    name="private-documents",
+    file_access=FileAccessPolicy(mode="protected"),
+)
+client.ingest(documents=[Document(
+    bucket_id=bucket.bucket.bucket_id,
+    file_path="./contract.pdf",
+    file_access=FileAccessPolicy(mode="protected", url_ttl_seconds=120),
+)])
+```
+
+Initial policies are optional; omitted/null inherits account/bucket settings.
+The sync and async ingest helpers request upload URLs from the configured
+GroundX API for every local file, public or protected. On-prem uploads use that
+installation's storage and do not contact the hosted upload service. A failed
+upload request stops ingestion without a public fallback. Each initial file
+policy is checked by upload admission before bytes are sent. Directory ingest
+accepts `file_access` for every file in that call.
+
+Upload grants allow PUT for at most fifteen minutes. They do not expire an
+already uploaded public file or prevent its later ingestion. Protected source
+reservations must reach ingest before their deadline; the API rejects expired
+reservations. Retry those files with a smaller batch. The helpers check each
+grant before PUT and return ingest errors without renewing or splitting a batch.
+
+Deploy the bucket upload endpoint before adopting these helpers. Existing
+integrations can explicitly set `upload_api` to keep the legacy broker protocol
+for public files. An override is rejected for inherited or requested protection.
+
+Later policy changes require the current revision. Stable protected URLs need
+current API authentication and have no age-based expiry. `documents.file_link`
+issues a finite bearer link that can be forwarded until expiry; later key/policy
+changes do not revoke it. Keep native signatures intact and API keys server-side.
+Fern owns the human API guide. The Studio Harness API/MCP file-access references
+cover asset selectors, private upload, refresh and on-prem use.

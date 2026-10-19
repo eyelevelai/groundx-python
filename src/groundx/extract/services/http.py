@@ -1,9 +1,11 @@
 import contextlib
 import os
+import re
 import signal
 import threading
 import time
 import typing
+from urllib.parse import parse_qsl, unquote, urlsplit, urlunsplit
 
 import requests
 from .deadline import remaining_operation_seconds
@@ -309,6 +311,139 @@ def bounded_get(
         sleep_between_attempts=sleep_between_attempts,
         **kwargs,
     )
+
+
+def is_native_signed_url(url: str) -> bool:
+    try:
+        names = {name.lower() for name, _ in parse_qsl(urlsplit(url).query, keep_blank_values=True)}
+    except ValueError:
+        return False
+    return bool(names & {"x-amz-signature", "x-amz-credential", "x-amz-algorithm", "awsaccesskeyid", "signature"})
+
+
+def redacted_file_url(url: str) -> str:
+    try:
+        parts = urlsplit(url)
+        return urlunsplit((parts.scheme, parts.netloc.rsplit("@", 1)[-1], parts.path, "", ""))
+    except ValueError:
+        return "[invalid file URL]"
+
+
+def _file_location(url: str) -> typing.Optional[typing.Tuple[str, int, str]]:
+    try:
+        parts = urlsplit(url)
+        host = parts.hostname
+        path = unquote(parts.path or "/")
+        port = parts.port if parts.port is not None else 443
+        if (
+            parts.scheme != "https"
+            or not host
+            or parts.username is not None
+            or parts.password is not None
+            or not 1 <= port <= 65535
+            or any(char.isspace() for char in url)
+            or "\\" in path
+            or "%" in path
+            or any(segment in (".", "..") for segment in path.split("/"))
+        ):
+            return None
+        authority = f"[{host}]" if ":" in host else host
+        if not re.fullmatch(re.escape(authority) + r"(?::[0-9]+)?", parts.netloc, re.IGNORECASE):
+            return None
+        return host.lower(), port, path.rstrip("/") or "/"
+    except ValueError:
+        return None
+
+
+def bounded_file_get(
+    url: str,
+    *,
+    operation: str,
+    api_key: typing.Optional[str] = None,
+    customer_key: typing.Optional[str] = None,
+    trusted_file_roots: typing.Sequence[str] = (),
+    **kwargs: typing.Any,
+) -> requests.Response:
+    """Read a file with explicitly scoped credentials and no authenticated redirects."""
+    if customer_key and not api_key:
+        raise ValueError("customer_key requires api_key")
+    if any(name in kwargs for name in ("headers", "allow_redirects", "stream")):
+        raise ValueError("file headers, redirects and streaming are controlled by bounded_file_get")
+    roots = []
+    for root in trusted_file_roots:
+        parts = urlsplit(root)
+        location = _file_location(root)
+        if location is None or "?" in root or "#" in root or "%" in parts.path:
+            raise ValueError("trusted_file_roots must contain canonical HTTPS roots without credentials or queries")
+        roots.append(location)
+
+    native = is_native_signed_url(url)
+    if not api_key and not customer_key and not roots and not native:
+        return bounded_get(url, operation=operation, **kwargs)
+
+    headers: typing.Dict[str, str] = {}
+    target = _file_location(url)
+    if api_key and not native and target is not None:
+        for host, port, path in roots:
+            if target[:2] == (host, port) and (target[2] == path or target[2].startswith(path.rstrip("/") + "/")):
+                headers["X-API-Key"] = api_key
+                if customer_key:
+                    headers["X-Customer-Key"] = customer_key
+                break
+
+    response = None
+    safe_url = redacted_file_url(url)
+    started = time.monotonic()
+    budget = kwargs.get("operation_deadline_seconds")
+    if budget is None:
+        budget = _env_float("GROUNDX_EXTRACT_HTTP_OPERATION_DEADLINE_SECONDS", DEFAULT_HTTP_OPERATION_DEADLINE_SECONDS)
+    total = remaining_operation_seconds(float(budget))
+    try:
+        response = bounded_get(
+            url,
+            operation=operation,
+            headers=headers,
+            allow_redirects=False,
+            stream=True,
+            **kwargs,
+        )
+        if 300 <= response.status_code < 400:
+            raise RuntimeError(f"File redirect rejected for {safe_url}")
+        response.raise_for_status()
+        raw = response.raw
+        close_response = response.close
+
+        def abort_body() -> None:
+            shutdown = getattr(raw, "shutdown", None)
+            if callable(shutdown):
+                try:
+                    shutdown()
+                except (OSError, RuntimeError, ValueError):
+                    pass
+            close_response()
+
+        read_response_body_with_deadline(
+            lambda: typing.cast(requests.Response, response).content,
+            close_response,
+            abort_response=abort_body,
+            total_timeout_seconds=total,
+            started_at=started,
+            operation=operation,
+        )
+        return response
+    except (BoundedRequestTimeout, requests.Timeout, WallClockDeadlineExceeded):
+        raise BoundedRequestTimeout(
+            operation=operation,
+            url=safe_url,
+            attempts=1,
+            cause=requests.Timeout("file request exceeded its deadline"),
+        ) from None
+    except (BoundedRequestError, requests.RequestException):
+        status = response.status_code if response is not None else "transport"
+        raise RuntimeError(f"File GET failed ({status}) for {safe_url}") from None
+    finally:
+        if response is not None:
+            response.close()
 
 
 def bounded_head(

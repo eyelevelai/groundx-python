@@ -11,12 +11,12 @@ from .workflow_prompt_role import WorkflowPromptRole
 
 class WorkflowPrompt(UniversalBaseModel):
     """
-    Configurations for the prompt an agent uses in a workflow
+    Prompt settings for a workflow agent.
     """
 
     abbreviated: typing.Optional[str] = pydantic.Field(default=None)
     """
-    A short version of the prompt that is included in historical chat transcripts as part of the prompt context
+    Short prompt included in the chat history as context.
     """
 
     additional_context: typing_extensions.Annotated[
@@ -24,7 +24,7 @@ class WorkflowPrompt(UniversalBaseModel):
         FieldMetadata(alias="additionalContext"),
         pydantic.Field(
             alias="additionalContext",
-            description="Supplemental context appended to the default full request or task prompt. Server validation authoritatively limits this value to 4096 UTF-8 bytes. When omitted, rendered prompt output is unchanged. Workflow-level template.CUSTOM_INSTRUCTIONS remains a global fallback, and a prompt-member additionalContext takes precedence for that member. It is supported only on fixed workflow default request/task prompt members for GPT and EyeLevel workflows; because this shared schema also appears under custom workflow prompt shapes, server validation rejects additionalContext under customSteps, useExtras, or prompt members that replace the full prompt.",
+            description="Extra instructions appended to a default request or task prompt, limited to 4096 UTF-8 bytes. Omit to leave the prompt unchanged. This value overrides workflow-level template.CUSTOM_INSTRUCTIONS for the same prompt. Supported only on fixed default request and task prompts in GPT and EyeLevel workflows. The server rejects it under customSteps, useExtras or prompts that replace the full prompt, even where this shared schema appears.",
         ),
     ] = None
     prompt: typing.Optional[str] = pydantic.Field(default=None)

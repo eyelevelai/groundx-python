@@ -12,17 +12,24 @@ from ..core.pydantic_utilities import parse_obj_as
 from ..core.request_options import RequestOptions
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..errors.bad_request_error import BadRequestError
+from ..errors.conflict_error import ConflictError
+from ..errors.forbidden_error import ForbiddenError
+from ..errors.not_found_error import NotFoundError
+from ..errors.service_unavailable_error import ServiceUnavailableError
 from ..errors.unauthorized_error import UnauthorizedError
+from ..types.asset_selector import AssetSelector
 from ..types.document_list_response import DocumentListResponse
 from ..types.document_local_ingest_request import DocumentLocalIngestRequest
 from ..types.document_lookup_response import DocumentLookupResponse
 from ..types.document_response import DocumentResponse
 from ..types.document_update import DocumentUpdate
 from ..types.document_xray import DocumentXray
+from ..types.file_link_response import FileLinkResponse
 from ..types.ingest_remote_document import IngestRemoteDocument
 from ..types.ingest_response import IngestResponse
 from ..types.processes_status_response import ProcessesStatusResponse
 from ..types.processing_status import ProcessingStatus
+from ..types.retry_failed_stage_response import RetryFailedStageResponse
 from ..types.sort import Sort
 from ..types.sort_order import SortOrder
 from ..types.website_source import WebsiteSource
@@ -46,7 +53,7 @@ class RawDocumentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[IngestResponse]:
         """
-        copy documents from one bucket to another
+        Copy documents from one bucket to another.
 
         Parameters
         ----------
@@ -118,10 +125,10 @@ class RawDocumentsClient:
         documents : typing.Sequence[IngestRemoteDocument]
 
         callback_url : typing.Optional[str]
-            An endpoint that will receive processing event updates as POST.
+            URL that receives processing updates as POST requests.
 
         callback_data : typing.Optional[str]
-            A string that is returned, along with processing event updates, to the callback URL.
+            Custom string included in processing updates sent to the callback URL.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -170,6 +177,28 @@ class RawDocumentsClient:
                 )
             if _response.status_code == 401:
                 raise UnauthorizedError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 403:
+                raise ForbiddenError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 503:
+                raise ServiceUnavailableError(
                     headers=dict(_response.headers),
                     body=typing.cast(
                         typing.Any,
@@ -249,6 +278,50 @@ class RawDocumentsClient:
                         ),
                     ),
                 )
+            if _response.status_code == 403:
+                raise ForbiddenError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 409:
+                raise ConflictError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 503:
+                raise ServiceUnavailableError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
@@ -267,12 +340,7 @@ class RawDocumentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[IngestResponse]:
         """
-        Upload the content of a publicly accessible website for ingestion into a GroundX bucket. This is done by following links within a specified URL, recursively, up to a specified depth or number of pages.
-
-        Note1: This endpoint is currently not supported for on-prem deployments.
-        Note2: The `source_url` must include the protocol, http:// or https://.
-
-        [Supported Document Types and Ingest Capacities](https://docs.eyelevel.ai/documentation/fundamentals/document-types-and-ingest-capacities)
+        Ingest a public website by following links from a starting URL, up to the requested depth or page limit. The source_url must start with http:// or https://. Website crawling is not supported on-prem. [Supported Document Types and Ingest Capacities](https://docs.eyelevel.ai/documentation/fundamentals/document-types-and-ingest-capacities)
 
         Parameters
         ----------
@@ -282,7 +350,7 @@ class RawDocumentsClient:
             The URL that will receive processing event updates.
 
         callback_data : typing.Optional[str]
-            A string that is returned, along with processing event updates, to the callback URL.
+            Custom string included in processing updates sent to the callback URL.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -340,6 +408,28 @@ class RawDocumentsClient:
                         ),
                     ),
                 )
+            if _response.status_code == 403:
+                raise ForbiddenError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 503:
+                raise ServiceUnavailableError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
@@ -369,19 +459,19 @@ class RawDocumentsClient:
             The maximum number of returned documents. Accepts 1-100 with a default of 20.
 
         filter : typing.Optional[str]
-            Only documents with names that contain the filter string will be returned in the results.
+            Return only documents whose names contain this string.
 
         sort : typing.Optional[Sort]
             The document attribute that will be used to sort the results.
 
         sort_order : typing.Optional[SortOrder]
-            The order in which to sort the results. A value for sort must also be set.
+            Sort order. Requires sort.
 
         status : typing.Optional[ProcessingStatus]
-            A status filter on the get documents query. If this value is set, then only documents with this status will be returned in the results.
+            Return only documents with this status.
 
         next_token : typing.Optional[str]
-            A token for pagination. If the number of documents for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n documents.
+            Pass nextToken from the previous response to get the next page of up to n documents.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -389,7 +479,7 @@ class RawDocumentsClient:
         Returns
         -------
         HttpResponse[DocumentListResponse]
-            Look up success
+            Lookup successful
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/ingest/documents",
@@ -433,16 +523,18 @@ class RawDocumentsClient:
     ) -> HttpResponse[IngestResponse]:
         """
         Update the attributes of documents that have been uploaded to GroundX.
+        Policy-bearing updates return 403 when file access is disabled; enabled
+        temporary failures return 503 with Retry-After.
 
         Parameters
         ----------
         documents : typing.Sequence[DocumentUpdate]
 
         callback_url : typing.Optional[str]
-            An endpoint that will receive processing event updates as POST.
+            URL that receives processing updates as POST requests.
 
         callback_data : typing.Optional[str]
-            A string that is returned, along with processing event updates, to the callback URL.
+            Custom string included in processing updates sent to the callback URL.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -491,6 +583,50 @@ class RawDocumentsClient:
                 )
             if _response.status_code == 401:
                 raise UnauthorizedError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 403:
+                raise ForbiddenError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 409:
+                raise ConflictError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 503:
+                raise ServiceUnavailableError(
                     headers=dict(_response.headers),
                     body=typing.cast(
                         typing.Any,
@@ -599,7 +735,7 @@ class RawDocumentsClient:
         Returns
         -------
         HttpResponse[IngestResponse]
-            Look up success
+            Lookup successful
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/ingest/{encode_path_param(process_id)}",
@@ -736,19 +872,19 @@ class RawDocumentsClient:
             The maximum number of returned documents. Accepts 1-100 with a default of 20.
 
         filter : typing.Optional[str]
-            Only documents with names that contain the filter string will be returned in the results.
+            Return only documents whose names contain this string.
 
         sort : typing.Optional[Sort]
             The document attribute that will be used to sort the results.
 
         sort_order : typing.Optional[SortOrder]
-            The order in which to sort the results. A value for sort must also be set.
+            Sort order. Requires sort.
 
         status : typing.Optional[ProcessingStatus]
-            A status filter on the get documents query. If this value is set, then only documents with this status will be returned in the results.
+            Return only documents with this status.
 
         next_token : typing.Optional[str]
-            A token for pagination. If the number of documents for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n documents.
+            Pass nextToken from the previous response to get the next page of up to n documents.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -756,7 +892,7 @@ class RawDocumentsClient:
         Returns
         -------
         HttpResponse[DocumentLookupResponse]
-            Look up success
+            Lookup successful
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/ingest/documents/{encode_path_param(id)}",
@@ -829,7 +965,7 @@ class RawDocumentsClient:
         Returns
         -------
         HttpResponse[DocumentResponse]
-            Look up success
+            Lookup successful
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/ingest/document/{encode_path_param(document_id)}",
@@ -942,6 +1078,92 @@ class RawDocumentsClient:
             )
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
+    def retry_failed_stage(
+        self, document_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> HttpResponse[RetryFailedStageResponse]:
+        """
+        Retry a failed HTTP callback using its saved output and settings. No request body is needed. Post-processing and manual retries must be enabled. Active or successfully delivered documents and other failed stages return 409. A 202 response confirms acceptance; get the document to check deliveryStatus. An earlier unconfirmed delivery may already have reached the receiver.
+
+        Parameters
+        ----------
+        document_id : str
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[RetryFailedStageResponse]
+            Retry request accepted; read the document to check deliveryStatus
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"v1/ingest/document/{encode_path_param(document_id)}/retry",
+            method="POST",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    RetryFailedStageResponse,
+                    parse_obj_as(
+                        type_=RetryFailedStageResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 409:
+                raise ConflictError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 503:
+                raise ServiceUnavailableError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
+        except ValidationError as e:
+            raise ParsingError(
+                status_code=_response.status_code, headers=dict(_response.headers), body=_response.json(), cause=e
+            )
+        raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
+
     def get_extract(
         self, document_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> HttpResponse[DocumentsGetExtractResponse]:
@@ -959,7 +1181,7 @@ class RawDocumentsClient:
         Returns
         -------
         HttpResponse[DocumentsGetExtractResponse]
-            Look up success
+            Lookup successful
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/ingest/document/extract/{encode_path_param(document_id)}",
@@ -1024,7 +1246,7 @@ class RawDocumentsClient:
         Returns
         -------
         HttpResponse[DocumentXray]
-            Look up success
+            Lookup successful
         """
         _response = self._client_wrapper.httpx_client.request(
             f"v1/ingest/document/xray/{encode_path_param(document_id)}",
@@ -1088,7 +1310,7 @@ class RawDocumentsClient:
             The maximum number of returned processes. Accepts 1-100 with a default of 20.
 
         status : typing.Optional[ProcessingStatus]
-            A status filter on the processing status. If this value is set, then only processes with this status will be returned in the results.
+            Return only processes with this status.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1096,7 +1318,7 @@ class RawDocumentsClient:
         Returns
         -------
         HttpResponse[ProcessesStatusResponse]
-            Look up success
+            Lookup successful
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/ingest",
@@ -1126,6 +1348,133 @@ class RawDocumentsClient:
             )
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
+    def file_link(
+        self,
+        document_id: str,
+        *,
+        asset: AssetSelector,
+        expires_in_seconds: typing.Optional[int] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> HttpResponse[FileLinkResponse]:
+        """
+        Create a storage-signed download link for a saved asset you own. Anyone with the link can use or forward it until expiresAt. Revoking an API key or changing policy does not cancel issued links. The URL contains no GroundX API key. Returns 404 if file access is disabled, or 503 with Retry-After for temporary file-access failures.
+
+        Parameters
+        ----------
+        document_id : str
+
+        asset : AssetSelector
+
+        expires_in_seconds : typing.Optional[int]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[FileLinkResponse]
+            Private, no-store response
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"v1/ingest/document/{encode_path_param(document_id)}/file-link",
+            method="POST",
+            json={
+                "asset": convert_and_respect_annotation_metadata(
+                    object_=asset, annotation=AssetSelector, direction="write"
+                ),
+                "expiresInSeconds": expires_in_seconds,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    FileLinkResponse,
+                    parse_obj_as(
+                        type_=FileLinkResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 403:
+                raise ForbiddenError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 409:
+                raise ConflictError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 503:
+                raise ServiceUnavailableError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
+        except ValidationError as e:
+            raise ParsingError(
+                status_code=_response.status_code, headers=dict(_response.headers), body=_response.json(), cause=e
+            )
+        raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
+
 
 class AsyncRawDocumentsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
@@ -1140,7 +1489,7 @@ class AsyncRawDocumentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[IngestResponse]:
         """
-        copy documents from one bucket to another
+        Copy documents from one bucket to another.
 
         Parameters
         ----------
@@ -1212,10 +1561,10 @@ class AsyncRawDocumentsClient:
         documents : typing.Sequence[IngestRemoteDocument]
 
         callback_url : typing.Optional[str]
-            An endpoint that will receive processing event updates as POST.
+            URL that receives processing updates as POST requests.
 
         callback_data : typing.Optional[str]
-            A string that is returned, along with processing event updates, to the callback URL.
+            Custom string included in processing updates sent to the callback URL.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1264,6 +1613,28 @@ class AsyncRawDocumentsClient:
                 )
             if _response.status_code == 401:
                 raise UnauthorizedError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 403:
+                raise ForbiddenError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 503:
+                raise ServiceUnavailableError(
                     headers=dict(_response.headers),
                     body=typing.cast(
                         typing.Any,
@@ -1343,6 +1714,50 @@ class AsyncRawDocumentsClient:
                         ),
                     ),
                 )
+            if _response.status_code == 403:
+                raise ForbiddenError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 409:
+                raise ConflictError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 503:
+                raise ServiceUnavailableError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
@@ -1361,12 +1776,7 @@ class AsyncRawDocumentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[IngestResponse]:
         """
-        Upload the content of a publicly accessible website for ingestion into a GroundX bucket. This is done by following links within a specified URL, recursively, up to a specified depth or number of pages.
-
-        Note1: This endpoint is currently not supported for on-prem deployments.
-        Note2: The `source_url` must include the protocol, http:// or https://.
-
-        [Supported Document Types and Ingest Capacities](https://docs.eyelevel.ai/documentation/fundamentals/document-types-and-ingest-capacities)
+        Ingest a public website by following links from a starting URL, up to the requested depth or page limit. The source_url must start with http:// or https://. Website crawling is not supported on-prem. [Supported Document Types and Ingest Capacities](https://docs.eyelevel.ai/documentation/fundamentals/document-types-and-ingest-capacities)
 
         Parameters
         ----------
@@ -1376,7 +1786,7 @@ class AsyncRawDocumentsClient:
             The URL that will receive processing event updates.
 
         callback_data : typing.Optional[str]
-            A string that is returned, along with processing event updates, to the callback URL.
+            Custom string included in processing updates sent to the callback URL.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1434,6 +1844,28 @@ class AsyncRawDocumentsClient:
                         ),
                     ),
                 )
+            if _response.status_code == 403:
+                raise ForbiddenError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 503:
+                raise ServiceUnavailableError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
@@ -1463,19 +1895,19 @@ class AsyncRawDocumentsClient:
             The maximum number of returned documents. Accepts 1-100 with a default of 20.
 
         filter : typing.Optional[str]
-            Only documents with names that contain the filter string will be returned in the results.
+            Return only documents whose names contain this string.
 
         sort : typing.Optional[Sort]
             The document attribute that will be used to sort the results.
 
         sort_order : typing.Optional[SortOrder]
-            The order in which to sort the results. A value for sort must also be set.
+            Sort order. Requires sort.
 
         status : typing.Optional[ProcessingStatus]
-            A status filter on the get documents query. If this value is set, then only documents with this status will be returned in the results.
+            Return only documents with this status.
 
         next_token : typing.Optional[str]
-            A token for pagination. If the number of documents for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n documents.
+            Pass nextToken from the previous response to get the next page of up to n documents.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1483,7 +1915,7 @@ class AsyncRawDocumentsClient:
         Returns
         -------
         AsyncHttpResponse[DocumentListResponse]
-            Look up success
+            Lookup successful
         """
         _response = await self._client_wrapper.httpx_client.request(
             "v1/ingest/documents",
@@ -1527,16 +1959,18 @@ class AsyncRawDocumentsClient:
     ) -> AsyncHttpResponse[IngestResponse]:
         """
         Update the attributes of documents that have been uploaded to GroundX.
+        Policy-bearing updates return 403 when file access is disabled; enabled
+        temporary failures return 503 with Retry-After.
 
         Parameters
         ----------
         documents : typing.Sequence[DocumentUpdate]
 
         callback_url : typing.Optional[str]
-            An endpoint that will receive processing event updates as POST.
+            URL that receives processing updates as POST requests.
 
         callback_data : typing.Optional[str]
-            A string that is returned, along with processing event updates, to the callback URL.
+            Custom string included in processing updates sent to the callback URL.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1585,6 +2019,50 @@ class AsyncRawDocumentsClient:
                 )
             if _response.status_code == 401:
                 raise UnauthorizedError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 403:
+                raise ForbiddenError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 409:
+                raise ConflictError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 503:
+                raise ServiceUnavailableError(
                     headers=dict(_response.headers),
                     body=typing.cast(
                         typing.Any,
@@ -1693,7 +2171,7 @@ class AsyncRawDocumentsClient:
         Returns
         -------
         AsyncHttpResponse[IngestResponse]
-            Look up success
+            Lookup successful
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/ingest/{encode_path_param(process_id)}",
@@ -1830,19 +2308,19 @@ class AsyncRawDocumentsClient:
             The maximum number of returned documents. Accepts 1-100 with a default of 20.
 
         filter : typing.Optional[str]
-            Only documents with names that contain the filter string will be returned in the results.
+            Return only documents whose names contain this string.
 
         sort : typing.Optional[Sort]
             The document attribute that will be used to sort the results.
 
         sort_order : typing.Optional[SortOrder]
-            The order in which to sort the results. A value for sort must also be set.
+            Sort order. Requires sort.
 
         status : typing.Optional[ProcessingStatus]
-            A status filter on the get documents query. If this value is set, then only documents with this status will be returned in the results.
+            Return only documents with this status.
 
         next_token : typing.Optional[str]
-            A token for pagination. If the number of documents for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n documents.
+            Pass nextToken from the previous response to get the next page of up to n documents.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1850,7 +2328,7 @@ class AsyncRawDocumentsClient:
         Returns
         -------
         AsyncHttpResponse[DocumentLookupResponse]
-            Look up success
+            Lookup successful
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/ingest/documents/{encode_path_param(id)}",
@@ -1923,7 +2401,7 @@ class AsyncRawDocumentsClient:
         Returns
         -------
         AsyncHttpResponse[DocumentResponse]
-            Look up success
+            Lookup successful
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/ingest/document/{encode_path_param(document_id)}",
@@ -2036,6 +2514,92 @@ class AsyncRawDocumentsClient:
             )
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
+    async def retry_failed_stage(
+        self, document_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> AsyncHttpResponse[RetryFailedStageResponse]:
+        """
+        Retry a failed HTTP callback using its saved output and settings. No request body is needed. Post-processing and manual retries must be enabled. Active or successfully delivered documents and other failed stages return 409. A 202 response confirms acceptance; get the document to check deliveryStatus. An earlier unconfirmed delivery may already have reached the receiver.
+
+        Parameters
+        ----------
+        document_id : str
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[RetryFailedStageResponse]
+            Retry request accepted; read the document to check deliveryStatus
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"v1/ingest/document/{encode_path_param(document_id)}/retry",
+            method="POST",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    RetryFailedStageResponse,
+                    parse_obj_as(
+                        type_=RetryFailedStageResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 409:
+                raise ConflictError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 503:
+                raise ServiceUnavailableError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
+        except ValidationError as e:
+            raise ParsingError(
+                status_code=_response.status_code, headers=dict(_response.headers), body=_response.json(), cause=e
+            )
+        raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
+
     async def get_extract(
         self, document_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> AsyncHttpResponse[DocumentsGetExtractResponse]:
@@ -2053,7 +2617,7 @@ class AsyncRawDocumentsClient:
         Returns
         -------
         AsyncHttpResponse[DocumentsGetExtractResponse]
-            Look up success
+            Lookup successful
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/ingest/document/extract/{encode_path_param(document_id)}",
@@ -2118,7 +2682,7 @@ class AsyncRawDocumentsClient:
         Returns
         -------
         AsyncHttpResponse[DocumentXray]
-            Look up success
+            Lookup successful
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"v1/ingest/document/xray/{encode_path_param(document_id)}",
@@ -2182,7 +2746,7 @@ class AsyncRawDocumentsClient:
             The maximum number of returned processes. Accepts 1-100 with a default of 20.
 
         status : typing.Optional[ProcessingStatus]
-            A status filter on the processing status. If this value is set, then only processes with this status will be returned in the results.
+            Return only processes with this status.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -2190,7 +2754,7 @@ class AsyncRawDocumentsClient:
         Returns
         -------
         AsyncHttpResponse[ProcessesStatusResponse]
-            Look up success
+            Lookup successful
         """
         _response = await self._client_wrapper.httpx_client.request(
             "v1/ingest",
@@ -2211,6 +2775,133 @@ class AsyncRawDocumentsClient:
                     ),
                 )
                 return AsyncHttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
+        except ValidationError as e:
+            raise ParsingError(
+                status_code=_response.status_code, headers=dict(_response.headers), body=_response.json(), cause=e
+            )
+        raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
+
+    async def file_link(
+        self,
+        document_id: str,
+        *,
+        asset: AssetSelector,
+        expires_in_seconds: typing.Optional[int] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AsyncHttpResponse[FileLinkResponse]:
+        """
+        Create a storage-signed download link for a saved asset you own. Anyone with the link can use or forward it until expiresAt. Revoking an API key or changing policy does not cancel issued links. The URL contains no GroundX API key. Returns 404 if file access is disabled, or 503 with Retry-After for temporary file-access failures.
+
+        Parameters
+        ----------
+        document_id : str
+
+        asset : AssetSelector
+
+        expires_in_seconds : typing.Optional[int]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[FileLinkResponse]
+            Private, no-store response
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"v1/ingest/document/{encode_path_param(document_id)}/file-link",
+            method="POST",
+            json={
+                "asset": convert_and_respect_annotation_metadata(
+                    object_=asset, annotation=AssetSelector, direction="write"
+                ),
+                "expiresInSeconds": expires_in_seconds,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    FileLinkResponse,
+                    parse_obj_as(
+                        type_=FileLinkResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 403:
+                raise ForbiddenError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 409:
+                raise ConflictError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 503:
+                raise ServiceUnavailableError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)

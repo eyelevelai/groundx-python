@@ -35,7 +35,7 @@ class RawApiKeyClient:
         Returns
         -------
         HttpResponse[ApiKeyResponse]
-            Look up success
+            Lookup successful
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/apikey",
@@ -229,7 +229,7 @@ class AsyncRawApiKeyClient:
         Returns
         -------
         AsyncHttpResponse[ApiKeyResponse]
-            Look up success
+            Lookup successful
         """
         _response = await self._client_wrapper.httpx_client.request(
             "v1/apikey",

@@ -17,7 +17,10 @@ class SearchResultItemPagesItem(UniversalBaseModel):
     image_url: typing_extensions.Annotated[
         typing.Optional[str],
         FieldMetadata(alias="imageUrl"),
-        pydantic.Field(alias="imageUrl", description="A jpg of the page the chunk appears on"),
+        pydantic.Field(
+            alias="imageUrl",
+            description="JPEG of the page containing this chunk. Protected images use storage-signed links that expire within the applied policy time limit. Keep documentId and this page number; use documents.fileLink with a page selector to refresh the link. Public stable links do not expire.",
+        ),
     ] = None
     number: typing.Optional[float] = pydantic.Field(default=None)
     """

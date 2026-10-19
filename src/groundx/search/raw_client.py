@@ -37,8 +37,7 @@ class RawSearchClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[SearchResponse]:
         """
-        Search documents on GroundX for the most relevant information to a given query.
-        The result of this query is typically used in one of two ways; `result.search.text` can be used to provide context to a language model, facilitating RAG, or `result.search.results` can be used to observe chunks of text which are relevant to the query, facilitating citation.
+        Search a bucket, group or document for information relevant to a query. Use result.search.text as context for a language model and result.search.results for matching text and citations.
 
         Parameters
         ----------
@@ -46,19 +45,19 @@ class RawSearchClient:
             The bucketId, groupId, or documentId to be searched. The document or documents within the specified container will be compared to the query, and relevant information will be extracted.
 
         query : str
-            The search query to be used to find relevant documentation.
+            Search query.
 
         n : typing.Optional[int]
             The maximum number of returned search results. Accepts 1-100 with a default of 20.
 
         next_token : typing.Optional[str]
-            A token for pagination. If the number of search results for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n search results.
+            Pass nextToken from the previous response to get the next page of up to n search results.
 
         verbosity : typing.Optional[int]
-            The amount of data returned with each search result. 0 == no search results, only the recommended context. 1 == search results but no searchData. 2 == search results and searchData.
+            Response detail: 0 returns only recommended context; 1 adds search results without searchData; 2 includes searchData.
 
         filter : typing.Optional[typing.Dict[str, typing.Any]]
-            A dictionary of key-value pairs that can be used to pre-filter documents prior to a search.
+            Key-value metadata used to filter documents before searching.
 
         relevance : typing.Optional[float]
             The minimum search relevance score required to include the result. By default, this is 10.0.
@@ -144,13 +143,12 @@ class RawSearchClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[SearchResponse]:
         """
-        Search documents on GroundX for the most relevant information to a given query by documentId(s).
-        The result of this query is typically used in one of two ways; `result.search.text` can be used to provide context to a language model, facilitating RAG, or `result.search.results` can be used to observe chunks of text which are relevant to the query, facilitating citation.
+        Search the specified document IDs for information relevant to a query. Use result.search.text as context for a language model and result.search.results for matching text and citations.
 
         Parameters
         ----------
         query : str
-            The search query to be used to find relevant documentation.
+            Search query.
 
         document_ids : typing.Sequence[str]
             An array of unique documentIds to be searched.
@@ -159,13 +157,13 @@ class RawSearchClient:
             The maximum number of returned search results. Accepts 1-100 with a default of 20.
 
         next_token : typing.Optional[str]
-            A token for pagination. If the number of search results for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n search results.
+            Pass nextToken from the previous response to get the next page of up to n search results.
 
         verbosity : typing.Optional[int]
-            The amount of data returned with each search result. 0 == no search results, only the recommended context. 1 == search results but no searchData. 2 == search results and searchData.
+            Response detail: 0 returns only recommended context; 1 adds search results without searchData; 2 includes searchData.
 
         filter : typing.Optional[typing.Dict[str, typing.Any]]
-            A dictionary of key-value pairs that can be used to pre-filter documents prior to a search.
+            Key-value metadata used to filter documents before searching.
 
         relevance : typing.Optional[float]
             The minimum search relevance score required to include the result. By default, this is 10.0.
@@ -257,8 +255,7 @@ class AsyncRawSearchClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[SearchResponse]:
         """
-        Search documents on GroundX for the most relevant information to a given query.
-        The result of this query is typically used in one of two ways; `result.search.text` can be used to provide context to a language model, facilitating RAG, or `result.search.results` can be used to observe chunks of text which are relevant to the query, facilitating citation.
+        Search a bucket, group or document for information relevant to a query. Use result.search.text as context for a language model and result.search.results for matching text and citations.
 
         Parameters
         ----------
@@ -266,19 +263,19 @@ class AsyncRawSearchClient:
             The bucketId, groupId, or documentId to be searched. The document or documents within the specified container will be compared to the query, and relevant information will be extracted.
 
         query : str
-            The search query to be used to find relevant documentation.
+            Search query.
 
         n : typing.Optional[int]
             The maximum number of returned search results. Accepts 1-100 with a default of 20.
 
         next_token : typing.Optional[str]
-            A token for pagination. If the number of search results for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n search results.
+            Pass nextToken from the previous response to get the next page of up to n search results.
 
         verbosity : typing.Optional[int]
-            The amount of data returned with each search result. 0 == no search results, only the recommended context. 1 == search results but no searchData. 2 == search results and searchData.
+            Response detail: 0 returns only recommended context; 1 adds search results without searchData; 2 includes searchData.
 
         filter : typing.Optional[typing.Dict[str, typing.Any]]
-            A dictionary of key-value pairs that can be used to pre-filter documents prior to a search.
+            Key-value metadata used to filter documents before searching.
 
         relevance : typing.Optional[float]
             The minimum search relevance score required to include the result. By default, this is 10.0.
@@ -364,13 +361,12 @@ class AsyncRawSearchClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[SearchResponse]:
         """
-        Search documents on GroundX for the most relevant information to a given query by documentId(s).
-        The result of this query is typically used in one of two ways; `result.search.text` can be used to provide context to a language model, facilitating RAG, or `result.search.results` can be used to observe chunks of text which are relevant to the query, facilitating citation.
+        Search the specified document IDs for information relevant to a query. Use result.search.text as context for a language model and result.search.results for matching text and citations.
 
         Parameters
         ----------
         query : str
-            The search query to be used to find relevant documentation.
+            Search query.
 
         document_ids : typing.Sequence[str]
             An array of unique documentIds to be searched.
@@ -379,13 +375,13 @@ class AsyncRawSearchClient:
             The maximum number of returned search results. Accepts 1-100 with a default of 20.
 
         next_token : typing.Optional[str]
-            A token for pagination. If the number of search results for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n search results.
+            Pass nextToken from the previous response to get the next page of up to n search results.
 
         verbosity : typing.Optional[int]
-            The amount of data returned with each search result. 0 == no search results, only the recommended context. 1 == search results but no searchData. 2 == search results and searchData.
+            Response detail: 0 returns only recommended context; 1 adds search results without searchData; 2 includes searchData.
 
         filter : typing.Optional[typing.Dict[str, typing.Any]]
-            A dictionary of key-value pairs that can be used to pre-filter documents prior to a search.
+            Key-value metadata used to filter documents before searching.
 
         relevance : typing.Optional[float]
             The minimum search relevance score required to include the result. By default, this is 10.0.

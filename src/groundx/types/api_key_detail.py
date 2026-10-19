@@ -15,7 +15,7 @@ class ApiKeyDetail(UniversalBaseModel):
     ]
     created: typing.Optional[dt.datetime] = pydantic.Field(default=None)
     """
-    The data time when the API key was created, in RFC3339 format
+    API key creation time in RFC3339 format.
     """
 
     name: typing.Optional[str] = None

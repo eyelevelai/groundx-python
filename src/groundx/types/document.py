@@ -7,10 +7,19 @@ import typing_extensions
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 from ..core.serialization import FieldMetadata
 from .document_type import DocumentType
+from .file_access_policy import FileAccessPolicy
 from .process_level import ProcessLevel
 
 
 class Document(UniversalBaseModel):
+    file_access: typing_extensions.Annotated[
+        typing.Optional[FileAccessPolicy],
+        FieldMetadata(alias="fileAccess"),
+        pydantic.Field(
+            alias="fileAccess",
+            description="Initial file settings, preserved by SDK batching and splitting. Omit or send null to inherit. New files need no policy revision. Use private staging before uploading a protected file. Returns 403 if file access is disabled.",
+        ),
+    ] = None
     bucket_id: typing_extensions.Annotated[
         int,
         FieldMetadata(alias="bucketId"),
@@ -35,7 +44,7 @@ class Document(UniversalBaseModel):
     ] = None
     filter: typing.Optional[typing.Dict[str, typing.Any]] = pydantic.Field(default=None)
     """
-    A dictionary of key-value pairs that can be used to pre-filter documents prior to a search.
+    Key-value metadata used to filter documents before searching.
     """
 
     process_level: typing_extensions.Annotated[
@@ -44,10 +53,7 @@ class Document(UniversalBaseModel):
     search_data: typing_extensions.Annotated[
         typing.Optional[typing.Dict[str, typing.Any]],
         FieldMetadata(alias="searchData"),
-        pydantic.Field(
-            alias="searchData",
-            description="Custom metadata which can be used to influence GroundX's search functionality. This data can be used to further hone GroundX search.",
-        ),
+        pydantic.Field(alias="searchData", description="Custom metadata used to improve search results."),
     ] = None
 
     if IS_PYDANTIC_V2:

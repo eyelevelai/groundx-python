@@ -7,6 +7,7 @@ in the linked docs, not in this entrypoint.
 |---|---|
 | [Contributor workflow](CONTRIBUTING.md) | You need setup, tests, release flow, PR guidance, validation, or rules for committed comments. |
 | [`.fernignore`](.fernignore) | Before editing any SDK file. Only `.fernignore`-protected paths are safe to hand-edit here; use it for the generated-vs-hand-written boundary. |
+| [File access and ingest](CONTRIBUTING.md#file-access-and-ingest) | You are changing initial policies, private upload, native links or protected transport. |
 | [`src/groundx/ingest.py`](src/groundx/ingest.py) | You are changing the hand-written ingest helper. |
 | [`src/groundx/extract/`](src/groundx/extract/) | You are changing the hand-written extract helper surface. |
 | [Extraction placement contract](openspec/specs/extraction-placement/spec.md) | You are changing extraction YAML parsing, compilation parity, route placement, or GroundX Python's relationship-aware X-Ray/custom-output reassembly. |

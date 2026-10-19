@@ -1,8 +1,10 @@
 import json
 import os
+import re
 import typing
+from urllib.parse import urlsplit
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 AWS_REGION: str = "AWS_REGION"
 AWS_DEFAULT_REGION: str = "AWS_DEFAULT_REGION"
@@ -149,7 +151,9 @@ class ContainerUploadSettings(BaseModel):
     base_domain: str
     base_path: str = "layout/processed/"
     bucket: str
+    public_read: bool = True
     ssl: bool = False
+    storage_endpoint: typing.Optional[str] = None
     type: str
     url: str
 
@@ -157,6 +161,39 @@ class ContainerUploadSettings(BaseModel):
     region: typing.Optional[str] = None
     secret: typing.Optional[str] = None
     token: typing.Optional[str] = None
+
+    @field_validator("storage_endpoint")
+    @classmethod
+    def validate_storage_endpoint(cls, value: typing.Optional[str]) -> typing.Optional[str]:
+        if value is None:
+            return None
+        message = "storage_endpoint must be an HTTP(S) URL with only a host and optional port"
+        if any(char.isspace() for char in value) or any(char in value for char in "\\%?#"):
+            raise ValueError(message)
+        parsed = urlsplit(value)
+        host = parsed.hostname
+        if (
+            parsed.scheme not in ("http", "https")
+            or not host
+            or parsed.username is not None
+            or parsed.password is not None
+            or parsed.path not in ("", "/")
+            or parsed.netloc.endswith(":")
+            or (parsed.port is not None and not 1 <= parsed.port <= 65535)
+        ):
+            raise ValueError(message)
+        authority = rf"\[{re.escape(host)}\]" if ":" in host else re.escape(host)
+        if not re.fullmatch(authority + r"(?::[0-9]+)?", parsed.netloc, re.IGNORECASE):
+            raise ValueError(message)
+        if ":" in host:
+            from ipaddress import IPv6Address
+
+            IPv6Address(host)
+        elif len(host) > 253 or any(
+            not re.fullmatch(r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?", label) for label in host.rstrip(".").split(".")
+        ):
+            raise ValueError(message)
+        return value
 
     def get_key(self) -> typing.Optional[str]:
         if self.key:

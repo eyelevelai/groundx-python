@@ -21,7 +21,7 @@ class DocumentLookupResponse(UniversalBaseModel):
     ] = None
     remaining: typing.Optional[int] = pydantic.Field(default=None)
     """
-    The number of results that have not been returned yet. Will be null if there are no remaining results.
+    Number of results not yet returned, or null if none remain.
     """
 
     total: typing.Optional[int] = pydantic.Field(default=None)

@@ -7,6 +7,9 @@ from ..core.request_options import RequestOptions
 from ..types.bucket_list_response import BucketListResponse
 from ..types.bucket_response import BucketResponse
 from ..types.bucket_update_response import BucketUpdateResponse
+from ..types.document_type import DocumentType
+from ..types.file_access_policy import FileAccessPolicy
+from ..types.file_upload_response import FileUploadResponse
 from ..types.message_response import MessageResponse
 from .raw_client import AsyncRawBucketsClient, RawBucketsClient
 
@@ -45,7 +48,7 @@ class BucketsClient:
             The maximum number of returned buckets. Accepts 1-100 with a default of 20.
 
         next_token : typing.Optional[str]
-            A token for pagination. If the number of buckets for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n buckets.
+            Pass nextToken from the previous response to get the next page of up to n buckets.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -53,7 +56,7 @@ class BucketsClient:
         Returns
         -------
         BucketListResponse
-            Look up success
+            Lookup successful
 
         Examples
         --------
@@ -70,13 +73,22 @@ class BucketsClient:
         _response = self._raw_client.list(n=n, next_token=next_token, request_options=request_options)
         return _response.data
 
-    def create(self, *, name: str, request_options: typing.Optional[RequestOptions] = None) -> BucketResponse:
+    def create(
+        self,
+        *,
+        name: str,
+        file_access: typing.Optional[FileAccessPolicy] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> BucketResponse:
         """
         Create a new bucket.
 
         Parameters
         ----------
         name : str
+
+        file_access : typing.Optional[FileAccessPolicy]
+            Initial settings for this resource. Omit or send null to inherit. Creation needs no fileAccessRevision. These settings cannot make a protected parent public or exceed its sharing time limit. Use private staging before uploading a protected file, even in a public bucket. Returns 403 if file access is disabled.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -88,16 +100,20 @@ class BucketsClient:
 
         Examples
         --------
-        from groundx import GroundX
+        from groundx import FileAccessPolicy, GroundX
 
         client = GroundX(
             api_key="YOUR_API_KEY",
         )
         client.buckets.create(
-            name="your_bucket_name",
+            name="private-documents",
+            file_access=FileAccessPolicy(
+                mode="protected",
+                url_ttl_seconds=300,
+            ),
         )
         """
-        _response = self._raw_client.create(name=name, request_options=request_options)
+        _response = self._raw_client.create(name=name, file_access=file_access, request_options=request_options)
         return _response.data
 
     def get(self, bucket_id: int, *, request_options: typing.Optional[RequestOptions] = None) -> BucketResponse:
@@ -115,7 +131,7 @@ class BucketsClient:
         Returns
         -------
         BucketResponse
-            Look up success
+            Lookup successful
 
         Examples
         --------
@@ -132,18 +148,28 @@ class BucketsClient:
         return _response.data
 
     def update(
-        self, bucket_id: int, *, new_name: str, request_options: typing.Optional[RequestOptions] = None
+        self,
+        bucket_id: int,
+        *,
+        new_name: typing.Optional[str] = OMIT,
+        file_access: typing.Optional[FileAccessPolicy] = OMIT,
+        file_access_revision: typing.Optional[int] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> BucketUpdateResponse:
         """
-        Rename a bucket.
+        Rename a bucket or replace its file-access policy. Policy-bearing updates return 403 when file access is disabled; enabled temporary failures return 503 with Retry-After.
 
         Parameters
         ----------
         bucket_id : int
             The bucketId of the bucket being updated.
 
-        new_name : str
+        new_name : typing.Optional[str]
             The new name of the bucket being renamed.
+
+        file_access : typing.Optional[FileAccessPolicy]
+
+        file_access_revision : typing.Optional[int]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -161,11 +187,17 @@ class BucketsClient:
             api_key="YOUR_API_KEY",
         )
         client.buckets.update(
-            bucket_id=1,
+            bucket_id=7,
             new_name="your_bucket_name",
         )
         """
-        _response = self._raw_client.update(bucket_id, new_name=new_name, request_options=request_options)
+        _response = self._raw_client.update(
+            bucket_id,
+            new_name=new_name,
+            file_access=file_access,
+            file_access_revision=file_access_revision,
+            request_options=request_options,
+        )
         return _response.data
 
     def delete(self, bucket_id: int, *, request_options: typing.Optional[RequestOptions] = None) -> MessageResponse:
@@ -197,6 +229,59 @@ class BucketsClient:
         )
         """
         _response = self._raw_client.delete(bucket_id, request_options=request_options)
+        return _response.data
+
+    def file_upload(
+        self,
+        bucket_id: int,
+        *,
+        file_name: str,
+        file_type: DocumentType,
+        file_access: typing.Optional[FileAccessPolicy] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> FileUploadResponse:
+        """
+        Return a storage-signed PUT link for a public or protected bucket, valid for at most 900 seconds. Complete PUT before it expires. A private upload reservation also requires ingest submission before that deadline; an unreserved public source remains ingestible after PUT expiry. Available even when file-access protection is disabled. Uses this deployment and its configured storage. Include the requested per-file fileAccess policy so it is checked before upload; non-null policies return 403 when protection is disabled. Returns 503 with Retry-After for temporary verification failures.
+
+        Parameters
+        ----------
+        bucket_id : int
+
+        file_name : str
+
+        file_type : DocumentType
+
+        file_access : typing.Optional[FileAccessPolicy]
+            Requested initial file policy, also sent during ingest. Omit or send null to inherit. Validated before an upload URL is issued. Non-null policies return 403 when file protection is disabled, so a protected upload cannot be staged publicly.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        FileUploadResponse
+            Private, no-store response
+
+        Examples
+        --------
+        from groundx import GroundX
+
+        client = GroundX(
+            api_key="YOUR_API_KEY",
+        )
+        client.buckets.file_upload(
+            bucket_id=1234,
+            file_name="invoice.pdf",
+            file_type="pdf",
+        )
+        """
+        _response = self._raw_client.file_upload(
+            bucket_id,
+            file_name=file_name,
+            file_type=file_type,
+            file_access=file_access,
+            request_options=request_options,
+        )
         return _response.data
 
 
@@ -231,7 +316,7 @@ class AsyncBucketsClient:
             The maximum number of returned buckets. Accepts 1-100 with a default of 20.
 
         next_token : typing.Optional[str]
-            A token for pagination. If the number of buckets for a given query is larger than n, the response will include a "nextToken" value. That token can be included in this field to retrieve the next batch of n buckets.
+            Pass nextToken from the previous response to get the next page of up to n buckets.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -239,7 +324,7 @@ class AsyncBucketsClient:
         Returns
         -------
         BucketListResponse
-            Look up success
+            Lookup successful
 
         Examples
         --------
@@ -264,13 +349,22 @@ class AsyncBucketsClient:
         _response = await self._raw_client.list(n=n, next_token=next_token, request_options=request_options)
         return _response.data
 
-    async def create(self, *, name: str, request_options: typing.Optional[RequestOptions] = None) -> BucketResponse:
+    async def create(
+        self,
+        *,
+        name: str,
+        file_access: typing.Optional[FileAccessPolicy] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> BucketResponse:
         """
         Create a new bucket.
 
         Parameters
         ----------
         name : str
+
+        file_access : typing.Optional[FileAccessPolicy]
+            Initial settings for this resource. Omit or send null to inherit. Creation needs no fileAccessRevision. These settings cannot make a protected parent public or exceed its sharing time limit. Use private staging before uploading a protected file, even in a public bucket. Returns 403 if file access is disabled.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -284,7 +378,7 @@ class AsyncBucketsClient:
         --------
         import asyncio
 
-        from groundx import AsyncGroundX
+        from groundx import AsyncGroundX, FileAccessPolicy
 
         client = AsyncGroundX(
             api_key="YOUR_API_KEY",
@@ -293,13 +387,17 @@ class AsyncBucketsClient:
 
         async def main() -> None:
             await client.buckets.create(
-                name="your_bucket_name",
+                name="private-documents",
+                file_access=FileAccessPolicy(
+                    mode="protected",
+                    url_ttl_seconds=300,
+                ),
             )
 
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.create(name=name, request_options=request_options)
+        _response = await self._raw_client.create(name=name, file_access=file_access, request_options=request_options)
         return _response.data
 
     async def get(self, bucket_id: int, *, request_options: typing.Optional[RequestOptions] = None) -> BucketResponse:
@@ -317,7 +415,7 @@ class AsyncBucketsClient:
         Returns
         -------
         BucketResponse
-            Look up success
+            Lookup successful
 
         Examples
         --------
@@ -342,18 +440,28 @@ class AsyncBucketsClient:
         return _response.data
 
     async def update(
-        self, bucket_id: int, *, new_name: str, request_options: typing.Optional[RequestOptions] = None
+        self,
+        bucket_id: int,
+        *,
+        new_name: typing.Optional[str] = OMIT,
+        file_access: typing.Optional[FileAccessPolicy] = OMIT,
+        file_access_revision: typing.Optional[int] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> BucketUpdateResponse:
         """
-        Rename a bucket.
+        Rename a bucket or replace its file-access policy. Policy-bearing updates return 403 when file access is disabled; enabled temporary failures return 503 with Retry-After.
 
         Parameters
         ----------
         bucket_id : int
             The bucketId of the bucket being updated.
 
-        new_name : str
+        new_name : typing.Optional[str]
             The new name of the bucket being renamed.
+
+        file_access : typing.Optional[FileAccessPolicy]
+
+        file_access_revision : typing.Optional[int]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -376,14 +484,20 @@ class AsyncBucketsClient:
 
         async def main() -> None:
             await client.buckets.update(
-                bucket_id=1,
+                bucket_id=7,
                 new_name="your_bucket_name",
             )
 
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.update(bucket_id, new_name=new_name, request_options=request_options)
+        _response = await self._raw_client.update(
+            bucket_id,
+            new_name=new_name,
+            file_access=file_access,
+            file_access_revision=file_access_revision,
+            request_options=request_options,
+        )
         return _response.data
 
     async def delete(
@@ -425,4 +539,65 @@ class AsyncBucketsClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.delete(bucket_id, request_options=request_options)
+        return _response.data
+
+    async def file_upload(
+        self,
+        bucket_id: int,
+        *,
+        file_name: str,
+        file_type: DocumentType,
+        file_access: typing.Optional[FileAccessPolicy] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> FileUploadResponse:
+        """
+        Return a storage-signed PUT link for a public or protected bucket, valid for at most 900 seconds. Complete PUT before it expires. A private upload reservation also requires ingest submission before that deadline; an unreserved public source remains ingestible after PUT expiry. Available even when file-access protection is disabled. Uses this deployment and its configured storage. Include the requested per-file fileAccess policy so it is checked before upload; non-null policies return 403 when protection is disabled. Returns 503 with Retry-After for temporary verification failures.
+
+        Parameters
+        ----------
+        bucket_id : int
+
+        file_name : str
+
+        file_type : DocumentType
+
+        file_access : typing.Optional[FileAccessPolicy]
+            Requested initial file policy, also sent during ingest. Omit or send null to inherit. Validated before an upload URL is issued. Non-null policies return 403 when file protection is disabled, so a protected upload cannot be staged publicly.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        FileUploadResponse
+            Private, no-store response
+
+        Examples
+        --------
+        import asyncio
+
+        from groundx import AsyncGroundX
+
+        client = AsyncGroundX(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.buckets.file_upload(
+                bucket_id=1234,
+                file_name="invoice.pdf",
+                file_type="pdf",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.file_upload(
+            bucket_id,
+            file_name=file_name,
+            file_type=file_type,
+            file_access=file_access,
+            request_options=request_options,
+        )
         return _response.data
