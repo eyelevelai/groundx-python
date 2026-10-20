@@ -588,24 +588,31 @@ class TestMinIOClient(unittest.TestCase):
         )
 
     def test_head_object_uses_bounded_leased_client(self) -> None:
-        cl = self._client()
-        bounded = FakeMinioClient()
-        create_client = Mock(return_value=bounded)
-        setattr(cl, "_create_client", create_client)
+        for size in (None, 0, 1234):
+            with self.subTest(size=size):
+                cl = self._client()
+                bounded = FakeMinioClient()
+                stat = types.SimpleNamespace(etag="etag-1", last_modified=None, size=size)
+                setattr(bounded, "stat_object", Mock(return_value=stat))
+                create_client = Mock(return_value=bounded)
+                setattr(cl, "_create_client", create_client)
 
-        with fake_minio_error_module():
-            metadata = cl.head_object(
-                "s3://eyelevel/workflows/extract/latest.yaml",
-                connect_timeout_seconds=0.2,
-                read_timeout_seconds=0.5,
-            )
+                with fake_minio_error_module():
+                    metadata = cl.head_object(
+                        "s3://eyelevel/workflows/extract/latest.yaml",
+                        connect_timeout_seconds=0.2,
+                        read_timeout_seconds=0.5,
+                    )
 
-        self.assertEqual(metadata, {"ETag": "etag-1"})
-        create_client.assert_called_once_with(
-            connect_timeout_seconds=0.2,
-            read_timeout_seconds=0.5,
-            total_timeout_seconds=None,
-        )
+                expected = {"ETag": "etag-1"}
+                if size is not None:
+                    expected["ContentLength"] = str(size)
+                self.assertEqual(metadata, expected)
+                create_client.assert_called_once_with(
+                    connect_timeout_seconds=0.2,
+                    read_timeout_seconds=0.5,
+                    total_timeout_seconds=None,
+                )
 
     def test_worker_thread_head_and_put_use_transport_bounded_client(self) -> None:
         cl = self._client()

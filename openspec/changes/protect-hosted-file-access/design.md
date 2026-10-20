@@ -114,3 +114,16 @@ credential separation.
 Keep extraction fixture, generated HTTP and protocol tests in their existing
 responsibility files. TypeScript has no owned OpenSpec tree; its wrapper and
 existing custom tests are covered by this cross-SDK plan.
+
+
+## Native image size metadata
+
+S3 HEAD responses expose `ContentLength`; MinIO stat responses expose `size`.
+Return that value, when available, as string metadata under `ContentLength`.
+This uses the existing metadata dictionary and lets the extraction service's
+existing payload selector resize oversized page groups. Missing size stays
+missing, and zero remains valid. Keep ETag, LastModified, GET responses, storage
+identity and transport behavior unchanged. This adds no dependency, client call,
+public API field or generated code. S3 and MinIO-compatible deployments share
+the same fix. A human-owned SDK release and a rebuilt extraction image are
+required before deployed remediation can be claimed.

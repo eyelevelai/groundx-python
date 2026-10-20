@@ -485,12 +485,22 @@ class TestS3Client(unittest.TestCase):
         )
 
     def test_head_object_handles_missing_last_modified(self) -> None:
-        cl = self._client()
-        cl.client = typing.cast(typing.Any, FakeS3Client())
+        for size in (None, 0, 1234):
+            with self.subTest(size=size):
+                cl = self._client()
+                fake = FakeS3Client()
+                response: typing.Dict[str, typing.Any] = {"ETag": '"etag-1"'}
+                if size is not None:
+                    response["ContentLength"] = size
+                setattr(fake, "head_object", Mock(return_value=response))
+                cl.client = typing.cast(typing.Any, fake)
 
-        metadata = cl.head_object("s3://eyelevel/workflows/extract/latest.yaml")
+                metadata = cl.head_object("s3://eyelevel/workflows/extract/latest.yaml")
 
-        self.assertEqual(metadata, {"ETag": '"etag-1"'})
+                expected = {"ETag": '"etag-1"'}
+                if size is not None:
+                    expected["ContentLength"] = str(size)
+                self.assertEqual(metadata, expected)
 
     def test_head_object_uses_bounded_leased_client(self) -> None:
         cl = self._client()

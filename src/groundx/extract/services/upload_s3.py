@@ -225,7 +225,11 @@ class S3Client:
                 try:
                     s3_bucket, s3_key = self.parse_url(url)
                     response = client.head_object(Bucket=s3_bucket, Key=s3_key)
-                    return self._metadata_from_response(response)
+                    metadata = self._metadata_from_response(response)
+                    size = response.get("ContentLength")
+                    if size is not None:
+                        metadata["ContentLength"] = str(size)
+                    return metadata
                 except Exception as e:
                     self.logger.error_msg(f"[{url}] exception: {e}")
                     raise
