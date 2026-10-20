@@ -287,7 +287,7 @@ image payload limit. The production selector reproduced the missing estimate on
   sizes while preserving ETag, LastModified and bounded-client checks.
 - [x] Include native object length as the optional string `ContentLength` in
   existing HEAD metadata. Preserve GET behavior, keys, timeouts and clients.
-- [ ] Run storage tests, typing and required extraction replays. Repeat the
+- [x] Run storage tests, typing and required extraction replays. Repeat the
   read-only production selector probe and prepare the release handoff. Do not
   publish the SDK or change production.
 
@@ -300,3 +300,15 @@ unresized payload. Ruff and line-ending checks pass. Local mypy reports three
 errors in unchanged generated Pydantic/status code with the system dependencies;
 CI typing with the repository lock remains required. No SDK release or deployed
 extraction remediation is claimed.
+
+
+CI compile, test and line-ending jobs pass on `c30d64e`, and independent source
+review found no material defect. The existing production resizer retained all
+30 pages in 27,094,414 bytes after receiving the correct 58,076,623-byte estimate.
+The original image count and configured resizing policy are preserved.
+
+Release handoff: merge this SDK change, then the human Fern release owner releases
+Python SDK `4.1.2`. Rebuild `internal-arcadia-agents` with that release and deploy
+only dev before repeating ADP public/protected extraction. Do not change the
+TypeScript SDK, publish from this repository, or infer deployed success from the
+read-only probe. Existing package version `4.1.1` remains unchanged in this PR.
