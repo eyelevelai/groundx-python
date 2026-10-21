@@ -5,6 +5,17 @@ Hand-written SDK surface changes. Generated releases are produced from
 
 ## Unreleased
 
+### Added
+
+- `upload.type: s4` in the extract upload layer. `Upload` selects the new
+  `S4Client` (`groundx.extract.services.upload_s4`), a `MinIOClient` subclass.
+  `S4Client` always signs requests for `us-east-1`, ignoring `upload.region`
+  and the region environment variables, and removes one leading `/` from the
+  key on `put_object` and `put_json_stream`. It sends every write of up to
+  5 GiB as one PUT, because S4 accepts a longer key in one PUT than in a
+  multipart upload, and refuses a larger write before sending it. The `minio`
+  and `s3` types select the same clients and behave as before.
+
 ### Deprecated
 
 - `groundx.extract.prepare_extraction_yaml` (and its re-export from
