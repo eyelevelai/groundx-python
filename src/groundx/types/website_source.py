@@ -15,7 +15,7 @@ class WebsiteSource(UniversalBaseModel):
         FieldMetadata(alias="fileAccess"),
         pydantic.Field(
             alias="fileAccess",
-            description="Initial settings for this resource. Omit or send null to inherit. Creation needs no fileAccessRevision. These settings cannot make a protected parent public or exceed its sharing time limit. Use private staging before uploading a protected file, even in a public bucket. Returns 403 if file access is disabled.",
+            description="Initial settings for this resource. Omit or send null to inherit. Explicit settings take priority over the same account or bucket settings; omitted fields use broader values. Use private staging before uploading a protected file, even in a public bucket. Returns 403 if file access is disabled.",
         ),
     ] = None
     bucket_id: typing_extensions.Annotated[

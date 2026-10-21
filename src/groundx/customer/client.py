@@ -59,18 +59,19 @@ class CustomerClient:
     def update(
         self,
         *,
-        file_access_revision: int,
         file_access: typing.Optional[FileAccessPolicy] = OMIT,
+        file_access_revision: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CustomerResponse:
         """
-        Replace or clear your account's file-access settings. Include fileAccessRevision. Invalid or missing input returns 400; disabled or forbidden access returns 403; a stale revision returns 409. If settings or ownership cannot be verified, returns 503 with Retry-After. After an uncertain outcome, read the applied settings before retrying. Protected stable links require X-API-Key on every read.
+        Replace or clear your account's file-access settings. Send only fileAccess; the latest successful update takes effect. Invalid or missing input returns 400; disabled or forbidden access returns 403; ownership or source conflicts return 409. If settings or ownership cannot be verified, returns 503 with Retry-After. After an uncertain outcome, read the applied settings before retrying. Protected stable links require X-API-Key on every read.
 
         Parameters
         ----------
-        file_access_revision : int
-
         file_access : typing.Optional[FileAccessPolicy]
+
+        file_access_revision : typing.Optional[int]
+            Legacy compatibility field. Not required or checked when changing file access.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -92,11 +93,10 @@ class CustomerClient:
                 mode="protected",
                 url_ttl_seconds=300,
             ),
-            file_access_revision=0,
         )
         """
         _response = self._raw_client.update(
-            file_access_revision=file_access_revision, file_access=file_access, request_options=request_options
+            file_access=file_access, file_access_revision=file_access_revision, request_options=request_options
         )
         return _response.data
 
@@ -207,18 +207,19 @@ class AsyncCustomerClient:
     async def update(
         self,
         *,
-        file_access_revision: int,
         file_access: typing.Optional[FileAccessPolicy] = OMIT,
+        file_access_revision: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CustomerResponse:
         """
-        Replace or clear your account's file-access settings. Include fileAccessRevision. Invalid or missing input returns 400; disabled or forbidden access returns 403; a stale revision returns 409. If settings or ownership cannot be verified, returns 503 with Retry-After. After an uncertain outcome, read the applied settings before retrying. Protected stable links require X-API-Key on every read.
+        Replace or clear your account's file-access settings. Send only fileAccess; the latest successful update takes effect. Invalid or missing input returns 400; disabled or forbidden access returns 403; ownership or source conflicts return 409. If settings or ownership cannot be verified, returns 503 with Retry-After. After an uncertain outcome, read the applied settings before retrying. Protected stable links require X-API-Key on every read.
 
         Parameters
         ----------
-        file_access_revision : int
-
         file_access : typing.Optional[FileAccessPolicy]
+
+        file_access_revision : typing.Optional[int]
+            Legacy compatibility field. Not required or checked when changing file access.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -245,14 +246,13 @@ class AsyncCustomerClient:
                     mode="protected",
                     url_ttl_seconds=300,
                 ),
-                file_access_revision=0,
             )
 
 
         asyncio.run(main())
         """
         _response = await self._raw_client.update(
-            file_access_revision=file_access_revision, file_access=file_access, request_options=request_options
+            file_access=file_access, file_access_revision=file_access_revision, request_options=request_options
         )
         return _response.data
 

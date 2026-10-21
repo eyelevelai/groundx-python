@@ -103,7 +103,7 @@ class RawBucketsClient:
         name : str
 
         file_access : typing.Optional[FileAccessPolicy]
-            Initial settings for this resource. Omit or send null to inherit. Creation needs no fileAccessRevision. These settings cannot make a protected parent public or exceed its sharing time limit. Use private staging before uploading a protected file, even in a public bucket. Returns 403 if file access is disabled.
+            Initial settings for this resource. Omit or send null to inherit. Explicit settings take priority over the same account or bucket settings; omitted fields use broader values. Use private staging before uploading a protected file, even in a public bucket. Returns 403 if file access is disabled.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -279,6 +279,7 @@ class RawBucketsClient:
         file_access : typing.Optional[FileAccessPolicy]
 
         file_access_revision : typing.Optional[int]
+            Legacy compatibility field. Not required or checked when changing file access.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -660,7 +661,7 @@ class AsyncRawBucketsClient:
         name : str
 
         file_access : typing.Optional[FileAccessPolicy]
-            Initial settings for this resource. Omit or send null to inherit. Creation needs no fileAccessRevision. These settings cannot make a protected parent public or exceed its sharing time limit. Use private staging before uploading a protected file, even in a public bucket. Returns 403 if file access is disabled.
+            Initial settings for this resource. Omit or send null to inherit. Explicit settings take priority over the same account or bucket settings; omitted fields use broader values. Use private staging before uploading a protected file, even in a public bucket. Returns 403 if file access is disabled.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -836,6 +837,7 @@ class AsyncRawBucketsClient:
         file_access : typing.Optional[FileAccessPolicy]
 
         file_access_revision : typing.Optional[int]
+            Legacy compatibility field. Not required or checked when changing file access.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.

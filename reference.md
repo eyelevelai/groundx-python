@@ -1875,7 +1875,7 @@ client.buckets.create(
 <dl>
 <dd>
 
-**file_access:** `typing.Optional[FileAccessPolicy]` — Initial settings for this resource. Omit or send null to inherit. Creation needs no fileAccessRevision. These settings cannot make a protected parent public or exceed its sharing time limit. Use private staging before uploading a protected file, even in a public bucket. Returns 403 if file access is disabled.
+**file_access:** `typing.Optional[FileAccessPolicy]` — Initial settings for this resource. Omit or send null to inherit. Explicit settings take priority over the same account or bucket settings; omitted fields use broader values. Use private staging before uploading a protected file, even in a public bucket. Returns 403 if file access is disabled.
     
 </dd>
 </dl>
@@ -2046,7 +2046,7 @@ client.buckets.update(
 <dl>
 <dd>
 
-**file_access_revision:** `typing.Optional[int]` 
+**file_access_revision:** `typing.Optional[int]` — Legacy compatibility field. Not required or checked when changing file access.
     
 </dd>
 </dl>
@@ -3675,7 +3675,7 @@ client.customer.get()
 <dl>
 <dd>
 
-Replace or clear your account's file-access settings. Include fileAccessRevision. Invalid or missing input returns 400; disabled or forbidden access returns 403; a stale revision returns 409. If settings or ownership cannot be verified, returns 503 with Retry-After. After an uncertain outcome, read the applied settings before retrying. Protected stable links require X-API-Key on every read.
+Replace or clear your account's file-access settings. Send only fileAccess; the latest successful update takes effect. Invalid or missing input returns 400; disabled or forbidden access returns 403; ownership or source conflicts return 409. If settings or ownership cannot be verified, returns 503 with Retry-After. After an uncertain outcome, read the applied settings before retrying. Protected stable links require X-API-Key on every read.
 </dd>
 </dl>
 </dd>
@@ -3703,7 +3703,6 @@ client.customer.update(
         mode="protected",
         url_ttl_seconds=300,
     ),
-    file_access_revision=0,
 )
 
 ```
@@ -3720,7 +3719,7 @@ client.customer.update(
 <dl>
 <dd>
 
-**file_access_revision:** `int` 
+**file_access:** `typing.Optional[FileAccessPolicy]` 
     
 </dd>
 </dl>
@@ -3728,7 +3727,7 @@ client.customer.update(
 <dl>
 <dd>
 
-**file_access:** `typing.Optional[FileAccessPolicy]` 
+**file_access_revision:** `typing.Optional[int]` — Legacy compatibility field. Not required or checked when changing file access.
     
 </dd>
 </dl>

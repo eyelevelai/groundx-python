@@ -17,7 +17,7 @@ class Document(UniversalBaseModel):
         FieldMetadata(alias="fileAccess"),
         pydantic.Field(
             alias="fileAccess",
-            description="Initial file settings, preserved by SDK batching and splitting. Omit or send null to inherit. New files need no policy revision. Use private staging before uploading a protected file. Returns 403 if file access is disabled.",
+            description="Initial file settings, preserved by SDK batching and splitting. Omit or send null to inherit. Use private staging before uploading a protected file. Returns 403 if file access is disabled.",
         ),
     ] = None
     bucket_id: typing_extensions.Annotated[

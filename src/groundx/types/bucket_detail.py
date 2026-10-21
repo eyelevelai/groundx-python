@@ -25,7 +25,7 @@ class BucketDetail(UniversalBaseModel):
         FieldMetadata(alias="fileAccessRevision"),
         pydantic.Field(
             alias="fileAccessRevision",
-            description="Current settings revision. Include it when updating fileAccess. A stale revision returns 409.",
+            description="Legacy compatibility field. Not required or checked when changing file access.",
         ),
     ] = None
     effective_file_access: typing_extensions.Annotated[

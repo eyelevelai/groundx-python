@@ -11,7 +11,7 @@ from .file_access_policy_mode import FileAccessPolicyMode
 
 class FileAccessPolicy(UniversalBaseModel):
     """
-    Settings that override inherited values. Omitted fields inherit. A protected parent cannot be made public, and its sharing time limit cannot be exceeded. Stable public links never expire. urlTtlSeconds limits the lifetime of storage-signed sharing links.
+    For each field, document settings take priority over bucket settings, then account settings. Omitted fields use the broader value. Explicit public mode and longer sharing lifetimes are allowed. Stable public links never expire. urlTtlSeconds limits new sharing links; an issued link works without API credentials until its storage expiry.
     """
 
     mode: typing.Optional[FileAccessPolicyMode] = None

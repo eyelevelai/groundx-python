@@ -36,7 +36,12 @@ class DocumentUpdate(UniversalBaseModel):
         typing.Optional[FileAccessPolicy], FieldMetadata(alias="fileAccess"), pydantic.Field(alias="fileAccess")
     ] = None
     file_access_revision: typing_extensions.Annotated[
-        typing.Optional[int], FieldMetadata(alias="fileAccessRevision"), pydantic.Field(alias="fileAccessRevision")
+        typing.Optional[int],
+        FieldMetadata(alias="fileAccessRevision"),
+        pydantic.Field(
+            alias="fileAccessRevision",
+            description="Legacy compatibility field. Not required or checked when changing file access.",
+        ),
     ] = None
 
     if IS_PYDANTIC_V2:
