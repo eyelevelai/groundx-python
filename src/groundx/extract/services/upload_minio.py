@@ -305,6 +305,9 @@ class MinIOClient:
                         res["ETag"] = response.etag
                     if response.last_modified:
                         res["LastModified"] = str(response.last_modified.timestamp())
+                    size = getattr(response, "size", None)
+                    if size is not None:
+                        res["ContentLength"] = str(size)
                     return res
                 except S3Error as e:
                     self.logger.error_msg(f"Failed to get object from [{url}] [{self.parse_url(url)}]: {str(e)}")

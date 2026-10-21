@@ -273,3 +273,42 @@ Local closeout receipt: `protect-hosted-file-access/test-preservation-python`, c
 - [x] Extend the existing sync/async creation transport case with a typed document policy, successful protected bucket creation, two remote documents with distinct 120/300-second policies and website policy. Exact wire assertions preserve omitted/null creation and legacy rename requests and reject accidental creation revisions. These replace the meaningful transport assertions formerly run from Fern without restoring duplicate CI or editing generated code.
 
 The existing upload suite passes all 90 cases. Generated files and package metadata remain byte-identical to official Fern 4.1.0 main.
+
+
+## Native image size metadata
+
+The native S3/MinIO metadata adapters omit object length. Private extraction
+cannot use anonymous HTTP HEAD as a fallback, so page selection loses its
+existing payload estimate and may skip resizing. A dev ADP run failed its 40 MiB
+image payload limit. The production selector reproduced the missing estimate on
+30 synthetic pages with a measured 58,076,623-byte model payload.
+
+- [x] Extend the existing S3 and MinIO HEAD tests for absent, zero and positive
+  sizes while preserving ETag, LastModified and bounded-client checks.
+- [x] Include native object length as the optional string `ContentLength` in
+  existing HEAD metadata. Preserve GET behavior, keys, timeouts and clients.
+- [x] Run storage tests, typing and required extraction replays. Repeat the
+  read-only production selector probe and prepare the release handoff. Do not
+  publish the SDK or change production.
+
+
+Validation: 82 storage tests and 706 extract/custom tests pass, including the
+promoted compact fixture replay. Existing cases remain; two HEAD tests add
+missing, zero and positive size subcases. The live read-only selector probe now
+reports 58,076,623 bytes for the same 30 synthetic pages and rejects the
+unresized payload. Ruff and line-ending checks pass. Local mypy reports three
+errors in unchanged generated Pydantic/status code with the system dependencies;
+CI typing with the repository lock remains required. No SDK release or deployed
+extraction remediation is claimed.
+
+
+CI compile, test and line-ending jobs pass on `c30d64e`, and independent source
+review found no material defect. The existing production resizer retained all
+30 pages in 27,094,414 bytes after receiving the correct 58,076,623-byte estimate.
+The original image count and configured resizing policy are preserved.
+
+Release handoff: merge this SDK change, then the human Fern release owner releases
+Python SDK `4.1.2`. Rebuild `internal-arcadia-agents` with that release and deploy
+only dev before repeating ADP public/protected extraction. Do not change the
+TypeScript SDK, publish from this repository, or infer deployed success from the
+read-only probe. Existing package version `4.1.1` remains unchanged in this PR.
