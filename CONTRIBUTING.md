@@ -165,9 +165,11 @@ values are ignored. Each field uses the document override, then bucket, then acc
 Explicit child settings may allow public access or a longer sharing lifetime.
 A supplied policy replaces the previous override rather than merging it.
 
-Common Python recipes live in Fern's [file-access guide](https://github.com/eyelevelai/eyelevel-fern-config/blob/main/fern/pages/file-access.mdx)
-and the Harness API reference `13-file-access.md`. Temporary downloads require a
-saved-asset selector; they are separate bearer grants, not another policy scope.
+Common Python recipes are in the [human file-access guide](https://docs.groundx.ai/documentation/fundamentals/file-access-and-sharing)
+and the [agent file-access guide](https://github.com/GroundX-Studio/groundx-agent-harness/blob/main/skills/groundx-api/references/13-file-access.md).
+Temporary downloads require a saved-asset selector. Anyone with the resulting
+link can download that asset until it expires; issuing a link does not change
+its access policy.
 
 The preserved sync/async helpers use `buckets.file_upload` for every local file,
 public or protected, through the configured GroundX API. Forward each document's
