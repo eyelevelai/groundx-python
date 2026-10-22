@@ -159,9 +159,15 @@ and state the released SDK version separately from branch support.
 
 `Document.file_access` carries an optional initial override into remote ingest and
 each local/split document. `ingest_directory(file_access=...)` applies it to every
-file in that call. Omitted/null inherits; creating resources requires no prior
-revision. Later settings changes use the current revision and cannot weaken an
-ancestor's protection or share lifetime.
+file in that call. On creation, omitted/null inherits. On update, omission keeps
+an override and explicit null clears it. Updates require no revision; legacy revision
+values are ignored. Each field uses the document override, then bucket, then account.
+Explicit child settings may allow public access or a longer sharing lifetime.
+A supplied policy replaces the previous override rather than merging it.
+
+Common Python recipes live in Fern's [file-access guide](https://github.com/eyelevelai/eyelevel-fern-config/blob/main/fern/pages/file-access.mdx)
+and the Harness API reference `13-file-access.md`. Temporary downloads require a
+saved-asset selector; they are separate bearer grants, not another policy scope.
 
 The preserved sync/async helpers use `buckets.file_upload` for every local file,
 public or protected, through the configured GroundX API. Forward each document's
