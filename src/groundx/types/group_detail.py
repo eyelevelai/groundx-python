@@ -41,7 +41,7 @@ class GroupDetail(UniversalBaseModel):
     name: typing.Optional[str] = None
     prompt: typing.Optional[str] = pydantic.Field(default=None)
     """
-    The group chat prompt stored in settings, when configured.
+    Optional prompt text.
     """
 
     updated: typing.Optional[dt.datetime] = pydantic.Field(default=None)

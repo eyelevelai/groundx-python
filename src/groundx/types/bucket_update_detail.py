@@ -11,6 +11,11 @@ from .file_access_policy import FileAccessPolicy
 
 
 class BucketUpdateDetail(UniversalBaseModel):
+    prompt: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Optional prompt text.
+    """
+
     file_access: typing_extensions.Annotated[
         typing.Optional[FileAccessPolicy],
         FieldMetadata(alias="fileAccess"),

@@ -92,6 +92,7 @@ class RawBucketsClient:
         self,
         *,
         name: str,
+        prompt: typing.Optional[str] = OMIT,
         file_access: typing.Optional[FileAccessPolicy] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[BucketResponse]:
@@ -101,6 +102,9 @@ class RawBucketsClient:
         Parameters
         ----------
         name : str
+
+        prompt : typing.Optional[str]
+            Optional prompt text.
 
         file_access : typing.Optional[FileAccessPolicy]
             Initial settings for this resource. Omit or send null to inherit. Explicit settings take priority over the same account or bucket settings; omitted fields use broader values. Use private staging before uploading a protected file, even in a public bucket. Returns 403 if file access is disabled.
@@ -117,6 +121,7 @@ class RawBucketsClient:
             "v1/bucket",
             method="POST",
             json={
+                "prompt": prompt,
                 "fileAccess": convert_and_respect_annotation_metadata(
                     object_=file_access, annotation=typing.Optional[FileAccessPolicy], direction="write"
                 ),
@@ -260,6 +265,7 @@ class RawBucketsClient:
         self,
         bucket_id: int,
         *,
+        prompt: typing.Optional[str] = OMIT,
         new_name: typing.Optional[str] = OMIT,
         file_access: typing.Optional[FileAccessPolicy] = OMIT,
         file_access_revision: typing.Optional[int] = OMIT,
@@ -272,6 +278,9 @@ class RawBucketsClient:
         ----------
         bucket_id : int
             The bucketId of the bucket being updated.
+
+        prompt : typing.Optional[str]
+            Optional prompt text.
 
         new_name : typing.Optional[str]
             The new name of the bucket being renamed.
@@ -293,6 +302,7 @@ class RawBucketsClient:
             f"v1/bucket/{encode_path_param(bucket_id)}",
             method="PUT",
             json={
+                "prompt": prompt,
                 "newName": new_name,
                 "fileAccess": convert_and_respect_annotation_metadata(
                     object_=file_access, annotation=typing.Optional[FileAccessPolicy], direction="write"
@@ -650,6 +660,7 @@ class AsyncRawBucketsClient:
         self,
         *,
         name: str,
+        prompt: typing.Optional[str] = OMIT,
         file_access: typing.Optional[FileAccessPolicy] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[BucketResponse]:
@@ -659,6 +670,9 @@ class AsyncRawBucketsClient:
         Parameters
         ----------
         name : str
+
+        prompt : typing.Optional[str]
+            Optional prompt text.
 
         file_access : typing.Optional[FileAccessPolicy]
             Initial settings for this resource. Omit or send null to inherit. Explicit settings take priority over the same account or bucket settings; omitted fields use broader values. Use private staging before uploading a protected file, even in a public bucket. Returns 403 if file access is disabled.
@@ -675,6 +689,7 @@ class AsyncRawBucketsClient:
             "v1/bucket",
             method="POST",
             json={
+                "prompt": prompt,
                 "fileAccess": convert_and_respect_annotation_metadata(
                     object_=file_access, annotation=typing.Optional[FileAccessPolicy], direction="write"
                 ),
@@ -818,6 +833,7 @@ class AsyncRawBucketsClient:
         self,
         bucket_id: int,
         *,
+        prompt: typing.Optional[str] = OMIT,
         new_name: typing.Optional[str] = OMIT,
         file_access: typing.Optional[FileAccessPolicy] = OMIT,
         file_access_revision: typing.Optional[int] = OMIT,
@@ -830,6 +846,9 @@ class AsyncRawBucketsClient:
         ----------
         bucket_id : int
             The bucketId of the bucket being updated.
+
+        prompt : typing.Optional[str]
+            Optional prompt text.
 
         new_name : typing.Optional[str]
             The new name of the bucket being renamed.
@@ -851,6 +870,7 @@ class AsyncRawBucketsClient:
             f"v1/bucket/{encode_path_param(bucket_id)}",
             method="PUT",
             json={
+                "prompt": prompt,
                 "newName": new_name,
                 "fileAccess": convert_and_respect_annotation_metadata(
                     object_=file_access, annotation=typing.Optional[FileAccessPolicy], direction="write"

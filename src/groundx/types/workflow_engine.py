@@ -19,7 +19,8 @@ class WorkflowEngine(UniversalBaseModel):
         typing.Optional[str],
         FieldMetadata(alias="apiKey"),
         pydantic.Field(
-            alias="apiKey", description="Credential sent using the selected service's authentication scheme"
+            alias="apiKey",
+            description="Credential sent using the selected service's authentication scheme. SageMaker uses the worker's AWS IAM identity and does not require or use apiKey.",
         ),
     ] = None
     base_url: typing_extensions.Annotated[
@@ -53,7 +54,7 @@ class WorkflowEngine(UniversalBaseModel):
         FieldMetadata(alias="requestHeaders"),
         pydantic.Field(
             alias="requestHeaders",
-            description="Extra LLM request headers with string values, such as OpenAI-Project for usage tracking. They override headers set by GroundX. Set apiKey on the same engine; workflow create and update reject requestHeaders without it. GroundX sends the headers unchanged, but the provider may ignore them.",
+            description="Extra LLM request headers with string values, such as OpenAI-Project for usage tracking. They override headers set by GroundX. Set apiKey on the same engine; workflow create and update reject requestHeaders without it, except for service sagemaker, which uses IAM. SageMaker rejects authentication header overrides. GroundX sends other headers unchanged, but the provider may ignore them.",
         ),
     ] = None
     request_passthrough: typing_extensions.Annotated[
@@ -66,7 +67,7 @@ class WorkflowEngine(UniversalBaseModel):
     ] = None
     service: typing.Optional[WorkflowEngineService] = pydantic.Field(default=None)
     """
-    Selects how requests are configured for the provider. Anthropic uses the native Messages API with baseURL, apiKey, engineID, requestHeaders, and requestPassthrough.
+    Selects how requests are configured for the provider. Anthropic uses the native Messages API with baseURL, apiKey, engineID, requestHeaders, and requestPassthrough. SageMaker uses the worker AWS IAM identity and streams a complete response from baseURL. Only service sagemaker selects this behavior; baseURL is a destination and never selects the provider.
     """
 
     if IS_PYDANTIC_V2:

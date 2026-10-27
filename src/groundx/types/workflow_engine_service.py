@@ -3,5 +3,6 @@
 import typing
 
 WorkflowEngineService = typing.Union[
-    typing.Literal["openai", "openai-base64", "azure", "deep-infra", "hosted", "bedrock", "anthropic"], typing.Any
+    typing.Literal["openai", "openai-base64", "azure", "deep-infra", "hosted", "bedrock", "anthropic", "sagemaker"],
+    typing.Any,
 ]

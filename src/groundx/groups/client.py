@@ -73,6 +73,7 @@ class GroupsClient:
         self,
         *,
         name: str,
+        prompt: typing.Optional[str] = OMIT,
         bucket_name: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> GroupResponse:
@@ -83,6 +84,9 @@ class GroupsClient:
         ----------
         name : str
             The name of the group being created.
+
+        prompt : typing.Optional[str]
+            Optional prompt text.
 
         bucket_name : typing.Optional[str]
             Specify bucketName to automatically create a bucket, by the name specified, and add it to the created group.
@@ -106,7 +110,9 @@ class GroupsClient:
             name="your_group_name",
         )
         """
-        _response = self._raw_client.create(name=name, bucket_name=bucket_name, request_options=request_options)
+        _response = self._raw_client.create(
+            name=name, prompt=prompt, bucket_name=bucket_name, request_options=request_options
+        )
         return _response.data
 
     def get(self, group_id: int, *, request_options: typing.Optional[RequestOptions] = None) -> GroupResponse:
@@ -141,7 +147,12 @@ class GroupsClient:
         return _response.data
 
     def update(
-        self, group_id: int, *, new_name: str, request_options: typing.Optional[RequestOptions] = None
+        self,
+        group_id: int,
+        *,
+        prompt: typing.Optional[str] = OMIT,
+        new_name: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> GroupResponse:
         """
         Rename a group
@@ -151,7 +162,10 @@ class GroupsClient:
         group_id : int
             The groupId of the group to update.
 
-        new_name : str
+        prompt : typing.Optional[str]
+            Optional prompt text.
+
+        new_name : typing.Optional[str]
             The new name of the group being renamed.
 
         request_options : typing.Optional[RequestOptions]
@@ -171,10 +185,9 @@ class GroupsClient:
         )
         client.groups.update(
             group_id=1,
-            new_name="your_group_name",
         )
         """
-        _response = self._raw_client.update(group_id, new_name=new_name, request_options=request_options)
+        _response = self._raw_client.update(group_id, prompt=prompt, new_name=new_name, request_options=request_options)
         return _response.data
 
     def delete(self, group_id: int, *, request_options: typing.Optional[RequestOptions] = None) -> MessageResponse:
@@ -351,6 +364,7 @@ class AsyncGroupsClient:
         self,
         *,
         name: str,
+        prompt: typing.Optional[str] = OMIT,
         bucket_name: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> GroupResponse:
@@ -361,6 +375,9 @@ class AsyncGroupsClient:
         ----------
         name : str
             The name of the group being created.
+
+        prompt : typing.Optional[str]
+            Optional prompt text.
 
         bucket_name : typing.Optional[str]
             Specify bucketName to automatically create a bucket, by the name specified, and add it to the created group.
@@ -392,7 +409,9 @@ class AsyncGroupsClient:
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.create(name=name, bucket_name=bucket_name, request_options=request_options)
+        _response = await self._raw_client.create(
+            name=name, prompt=prompt, bucket_name=bucket_name, request_options=request_options
+        )
         return _response.data
 
     async def get(self, group_id: int, *, request_options: typing.Optional[RequestOptions] = None) -> GroupResponse:
@@ -435,7 +454,12 @@ class AsyncGroupsClient:
         return _response.data
 
     async def update(
-        self, group_id: int, *, new_name: str, request_options: typing.Optional[RequestOptions] = None
+        self,
+        group_id: int,
+        *,
+        prompt: typing.Optional[str] = OMIT,
+        new_name: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> GroupResponse:
         """
         Rename a group
@@ -445,7 +469,10 @@ class AsyncGroupsClient:
         group_id : int
             The groupId of the group to update.
 
-        new_name : str
+        prompt : typing.Optional[str]
+            Optional prompt text.
+
+        new_name : typing.Optional[str]
             The new name of the group being renamed.
 
         request_options : typing.Optional[RequestOptions]
@@ -470,13 +497,14 @@ class AsyncGroupsClient:
         async def main() -> None:
             await client.groups.update(
                 group_id=1,
-                new_name="your_group_name",
             )
 
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.update(group_id, new_name=new_name, request_options=request_options)
+        _response = await self._raw_client.update(
+            group_id, prompt=prompt, new_name=new_name, request_options=request_options
+        )
         return _response.data
 
     async def delete(
