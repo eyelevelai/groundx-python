@@ -199,3 +199,35 @@ helper changes and retain existing extraction transport/replay tests. Validate
 sync/async, public/private, initial overrides, split propagation and native header
 separation. Runtime enablement, image adoption, vendor acceptance and human-owned
 SDK publication remain separate gates.
+
+### Extraction storage settings
+
+`ContainerUploadSettings.public_read` is a service deployment setting, defaulting
+to `True`. The service operator sets it in `config.py`; it is not a customer API,
+MCP, account, bucket or document policy field.
+
+Its bucket-creation purpose is limited to `MinIOClient.provision_bucket()`:
+
+- An existing bucket and its permissions are left unchanged.
+- A missing bucket is created. `True` adds an anonymous download policy;
+  `False` leaves the new bucket private. The S4 adapter inherits this behavior.
+- The S3 adapter does not use this flag to provision buckets or change permissions.
+  S3 reads use the configured service credentials with either value.
+
+Customer downloads are controlled by account, bucket and document `fileAccess`
+policies at the file-access service, or by an issued temporary link. Changing
+`public_read` does not apply those policies or revoke existing public storage access.
+
+**Current extraction consumer:** Internal Arcadia also uses this flag in
+`private_image_storage()` to select image validation and delivery. Those checks
+must recognize the current document's original PNG/JPG source as well as generated
+pages/crops. Do not switch to `True` to bypass a failed image check or describe
+this flag as unused outside bucket creation.
+
+Keep bucket creation separate from extraction authorization. Reuse service
+storage clients for authorized GroundX files, including original images and
+generated pages/crops. Preserve external/signed URL authorization, including
+failure without privileged fallback after a grant is denied. Extend existing
+storage and image tests using actual producer URL shapes; include both flag
+values and public/protected files. Preserve image quality, provider request
+limits and the provider's supported delivery method.

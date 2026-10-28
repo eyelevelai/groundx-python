@@ -10,6 +10,7 @@ in the linked docs, not in this entrypoint.
 | [File access and ingest](CONTRIBUTING.md#file-access-and-ingest) | You are changing initial policies, private upload, native links or protected transport. |
 | [`src/groundx/ingest.py`](src/groundx/ingest.py) | You are changing the hand-written ingest helper. |
 | [`src/groundx/extract/`](src/groundx/extract/) | You are changing the hand-written extract helper surface. |
+| [Extraction storage settings](CONTRIBUTING.md#extraction-storage-settings) | Before changing `public_read`, bucket provisioning, or service image reads; separate deployment settings from customer file policies. |
 | [Extraction placement contract](openspec/specs/extraction-placement/spec.md) | You are changing extraction YAML parsing, compilation parity, route placement, or GroundX Python's relationship-aware X-Ray/custom-output reassembly. |
 | [Custom output readback contract](openspec/specs/custom-output-readback/spec.md) | You are changing custom-output readback, the relationship matcher, or the exported `select_relationship_parent` parent-selection primitive and its `<field>__conflicts` read-side convention. |
 | [Extraction fixture pack](tests/extract/test_compact_fixture_pack_replay.py) | Fixture capture, diagnosis, updates, and final certification follow the canonical private Studio Harness guide (`groundx-extraction-workflows` skill, `references/certification.private.md`). |
