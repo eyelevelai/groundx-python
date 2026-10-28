@@ -35,6 +35,12 @@ parsing is retained.
 | Helm | Full gate passed: 545 tests and 850 unchanged snapshots, both chart trees, template mirrors and Minikube render. Generated extraction settings refuse an SDK lacking alias support. |
 | Harness | Full validation, extraction gate, 26/26 chart-grounded on-prem checks, mirror and version-bump checks passed. |
 
+The full Go summarizer short suite also passed after two malformed test fixture
+joins were changed to the existing `utility.FileURL` helper. Their previous
+host and path concatenation omitted `/`; the production layout and processed-file
+writers already insert it. Existing comparator and error assertions remain
+unchanged. No malformed-host acceptance was added to production readers.
+
 The exact-key adapter test failed five of nine cases before its fix, then passed
 all nine through production image loading and S3/MinIO/S4 adapters. Only native
 storage clients were replaced with recording byte stores. These are local
@@ -74,3 +80,18 @@ No cloud configuration, infrastructure, database, storage policy, release or
 deployment was changed. Live cloud acceptance, container smoke with the released
 SDK and live on-prem vendor certification remain separate gates. The plan stays
 open until its release and acceptance tasks are settled.
+
+## Pull requests
+
+| Repository | PR | Release dependency |
+| --- | --- | --- |
+| groundx-python | [#116](https://github.com/eyelevelai/groundx-python/pull/116) | Merge before the human-owned SDK 4.1.6 release. |
+| cashbot-go | [#1886](https://github.com/EyeLevel-ai/cashbot-go/pull/1886) | Independent Go build; coordinated configuration rollout follows validation. |
+| internal-arcadia-agents | [#215](https://github.com/eyelevelai/internal-arcadia-agents/pull/215) | Draft until SDK 4.1.6 is published, the requirement is updated and normal Linux CI passes. Current CI fails because 4.1.4 lacks `storage_key`. |
+| groundx-on-prem | [#162](https://github.com/eyelevelai/groundx-on-prem/pull/162) | Compatible extraction images before alias-bearing configuration. |
+| ai-server | [#86](https://github.com/EyeLevel-ai/ai-server/pull/86) | Documentation and regression coverage only; no reader image change. |
+| groundx-studio-harness | [#293](https://github.com/EyeLevel-ai/groundx-studio-harness/pull/293) | Guidance release 2.6.30; runtime compatibility remains explicit. |
+
+All six PR heads match their pushed branch and local implementation commit.
+Source worktrees remain for these unmerged PRs. Test dependencies and raw local
+logs are governed by the implementation run's closeout receipt.
