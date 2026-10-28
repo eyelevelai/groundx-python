@@ -26,11 +26,11 @@ parsing is retained.
 
 | Surface | Result |
 | --- | --- |
-| Python SDK | 834 tests passed, 2 skipped, 106 subtests passed, including optional aiohttp coverage. Mypy passed all 221 source files; touched-file Ruff passed. |
+| Python SDK | 834 tests passed, 2 skipped, 106 subtests passed, including optional aiohttp coverage. Mypy passed all 286 source/test files; touched-file Ruff and wheel/sdist builds passed. |
 | Extraction runtime | 1,740 tests passed, 1 deselected, 180 subtests passed with the local SDK source. Full Pyright: no errors; four optional IPython-source warnings. |
 | Protected extraction cases | Maintained compact replay passed for Arcadia legacy, Arcadia v1, generic v1 and ADP v1. Captured fixtures and expected outputs were not changed. |
 | Image preparation | Mixed current/alias PDF and PNG/JPG sources, both provisioning settings, supported review callers and Bedrock paths retain exact storage keys and provider image bytes. Native grants, wrong-document references, denied reads and external HTTP paths remain covered. |
-| Go | Config, utility, fileaccess, prompt and ratelimit short suites passed. Affected-package race tests, partner file-access/source readback, builds and vet passed before rebase; final rebased checks are recorded below. |
+| Go | Config, utility, fileaccess, prompt and ratelimit short suites and race suites passed. Partner file-access/source readback passed after rebase onto current master `6b5a066a`. Affected-package builds, vet and LF checks passed. |
 | Layout | 18 existing File, utility and process-file reader tests passed. |
 | Helm | Full gate passed: 545 tests and 850 unchanged snapshots, both chart trees, template mirrors and Minikube render. Generated extraction settings refuse an SDK lacking alias support. |
 | Harness | Full validation, extraction gate, 26/26 chart-grounded on-prem checks, mirror and version-bump checks passed. |
@@ -39,6 +39,13 @@ The exact-key adapter test failed five of nine cases before its fix, then passed
 all nine through production image loading and S3/MinIO/S4 adapters. Only native
 storage clients were replaced with recording byte stores. These are local
 contract tests, not live vendor certification or model-accuracy measurements.
+
+Arcadia's separate Redis/Celery gate did not pass locally. On macOS the default
+spawn worker cannot register dynamically defined test tasks. Using Linux-style
+fork allowed five tests to pass, then the queue-admission test failed with a
+worker shutdown timeout; the remaining integration cases were stopped. No
+callback/queue source was changed. The normal Linux CI gate must pass after the
+released SDK dependency is updated; the local extraction suite does not replace it.
 
 The old workflow-placement handoff script expects removed Go fixture paths and
 cannot run against the current source tree. Maintained compact replays provide

@@ -121,7 +121,9 @@ def test_alias_image_reads_preserve_exact_native_object_keys(upload_type: str, k
         upload = _upload(upload_type)
         upload.settings.upload.url = "https://current.test/delivery"
         upload.settings.upload.url_aliases = ["https://old.test/delivery"]
-        request = DocumentRequest.model_construct()
+        request = DocumentRequest.model_construct(
+            document_id="document", file_name="image", model_id=1, processor_id=1, task_id="task"
+        )
         images = request.load_images(["https://old.test/delivery/" + key], upload=upload)
 
     assert len(images) == 1
