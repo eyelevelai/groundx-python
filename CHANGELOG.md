@@ -7,6 +7,10 @@ Hand-written SDK surface changes. Generated releases are produced from
 
 ### Added
 
+- Optional extraction `upload.url_aliases` and `Upload.storage_key` resolve current
+  and historical roots for the configured bucket. Image reads reuse the resolver;
+  signed links and explicitly authenticated HTTP reads retain their own transport.
+
 - `upload.type: s4` in the extract upload layer. `Upload` selects the new
   `S4Client` (`groundx.extract.services.upload_s4`), a `MinIOClient` subclass.
   `S4Client` always signs requests for `us-east-1`, ignoring `upload.region`

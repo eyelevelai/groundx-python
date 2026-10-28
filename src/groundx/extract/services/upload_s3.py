@@ -238,9 +238,7 @@ class S3Client:
 
     def parse_url(self, key: str) -> typing.Tuple[str, str]:
         if key.startswith("s3://"):
-            s3_uri_parts = key.replace("s3://", "").split("/")
-            s3_bucket = s3_uri_parts[0]
-            s3_key = "/".join(s3_uri_parts[1:])
+            s3_bucket, _, s3_key = key[len("s3://"):].partition("/")
         else:
             s3_bucket = self.settings.upload.bucket
             s3_key = key

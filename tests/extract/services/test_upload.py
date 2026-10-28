@@ -1,9 +1,42 @@
 import math
 import typing
+from types import SimpleNamespace
 
 import pytest
 
 from groundx.extract.services.upload import TimeoutClientCache, Upload, validate_upload_timeouts
+from groundx.extract.settings.settings import ContainerUploadSettings
+
+
+@pytest.mark.parametrize("reference, expected", [
+    ("https://files.test/prefix/layout/page.jpg", "layout/page.jpg"),
+    ("https://old.test/layout/page.jpg", "layout/page.jpg"),
+    ("http://old.test/layout/page.jpg", "layout/page.jpg"),
+    ("https://OLD.test:443/layout/page.jpg", "layout/page.jpg"),
+    ("https://old.test/deeper/layout/page.jpg", "layout/page.jpg"),
+    ("https://files.test/prefix//literal%252F+name.jpg", "/literal%252F+name.jpg"),
+    ("https://old.test/file/name.jpg?literal=value", "file/name.jpg?literal=value"),
+    ("https://old.test:444/layout/page.jpg", None),
+    ("https://old.test.other/layout/page.jpg", None),
+    ("https://files.test/prefix-other/layout/page.jpg", None),
+    ("https://user@old.test/layout/page.jpg", None),
+    ("https://old.test/layout/page.jpg?X-Amz-Signature=example", None),
+    ("s3://files/layout/page.jpg", "layout/page.jpg"),
+    ("s3://other/layout/page.jpg", None),
+])
+def test_upload_resolves_only_configured_storage_roots(reference: str, expected: typing.Optional[str]) -> None:
+    upload = Upload.__new__(Upload)
+    upload.settings = typing.cast(typing.Any, SimpleNamespace(upload=ContainerUploadSettings(
+        base_domain="storage.test", bucket="files", type="s3", url="https://files.test/prefix/",
+        url_aliases=["https://old.test", "https://old.test/deeper"],
+    )))
+    assert upload.storage_key(reference) == expected
+
+
+@pytest.mark.parametrize("alias", ["https://user:pass@old.test", "https://old.test?query=1", "https://old.test#fragment", "https://old.test:bad", "https://old.test:", "file:///tmp/files", "https://old.test/\npath"])
+def test_upload_rejects_invalid_storage_aliases(alias: str) -> None:
+    with pytest.raises(ValueError):
+        ContainerUploadSettings(base_domain="storage.test", bucket="files", type="s3", url="https://files.test", url_aliases=[alias])
 
 
 class _Client:

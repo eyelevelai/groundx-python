@@ -4,7 +4,7 @@ import re
 import typing
 from urllib.parse import urlsplit
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, Field, field_validator
 
 AWS_REGION: str = "AWS_REGION"
 AWS_DEFAULT_REGION: str = "AWS_DEFAULT_REGION"
@@ -156,11 +156,27 @@ class ContainerUploadSettings(BaseModel):
     storage_endpoint: typing.Optional[str] = None
     type: str
     url: str
+    url_aliases: typing.List[str] = Field(default_factory=list)
 
     key: typing.Optional[str] = None
     region: typing.Optional[str] = None
     secret: typing.Optional[str] = None
     token: typing.Optional[str] = None
+
+    @field_validator("url_aliases")
+    @classmethod
+    def validate_url_aliases(cls, values: typing.List[str]) -> typing.List[str]:
+        for value in values:
+            parsed = urlsplit(value)
+            if (
+                parsed.scheme not in ("http", "https") or not parsed.hostname
+                or parsed.username is not None or parsed.password is not None
+                or parsed.query or parsed.fragment or parsed.netloc.endswith(":")
+                or any(char.isspace() for char in value) or "\\" in value
+                or (parsed.port is not None and not 1 <= parsed.port <= 65535)
+            ):
+                raise ValueError("url_aliases must contain HTTP(S) file roots without credentials, query or fragment")
+        return values
 
     @field_validator("storage_endpoint")
     @classmethod

@@ -5,7 +5,6 @@ import typing
 from datetime import datetime, timezone
 from io import BytesIO
 from pathlib import Path
-from urllib.parse import urlparse
 
 from ..custom_outputs import (
     custom_output_payload_identity,
@@ -977,15 +976,16 @@ class DocumentRequest(BaseModel):
                 continue
 
             if upload and not protected_transport:
-                parsed = urlparse(page)
-                path = parsed.path + ("?" + parsed.query if parsed.query else "")
-                ru = upload.get_object(
-                    path,
-                    connect_timeout_seconds=OBJECT_STORE_CONNECT_TIMEOUT_SECONDS,
-                    read_timeout_seconds=OBJECT_STORE_READ_TIMEOUT_SECONDS,
-                    total_timeout_seconds=OBJECT_STORE_TOTAL_TIMEOUT_SECONDS,
-                )
-                if ru:
+                key = upload.storage_key(page)
+                if key is not None:
+                    ru = upload.get_object(
+                        f"s3://{upload.settings.upload.bucket}/{key}",
+                        connect_timeout_seconds=OBJECT_STORE_CONNECT_TIMEOUT_SECONDS,
+                        read_timeout_seconds=OBJECT_STORE_READ_TIMEOUT_SECONDS,
+                        total_timeout_seconds=OBJECT_STORE_TOTAL_TIMEOUT_SECONDS,
+                    )
+                    if not ru:
+                        raise RuntimeError(f"Failed to load stored image from {safe_page}")
                     img = Image.open(BytesIO(ru))
                     if img:
                         self.page_image_dict[page] = len(self.page_images)
