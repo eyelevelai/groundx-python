@@ -1028,27 +1028,37 @@ class TestDocumentRequest(unittest.TestCase):
         self.assertEqual(get.call_args.kwargs["timeout"], (5.0, 30.0))
 
     def test_load_images_uses_bounded_object_store_timeout(self) -> None:
+        from types import SimpleNamespace
+
+        from groundx.extract.services.upload import Upload
+
         red_img = Image.new("RGB", (10, 10), color="red")
         buf = BytesIO()
         red_img.save(buf, format="PNG")
 
         class RecordingUpload:
+            storage_key = Upload.storage_key
+
             def __init__(self) -> None:
                 self.kwargs: typing.Dict[str, float] = {}
+                self.settings = SimpleNamespace(upload=SimpleNamespace(bucket="eyelevel", url="https://files.test/prefix", url_aliases=["https://old.test/prefix"]))
+                self.paths: typing.List[str] = []
 
             def get_object(self, _path: str, **kwargs: float) -> bytes:
                 self.kwargs = kwargs
+                self.paths.append(_path)
                 return buf.getvalue()
 
         upload = RecordingUpload()
         st = _make_request()
         with patch("requests.get") as get:
             images = st.load_images(
-                ["s3://eyelevel/layout/page1.png"],
+                ["s3://eyelevel/layout/page1.png", "https://old.test/prefix/layout/page1.png"],
                 upload=typing.cast(typing.Any, upload),
             )
 
-        self.assertEqual(len(images), 1)
+        self.assertEqual(len(images), 2)
+        self.assertEqual(upload.paths, ["s3://eyelevel/layout/page1.png", "s3://eyelevel/layout/page1.png"])
         self.assertEqual(
             upload.kwargs,
             {

@@ -5,8 +5,10 @@ import threading
 import typing
 from collections import OrderedDict
 from types import MappingProxyType
+from urllib.parse import urlsplit
 
 from ..settings.settings import ContainerSettings
+from .http import is_native_signed_url
 from .logger import Logger
 
 OBJECT_STORE_CONNECT_TIMEOUT_SECONDS = 5.0
@@ -144,6 +146,41 @@ class UploadClient(typing.Protocol):
 
 
 class Upload:
+    def storage_key(self, reference: str) -> typing.Optional[str]:
+        """Resolve an unsigned reference in this store without changing its key."""
+        if is_native_signed_url(reference) or any(char.isspace() for char in reference) or "\\" in reference:
+            return None
+        settings = self.settings.upload
+        try:
+            target = urlsplit(reference)
+            if target.username is not None or target.password is not None:
+                return None
+            if target.scheme == "s3":
+                if target.netloc == settings.bucket and not target.query and not target.fragment:
+                    return target.path[1:] or None
+                return None
+            if target.scheme not in ("http", "https") or not target.hostname:
+                return None
+            for raw in sorted([settings.url, *getattr(settings, "url_aliases", [])], key=lambda root: len(urlsplit(root).path), reverse=True):
+                root = urlsplit(raw)
+                if root.username is not None or root.password is not None or root.query or root.fragment:
+                    continue
+                same_origin = target.scheme == root.scheme and (
+                    target.port or (443 if target.scheme == "https" else 80)
+                ) == (root.port or (443 if root.scheme == "https" else 80))
+                historical_http = root.scheme == "https" and target.scheme == "http" and target.netloc.lower() == root.netloc.lower()
+                prefix = root.path.rstrip("/") + "/"
+                if target.hostname == root.hostname and (same_origin or historical_http) and target.path.startswith(prefix):
+                    key = target.path[len(prefix):]
+                    if target.query:
+                        key += "?" + target.query
+                    if target.fragment:
+                        key += "#" + target.fragment
+                    return key or None
+        except ValueError:
+            return None
+        return None
+
     def __init__(
         self,
         settings: ContainerSettings,

@@ -316,6 +316,9 @@ class MinIOClient:
         return head()
 
     def parse_url(self, ur: str) -> str:
+        prefix = f"s3://{self.settings.upload.bucket}/"
+        if ur.startswith(prefix):
+            return ur[len(prefix):]
         minio_uri_parts = ur.replace("s3://", "").split("/")
         if len(minio_uri_parts) > 0 and minio_uri_parts[0] == "":
             minio_uri_parts = minio_uri_parts[1:]

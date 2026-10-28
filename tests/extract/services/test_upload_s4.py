@@ -1,10 +1,13 @@
 import os
 import typing
 import urllib.parse
-from unittest.mock import patch
+from io import BytesIO
+from unittest.mock import Mock, patch
 
 import pytest
+from PIL import Image
 
+from groundx.extract.classes.document import DocumentRequest
 from groundx.extract.services.logger import Logger
 from groundx.extract.services.upload import Upload
 from groundx.extract.services.upload_minio import MinIOClient
@@ -103,6 +106,32 @@ def test_minio_and_s3_upload_types_keep_their_clients(upload_type: str, expected
         upload = _upload(upload_type)
 
     assert type(upload.client) is expected_client
+
+
+@pytest.mark.parametrize("upload_type", ["s3", "minio", "s4"])
+@pytest.mark.parametrize("key", ["/literal%252F+name.jpg", "file/s3://source.test/a.jpg", "eyelevel/original.jpg"])
+def test_alias_image_reads_preserve_exact_native_object_keys(upload_type: str, key: str) -> None:
+    image = BytesIO()
+    Image.new("RGB", (2, 2), color="red").save(image, format="PNG")
+    response = Mock()
+    response.read.return_value = image.getvalue()
+    with patch("minio.Minio") as minio_cls, patch("boto3.client") as boto3_client:
+        native = boto3_client.return_value if upload_type == "s3" else minio_cls.return_value
+        native.get_object.return_value = {"Body": response} if upload_type == "s3" else response
+        upload = _upload(upload_type)
+        upload.settings.upload.url = "https://current.test/delivery"
+        upload.settings.upload.url_aliases = ["https://old.test/delivery"]
+        request = DocumentRequest.model_construct(
+            document_id="document", file_name="image", model_id=1, processor_id=1, task_id="task"
+        )
+        images = request.load_images(["https://old.test/delivery/" + key], upload=upload)
+
+    assert len(images) == 1
+    assert images[0].getpixel((0, 0)) == (255, 0, 0)
+    if upload_type == "s3":
+        native.get_object.assert_called_once_with(Bucket="eyelevel", Key=key)
+    else:
+        native.get_object.assert_called_once_with("eyelevel", key)
 
 
 def test_upload_rejects_an_unknown_upload_type_before_building_a_client() -> None:

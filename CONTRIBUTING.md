@@ -202,6 +202,19 @@ SDK publication remain separate gates.
 
 ### Extraction storage settings
 
+`ContainerUploadSettings.url` is the current file root. Optional `url_aliases`
+lists older or native roots for that same bucket, including any delivery prefix
+or MinIO/S4 bucket path. Both default configuration and custom on-prem addresses
+use `Upload.storage_key(reference)` to remove one matching root and preserve the
+exact key. Signed links return no storage key and retain their exact HTTP request.
+Aliases identify a store; callers still enforce document ownership.
+
+The Helm chart supplies aliases from the existing operator setting
+`fileAccess.trustedOrigins` to Go configuration, layout `uploadReplaceURL` and
+extraction `url_aliases`. Alias support does not enable the gateway. Compatible
+service images must precede the alias-bearing configuration. Hosted deployments
+declare their own aliases in existing runtime configuration, not SDK defaults.
+
 `ContainerUploadSettings.public_read` is a service deployment setting, defaulting
 to `True`. The service operator sets it in `config.py`; it is not a customer API,
 MCP, account, bucket or document policy field.
