@@ -83,6 +83,7 @@ class RawGroupsClient:
         self,
         *,
         name: str,
+        prompt: typing.Optional[str] = OMIT,
         bucket_name: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[GroupResponse]:
@@ -93,6 +94,9 @@ class RawGroupsClient:
         ----------
         name : str
             The name of the group being created.
+
+        prompt : typing.Optional[str]
+            Optional prompt text.
 
         bucket_name : typing.Optional[str]
             Specify bucketName to automatically create a bucket, by the name specified, and add it to the created group.
@@ -109,6 +113,7 @@ class RawGroupsClient:
             "v1/group",
             method="POST",
             json={
+                "prompt": prompt,
                 "name": name,
                 "bucketName": bucket_name,
             },
@@ -214,7 +219,12 @@ class RawGroupsClient:
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
     def update(
-        self, group_id: int, *, new_name: str, request_options: typing.Optional[RequestOptions] = None
+        self,
+        group_id: int,
+        *,
+        prompt: typing.Optional[str] = OMIT,
+        new_name: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[GroupResponse]:
         """
         Rename a group
@@ -224,7 +234,10 @@ class RawGroupsClient:
         group_id : int
             The groupId of the group to update.
 
-        new_name : str
+        prompt : typing.Optional[str]
+            Optional prompt text.
+
+        new_name : typing.Optional[str]
             The new name of the group being renamed.
 
         request_options : typing.Optional[RequestOptions]
@@ -239,6 +252,7 @@ class RawGroupsClient:
             f"v1/group/{encode_path_param(group_id)}",
             method="PUT",
             json={
+                "prompt": prompt,
                 "newName": new_name,
             },
             headers={
@@ -552,6 +566,7 @@ class AsyncRawGroupsClient:
         self,
         *,
         name: str,
+        prompt: typing.Optional[str] = OMIT,
         bucket_name: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[GroupResponse]:
@@ -562,6 +577,9 @@ class AsyncRawGroupsClient:
         ----------
         name : str
             The name of the group being created.
+
+        prompt : typing.Optional[str]
+            Optional prompt text.
 
         bucket_name : typing.Optional[str]
             Specify bucketName to automatically create a bucket, by the name specified, and add it to the created group.
@@ -578,6 +596,7 @@ class AsyncRawGroupsClient:
             "v1/group",
             method="POST",
             json={
+                "prompt": prompt,
                 "name": name,
                 "bucketName": bucket_name,
             },
@@ -683,7 +702,12 @@ class AsyncRawGroupsClient:
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
     async def update(
-        self, group_id: int, *, new_name: str, request_options: typing.Optional[RequestOptions] = None
+        self,
+        group_id: int,
+        *,
+        prompt: typing.Optional[str] = OMIT,
+        new_name: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[GroupResponse]:
         """
         Rename a group
@@ -693,7 +717,10 @@ class AsyncRawGroupsClient:
         group_id : int
             The groupId of the group to update.
 
-        new_name : str
+        prompt : typing.Optional[str]
+            Optional prompt text.
+
+        new_name : typing.Optional[str]
             The new name of the group being renamed.
 
         request_options : typing.Optional[RequestOptions]
@@ -708,6 +735,7 @@ class AsyncRawGroupsClient:
             f"v1/group/{encode_path_param(group_id)}",
             method="PUT",
             json={
+                "prompt": prompt,
                 "newName": new_name,
             },
             headers={

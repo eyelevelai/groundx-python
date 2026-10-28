@@ -77,6 +77,7 @@ class BucketsClient:
         self,
         *,
         name: str,
+        prompt: typing.Optional[str] = OMIT,
         file_access: typing.Optional[FileAccessPolicy] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> BucketResponse:
@@ -86,6 +87,9 @@ class BucketsClient:
         Parameters
         ----------
         name : str
+
+        prompt : typing.Optional[str]
+            Optional prompt text.
 
         file_access : typing.Optional[FileAccessPolicy]
             Initial settings for this resource. Omit or send null to inherit. Explicit settings take priority over the same account or bucket settings; omitted fields use broader values. Use private staging before uploading a protected file, even in a public bucket. Returns 403 if file access is disabled.
@@ -113,7 +117,9 @@ class BucketsClient:
             ),
         )
         """
-        _response = self._raw_client.create(name=name, file_access=file_access, request_options=request_options)
+        _response = self._raw_client.create(
+            name=name, prompt=prompt, file_access=file_access, request_options=request_options
+        )
         return _response.data
 
     def get(self, bucket_id: int, *, request_options: typing.Optional[RequestOptions] = None) -> BucketResponse:
@@ -151,6 +157,7 @@ class BucketsClient:
         self,
         bucket_id: int,
         *,
+        prompt: typing.Optional[str] = OMIT,
         new_name: typing.Optional[str] = OMIT,
         file_access: typing.Optional[FileAccessPolicy] = OMIT,
         file_access_revision: typing.Optional[int] = OMIT,
@@ -163,6 +170,9 @@ class BucketsClient:
         ----------
         bucket_id : int
             The bucketId of the bucket being updated.
+
+        prompt : typing.Optional[str]
+            Optional prompt text.
 
         new_name : typing.Optional[str]
             The new name of the bucket being renamed.
@@ -194,6 +204,7 @@ class BucketsClient:
         """
         _response = self._raw_client.update(
             bucket_id,
+            prompt=prompt,
             new_name=new_name,
             file_access=file_access,
             file_access_revision=file_access_revision,
@@ -354,6 +365,7 @@ class AsyncBucketsClient:
         self,
         *,
         name: str,
+        prompt: typing.Optional[str] = OMIT,
         file_access: typing.Optional[FileAccessPolicy] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> BucketResponse:
@@ -363,6 +375,9 @@ class AsyncBucketsClient:
         Parameters
         ----------
         name : str
+
+        prompt : typing.Optional[str]
+            Optional prompt text.
 
         file_access : typing.Optional[FileAccessPolicy]
             Initial settings for this resource. Omit or send null to inherit. Explicit settings take priority over the same account or bucket settings; omitted fields use broader values. Use private staging before uploading a protected file, even in a public bucket. Returns 403 if file access is disabled.
@@ -398,7 +413,9 @@ class AsyncBucketsClient:
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.create(name=name, file_access=file_access, request_options=request_options)
+        _response = await self._raw_client.create(
+            name=name, prompt=prompt, file_access=file_access, request_options=request_options
+        )
         return _response.data
 
     async def get(self, bucket_id: int, *, request_options: typing.Optional[RequestOptions] = None) -> BucketResponse:
@@ -444,6 +461,7 @@ class AsyncBucketsClient:
         self,
         bucket_id: int,
         *,
+        prompt: typing.Optional[str] = OMIT,
         new_name: typing.Optional[str] = OMIT,
         file_access: typing.Optional[FileAccessPolicy] = OMIT,
         file_access_revision: typing.Optional[int] = OMIT,
@@ -456,6 +474,9 @@ class AsyncBucketsClient:
         ----------
         bucket_id : int
             The bucketId of the bucket being updated.
+
+        prompt : typing.Optional[str]
+            Optional prompt text.
 
         new_name : typing.Optional[str]
             The new name of the bucket being renamed.
@@ -495,6 +516,7 @@ class AsyncBucketsClient:
         """
         _response = await self._raw_client.update(
             bucket_id,
+            prompt=prompt,
             new_name=new_name,
             file_access=file_access,
             file_access_revision=file_access_revision,

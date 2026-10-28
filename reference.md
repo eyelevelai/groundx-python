@@ -1875,6 +1875,14 @@ client.buckets.create(
 <dl>
 <dd>
 
+**prompt:** `typing.Optional[str]` — Optional prompt text.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **file_access:** `typing.Optional[FileAccessPolicy]` — Initial settings for this resource. Omit or send null to inherit. Explicit settings take priority over the same account or bucket settings; omitted fields use broader values. Use private staging before uploading a protected file, even in a public bucket. Returns 403 if file access is disabled.
     
 </dd>
@@ -2023,6 +2031,14 @@ client.buckets.update(
 <dd>
 
 **bucket_id:** `int` — The bucketId of the bucket being updated.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**prompt:** `typing.Optional[str]` — Optional prompt text.
     
 </dd>
 </dl>
@@ -2382,6 +2398,14 @@ client.groups.create(
 <dl>
 <dd>
 
+**prompt:** `typing.Optional[str]` — Optional prompt text.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **bucket_name:** `typing.Optional[str]` — Specify bucketName to automatically create a bucket, by the name specified, and add it to the created group.
     
 </dd>
@@ -2512,7 +2536,6 @@ client = GroundX(
 
 client.groups.update(
     group_id=1,
-    new_name="your_group_name",
 )
 
 ```
@@ -2537,7 +2560,15 @@ client.groups.update(
 <dl>
 <dd>
 
-**new_name:** `str` — The new name of the group being renamed.
+**prompt:** `typing.Optional[str]` — Optional prompt text.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**new_name:** `typing.Optional[str]` — The new name of the group being renamed.
     
 </dd>
 </dl>
