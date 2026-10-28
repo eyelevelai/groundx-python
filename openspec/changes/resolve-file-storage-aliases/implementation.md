@@ -27,10 +27,10 @@ parsing is retained.
 | Surface | Result |
 | --- | --- |
 | Python SDK | 834 tests passed, 2 skipped, 106 subtests passed, including optional aiohttp coverage. Mypy passed all 286 source/test files; touched-file Ruff and wheel/sdist builds passed. |
-| Extraction runtime | 1,740 tests passed, 1 deselected, 180 subtests passed with the local SDK source. Full Pyright: no errors; four optional IPython-source warnings. |
+| Extraction runtime | 1,744 tests passed, 1 deselected, 180 subtests passed with the local SDK source. Full Pyright: no errors; four optional IPython-source warnings. |
 | Protected extraction cases | Maintained compact replay passed for Arcadia legacy, Arcadia v1, generic v1 and ADP v1. Captured fixtures and expected outputs were not changed. |
 | Image preparation | Mixed current/alias PDF and PNG/JPG sources, both provisioning settings, supported review callers and Bedrock paths retain exact storage keys and provider image bytes. Native grants, wrong-document references, denied reads and external HTTP paths remain covered. |
-| Go | Config, utility, fileaccess, prompt and ratelimit short suites and race suites passed. Partner file-access/source readback passed after rebase onto current master `6b5a066a`. Affected-package builds, vet and LF checks passed. |
+| Go | Config, utility, fileaccess, prompt and ratelimit short suites and race suites passed. Partner file-access/source readback and the full summarizer short suite passed at `99679f46`. Affected-package builds, vet and LF checks passed. |
 | Layout | 18 existing File, utility and process-file reader tests passed. |
 | Helm | Full gate passed: 545 tests and 850 unchanged snapshots, both chart trees, template mirrors and Minikube render. Generated extraction settings refuse an SDK lacking alias support. |
 | Harness | Full validation, extraction gate, 26/26 chart-grounded on-prem checks, mirror and version-bump checks passed. |
@@ -45,6 +45,15 @@ The exact-key adapter test failed five of nine cases before its fix, then passed
 all nine through production image loading and S3/MinIO/S4 adapters. Only native
 storage clients were replaced with recording byte stores. These are local
 contract tests, not live vendor certification or model-accuracy measurements.
+
+Bedrock on MinIO/S4 uses the shared source-key comparison when validating an
+original PNG/JPG under alternate configured addresses. The existing original
+image regression covers both addresses and both bucket provisioning settings;
+provider request bodies remain identical, and unrelated originals are denied
+before reads. Native signed and external HTTP denial checks remain intact.
+
+All 18 SDK paths in the implementation diff match Fern's upstream ignore matcher.
+Generated clients, package metadata and the existing `.fernignore` are unchanged.
 
 Arcadia's separate Redis/Celery gate did not pass locally. On macOS the default
 spawn worker cannot register dynamically defined test tasks. Using Linux-style
