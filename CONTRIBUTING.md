@@ -219,10 +219,10 @@ policies at the file-access service, or by an issued temporary link. Changing
 `public_read` does not apply those policies or revoke existing public storage access.
 
 **Current extraction consumer:** Internal Arcadia also uses this flag in
-`private_image_storage()` to select image validation and delivery. With `False`,
-its validator currently rejects valid unsigned original PNG/JPG page references because
-it accepts only generated page/crop paths. Do not switch to `True` to hide that
-failure or describe the flag as unused outside bucket creation.
+`private_image_storage()` to select image validation and delivery. Those checks
+must recognize the current document's original PNG/JPG source as well as generated
+pages/crops. Do not switch to `True` to bypass a failed image check or describe
+this flag as unused outside bucket creation.
 
 Keep bucket creation separate from extraction authorization. Reuse service
 storage clients for authorized GroundX files, including original images and
