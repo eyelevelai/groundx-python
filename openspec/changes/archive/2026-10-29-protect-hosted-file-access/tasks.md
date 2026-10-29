@@ -33,7 +33,7 @@ adoption.
 - [x] Publish the merged hand-written change through the established release
       path. [Version 4.1.1](https://github.com/eyelevelai/groundx-python/releases/tag/4.1.1)
       is published on PyPI and includes the unified upload helpers.
-- [ ] GroundX on-prem extraction image adopts the compatible SDK version and
+- Transferred to the on-prem 0.2.9 plan: GroundX on-prem extraction image adopts the compatible SDK version and
       passes live private-storage and CA verification before activation.
 
 ## Protected consumers
@@ -312,3 +312,10 @@ Python SDK `4.1.2`. Rebuild `internal-arcadia-agents` with that release and depl
 only dev before repeating ADP public/protected extraction. Do not change the
 TypeScript SDK, publish from this repository, or infer deployed success from the
 read-only probe. Existing package version `4.1.1` remains unchanged in this PR.
+
+
+## Closeout, 2026-10-29
+
+Merged implementation and released SDK support are complete. Cashbot's archived `verify-cloud-file-access` production rollout records the exact builds and bounded public/protected PDF, PNG and JPG acceptance, legacy-link compatibility, policy precedence, sharing expiry and synthetic cleanup. It does not claim a full production ADP accuracy replay, live vendor qualification, installed MCP/delegated-client certification or named-customer sign-off.
+
+Deferred release, backend qualification, unverified client/customer acceptance and any future infrastructure-state adoption are owned by [the existing on-prem 0.2.9 plan](https://github.com/eyelevelai/groundx-on-prem/pull/162). Transferred items were not marked passed. This archival changes documentation only; it deploys no services, changes no configuration and performs no SQL or infrastructure operations.
