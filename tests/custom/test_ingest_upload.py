@@ -711,8 +711,7 @@ def test_policy_models_preserve_legacy_updates_and_initial_inheritance(asynchron
 
 
 @pytest.mark.parametrize("asynchronous", [False, True])
-@pytest.mark.parametrize("authenticated", [None, False, True])
-def test_file_link_serializes_page_selector_and_reads_native_grant(asynchronous, authenticated):
+def test_file_link_serializes_page_selector_and_reads_native_grant(asynchronous):
     import asyncio
     import json
 
@@ -728,9 +727,6 @@ def test_file_link_serializes_page_selector_and_reads_native_grant(asynchronous,
         return httpx.Response(200, json=grant)
 
     kwargs = {"asset": AssetSelectorCorrected(kind="page", page_number=1), "expires_in_seconds": 120}
-
-    if authenticated is not None:
-        kwargs["require_authentication"] = authenticated
 
     async def run():
         async with httpx.AsyncClient(transport=httpx.MockTransport(handle)) as transport:
@@ -748,7 +744,7 @@ def test_file_link_serializes_page_selector_and_reads_native_grant(asynchronous,
         (
             "POST",
             "/v1/ingest/document/document/file-link",
-            {"asset": {"kind": "page", "pageNumber": 1}, "expiresInSeconds": 120, **({} if authenticated is None else {"requireAuthentication": authenticated})},
+            {"asset": {"kind": "page", "pageNumber": 1}, "expiresInSeconds": 120},
         )
     ]
     assert response.url == grant["url"]

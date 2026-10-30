@@ -16,7 +16,7 @@ class FileUploadResponse(UniversalBaseModel):
         FieldMetadata(alias="effectiveFileAccess"),
         pydantic.Field(
             alias="effectiveFileAccess",
-            description="Settings used for this upload. If mode is protected, submit ingest before expiresAt. Public uploads can be ingested later.",
+            description="Policy used when issuing this upload. Only protected uploads have a private ingest deadline. Missing policy metadata should retain existing protected-upload checks.",
         ),
     ] = None
     upload_id: typing_extensions.Annotated[str, FieldMetadata(alias="uploadId"), pydantic.Field(alias="uploadId")]

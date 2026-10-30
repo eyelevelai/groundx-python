@@ -11,21 +11,12 @@ from .file_access_policy_mode import FileAccessPolicyMode
 
 class FileAccessPolicy(UniversalBaseModel):
     """
-    Controls access to normal file URLs and the maximum lifetime of temporary links. For each setting, use the document value first, then bucket, then account. If none is set, defaults are public access and a 300-second link lifetime. Normal file URLs do not expire.
+    For each field, document settings take priority over bucket settings, then account settings. Omitted fields use the broader value. Explicit public mode and longer sharing lifetimes are allowed. Stable public links never expire. urlTtlSeconds limits new sharing links; an issued link works without API credentials until its storage expiry.
     """
 
-    mode: typing.Optional[FileAccessPolicyMode] = pydantic.Field(default=None)
-    """
-    Public allows anyone with the URL to read the file. Protected requires the owning account's API key in X-API-Key.
-    """
-
+    mode: typing.Optional[FileAccessPolicyMode] = None
     url_ttl_seconds: typing_extensions.Annotated[
-        typing.Optional[int],
-        FieldMetadata(alias="urlTtlSeconds"),
-        pydantic.Field(
-            alias="urlTtlSeconds",
-            description="Maximum lifetime of a new temporary link, in seconds. Does not make normal file URLs expire.",
-        ),
+        typing.Optional[int], FieldMetadata(alias="urlTtlSeconds"), pydantic.Field(alias="urlTtlSeconds")
     ] = None
 
     if IS_PYDANTIC_V2:

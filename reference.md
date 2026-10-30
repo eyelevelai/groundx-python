@@ -500,7 +500,9 @@ client.documents.list(
 <dl>
 <dd>
 
-Update document metadata or file-access settings. Change one document policy per request, without other attribute changes. Policy updates do not rerun processing.
+Update the attributes of documents that have been uploaded to GroundX.
+Policy-bearing updates return 403 when file access is disabled; enabled
+temporary failures return 503 with Retry-After.
 </dd>
 </dl>
 </dd>
@@ -1388,7 +1390,7 @@ client.documents.get_processes(
 <dl>
 <dd>
 
-Create a temporary download link for a file, page, crop, X-Ray or extraction output you own. The link stops working at expiresAt without changing the file's policy or other URLs. The recipient may also need an API key, depending on requireAuthentication. Storage-signed links remain valid until expiry even if a policy or API key changes.
+Create a storage-signed download link for a saved asset you own. Anyone with the link can use or forward it until expiresAt. Revoking an API key or changing policy does not cancel issued links. The URL contains no GroundX API key. Returns 404 if file access is disabled, or 503 with Retry-After for temporary file-access failures.
 </dd>
 </dl>
 </dd>
@@ -1451,15 +1453,7 @@ client.documents.file_link(
 <dl>
 <dd>
 
-**require_authentication:** `typing.Optional[bool]` — True requires the owning account's API key in X-API-Key. False lets anyone with the link read the file. Both links expire at expiresAt. Omit to create a storage-signed link that needs no GroundX key.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**expires_in_seconds:** `typing.Optional[int]` — Link lifetime in seconds. Cannot exceed the effective policy's urlTtlSeconds. Omit to use that maximum.
+**expires_in_seconds:** `typing.Optional[int]` 
     
 </dd>
 </dl>
@@ -1889,7 +1883,7 @@ client.buckets.create(
 <dl>
 <dd>
 
-**file_access:** `typing.Optional[FileAccessPolicy]` — Settings for the new bucket. Each supplied value overrides the account setting. Omit or send null to use the account settings. Requires file protection to be enabled.
+**file_access:** `typing.Optional[FileAccessPolicy]` — Initial settings for this resource. Omit or send null to inherit. Explicit settings take priority over the same account or bucket settings; omitted fields use broader values. Use private staging before uploading a protected file, even in a public bucket. Returns 403 if file access is disabled.
     
 </dd>
 </dl>
@@ -1994,7 +1988,7 @@ client.buckets.get(
 <dl>
 <dd>
 
-Rename a bucket or change its file-access settings. Send fileAccess to replace the settings, null to remove them, or omit it to keep them.
+Rename a bucket or replace its file-access policy. Policy-bearing updates return 403 when file access is disabled; enabled temporary failures return 503 with Retry-After.
 </dd>
 </dl>
 </dd>
@@ -2068,7 +2062,7 @@ client.buckets.update(
 <dl>
 <dd>
 
-**file_access_revision:** `typing.Optional[int]` — Deprecated. Not needed and ignored when updating file-access settings.
+**file_access_revision:** `typing.Optional[int]` — Legacy compatibility field. Not required or checked when changing file access.
     
 </dd>
 </dl>
@@ -2173,7 +2167,7 @@ client.buckets.delete(
 <dl>
 <dd>
 
-Get upload instructions for a public or protected file. Upload the bytes using the returned method and headers before expiresAt, at most 900 seconds later. Then ingest hostedUrl into the same bucket with the same fileAccess settings. For protected files, submit ingest before expiresAt; public uploads can be ingested later. Uploads without a policy also work when file protection is disabled.
+Return a storage-signed PUT link for a public or protected bucket, valid for at most 900 seconds. Complete PUT before it expires. A private upload reservation also requires ingest submission before that deadline; an unreserved public source remains ingestible after PUT expiry. Available even when file-access protection is disabled. Uses this deployment and its configured storage. Include the requested per-file fileAccess policy so it is checked before upload; non-null policies return 403 when protection is disabled. Returns 503 with Retry-After for temporary verification failures.
 </dd>
 </dl>
 </dd>
@@ -2240,7 +2234,7 @@ client.buckets.file_upload(
 <dl>
 <dd>
 
-**file_access:** `typing.Optional[FileAccessPolicy]` — Settings for the uploaded file. Send the same settings when ingesting hostedUrl. Omit or send null to use the bucket and account settings. Checked before upload; requires file protection to be enabled.
+**file_access:** `typing.Optional[FileAccessPolicy]` — Requested initial file policy, also sent during ingest. Omit or send null to inherit. Validated before an upload URL is issued. Non-null policies return 403 when file protection is disabled, so a protected upload cannot be staged publicly.
     
 </dd>
 </dl>
@@ -3712,7 +3706,7 @@ client.customer.get()
 <dl>
 <dd>
 
-Set the account's file-access defaults. Send fileAccess to replace the settings or null to remove them. Bucket and document settings take precedence. If an update times out, read the settings before retrying.
+Replace or clear your account's file-access settings. Send only fileAccess; the latest successful update takes effect. Invalid or missing input returns 400; disabled or forbidden access returns 403; ownership or source conflicts return 409. If settings or ownership cannot be verified, returns 503 with Retry-After. After an uncertain outcome, read the applied settings before retrying. Protected stable links require X-API-Key on every read.
 </dd>
 </dl>
 </dd>
@@ -3764,7 +3758,7 @@ client.customer.update(
 <dl>
 <dd>
 
-**file_access_revision:** `typing.Optional[int]` — Deprecated. Not needed and ignored when updating file-access settings.
+**file_access_revision:** `typing.Optional[int]` — Legacy compatibility field. Not required or checked when changing file access.
     
 </dd>
 </dl>
