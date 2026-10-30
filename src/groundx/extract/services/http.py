@@ -321,10 +321,21 @@ def is_native_signed_url(url: str) -> bool:
     return bool(names & {"x-amz-signature", "x-amz-credential", "x-amz-algorithm", "awsaccesskeyid", "signature"})
 
 
+FILE_LINK_PATH = "/_groundx/file-link/"
+
+
+def is_file_grant(url: str) -> bool:
+    try:
+        return is_native_signed_url(url) or urlsplit(url).path.startswith(FILE_LINK_PATH)
+    except ValueError:
+        return False
+
+
 def redacted_file_url(url: str) -> str:
     try:
         parts = urlsplit(url)
-        return urlunsplit((parts.scheme, parts.netloc.rsplit("@", 1)[-1], parts.path, "", ""))
+        path = FILE_LINK_PATH + "[redacted]" if parts.path.startswith(FILE_LINK_PATH) else parts.path
+        return urlunsplit((parts.scheme, parts.netloc.rsplit("@", 1)[-1], path, "", ""))
     except ValueError:
         return "[invalid file URL]"
 
@@ -378,7 +389,7 @@ def bounded_file_get(
         roots.append(location)
 
     native = is_native_signed_url(url)
-    if not api_key and not customer_key and not roots and not native:
+    if not api_key and not customer_key and not roots and not is_file_grant(url):
         return bounded_get(url, operation=operation, **kwargs)
 
     headers: typing.Dict[str, str] = {}

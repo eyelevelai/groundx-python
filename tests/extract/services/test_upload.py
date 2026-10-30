@@ -21,6 +21,7 @@ from groundx.extract.settings.settings import ContainerUploadSettings
     ("https://files.test/prefix-other/layout/page.jpg", None),
     ("https://user@old.test/layout/page.jpg", None),
     ("https://old.test/layout/page.jpg?X-Amz-Signature=example", None),
+    ("https://old.test/_groundx/file-link/signed-token", None),
     ("s3://files/layout/page.jpg", "layout/page.jpg"),
     ("s3://other/layout/page.jpg", None),
 ])

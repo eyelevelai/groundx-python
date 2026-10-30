@@ -8,7 +8,7 @@ from types import MappingProxyType
 from urllib.parse import urlsplit
 
 from ..settings.settings import ContainerSettings
-from .http import is_native_signed_url
+from .http import is_file_grant
 from .logger import Logger
 
 OBJECT_STORE_CONNECT_TIMEOUT_SECONDS = 5.0
@@ -148,7 +148,7 @@ class UploadClient(typing.Protocol):
 class Upload:
     def storage_key(self, reference: str) -> typing.Optional[str]:
         """Resolve an unsigned reference in this store without changing its key."""
-        if is_native_signed_url(reference) or any(char.isspace() for char in reference) or "\\" in reference:
+        if is_file_grant(reference) or any(char.isspace() for char in reference) or "\\" in reference:
             return None
         settings = self.settings.upload
         try:

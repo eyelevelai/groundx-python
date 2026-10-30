@@ -12,7 +12,7 @@ from ..custom_outputs import (
     custom_output_section_identity,
 )
 from ..prompt.manager import PromptManager
-from ..services.http import BoundedRequestTimeout, bounded_file_get, is_native_signed_url, redacted_file_url
+from ..services.http import BoundedRequestTimeout, bounded_file_get, is_file_grant, redacted_file_url
 from ..services.logger import Logger
 from ..services.upload import (
     OBJECT_STORE_CONNECT_TIMEOUT_SECONDS,
@@ -966,7 +966,7 @@ class DocumentRequest(BaseModel):
         pageImages: typing.List[Image.Image] = []
         for page in imgs:
             safe_page = redacted_file_url(page)
-            protected_transport = bool(api_key or customer_key or trusted_file_roots or is_native_signed_url(page))
+            protected_transport = bool(api_key or customer_key or trusted_file_roots or is_file_grant(page))
             if page in self.page_image_dict:
                 self.print(
                     "WARN",
