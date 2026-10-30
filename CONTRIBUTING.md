@@ -189,8 +189,8 @@ preserve its status and body. Do not add policy discovery, client renewal or
 automatic splitting to infer reservation state.
 
 Stable protected URLs need current authentication; they do not expire by age.
-Generated `documents.file_link` returns a finite bearer grant that can be forwarded
-until expiry. Reissue expired links; policy/key changes do not revoke prior native
+With its authentication argument omitted, `documents.file_link` returns a
+temporary link that anyone can forward and use until expiry. Reissue expired links; policy/key changes do not revoke prior native
 grants. Raw X-Ray links cover only the JSON object. Preserve exact raw bytes for
 certification; use the authenticated `?view=links` presentation for browser/QC assets.
 
@@ -245,10 +245,13 @@ storage and image tests using actual producer URL shapes; include both flag
 values and public/protected files. Preserve image quality, provider request
 limits and the provider's supported delivery method.
 
-Temporary file-link authentication is an optional generated `require_authentication`
-argument, defined in Fern. Omission keeps native sharing; false and true select
-gateway links with the same expiry check, and true additionally requires current
-GroundX headers. Keep `is_native_signed_url` distinct from `is_file_grant`: native
-URLs never receive GroundX headers; gateway URLs receive them only through explicit
-trusted-root HTTP access. Both bypass storage-key shortcuts and local image caches.
-Redact gateway path tokens as well as native query signatures.
+The optional `require_authentication` argument comes from Fern. True requires an
+API key from the owning account; false does not. Both links expire. Leaving out
+the argument keeps existing storage-signed sharing. Edit the Fern source and
+regenerate; do not patch generated SDK methods.
+
+Use `is_native_signed_url` to identify storage-signed URLs and `is_file_grant` to
+identify either kind of signed link. Native storage must never receive GroundX
+headers. Add headers to a gateway link only when its HTTPS host is explicitly
+trusted. Read signed links over HTTP unchanged, without storage-key shortcuts or
+local image-cache lookup. Redact both query signatures and gateway path tokens.
