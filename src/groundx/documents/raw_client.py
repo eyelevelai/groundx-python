@@ -522,9 +522,7 @@ class RawDocumentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[IngestResponse]:
         """
-        Update the attributes of documents that have been uploaded to GroundX.
-        Policy-bearing updates return 403 when file access is disabled; enabled
-        temporary failures return 503 with Retry-After.
+        Update document metadata or file-access settings. Change one document policy per request, without other attribute changes. Policy updates do not rerun processing.
 
         Parameters
         ----------
@@ -1358,7 +1356,7 @@ class RawDocumentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[FileLinkResponse]:
         """
-        Create a temporary download link for a saved asset you own. Omit requireAuthentication for existing anonymous storage sharing. Explicit false or true uses the file gateway, with the same expiry check; true also requires current GroundX API-key access on every read. Expiry affects only this URL. No URL contains a GroundX API key. Returns 404 if file access or the requested link mode is unavailable, or 503 with Retry-After for temporary failures.
+        Create a temporary download link for a file, page, crop, X-Ray or extraction output you own. The link stops working at expiresAt without changing the file's policy or other URLs. The recipient may also need an API key, depending on requireAuthentication. Storage-signed links remain valid until expiry even if a policy or API key changes.
 
         Parameters
         ----------
@@ -1367,9 +1365,10 @@ class RawDocumentsClient:
         asset : AssetSelector
 
         require_authentication : typing.Optional[bool]
-            Require current GroundX API-key access when true. Explicit false creates an anonymous gateway link. Both expire at expiresAt. Omit to retain native storage sharing. Gateway links require a configured signing key; otherwise this mode returns 404.
+            True requires the owning account's API key in X-API-Key. False lets anyone with the link read the file. Both links expire at expiresAt. Omit to create a storage-signed link that needs no GroundX key.
 
         expires_in_seconds : typing.Optional[int]
+            Link lifetime in seconds. Cannot exceed the effective policy's urlTtlSeconds. Omit to use that maximum.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1963,9 +1962,7 @@ class AsyncRawDocumentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[IngestResponse]:
         """
-        Update the attributes of documents that have been uploaded to GroundX.
-        Policy-bearing updates return 403 when file access is disabled; enabled
-        temporary failures return 503 with Retry-After.
+        Update document metadata or file-access settings. Change one document policy per request, without other attribute changes. Policy updates do not rerun processing.
 
         Parameters
         ----------
@@ -2799,7 +2796,7 @@ class AsyncRawDocumentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[FileLinkResponse]:
         """
-        Create a temporary download link for a saved asset you own. Omit requireAuthentication for existing anonymous storage sharing. Explicit false or true uses the file gateway, with the same expiry check; true also requires current GroundX API-key access on every read. Expiry affects only this URL. No URL contains a GroundX API key. Returns 404 if file access or the requested link mode is unavailable, or 503 with Retry-After for temporary failures.
+        Create a temporary download link for a file, page, crop, X-Ray or extraction output you own. The link stops working at expiresAt without changing the file's policy or other URLs. The recipient may also need an API key, depending on requireAuthentication. Storage-signed links remain valid until expiry even if a policy or API key changes.
 
         Parameters
         ----------
@@ -2808,9 +2805,10 @@ class AsyncRawDocumentsClient:
         asset : AssetSelector
 
         require_authentication : typing.Optional[bool]
-            Require current GroundX API-key access when true. Explicit false creates an anonymous gateway link. Both expire at expiresAt. Omit to retain native storage sharing. Gateway links require a configured signing key; otherwise this mode returns 404.
+            True requires the owning account's API key in X-API-Key. False lets anyone with the link read the file. Both links expire at expiresAt. Omit to create a storage-signed link that needs no GroundX key.
 
         expires_in_seconds : typing.Optional[int]
+            Link lifetime in seconds. Cannot exceed the effective policy's urlTtlSeconds. Omit to use that maximum.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.

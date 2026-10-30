@@ -19,7 +19,7 @@ class SearchResultItemPagesItem(UniversalBaseModel):
         FieldMetadata(alias="imageUrl"),
         pydantic.Field(
             alias="imageUrl",
-            description="JPEG of the page containing this chunk. Protected images use storage-signed links that expire within the applied policy time limit. Keep documentId and this page number; use documents.fileLink with a page selector to refresh the link. Public stable links do not expire.",
+            description="JPEG of this page. For protected files, this is a temporary link. Use documentId and this page number with documents.fileLink to request another. Normal public URLs do not expire.",
         ),
     ] = None
     number: typing.Optional[float] = pydantic.Field(default=None)

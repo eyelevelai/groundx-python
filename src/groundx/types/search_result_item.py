@@ -49,7 +49,7 @@ class SearchResultItem(UniversalBaseModel):
         FieldMetadata(alias="multimodalUrl"),
         pydantic.Field(
             alias="multimodalUrl",
-            description="Image of a table or figure. Protected images use storage-signed links that expire within the applied policy time limit. Keep documentId and chunkId; use documents.fileLink with a crop selector to refresh the link. Public stable links do not expire.",
+            description="Image of a table or figure. For protected files, this is a temporary link. Use documentId and chunkId with documents.fileLink to request another. Normal public URLs do not expire.",
         ),
     ] = None
     page_images: typing_extensions.Annotated[
@@ -57,7 +57,7 @@ class SearchResultItem(UniversalBaseModel):
         FieldMetadata(alias="pageImages"),
         pydantic.Field(
             alias="pageImages",
-            description="Page image URLs for this chunk. Protected images use storage-signed links that expire within the applied policy time limit. Keep documentId and the page number; use documents.fileLink with a page selector to refresh the link. Public stable links do not expire.",
+            description="Page image URLs for this chunk. For protected files, these are temporary links. Use documentId and the page number with documents.fileLink to request another. Normal public URLs do not expire.",
         ),
     ] = None
     pages: typing.Optional[typing.List[SearchResultItemPagesItem]] = None
@@ -94,7 +94,7 @@ class SearchResultItem(UniversalBaseModel):
         FieldMetadata(alias="sourceUrl"),
         pydantic.Field(
             alias="sourceUrl",
-            description="Source document URL. Protected GroundX-hosted sources use storage-signed links that expire within the applied policy time limit. Keep documentId; use documents.fileLink with a source selector to refresh the link. Public stable links do not expire.",
+            description="Source document URL. For protected GroundX files, this is a temporary link. Request another with documents.fileLink and a source selector when it expires. Normal public URLs do not expire.",
         ),
     ] = None
     suggested_text: typing_extensions.Annotated[
