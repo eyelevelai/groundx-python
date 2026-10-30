@@ -41,7 +41,7 @@
 
 - [x] 4.1 Run focused tests, the full pytest suite, mypy, changed-file Ruff,
   build, line-ending checks, and strict OpenSpec validation.
-- [ ] 4.2 Exercise the Internal Arcadia consumer change against this branch and
+- [ ] 4.2 Exercise the Extraction Agents consumer change against this branch and
   complete its protected-case and collision gates before publishing.
 - [x] 4.3 If any existing evidence fails, stop before editing it and obtain human
   approval for the specific input and behavioral change.
@@ -50,4 +50,4 @@
   SDK release.
 - [ ] 4.5 After collision approval, merge the implementation and prepare the
   human release handoff with the merged commit, requested version, validation
-  evidence, and Internal Arcadia as the downstream consumer.
+  evidence, and Extraction Agents as the downstream consumer.

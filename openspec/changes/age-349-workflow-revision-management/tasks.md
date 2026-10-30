@@ -32,7 +32,7 @@
 - [ ] 3.3 Update README.md and helper docstrings for exact revision reads and
   expected_updated_at conflicts using available service/client methods.
 - [ ] 3.4 Prepare the human release handoff after Fern generation and backend
-  revision-read readiness. Record the minimum released version for Arcadia and
+  revision-read readiness. Record the minimum released version for Extraction Agents and
   Harness; no release tag, workflow dispatch, or package publishing by the agent.
 - [ ] 3.5 Validate the OpenSpec change, reconcile related remaining work, and
   archive only after generated clients, helpers, docs, tests, and consumer release

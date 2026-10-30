@@ -45,7 +45,7 @@ context: |
   
   Dependency graph edges (this repo as target):
   - eyelevel-fern-config → groundx-python: generator-source, schematized:true — Fern generates the client portion; .fernignore fences the hand-written layer
-  - internal-arcadia-agents → groundx-python: package-import, schematized:false, sensitivity:normal — arcadia imports groundx[extract]>=3.4.3; is the de-facto integration test for the extract/ layer
+  - extraction-agents → groundx-python: package-import, schematized:false, sensitivity:normal — Extraction Agents imports groundx[extract]>=3.4.3; is the de-facto integration test for the extract/ layer
   - groundx-studio-harness → groundx-python: reference-only (SDK usage docs; no code dependency)
   - groundx-agent-harness → groundx-python: reference-only (skill references; no code dependency)
   - groundx-on-prem → groundx-python: reference-only (soft bind via eyelevel/extract image; constructor signatures are de-facto contract; nothing validates it)

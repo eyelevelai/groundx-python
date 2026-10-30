@@ -27,7 +27,7 @@ protected. Generated clients/types come from Fern, not this plan's handwritten
 code. Changes are additive keyword arguments; retain existing defaults and
 sync/async behavior. No new dependency or client-side version database is needed.
 
-Internal Arcadia and the Studio Harness consume this release. Generated
+Extraction Agents and the Studio Harness consume this release. Generated
 TypeScript coverage belongs to the Fern companion. The existing compiler
 retirement work remains separate; do not revive or expand local compilation.
 Rollback pins the last compatible package, retaining revision-capable consumers

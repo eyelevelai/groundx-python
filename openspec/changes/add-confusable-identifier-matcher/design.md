@@ -93,7 +93,7 @@ Existing tests run unchanged. If an existing assertion fails because the new
 equality is intentional, implementation stops before editing it and records the
 input, old result, new result, and downstream effect for human approval.
 
-Before release, the Internal Arcadia consumer change runs a read-only collision
+Before release, the Extraction Agents consumer change runs a read-only collision
 report over protected fixtures and representative private captures. It lists
 each pair of distinct raw strings that produces one key, with caller and field.
 Every unexpected collision requires human approval. The report is not a runtime
@@ -117,16 +117,16 @@ compiler, or workflow payload.
 ## Migration Plan
 
 1. Implement and validate the GroundX Python functions and production callers.
-2. Exercise the Internal Arcadia implementation against this branch and run its
+2. Exercise the Extraction Agents implementation against this branch and run its
    collision report before publishing.
 3. Obtain approval for every unexpected collision and any existing-test change.
 4. Merge the Fern public-documentation change.
 5. Merge GroundX Python and hand the merged commit and requested version to the
    human release owner.
-6. Pin the published version in Internal Arcadia, rebuild its image, and run the
+6. Pin the published version in Extraction Agents, rebuild its image, and run the
    protected and affected-document verification.
 
-Rollback pins the prior SDK release and restores the prior Internal Arcadia
+Rollback pins the prior SDK release and restores the prior Extraction Agents
 image. No stored value changes.
 
 ## Open Questions

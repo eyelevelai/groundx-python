@@ -231,7 +231,7 @@ Customer downloads are controlled by account, bucket and document `fileAccess`
 policies at the file-access service, or by an issued temporary link. Changing
 `public_read` does not apply those policies or revoke existing public storage access.
 
-**Current extraction consumer:** Internal Arcadia also uses this flag in
+**Current extraction consumer:** Extraction Agents also uses this flag in
 `private_image_storage()` to select image validation and delivery. Those checks
 must recognize the current document's original PNG/JPG source as well as generated
 pages/crops. Do not switch to `True` to bypass a failed image check or describe
