@@ -1390,7 +1390,7 @@ client.documents.get_processes(
 <dl>
 <dd>
 
-Create a storage-signed download link for a saved asset you own. Anyone with the link can use or forward it until expiresAt. Revoking an API key or changing policy does not cancel issued links. The URL contains no GroundX API key. Returns 404 if file access is disabled, or 503 with Retry-After for temporary file-access failures.
+Create a temporary download link for a saved asset you own. Omit requireAuthentication for existing anonymous storage sharing. Explicit false or true uses the file gateway, with the same expiry check; true also requires current GroundX API-key access on every read. Expiry affects only this URL. No URL contains a GroundX API key. Returns 404 if file access or the requested link mode is unavailable, or 503 with Retry-After for temporary failures.
 </dd>
 </dl>
 </dd>
@@ -1446,6 +1446,14 @@ client.documents.file_link(
 <dd>
 
 **asset:** `AssetSelector` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**require_authentication:** `typing.Optional[bool]` — Require current GroundX API-key access when true. Explicit false creates an anonymous gateway link. Both expire at expiresAt. Omit to retain native storage sharing. Gateway links require a configured signing key; otherwise this mode returns 404.
     
 </dd>
 </dl>

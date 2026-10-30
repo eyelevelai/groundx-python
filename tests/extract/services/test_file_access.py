@@ -142,14 +142,14 @@ def test_file_redirect_is_rejected_without_following_or_reading_body() -> None:
     assert response.raw.closed
 
 
-def test_expired_native_grant_fails_without_secret_in_error_or_privileged_retry() -> None:
-    url = "https://store.test/page?X-Amz-Signature=native-secret&X-Amz-Credential=user%2Fscope"
+@pytest.mark.parametrize("url", ["https://store.test/page?X-Amz-Signature=native-secret&X-Amz-Credential=user%2Fscope", "https://store.test/_groundx/file-link/native-secret"])
+def test_expired_native_grant_fails_without_secret_in_error_or_privileged_retry(url: str) -> None:
     response = _response(url, 403, b"expired native-secret")
     with patch("requests.get", return_value=response) as get, pytest.raises(RuntimeError) as error:
         _get(url, api_key="private-api-key", trusted_file_roots=("https://store.test",))
     assert get.call_count == 1
     assert get.call_args.args == (url,)
-    assert get.call_args.kwargs.get("headers") == {}
+    assert get.call_args.kwargs.get("headers") == ({} if "?" in url else {"X-API-Key": "private-api-key"})
     assert "native-secret" not in str(error.value)
     assert "private-api-key" not in repr(error.value)
     assert response.raw.closed

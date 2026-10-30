@@ -904,37 +904,37 @@ class TestDocumentRequest(unittest.TestCase):
 
         import urllib3
 
-        url = "https://files.test/page.png?X-Amz-Signature=native-secret&X-Amz-Credential=user%2Fscope"
-        buffer = BytesIO()
-        Image.new("RGB", (2, 3), color="red").save(buffer, format="PNG")
-        response = requests.Response()
-        response.status_code = 200
-        response.url = url
-        response.raw = urllib3.HTTPResponse(body=BytesIO(buffer.getvalue()), preload_content=False)
-        upload = Mock()
-        with (
-            patch("requests.get", return_value=response) as get,
-            patch("requests.head") as head,
-            patch("builtins.print") as log,
-        ):
-            try:
-                images = _make_request().load_images(
-                    [url],
-                    upload=upload,
-                    api_key="private-api-key",
-                    customer_key="customer-context",
-                    trusted_file_roots=("https://files.test",),
-                )
-            except TypeError as error:
-                self.fail(f"Page reader cannot consume protected or native links: {error}")
-        self.assertEqual([image.size for image in images], [(2, 3)])
-        self.assertEqual(get.call_args.args, (url,))
-        self.assertEqual(get.call_args.kwargs.get("headers"), {})
-        upload.get_object.assert_not_called()
-        head.assert_not_called()
-        self.assertNotIn("native-secret", repr(log.call_args_list))
-        self.assertNotIn("private-api-key", repr(log.call_args_list))
-        self.assertTrue(response.raw.closed)
+        for url in ("https://files.test/page.png?X-Amz-Signature=native-secret&X-Amz-Credential=user%2Fscope", "https://files.test/_groundx/file-link/native-secret"):
+            buffer = BytesIO()
+            Image.new("RGB", (2, 3), color="red").save(buffer, format="PNG")
+            response = requests.Response()
+            response.status_code = 200
+            response.url = url
+            response.raw = urllib3.HTTPResponse(body=BytesIO(buffer.getvalue()), preload_content=False)
+            upload = Mock()
+            with (
+                patch("requests.get", return_value=response) as get,
+                patch("requests.head") as head,
+                patch("builtins.print") as log,
+            ):
+                try:
+                    images = _make_request().load_images(
+                        [url],
+                        upload=upload,
+                        api_key="private-api-key",
+                        customer_key="customer-context",
+                        trusted_file_roots=("https://files.test",),
+                    )
+                except TypeError as error:
+                    self.fail(f"Page reader cannot consume protected or native links: {error}")
+            self.assertEqual([image.size for image in images], [(2, 3)])
+            self.assertEqual(get.call_args.args, (url,))
+            self.assertEqual(get.call_args.kwargs.get("headers"), {} if "?" in url else {"X-API-Key": "private-api-key", "X-Customer-Key": "customer-context"})
+            upload.get_object.assert_not_called()
+            head.assert_not_called()
+            self.assertNotIn("native-secret", repr(log.call_args_list))
+            self.assertNotIn("private-api-key", repr(log.call_args_list))
+            self.assertTrue(response.raw.closed)
 
     def test_protected_image_uses_owner_headers_without_storage_shortcut(self) -> None:
         from unittest.mock import Mock

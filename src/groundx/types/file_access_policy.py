@@ -11,7 +11,7 @@ from .file_access_policy_mode import FileAccessPolicyMode
 
 class FileAccessPolicy(UniversalBaseModel):
     """
-    For each field, document settings take priority over bucket settings, then account settings. Omitted fields use the broader value. Explicit public mode and longer sharing lifetimes are allowed. Stable public links never expire. urlTtlSeconds limits new sharing links; an issued link works without API credentials until its storage expiry.
+    For each field, document settings take priority over bucket settings, then account settings. Omitted fields use the broader value. Explicit public mode and longer sharing lifetimes are allowed. Stable public links never expire. urlTtlSeconds limits new sharing links; legacy sharing links work without API credentials until their storage expiry.
     """
 
     mode: typing.Optional[FileAccessPolicyMode] = None

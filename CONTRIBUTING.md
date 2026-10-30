@@ -244,3 +244,11 @@ failure without privileged fallback after a grant is denied. Extend existing
 storage and image tests using actual producer URL shapes; include both flag
 values and public/protected files. Preserve image quality, provider request
 limits and the provider's supported delivery method.
+
+Temporary file-link authentication is an optional generated `require_authentication`
+argument, defined in Fern. Omission keeps native sharing; false and true select
+gateway links with the same expiry check, and true additionally requires current
+GroundX headers. Keep `is_native_signed_url` distinct from `is_file_grant`: native
+URLs never receive GroundX headers; gateway URLs receive them only through explicit
+trusted-root HTTP access. Both bypass storage-key shortcuts and local image caches.
+Redact gateway path tokens as well as native query signatures.
