@@ -11,7 +11,7 @@ from .effective_policy_mode import EffectivePolicyMode
 
 class EffectivePolicy(UniversalBaseModel):
     """
-    Applied settings after inheritance. Sharing links expire after 300 seconds by default; storage credentials may shorten that time. Protected stable URLs require current authentication on every read.
+    Settings GroundX uses after checking document, bucket and account values. The default temporary-link lifetime is 300 seconds. Storage credentials may expire sooner. Normal protected URLs require an API key and do not expire.
     """
 
     mode: EffectivePolicyMode

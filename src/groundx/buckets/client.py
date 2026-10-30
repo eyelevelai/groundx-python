@@ -92,7 +92,7 @@ class BucketsClient:
             Optional prompt text.
 
         file_access : typing.Optional[FileAccessPolicy]
-            Initial settings for this resource. Omit or send null to inherit. Explicit settings take priority over the same account or bucket settings; omitted fields use broader values. Use private staging before uploading a protected file, even in a public bucket. Returns 403 if file access is disabled.
+            Settings for the new bucket. Each supplied value overrides the account setting. Omit or send null to use the account settings. Requires file protection to be enabled.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -164,7 +164,7 @@ class BucketsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> BucketUpdateResponse:
         """
-        Rename a bucket or replace its file-access policy. Policy-bearing updates return 403 when file access is disabled; enabled temporary failures return 503 with Retry-After.
+        Rename a bucket or change its file-access settings. Send fileAccess to replace the settings, null to remove them, or omit it to keep them.
 
         Parameters
         ----------
@@ -180,7 +180,7 @@ class BucketsClient:
         file_access : typing.Optional[FileAccessPolicy]
 
         file_access_revision : typing.Optional[int]
-            Legacy compatibility field. Not required or checked when changing file access.
+            Deprecated. Not needed and ignored when updating file-access settings.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -253,7 +253,7 @@ class BucketsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> FileUploadResponse:
         """
-        Return a storage-signed PUT link for a public or protected bucket, valid for at most 900 seconds. Complete PUT before it expires. A private upload reservation also requires ingest submission before that deadline; an unreserved public source remains ingestible after PUT expiry. Available even when file-access protection is disabled. Uses this deployment and its configured storage. Include the requested per-file fileAccess policy so it is checked before upload; non-null policies return 403 when protection is disabled. Returns 503 with Retry-After for temporary verification failures.
+        Get upload instructions for a public or protected file. Upload the bytes using the returned method and headers before expiresAt, at most 900 seconds later. Then ingest hostedUrl into the same bucket with the same fileAccess settings. For protected files, submit ingest before expiresAt; public uploads can be ingested later. Uploads without a policy also work when file protection is disabled.
 
         Parameters
         ----------
@@ -264,7 +264,7 @@ class BucketsClient:
         file_type : DocumentType
 
         file_access : typing.Optional[FileAccessPolicy]
-            Requested initial file policy, also sent during ingest. Omit or send null to inherit. Validated before an upload URL is issued. Non-null policies return 403 when file protection is disabled, so a protected upload cannot be staged publicly.
+            Settings for the uploaded file. Send the same settings when ingesting hostedUrl. Omit or send null to use the bucket and account settings. Checked before upload; requires file protection to be enabled.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -272,7 +272,7 @@ class BucketsClient:
         Returns
         -------
         FileUploadResponse
-            Private, no-store response
+            Upload instructions
 
         Examples
         --------
@@ -380,7 +380,7 @@ class AsyncBucketsClient:
             Optional prompt text.
 
         file_access : typing.Optional[FileAccessPolicy]
-            Initial settings for this resource. Omit or send null to inherit. Explicit settings take priority over the same account or bucket settings; omitted fields use broader values. Use private staging before uploading a protected file, even in a public bucket. Returns 403 if file access is disabled.
+            Settings for the new bucket. Each supplied value overrides the account setting. Omit or send null to use the account settings. Requires file protection to be enabled.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -468,7 +468,7 @@ class AsyncBucketsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> BucketUpdateResponse:
         """
-        Rename a bucket or replace its file-access policy. Policy-bearing updates return 403 when file access is disabled; enabled temporary failures return 503 with Retry-After.
+        Rename a bucket or change its file-access settings. Send fileAccess to replace the settings, null to remove them, or omit it to keep them.
 
         Parameters
         ----------
@@ -484,7 +484,7 @@ class AsyncBucketsClient:
         file_access : typing.Optional[FileAccessPolicy]
 
         file_access_revision : typing.Optional[int]
-            Legacy compatibility field. Not required or checked when changing file access.
+            Deprecated. Not needed and ignored when updating file-access settings.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -575,7 +575,7 @@ class AsyncBucketsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> FileUploadResponse:
         """
-        Return a storage-signed PUT link for a public or protected bucket, valid for at most 900 seconds. Complete PUT before it expires. A private upload reservation also requires ingest submission before that deadline; an unreserved public source remains ingestible after PUT expiry. Available even when file-access protection is disabled. Uses this deployment and its configured storage. Include the requested per-file fileAccess policy so it is checked before upload; non-null policies return 403 when protection is disabled. Returns 503 with Retry-After for temporary verification failures.
+        Get upload instructions for a public or protected file. Upload the bytes using the returned method and headers before expiresAt, at most 900 seconds later. Then ingest hostedUrl into the same bucket with the same fileAccess settings. For protected files, submit ingest before expiresAt; public uploads can be ingested later. Uploads without a policy also work when file protection is disabled.
 
         Parameters
         ----------
@@ -586,7 +586,7 @@ class AsyncBucketsClient:
         file_type : DocumentType
 
         file_access : typing.Optional[FileAccessPolicy]
-            Requested initial file policy, also sent during ingest. Omit or send null to inherit. Validated before an upload URL is issued. Non-null policies return 403 when file protection is disabled, so a protected upload cannot be staged publicly.
+            Settings for the uploaded file. Send the same settings when ingesting hostedUrl. Omit or send null to use the bucket and account settings. Checked before upload; requires file protection to be enabled.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -594,7 +594,7 @@ class AsyncBucketsClient:
         Returns
         -------
         FileUploadResponse
-            Private, no-store response
+            Upload instructions
 
         Examples
         --------

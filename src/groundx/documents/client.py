@@ -316,9 +316,7 @@ class DocumentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
         """
-        Update the attributes of documents that have been uploaded to GroundX.
-        Policy-bearing updates return 403 when file access is disabled; enabled
-        temporary failures return 503 with Retry-After.
+        Update document metadata or file-access settings. Change one document policy per request, without other attribute changes. Policy updates do not rerun processing.
 
         Parameters
         ----------
@@ -741,11 +739,12 @@ class DocumentsClient:
         document_id: str,
         *,
         asset: AssetSelector,
+        require_authentication: typing.Optional[bool] = OMIT,
         expires_in_seconds: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> FileLinkResponse:
         """
-        Create a storage-signed download link for a saved asset you own. Anyone with the link can use or forward it until expiresAt. Revoking an API key or changing policy does not cancel issued links. The URL contains no GroundX API key. Returns 404 if file access is disabled, or 503 with Retry-After for temporary file-access failures.
+        Create a temporary download link for a file, page, crop, X-Ray or extraction output you own. The link stops working at expiresAt without changing the file's policy or other URLs. The recipient may also need an API key, depending on requireAuthentication. Storage-signed links remain valid until expiry even if a policy or API key changes.
 
         Parameters
         ----------
@@ -753,7 +752,11 @@ class DocumentsClient:
 
         asset : AssetSelector
 
+        require_authentication : typing.Optional[bool]
+            True requires the owning account's API key in X-API-Key. False lets anyone with the link read the file. Both links expire at expiresAt. Omit to create a storage-signed link that needs no GroundX key.
+
         expires_in_seconds : typing.Optional[int]
+            Link lifetime in seconds. Cannot exceed the effective policy's urlTtlSeconds. Omit to use that maximum.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -780,7 +783,11 @@ class DocumentsClient:
         )
         """
         _response = self._raw_client.file_link(
-            document_id, asset=asset, expires_in_seconds=expires_in_seconds, request_options=request_options
+            document_id,
+            asset=asset,
+            require_authentication=require_authentication,
+            expires_in_seconds=expires_in_seconds,
+            request_options=request_options,
         )
         return _response.data
 
@@ -1118,9 +1125,7 @@ class AsyncDocumentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> IngestResponse:
         """
-        Update the attributes of documents that have been uploaded to GroundX.
-        Policy-bearing updates return 403 when file access is disabled; enabled
-        temporary failures return 503 with Retry-After.
+        Update document metadata or file-access settings. Change one document policy per request, without other attribute changes. Policy updates do not rerun processing.
 
         Parameters
         ----------
@@ -1635,11 +1640,12 @@ class AsyncDocumentsClient:
         document_id: str,
         *,
         asset: AssetSelector,
+        require_authentication: typing.Optional[bool] = OMIT,
         expires_in_seconds: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> FileLinkResponse:
         """
-        Create a storage-signed download link for a saved asset you own. Anyone with the link can use or forward it until expiresAt. Revoking an API key or changing policy does not cancel issued links. The URL contains no GroundX API key. Returns 404 if file access is disabled, or 503 with Retry-After for temporary file-access failures.
+        Create a temporary download link for a file, page, crop, X-Ray or extraction output you own. The link stops working at expiresAt without changing the file's policy or other URLs. The recipient may also need an API key, depending on requireAuthentication. Storage-signed links remain valid until expiry even if a policy or API key changes.
 
         Parameters
         ----------
@@ -1647,7 +1653,11 @@ class AsyncDocumentsClient:
 
         asset : AssetSelector
 
+        require_authentication : typing.Optional[bool]
+            True requires the owning account's API key in X-API-Key. False lets anyone with the link read the file. Both links expire at expiresAt. Omit to create a storage-signed link that needs no GroundX key.
+
         expires_in_seconds : typing.Optional[int]
+            Link lifetime in seconds. Cannot exceed the effective policy's urlTtlSeconds. Omit to use that maximum.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1682,6 +1692,10 @@ class AsyncDocumentsClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.file_link(
-            document_id, asset=asset, expires_in_seconds=expires_in_seconds, request_options=request_options
+            document_id,
+            asset=asset,
+            require_authentication=require_authentication,
+            expires_in_seconds=expires_in_seconds,
+            request_options=request_options,
         )
         return _response.data

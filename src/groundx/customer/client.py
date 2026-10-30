@@ -64,14 +64,14 @@ class CustomerClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CustomerResponse:
         """
-        Replace or clear your account's file-access settings. Send only fileAccess; the latest successful update takes effect. Invalid or missing input returns 400; disabled or forbidden access returns 403; ownership or source conflicts return 409. If settings or ownership cannot be verified, returns 503 with Retry-After. After an uncertain outcome, read the applied settings before retrying. Protected stable links require X-API-Key on every read.
+        Set the account's file-access defaults. Send fileAccess to replace the settings or null to remove them. Bucket and document settings take precedence. If an update times out, read the settings before retrying.
 
         Parameters
         ----------
         file_access : typing.Optional[FileAccessPolicy]
 
         file_access_revision : typing.Optional[int]
-            Legacy compatibility field. Not required or checked when changing file access.
+            Deprecated. Not needed and ignored when updating file-access settings.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -212,14 +212,14 @@ class AsyncCustomerClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CustomerResponse:
         """
-        Replace or clear your account's file-access settings. Send only fileAccess; the latest successful update takes effect. Invalid or missing input returns 400; disabled or forbidden access returns 403; ownership or source conflicts return 409. If settings or ownership cannot be verified, returns 503 with Retry-After. After an uncertain outcome, read the applied settings before retrying. Protected stable links require X-API-Key on every read.
+        Set the account's file-access defaults. Send fileAccess to replace the settings or null to remove them. Bucket and document settings take precedence. If an update times out, read the settings before retrying.
 
         Parameters
         ----------
         file_access : typing.Optional[FileAccessPolicy]
 
         file_access_revision : typing.Optional[int]
-            Legacy compatibility field. Not required or checked when changing file access.
+            Deprecated. Not needed and ignored when updating file-access settings.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.

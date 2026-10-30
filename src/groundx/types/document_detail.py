@@ -22,7 +22,7 @@ class DocumentDetail(UniversalBaseModel):
         FieldMetadata(alias="fileAccess"),
         pydantic.Field(
             alias="fileAccess",
-            description="Applied settings for this resource. Null means it inherits settings. Deployments without file access omit this field. Pending changes are not returned.",
+            description="Settings saved on this document. Null means use the bucket and account settings. Omitted when file protection is disabled.",
         ),
     ] = None
     file_access_revision: typing_extensions.Annotated[
@@ -30,7 +30,7 @@ class DocumentDetail(UniversalBaseModel):
         FieldMetadata(alias="fileAccessRevision"),
         pydantic.Field(
             alias="fileAccessRevision",
-            description="Legacy compatibility field. Not required or checked when changing file access.",
+            description="Deprecated. Not needed and ignored when updating file-access settings.",
         ),
     ] = None
     effective_file_access: typing_extensions.Annotated[

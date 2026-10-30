@@ -40,7 +40,7 @@ class DocumentUpdate(UniversalBaseModel):
         FieldMetadata(alias="fileAccessRevision"),
         pydantic.Field(
             alias="fileAccessRevision",
-            description="Legacy compatibility field. Not required or checked when changing file access.",
+            description="Deprecated. Not needed and ignored when updating file-access settings.",
         ),
     ] = None
 
