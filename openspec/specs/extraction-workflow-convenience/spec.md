@@ -405,15 +405,15 @@ JSON compilation.
 
 #### Scenario: Arcadia adoption is equivalence-gated
 
-- **GIVEN** Arcadia prompt management uses specialized extraction metadata keys
+- **GIVEN** Extraction Agents prompt management uses specialized extraction metadata keys
 - **WHEN** helper adoption is considered
 - **THEN** tests compare first-class-method behavior with the existing explicit
-  Arcadia workflow kwargs
+  Extraction Agents workflow kwargs
 - **AND** equivalence includes `extract`, `_groundx_persisted_extract`,
   serialized `steps`, `chunk_strategy`, `section_strategy`, workflow `name`, and
   update `id`
-- **AND** Arcadia adopts the methods only if behavior is equivalent
-- **AND** otherwise Arcadia records a no-op decision and keeps its lower-level
+- **AND** Extraction Agents adopts the methods only if behavior is equivalent
+- **AND** otherwise Extraction Agents records a no-op decision and keeps its lower-level
   explicit path
 
 ### Requirement: Convenience helpers do not change Fern schema names

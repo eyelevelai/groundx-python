@@ -49,7 +49,7 @@ case, whitespace, and approved OCR-confusable handling for both.
 - `src/groundx/extract/custom_outputs.py`: removes duplicate string transforms
   from identity indexes, partitions, dedupe, thresholds, and parent selection.
 - `tests/extract/`: adds function and production-entrypoint regressions.
-- `internal-arcadia-agents`: consumes the released functions under its separate
+- `extraction-agents`: consumes the released functions under its separate
   `adopt-confusable-identifier-matcher` change and updates its SDK pin.
 - `eyelevel-fern-config`: a separate docs-only
   `document-universal-identifier-matching` change updates the public workflow
