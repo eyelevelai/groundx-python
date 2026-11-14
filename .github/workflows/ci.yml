@@ -1,12 +1,19 @@
 name: ci
-on: [pull_request, push]
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+  push:
+    branches: [main]
+    tags: ["**"]
+  workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.event_name != 'push' && github.run_id || github.ref }}
   cancel-in-progress: false
 
 jobs:
   compile:
+    if: ${{ github.event_name != 'pull_request' || !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
@@ -25,6 +32,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - name: Require a pull request ready for review
+        if: github.event_name == 'pull_request' && github.event.pull_request.draft
+        run: |
+          echo "::error::Mark the pull request ready for review to run required checks."
+          exit 1
       - name: Checkout repo
         uses: actions/checkout@v4
       - name: Set up python

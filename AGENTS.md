@@ -6,6 +6,7 @@ in the linked docs, not in this entrypoint.
 | Topic | Read when |
 |---|---|
 | [Contributor workflow](CONTRIBUTING.md) | You need setup, tests, release flow, PR guidance, validation, or rules for committed comments. |
+| [Draft PRs and required CI](CONTRIBUTING.md#draft-prs-and-required-ci) | You are opening or updating a PR. |
 | [`.fernignore`](.fernignore) | Before editing any SDK file. Only `.fernignore`-protected paths are safe to hand-edit here; use it for the generated-vs-hand-written boundary. |
 | [File access and ingest](CONTRIBUTING.md#file-access-and-ingest) | You are changing initial policies, private upload, native links or protected transport. |
 | [`src/groundx/ingest.py`](src/groundx/ingest.py) | You are changing the hand-written ingest helper. |

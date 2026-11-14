@@ -109,7 +109,18 @@ This approach is best for:
 5. Run type checking: `poetry run mypy .`
 6. Build the project: `poetry build`
 7. Commit your changes with a clear commit message
-8. Push your branch and create a pull request
+8. Push your branch and open a draft pull request
+
+### Draft PRs and required CI
+
+Open PRs as drafts and leave **Ready for review** to a human. Draft PR
+updates report a failed required check before dependency setup or tests.
+Marking the PR ready starts the suite, and later pushes rerun it automatically
+while the PR is ready.
+
+Use **Run workflow** on a branch for a full SDK run before opening a PR. The
+line-ending check still runs on branch pushes. Main and tag pushes still run
+the full SDK suite.
 
 ### Release Handoff
 
